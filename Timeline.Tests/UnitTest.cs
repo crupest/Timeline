@@ -36,7 +36,7 @@ namespace Timeline.Tests
         {
             using (var client = _factory.CreateDefaultClient())
             {
-                var response = await client.PostAsJsonAsync("/api/User/LogIn", new UserController.UserCredentials { Username = "crupest", Password = "yang0101" });
+                var response = await client.PostAsJsonAsync("/api/User/LogIn", new UserController.UserCredentials { Username = "hello", Password = "crupest" });
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
