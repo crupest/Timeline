@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Timeline.Configs;
 using Timeline.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Timeline
 {
@@ -49,6 +50,7 @@ namespace Timeline
                 });
 
             services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IJwtService, JwtService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,19 +63,15 @@ namespace Timeline
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
             }
-
-
-            // When not in test environment, use https redirection.
-            // Because I found some problems using https redirection in test mode.
-            if (!env.IsTest())
-                app.UseHttpsRedirection();
-
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             app.UseAuthentication();
 
