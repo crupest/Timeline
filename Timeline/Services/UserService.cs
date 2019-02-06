@@ -21,8 +21,8 @@ namespace Timeline.Services
     public class UserService : IUserService
     {
         private readonly IList<User> _users = new List<User>{
-            new User { Id = 0, Username = "hello", Password = "crupest" },
-            new User { Id = 1, Username = "test", Password = "test"}
+            new User { Id = 0, Username = "admin", Password = "admin", Roles = new string[] { "User", "Admin" } },
+            new User { Id = 1, Username = "user", Password = "user", Roles = new string[] { "User"} }
         };
 
         public User Authenticate(string username, string password)

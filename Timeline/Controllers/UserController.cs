@@ -1,15 +1,6 @@
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Timeline.Configs;
 using Timeline.Services;
 
 namespace Timeline.Controllers
@@ -29,20 +20,26 @@ namespace Timeline.Controllers
             public string Password { get; set; }
         }
 
-        private readonly IOptionsMonitor<JwtConfig> _jwtConfig;
+        public class LoginInfo
+        {
+            public string Token { get; set; }
+            public string[] Roles { get; set; }
+        }
+
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IOptionsMonitor<JwtConfig> jwtConfig, IUserService userService, ILogger<UserController> logger)
+        public UserController(IUserService userService, IJwtService jwtService, ILogger<UserController> logger)
         {
-            _jwtConfig = jwtConfig;
             _userService = userService;
+            _jwtService = jwtService;
             _logger = logger;
         }
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public IActionResult LogIn([FromBody] UserCredentials credentials)
+        public ActionResult<LoginInfo> LogIn([FromBody] UserCredentials credentials)
         {
             var user = _userService.Authenticate(credentials.Username, credentials.Password);
 
@@ -51,28 +48,15 @@ namespace Timeline.Controllers
                 return BadRequest();
             }
 
-            _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.");
+            _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.", credentials.Username);
 
-            var jwtConfig = _jwtConfig.CurrentValue;
-
-            var handler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor()
+            var result = new LoginInfo
             {
-                Subject = new ClaimsIdentity(new Claim[]{ new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }),
-                Issuer = jwtConfig.Issuer,
-                Audience = jwtConfig.Audience,
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey)), SecurityAlgorithms.HmacSha384),
-                IssuedAt = DateTime.Now,
-                Expires = DateTime.Now.AddDays(1)
+                Token = _jwtService.GenerateJwtToken(user),
+                Roles = user.Roles
             };
 
-            var token = handler.CreateToken(tokenDescriptor);
-            var tokenString = handler.WriteToken(token);
-
-            Response.Headers.Append("Authorization", "Bearer " + tokenString);
-
-            return Ok();
+            return Ok(result);
         }
     }
 }
