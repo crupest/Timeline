@@ -26,3 +26,14 @@ steps:
     command: test
     projects: '**/*Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    projects: Timeline/Timeline.csproj
+    arguments: -o ./publish/
+
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'timeline'
+    targetPath: Timeline/publish/
