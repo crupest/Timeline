@@ -31,9 +31,8 @@ steps:
   inputs:
     command: publish
     projects: Timeline/Timeline.csproj
-    arguments: -o ./publish/
 
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'timeline'
-    targetPath: Timeline/publish/
+    targetPath: Timeline/bin/Release/netcoreapp2.2/publish/
