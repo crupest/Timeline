@@ -19,7 +19,6 @@ steps:
     command: build
     feedsToUse: config
     nugetConfigPath: nuget.config
-    arguments: '--configuration $(buildConfiguration)'
 
 
 - task: DotNetCoreCLI@2
