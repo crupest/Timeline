@@ -36,4 +36,4 @@ steps:
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'timeline'
-    targetPath: Timeline/bin/Release/netcoreapp2.2/publish/
+    targetPath: Timeline/bin/Release/netcoreapp2.2/publish
