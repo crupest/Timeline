@@ -19,6 +19,7 @@ steps:
     command: build
     feedsToUse: config
     nugetConfigPath: nuget.config
+    arguments: '--configuration $(buildConfiguration)'
 
 
 - task: DotNetCoreCLI@2
@@ -31,6 +32,7 @@ steps:
   inputs:
     command: publish
     projects: Timeline/Timeline.csproj
+    arguments: '--configuration $(buildConfiguration)'
 
 - task: PublishPipelineArtifact@0
   inputs:
