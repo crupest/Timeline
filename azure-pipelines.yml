@@ -16,7 +16,7 @@ variables:
 steps:
 - script: dotnet build --configuration $(buildConfiguration) --configfile nuget.config
 
-- script: dotnet test --configuration $(buildConfiguration) --logger trx
+- script: dotnet test Timeline.Tests --configuration $(buildConfiguration) --logger trx
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
