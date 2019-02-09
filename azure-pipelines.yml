@@ -14,26 +14,19 @@ variables:
   ASPNETCORE_ENVIRONMENT: 'Development'
 
 steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: build
-    feedsToUse: config
-    nugetConfigPath: nuget.config
+- script: dotnet build --configuration $(buildConfiguration) --configfile nuget.config
 
+- script: dotnet test --configuration $(buildConfiguration) --logger trx
 
-- task: DotNetCoreCLI@2
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
   inputs:
-    command: test
-    projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+    testRunner: xUnit
+    testResultsFiles: '**/*.trx'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: publish
-    projects: Timeline/Timeline.csproj
-    arguments: '--configuration $(buildConfiguration)'
+- script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./publish/
 
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'timeline'
-    targetPath: Timeline/bin/Release/netcoreapp2.2/publish
+    targetPath: Timeline/publish
