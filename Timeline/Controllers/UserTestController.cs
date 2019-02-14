@@ -7,28 +7,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Timeline.Controllers
 {
-    [Route("api/[controller]")]
-    public class TestController : Controller
+    [Route("api/test/User")]
+    public class UserTestController : Controller
     {
         [HttpGet("[action]")]
         [Authorize]
-        public string Action1()
+        public ActionResult NeedAuthorize()
         {
-            return "test";
+            return Ok();
         }
 
         [HttpGet("[action]")]
         [Authorize(Roles = "User,Admin")]
-        public string Action2()
+        public ActionResult BothUserAndAdmin()
         {
-            return "test";
+            return Ok();
         }
 
         [HttpGet("[action]")]
         [Authorize(Roles = "Admin")]
-        public string Action3()
+        public ActionResult OnlyAdmin()
         {
-            return "test";
+            return Ok();
         }
     }
 }

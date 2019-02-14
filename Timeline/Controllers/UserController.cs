@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using Timeline.Entities;
 using Timeline.Services;
 
 namespace Timeline.Controllers
@@ -20,10 +23,15 @@ namespace Timeline.Controllers
             public string Password { get; set; }
         }
 
-        public class LoginInfo
+        public class CreateTokenResult
         {
             public string Token { get; set; }
-            public string[] Roles { get; set; }
+            public UserInfo UserInfo { get; set; }
+        }
+
+        public class TokenValidationRequest
+        {
+            public string Token { get; set; }
         }
 
         private readonly IUserService _userService;
@@ -39,7 +47,7 @@ namespace Timeline.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public ActionResult<LoginInfo> LogIn([FromBody] UserCredentials credentials)
+        public ActionResult<CreateTokenResult> CreateToken([FromBody] UserCredentials credentials)
         {
             var user = _userService.Authenticate(credentials.Username, credentials.Password);
 
@@ -50,12 +58,30 @@ namespace Timeline.Controllers
 
             _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.", credentials.Username);
 
-            var result = new LoginInfo
+            var result = new CreateTokenResult
             {
                 Token = _jwtService.GenerateJwtToken(user),
-                Roles = user.Roles
+                UserInfo = user.GetUserInfo()
             };
 
+            return Ok(result);
+        }
+
+        [HttpPost("[action]")]
+        [Consumes("text/plain")]
+        [AllowAnonymous]
+        public ActionResult<TokenValidationResult> ValidateToken([FromBody] string token)
+        {
+            var result = _jwtService.ValidateJwtToken(token);
+            return Ok(result);
+        }
+
+        [HttpPost("[action]")]
+        [Consumes("application/json")]
+        [AllowAnonymous]
+        public ActionResult<TokenValidationResult> ValidateToken([FromBody] TokenValidationRequest request)
+        {
+            var result = _jwtService.ValidateJwtToken(request.Token);
             return Ok(result);
         }
     }
