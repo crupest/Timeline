@@ -10,6 +10,10 @@ using System.Text;
 using Timeline.Configs;
 using Timeline.Services;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System;
+using System.Threading.Tasks;
+using Timeline.Formatters;
 
 namespace Timeline
 {
@@ -25,7 +29,10 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(options =>
+            {
+                options.InputFormatters.Add(new StringInputFormatter());
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
