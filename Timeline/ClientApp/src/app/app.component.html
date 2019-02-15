@@ -1,5 +1,19 @@
 <body>
-  <div id="rootContainer">
-      <router-outlet></router-outlet>
+  <mat-toolbar color="primary" class="mat-elevation-z4">
+    <a mat-button routerLink="/">Timeline</a>
+    <a mat-button routerLink="/todo">TodoList</a>
+    <span class="fill-remaining-space"></span>
+    <button mat-icon-button>
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <div>
+    <router-outlet></router-outlet>
   </div>
+
+  <footer>
+    <span class="fill-remaining-space"></span>
+    <a class="icp-record" href="http://www.miitbeian.gov.cn/state/outPortal/loginPortal.action">鄂ICP备18030913号-1</a>
+  </footer>
 </body>
