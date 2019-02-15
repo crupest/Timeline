@@ -1,6 +1,14 @@
-body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
+.fill-remaining-space {
+  flex: 1 1 auto;
 }
 
+a.icp-record {
+  color: grey;
+  text-decoration: none;
+  font-size: 0.8rem;
+  margin: 0 5vw;
+}
+
+footer {
+  display: flex;
+}
