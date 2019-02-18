@@ -6,3 +6,7 @@
   width: 1.2rem;
   height: 1.2rem;
 }
+
+mat-list-item {
+  margin: 10px;
+}

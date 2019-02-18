@@ -28,28 +28,41 @@ export interface WorkItem {
 export class TodoListService {
 
   private username = 'crupest';
-  private pat = 'ehnmegogmk6r7qlkpy6zdl2hnfl6ntqbvggzxvvgp4a5vhr7lmnq';
   private organization = 'crupest-web';
   private project = 'Timeline';
   private fieldId = 'System.Title';
 
-  private headers: HttpHeaders;
 
-  constructor(private client: HttpClient) {
-    this.headers = new HttpHeaders({
-      'Accept': 'application/json',
-      'Authorization': `Basic ${btoa(this.username + ':' + this.pat)}`
+  constructor(private client: HttpClient) { }
+
+  private getAzureDevOpsPat(): Observable<string> {
+    return this.client.get('/api/TodoList/AzureDevOpsPat', {
+      headers: {
+        'Accept': 'text/plain'
+      },
+      responseType: 'text'
     });
   }
 
   getWorkItemList(): Observable<WorkItem[]> {
-    return this.client.post<WiqlResult>(`https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/wiql?api-version=5.0`, {
-      query: 'SELECT [System.Id] FROM workitems WHERE [System.TeamProject] = @project'
-    }, { headers: this.headers }).pipe(
-      switchMap(result => result.workItems),
-      concatMap(result => this.client.get<WorkItemResult>(result.url, {headers: this.headers})),
-      map(result => <WorkItem>{ id: result.id, title: result.fields[this.fieldId] }),
-      toArray()
+    return this.getAzureDevOpsPat().pipe(
+      switchMap(
+        pat => {
+          const headers = new HttpHeaders({
+            'Accept': 'application/json',
+            'Authorization': `Basic ${btoa(this.username + ':' + pat)}`
+          });
+          return this.client.post<WiqlResult>(
+            `https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/wiql?api-version=5.0`, {
+              query: 'SELECT [System.Id] FROM workitems WHERE [System.TeamProject] = @project'
+            }, { headers: headers }).pipe(
+              switchMap(result => result.workItems),
+              concatMap(result => this.client.get<WorkItemResult>(result.url, { headers: headers })),
+              map(result => <WorkItem>{ id: result.id, title: result.fields[this.fieldId] }),
+              toArray()
+            );
+        }
+      )
     );
   }
 }
