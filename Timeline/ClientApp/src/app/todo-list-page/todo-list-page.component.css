@@ -1,0 +1,8 @@
+.item-id {
+  display: inline-block;
+  text-align: center;
+  background: skyblue;
+  border-radius: 0.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}

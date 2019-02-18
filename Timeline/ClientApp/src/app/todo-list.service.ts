@@ -17,6 +17,11 @@ interface WorkItemResult {
   fields: { [name: string]: any };
 }
 
+export interface WorkItem {
+  id: number;
+  title: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,13 +42,13 @@ export class TodoListService {
     });
   }
 
-  getWorkItemList(): Observable<string[]> {
+  getWorkItemList(): Observable<WorkItem[]> {
     return this.client.post<WiqlResult>(`https://dev.azure.com/${this.organization}/${this.project}/_apis/wit/wiql?api-version=5.0`, {
       query: 'SELECT [System.Id] FROM workitems WHERE [System.TeamProject] = @project'
     }, { headers: this.headers }).pipe(
       switchMap(result => result.workItems),
       concatMap(result => this.client.get<WorkItemResult>(result.url, {headers: this.headers})),
-      map(result => <string>(result.fields[this.fieldId])),
+      map(result => <WorkItem>{ id: result.id, title: result.fields[this.fieldId] }),
       toArray()
     );
   }
