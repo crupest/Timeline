@@ -1,3 +1,9 @@
-<p>
-  todo-list-page works!
-</p>
+<mat-progress-bar *ngIf="!items" mode="indeterminate"></mat-progress-bar>
+
+<mat-list>
+  <mat-list-item *ngFor="let item of items">
+    <mat-card>
+        <span class="item-id">{{item.id}}</span> {{item.title}}
+    </mat-card>
+  </mat-list-item>
+</mat-list>
