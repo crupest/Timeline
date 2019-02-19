@@ -20,6 +20,7 @@ interface WorkItemResult {
 export interface WorkItem {
   id: number;
   title: string;
+  closed: boolean;
 }
 
 @Injectable({
@@ -30,8 +31,8 @@ export class TodoListService {
   private username = 'crupest';
   private organization = 'crupest-web';
   private project = 'Timeline';
-  private fieldId = 'System.Title';
-
+  private titleFieldName = 'System.Title';
+  private stateFieldName = 'System.State';
 
   constructor(private client: HttpClient) { }
 
@@ -58,7 +59,11 @@ export class TodoListService {
             }, { headers: headers }).pipe(
               switchMap(result => result.workItems),
               concatMap(result => this.client.get<WorkItemResult>(result.url, { headers: headers })),
-              map(result => <WorkItem>{ id: result.id, title: result.fields[this.fieldId] }),
+              map(result => <WorkItem>{
+                id: result.id,
+                title: <string>result.fields[this.titleFieldName],
+                closed: ((<string>result.fields[this.stateFieldName]).toLowerCase() === 'closed')
+              }),
               toArray()
             );
         }

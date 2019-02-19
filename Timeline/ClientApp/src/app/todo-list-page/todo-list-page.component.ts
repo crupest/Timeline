@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TodoListService, WorkItem } from '../todo-list.service';
+import { TodoListService, WorkItem } from './todo-list.service';
 
 @Component({
   selector: 'app-todo-list-page',
