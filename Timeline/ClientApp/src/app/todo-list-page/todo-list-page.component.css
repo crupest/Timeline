@@ -1,12 +1,42 @@
+.align-self-bottom {
+  align-self: flex-end;
+}
+
+.first-item-box {
+  justify-content: space-between;
+}
+
+.item-box {
+  display: flex;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.sample-box {
+  box-sizing: border-box;
+  align-self: flex-start;
+}
+
 .item-id {
   display: inline-block;
   text-align: center;
-  background: skyblue;
   border-radius: 0.2rem;
   width: 1.2rem;
   height: 1.2rem;
 }
 
-mat-list-item {
-  margin: 10px;
+.item-id-sample {
+  display: inline-block;
+  border-radius: 0.2em;
+  width: 1em;
+  height: 1em;
+}
+
+.item-id-open {
+  background: red;
+}
+
+.item-id-closed {
+  background: green;
 }
