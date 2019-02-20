@@ -10,21 +10,20 @@ using Timeline.Configs;
 namespace Timeline.Controllers
 {
     [Route("api/[controller]")]
-    public class TodoListController : Controller
+    public class TodoPageController : Controller
     {
-        private readonly IOptionsMonitor<TodoListConfig> _config;
+        private readonly IOptionsMonitor<TodoPageConfig> _config;
 
-        public TodoListController(IOptionsMonitor<TodoListConfig> config)
+        public TodoPageController(IOptionsMonitor<TodoPageConfig> config)
         {
             _config = config;
         }
 
         [HttpGet("[action]")]
         [AllowAnonymous]
-        [Produces("text/plain")]
-        public ActionResult<string> AzureDevOpsPat()
+        public ActionResult<AzureDevOpsAccessInfo> AzureDevOpsAccessInfo()
         {
-            return Ok(_config.CurrentValue.AzureDevOpsPat);
+            return Ok(_config.CurrentValue.AzureDevOpsAccessInfo);
         }
     }
 }

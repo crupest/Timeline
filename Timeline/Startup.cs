@@ -41,7 +41,7 @@ namespace Timeline
             });
 
 
-            services.Configure<TodoListConfig>(Configuration.GetSection("TodoListConfig"));
+            services.Configure<TodoPageConfig>(Configuration.GetSection("TodoPageConfig"));
 
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
             var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
