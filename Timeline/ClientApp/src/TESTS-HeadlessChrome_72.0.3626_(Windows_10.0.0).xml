@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<testsuite name="HeadlessChrome 72.0.3626 (Windows 10.0.0)" package="" timestamp="2019-02-21T16:12:41" id="0" hostname="crupestcomputer" tests="6" errors="0" failures="0" time="0.146">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/72.0.3626.109 Safari/537.36"/>
+  </properties>
+  <testcase name="TodoListPageComponent should hide progress bar after loading" time="0.028" classname="HeadlessChrome_72_0_3626_(Windows_10_0_0).TodoListPageComponent"/>
+  <testcase name="TodoListPageComponent should show progress bar during loading" time="0.024" classname="HeadlessChrome_72_0_3626_(Windows_10_0_0).TodoListPageComponent"/>
+  <testcase name="TodoListServiceService should work well" time="0.011" classname="HeadlessChrome_72_0_3626_(Windows_10_0_0).TodoListServiceService"/>
+  <testcase name="TodoListServiceService should be created" time="0.005" classname="HeadlessChrome_72_0_3626_(Windows_10_0_0).TodoListServiceService"/>
+  <testcase name="HomeComponent should create" time="0.011" classname="HeadlessChrome_72_0_3626_(Windows_10_0_0).HomeComponent"/>
+  <testcase name="TodoListPageComponent should create" time="0.067" classname="HeadlessChrome_72_0_3626_(Windows_10_0_0).TodoListPageComponent"/>
+  <system-out>
+    <![CDATA[
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>

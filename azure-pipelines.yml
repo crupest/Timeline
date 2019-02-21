@@ -24,6 +24,18 @@ steps:
     testRunner: VSTest
     testResultsFiles: '**/*.trx'
 
+- script: yarn install
+  workingDirectory: Timeline/ClientApp
+
+- script: yarn run test --no-watch --browsers=ChromeHeadless --reporters junit
+  workingDirectory: Timeline/ClientApp
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: '**/TESTS-*.xml'
+
 - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./publish/
 
 - task: PublishPipelineArtifact@0
