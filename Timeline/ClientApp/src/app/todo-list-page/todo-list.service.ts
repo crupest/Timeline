@@ -3,23 +3,23 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { switchMap, concatMap, map, toArray } from 'rxjs/operators';
 
-interface AzureDevOpsAccessInfo {
+export interface AzureDevOpsAccessInfo {
   username: string;
   personalAccessToken: string;
   organization: string;
   project: string;
 }
 
-interface WiqlWorkItemResult {
+export interface WiqlWorkItemResult {
   id: number;
   url: string;
 }
 
-interface WiqlResult {
+export interface WiqlResult {
   workItems: WiqlWorkItemResult[];
 }
 
-interface WorkItemResult {
+export interface WorkItemResult {
   id: number;
   fields: { [name: string]: any };
 }
@@ -36,8 +36,8 @@ export interface WorkItem {
 })
 export class TodoListService {
 
-  private titleFieldName = 'System.Title';
-  private stateFieldName = 'System.State';
+  public static titleFieldName = 'System.Title';
+  public static stateFieldName = 'System.State';
 
   constructor(private client: HttpClient) { }
 
@@ -61,8 +61,8 @@ export class TodoListService {
               concatMap(result => this.client.get<WorkItemResult>(result.url, { headers: headers })),
               map(result => <WorkItem>{
                 id: result.id,
-                title: <string>result.fields[this.titleFieldName],
-                closed: ((<string>result.fields[this.stateFieldName]).toLowerCase() === 'closed')
+                title: <string>result.fields[TodoListService.titleFieldName],
+                closed: ((<string>result.fields[TodoListService.stateFieldName]).toLowerCase() === 'closed')
               }),
               toArray()
             );
