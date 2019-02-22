@@ -8,7 +8,8 @@ import { TodoListService, WorkItem } from './todo-list.service';
 import { By } from '@angular/platform-browser';
 
 @Component({
-  selector: 'mat-progress-bar',
+/* tslint:disable-next-line:component-selector*/
+selector: 'mat-progress-bar',
   template: ''
 })
 class MatProgressBarStubComponent {
