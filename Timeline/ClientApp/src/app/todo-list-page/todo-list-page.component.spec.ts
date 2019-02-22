@@ -1,5 +1,5 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { defer, Observable } from 'rxjs';
 
@@ -8,7 +8,8 @@ import { TodoListService, WorkItem } from './todo-list.service';
 import { By } from '@angular/platform-browser';
 
 @Component({
-  selector: 'mat-progress-bar',
+/* tslint:disable-next-line:component-selector*/
+selector: 'mat-progress-bar',
   template: ''
 })
 class MatProgressBarStubComponent {
@@ -45,21 +46,22 @@ describe('TodoListPageComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TodoListPageComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
   it('should show progress bar during loading', () => {
+    fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('mat-progress-bar'))).toBeTruthy();
   });
 
-  it('should hide progress bar after loading', async(() => {
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
-      expect(fixture.debugElement.query(By.css('mat-progress-bar'))).toBeFalsy();
-    });
+  it('should hide progress bar after loading', fakeAsync(() => {
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('mat-progress-bar'))).toBeFalsy();
   }));
 });

@@ -11,10 +11,9 @@ export class TodoListPageComponent implements OnInit {
   items: WorkItem[];
 
   constructor(private todoService: TodoListService) {
-    todoService.getWorkItemList().subscribe(result => this.items = result);
   }
 
   ngOnInit() {
+    this.todoService.getWorkItemList().subscribe(result => this.items = result);
   }
-
 }
