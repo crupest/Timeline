@@ -8,8 +8,8 @@ import { TodoListService, WorkItem } from './todo-list.service';
 import { By } from '@angular/platform-browser';
 
 @Component({
-/* tslint:disable-next-line:component-selector*/
-selector: 'mat-progress-bar',
+  /* tslint:disable-next-line:component-selector*/
+  selector: 'mat-progress-bar',
   template: ''
 })
 class MatProgressBarStubComponent {
@@ -24,14 +24,18 @@ describe('TodoListPageComponent', () => {
   let component: TodoListPageComponent;
   let fixture: ComponentFixture<TodoListPageComponent>;
 
+  let mockWorkItems: WorkItem[];
+
   beforeEach(async(() => {
     const todoListService: jasmine.SpyObj<TodoListService> = jasmine.createSpyObj('TodoListService', ['getWorkItemList']);
 
-    todoListService.getWorkItemList.and.returnValue(asyncData(<WorkItem[]>[{
-      id: 0, title: 'Test title 1', closed: true
+    mockWorkItems = [{
+      id: 0, title: 'Test title 1', closed: true, detailUrl: 'https://test.org/workitems/0'
     }, {
-      id: 1, title: 'Test title 2', closed: false
-    }]));
+      id: 1, title: 'Test title 2', closed: false, detailUrl: 'https://test.org/workitems/1'
+    }];
+
+    todoListService.getWorkItemList.and.returnValue(asyncData(mockWorkItems));
 
     TestBed.configureTestingModule({
       declarations: [TodoListPageComponent, MatProgressBarStubComponent],
@@ -63,5 +67,15 @@ describe('TodoListPageComponent', () => {
     tick();
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('mat-progress-bar'))).toBeFalsy();
+  }));
+
+  it('should set href on item title', fakeAsync(() => {
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+
+    fixture.debugElement.queryAll(By.css('a.item-title')).forEach((element, index) => {
+      expect(element.properties['href']).toBe(mockWorkItems[index].detailUrl);
+    });
   }));
 });

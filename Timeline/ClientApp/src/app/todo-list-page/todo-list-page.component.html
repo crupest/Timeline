@@ -3,19 +3,20 @@
 <mat-list>
   <mat-list-item *ngFor="let item of items; let i = index" style="height:unset;">
     <div class="item-box" [class.first-item-box]="i === 0">
-      <mat-card [class.align-self-bottom]="i === 0">
+      <mat-card class="mat-elevation-z2" [class.align-self-bottom]="i === 0">
         <span class="item-id" [class.item-id-closed]="item.closed"
           [class.item-id-open]="!item.closed">{{item.id}}</span>
-        {{item.title}}
+        <a class="mat-h3 item-title" [href]="item.detailUrl">{{item.title}}</a>
       </mat-card>
       <div class="sample-box" *ngIf="i === 0">
-          <div class="mat-caption">
-            <span class="item-id-sample item-id-open"></span> means working now.
-          </div>
-          <div class="mat-caption">
-            <span class="item-id-sample item-id-closed"></span> means completed.
-          </div>
+        <div class="mat-caption sample-container">
+          <span class="item-id-sample item-id-open"></span> means working now.
         </div>
+        <div class="mat-caption sample-container">
+          <span class="item-id-sample item-id-closed"></span> means completed.
+        </div>
+        <div class="mat-caption">click on item to see details.</div>
+      </div>
     </div>
   </mat-list-item>
 </mat-list>

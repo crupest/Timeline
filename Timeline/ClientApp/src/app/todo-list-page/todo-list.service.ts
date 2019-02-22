@@ -29,6 +29,7 @@ export interface WorkItem {
   id: number;
   title: string;
   closed: boolean;
+  detailUrl: string;
 }
 
 @Injectable({
@@ -41,20 +42,21 @@ export class TodoListService {
 
   constructor(private client: HttpClient) { }
 
-  private getAzureDevOpsPat(): Observable<AzureDevOpsAccessInfo> {
+  private getAzureDevOpsAccessInfo(): Observable<AzureDevOpsAccessInfo> {
     return this.client.get<AzureDevOpsAccessInfo>('/api/TodoPage/AzureDevOpsAccessInfo');
   }
 
   getWorkItemList(): Observable<WorkItem[]> {
-    return this.getAzureDevOpsPat().pipe(
+    return this.getAzureDevOpsAccessInfo().pipe(
       switchMap(
         accessInfo => {
+          const baseUrl = `https://dev.azure.com/${accessInfo.organization}/${accessInfo.project}/`;
           const headers = new HttpHeaders({
             'Accept': 'application/json',
             'Authorization': `Basic ${btoa(accessInfo.username + ':' + accessInfo.personalAccessToken)}`
           });
           return this.client.post<WiqlResult>(
-            `https://dev.azure.com/${accessInfo.organization}/${accessInfo.project}/_apis/wit/wiql?api-version=5.0`, {
+            `${baseUrl}_apis/wit/wiql?api-version=5.0`, {
               query: 'SELECT [System.Id] FROM workitems WHERE [System.TeamProject] = @project'
             }, { headers: headers }).pipe(
               switchMap(result => result.workItems),
@@ -62,7 +64,8 @@ export class TodoListService {
               map(result => <WorkItem>{
                 id: result.id,
                 title: <string>result.fields[TodoListService.titleFieldName],
-                closed: ((<string>result.fields[TodoListService.stateFieldName]).toLowerCase() === 'closed')
+                closed: ((<string>result.fields[TodoListService.stateFieldName]).toLowerCase() === 'closed'),
+                detailUrl: `${baseUrl}_workitems/edit/${result.id}/`
               }),
               toArray()
             );
