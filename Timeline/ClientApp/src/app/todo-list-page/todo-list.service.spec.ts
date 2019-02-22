@@ -19,14 +19,26 @@ describe('TodoListServiceService', () => {
     const service: TodoListService = TestBed.get(TodoListService);
     expect(service).toBeTruthy();
 
+    const mockAccessInfo: AzureDevOpsAccessInfo = {
+      username: 'testusername',
+      personalAccessToken: 'testtoken',
+      organization: 'testorganization',
+      project: 'testproject'
+    };
+
+    const generateDetailUrl = (id: number) =>
+     `https://dev.azure.com/${mockAccessInfo.organization}/${mockAccessInfo.project}/_workitems/edit/${id}/`;
+
     const mockWorkItems: WorkItem[] = [{
       id: 0,
       title: 'Test work item 1',
-      closed: true
+      closed: true,
+      detailUrl: generateDetailUrl(0)
     }, {
       id: 1,
       title: 'Test work item 2',
-      closed: false
+      closed: false,
+      detailUrl: generateDetailUrl(1)
     }];
 
     service.getWorkItemList().subscribe(data => {
@@ -35,12 +47,7 @@ describe('TodoListServiceService', () => {
 
     const httpController: HttpTestingController = TestBed.get(HttpTestingController);
 
-    const mockAccessInfo: AzureDevOpsAccessInfo = {
-      username: 'testusername',
-      personalAccessToken: 'testtoken',
-      organization: 'testorganization',
-      project: 'testproject'
-    };
+
 
     httpController.expectOne('/api/TodoPage/AzureDevOpsAccessInfo').flush(mockAccessInfo);
 
