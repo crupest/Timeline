@@ -13,24 +13,19 @@
   justify-content: space-between;
 }
 
-.item-id {
-  display: inline-block;
-  text-align: center;
-  border-radius: 0.2rem;
-  width: 1.2rem;
-  height: 1.2rem;
+.item-card {
+  display: flex;
+  align-items: center;
 }
 
-.item-id-open {
-  background: red;
-}
-
-.item-id-closed {
-  background: green;
+.item-img {
+  padding: 1px;
+  background: white;
+  border-radius: 3px;
 }
 
 .item-title {
-  margin-left: 5px;
+  padding-left: 5px;
   color: black;
   text-decoration: none;
 }
@@ -45,9 +40,17 @@
   align-items: center;
 }
 
-.item-id-sample {
+.sample-color-block {
   border-radius: 0.2em;
   width: 1em;
   height: 1em;
   margin-right: 2px;
+}
+
+.sample-color-block-open {
+  background: tomato;
+}
+
+.sample-color-block-closed {
+  background: mediumspringgreen;
 }
