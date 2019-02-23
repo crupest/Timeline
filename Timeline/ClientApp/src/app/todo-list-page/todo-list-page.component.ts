@@ -4,7 +4,7 @@ import { TodoListService, WorkItem } from './todo-list.service';
 @Component({
   selector: 'app-todo-list-page',
   templateUrl: './todo-list-page.component.html',
-  styleUrls: ['./todo-list-page.component.css']
+  styleUrls: ['./todo-list-page.component.css', './todo-list-color-block.css']
 })
 export class TodoListPageComponent implements OnInit {
 
