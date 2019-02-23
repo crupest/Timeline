@@ -24,12 +24,18 @@ export interface WorkItemResult {
   fields: { [name: string]: any };
 }
 
+export interface WorkItemTypeResult {
+  icon: {
+    url: string
+  };
+}
 
 export interface WorkItem {
   id: number;
   title: string;
   closed: boolean;
   detailUrl: string;
+  iconUrl: string;
 }
 
 @Injectable({
@@ -39,11 +45,20 @@ export class TodoListService {
 
   public static titleFieldName = 'System.Title';
   public static stateFieldName = 'System.State';
+  public static typeFieldName = 'System.WorkItemType';
 
   constructor(private client: HttpClient) { }
 
   private getAzureDevOpsAccessInfo(): Observable<AzureDevOpsAccessInfo> {
     return this.client.get<AzureDevOpsAccessInfo>('/api/TodoPage/AzureDevOpsAccessInfo');
+  }
+
+  private getItemIconUrl(baseUrl: string, headers: HttpHeaders, type: string): Observable<string> {
+    return this.client.get<WorkItemTypeResult>(`${baseUrl}_apis/wit/workitemtypes/${encodeURIComponent(type)}?api-version=5.0`, {
+      headers: headers
+    }).pipe(
+      map(result => result.icon.url)
+    );
   }
 
   getWorkItemList(): Observable<WorkItem[]> {
@@ -61,12 +76,14 @@ export class TodoListService {
             }, { headers: headers }).pipe(
               switchMap(result => result.workItems),
               concatMap(result => this.client.get<WorkItemResult>(result.url, { headers: headers })),
-              map(result => <WorkItem>{
+              concatMap(result => this.getItemIconUrl(baseUrl, headers, result.fields[TodoListService.typeFieldName]).pipe(
+                map(iconResult => <WorkItem>{
                 id: result.id,
                 title: <string>result.fields[TodoListService.titleFieldName],
                 closed: ((<string>result.fields[TodoListService.stateFieldName]).toLowerCase() === 'closed'),
-                detailUrl: `${baseUrl}_workitems/edit/${result.id}/`
-              }),
+                detailUrl: `${baseUrl}_workitems/edit/${result.id}/`,
+                iconUrl: iconResult
+              }))),
               toArray()
             );
         }

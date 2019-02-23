@@ -1,7 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { TodoListService, WorkItem, AzureDevOpsAccessInfo, WiqlResult, WiqlWorkItemResult, WorkItemResult } from './todo-list.service';
+import {
+  TodoListService, WorkItem, AzureDevOpsAccessInfo,
+  WiqlResult, WiqlWorkItemResult, WorkItemResult, WorkItemTypeResult
+} from './todo-list.service';
 
 
 describe('TodoListServiceService', () => {
@@ -26,20 +29,17 @@ describe('TodoListServiceService', () => {
       project: 'testproject'
     };
 
-    const generateDetailUrl = (id: number) =>
-     `https://dev.azure.com/${mockAccessInfo.organization}/${mockAccessInfo.project}/_workitems/edit/${id}/`;
+    const baseUrl = `https://dev.azure.com/${mockAccessInfo.organization}/${mockAccessInfo.project}/`;
 
-    const mockWorkItems: WorkItem[] = [{
-      id: 0,
-      title: 'Test work item 1',
-      closed: true,
-      detailUrl: generateDetailUrl(0)
-    }, {
-      id: 1,
-      title: 'Test work item 2',
-      closed: false,
-      detailUrl: generateDetailUrl(1)
-    }];
+    const mockWorkItems: WorkItem[] = Array.from({ length: 2 }, (_, i) => <WorkItem>{
+      id: i,
+      title: 'Test work item ' + i,
+      closed: i === 0,
+      detailUrl: `${baseUrl}_workitems/edit/${i}/`,
+      iconUrl: `${baseUrl}_api/wit/icon/${i}`,
+    });
+
+    const workItemTypeMap = new Map<WorkItem, string>(Array.from(mockWorkItems, v => <[WorkItem, string]>[v, 'type' + v.id]));
 
     service.getWorkItemList().subscribe(data => {
       expect(data).toEqual(mockWorkItems);
@@ -47,31 +47,27 @@ describe('TodoListServiceService', () => {
 
     const httpController: HttpTestingController = TestBed.get(HttpTestingController);
 
-
-
     httpController.expectOne('/api/TodoPage/AzureDevOpsAccessInfo').flush(mockAccessInfo);
 
-    const mockWiqlWorkItems: WiqlWorkItemResult[] = [{
-      id: 0,
-      url: `https://dev.azure.com/${mockAccessInfo.organization}/${mockAccessInfo.project}/_apis/wit/workItems/0`
-    }, {
-      id: 1,
-      url: `https://dev.azure.com/${mockAccessInfo.organization}/${mockAccessInfo.project}/_apis/wit/workItems/1`
-    }];
+    const mockWiqlWorkItems: WiqlWorkItemResult[] = Array.from(mockWorkItems, v => <WiqlWorkItemResult>{
+      id: v.id,
+      url: `${baseUrl}_apis/wit/workItems/${v.id}`
+    });
 
     const authorizationHeader = 'Basic ' + btoa(mockAccessInfo.username + ':' + mockAccessInfo.personalAccessToken);
 
     httpController.expectOne(req =>
-      req.url === `https://dev.azure.com/${mockAccessInfo.organization}/${mockAccessInfo.project}/_apis/wit/wiql?api-version=5.0` &&
+      req.url === `${baseUrl}_apis/wit/wiql?api-version=5.0` &&
       req.headers.get('Authorization') === authorizationHeader
     ).flush(<WiqlResult>{ workItems: mockWiqlWorkItems });
 
-    function mapWorkItemToResult(workItem: WorkItem): WorkItemResult {
+    function mapWorkItemToResult(mockWorkItem: WorkItem): WorkItemResult {
       return {
-        id: workItem.id,
+        id: mockWorkItem.id,
         fields: {
-          [TodoListService.titleFieldName]: workItem.title,
-          [TodoListService.stateFieldName]: (workItem.closed ? 'Closed' : 'Active')
+          [TodoListService.titleFieldName]: mockWorkItem.title,
+          [TodoListService.stateFieldName]: (mockWorkItem.closed ? 'Closed' : 'Active'),
+          [TodoListService.typeFieldName]: workItemTypeMap.get(mockWorkItem)
         }
       };
     }
@@ -81,6 +77,15 @@ describe('TodoListServiceService', () => {
         req.url === mockWiqlWorkItems[i].url &&
         req.headers.get('Authorization') === authorizationHeader
       ).flush(mapWorkItemToResult(mockWorkItems[i]));
+
+      httpController.expectOne(req =>
+        req.url === `${baseUrl}_apis/wit/workitemtypes/${encodeURIComponent(workItemTypeMap.get(mockWorkItems[i]))}?api-version=5.0` &&
+        req.headers.get('Authorization') === authorizationHeader
+      ).flush(<WorkItemTypeResult>{
+        icon: {
+          url: mockWorkItems[i].iconUrl
+        }
+      });
     }
   });
 });
