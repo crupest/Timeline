@@ -68,14 +68,4 @@ describe('TodoListPageComponent', () => {
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('mat-progress-bar'))).toBeFalsy();
   }));
-
-  it('should set href on item title', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-    fixture.detectChanges();
-
-    fixture.debugElement.queryAll(By.css('a.item-title')).forEach((element, index) => {
-      expect(element.properties['href']).toBe(mockWorkItems[index].detailUrl);
-    });
-  }));
 });
