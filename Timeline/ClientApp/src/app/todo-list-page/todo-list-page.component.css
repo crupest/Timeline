@@ -5,34 +5,20 @@
 .item-box {
   display: flex;
   width: 100%;
-  padding: 5px;
   box-sizing: border-box;
 }
 
 .first-item-box {
   justify-content: space-between;
+  padding: 0 0 5px 5px;
 }
 
-.item-id {
-  display: inline-block;
-  text-align: center;
-  border-radius: 0.2rem;
-  width: 1.2rem;
-  height: 1.2rem;
+.non-first-item-box {
+  padding: 5px;
 }
 
-.item-id-open {
-  background: red;
-}
-
-.item-id-closed {
-  background: green;
-}
-
-.item-title {
-  margin-left: 5px;
-  color: black;
-  text-decoration: none;
+.space {
+  flex: 1 4 20px;
 }
 
 .sample-box {
@@ -40,12 +26,12 @@
   align-self: flex-start;
 }
 
-.sample-container {
+.sample-item {
   display: flex;
   align-items: center;
 }
 
-.item-id-sample {
+.sample-color-block {
   border-radius: 0.2em;
   width: 1em;
   height: 1em;
