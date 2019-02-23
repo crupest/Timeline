@@ -34,7 +34,7 @@ describe('TodoListServiceService', () => {
     const mockWorkItems: WorkItem[] = Array.from({ length: 2 }, (_, i) => <WorkItem>{
       id: i,
       title: 'Test work item ' + i,
-      closed: i === 0,
+      isCompleted: i === 0,
       detailUrl: `${baseUrl}_workitems/edit/${i}/`,
       iconUrl: `${baseUrl}_api/wit/icon/${i}`,
     });
@@ -66,7 +66,7 @@ describe('TodoListServiceService', () => {
         id: mockWorkItem.id,
         fields: {
           [TodoListService.titleFieldName]: mockWorkItem.title,
-          [TodoListService.stateFieldName]: (mockWorkItem.closed ? 'Closed' : 'Active'),
+          [TodoListService.stateFieldName]: (mockWorkItem.isCompleted ? 'Closed' : 'Active'),
           [TodoListService.typeFieldName]: workItemTypeMap.get(mockWorkItem)
         }
       };

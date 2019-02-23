@@ -1,7 +1,7 @@
-.color-block-open {
+.color-block-resolving {
   background: red;
 }
 
-.color-block-closed {
+.color-block-completed {
   background: green;
 }
