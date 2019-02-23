@@ -30,9 +30,9 @@ describe('TodoListPageComponent', () => {
     const todoListService: jasmine.SpyObj<TodoListService> = jasmine.createSpyObj('TodoListService', ['getWorkItemList']);
 
     mockWorkItems = [{
-      id: 0, title: 'Test title 1', closed: true, detailUrl: 'https://test.org/workitems/0', iconUrl: 'https://test.org/icon/0'
+      id: 0, title: 'Test title 1', isCompleted: true, detailUrl: 'https://test.org/workitems/0', iconUrl: 'https://test.org/icon/0'
     }, {
-      id: 1, title: 'Test title 2', closed: false, detailUrl: 'https://test.org/workitems/1', iconUrl: 'https://test.org/icon/1'
+      id: 1, title: 'Test title 2', isCompleted: false, detailUrl: 'https://test.org/workitems/1', iconUrl: 'https://test.org/icon/1'
     }];
 
     todoListService.getWorkItemList.and.returnValue(asyncData(mockWorkItems));

@@ -22,7 +22,7 @@ describe('TodoItemComponent', () => {
     mockWorkItem = {
       id: 0,
       title: 'Title',
-      closed: true,
+      isCompleted: true,
       detailUrl: '/detail',
       iconUrl: '/icon'
     };
