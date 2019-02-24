@@ -5,6 +5,7 @@ import {
   TodoListService, WorkItem, AzureDevOpsAccessInfo,
   WiqlResult, WiqlWorkItemResult, WorkItemResult, WorkItemTypeResult
 } from './todo-list.service';
+import { toArray } from 'rxjs/operators';
 
 
 describe('TodoListServiceService', () => {
@@ -41,7 +42,7 @@ describe('TodoListServiceService', () => {
 
     const workItemTypeMap = new Map<WorkItem, string>(Array.from(mockWorkItems, v => <[WorkItem, string]>[v, 'type' + v.id]));
 
-    service.getWorkItemList().subscribe(data => {
+    service.getWorkItemList().pipe(toArray()).subscribe(data => {
       expect(data).toEqual(mockWorkItems);
     });
 
@@ -87,5 +88,7 @@ describe('TodoListServiceService', () => {
         }
       });
     }
+
+    httpController.verify();
   });
 });
