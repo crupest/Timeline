@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { switchMap, concatMap, map, toArray } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { switchMap, concatMap, map } from 'rxjs/operators';
 
 export interface AzureDevOpsAccessInfo {
   username: string;
@@ -60,7 +60,7 @@ export class TodoListService {
       .pipe(map(result => result.icon.url));
   }
 
-  getWorkItemList(): Observable<WorkItem[]> {
+  getWorkItemList(): Observable<WorkItem> {
     return this.getAzureDevOpsAccessInfo().pipe(
       switchMap(accessInfo => {
         const baseUrl = `https://dev.azure.com/${accessInfo.organization}/${accessInfo.project}/`;
@@ -77,7 +77,7 @@ export class TodoListService {
             { headers: headers }
           )
           .pipe(
-            switchMap(result => result.workItems),
+            concatMap(result => from(result.workItems)),
             concatMap(result => this.client.get<WorkItemResult>(result.url, { headers: headers })),
             concatMap(result =>
               this.getItemIconUrl(baseUrl, headers, result.fields[TodoListService.typeFieldName]).pipe(
@@ -94,8 +94,7 @@ export class TodoListService {
                     }
                 )
               )
-            ),
-            toArray()
+            )
           );
       })
     );
