@@ -46,7 +46,7 @@ export class AlreadyLoginException extends Error {
 
 export class BadCredentialsException extends Error {
   constructor(username: string = null , password: string = null) {
-    super(`Username[${username}] or password[${password}] is wrong.`);
+    super(`Username or password is wrong.`);
   }
 }
 

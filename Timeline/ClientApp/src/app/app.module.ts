@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatMenuModule, MatIconModule, MatButtonModule, MatToolbarModule, MatListModule,
-  MatProgressBarModule, MatCardModule, MatDialogModule, MatInputModule, MatFormFieldModule
+  MatProgressBarModule, MatCardModule, MatDialogModule, MatInputModule, MatFormFieldModule, MatProgressSpinnerModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -20,7 +20,7 @@ import { UserLoginComponent } from './user-login/user-login.component';
 const importedMatModules = [
   MatMenuModule, MatIconModule, MatButtonModule, MatToolbarModule,
   MatListModule, MatProgressBarModule, MatCardModule, MatDialogModule,
-  MatInputModule, MatFormFieldModule
+  MatInputModule, MatFormFieldModule, MatProgressSpinnerModule
 ];
 
 @NgModule({

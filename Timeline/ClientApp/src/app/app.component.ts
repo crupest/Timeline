@@ -13,7 +13,7 @@ export class AppComponent {
 
   openUserDialog() {
     this.dialog.open(UserDialogComponent, {
-      width: '250px'
+      width: '300px'
     });
   }
 }
