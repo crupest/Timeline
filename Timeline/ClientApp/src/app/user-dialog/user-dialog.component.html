@@ -1,3 +1,12 @@
 <div [ngSwitch]="state">
-  <app-user-login *ngSwitchCase="'login'"></app-user-login>
+  <div *ngSwitchCase="'loading'" class="progress-container">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+  </div>
+  <div *ngSwitchCase="'login'">
+    <p *ngIf="loginMessage" class="mat-body">{{ loginMessage }}</p>
+    <app-user-login (login)="login($event)"></app-user-login>
+  </div>
+  <div *ngSwitchCase="'success'">
+    <p class="mat-body">You have been login as {{ userInfo.username }}.</p>
+  </div>
 </div>
