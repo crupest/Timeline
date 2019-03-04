@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Timeline.Entities
 {
     public class User
@@ -16,8 +11,8 @@ namespace Timeline.Entities
         {
             return new UserInfo
             {
-                Username = this.Username,
-                Roles = this.Roles
+                Username = Username,
+                Roles = Roles
             };
         }
     }
