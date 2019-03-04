@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TodoItemComponent } from './todo-item.component';
-import { WorkItem } from '../todo-list-page/todo-list.service';
+import { TodoItem } from '../todo-list-page/todo-list.service';
 import { By } from '@angular/platform-browser';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
@@ -9,7 +9,12 @@ describe('TodoItemComponent', () => {
   let component: TodoItemComponent;
   let fixture: ComponentFixture<TodoItemComponent>;
 
-  let mockWorkItem: WorkItem;
+  const mockTodoItem: TodoItem = {
+    number: 1,
+    title: 'Title',
+    isClosed: true,
+    detailUrl: '/detail',
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -19,17 +24,9 @@ describe('TodoItemComponent', () => {
   }));
 
   beforeEach(() => {
-    mockWorkItem = {
-      id: 0,
-      title: 'Title',
-      isCompleted: true,
-      detailUrl: '/detail',
-      iconUrl: '/icon'
-    };
-
     fixture = TestBed.createComponent(TodoItemComponent);
     component = fixture.componentInstance;
-    component.item = mockWorkItem;
+    component.item = mockTodoItem;
     fixture.detectChanges();
   });
 
@@ -37,17 +34,13 @@ describe('TodoItemComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should set icon', () => {
-    expect(fixture.debugElement.query(By.css('img.item-icon')).properties['src']).toBe(mockWorkItem.iconUrl);
-  });
-
   it('should set title', () => {
     expect((fixture.debugElement.query(By.css('span.item-title')).nativeElement as HTMLSpanElement).textContent).toBe(
-      mockWorkItem.id + '. ' + mockWorkItem.title
+      mockTodoItem.number + '. ' + mockTodoItem.title
     );
   });
 
   it('should set detail link', () => {
-    expect(fixture.debugElement.query(By.css('a.item-detail-button')).properties['href']).toBe(mockWorkItem.detailUrl);
+    expect(fixture.debugElement.query(By.css('a.item-detail-button')).properties['href']).toBe(mockTodoItem.detailUrl);
   });
 });

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TodoListService, WorkItem } from './todo-list.service';
+import { TodoListService, TodoItem } from './todo-list.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
@@ -21,7 +21,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 })
 export class TodoListPageComponent implements OnInit {
 
-  items: WorkItem[] = [];
+  items: TodoItem[] = [];
   isLoadCompleted = false;
 
   constructor(private todoService: TodoListService) {
