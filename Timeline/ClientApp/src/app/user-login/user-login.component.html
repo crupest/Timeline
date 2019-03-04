@@ -1,0 +1,13 @@
+<form [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Username</mat-label>
+    <input formControlName="username" matInput type="text" />
+  </mat-form-field>
+  <div class="w-100"></div>
+  <mat-form-field>
+    <mat-label>Password</mat-label>
+    <input formControlName="password" matInput type="password" />
+  </mat-form-field>
+  <div class="w-100"></div>
+  <button mat-flat-button class="login-button" (appDebounceClick)="onLoginButtonClick()">Login</button>
+</form>
