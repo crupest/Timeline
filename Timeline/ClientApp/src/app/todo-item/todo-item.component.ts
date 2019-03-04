@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { WorkItem } from '../todo-list-page/todo-list.service';
+import { Component, Input } from '@angular/core';
+import { TodoItem } from '../todo-list-page/todo-list.service';
 
 @Component({
   selector: 'app-todo-item',
@@ -8,7 +8,6 @@ import { WorkItem } from '../todo-list-page/todo-list.service';
 })
 export class TodoItemComponent {
 
-  @Input() item: WorkItem;
-
+  @Input() item: TodoItem;
 
 }

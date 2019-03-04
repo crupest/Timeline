@@ -2,8 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import {
-  TodoListService, WorkItem, AzureDevOpsAccessInfo,
-  WiqlResult, WiqlWorkItemResult, WorkItemResult, WorkItemTypeResult
+  TodoListService, IssueResponse, IssueResponseItem, TodoItem
 } from './todo-list.service';
 import { toArray } from 'rxjs/operators';
 
@@ -14,80 +13,42 @@ describe('TodoListServiceService', () => {
   }));
 
   it('should be created', () => {
-
     const service: TodoListService = TestBed.get(TodoListService);
     expect(service).toBeTruthy();
   });
 
   it('should work well', () => {
     const service: TodoListService = TestBed.get(TodoListService);
-    expect(service).toBeTruthy();
 
-    const mockAccessInfo: AzureDevOpsAccessInfo = {
-      username: 'testusername',
-      personalAccessToken: 'testtoken',
-      organization: 'testorganization',
-      project: 'testproject'
-    };
+    const baseUrl = service.baseUrl;
 
-    const baseUrl = `https://dev.azure.com/${mockAccessInfo.organization}/${mockAccessInfo.project}/`;
+    const mockIssueList: IssueResponse = [{
+      number: 1,
+      title: 'Issue title 1',
+      state: 'open',
+      html_url: 'test_url1'
+    }, {
+      number: 2,
+      title: 'Issue title 2',
+      state: 'closed',
+      html_url: 'test_url2',
+      pull_request: {}
+    }];
 
-    const mockWorkItems: WorkItem[] = Array.from({ length: 2 }, (_, i) => <WorkItem>{
-      id: i,
-      title: 'Test work item ' + i,
-      isCompleted: i === 0,
-      detailUrl: `${baseUrl}_workitems/edit/${i}/`,
-      iconUrl: `${baseUrl}_api/wit/icon/${i}`,
-    });
-
-    const workItemTypeMap = new Map<WorkItem, string>(Array.from(mockWorkItems, v => <[WorkItem, string]>[v, 'type' + v.id]));
+    const mockTodoItemList: TodoItem[] = [{
+      number: 1,
+      title: 'Issue title 1',
+      isClosed: false,
+      detailUrl: 'test_url1'
+    }];
 
     service.getWorkItemList().pipe(toArray()).subscribe(data => {
-      expect(data).toEqual(mockWorkItems);
+      expect(data).toEqual(mockTodoItemList);
     });
 
     const httpController: HttpTestingController = TestBed.get(HttpTestingController);
 
-    httpController.expectOne('/api/TodoPage/AzureDevOpsAccessInfo').flush(mockAccessInfo);
-
-    const mockWiqlWorkItems: WiqlWorkItemResult[] = Array.from(mockWorkItems, v => <WiqlWorkItemResult>{
-      id: v.id,
-      url: `${baseUrl}_apis/wit/workItems/${v.id}`
-    });
-
-    const authorizationHeader = 'Basic ' + btoa(mockAccessInfo.username + ':' + mockAccessInfo.personalAccessToken);
-
-    httpController.expectOne(req =>
-      req.url === `${baseUrl}_apis/wit/wiql?api-version=5.0` &&
-      req.headers.get('Authorization') === authorizationHeader
-    ).flush(<WiqlResult>{ workItems: mockWiqlWorkItems });
-
-    function mapWorkItemToResult(mockWorkItem: WorkItem): WorkItemResult {
-      return {
-        id: mockWorkItem.id,
-        fields: {
-          [TodoListService.titleFieldName]: mockWorkItem.title,
-          [TodoListService.stateFieldName]: (mockWorkItem.isCompleted ? 'Closed' : 'Active'),
-          [TodoListService.typeFieldName]: workItemTypeMap.get(mockWorkItem)
-        }
-      };
-    }
-
-    for (let i = 0; i < mockWorkItems.length; i++) {
-      httpController.expectOne(req =>
-        req.url === mockWiqlWorkItems[i].url &&
-        req.headers.get('Authorization') === authorizationHeader
-      ).flush(mapWorkItemToResult(mockWorkItems[i]));
-
-      httpController.expectOne(req =>
-        req.url === `${baseUrl}_apis/wit/workitemtypes/${encodeURIComponent(workItemTypeMap.get(mockWorkItems[i]))}?api-version=5.0` &&
-        req.headers.get('Authorization') === authorizationHeader
-      ).flush(<WorkItemTypeResult>{
-        icon: {
-          url: mockWorkItems[i].iconUrl
-        }
-      });
-    }
+    httpController.expectOne(request => request.url === baseUrl + '/issues' && request.params.get('state') === 'all').flush(mockIssueList);
 
     httpController.verify();
   });

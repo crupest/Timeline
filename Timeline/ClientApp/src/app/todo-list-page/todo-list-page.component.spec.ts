@@ -4,7 +4,7 @@ import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core
 import { Observable, from } from 'rxjs';
 
 import { TodoListPageComponent } from './todo-list-page.component';
-import { TodoListService, WorkItem } from './todo-list.service';
+import { TodoListService, TodoItem } from './todo-list.service';
 import { By } from '@angular/platform-browser';
 import { delay } from 'rxjs/operators';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -24,29 +24,25 @@ describe('TodoListPageComponent', () => {
   let component: TodoListPageComponent;
   let fixture: ComponentFixture<TodoListPageComponent>;
 
-  let mockWorkItems: WorkItem[];
+  const mockTodoItems: TodoItem[] = [
+    {
+      number: 0,
+      title: 'Test title 1',
+      isClosed: true,
+      detailUrl: 'test_url1'
+    },
+    {
+      number: 1,
+      title: 'Test title 2',
+      isClosed: false,
+      detailUrl: 'test_url2'
+    }
+  ];
 
   beforeEach(async(() => {
     const todoListService: jasmine.SpyObj<TodoListService> = jasmine.createSpyObj('TodoListService', ['getWorkItemList']);
 
-    mockWorkItems = [
-      {
-        id: 0,
-        title: 'Test title 1',
-        isCompleted: true,
-        detailUrl: 'https://test.org/workitems/0',
-        iconUrl: 'https://test.org/icon/0'
-      },
-      {
-        id: 1,
-        title: 'Test title 2',
-        isCompleted: false,
-        detailUrl: 'https://test.org/workitems/1',
-        iconUrl: 'https://test.org/icon/1'
-      }
-    ];
-
-    todoListService.getWorkItemList.and.returnValue(asyncArray(mockWorkItems));
+    todoListService.getWorkItemList.and.returnValue(asyncArray(mockTodoItems));
 
     TestBed.configureTestingModule({
       declarations: [TodoListPageComponent, MatProgressBarStubComponent],

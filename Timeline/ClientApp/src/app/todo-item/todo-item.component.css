@@ -4,16 +4,14 @@
   overflow: hidden;
 }
 
+.item-body-box {
+  margin: 5px!important
+}
+
 .item-color-block {
   width: 15px;
   align-self: stretch;
   flex: 0 0 auto;
-}
-
-.item-icon {
-  width: 1.2em;
-  height: 1.2em;
-  vertical-align: -0.25em;
 }
 
 .item-title {
