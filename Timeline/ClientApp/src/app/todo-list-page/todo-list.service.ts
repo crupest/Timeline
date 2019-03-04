@@ -1,101 +1,47 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
-import { switchMap, concatMap, map } from 'rxjs/operators';
+import { switchMap, map, filter } from 'rxjs/operators';
 
-export interface AzureDevOpsAccessInfo {
-  username: string;
-  personalAccessToken: string;
-  organization: string;
-  project: string;
-}
-
-export interface WiqlWorkItemResult {
-  id: number;
-  url: string;
-}
-
-export interface WiqlResult {
-  workItems: WiqlWorkItemResult[];
-}
-
-export interface WorkItemResult {
-  id: number;
-  fields: { [name: string]: any };
-}
-
-export interface WorkItemTypeResult {
-  icon: {
-    url: string;
-  };
-}
-
-export interface WorkItem {
-  id: number;
+export interface IssueResponseItem {
+  number: number;
   title: string;
-  isCompleted: boolean;
+  state: string;
+  html_url: string;
+  pull_request?: any;
+}
+
+export type IssueResponse = IssueResponseItem[];
+
+export interface TodoItem {
+  number: number;
+  title: string;
+  isClosed: boolean;
   detailUrl: string;
-  iconUrl: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodoListService {
-  public static titleFieldName = 'System.Title';
-  public static stateFieldName = 'System.State';
-  public static typeFieldName = 'System.WorkItemType';
 
-  constructor(private client: HttpClient) {}
+  readonly baseUrl = 'https://api.github.com/repos/crupest/Timeline';
 
-  private getAzureDevOpsAccessInfo(): Observable<AzureDevOpsAccessInfo> {
-    return this.client.get<AzureDevOpsAccessInfo>('/api/TodoPage/AzureDevOpsAccessInfo');
-  }
+  constructor(private client: HttpClient) { }
 
-  private getItemIconUrl(baseUrl: string, headers: HttpHeaders, type: string): Observable<string> {
-    return this.client
-      .get<WorkItemTypeResult>(`${baseUrl}_apis/wit/workitemtypes/${encodeURIComponent(type)}?api-version=5.0`, {
-        headers: headers
-      })
-      .pipe(map(result => result.icon.url));
-  }
-
-  getWorkItemList(): Observable<WorkItem> {
-    return this.getAzureDevOpsAccessInfo().pipe(
-      switchMap(accessInfo => {
-        const baseUrl = `https://dev.azure.com/${accessInfo.organization}/${accessInfo.project}/`;
-        const headers = new HttpHeaders({
-          Accept: 'application/json',
-          Authorization: `Basic ${btoa(accessInfo.username + ':' + accessInfo.personalAccessToken)}`
-        });
-        return this.client
-          .post<WiqlResult>(
-            `${baseUrl}_apis/wit/wiql?api-version=5.0`,
-            {
-              query: 'SELECT [System.Id] FROM workitems WHERE [System.TeamProject] = @project'
-            },
-            { headers: headers }
-          )
-          .pipe(
-            concatMap(result => from(result.workItems)),
-            concatMap(result => this.client.get<WorkItemResult>(result.url, { headers: headers })),
-            concatMap(result =>
-              this.getItemIconUrl(baseUrl, headers, result.fields[TodoListService.typeFieldName]).pipe(
-                map(
-                  iconResult =>
-                    <WorkItem>{
-                      id: result.id,
-                      title: <string>result.fields[TodoListService.titleFieldName],
-                      isCompleted: (function(stateErasedCase: string): Boolean {
-                        return stateErasedCase === 'closed' || stateErasedCase === 'resolved';
-                      })((result.fields[TodoListService.stateFieldName] as string).toLowerCase()),
-                      detailUrl: `${baseUrl}_workitems/edit/${result.id}/`,
-                      iconUrl: iconResult
-                    }
-                )
-              )
-            )
-          );
+  getWorkItemList(): Observable<TodoItem> {
+    return this.client.get<IssueResponse>(`${this.baseUrl}/issues`, {
+      params: {
+        state: 'all'
+      }
+    }).pipe(
+      switchMap(result => from(result)),
+      filter(result => result.pull_request === undefined), // filter out pull requests.
+      map(result => <TodoItem>{
+        number: result.number,
+        title: result.title,
+        isClosed: result.state === 'closed',
+        detailUrl: result.html_url
       })
     );
   }
