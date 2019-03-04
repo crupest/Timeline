@@ -9,7 +9,12 @@ export class UserDialogComponent implements OnInit {
 
   constructor() { }
 
+  state: 'login' | 'success' = 'login';
+
   ngOnInit() {
   }
 
+  login() {
+
+  }
 }
