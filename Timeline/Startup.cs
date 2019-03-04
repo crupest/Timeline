@@ -10,9 +10,6 @@ using System.Text;
 using Timeline.Configs;
 using Timeline.Services;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System;
-using System.Threading.Tasks;
 using Timeline.Formatters;
 
 namespace Timeline
@@ -39,9 +36,6 @@ namespace Timeline
             {
                 configuration.RootPath = "ClientApp/dist";
             });
-
-
-            services.Configure<TodoPageConfig>(Configuration.GetSection("TodoPageConfig"));
 
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
             var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
