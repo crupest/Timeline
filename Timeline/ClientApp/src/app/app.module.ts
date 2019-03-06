@@ -16,6 +16,7 @@ import { TodoItemComponent } from './todo-item/todo-item.component';
 import { UserDialogComponent } from './user-dialog/user-dialog.component';
 import { DebounceClickDirective } from './debounce-click.directive';
 import { UserLoginComponent } from './user-login/user-login.component';
+import { UserLoginSuccessComponent } from './user-login-success/user-login-success.component';
 
 const importedMatModules = [
   MatMenuModule, MatIconModule, MatButtonModule, MatToolbarModule,
@@ -31,7 +32,8 @@ const importedMatModules = [
     TodoItemComponent,
     UserDialogComponent,
     DebounceClickDirective,
-    UserLoginComponent
+    UserLoginComponent,
+    UserLoginSuccessComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

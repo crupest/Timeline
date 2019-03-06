@@ -15,6 +15,7 @@ export class UserDialogComponent implements OnInit {
 
   loginMessage: LoginMessage;
 
+  displayLoginSuccessMessage = false;
   userInfo: UserInfo;
 
   ngOnInit() {
@@ -32,6 +33,7 @@ export class UserDialogComponent implements OnInit {
   login(event: LoginEvent) {
     this.userService.tryLogin(event.username, event.password).subscribe(result => {
       this.userInfo = result;
+      this.displayLoginSuccessMessage = true;
       this.state = 'success';
     }, (error: Error) => {
       this.loginMessage = error.message;
