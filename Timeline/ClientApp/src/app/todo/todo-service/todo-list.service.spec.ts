@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-
-import {
-  TodoListService, IssueResponse, IssueResponseItem, TodoItem
-} from './todo-list.service';
 import { toArray } from 'rxjs/operators';
+
+import { TodoItem } from '../todo-item';
+import { TodoListService, IssueResponse } from './todo-list.service';
 
 
 describe('TodoListServiceService', () => {

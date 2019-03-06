@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
 import { switchMap, map, filter } from 'rxjs/operators';
 
+import {TodoItem} from '../todo-item';
+
 export interface IssueResponseItem {
   number: number;
   title: string;
@@ -12,13 +14,6 @@ export interface IssueResponseItem {
 }
 
 export type IssueResponse = IssueResponseItem[];
-
-export interface TodoItem {
-  number: number;
-  title: string;
-  isClosed: boolean;
-  detailUrl: string;
-}
 
 @Injectable({
   providedIn: 'root'
