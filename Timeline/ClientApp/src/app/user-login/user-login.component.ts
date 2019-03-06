@@ -1,5 +1,7 @@
-import { Component, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, Output, OnInit, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
+
+export type LoginMessage = 'nologin' | 'invalidlogin' | string;
 
 export class LoginEvent {
   username: string;
@@ -12,6 +14,9 @@ export class LoginEvent {
   styleUrls: ['./user-login.component.css']
 })
 export class UserLoginComponent {
+
+  @Input()
+  message: LoginMessage;
 
   @Output()
   login = new EventEmitter<LoginEvent>();

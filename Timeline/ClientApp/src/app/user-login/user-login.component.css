@@ -10,3 +10,15 @@ div.w-100 {
 .login-button {
   margin-left: auto;
 }
+
+.no-login-message {
+  color: blue;
+}
+
+.invalid-login-message {
+  color: red;
+}
+
+.error-message {
+  color: red;
+}
