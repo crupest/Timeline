@@ -1,4 +1,9 @@
 <form [formGroup]="form">
+  <ng-container *ngIf="message" [ngSwitch]="message">
+    <p *ngSwitchCase="'nologin'" class="mat-body no-login-message">You haven't login.</p>
+    <p *ngSwitchCase="'invalidlogin'" class="mat-body invalid-login-message">Your login is no longer valid.</p>
+    <p *ngSwitchDefault class="mat-body error-message">{{ message }}</p>
+  </ng-container>
   <mat-form-field>
     <mat-label>Username</mat-label>
     <input formControlName="username" matInput type="text" />
