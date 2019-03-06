@@ -1,20 +1,22 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { Observable, from } from 'rxjs';
-
-import { TodoListPageComponent } from './todo-list-page.component';
-import { TodoListService, TodoItem } from './todo-list.service';
-import { By } from '@angular/platform-browser';
 import { delay } from 'rxjs/operators';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+
+import { TodoItem } from '../todo-item';
+import { TodoListPageComponent } from './todo-list-page.component';
+import { TodoListService } from '../todo-service/todo-list.service';
+
 
 @Component({
   /* tslint:disable-next-line:component-selector*/
   selector: 'mat-progress-bar',
   template: ''
 })
-class MatProgressBarStubComponent {}
+class MatProgressBarStubComponent { }
 
 function asyncArray<T>(data: T[]): Observable<T> {
   return from(data).pipe(delay(0));

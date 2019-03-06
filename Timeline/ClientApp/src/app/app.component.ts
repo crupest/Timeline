@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { UserDialogComponent } from './user/user-dialog/user-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -6,7 +8,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
 
-  public isCollapse = false;
+  constructor(private dialog: MatDialog) { }
+
+  openUserDialog() {
+    this.dialog.open(UserDialogComponent, {
+      width: '300px'
+    });
+  }
 }
