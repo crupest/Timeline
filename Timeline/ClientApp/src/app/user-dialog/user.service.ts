@@ -28,7 +28,7 @@ export interface TokenValidationResult {
 }
 
 export interface UserLoginState {
-  state: 'nologin' | 'invalid' | 'success';
+  state: 'nologin' | 'invalidlogin' | 'success';
   userInfo?: UserInfo;
 }
 
@@ -45,7 +45,7 @@ export class AlreadyLoginException extends Error {
 }
 
 export class BadCredentialsException extends Error {
-  constructor(username: string = null , password: string = null) {
+  constructor() {
     super(`Username or password is wrong.`);
   }
 }
@@ -82,7 +82,7 @@ export class UserService {
           this.token = null;
           this.userInfo = null;
           return <UserLoginState>{
-            state: 'invalid'
+            state: 'invalidlogin'
           };
         }
       })
@@ -103,7 +103,7 @@ export class UserService {
           return throwError(new BadNetworkException());
         } else if (error.status === 400) {
           console.error('An error occurred when login: wrong credentials.');
-          return throwError(new BadCredentialsException(username, password));
+          return throwError(new BadCredentialsException());
         } else {
           console.error('An unknown error occurred when login: ' + error);
           return throwError(error);

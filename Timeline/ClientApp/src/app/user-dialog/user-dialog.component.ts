@@ -23,11 +23,7 @@ export class UserDialogComponent implements OnInit {
         this.userInfo = result.userInfo;
         this.state = 'success';
       } else {
-        if (result.state === 'invalid') {
-          this.loginMessage = 'invalidlogin';
-        } else if (result.state === 'nologin') {
-          this.loginMessage = 'nologin';
-        }
+        this.loginMessage = result.state;
         this.state = 'login';
       }
     });
