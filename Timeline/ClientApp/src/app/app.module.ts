@@ -11,12 +11,15 @@ import {
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
-import { TodoListPageComponent } from './todo-list-page/todo-list-page.component';
-import { TodoItemComponent } from './todo-item/todo-item.component';
-import { UserDialogComponent } from './user-dialog/user-dialog.component';
+
 import { DebounceClickDirective } from './debounce-click.directive';
-import { UserLoginComponent } from './user-login/user-login.component';
-import { UserLoginSuccessComponent } from './user-login-success/user-login-success.component';
+
+import { TodoListPageComponent } from './todo/todo-list-page/todo-list-page.component';
+import { TodoItemComponent } from './todo/todo-item/todo-item.component';
+
+import { UserDialogComponent } from './user/user-dialog/user-dialog.component';
+import { UserLoginComponent } from './user/user-login/user-login.component';
+import { UserLoginSuccessComponent } from './user/user-login-success/user-login-success.component';
 
 const importedMatModules = [
   MatMenuModule, MatIconModule, MatButtonModule, MatToolbarModule,

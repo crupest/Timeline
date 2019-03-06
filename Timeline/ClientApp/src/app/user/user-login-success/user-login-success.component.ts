@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { UserInfo } from '../user-dialog/user.service';
+import { UserInfo } from '../user-info';
 
 @Component({
   selector: 'app-user-login-success',

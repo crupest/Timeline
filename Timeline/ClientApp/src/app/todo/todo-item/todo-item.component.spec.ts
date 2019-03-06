@@ -1,9 +1,9 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { TodoItemComponent } from './todo-item.component';
-import { TodoItem } from '../todo-list-page/todo-list.service';
-import { By } from '@angular/platform-browser';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+
+import { TodoItem } from '../todo-item';
+import { TodoItemComponent } from '../todo-item/todo-item.component';
 
 describe('TodoItemComponent', () => {
   let component: TodoItemComponent;

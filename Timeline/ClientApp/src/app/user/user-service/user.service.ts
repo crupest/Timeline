@@ -3,14 +3,11 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, retry } from 'rxjs/operators';
 
+import { UserInfo } from '../user-info';
+
 export interface UserCredentials {
   username: string;
   password: string;
-}
-
-export interface UserInfo {
-  username: string;
-  roles: string[];
 }
 
 export interface CreateTokenResult {
