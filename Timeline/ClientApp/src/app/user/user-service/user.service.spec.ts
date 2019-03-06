@@ -65,7 +65,7 @@ describe('UserService', () => {
 
     const tokenValidateRequestMatcher = (req: HttpRequest<TokenValidationRequest>) => {
       return req.url === '/api/User/ValidateToken' && req.body.token === mockToken;
-    }
+    };
 
     beforeEach(() => {
       service = TestBed.get(UserService);
