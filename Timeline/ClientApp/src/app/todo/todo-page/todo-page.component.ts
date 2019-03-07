@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { TodoItem } from '../todo-item';
-import { TodoListService } from '../todo-service/todo-list.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
+
+import { TodoItem } from '../todo-item';
+import { TodoService } from '../todo-service/todo.service';
+
 @Component({
-  selector: 'app-todo-list-page',
-  templateUrl: './todo-list-page.component.html',
-  styleUrls: ['./todo-list-page.component.css', '../todo-list-color-block.css'],
+  selector: 'app-todo-page',
+  templateUrl: './todo-page.component.html',
+  styleUrls: ['./todo-page.component.css', '../todo-list-color-block.css'],
   animations: [
     trigger('itemEnter', [
       transition(':enter', [
@@ -20,12 +22,12 @@ import { trigger, transition, style, animate } from '@angular/animations';
     ])
   ]
 })
-export class TodoListPageComponent implements OnInit {
+export class TodoPageComponent implements OnInit {
 
   items: TodoItem[] = [];
   isLoadCompleted = false;
 
-  constructor(private todoService: TodoListService) {
+  constructor(private todoService: TodoService) {
   }
 
   ngOnInit() {
