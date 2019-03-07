@@ -3,21 +3,21 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { toArray } from 'rxjs/operators';
 
 import { TodoItem } from '../todo-item';
-import { TodoListService, IssueResponse } from './todo-list.service';
+import { TodoService, IssueResponse } from './todo.service';
 
 
-describe('TodoListServiceService', () => {
+describe('TodoService', () => {
   beforeEach(() => TestBed.configureTestingModule({
     imports: [HttpClientTestingModule]
   }));
 
   it('should be created', () => {
-    const service: TodoListService = TestBed.get(TodoListService);
+    const service: TodoService = TestBed.get(TodoService);
     expect(service).toBeTruthy();
   });
 
   it('should work well', () => {
-    const service: TodoListService = TestBed.get(TodoListService);
+    const service: TodoService = TestBed.get(TodoService);
 
     const baseUrl = service.baseUrl;
 
