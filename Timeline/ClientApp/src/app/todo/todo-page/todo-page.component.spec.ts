@@ -7,8 +7,8 @@ import { Observable, from } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 import { TodoItem } from '../todo-item';
-import { TodoListPageComponent } from './todo-list-page.component';
-import { TodoListService } from '../todo-service/todo-list.service';
+import { TodoPageComponent } from './todo-page.component';
+import { TodoService } from '../todo-service/todo.service';
 
 
 @Component({
@@ -23,8 +23,8 @@ function asyncArray<T>(data: T[]): Observable<T> {
 }
 
 describe('TodoListPageComponent', () => {
-  let component: TodoListPageComponent;
-  let fixture: ComponentFixture<TodoListPageComponent>;
+  let component: TodoPageComponent;
+  let fixture: ComponentFixture<TodoPageComponent>;
 
   const mockTodoItems: TodoItem[] = [
     {
@@ -42,20 +42,20 @@ describe('TodoListPageComponent', () => {
   ];
 
   beforeEach(async(() => {
-    const todoListService: jasmine.SpyObj<TodoListService> = jasmine.createSpyObj('TodoListService', ['getWorkItemList']);
+    const mockTodoService: jasmine.SpyObj<TodoService> = jasmine.createSpyObj('TodoService', ['getWorkItemList']);
 
-    todoListService.getWorkItemList.and.returnValue(asyncArray(mockTodoItems));
+    mockTodoService.getWorkItemList.and.returnValue(asyncArray(mockTodoItems));
 
     TestBed.configureTestingModule({
-      declarations: [TodoListPageComponent, MatProgressBarStubComponent],
+      declarations: [TodoPageComponent, MatProgressBarStubComponent],
       imports: [NoopAnimationsModule],
-      providers: [{ provide: TodoListService, useValue: todoListService }],
+      providers: [{ provide: TodoService, useValue: mockTodoService }],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TodoListPageComponent);
+    fixture = TestBed.createComponent(TodoPageComponent);
     component = fixture.componentInstance;
   });
 
