@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
 import { switchMap, map, filter } from 'rxjs/operators';
 
-import {TodoItem} from '../todo-item';
+import { TodoItem } from '../todo-item';
 
 export interface IssueResponseItem {
   number: number;
@@ -18,7 +18,7 @@ export type IssueResponse = IssueResponseItem[];
 @Injectable({
   providedIn: 'root'
 })
-export class TodoListService {
+export class TodoService {
 
   readonly baseUrl = 'https://api.github.com/repos/crupest/Timeline';
 
