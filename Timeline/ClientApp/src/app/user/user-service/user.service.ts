@@ -3,12 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError, retry } from 'rxjs/operators';
 
-import { UserInfo } from '../user-info';
-
-export interface UserCredentials {
-  username: string;
-  password: string;
-}
+import { UserCredentials, UserInfo } from '../entities';
+import { Router } from '@angular/router';
 
 export interface CreateTokenResult {
   token: string;
@@ -53,9 +49,17 @@ export class BadCredentialsException extends Error {
 export class UserService {
 
   private token: string;
-  private userInfo: UserInfo;
+  userInfo: UserInfo;
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient, private router: Router) { }
+
+  userRouteNavigate(commands: any[]) {
+    this.router.navigate([{
+      outlets: {
+        user: commands
+      }
+    }]);
+  }
 
   validateUserLoginState(): Observable<UserLoginState> {
     if (this.token === undefined || this.token === null) {
@@ -86,14 +90,12 @@ export class UserService {
     );
   }
 
-  tryLogin(username: string, password: string): Observable<UserInfo> {
+  tryLogin(credentials: UserCredentials): Observable<UserInfo> {
     if (this.token) {
       return throwError(new AlreadyLoginException());
     }
 
-    return this.httpClient.post<CreateTokenResult>('/api/User/CreateToken', <UserCredentials>{
-      username, password
-    }).pipe(
+    return this.httpClient.post<CreateTokenResult>('/api/User/CreateToken', credentials).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.error instanceof ErrorEvent) {
           console.error('An error occurred when login: ' + error.error.message);

@@ -2,14 +2,19 @@ import { TestBed } from '@angular/core/testing';
 import { HttpRequest } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { UserInfo } from '../user-info';
+import { UserInfo, UserCredentials } from '../entities';
 import {
-  UserService, UserCredentials, CreateTokenResult,
+  UserService, CreateTokenResult,
   UserLoginState, TokenValidationRequest, TokenValidationResult
 } from './user.service';
 
 describe('UserService', () => {
   const tokenCreateUrl = '/api/User/CreateToken';
+
+  const mockUserCredentials: UserCredentials = {
+    username: 'user',
+    password: 'user'
+  };
 
   beforeEach(() => TestBed.configureTestingModule({
     imports: [HttpClientTestingModule]
@@ -35,7 +40,7 @@ describe('UserService', () => {
       roles: ['user', 'other']
     };
 
-    service.tryLogin('user', 'user').subscribe(result => {
+    service.tryLogin(mockUserCredentials).subscribe(result => {
       expect(result).toEqual(mockUserInfo);
     });
 
@@ -71,7 +76,7 @@ describe('UserService', () => {
       service = TestBed.get(UserService);
       httpController = TestBed.get(HttpTestingController);
 
-      service.tryLogin('user', 'user').subscribe(); // subscribe to activate login
+      service.tryLogin(mockUserCredentials).subscribe(); // subscribe to activate login
 
       httpController.expectOne(tokenCreateUrl).flush(<CreateTokenResult>{
         token: mockToken,
