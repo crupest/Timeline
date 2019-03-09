@@ -4,9 +4,9 @@ import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
-import { UserInfo } from '../user-info';
+import { UserInfo } from '../entities';
 import { UserDialogComponent } from './user-dialog.component';
-import { UserService, UserLoginState } from '../user-service/user.service';
+import { InternalUserService, UserLoginState } from '../internal-user-service/internal-user.service';
 import { LoginEvent } from '../user-login/user-login.component';
 
 @Component({
@@ -38,7 +38,7 @@ class UserLoginSuccessStubComponent { }
 describe('UserDialogComponent', () => {
   let component: UserDialogComponent;
   let fixture: ComponentFixture<UserDialogComponent>;
-  let mockUserService: jasmine.SpyObj<UserService>;
+  let mockUserService: jasmine.SpyObj<InternalUserService>;
 
   beforeEach(async(() => {
     mockUserService = jasmine.createSpyObj('UserService', ['validateUserLoginState', 'tryLogin']);
@@ -46,7 +46,7 @@ describe('UserDialogComponent', () => {
     TestBed.configureTestingModule({
       declarations: [UserDialogComponent, MatProgressSpinnerStubComponent,
         UserLoginStubComponent, UserLoginSuccessStubComponent],
-      providers: [{ provide: UserService, useValue: mockUserService }]
+      providers: [{ provide: InternalUserService, useValue: mockUserService }]
     })
       .compileComponents();
   }));
@@ -57,7 +57,7 @@ describe('UserDialogComponent', () => {
   });
 
   it('progress spinner should work well', fakeAsync(() => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }).pipe(delay(10)));
+    mockUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }).pipe(delay(10)));
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('mat-progress-spinner'))).toBeTruthy();
     tick(10);
@@ -66,30 +66,30 @@ describe('UserDialogComponent', () => {
   }));
 
   it('nologin should work well', () => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }));
+    mockUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }));
 
     fixture.detectChanges();
 
-    expect(mockUserService.validateUserLoginState).toHaveBeenCalled();
+    expect(mockUserService.refreshAndGetUserState).toHaveBeenCalled();
     expect(fixture.debugElement.query(By.css('app-user-login'))).toBeTruthy();
     expect(fixture.debugElement.query(By.css('app-user-login-success'))).toBeFalsy();
   });
 
   it('success should work well', () => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'success', userInfo: {} }));
+    mockUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>{ state: 'success', userInfo: {} }));
 
     fixture.detectChanges();
 
-    expect(mockUserService.validateUserLoginState).toHaveBeenCalled();
+    expect(mockUserService.refreshAndGetUserState).toHaveBeenCalled();
     expect(fixture.debugElement.query(By.css('app-user-login'))).toBeFalsy();
     expect(fixture.debugElement.query(By.css('app-user-login-success'))).toBeTruthy();
   });
 
   it('login should work well', () => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }));
+    mockUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }));
 
     fixture.detectChanges();
-    expect(mockUserService.validateUserLoginState).toHaveBeenCalled();
+    expect(mockUserService.refreshAndGetUserState).toHaveBeenCalled();
     expect(fixture.debugElement.query(By.css('app-user-login'))).toBeTruthy();
     expect(fixture.debugElement.query(By.css('app-user-login-success'))).toBeFalsy();
 

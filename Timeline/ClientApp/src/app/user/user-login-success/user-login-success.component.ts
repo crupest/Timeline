@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { UserInfo } from '../entities';
-import { UserService } from '../user-service/user.service';
 import { ActivatedRoute } from '@angular/router';
+
+import { UserInfo } from '../entities';
+import { InternalUserService } from '../internal-user-service/internal-user.service';
 
 @Component({
   selector: 'app-user-login-success',
@@ -14,10 +15,10 @@ export class UserLoginSuccessComponent implements OnInit {
 
   userInfo: UserInfo;
 
-  constructor(private route: ActivatedRoute, private userService: UserService) { }
+  constructor(private route: ActivatedRoute, private userService: InternalUserService) { }
 
   ngOnInit() {
-    this.userInfo = this.userService.userInfo;
+    this.userInfo = this.userService.currentUserInfo;
     this.displayLoginSuccessMessage = this.route.snapshot.paramMap.get('reason') === 'login';
   }
 }

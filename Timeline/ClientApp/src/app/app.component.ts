@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { MatDialog } from '@angular/material';
-import { UserDialogComponent } from './user/user-dialog/user-dialog.component';
+import { UserService } from './user/user.service';
 
 @Component({
   selector: 'app-root',
@@ -9,11 +8,9 @@ import { UserDialogComponent } from './user/user-dialog/user-dialog.component';
 })
 export class AppComponent {
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private userService: UserService) { }
 
   openUserDialog() {
-    this.dialog.open(UserDialogComponent, {
-      width: '300px'
-    });
+    this.userService.openUserDialog();
   }
 }

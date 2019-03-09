@@ -4,9 +4,9 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { UserInfo, UserCredentials } from '../entities';
 import {
-  UserService, CreateTokenResult,
+  InternalUserService, CreateTokenResult,
   UserLoginState, TokenValidationRequest, TokenValidationResult
-} from './user.service';
+} from './internal-user.service';
 
 describe('UserService', () => {
   const tokenCreateUrl = '/api/User/CreateToken';
@@ -21,19 +21,19 @@ describe('UserService', () => {
   }));
 
   it('should be created', () => {
-    const service: UserService = TestBed.get(UserService);
+    const service: InternalUserService = TestBed.get(InternalUserService);
     expect(service).toBeTruthy();
   });
 
   it('should be nologin at first', () => {
-    const service: UserService = TestBed.get(UserService);
-    service.validateUserLoginState().subscribe(result => {
+    const service: InternalUserService = TestBed.get(InternalUserService);
+    service.refreshAndGetUserState().subscribe(result => {
       expect(result.state).toBe('nologin');
     });
   });
 
   it('login should work well', () => {
-    const service: UserService = TestBed.get(UserService);
+    const service: InternalUserService = TestBed.get(InternalUserService);
 
     const mockUserInfo: UserInfo = {
       username: 'user',
@@ -58,7 +58,7 @@ describe('UserService', () => {
   });
 
   describe('validateUserLoginState', () => {
-    let service: UserService;
+    let service: InternalUserService;
     let httpController: HttpTestingController;
 
     const mockUserInfo: UserInfo = {
@@ -73,7 +73,7 @@ describe('UserService', () => {
     };
 
     beforeEach(() => {
-      service = TestBed.get(UserService);
+      service = TestBed.get(InternalUserService);
       httpController = TestBed.get(HttpTestingController);
 
       service.tryLogin(mockUserCredentials).subscribe(); // subscribe to activate login
@@ -85,7 +85,7 @@ describe('UserService', () => {
     });
 
     it('success should work well', () => {
-      service.validateUserLoginState().subscribe((result: UserLoginState) => {
+      service.refreshAndGetUserState().subscribe((result: UserLoginState) => {
         expect(result).toEqual(<UserLoginState>{
           state: 'success',
           userInfo: mockUserInfo
@@ -101,7 +101,7 @@ describe('UserService', () => {
     });
 
     it('invalid should work well', () => {
-      service.validateUserLoginState().subscribe((result: UserLoginState) => {
+      service.refreshAndGetUserState().subscribe((result: UserLoginState) => {
         expect(result).toEqual(<UserLoginState>{
           state: 'invalidlogin'
         });
