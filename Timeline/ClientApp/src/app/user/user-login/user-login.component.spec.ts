@@ -2,16 +2,27 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
+import { createMockInternalUserService } from '../internal-user-service/mock-internal-user-service';
+import { createMockActivatedRoute } from '../mock-activated-route';
 import { UserLoginComponent, LoginEvent } from './user-login.component';
+import { InternalUserService } from '../internal-user-service/internal-user.service';
 
 describe('UserLoginComponent', () => {
   let component: UserLoginComponent;
   let fixture: ComponentFixture<UserLoginComponent>;
+  let mockInternalUserService: jasmine.SpyObj<InternalUserService>;
 
   beforeEach(async(() => {
+    mockInternalUserService = createMockInternalUserService();
+
     TestBed.configureTestingModule({
       declarations: [UserLoginComponent],
+      providers: [
+        {provide: InternalUserService, useValue: mockInternalUserService},
+        {provide: ActivatedRoute, useValue:} // TODO: custom route snapshot param later.
+      ]
       imports: [ReactiveFormsModule],
       schemas: [NO_ERRORS_SCHEMA]
     })
