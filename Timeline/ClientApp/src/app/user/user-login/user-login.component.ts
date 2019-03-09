@@ -1,7 +1,8 @@
 import { Component, Output, OnInit, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { UserService } from '../user-service/user.service';
 import { ActivatedRoute } from '@angular/router';
+
+import { InternalUserService } from '../internal-user-service/internal-user.service';
 
 export type LoginMessage = 'nologin' | 'invalidlogin' | string;
 
@@ -17,9 +18,9 @@ export class LoginEvent {
 })
 export class UserLoginComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute, private userService: UserService) { }
+  constructor(private route: ActivatedRoute, private userService: InternalUserService) { }
 
-  message: string;
+  message: LoginMessage;
 
   form = new FormGroup({
     username: new FormControl(''),

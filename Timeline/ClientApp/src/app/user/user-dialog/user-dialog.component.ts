@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { UserService } from '../user-service/user.service';
+import { InternalUserService } from '../internal-user-service/internal-user.service';
 import { RouterOutlet, Router, ActivationStart } from '@angular/router';
 
 @Component({
@@ -9,7 +9,7 @@ import { RouterOutlet, Router, ActivationStart } from '@angular/router';
 })
 export class UserDialogComponent implements OnInit, OnDestroy {
 
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(private userService: InternalUserService, private router: Router) { }
 
   @ViewChild(RouterOutlet) outlet: RouterOutlet;
 
@@ -24,12 +24,12 @@ export class UserDialogComponent implements OnInit, OnDestroy {
     });
 
 
-    this.userService.validateUserLoginState().subscribe(result => {
+    this.userService.refreshAndGetUserState().subscribe(result => {
       this.isLoading = false;
-      if (result.state === 'success') {
+      if (result === 'success') {
         this.userService.userRouteNavigate(['success', { reason: 'already' }]);
       } else {
-        this.userService.userRouteNavigate(['login', { reason: result.state }]);
+        this.userService.userRouteNavigate(['login', { reason: result }]);
       }
     });
   }
