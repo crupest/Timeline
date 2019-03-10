@@ -1,4 +1,4 @@
-import { Component, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -6,10 +6,6 @@ import { InternalUserService } from '../internal-user-service/internal-user.serv
 
 export type LoginMessage = 'nologin' | 'invalidlogin' | string;
 
-export class LoginEvent {
-  username: string;
-  password: string;
-}
 
 @Component({
   selector: 'app-user-login',
