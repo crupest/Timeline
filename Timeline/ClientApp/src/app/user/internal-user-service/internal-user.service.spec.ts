@@ -4,12 +4,13 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { Router } from '@angular/router';
 
 import { UserInfo, UserCredentials } from '../entities';
-import { CreateTokenRequest, CreateTokenResponse, ValidateTokenRequest, ValidateTokenResponse } from './http-entities';
+import {
+  createTokenUrl, validateTokenUrl, CreateTokenRequest,
+  CreateTokenResponse, ValidateTokenRequest, ValidateTokenResponse
+} from './http-entities';
 import { InternalUserService, UserLoginState } from './internal-user.service';
 
 describe('InternalUserService', () => {
-  const tokenCreateUrl = '/api/User/CreateToken';
-
   const mockUserCredentials: UserCredentials = {
     username: 'user',
     password: 'user'
@@ -48,7 +49,7 @@ describe('InternalUserService', () => {
     const httpController = TestBed.get(HttpTestingController) as HttpTestingController;
 
     httpController.expectOne((request: HttpRequest<CreateTokenRequest>) =>
-      request.url === tokenCreateUrl &&
+      request.url === createTokenUrl &&
       request.body.username === 'user' &&
       request.body.password === 'user').flush(<CreateTokenResponse>{
         token: 'test-token',
@@ -72,7 +73,7 @@ describe('InternalUserService', () => {
     const mockToken = 'mock-token';
 
     const tokenValidateRequestMatcher = (req: HttpRequest<ValidateTokenRequest>) => {
-      return req.url === '/api/User/ValidateToken' && req.body.token === mockToken;
+      return req.url === validateTokenUrl && req.body.token === mockToken;
     };
 
     beforeEach(() => {
@@ -81,7 +82,7 @@ describe('InternalUserService', () => {
 
       service.tryLogin(mockUserCredentials).subscribe(); // subscribe to activate login
 
-      httpController.expectOne(tokenCreateUrl).flush(<CreateTokenResponse>{
+      httpController.expectOne(createTokenUrl).flush(<CreateTokenResponse>{
         token: mockToken,
         userInfo: mockUserInfo
       });

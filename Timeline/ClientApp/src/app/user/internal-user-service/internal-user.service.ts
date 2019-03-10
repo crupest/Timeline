@@ -6,7 +6,10 @@ import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
 import { map, catchError, retry } from 'rxjs/operators';
 
 import { AlreadyLoginError, BadCredentialsError, BadNetworkError, UnknownError } from './errors';
-import { CreateTokenRequest, CreateTokenResponse, ValidateTokenRequest, ValidateTokenResponse } from './http-entities';
+import {
+  createTokenUrl, validateTokenUrl, CreateTokenRequest,
+  CreateTokenResponse, ValidateTokenRequest, ValidateTokenResponse
+} from './http-entities';
 import { UserCredentials, UserInfo } from '../entities';
 
 
@@ -46,7 +49,7 @@ export class InternalUserService {
       return of(<UserLoginState>'nologin');
     }
 
-    return this.httpClient.post<ValidateTokenResponse>('/api/User/ValidateToken', <ValidateTokenRequest>{ token: this.token }).pipe(
+    return this.httpClient.post<ValidateTokenResponse>(validateTokenUrl, <ValidateTokenRequest>{ token: this.token }).pipe(
       retry(3),
       catchError(error => {
         console.error('Failed to validate token.');
@@ -70,7 +73,7 @@ export class InternalUserService {
       return throwError(new AlreadyLoginError());
     }
 
-    return this.httpClient.post<CreateTokenResponse>('/api/User/CreateToken', <CreateTokenRequest>credentials).pipe(
+    return this.httpClient.post<CreateTokenResponse>(createTokenUrl, <CreateTokenRequest>credentials).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.error instanceof ErrorEvent) {
           console.error('An error occurred when login: ' + error.error.message);
