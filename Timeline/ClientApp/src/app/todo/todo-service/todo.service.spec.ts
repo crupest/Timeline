@@ -3,7 +3,8 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { toArray } from 'rxjs/operators';
 
 import { TodoItem } from '../todo-item';
-import { TodoService, IssueResponse } from './todo.service';
+import { TodoService } from './todo.service';
+import { IssueResponse, githubBaseUrl } from './http-entities';
 
 
 describe('TodoService', () => {
@@ -18,8 +19,6 @@ describe('TodoService', () => {
 
   it('should work well', () => {
     const service: TodoService = TestBed.get(TodoService);
-
-    const baseUrl = service.baseUrl;
 
     const mockIssueList: IssueResponse = [{
       number: 1,
@@ -47,7 +46,8 @@ describe('TodoService', () => {
 
     const httpController: HttpTestingController = TestBed.get(HttpTestingController);
 
-    httpController.expectOne(request => request.url === baseUrl + '/issues' && request.params.get('state') === 'all').flush(mockIssueList);
+    httpController.expectOne(request => request.url === githubBaseUrl + '/issues' &&
+      request.params.get('state') === 'all').flush(mockIssueList);
 
     httpController.verify();
   });
