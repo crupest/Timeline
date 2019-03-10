@@ -6,7 +6,7 @@ import { of, Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 import { UserDialogComponent } from './user-dialog.component';
-import { createMockInternalUserService } from '../internal-user-service/mock-internal-user-service';
+import { createMockInternalUserService } from '../internal-user-service/internal-user.service.mock';
 import { InternalUserService, UserLoginState } from '../internal-user-service/internal-user.service';
 
 @Component({

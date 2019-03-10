@@ -10,7 +10,7 @@ import {
 import { UserDialogComponent } from './user-dialog/user-dialog.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { UserLoginSuccessComponent } from './user-login-success/user-login-success.component';
-import { UtilityModule } from '../utility/utility.module';
+import { UtilityModule } from '../utilities/utility.module';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
