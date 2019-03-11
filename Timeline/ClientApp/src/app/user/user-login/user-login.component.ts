@@ -1,32 +1,35 @@
-import { Component, Output, OnInit, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+
+import { InternalUserService } from '../internal-user-service/internal-user.service';
 
 export type LoginMessage = 'nologin' | 'invalidlogin' | string;
 
-export class LoginEvent {
-  username: string;
-  password: string;
-}
 
 @Component({
   selector: 'app-user-login',
   templateUrl: './user-login.component.html',
   styleUrls: ['./user-login.component.css']
 })
-export class UserLoginComponent {
+export class UserLoginComponent implements OnInit {
 
-  @Input()
+  constructor(private route: ActivatedRoute, private userService: InternalUserService) { }
+
   message: LoginMessage;
-
-  @Output()
-  login = new EventEmitter<LoginEvent>();
 
   form = new FormGroup({
     username: new FormControl(''),
     password: new FormControl('')
   });
 
+  ngOnInit() {
+    this.message = this.route.snapshot.paramMap.get('reason');
+  }
+
   onLoginButtonClick() {
-    this.login.emit(this.form.value);
+    this.userService.tryLogin(this.form.value).subscribe(_ => {
+      this.userService.userRouteNavigate(['success', { reason: 'login' }]);
+    }, (error: Error) => this.message = error.message);
   }
 }

@@ -3,29 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
 import { switchMap, map, filter } from 'rxjs/operators';
 
+import { IssueResponse, githubBaseUrl } from './http-entities';
 import { TodoItem } from '../todo-item';
 
-export interface IssueResponseItem {
-  number: number;
-  title: string;
-  state: string;
-  html_url: string;
-  pull_request?: any;
-}
-
-export type IssueResponse = IssueResponseItem[];
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodoService {
 
-  readonly baseUrl = 'https://api.github.com/repos/crupest/Timeline';
-
   constructor(private client: HttpClient) { }
 
   getWorkItemList(): Observable<TodoItem> {
-    return this.client.get<IssueResponse>(`${this.baseUrl}/issues`, {
+    return this.client.get<IssueResponse>(`${githubBaseUrl}/issues`, {
       params: {
         state: 'all'
       }
