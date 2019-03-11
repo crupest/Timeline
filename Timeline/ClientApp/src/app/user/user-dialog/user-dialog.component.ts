@@ -11,15 +11,16 @@ export class UserDialogComponent implements OnInit, OnDestroy {
 
   constructor(private userService: InternalUserService, private router: Router) { }
 
-  @ViewChild(RouterOutlet) outlet: RouterOutlet;
+  @ViewChild(RouterOutlet) outlet!: RouterOutlet;
 
   isLoading = true;
 
   ngOnInit() {
     // this is a workaround for a bug. see https://github.com/angular/angular/issues/20694
-    this.router.events.subscribe(e => {
+    const subscription = this.router.events.subscribe(e => {
       if (e instanceof ActivationStart && e.snapshot.outlet === 'user') {
         this.outlet.deactivate();
+        subscription.unsubscribe();
       }
     });
 

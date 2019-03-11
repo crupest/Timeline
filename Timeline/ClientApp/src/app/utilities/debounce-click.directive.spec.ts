@@ -13,8 +13,8 @@ interface TestComponent {
   template: '<button (appDebounceClick)="clickHandler()"></button>'
 })
 class DefaultDebounceTimeTestComponent {
-  @ViewChild(DebounceClickDirective)
-  directive: DebounceClickDirective;
+
+  @ViewChild(DebounceClickDirective) directive!: DebounceClickDirective;
 
   clickHandler: () => void = () => { };
 }
@@ -24,10 +24,9 @@ class DefaultDebounceTimeTestComponent {
   template: '<button (appDebounceClick)="clickHandler()" [appDebounceClickTime]="debounceTime"></button>'
 })
 class CustomDebounceTimeTestComponent {
-  debounceTime: number;
+  debounceTime: number | undefined;
 
-  @ViewChild(DebounceClickDirective)
-  directive: DebounceClickDirective;
+  @ViewChild(DebounceClickDirective) directive!: DebounceClickDirective;
 
   clickHandler: () => void = () => { };
 }
