@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { UserInfo } from '../entities';
 import { InternalUserService } from '../internal-user-service/internal-user.service';
+import { throwIfFalsy } from 'src/app/utilities/language-untilities';
 
 @Component({
   selector: 'app-user-login-success',
@@ -13,12 +14,18 @@ export class UserLoginSuccessComponent implements OnInit {
 
   displayLoginSuccessMessage = false;
 
-  userInfo: UserInfo;
+  userInfo: UserInfo | undefined;
 
   constructor(private route: ActivatedRoute, private userService: InternalUserService) { }
 
   ngOnInit() {
-    this.userInfo = this.userService.currentUserInfo;
+    const { currentUserInfo } = this.userService;
+
+    if (!currentUserInfo) {
+      throw new Error('Route error. No login now!');
+    }
+
+    this.userInfo = this.userService.currentUserInfo!;
     this.displayLoginSuccessMessage = this.route.snapshot.paramMap.get('reason') === 'login';
   }
 }

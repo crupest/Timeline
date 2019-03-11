@@ -49,7 +49,7 @@ describe('InternalUserService', () => {
     const httpController = TestBed.get(HttpTestingController) as HttpTestingController;
 
     httpController.expectOne((request: HttpRequest<CreateTokenRequest>) =>
-      request.url === createTokenUrl &&
+      request.url === createTokenUrl && request.body !== null &&
       request.body.username === 'user' &&
       request.body.password === 'user').flush(<CreateTokenResponse>{
         token: 'test-token',
@@ -73,7 +73,7 @@ describe('InternalUserService', () => {
     const mockToken = 'mock-token';
 
     const tokenValidateRequestMatcher = (req: HttpRequest<ValidateTokenRequest>) => {
-      return req.url === validateTokenUrl && req.body.token === mockToken;
+      return req.url === validateTokenUrl && req.body !== null && req.body.token === mockToken;
     };
 
     beforeEach(() => {

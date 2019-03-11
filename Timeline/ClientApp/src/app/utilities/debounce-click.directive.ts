@@ -7,7 +7,7 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class DebounceClickDirective implements OnInit, OnDestroy {
 
-  private subscription: Subscription;
+  private subscription: Subscription | undefined;
 
   @Output('appDebounceClick') clickEvent = new EventEmitter<any>();
 
@@ -34,6 +34,8 @@ export class DebounceClickDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }
