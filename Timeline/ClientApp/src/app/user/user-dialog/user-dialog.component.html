@@ -1,5 +1,4 @@
-<div [ngSwitch]="state" class="container">
-  <mat-progress-spinner *ngSwitchCase="'loading'" mode="indeterminate" diameter="50"></mat-progress-spinner>
-  <app-user-login *ngSwitchCase="'login'" (login)="login($event)" [message]="loginMessage"></app-user-login>
-  <app-user-login-success *ngSwitchCase="'success'" [userInfo]="userInfo" [displayLoginSuccessMessage]="displayLoginSuccessMessage"></app-user-login-success>
+<div class="container">
+  <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="50"></mat-progress-spinner>
+  <router-outlet name="user"></router-outlet>
 </div>

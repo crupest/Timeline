@@ -1,43 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-import { UserInfo } from '../user-info';
-import { UserService } from '../user-service/user.service';
-import { LoginEvent, LoginMessage } from '../user-login/user-login.component';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { InternalUserService } from '../internal-user-service/internal-user.service';
+import { RouterOutlet, Router, ActivationStart } from '@angular/router';
 
 @Component({
   selector: 'app-user-dialog',
   templateUrl: './user-dialog.component.html',
   styleUrls: ['./user-dialog.component.css']
 })
-export class UserDialogComponent implements OnInit {
+export class UserDialogComponent implements OnInit, OnDestroy {
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: InternalUserService, private router: Router) { }
 
-  state: 'loading' | 'login' | 'success' = 'loading';
+  @ViewChild(RouterOutlet) outlet: RouterOutlet;
 
-  loginMessage: LoginMessage;
-
-  displayLoginSuccessMessage = false;
-  userInfo: UserInfo;
+  isLoading = true;
 
   ngOnInit() {
-    this.userService.validateUserLoginState().subscribe(result => {
-      if (result.state === 'success') {
-        this.userInfo = result.userInfo;
-        this.state = 'success';
+    // this is a workaround for a bug. see https://github.com/angular/angular/issues/20694
+    this.router.events.subscribe(e => {
+      if (e instanceof ActivationStart && e.snapshot.outlet === 'user') {
+        this.outlet.deactivate();
+      }
+    });
+
+
+    this.userService.refreshAndGetUserState().subscribe(result => {
+      this.isLoading = false;
+      if (result === 'success') {
+        this.userService.userRouteNavigate(['success', { reason: 'already' }]);
       } else {
-        this.loginMessage = result.state;
-        this.state = 'login';
+        this.userService.userRouteNavigate(['login', { reason: result }]);
       }
     });
   }
 
-  login(event: LoginEvent) {
-    this.userService.tryLogin(event.username, event.password).subscribe(result => {
-      this.userInfo = result;
-      this.displayLoginSuccessMessage = true;
-      this.state = 'success';
-    }, (error: Error) => {
-      this.loginMessage = error.message;
-    });
+  ngOnDestroy() {
+    this.userService.userRouteNavigate(null);
   }
 }

@@ -1,13 +1,13 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { of } from 'rxjs';
+import { Router, Event } from '@angular/router';
+import { of, Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
-import { UserInfo } from '../user-info';
 import { UserDialogComponent } from './user-dialog.component';
-import { UserService, UserLoginState } from '../user-service/user.service';
-import { LoginEvent } from '../user-login/user-login.component';
+import { createMockInternalUserService } from '../internal-user-service/internal-user.service.mock';
+import { InternalUserService, UserLoginState } from '../internal-user-service/internal-user.service';
 
 @Component({
   /* tslint:disable-next-line:component-selector*/
@@ -17,36 +17,30 @@ import { LoginEvent } from '../user-login/user-login.component';
 class MatProgressSpinnerStubComponent { }
 
 @Component({
-  selector: 'app-user-login',
-  /* tslint:disable-next-line:use-input-property-decorator*/
-  inputs: ['message'],
+  /* tslint:disable-next-line:component-selector*/
+  selector: 'router-outlet',
   template: ''
 })
-class UserLoginStubComponent {
-  @Output()
-  login = new EventEmitter<LoginEvent>();
-}
+class RouterOutletStubComponent { }
 
-@Component({
-  selector: 'app-user-login-success',
-  /* tslint:disable-next-line:use-input-property-decorator*/
-  inputs: ['userInfo', 'displayLoginSuccessMessage'],
-  template: ''
-})
-class UserLoginSuccessStubComponent { }
 
 describe('UserDialogComponent', () => {
   let component: UserDialogComponent;
   let fixture: ComponentFixture<UserDialogComponent>;
-  let mockUserService: jasmine.SpyObj<UserService>;
+  let mockInternalUserService: jasmine.SpyObj<InternalUserService>;
+
 
   beforeEach(async(() => {
-    mockUserService = jasmine.createSpyObj('UserService', ['validateUserLoginState', 'tryLogin']);
+    mockInternalUserService = createMockInternalUserService();
 
     TestBed.configureTestingModule({
-      declarations: [UserDialogComponent, MatProgressSpinnerStubComponent,
-        UserLoginStubComponent, UserLoginSuccessStubComponent],
-      providers: [{ provide: UserService, useValue: mockUserService }]
+      declarations: [UserDialogComponent, MatProgressSpinnerStubComponent, RouterOutletStubComponent],
+      providers: [{ provide: InternalUserService, useValue: mockInternalUserService },
+      { // for the workaround
+        provide: Router, useValue: {
+          events: new Observable<Event>()
+        }
+      }]
     })
       .compileComponents();
   }));
@@ -57,7 +51,7 @@ describe('UserDialogComponent', () => {
   });
 
   it('progress spinner should work well', fakeAsync(() => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }).pipe(delay(10)));
+    mockInternalUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>'nologin').pipe(delay(10)));
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('mat-progress-spinner'))).toBeTruthy();
     tick(10);
@@ -66,49 +60,29 @@ describe('UserDialogComponent', () => {
   }));
 
   it('nologin should work well', () => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }));
+    mockInternalUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>'nologin'));
 
     fixture.detectChanges();
 
-    expect(mockUserService.validateUserLoginState).toHaveBeenCalled();
-    expect(fixture.debugElement.query(By.css('app-user-login'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('app-user-login-success'))).toBeFalsy();
+    expect(mockInternalUserService.refreshAndGetUserState).toHaveBeenCalled();
+    expect(mockInternalUserService.userRouteNavigate).toHaveBeenCalledWith(['login', { reason: 'nologin' }]);
+  });
+
+  it('invalid login should work well', () => {
+    mockInternalUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>'invalidlogin'));
+
+    fixture.detectChanges();
+
+    expect(mockInternalUserService.refreshAndGetUserState).toHaveBeenCalled();
+    expect(mockInternalUserService.userRouteNavigate).toHaveBeenCalledWith(['login',  { reason: 'invalidlogin' }]);
   });
 
   it('success should work well', () => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'success', userInfo: {} }));
+    mockInternalUserService.refreshAndGetUserState.and.returnValue(of(<UserLoginState>'success'));
 
     fixture.detectChanges();
 
-    expect(mockUserService.validateUserLoginState).toHaveBeenCalled();
-    expect(fixture.debugElement.query(By.css('app-user-login'))).toBeFalsy();
-    expect(fixture.debugElement.query(By.css('app-user-login-success'))).toBeTruthy();
-  });
-
-  it('login should work well', () => {
-    mockUserService.validateUserLoginState.and.returnValue(of(<UserLoginState>{ state: 'nologin' }));
-
-    fixture.detectChanges();
-    expect(mockUserService.validateUserLoginState).toHaveBeenCalled();
-    expect(fixture.debugElement.query(By.css('app-user-login'))).toBeTruthy();
-    expect(fixture.debugElement.query(By.css('app-user-login-success'))).toBeFalsy();
-
-    mockUserService.tryLogin.withArgs('user', 'user').and.returnValue(of(<UserInfo>{
-      username: 'user',
-      roles: ['user']
-    }));
-
-    (fixture.debugElement.query(By.css('app-user-login')).componentInstance as
-      UserLoginStubComponent).login.emit(<LoginEvent>{
-        username: 'user',
-        password: 'user'
-      });
-
-    fixture.detectChanges();
-
-    expect(mockUserService.tryLogin).toHaveBeenCalledWith('user', 'user');
-
-    expect(fixture.debugElement.query(By.css('app-user-login'))).toBeFalsy();
-    expect(fixture.debugElement.query(By.css('app-user-login-success'))).toBeTruthy();
+    expect(mockInternalUserService.refreshAndGetUserState).toHaveBeenCalled();
+    expect(mockInternalUserService.userRouteNavigate).toHaveBeenCalledWith(['success', { reason: 'already' }]);
   });
 });

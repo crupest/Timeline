@@ -10,15 +10,22 @@ import {
 import { UserDialogComponent } from './user-dialog/user-dialog.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { UserLoginSuccessComponent } from './user-login-success/user-login-success.component';
-import { UtilityModule } from '../utility/utility.module';
+import { UtilityModule } from '../utilities/utility.module';
+import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [UserDialogComponent, UserLoginComponent, UserLoginSuccessComponent],
   imports: [
-    CommonModule, HttpClientModule, ReactiveFormsModule,
+    RouterModule.forChild([
+      { path: 'login', component: UserLoginComponent, outlet: 'user' },
+      { path: 'success', component: UserLoginSuccessComponent, outlet: 'user' }
+    ]),
+    CommonModule, HttpClientModule, ReactiveFormsModule, BrowserAnimationsModule,
     MatFormFieldModule, MatProgressSpinnerModule, MatDialogModule, MatInputModule, MatButtonModule,
     UtilityModule
   ],
+  exports: [RouterModule],
   entryComponents: [UserDialogComponent]
 })
 export class UserModule { }
