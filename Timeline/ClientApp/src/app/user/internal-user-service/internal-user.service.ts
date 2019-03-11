@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
 import { map, catchError, retry } from 'rxjs/operators';
 
+import { nullIfUndefined } from '../../utilities/language-untilities';
+
 import { AlreadyLoginError, BadCredentialsError, BadNetworkError, UnknownError } from './errors';
 import {
   createTokenUrl, validateTokenUrl, CreateTokenRequest,
@@ -23,7 +25,7 @@ export type UserLoginState = 'nologin' | 'invalidlogin' | 'success';
 })
 export class InternalUserService {
 
-  private token: string;
+  private token: string | null = null;
   private userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
 
   get currentUserInfo(): UserInfo | null {
@@ -36,7 +38,7 @@ export class InternalUserService {
 
   constructor(private httpClient: HttpClient, private router: Router) { }
 
-  userRouteNavigate(commands: any[]) {
+  userRouteNavigate(commands: any[] | null) {
     this.router.navigate([{
       outlets: {
         user: commands
@@ -57,7 +59,7 @@ export class InternalUserService {
       }),
       map(result => {
         if (result.isValid) {
-          this.userInfoSubject.next(result.userInfo);
+          this.userInfoSubject.next(nullIfUndefined(result.userInfo));
           return <UserLoginState>'success';
         } else {
           this.token = null;

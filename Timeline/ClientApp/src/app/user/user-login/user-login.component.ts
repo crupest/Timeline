@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { InternalUserService } from '../internal-user-service/internal-user.service';
 
-export type LoginMessage = 'nologin' | 'invalidlogin' | string;
+export type LoginMessage = 'nologin' | 'invalidlogin' | string | null | undefined;
 
 
 @Component({
