@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, Event } from '@angular/router';
-import { of, Observable } from 'rxjs';
-import { delay } from 'rxjs/operators';
+
+import { Observable } from 'rxjs';
 
 import { UserDialogComponent } from './user-dialog.component';
 
@@ -35,6 +34,10 @@ describe('UserDialogComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(UserDialogComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 });
