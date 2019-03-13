@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { InternalUserService } from '../internal-user-service/internal-user.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { RouterOutlet, Router, ActivationStart } from '@angular/router';
 
 @Component({
@@ -7,13 +6,11 @@ import { RouterOutlet, Router, ActivationStart } from '@angular/router';
   templateUrl: './user-dialog.component.html',
   styleUrls: ['./user-dialog.component.css']
 })
-export class UserDialogComponent implements OnInit, OnDestroy {
+export class UserDialogComponent implements OnInit {
 
-  constructor(private userService: InternalUserService, private router: Router) { }
+  constructor(private router: Router) { }
 
   @ViewChild(RouterOutlet) outlet!: RouterOutlet;
-
-  isLoading = true;
 
   ngOnInit() {
     // this is a workaround for a bug. see https://github.com/angular/angular/issues/20694
@@ -23,19 +20,5 @@ export class UserDialogComponent implements OnInit, OnDestroy {
         subscription.unsubscribe();
       }
     });
-
-
-    this.userService.refreshAndGetUserState().subscribe(result => {
-      this.isLoading = false;
-      if (result === 'success') {
-        this.userService.userRouteNavigate(['success', { reason: 'already' }]);
-      } else {
-        this.userService.userRouteNavigate(['login', { reason: result }]);
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    this.userService.userRouteNavigate(null);
   }
 }
