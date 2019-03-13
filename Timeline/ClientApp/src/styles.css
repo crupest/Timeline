@@ -1,6 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
+html {
+  overflow: unset!important; /* why cdk-global-scrollblock add overflow-y: scroll ??????????? */
+}
+
 body {
   margin: 0;
 }

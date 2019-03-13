@@ -58,7 +58,7 @@ export class RequireLoginGuard extends AuthGuard {
   }
 
   onAuthFailed() {
-    this.internalUserService.userRouteNavigate(['login', { reason: 'nologin' }]);
+    this.internalUserService.userRouteNavigate(['login']);
   }
 }
 
