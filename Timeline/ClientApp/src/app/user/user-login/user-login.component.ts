@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 
 import { InternalUserService } from '../internal-user-service/internal-user.service';
 
-export type LoginMessage = 'nologin' | 'invalidlogin' | string | null | undefined;
 
+export type LoginMessage = 'nologin' | 'invalidlogin' | string | null | undefined;
 
 @Component({
   selector: 'app-user-login',
@@ -14,7 +13,7 @@ export type LoginMessage = 'nologin' | 'invalidlogin' | string | null | undefine
 })
 export class UserLoginComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute, private userService: InternalUserService) { }
+  constructor(private userService: InternalUserService) { }
 
   message: LoginMessage;
 
@@ -24,12 +23,15 @@ export class UserLoginComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.message = this.route.snapshot.paramMap.get('reason');
+    if (this.userService.currentUserInfo) {
+      throw new Error('Route error! Already login!');
+    }
+    this.message = 'nologin';
   }
 
   onLoginButtonClick() {
     this.userService.tryLogin(this.form.value).subscribe(_ => {
-      this.userService.userRouteNavigate(['success', { reason: 'login' }]);
+      this.userService.userRouteNavigate(['success', { fromlogin: 'true' }]);
     }, (error: Error) => this.message = error.message);
   }
 }
