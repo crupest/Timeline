@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 import { TodoModule } from './todo/todo.module';
 import { HomeModule } from './home/home.module';
 import { UserModule } from './user/user.module';
+import { UserService } from './user/user.service';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { UserModule } from './user/user.module';
       { path: '', redirectTo: '/home', pathMatch: 'full' },
     ])
   ],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

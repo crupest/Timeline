@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
+import { Router, ActivationStart } from '@angular/router';
 
 import { Observable } from 'rxjs';
 
@@ -15,7 +16,18 @@ import { UserDialogComponent } from './user-dialog/user-dialog.component';
   providedIn: 'root'
 })
 export class UserService {
-  constructor(private dialog: MatDialog, private internalService: InternalUserService) { }
+
+  private dialogRef: MatDialogRef<UserDialogComponent> | null = null;
+
+  constructor(router: Router, private dialog: MatDialog, private internalService: InternalUserService) {
+    router.events.subscribe(event => {
+      if (event instanceof ActivationStart && event.snapshot.outlet === 'user') {
+        if (!this.dialogRef) {
+          setTimeout(() => this.openUserDialog(), 0);
+        }
+      }
+    });
+  }
 
   get currentUserInfo(): UserInfo | null {
     return this.internalService.currentUserInfo;
@@ -25,9 +37,19 @@ export class UserService {
     return this.internalService.userInfo$;
   }
 
-  openUserDialog() {
-    this.dialog.open(UserDialogComponent, {
+  private openUserDialog() {
+    if (this.dialogRef) {
+      return;
+    }
+
+    this.dialogRef = this.dialog.open(UserDialogComponent, {
       width: '300px'
+    });
+
+    const subscription = this.dialogRef.afterClosed().subscribe(_ => {
+      this.internalService.userRouteNavigate(null);
+      this.dialogRef = null;
+      subscription.unsubscribe();
     });
   }
 }

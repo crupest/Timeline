@@ -60,10 +60,8 @@ describe('UserLoginSuccessComponent', () => {
   });
 
   it('login success message should display well', () => {
-    mockActivatedRoute.pushSnapshotWithParamMap({ reason: 'login' });
-
+    mockActivatedRoute.pushSnapshotWithParamMap({ fromlogin: 'true' });
     fixture.detectChanges();
-
     expect((fixture.debugElement.query(By.css('p.login-success-message')))).toBeTruthy();
   });
 });

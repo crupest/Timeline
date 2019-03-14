@@ -20,6 +20,6 @@ export class UserLoginSuccessComponent implements OnInit {
 
   ngOnInit() {
     this.userInfo = throwIfNullOrUndefined(this.userService.currentUserInfo, () => 'Route error. No login now!');
-    this.displayLoginSuccessMessage = this.route.snapshot.paramMap.get('reason') === 'login';
+    this.displayLoginSuccessMessage = this.route.snapshot.paramMap.get('fromlogin') === 'true';
   }
 }

@@ -7,7 +7,6 @@ import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { createMockInternalUserService } from '../internal-user-service/internal-user.service.mock';
-import { MockActivatedRoute } from '../../test-utilities/activated-route.mock';
 import { UserLoginComponent } from './user-login.component';
 import { InternalUserService } from '../internal-user-service/internal-user.service';
 import { UserInfo } from '../entities';
@@ -16,17 +15,17 @@ describe('UserLoginComponent', () => {
   let component: UserLoginComponent;
   let fixture: ComponentFixture<UserLoginComponent>;
   let mockInternalUserService: jasmine.SpyObj<InternalUserService>;
-  let mockActivatedRoute: MockActivatedRoute;
 
   beforeEach(async(() => {
     mockInternalUserService = createMockInternalUserService();
-    mockActivatedRoute = new MockActivatedRoute();
+
+    // mock property
+    (<any>mockInternalUserService).currentUserInfo = null;
 
     TestBed.configureTestingModule({
       declarations: [UserLoginComponent],
       providers: [
-        { provide: InternalUserService, useValue: mockInternalUserService },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        { provide: InternalUserService, useValue: mockInternalUserService }
       ],
       imports: [ReactiveFormsModule],
       schemas: [NO_ERRORS_SCHEMA]
@@ -77,22 +76,22 @@ describe('UserLoginComponent', () => {
     component.onLoginButtonClick();
 
     expect(mockInternalUserService.tryLogin).toHaveBeenCalledWith(mockValue);
-    expect(mockInternalUserService.userRouteNavigate).toHaveBeenCalledWith(['success', { reason: 'login' }]);
+    expect(mockInternalUserService.userRouteNavigate).toHaveBeenCalledWith(['success', { fromlogin: 'true' }]);
   });
 
   describe('message display', () => {
     it('nologin reason should display', () => {
-      mockActivatedRoute.pushSnapshotWithParamMap({ reason: 'nologin' });
       fixture.detectChanges();
-      expect(component.message).toBe('nologin');
+      component.message = 'nologin';
+      fixture.detectChanges();
       expect((fixture.debugElement.query(By.css('p.mat-body')).nativeElement as
         HTMLParagraphElement).textContent).toBe('You haven\'t login.');
     });
 
     it('invalid login reason should display', () => {
-      mockActivatedRoute.pushSnapshotWithParamMap({ reason: 'invalidlogin' });
       fixture.detectChanges();
-      expect(component.message).toBe('invalidlogin');
+      component.message = 'invalidlogin';
+      fixture.detectChanges();
       expect((fixture.debugElement.query(By.css('p.mat-body')).nativeElement as
         HTMLParagraphElement).textContent).toBe('Your login is no longer valid.');
     });
