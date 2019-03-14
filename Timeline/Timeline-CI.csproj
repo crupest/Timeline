@@ -8,6 +8,7 @@
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <Authors>crupest</Authors>
+    <AssemblyName>Timeline</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

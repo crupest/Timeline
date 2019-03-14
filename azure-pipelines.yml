@@ -46,7 +46,7 @@ steps:
     dotnet restore Timeline.Tests/Timeline.Test-CI.csproj --configfile nuget.config
   displayName: Dotnet Restore
 
-- script: dotnet test Timeline.Tests/Timeline.Test-CI.csproj --configuration $(buildConfiguration) --no-restore --logger trx
+- script: dotnet test Timeline.Tests/Timeline.Tests-CI.csproj --configuration $(buildConfiguration) --no-restore --logger trx
   displayName: Dotnet Test
 
 - task: PublishTestResults@2
