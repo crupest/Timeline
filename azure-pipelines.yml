@@ -6,6 +6,9 @@
 trigger:
 - master
 
+variables:
+  ArtifactFeed: NodeModules
+
 jobs:
 - job: FrontEnd
   pool:
