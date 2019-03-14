@@ -8,69 +8,56 @@ trigger:
 
 variables:
   ArtifactFeed: NodeModules
+  buildConfiguration: 'Release'
+  ASPNETCORE_ENVIRONMENT: 'Development'
 
-jobs:
-- job: FrontEnd
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  steps:
-  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
-    inputs:
-      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
-      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
-      vstsFeed: '$(ArtifactFeed)'
-  - script: yarn install
-    condition: ne(variables['CacheRestored'], 'true')
-    workingDirectory: Timeline/ClientApp
-    displayName: Yarn Install
-  - script: yarn run test --no-watch --browsers=ChromeHeadless --reporters junit
-    workingDirectory: Timeline/ClientApp
-    displayName: Angular Test
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testRunner: JUnit
-      testResultsFiles: '**/TESTS-*.xml'
+pool:
+  vmImage: 'Ubuntu-16.04'
+steps:
+- task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreCacheV1.RestoreCache@1
+  inputs:
+    keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
+    targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+    vstsFeed: '$(ArtifactFeed)'
 
-- job: BackEnd
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  variables:
-    buildConfiguration: 'Release'
-    ASPNETCORE_ENVIRONMENT: 'Development'
-  steps:
-  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
-    inputs:
-      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
-      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
-      vstsFeed: '$(ArtifactFeed)'
-  - script: dotnet build --configuration $(buildConfiguration) --configfile nuget.config
-    displayName: Dotnet Build
-  - script: dotnet test Timeline.Tests --configuration $(buildConfiguration) --logger trx
-    displayName: Dotnet Test
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testRunner: VSTest
-      testResultsFiles: '**/*.trx'
+- script: yarn install --non-interactive
+  condition: ne(variables['CacheRestored'], 'true')
+  workingDirectory: Timeline/ClientApp
+  displayName: Yarn Install
 
-- job: Publish
-  dependsOn:
-  - FrontEnd
-  - BackEnd
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  variables:
-    buildConfiguration: 'Release'
-  steps:  
-  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
-    inputs:
-      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
-      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
-      vstsFeed: '$(ArtifactFeed)'
-  - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./publish/
-    displayName: Dotnet Publish
-  - task: PublishPipelineArtifact@0
-    inputs:
-      artifactName: 'timeline'
-      targetPath: Timeline/publish
+- task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
+  inputs:
+    keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
+    targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+    vstsFeed: '$(ArtifactFeed)'
+
+- script: yarn run test --prod --no-watch --browsers=ChromeHeadless --reporters junit
+  workingDirectory: Timeline/ClientApp
+  displayName: Angular Test
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: '**/TESTS-*.xml'
+
+- script: dotnet test Timeline.Tests/Timeline.Test-CI.csproj --configuration $(buildConfiguration) --configfile nuget.config --logger trx
+  displayName: Dotnet Test
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
+- script: yarn build --prod
+  workingDirectory: Timeline/ClientApp
+  displayName: Client App Build
+
+- script: dotnet publish Timeline/Timeline-CI.csproj --configuration $(buildConfiguration) --configfile nuget.config --output ./publish/
+  displayName: Dotnet Publish
+
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'timeline'
+    targetPath: Timeline/publish
