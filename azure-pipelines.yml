@@ -43,7 +43,7 @@ steps:
 
 - script: |
     dotnet restore Timeline/Timeline-CI.csproj --configfile nuget.config
-    dotnet restore Timeline.Tests/Timeline.Test-CI.csproj --configfile nuget.config
+    dotnet restore Timeline.Tests/Timeline.Tests-CI.csproj --configfile nuget.config
   displayName: Dotnet Restore
 
 - script: dotnet test Timeline.Tests/Timeline.Tests-CI.csproj --configuration $(buildConfiguration) --no-restore --logger trx
