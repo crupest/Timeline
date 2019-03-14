@@ -22,7 +22,9 @@ export class UserService {
   constructor(router: Router, private dialog: MatDialog, private internalService: InternalUserService) {
     router.events.subscribe(event => {
       if (event instanceof ActivationStart && event.snapshot.outlet === 'user') {
-        setTimeout(() => this.openUserDialog(), 0);
+        if (!this.dialogRef) {
+          setTimeout(() => this.openUserDialog(), 0);
+        }
       }
     });
   }
