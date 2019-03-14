@@ -11,7 +11,13 @@ jobs:
   pool:
     vmImage: 'Ubuntu-16.04'
   steps:
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
+    inputs:
+      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+      vstsFeed: '$(ArtifactFeed)'
   - script: yarn install
+    condition: ne(variables['CacheRestored'], 'true')
     workingDirectory: Timeline/ClientApp
     displayName: Yarn Install
   - script: yarn run test --no-watch --browsers=ChromeHeadless --reporters junit
@@ -30,6 +36,11 @@ jobs:
     buildConfiguration: 'Release'
     ASPNETCORE_ENVIRONMENT: 'Development'
   steps:
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
+    inputs:
+      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+      vstsFeed: '$(ArtifactFeed)'
   - script: dotnet build --configuration $(buildConfiguration) --configfile nuget.config
     displayName: Dotnet Build
   - script: dotnet test Timeline.Tests --configuration $(buildConfiguration) --logger trx
@@ -49,6 +60,11 @@ jobs:
   variables:
     buildConfiguration: 'Release'
   steps:  
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
+    inputs:
+      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+      vstsFeed: '$(ArtifactFeed)'
   - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./publish/
     displayName: Dotnet Publish
   - task: PublishPipelineArtifact@0
