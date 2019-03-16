@@ -3,9 +3,9 @@ export function nullIfUndefined<T>(value: T | undefined): T | null {
 }
 
 export function throwIfNullOrUndefined<T>(value: T | null | undefined,
-  lazyMessage: () => string = () => 'Value mustn\'t be falsy'): T | never {
+  message: string | (() => string) = 'Value mustn\'t be null or undefined'): T | never {
   if (value === null || value === undefined) {
-    throw new Error(lazyMessage());
+    throw new Error(typeof message === 'string' ? message : message());
   } else {
     return value;
   }
