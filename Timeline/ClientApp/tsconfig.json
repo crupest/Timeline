@@ -17,5 +17,9 @@
       "dom"
     ],
     "strict": true
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
   }
 }

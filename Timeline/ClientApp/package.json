@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start-dotnet": "dotnet run --project ..",
+    "start-dotnet": "dotnet run --project ../Timeline.csproj",
     "build": "ng build",
     "build:ssr": "ng run Timeline:server:dev",
     "test": "ng test",
