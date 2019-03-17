@@ -3,9 +3,7 @@ import { ParamMap, ActivatedRouteSnapshot, ActivatedRoute } from '@angular/route
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export type PartialMock<T> = {
-  [P in keyof T]?: T[P] | PartialMock<T[P]>;
-};
+import { PartialMock } from './mock';
 
 export interface ParamMapCreator { [name: string]: string | string[]; }
 

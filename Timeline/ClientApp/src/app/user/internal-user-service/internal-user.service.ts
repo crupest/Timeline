@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -12,7 +12,19 @@ import {
 } from './http-entities';
 import { UserCredentials, UserInfo } from '../entities';
 import { MatSnackBar } from '@angular/material';
+import { WINDOW } from '../window-inject-token';
 
+export const snackBarText = {
+  checkFail: 'Failed to check last login',
+  noLogin: 'No login before!',
+  alreadyLogin: 'You have login already!',
+  invalidLogin: 'Last login is no longer invalid!',
+  ok: 'ok'
+};
+
+export type SnackBarTextKey = Exclude<keyof typeof snackBarText, 'ok'>;
+
+export const TOKEN_STORAGE_KEY = 'token';
 
 /**
  * This service is only used internal in user module.
@@ -33,25 +45,28 @@ export class InternalUserService {
     return this.userInfoSubject;
   }
 
-  constructor(private httpClient: HttpClient, private router: Router, private snackBar: MatSnackBar) {
-    const savedToken = window.localStorage.getItem('token');
+  private openSnackBar(snackBar: MatSnackBar, textKey: SnackBarTextKey) {
+    setTimeout(() => snackBar.open(snackBarText[textKey], snackBarText.ok, { duration: 2000 }), 0);
+  }
+
+  constructor(@Inject(WINDOW) private window: Window, private httpClient: HttpClient, private router: Router, snackBar: MatSnackBar) {
+    const savedToken = this.window.localStorage.getItem(TOKEN_STORAGE_KEY);
     if (savedToken === null) {
-      setTimeout(() => snackBar.open('No login before!', 'ok', { duration: 2000 }), 0);
+      this.openSnackBar(snackBar, 'noLogin');
     } else {
       this.validateToken(savedToken).subscribe(result => {
         if (result === null) {
-          window.localStorage.removeItem('token');
-          setTimeout(() => snackBar.open('Last login is no longer invalid!', 'ok', { duration: 2000 }), 0);
+          this.window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+          this.openSnackBar(snackBar, 'invalidLogin');
         } else {
           this.token = savedToken;
           this.userInfoSubject.next(result);
-          setTimeout(() => snackBar.open('You have login already!', 'ok', { duration: 2000 }), 0);
+          this.openSnackBar(snackBar, 'alreadyLogin');
         }
       }, _ => {
-        setTimeout(() => snackBar.open('Failed to check last login', 'ok', { duration: 2000 }), 0);
+        this.openSnackBar(snackBar, 'checkFail');
       });
     }
-
   }
 
   private validateToken(token: string): Observable<UserInfo | null> {
@@ -107,7 +122,7 @@ export class InternalUserService {
       map(result => {
         this.token = result.token;
         if (options.remember) {
-          window.localStorage.setItem('token', result.token);
+          this.window.localStorage.setItem(TOKEN_STORAGE_KEY, result.token);
         }
         this.userInfoSubject.next(result.userInfo);
         return result.userInfo;
