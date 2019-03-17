@@ -10,3 +10,9 @@ export function throwIfNullOrUndefined<T>(value: T | null | undefined,
     return value;
   }
 }
+
+export function repeat(time: number, action: (index?: number) => void) {
+  for (let i = 0; i < time; i++) {
+    action(i);
+  }
+}

@@ -15,6 +15,7 @@ import { UserLoginComponent } from './user-login/user-login.component';
 import { UserLoginSuccessComponent } from './user-login-success/user-login-success.component';
 import { RedirectComponent } from './redirect.component';
 import { UtilityModule } from '../utilities/utility.module';
+import { WINDOW } from './window-inject-token';
 
 @NgModule({
   declarations: [UserDialogComponent, UserLoginComponent, UserLoginSuccessComponent, RedirectComponent],
@@ -28,6 +29,7 @@ import { UtilityModule } from '../utilities/utility.module';
     MatFormFieldModule, MatProgressSpinnerModule, MatDialogModule, MatInputModule, MatButtonModule, MatSnackBarModule,
     UtilityModule
   ],
+  providers: [{provide: WINDOW, useValue: window}],
   exports: [RouterModule],
   entryComponents: [UserDialogComponent]
 })
