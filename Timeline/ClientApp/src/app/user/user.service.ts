@@ -29,7 +29,7 @@ export class UserService {
     });
   }
 
-  get currentUserInfo(): UserInfo | null {
+  get currentUserInfo(): UserInfo | null | undefined {
     return this.internalService.currentUserInfo;
   }
 
