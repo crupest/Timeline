@@ -52,11 +52,13 @@ export class InternalUserService {
     const savedToken = this.window.localStorage.getItem(TOKEN_STORAGE_KEY);
     if (savedToken === null) {
       this.openSnackBar(snackBar, 'noLogin');
+      this.userInfoSubject.next(null);
     } else {
       this.validateToken(savedToken).subscribe(result => {
         if (result === null) {
           this.window.localStorage.removeItem(TOKEN_STORAGE_KEY);
           this.openSnackBar(snackBar, 'invalidLogin');
+          this.userInfoSubject.next(null);
         } else {
           this.token = savedToken;
           this.userInfoSubject.next(result);
@@ -64,6 +66,7 @@ export class InternalUserService {
         }
       }, _ => {
         this.openSnackBar(snackBar, 'checkFail');
+        this.userInfoSubject.next(null);
       });
     }
   }
