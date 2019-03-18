@@ -16,20 +16,22 @@ import { UserLoginSuccessComponent } from './user-login-success/user-login-succe
 import { RedirectComponent } from './redirect.component';
 import { UtilityModule } from '../utilities/utility.module';
 import { WINDOW } from './window-inject-token';
+import { UserLogoutComponent } from './user-logout/user-logout.component';
 
 @NgModule({
-  declarations: [UserDialogComponent, UserLoginComponent, UserLoginSuccessComponent, RedirectComponent],
+  declarations: [UserDialogComponent, UserLoginComponent, UserLoginSuccessComponent, RedirectComponent, UserLogoutComponent],
   imports: [
     RouterModule.forChild([
       { path: 'login', canActivate: [RequireNoLoginGuard], component: UserLoginComponent, outlet: 'user' },
       { path: 'success', canActivate: [RequireLoginGuard], component: UserLoginSuccessComponent, outlet: 'user' },
+      { path: 'logout', canActivate: [RequireLoginGuard], component: UserLogoutComponent, outlet: 'user' },
       { path: '**', component: RedirectComponent, outlet: 'user' }
     ]),
     CommonModule, HttpClientModule, ReactiveFormsModule, BrowserAnimationsModule,
     MatFormFieldModule, MatProgressSpinnerModule, MatDialogModule, MatInputModule, MatButtonModule, MatSnackBarModule,
     UtilityModule
   ],
-  providers: [{provide: WINDOW, useValue: window}],
+  providers: [{ provide: WINDOW, useValue: window }],
   exports: [RouterModule],
   entryComponents: [UserDialogComponent]
 })

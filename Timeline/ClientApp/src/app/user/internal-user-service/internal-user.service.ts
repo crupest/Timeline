@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { Observable, throwError, BehaviorSubject, of } from 'rxjs';
-import { map, catchError, retry, switchMap, tap } from 'rxjs/operators';
+import { map, catchError, retry, switchMap, tap, filter } from 'rxjs/operators';
 
 import { AlreadyLoginError, BadCredentialsError, BadNetworkError, UnknownError } from './errors';
 import {
@@ -35,14 +35,13 @@ export const TOKEN_STORAGE_KEY = 'token';
 export class InternalUserService {
 
   private token: string | null = null;
-  private userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
+  private userInfoSubject = new BehaviorSubject<UserInfo | null | undefined>(undefined);
 
-  get currentUserInfo(): UserInfo | null {
+  readonly userInfo$: Observable<UserInfo | null> =
+    <Observable<UserInfo | null>>this.userInfoSubject.pipe(filter(value => value !== undefined));
+
+  get currentUserInfo(): UserInfo | null | undefined {
     return this.userInfoSubject.value;
-  }
-
-  get userInfo$(): Observable<UserInfo | null> {
-    return this.userInfoSubject;
   }
 
   private openSnackBar(snackBar: MatSnackBar, textKey: SnackBarTextKey) {
@@ -128,5 +127,15 @@ export class InternalUserService {
         return result.userInfo;
       })
     );
+  }
+
+  logout() {
+    if (this.currentUserInfo === null) {
+      throw new Error('No login now. You can\'t logout.');
+    }
+
+    this.window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+    this.token = null;
+    this.userInfoSubject.next(null);
   }
 }
