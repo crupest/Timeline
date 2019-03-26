@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { InternalUserService } from '../internal-user-service/internal-user.service';
 
 @Component({
@@ -7,11 +8,9 @@ import { InternalUserService } from '../internal-user-service/internal-user.serv
   styleUrls: ['./user-logout.component.css']
 })
 export class UserLogoutComponent implements OnInit {
-
   constructor(private userService: InternalUserService) { }
 
   ngOnInit() {
     this.userService.logout();
   }
-
 }

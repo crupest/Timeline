@@ -1,3 +1,5 @@
+import { Observable, of } from 'rxjs';
+
 import { AuthGuard, AuthStrategy } from './auth.guard';
 import { UserInfo } from './entities';
 
@@ -8,10 +10,9 @@ describe('AuthGuard', () => {
     }
 
     authStrategy: AuthStrategy = 'all';
-    onAuthFailed: () => void = () => { };
   }
 
-  let mockUserService: { currentUserInfo: UserInfo | null };
+  let mockUserService: { userInfo$: Observable<UserInfo | null> };
   let guard: ConfiurableAuthGuard;
   let onAuthFialedSpy: jasmine.Spy;
 
@@ -28,19 +29,27 @@ describe('AuthGuard', () => {
     return () => {
       guard.authStrategy = authStrategy;
 
-      mockUserService.currentUserInfo = null;
-      expect(guard.canActivate(<any>null, <any>null)).toBe(result.nologin);
+      function testWith(userInfo: UserInfo | null, r: boolean) {
+        mockUserService.userInfo$ = of(userInfo);
 
-      mockUserService.currentUserInfo = { username: 'user', roles: [] };
-      expect(guard.canActivate(<any>null, <any>null)).toBe(result.loginWithNoRole);
+        const rawResult = guard.canActivate(<any>null, <any>null);
+        if (typeof rawResult === 'boolean') {
+          expect(rawResult).toBe(r);
+        } else if (rawResult instanceof Observable) {
+          rawResult.subscribe(next => expect(next).toBe(r));
+        } else {
+          throw new Error('Unsupported return type.');
+        }
+      }
 
-      mockUserService.currentUserInfo = { username: 'user', roles: mockRoles };
-      expect(guard.canActivate(<any>null, <any>null)).toBe(result.loginWithMockRoles);
+      testWith(null, result.nologin);
+      testWith({ username: 'user', roles: [] }, result.loginWithNoRole);
+      testWith({ username: 'user', roles: mockRoles }, result.loginWithMockRoles);
     };
   }
 
   beforeEach(() => {
-    mockUserService = { currentUserInfo: null };
+    mockUserService = { userInfo$: of(null) };
     guard = new ConfiurableAuthGuard(mockUserService);
     onAuthFialedSpy = spyOn(guard, 'onAuthFailed');
   });
@@ -54,8 +63,7 @@ describe('AuthGuard', () => {
 
   it('auth failed callback should be called', () => {
     guard.authStrategy = 'requirelogin';
-    mockUserService.currentUserInfo = null;
-    guard.canActivate(<any>null, <any>null);
+    (<Observable<boolean>>guard.canActivate(<any>null, <any>null)).subscribe();
     expect(onAuthFialedSpy).toHaveBeenCalled();
   });
 });
