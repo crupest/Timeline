@@ -2,7 +2,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 
-import { MockActivatedRoute } from 'src/app/test-utilities/activated-route.mock';
+import { RouterLinkStubDirective } from '../../test-utilities/router-link.mock';
+import { MockActivatedRoute } from '../../test-utilities/activated-route.mock';
 import { createMockInternalUserService } from '../internal-user-service/internal-user.service.mock';
 
 import { UserLoginSuccessComponent } from './user-login-success.component';
@@ -29,7 +30,7 @@ describe('UserLoginSuccessComponent', () => {
     (<any>mockInternalUserService).currentUserInfo = mockUserInfo;
 
     TestBed.configureTestingModule({
-      declarations: [UserLoginSuccessComponent],
+      declarations: [UserLoginSuccessComponent, RouterLinkStubDirective],
       providers: [
         { provide: InternalUserService, useValue: mockInternalUserService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute }
@@ -63,5 +64,12 @@ describe('UserLoginSuccessComponent', () => {
     mockActivatedRoute.pushSnapshotWithParamMap({ fromlogin: 'true' });
     fixture.detectChanges();
     expect((fixture.debugElement.query(By.css('p.login-success-message')))).toBeTruthy();
+  });
+
+  it('logout button should be set well', () => {
+    fixture.detectChanges();
+    const routerLinkDirective: RouterLinkStubDirective =
+      fixture.debugElement.query(By.css('a')).injector.get(RouterLinkStubDirective);
+      expect(routerLinkDirective.linkParams).toEqual(['..', 'logout']);
   });
 });
