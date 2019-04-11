@@ -1,6 +1,6 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpRequest } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material';
 
@@ -111,7 +111,7 @@ describe('InternalUserService', () => {
         httpController.verify();
 
         expect(mockLocalStorage.getItem(TOKEN_STORAGE_KEY)).toBe(rememberMe ? mockToken : null);
-      }
+      };
     }
 
     it('remember me should work well', createTest(true));
