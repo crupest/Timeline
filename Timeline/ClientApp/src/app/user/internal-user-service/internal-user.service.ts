@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Observable, throwError, BehaviorSubject, of } from 'rxjs';
 import { map, catchError, retry, switchMap, tap, filter } from 'rxjs/operators';
 
-import { AlreadyLoginError, BadCredentialsError, BadNetworkError, UnknownError } from './errors';
+import { AlreadyLoginError, BadCredentialsError, BadNetworkError, UnknownError, ServerInternalError } from './errors';
 import {
   createTokenUrl, validateTokenUrl, CreateTokenRequest,
   CreateTokenResponse, ValidateTokenRequest, ValidateTokenResponse
@@ -84,7 +84,7 @@ export class InternalUserService {
           if (userInfo) {
             return of(userInfo);
           } else {
-            return throwError(new Error('Wrong server response. IsValid is true but UserInfo is null.'));
+            return throwError(new ServerInternalError('IsValid is true but UserInfo is null.'));
           }
         } else {
           return of(null);
@@ -117,21 +117,28 @@ export class InternalUserService {
         if (error.error instanceof ErrorEvent) {
           console.error('An error occurred when login: ' + error.error.message);
           return throwError(new BadNetworkError());
-        } else if (error.status === 400) {
-          console.error('An error occurred when login: wrong credentials.');
-          return throwError(new BadCredentialsError());
         } else {
           console.error('An unknown error occurred when login: ' + error);
           return throwError(new UnknownError(error));
         }
       }),
-      map(result => {
-        this.token = result.token;
-        if (info.rememberMe) {
-          this.window.localStorage.setItem(TOKEN_STORAGE_KEY, result.token);
+      switchMap(result => {
+        if (result.success) {
+          if (result.token && result.userInfo) {
+            this.token = result.token;
+            if (info.rememberMe) {
+              this.window.localStorage.setItem(TOKEN_STORAGE_KEY, result.token);
+            }
+            this.userInfoSubject.next(result.userInfo);
+            return of(result.userInfo);
+          } else {
+          console.error('An error occurred when login: server return wrong data.');
+          return throwError(new ServerInternalError('Token or userInfo is null.'));
+          }
+        } else {
+          console.error('An error occurred when login: wrong credentials.');
+          return throwError(new BadCredentialsError());
         }
-        this.userInfoSubject.next(result.userInfo);
-        return result.userInfo;
       })
     );
   }
