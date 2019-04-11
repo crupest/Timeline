@@ -6,8 +6,9 @@ export const validateTokenUrl = '/api/User/ValidateToken';
 export type CreateTokenRequest = UserCredentials;
 
 export interface CreateTokenResponse {
-  token: string;
-  userInfo: UserInfo;
+  success: boolean;
+  token?: string;
+  userInfo?: UserInfo;
 }
 
 export interface ValidateTokenRequest {

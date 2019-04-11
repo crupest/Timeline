@@ -102,6 +102,7 @@ describe('InternalUserService', () => {
           request.url === createTokenUrl && request.body !== null &&
           request.body.username === mockUserCredentials.username &&
           request.body.password === mockUserCredentials.password).flush(<CreateTokenResponse>{
+            success: true,
             token: mockToken,
             userInfo: mockUserInfo
           });
