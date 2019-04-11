@@ -19,7 +19,8 @@ export class UserLoginComponent implements OnInit {
 
   form = new FormGroup({
     username: new FormControl(''),
-    password: new FormControl('')
+    password: new FormControl(''),
+    rememberMe: new FormControl(false)
   });
 
   ngOnInit() {
