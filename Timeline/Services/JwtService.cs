@@ -11,12 +11,6 @@ using Timeline.Entities;
 
 namespace Timeline.Services
 {
-    public class TokenValidationResult
-    {
-        public bool IsValid { get; set; }
-        public UserInfo UserInfo { get; set; }
-    }
-
     public interface IJwtService
     {
         /// <summary>
@@ -30,17 +24,17 @@ namespace Timeline.Services
         /// <summary>
         /// Validate a JWT token.
         /// Return null is <paramref name="token"/> is null.
-        /// If token is invalid, return a <see cref="TokenValidationResult"/> with
-        /// <see cref="TokenValidationResult.IsValid"/> set to false and
-        /// <see cref="TokenValidationResult.UserInfo"/> set to null.
-        /// If token is valid, return a <see cref="TokenValidationResult"/> with
-        /// <see cref="TokenValidationResult.IsValid"/> set to true and
-        /// <see cref="TokenValidationResult.UserInfo"/> filled with the user info
+        /// If token is invalid, return a <see cref="TokenValidationResponse"/> with
+        /// <see cref="TokenValidationResponse.IsValid"/> set to false and
+        /// <see cref="TokenValidationResponse.UserInfo"/> set to null.
+        /// If token is valid, return a <see cref="TokenValidationResponse"/> with
+        /// <see cref="TokenValidationResponse.IsValid"/> set to true and
+        /// <see cref="TokenValidationResponse.UserInfo"/> filled with the user info
         /// in the token.
         /// </summary>
         /// <param name="token">The token string to validate.</param>
         /// <returns>Null if <paramref name="token"/> is null. Or the result.</returns>
-        TokenValidationResult ValidateJwtToken(string token);
+        TokenValidationResponse ValidateJwtToken(string token);
 
     }
 
@@ -86,7 +80,7 @@ namespace Timeline.Services
         }
 
 
-        public TokenValidationResult ValidateJwtToken(string token)
+        public TokenValidationResponse ValidateJwtToken(string token)
         {
             if (token == null)
                 return null;
@@ -114,7 +108,7 @@ namespace Timeline.Services
                     Roles = identity.FindAll(identity.RoleClaimType).Select(claim => claim.Value).ToArray()
                 };
 
-                return new TokenValidationResult
+                return new TokenValidationResponse
                 {
                     IsValid = true,
                     UserInfo = userInfo
@@ -123,7 +117,7 @@ namespace Timeline.Services
             catch (Exception e)
             {
                 _logger.LogInformation(e, "Token validation failed! Token is {} .", token);
-                return new TokenValidationResult { IsValid = false };
+                return new TokenValidationResponse { IsValid = false };
             }
         }
     }
