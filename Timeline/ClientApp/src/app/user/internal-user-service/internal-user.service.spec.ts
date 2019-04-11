@@ -82,33 +82,40 @@ describe('InternalUserService', () => {
       })));
   });
 
-  it('login should work well', () => {
+  describe('login should work well', () => {
     const mockUserCredentials: UserCredentials = {
       username: 'user',
       password: 'user'
     };
 
-    const service: InternalUserService = TestBed.get(InternalUserService);
+    function createTest(rememberMe: boolean) {
+      return () => {
+        const service: InternalUserService = TestBed.get(InternalUserService);
 
-    service.tryLogin(mockUserCredentials).subscribe(result => {
-      expect(result).toEqual(mockUserInfo);
-    });
+        service.tryLogin({ ...mockUserCredentials, rememberMe: rememberMe }).subscribe(result => {
+          expect(result).toEqual(mockUserInfo);
+        });
 
-    const httpController = TestBed.get(HttpTestingController) as HttpTestingController;
+        const httpController = TestBed.get(HttpTestingController) as HttpTestingController;
 
-    httpController.expectOne((request: HttpRequest<CreateTokenRequest>) =>
-      request.url === createTokenUrl && request.body !== null &&
-      request.body.username === mockUserCredentials.username &&
-      request.body.password === mockUserCredentials.password).flush(<CreateTokenResponse>{
-        token: mockToken,
-        userInfo: mockUserInfo
-      });
+        httpController.expectOne((request: HttpRequest<CreateTokenRequest>) =>
+          request.url === createTokenUrl && request.body !== null &&
+          request.body.username === mockUserCredentials.username &&
+          request.body.password === mockUserCredentials.password).flush(<CreateTokenResponse>{
+            token: mockToken,
+            userInfo: mockUserInfo
+          });
 
-    expect(service.currentUserInfo).toEqual(mockUserInfo);
+        expect(service.currentUserInfo).toEqual(mockUserInfo);
 
-    httpController.verify();
+        httpController.verify();
 
-    expect(mockLocalStorage.getItem(TOKEN_STORAGE_KEY)).toBe(mockToken);
+        expect(mockLocalStorage.getItem(TOKEN_STORAGE_KEY)).toBe(rememberMe ? mockToken : null);
+      }
+    }
+
+    it('remember me should work well', createTest(true));
+    it('not remember me should work well', createTest(false));
   });
 
   // TODO: test on error situations.

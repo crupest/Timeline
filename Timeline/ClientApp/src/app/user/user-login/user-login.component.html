@@ -1,8 +1,8 @@
 <form [formGroup]="form">
   <ng-container *ngIf="message" [ngSwitch]="message">
-    <p *ngSwitchCase="'nologin'" class="mat-body no-login-message">You haven't login.</p>
-    <p *ngSwitchCase="'invalidlogin'" class="mat-body invalid-login-message">Your login is no longer valid.</p>
-    <p *ngSwitchDefault class="mat-body error-message">{{ message }}</p>
+    <p *ngSwitchCase="'nologin'" class="mat-h3 no-login-message">You haven't login.</p>
+    <p *ngSwitchCase="'invalidlogin'" class="mat-h3 invalid-login-message">Your login is no longer valid.</p>
+    <p *ngSwitchDefault class="mat-h3 error-message">{{ message }}</p>
   </ng-container>
   <mat-form-field>
     <mat-label>Username</mat-label>
@@ -13,6 +13,7 @@
     <mat-label>Password</mat-label>
     <input formControlName="password" matInput type="password" />
   </mat-form-field>
+  <mat-checkbox formControlName="rememberMe">Remember me!</mat-checkbox>
   <div class="w-100"></div>
   <button mat-flat-button class="login-button" (appDebounceClick)="onLoginButtonClick()">Login</button>
 </form>

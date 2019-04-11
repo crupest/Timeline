@@ -6,7 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import {
   MatFormFieldModule, MatProgressSpinnerModule,
-  MatDialogModule, MatInputModule, MatButtonModule, MatSnackBarModule
+  MatDialogModule, MatInputModule, MatButtonModule, MatSnackBarModule, MatCheckboxModule
 } from '@angular/material';
 
 import { RequireNoLoginGuard, RequireLoginGuard } from './auth.guard';
@@ -28,7 +28,7 @@ import { UserLogoutComponent } from './user-logout/user-logout.component';
       { path: '**', component: RedirectComponent, outlet: 'user' }
     ]),
     CommonModule, HttpClientModule, ReactiveFormsModule, BrowserAnimationsModule,
-    MatFormFieldModule, MatProgressSpinnerModule, MatDialogModule, MatInputModule, MatButtonModule, MatSnackBarModule,
+    MatFormFieldModule, MatProgressSpinnerModule, MatDialogModule, MatInputModule, MatButtonModule, MatCheckboxModule, MatSnackBarModule,
     UtilityModule
   ],
   providers: [{ provide: WINDOW, useValue: window }],

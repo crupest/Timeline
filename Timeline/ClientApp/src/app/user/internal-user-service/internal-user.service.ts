@@ -26,6 +26,10 @@ export type SnackBarTextKey = Exclude<keyof typeof snackBarText, 'ok'>;
 
 export const TOKEN_STORAGE_KEY = 'token';
 
+export interface LoginInfo extends UserCredentials {
+  rememberMe: boolean;
+}
+
 /**
  * This service is only used internal in user module.
  */
@@ -103,12 +107,12 @@ export class InternalUserService {
     }]);
   }
 
-  tryLogin(credentials: UserCredentials, options: { remember: boolean } = { remember: true }): Observable<UserInfo> {
+  tryLogin(info: LoginInfo): Observable<UserInfo> {
     if (this.token) {
       return throwError(new AlreadyLoginError());
     }
 
-    return this.httpClient.post<CreateTokenResponse>(createTokenUrl, <CreateTokenRequest>credentials).pipe(
+    return this.httpClient.post<CreateTokenResponse>(createTokenUrl, <CreateTokenRequest>info).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.error instanceof ErrorEvent) {
           console.error('An error occurred when login: ' + error.error.message);
@@ -123,7 +127,7 @@ export class InternalUserService {
       }),
       map(result => {
         this.token = result.token;
-        if (options.remember) {
+        if (info.rememberMe) {
           this.window.localStorage.setItem(TOKEN_STORAGE_KEY, result.token);
         }
         this.userInfoSubject.next(result.userInfo);

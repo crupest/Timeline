@@ -2,7 +2,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
 
 import { of, throwError } from 'rxjs';
 
@@ -10,6 +9,7 @@ import { createMockInternalUserService } from '../internal-user-service/internal
 import { UserLoginComponent } from './user-login.component';
 import { InternalUserService } from '../internal-user-service/internal-user.service';
 import { UserInfo } from '../entities';
+import { MatCheckboxModule } from '@angular/material';
 
 describe('UserLoginComponent', () => {
   let component: UserLoginComponent;
@@ -27,7 +27,7 @@ describe('UserLoginComponent', () => {
       providers: [
         { provide: InternalUserService, useValue: mockInternalUserService }
       ],
-      imports: [ReactiveFormsModule],
+      imports: [ReactiveFormsModule, MatCheckboxModule],
       schemas: [NO_ERRORS_SCHEMA]
     })
       .compileComponents();
@@ -48,17 +48,20 @@ describe('UserLoginComponent', () => {
 
     const usernameInput = fixture.debugElement.query(By.css('input[type=text]')).nativeElement as HTMLInputElement;
     const passwordInput = fixture.debugElement.query(By.css('input[type=password]')).nativeElement as HTMLInputElement;
+    const rememberMeCheckbox = fixture.debugElement.query(By.css('input[type=checkbox]')).nativeElement as HTMLInputElement;
 
     usernameInput.value = 'user';
     usernameInput.dispatchEvent(new Event('input'));
     passwordInput.value = 'user';
     passwordInput.dispatchEvent(new Event('input'));
+    rememberMeCheckbox.dispatchEvent(new MouseEvent('click'));
 
     fixture.detectChanges();
 
     expect(component.form.value).toEqual({
       username: 'user',
-      password: 'user'
+      password: 'user',
+      rememberMe: true
     });
   });
 
@@ -67,7 +70,8 @@ describe('UserLoginComponent', () => {
 
     const mockValue = {
       username: 'user',
-      password: 'user'
+      password: 'user',
+      rememberMe: true
     };
 
     mockInternalUserService.tryLogin.withArgs(mockValue).and.returnValue(of(<UserInfo>{ username: 'user', roles: ['user'] }));
@@ -84,7 +88,7 @@ describe('UserLoginComponent', () => {
       fixture.detectChanges();
       component.message = 'nologin';
       fixture.detectChanges();
-      expect((fixture.debugElement.query(By.css('p.mat-body')).nativeElement as
+      expect((fixture.debugElement.query(By.css('p')).nativeElement as
         HTMLParagraphElement).textContent).toBe('You haven\'t login.');
     });
 
@@ -92,7 +96,7 @@ describe('UserLoginComponent', () => {
       fixture.detectChanges();
       component.message = 'invalidlogin';
       fixture.detectChanges();
-      expect((fixture.debugElement.query(By.css('p.mat-body')).nativeElement as
+      expect((fixture.debugElement.query(By.css('p')).nativeElement as
         HTMLParagraphElement).textContent).toBe('Your login is no longer valid.');
     });
 
@@ -103,7 +107,8 @@ describe('UserLoginComponent', () => {
 
       const mockValue = {
         username: 'user',
-        password: 'user'
+        password: 'user',
+        rememberMe: false
       };
       mockInternalUserService.tryLogin.withArgs(mockValue).and.returnValue(throwError(new Error(customMessage)));
       component.form.setValue(mockValue);
@@ -111,7 +116,7 @@ describe('UserLoginComponent', () => {
 
       fixture.detectChanges();
       expect(component.message).toBe(customMessage);
-      expect((fixture.debugElement.query(By.css('p.mat-body')).nativeElement as
+      expect((fixture.debugElement.query(By.css('p')).nativeElement as
         HTMLParagraphElement).textContent).toBe(customMessage);
     });
   });
