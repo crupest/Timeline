@@ -15,23 +15,6 @@ namespace Timeline.Controllers
             public const int LogInFailed = 4001;
         }
 
-        public class UserCredentials
-        {
-            public string Username { get; set; }
-            public string Password { get; set; }
-        }
-
-        public class CreateTokenResult
-        {
-            public string Token { get; set; }
-            public UserInfo UserInfo { get; set; }
-        }
-
-        public class TokenValidationRequest
-        {
-            public string Token { get; set; }
-        }
-
         private readonly IUserService _userService;
         private readonly IJwtService _jwtService;
         private readonly ILogger<UserController> _logger;
@@ -45,39 +28,31 @@ namespace Timeline.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public ActionResult<CreateTokenResult> CreateToken([FromBody] UserCredentials credentials)
+        public ActionResult<CreateTokenResponse> CreateToken([FromBody] CreateTokenRequest request)
         {
-            var user = _userService.Authenticate(credentials.Username, credentials.Password);
+            var user = _userService.Authenticate(request.Username, request.Password);
 
             if (user == null) {
-                _logger.LogInformation(LoggingEventIds.LogInFailed, "Attemp to login with username: {} and password: {} failed.", credentials.Username, credentials.Password);
-                return BadRequest();
+                _logger.LogInformation(LoggingEventIds.LogInFailed, "Attemp to login with username: {} and password: {} failed.", request.Username, request.Password);
+                return Ok(new CreateTokenResponse
+                {
+                    Success = false
+                });
             }
 
-            _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.", credentials.Username);
+            _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.", request.Username);
 
-            var result = new CreateTokenResult
+            return Ok(new CreateTokenResponse
             {
+                Success = true,
                 Token = _jwtService.GenerateJwtToken(user),
                 UserInfo = user.GetUserInfo()
-            };
-
-            return Ok(result);
+            });
         }
 
         [HttpPost("[action]")]
-        [Consumes("text/plain")]
         [AllowAnonymous]
-        public ActionResult<TokenValidationResult> ValidateToken([FromBody] string token)
-        {
-            var result = _jwtService.ValidateJwtToken(token);
-            return Ok(result);
-        }
-
-        [HttpPost("[action]")]
-        [Consumes("application/json")]
-        [AllowAnonymous]
-        public ActionResult<TokenValidationResult> ValidateToken([FromBody] TokenValidationRequest request)
+        public ActionResult<TokenValidationResponse> ValidateToken([FromBody] TokenValidationRequest request)
         {
             var result = _jwtService.ValidateJwtToken(request.Token);
             return Ok(result);
