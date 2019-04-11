@@ -7,6 +7,7 @@
   },
   "exclude": [
     "src/test.ts",
+    "test-utilities/**/*",
     "**/*.spec.ts",
     "**/*.mock.ts",
     "**/*.test.ts"

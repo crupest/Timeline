@@ -3,3 +3,4 @@
 </p>
 <p class="mat-body">You have been login as <span class="username">{{ userInfo.username }}</span>.</p>
 <p class="mat-body">Your roles are <span class="roles">{{ userInfo.roles.join(', ') }}</span>.</p>
+<a mat-flat-button class="logout-button" [routerLink]="['..','logout']">Logout</a>

@@ -1,115 +1,121 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpRequest } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material';
+
+import { Mock } from 'src/app/test-utilities/mock';
+import { createMockStorage } from 'src/app/test-utilities/storage.mock';
+import { WINDOW } from '../window-inject-token';
 
 import { UserInfo, UserCredentials } from '../entities';
 import {
   createTokenUrl, validateTokenUrl, CreateTokenRequest,
   CreateTokenResponse, ValidateTokenRequest, ValidateTokenResponse
 } from './http-entities';
-import { InternalUserService, UserLoginState } from './internal-user.service';
+import { InternalUserService, SnackBarTextKey, snackBarText, TOKEN_STORAGE_KEY } from './internal-user.service';
+import { repeat } from 'src/app/utilities/language-untilities';
+
 
 describe('InternalUserService', () => {
-  const mockUserCredentials: UserCredentials = {
-    username: 'user',
-    password: 'user'
-  };
+  let mockLocalStorage: Mock<Storage>;
+  let mockSnackBar: jasmine.SpyObj<MatSnackBar>;
 
-  beforeEach(() => TestBed.configureTestingModule({
-    imports: [HttpClientTestingModule],
-    providers: [{ provide: Router, useValue: null }]
-  }));
+  beforeEach(() => {
+    mockLocalStorage = createMockStorage();
+    mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        { provide: WINDOW, useValue: { localStorage: mockLocalStorage } },
+        { provide: Router, useValue: null },
+        { provide: MatSnackBar, useValue: mockSnackBar }
+      ]
+    });
+  });
 
   it('should be created', () => {
     const service: InternalUserService = TestBed.get(InternalUserService);
     expect(service).toBeTruthy();
   });
 
-  it('should be nologin at first', () => {
-    const service: InternalUserService = TestBed.get(InternalUserService);
-    expect(service.currentUserInfo).toBe(null);
-    service.refreshAndGetUserState().subscribe(result => {
-      expect(result).toBe('nologin');
-    });
+  const mockUserInfo: UserInfo = {
+    username: 'user',
+    roles: ['user', 'other']
+  };
+
+  const mockToken = 'mock-token';
+
+  describe('validate token', () => {
+    const validateTokenRequestMatcher = (req: HttpRequest<ValidateTokenRequest>): boolean =>
+      req.url === validateTokenUrl && req.body !== null && req.body.token === mockToken;
+
+    function createTest(
+      expectSnackBarTextKey: SnackBarTextKey,
+      setStorageToken: boolean,
+      setHttpController?: (controller: HttpTestingController) => void
+    ): () => void {
+      return fakeAsync(() => {
+        if (setStorageToken) {
+          mockLocalStorage.setItem(TOKEN_STORAGE_KEY, mockToken);
+        }
+        TestBed.get(InternalUserService);
+        const controller = TestBed.get(HttpTestingController) as HttpTestingController;
+        if (setHttpController) {
+          setHttpController(controller);
+        }
+        controller.verify();
+        tick();
+        expect(mockSnackBar.open).toHaveBeenCalledWith(snackBarText[expectSnackBarTextKey], jasmine.anything(), jasmine.anything());
+      });
+    }
+
+    it('no login should work well', createTest('noLogin', false));
+    it('already login should work well', createTest('alreadyLogin', true,
+      controller => controller.expectOne(validateTokenRequestMatcher).flush(
+        <ValidateTokenResponse>{ isValid: true, userInfo: mockUserInfo })));
+    it('invalid login should work well', createTest('invalidLogin', true,
+      controller => controller.expectOne(validateTokenRequestMatcher).flush(<ValidateTokenResponse>{ isValid: false })));
+    it('check fail should work well', createTest('checkFail', true,
+      controller => repeat(4, () => {
+        controller.expectOne(validateTokenRequestMatcher).error(new ErrorEvent('Network error', { message: 'simulated network error' }));
+      })));
   });
 
-  it('login should work well', () => {
-    const service: InternalUserService = TestBed.get(InternalUserService);
-
-    const mockUserInfo: UserInfo = {
+  describe('login should work well', () => {
+    const mockUserCredentials: UserCredentials = {
       username: 'user',
-      roles: ['user', 'other']
+      password: 'user'
     };
 
-    service.tryLogin(mockUserCredentials).subscribe(result => {
-      expect(result).toEqual(mockUserInfo);
-    });
+    function createTest(rememberMe: boolean) {
+      return () => {
+        const service: InternalUserService = TestBed.get(InternalUserService);
 
-    const httpController = TestBed.get(HttpTestingController) as HttpTestingController;
+        service.tryLogin({ ...mockUserCredentials, rememberMe: rememberMe }).subscribe(result => {
+          expect(result).toEqual(mockUserInfo);
+        });
 
-    httpController.expectOne((request: HttpRequest<CreateTokenRequest>) =>
-      request.url === createTokenUrl && request.body !== null &&
-      request.body.username === 'user' &&
-      request.body.password === 'user').flush(<CreateTokenResponse>{
-        token: 'test-token',
-        userInfo: mockUserInfo
-      });
+        const httpController = TestBed.get(HttpTestingController) as HttpTestingController;
 
-    expect(service.currentUserInfo).toEqual(mockUserInfo);
+        httpController.expectOne((request: HttpRequest<CreateTokenRequest>) =>
+          request.url === createTokenUrl && request.body !== null &&
+          request.body.username === mockUserCredentials.username &&
+          request.body.password === mockUserCredentials.password).flush(<CreateTokenResponse>{
+            token: mockToken,
+            userInfo: mockUserInfo
+          });
 
-    httpController.verify();
-  });
+        expect(service.currentUserInfo).toEqual(mockUserInfo);
 
-  describe('validateUserLoginState', () => {
-    let service: InternalUserService;
-    let httpController: HttpTestingController;
+        httpController.verify();
 
-    const mockUserInfo: UserInfo = {
-      username: 'user',
-      roles: ['user', 'other']
-    };
+        expect(mockLocalStorage.getItem(TOKEN_STORAGE_KEY)).toBe(rememberMe ? mockToken : null);
+      };
+    }
 
-    const mockToken = 'mock-token';
-
-    const tokenValidateRequestMatcher = (req: HttpRequest<ValidateTokenRequest>) => {
-      return req.url === validateTokenUrl && req.body !== null && req.body.token === mockToken;
-    };
-
-    beforeEach(() => {
-      service = TestBed.get(InternalUserService);
-      httpController = TestBed.get(HttpTestingController);
-
-      service.tryLogin(mockUserCredentials).subscribe(); // subscribe to activate login
-
-      httpController.expectOne(createTokenUrl).flush(<CreateTokenResponse>{
-        token: mockToken,
-        userInfo: mockUserInfo
-      });
-    });
-
-    it('success should work well', () => {
-      service.refreshAndGetUserState().subscribe((result: UserLoginState) => {
-        expect(result).toEqual(<UserLoginState>'success');
-      });
-
-      httpController.expectOne(tokenValidateRequestMatcher).flush(<ValidateTokenResponse>{
-        isValid: true,
-        userInfo: mockUserInfo
-      });
-
-      httpController.verify();
-    });
-
-    it('invalid should work well', () => {
-      service.refreshAndGetUserState().subscribe((result: UserLoginState) => {
-        expect(result).toEqual(<UserLoginState>'invalidlogin');
-      });
-
-      httpController.expectOne(tokenValidateRequestMatcher).flush(<ValidateTokenResponse>{ isValid: false });
-
-      httpController.verify();
-    });
+    it('remember me should work well', createTest(true));
+    it('not remember me should work well', createTest(false));
   });
 
   // TODO: test on error situations.

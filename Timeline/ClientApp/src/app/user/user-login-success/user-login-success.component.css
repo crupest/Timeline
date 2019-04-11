@@ -5,3 +5,18 @@
 .username {
   color: blue;
 }
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+:host p {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  width: 100%;
+}
+
+.logout-button {
+  margin-left: auto;
+}

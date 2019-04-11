@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
+import { take, map } from 'rxjs/operators';
 
 import { InternalUserService } from './internal-user-service/internal-user.service';
 
@@ -23,26 +24,26 @@ export abstract class AuthGuard implements CanActivate {
       return true;
     }
 
-    const { currentUserInfo } = this.internalUserService;
-
-    if (currentUserInfo === null) {
-      if (authStrategy === 'requirenologin') {
-        return true;
-      }
-    } else {
-      if (authStrategy === 'requirelogin') {
-        return true;
-      } else if (authStrategy instanceof Array) {
-        const { roles } = currentUserInfo;
-        if (authStrategy.every(value => roles.includes(value))) {
+    return this.internalUserService.userInfo$.pipe(take(1), map(userInfo => {
+      if (userInfo === null) {
+        if (authStrategy === 'requirenologin') {
           return true;
         }
+      } else {
+        if (authStrategy === 'requirelogin') {
+          return true;
+        } else if (authStrategy instanceof Array) {
+          const { roles } = userInfo;
+          if (authStrategy.every(value => roles.includes(value))) {
+            return true;
+          }
+        }
       }
-    }
 
-    // reach here means auth fails
-    this.onAuthFailed();
-    return false;
+      // reach here means auth fails
+      this.onAuthFailed();
+      return false;
+    }));
   }
 }
 

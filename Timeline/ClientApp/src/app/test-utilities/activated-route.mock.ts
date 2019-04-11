@@ -1,11 +1,13 @@
-import { ParamMap } from '@angular/router';
+import { ParamMap, ActivatedRouteSnapshot, ActivatedRoute } from '@angular/router';
 
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { PartialMock } from './mock';
+
 export interface ParamMapCreator { [name: string]: string | string[]; }
 
-export class MockActivatedRouteSnapshot {
+export class MockActivatedRouteSnapshot implements PartialMock<ActivatedRouteSnapshot> {
 
   private paramMapInternal: ParamMap;
 
@@ -44,7 +46,7 @@ export class MockActivatedRouteSnapshot {
   }
 }
 
-export class MockActivatedRoute {
+export class MockActivatedRoute implements PartialMock<ActivatedRoute> {
 
   snapshot$ = new BehaviorSubject<MockActivatedRouteSnapshot>(new MockActivatedRouteSnapshot());
 
