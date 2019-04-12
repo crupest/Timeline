@@ -1,25 +1,41 @@
-namespace Timeline.Entities
+﻿namespace Timeline.Entities
 {
-    public class User
+    public class CreateTokenRequest
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string[] Roles { get; set; }
-
-        public UserInfo GetUserInfo()
-        {
-            return new UserInfo
-            {
-                Username = Username,
-                Roles = Roles
-            };
-        }
     }
 
-    public class UserInfo
+    public class CreateTokenResponse
+    {
+        public bool Success { get; set; }
+        public string Token { get; set; }
+        public UserInfo UserInfo { get; set; }
+    }
+
+    public class TokenValidationRequest
+    {
+        public string Token { get; set; }
+    }
+
+    public class TokenValidationResponse
+    {
+        public bool IsValid { get; set; }
+        public UserInfo UserInfo { get; set; }
+    }
+
+    public class CreateUserRequest
     {
         public string Username { get; set; }
-        public string[] Roles { get; set; }
+        public string Password { get; set; }
+        public string[] Roles { get; set; } 
+    }
+
+    public class CreateUserResponse
+    {
+        public const int SuccessCode = 0;
+        public const int AlreadyExistsCode = 1;
+
+        public int ReturnCode { get; set; }
     }
 }
