@@ -7,34 +7,25 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using Timeline.Configs;
-using Timeline.Entities;
 
 namespace Timeline.Services
 {
     public interface IJwtService
     {
         /// <summary>
-        /// Create a JWT token for a given user.
-        /// Return null if <paramref name="user"/> is null.
+        /// Create a JWT token for a given user id.
         /// </summary>
-        /// <param name="user">The user to generate token.</param>
-        /// <returns>The generated token or null if <paramref name="user"/> is null.</returns>
-        string GenerateJwtToken(User user);
+        /// <param name="userId">The user id used to generate token.</param>
+        /// <returns>Return the generated token.</returns>
+        string GenerateJwtToken(long userId, string[] roles);
 
         /// <summary>
-        /// Validate a JWT token.
+        /// Verify a JWT token.
         /// Return null is <paramref name="token"/> is null.
-        /// If token is invalid, return a <see cref="TokenValidationResponse"/> with
-        /// <see cref="TokenValidationResponse.IsValid"/> set to false and
-        /// <see cref="TokenValidationResponse.UserInfo"/> set to null.
-        /// If token is valid, return a <see cref="TokenValidationResponse"/> with
-        /// <see cref="TokenValidationResponse.IsValid"/> set to true and
-        /// <see cref="TokenValidationResponse.UserInfo"/> filled with the user info
-        /// in the token.
         /// </summary>
-        /// <param name="token">The token string to validate.</param>
-        /// <returns>Null if <paramref name="token"/> is null. Or the result.</returns>
-        TokenValidationResponse ValidateJwtToken(string token);
+        /// <param name="token">The token string to verify.</param>
+        /// <returns>Return null if <paramref name="token"/> is null or token is invalid. Return the saved user id otherwise.</returns>
+        long? VerifyJwtToken(string token);
 
     }
 
@@ -50,17 +41,13 @@ namespace Timeline.Services
             _logger = logger;
         }
 
-        public string GenerateJwtToken(User user)
+        public string GenerateJwtToken(long id, string[] roles)
         {
-            if (user == null)
-                return null;
-
             var jwtConfig = _jwtConfig.CurrentValue;
 
             var identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            identity.AddClaim(new Claim(identity.NameClaimType, user.Username));
-            identity.AddClaims(user.Roles.Select(role => new Claim(identity.RoleClaimType, role)));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.ToString()));
+            identity.AddClaims(roles.Select(role => new Claim(identity.RoleClaimType, role)));
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
@@ -80,7 +67,7 @@ namespace Timeline.Services
         }
 
 
-        public TokenValidationResponse ValidateJwtToken(string token)
+        public long? VerifyJwtToken(string token)
         {
             if (token == null)
                 return null;
@@ -100,24 +87,12 @@ namespace Timeline.Services
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey))
                 }, out SecurityToken validatedToken);
 
-                var identity = principal.Identity as ClaimsIdentity;
-
-                var userInfo = new UserInfo
-                {
-                    Username = identity.FindAll(identity.NameClaimType).Select(claim => claim.Value).Single(),
-                    Roles = identity.FindAll(identity.RoleClaimType).Select(claim => claim.Value).ToArray()
-                };
-
-                return new TokenValidationResponse
-                {
-                    IsValid = true,
-                    UserInfo = userInfo
-                };
+                return long.Parse(principal.FindAll(ClaimTypes.NameIdentifier).Single().Value);
             }
             catch (Exception e)
             {
                 _logger.LogInformation(e, "Token validation failed! Token is {} .", token);
-                return new TokenValidationResponse { IsValid = false };
+                return null;
             }
         }
     }
