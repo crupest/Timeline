@@ -61,16 +61,16 @@ namespace Timeline
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                            .AddJwtBearer(o =>
-                            {
-                                o.TokenValidationParameters.ValidateIssuer = true;
-                                o.TokenValidationParameters.ValidateAudience = true;
-                                o.TokenValidationParameters.ValidateIssuerSigningKey = true;
-                                o.TokenValidationParameters.ValidateLifetime = true;
-                                o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
-                                o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
-                                o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
-                            });
+                .AddJwtBearer(o =>
+                {
+                    o.TokenValidationParameters.ValidateIssuer = true;
+                    o.TokenValidationParameters.ValidateAudience = true;
+                    o.TokenValidationParameters.ValidateIssuerSigningKey = true;
+                    o.TokenValidationParameters.ValidateLifetime = true;
+                    o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
+                    o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
+                    o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
+                });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
@@ -79,9 +79,9 @@ namespace Timeline
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
             services.AddDbContext<DatabaseContext>(options =>
-                        {
-                            options.UseMySql(databaseConfig.ConnectionString);
-                        });
+            {
+                options.UseMySql(databaseConfig.ConnectionString);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
