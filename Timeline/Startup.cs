@@ -1,15 +1,16 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Timeline.Configs;
-using Timeline.Services;
-using Microsoft.AspNetCore.HttpOverrides;
 using Timeline.Formatters;
+using Timeline.Models;
+using Timeline.Services;
 
 namespace Timeline
 {
@@ -67,8 +68,16 @@ namespace Timeline
                     o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
                 });
 
-            services.AddSingleton<IUserService, UserService>();
-            services.AddSingleton<IJwtService, JwtService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddTransient<IPasswordService, PasswordService>();
+
+            var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
+
+            services.AddDbContext<DatabaseContext>(options =>
+            {
+                options.UseMySql(databaseConfig.ConnectionString);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -14,14 +14,14 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("[action]")]
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = "user,admin")]
         public ActionResult BothUserAndAdmin()
         {
             return Ok();
         }
 
         [HttpGet("[action]")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         public ActionResult OnlyAdmin()
         {
             return Ok();
