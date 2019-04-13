@@ -6,7 +6,7 @@ using Timeline.Services;
 
 namespace Timeline.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class UserController : Controller
     {
         private static class LoggingEventIds

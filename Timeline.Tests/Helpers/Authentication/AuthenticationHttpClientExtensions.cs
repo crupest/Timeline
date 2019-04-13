@@ -10,7 +10,7 @@ namespace Timeline.Tests.Helpers.Authentication
 {
     public static class AuthenticationHttpClientExtensions
     {
-        private const string CreateTokenUrl = "/api/User/CreateToken";
+        private const string CreateTokenUrl = "/User/CreateToken";
 
         public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, bool assertSuccess = true)
         {

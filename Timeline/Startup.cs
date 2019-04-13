@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,11 +15,15 @@ namespace Timeline
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private const string corsPolicyName = "MyPolicy";
+
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
+            Environment = environment;
             Configuration = configuration;
         }
 
+        public IHostingEnvironment Environment { get; }
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -31,14 +34,26 @@ namespace Timeline
                 options.InputFormatters.Add(new StringInputFormatter());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
+            services.AddCors(options =>
             {
-                configuration.RootPath = "ClientApp/dist";
+                if (Environment.IsProduction())
+                {
+                    options.AddPolicy(corsPolicyName, builder =>
+                    {
+                        builder.WithOrigins("www.crupest.xyz", "crupest.xyz").AllowAnyMethod().AllowAnyHeader();
+                    });
+                }
+                else
+                {
+                    options.AddPolicy(corsPolicyName, builder =>
+                    {
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    });
+                }
             });
 
-            services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
-            var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+            services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
+            var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o =>
@@ -57,9 +72,9 @@ namespace Timeline
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -68,13 +83,12 @@ namespace Timeline
                 app.UseExceptionHandler("/Error");
             }
 
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
+
+            app.UseCors(corsPolicyName);
 
             app.UseAuthentication();
 
@@ -83,16 +97,6 @@ namespace Timeline
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
-            });
-
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
             });
         }
     }
