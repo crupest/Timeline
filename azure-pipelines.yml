@@ -7,46 +7,18 @@ trigger:
 - master
 
 variables:
-  ArtifactFeed: NodeModules
   buildConfiguration: 'Release'
   ASPNETCORE_ENVIRONMENT: 'Development'
 
 pool:
   vmImage: 'Ubuntu-16.04'
 steps:
-- task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreCacheV1.RestoreCache@1
-  inputs:
-    keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
-    targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
-    vstsFeed: '$(ArtifactFeed)'
-
-- script: yarn install --non-interactive
-  condition: ne(variables['CacheRestored'], 'true')
-  workingDirectory: Timeline/ClientApp
-  displayName: Yarn Install
-
-- task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
-  inputs:
-    keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
-    targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
-    vstsFeed: '$(ArtifactFeed)'
-
-- script: yarn run test --no-watch --browsers=ChromeHeadless --reporters junit
-  workingDirectory: Timeline/ClientApp
-  displayName: Angular Test
-
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: '**/TESTS-*.xml'
-
 - script: |
-    dotnet restore Timeline/Timeline-CI.csproj --configfile nuget.config
-    dotnet restore Timeline.Tests/Timeline.Tests-CI.csproj --configfile nuget.config
+    dotnet restore Timeline/Timeline.csproj --configfile nuget.config
+    dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
   displayName: Dotnet Restore
 
-- script: dotnet test Timeline.Tests/Timeline.Tests-CI.csproj --configuration $(buildConfiguration) --no-restore --logger trx
+- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx
   displayName: Dotnet Test
 
 - task: PublishTestResults@2
@@ -55,11 +27,7 @@ steps:
     testRunner: VSTest
     testResultsFiles: '**/*.trx'
 
-- script: yarn build --prod
-  workingDirectory: Timeline/ClientApp
-  displayName: Client App Build
-
-- script: dotnet publish Timeline/Timeline-CI.csproj --configuration $(buildConfiguration) --no-restore --output ./publish/
+- script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --no-restore --output ./publish/
   displayName: Dotnet Publish
 
 - task: PublishPipelineArtifact@0

@@ -10,9 +10,9 @@ namespace Timeline.Tests
 {
     public class AuthorizationUnitTest : IClassFixture<WebApplicationFactory<Startup>>
     {
-        private const string NeedAuthorizeUrl = "api/test/User/NeedAuthorize";
-        private const string BothUserAndAdminUrl = "api/test/User/BothUserAndAdmin";
-        private const string OnlyAdminUrl = "api/test/User/OnlyAdmin";
+        private const string NeedAuthorizeUrl = "Test/User/NeedAuthorize";
+        private const string BothUserAndAdminUrl = "Test/User/BothUserAndAdmin";
+        private const string OnlyAdminUrl = "Test/User/OnlyAdmin";
 
         private readonly WebApplicationFactory<Startup> _factory;
 

@@ -12,8 +12,8 @@ namespace Timeline.Tests
 {
     public class JwtTokenUnitTest : IClassFixture<WebApplicationFactory<Startup>>
     {
-        private const string CreateTokenUrl = "/api/User/CreateToken";
-        private const string ValidateTokenUrl = "/api/User/ValidateToken";
+        private const string CreateTokenUrl = "User/CreateToken";
+        private const string ValidateTokenUrl = "User/ValidateToken";
 
         private readonly WebApplicationFactory<Startup> _factory;
 
