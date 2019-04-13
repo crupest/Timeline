@@ -36,38 +36,41 @@ namespace Timeline
                 options.InputFormatters.Add(new StringInputFormatter());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddCors(options =>
+            if (Environment.IsDevelopment())
             {
-                if (Environment.IsProduction())
+                services.AddCors(options =>
                 {
                     options.AddPolicy(corsPolicyName, builder =>
                     {
-                        builder.WithOrigins("www.crupest.xyz", "crupest.xyz").AllowAnyMethod().AllowAnyHeader();
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                     });
-                }
-                else
+                });
+            }
+            else
+            {
+                services.AddCors(options =>
                 {
                     options.AddPolicy(corsPolicyName, builder =>
                     {
-                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                        builder.WithOrigins("https://www.crupest.xyz", "https://crupest.xyz").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                     });
-                }
-            });
+                });
+            }
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o =>
-                {
-                    o.TokenValidationParameters.ValidateIssuer = true;
-                    o.TokenValidationParameters.ValidateAudience = true;
-                    o.TokenValidationParameters.ValidateIssuerSigningKey = true;
-                    o.TokenValidationParameters.ValidateLifetime = true;
-                    o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
-                    o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
-                    o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
-                });
+                            .AddJwtBearer(o =>
+                            {
+                                o.TokenValidationParameters.ValidateIssuer = true;
+                                o.TokenValidationParameters.ValidateAudience = true;
+                                o.TokenValidationParameters.ValidateIssuerSigningKey = true;
+                                o.TokenValidationParameters.ValidateLifetime = true;
+                                o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
+                                o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
+                                o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
+                            });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
@@ -76,9 +79,9 @@ namespace Timeline
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
             services.AddDbContext<DatabaseContext>(options =>
-            {
-                options.UseMySql(databaseConfig.ConnectionString);
-            });
+                        {
+                            options.UseMySql(databaseConfig.ConnectionString);
+                        });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,12 +96,12 @@ namespace Timeline
                 app.UseExceptionHandler("/Error");
             }
 
+            app.UseCors(corsPolicyName);
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
-
-            app.UseCors(corsPolicyName);
 
             app.UseAuthentication();
 
