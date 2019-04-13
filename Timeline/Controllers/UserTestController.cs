@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Timeline.Controllers
 {
-    [Route("api/test/User")]
+    [Route("Test/User")]
     public class UserTestController : Controller
     {
         [HttpGet("[action]")]
