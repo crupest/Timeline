@@ -53,19 +53,19 @@ namespace Timeline.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<ActionResult<TokenValidationResponse>> ValidateToken([FromBody] TokenValidationRequest request)
+        public async Task<ActionResult<VerifyTokenResponse>> VerifyToken([FromBody] VerifyTokenRequest request)
         {
             var result = await _userService.VerifyToken(request.Token);
 
             if (result == null)
             {
-                return Ok(new TokenValidationResponse
+                return Ok(new VerifyTokenResponse
                 {
                     IsValid = false,
                 });
             }
 
-            return Ok(new TokenValidationResponse
+            return Ok(new VerifyTokenResponse
             {
                 IsValid = true,
                 UserInfo = result
