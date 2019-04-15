@@ -15,11 +15,9 @@ namespace Timeline.Tests.Helpers.Authentication
         public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, bool assertSuccess = true)
         {
             var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password });
-
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
-
             if (assertSuccess)
                 Assert.True(result.Success);
 
@@ -33,9 +31,7 @@ namespace Timeline.Tests.Helpers.Authentication
                 RequestUri = new Uri(client.BaseAddress, path),
             };
             request.Headers.Add("Authorization", "Bearer " + token);
-
             requestBuilder?.Invoke(request);
-
             return await client.SendAsync(request);
         }
     }
