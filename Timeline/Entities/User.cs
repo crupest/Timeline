@@ -13,12 +13,12 @@
         public UserInfo UserInfo { get; set; }
     }
 
-    public class TokenValidationRequest
+    public class VerifyTokenRequest
     {
         public string Token { get; set; }
     }
 
-    public class TokenValidationResponse
+    public class VerifyTokenResponse
     {
         public bool IsValid { get; set; }
         public UserInfo UserInfo { get; set; }
