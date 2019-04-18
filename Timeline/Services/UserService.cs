@@ -13,10 +13,40 @@ namespace Timeline.Services
         public UserInfo UserInfo { get; set; }
     }
 
-    public enum CreateUserResult
+    public enum PutUserResult
     {
+        /// <summary>
+        /// A new user is created.
+        /// </summary>
+        Created,
+        /// <summary>
+        /// A existing user is modified.
+        /// </summary>
+        Modified
+    }
+
+    public enum PatchUserResult
+    {
+        /// <summary>
+        /// Succeed to modify user.
+        /// </summary>
         Success,
-        AlreadyExists
+        /// <summary>
+        /// A user of given username does not exist.
+        /// </summary>
+        NotExists
+    }
+
+    public enum DeleteUserResult
+    {
+        /// <summary>
+        /// Succeed to delete user.
+        /// </summary>
+        Success,
+        /// <summary>
+        /// A user of given username does not exist.
+        /// </summary>
+        NotExists
     }
 
     public interface IUserService
@@ -38,7 +68,51 @@ namespace Timeline.Services
         /// <returns>Return null if verification failed. The user info if verification succeeded.</returns>
         Task<UserInfo> VerifyToken(string token);
 
-        Task<CreateUserResult> CreateUser(string username, string password, string[] roles);
+        /// <summary>
+        /// Get the user info of given username.
+        /// </summary>
+        /// <param name="username">Username of the user.</param>
+        /// <returns>The info of the user. Null if the user of given username does not exists.</returns>
+        Task<UserInfo> GetUser(string username);
+
+        /// <summary>
+        /// List all users.
+        /// </summary>
+        /// <returns>The user info of users.</returns>
+        Task<UserInfo[]> ListUsers();
+
+        /// <summary>
+        /// Create or modify a user with given username.
+        /// Return <see cref="PutUserResult.Created"/> if a new user is created.
+        /// Return <see cref="PutUserResult.Modified"/> if a existing user is modified.
+        /// </summary>
+        /// <param name="username">Username of user.</param>
+        /// <param name="password">Password of user.</param>
+        /// <param name="roles">Array of roles of user.</param>
+        /// <returns>Return <see cref="PutUserResult.Created"/> if a new user is created.
+        /// Return <see cref="PutUserResult.Modified"/> if a existing user is modified.</returns>
+        Task<PutUserResult> PutUser(string username, string password, string[] roles);
+
+        /// <summary>
+        /// Partially modify a use of given username.
+        /// </summary>
+        /// <param name="username">Username of the user to modify.</param>
+        /// <param name="password">New password. If not modify, then null.</param>
+        /// <param name="roles">New roles. If not modify, then null.</param>
+        /// <returns>Return <see cref="PatchUserResult.Success"/> if modification succeeds.
+        /// Return <see cref="PatchUserResult.NotExists"/> if the user of given username doesn't exist.</returns>
+        Task<PatchUserResult> PatchUser(string username, string password, string[] roles); 
+
+        /// <summary>
+        /// Delete a user of given username.
+        /// Return <see cref="DeleteUserResult.Success"/> if success to delete.
+        /// Return <see cref="DeleteUserResult.NotExists"/> if the user of given username
+        /// does not exist.
+        /// </summary>
+        /// <param name="username">Username of thet user to delete.</param>
+        /// <returns><see cref="DeleteUserResult.Success"/> if success to delete.
+        /// <see cref="DeleteUserResult.NotExists"/> if the user doesn't exist.</returns>
+        Task<DeleteUserResult> DeleteUser(string username);
     }
 
     public class UserService : IUserService
@@ -108,19 +182,82 @@ namespace Timeline.Services
             return new UserInfo(user);
         }
 
-        public async Task<CreateUserResult> CreateUser(string username, string password, string[] roles)
+        public async Task<UserInfo> GetUser(string username)
         {
-            var exists = (await _databaseContext.Users.Where(u => u.Name == username).ToListAsync()).Count != 0;
+            return await _databaseContext.Users
+                .Where(user => user.Name == username)
+                .Select(user => new UserInfo(user)).SingleOrDefaultAsync();
+        }
 
-            if (exists)
+        public async Task<UserInfo[]> ListUsers()
+        {
+            return await _databaseContext.Users.Select(user => new UserInfo(user)).ToArrayAsync();
+        }
+
+        public async Task<PutUserResult> PutUser(string username, string password, string[] roles)
+        {
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+
+            if (user == null)
             {
-                return CreateUserResult.AlreadyExists;
+                await _databaseContext.AddAsync(new User
+                {
+                    Name = username,
+                    EncryptedPassword = _passwordService.HashPassword(password),
+                    RoleString = string.Join(',', roles)
+                });
+                await _databaseContext.SaveChangesAsync();
+                return PutUserResult.Created;
             }
 
-            await _databaseContext.Users.AddAsync(new User { Name = username, EncryptedPassword = _passwordService.HashPassword(password), RoleString = string.Join(',', roles) });
+            user.EncryptedPassword = _passwordService.HashPassword(password);
+            user.RoleString = string.Join(',', roles);
             await _databaseContext.SaveChangesAsync();
 
-            return CreateUserResult.Success;
+            return PutUserResult.Modified;
+        }
+
+        public async Task<PatchUserResult> PatchUser(string username, string password, string[] roles)
+        {
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+
+            if (user == null)
+                return PatchUserResult.NotExists;
+
+            bool modified = false;
+
+            if (password != null)
+            {
+                modified = true;
+                user.EncryptedPassword = _passwordService.HashPassword(password);
+            }
+
+            if (roles != null)
+            {
+                modified = true;
+                user.RoleString = string.Join(',', roles);
+            }
+
+            if (modified)
+            {
+                await _databaseContext.SaveChangesAsync();
+            }
+
+            return PatchUserResult.Success;
+        }
+
+        public async Task<DeleteUserResult> DeleteUser(string username)
+        {
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+
+            if (user == null)
+            {
+                return DeleteUserResult.NotExists;
+            }
+
+            _databaseContext.Users.Remove(user);
+            await _databaseContext.SaveChangesAsync();
+            return DeleteUserResult.Success;
         }
     }
 }

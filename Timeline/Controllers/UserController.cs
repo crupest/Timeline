@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
@@ -70,22 +69,6 @@ namespace Timeline.Controllers
                 IsValid = true,
                 UserInfo = result
             });
-        }
-
-        [HttpPost("[action]")]
-        [Authorize(Roles = "admin")]
-        public async Task<ActionResult<CreateUserResponse>> CreateUser([FromBody] CreateUserRequest request)
-        {
-            var result = await _userService.CreateUser(request.Username, request.Password, request.Roles);
-            switch (result)
-            {
-                case CreateUserResult.Success:
-                    return Ok(new CreateUserResponse { ReturnCode = CreateUserResponse.SuccessCode });
-                case CreateUserResult.AlreadyExists:
-                    return Ok(new CreateUserResponse { ReturnCode = CreateUserResponse.AlreadyExistsCode });
-                default:
-                    throw new Exception("Unreachable code.");
-            }
         }
     }
 }
