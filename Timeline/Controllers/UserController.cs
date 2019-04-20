@@ -1,74 +1,81 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
 
 namespace Timeline.Controllers
 {
-    [Route("[controller]")]
     public class UserController : Controller
     {
-        private static class LoggingEventIds
-        {
-            public const int LogInSucceeded = 4000;
-            public const int LogInFailed = 4001;
-        }
-
         private readonly IUserService _userService;
-        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _logger = logger;
         }
 
-        [HttpPost("[action]")]
-        [AllowAnonymous]
-        public async Task<ActionResult<CreateTokenResponse>> CreateToken([FromBody] CreateTokenRequest request)
+        [HttpGet("users"), Authorize(Roles = "admin")]
+        public async Task<ActionResult<UserInfo[]>> List()
         {
-            var result = await _userService.CreateToken(request.Username, request.Password);
-
-            if (result == null)
-            {
-                _logger.LogInformation(LoggingEventIds.LogInFailed, "Attemp to login with username: {} and password: {} failed.", request.Username, request.Password);
-                return Ok(new CreateTokenResponse
-                {
-                    Success = false
-                });
-            }
-
-            _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.", request.Username);
-
-            return Ok(new CreateTokenResponse
-            {
-                Success = true,
-                Token = result.Token,
-                UserInfo = result.UserInfo
-            });
+            return Ok(await _userService.ListUsers());
         }
 
-        [HttpPost("[action]")]
-        [AllowAnonymous]
-        public async Task<ActionResult<VerifyTokenResponse>> VerifyToken([FromBody] VerifyTokenRequest request)
+        [HttpGet("user/{username}"), Authorize]
+        public async Task<IActionResult> Get([FromRoute] string username)
         {
-            var result = await _userService.VerifyToken(request.Token);
-
-            if (result == null)
+            var user = await _userService.GetUser(username);
+            if (user == null)
             {
-                return Ok(new VerifyTokenResponse
-                {
-                    IsValid = false,
-                });
+                return NotFound();
             }
+            return Ok(user);
+        }
 
-            return Ok(new VerifyTokenResponse
+        [HttpPut("user/{username}"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> Put([FromBody] UserModifyRequest request, [FromRoute] string username)
+        {
+            var result = await _userService.PutUser(username, request.Password, request.Roles);
+            switch (result)
             {
-                IsValid = true,
-                UserInfo = result
-            });
+                case PutUserResult.Created:
+                    return CreatedAtAction("Get", new { username }, UserPutResponse.Created);
+                case PutUserResult.Modified:
+                    return Ok(UserPutResponse.Modified);
+                default:
+                    throw new Exception("Unreachable code.");
+            }
+        }
+
+        [HttpPatch("user/{username}"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> Patch([FromBody] UserModifyRequest request, [FromRoute] string username)
+        {
+            var result = await _userService.PatchUser(username, request.Password, request.Roles);
+            switch (result)
+            {
+                case PatchUserResult.Success:
+                    return Ok();
+                case PatchUserResult.NotExists:
+                    return NotFound();
+                default:
+                    throw new Exception("Unreachable code.");
+            }
+        }
+
+        [HttpDelete("user/{username}"), Authorize(Roles = "admin")]
+        public async Task<ActionResult<UserDeleteResponse>> Delete([FromRoute] string username)
+        {
+            var result = await _userService.DeleteUser(username);
+            switch (result)
+            {
+                case DeleteUserResult.Success:
+                    return Ok(UserDeleteResponse.Success);
+                case DeleteUserResult.NotExists:
+                    return Ok(UserDeleteResponse.NotExists);
+                default:
+                    throw new Exception("Uncreachable code.");
+            }
         }
     }
 }
