@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -36,26 +37,16 @@ namespace Timeline
                 options.InputFormatters.Add(new StringInputFormatter());
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            if (Environment.IsDevelopment())
+            services.AddCors(options =>
             {
-                services.AddCors(options =>
+                options.AddPolicy(corsPolicyName, builder =>
                 {
-                    options.AddPolicy(corsPolicyName, builder =>
-                    {
-                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-                    });
-                });
-            }
-            else
-            {
-                services.AddCors(options =>
-                {
-                    options.AddPolicy(corsPolicyName, builder =>
-                    {
+                    if (Environment.IsProduction())
                         builder.WithOrigins("https://www.crupest.xyz", "https://crupest.xyz").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-                    });
+                    else
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                 });
-            }
+            });
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
@@ -80,7 +71,14 @@ namespace Timeline
 
             services.AddDbContext<DatabaseContext>(options =>
             {
-                options.UseMySql(databaseConfig.ConnectionString);
+                options.UseMySql(databaseConfig.ConnectionString)
+                .ConfigureWarnings(warnings =>
+                {
+                    if (Environment.IsProduction())
+                        warnings.Log(RelationalEventId.QueryClientEvaluationWarning);
+                    else
+                        warnings.Throw(RelationalEventId.QueryClientEvaluationWarning);
+                });
             });
         }
 
