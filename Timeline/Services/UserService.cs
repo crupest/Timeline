@@ -101,7 +101,7 @@ namespace Timeline.Services
         /// <param name="roles">New roles. If not modify, then null.</param>
         /// <returns>Return <see cref="PatchUserResult.Success"/> if modification succeeds.
         /// Return <see cref="PatchUserResult.NotExists"/> if the user of given username doesn't exist.</returns>
-        Task<PatchUserResult> PatchUser(string username, string password, string[] roles); 
+        Task<PatchUserResult> PatchUser(string username, string password, string[] roles);
 
         /// <summary>
         /// Delete a user of given username.
@@ -148,7 +148,7 @@ namespace Timeline.Services
 
                 return new CreateTokenResult
                 {
-                    Token = _jwtService.GenerateJwtToken(user.Id, userInfo.Roles),
+                    Token = _jwtService.GenerateJwtToken(user.Id, userInfo.Username, userInfo.Roles),
                     UserInfo = userInfo
                 };
             }
@@ -161,26 +161,15 @@ namespace Timeline.Services
 
         public async Task<UserInfo> VerifyToken(string token)
         {
-            var userId = _jwtService.VerifyJwtToken(token);
+            var userInfo = _jwtService.VerifyJwtToken(token);
 
-            if (userId == null)
+            if (userInfo == null)
             {
                 _logger.LogInformation($"Verify token falied. Reason: invalid token. Token: {token} .");
                 return null;
             }
 
-            var user = await _databaseContext.Users
-                .Where(u => u.Id == userId.Value)
-                .Select(u => UserInfo.Create(u.Name, u.RoleString))
-                .SingleOrDefaultAsync();
-
-            if (user == null)
-            {
-                _logger.LogInformation($"Verify token falied. Reason: invalid user id. UserId: {userId} Token: {token} .");
-                return null;
-            }
-
-            return user;
+            return await Task.FromResult(userInfo);
         }
 
         public async Task<UserInfo> GetUser(string username)

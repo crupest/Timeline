@@ -1,26 +1,30 @@
 ﻿namespace Timeline.Entities
 {
-    public class CreateTokenRequest
+    public class UserModifyRequest
     {
-        public string Username { get; set; }
         public string Password { get; set; }
+        public string[] Roles { get; set; }
     }
 
-    public class CreateTokenResponse
+    public class UserPutResponse
     {
-        public bool Success { get; set; }
-        public string Token { get; set; }
-        public UserInfo UserInfo { get; set; }
+        public const int CreatedCode = 0;
+        public const int ModifiedCode = 1;
+
+        public static UserPutResponse Created { get; } = new UserPutResponse { ReturnCode = CreatedCode };
+        public static UserPutResponse Modified { get; } = new UserPutResponse { ReturnCode = ModifiedCode };
+
+        public int ReturnCode { get; set; }
     }
 
-    public class VerifyTokenRequest
+    public class UserDeleteResponse
     {
-        public string Token { get; set; }
-    }
+        public const int SuccessCode = 0;
+        public const int NotExistsCode = 1;
 
-    public class VerifyTokenResponse
-    {
-        public bool IsValid { get; set; }
-        public UserInfo UserInfo { get; set; }
+        public static UserDeleteResponse Success { get; } = new UserDeleteResponse { ReturnCode = SuccessCode };
+        public static UserDeleteResponse NotExists { get; } = new UserDeleteResponse { ReturnCode = NotExistsCode };
+
+        public int ReturnCode { get; set; }
     }
 }
