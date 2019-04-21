@@ -48,18 +48,39 @@ namespace Timeline.Controllers
             }
         }
 
-        [HttpPatch("user/{username}"), Authorize(Roles = "admin")]
+        [HttpPatch("user/{username}"), Authorize]
         public async Task<IActionResult> Patch([FromBody] UserModifyRequest request, [FromRoute] string username)
         {
-            var result = await _userService.PatchUser(username, request.Password, request.Roles);
-            switch (result)
+            if (User.IsInRole("admin"))
             {
-                case PatchUserResult.Success:
-                    return Ok();
-                case PatchUserResult.NotExists:
-                    return NotFound();
-                default:
-                    throw new Exception("Unreachable code.");
+                var result = await _userService.PatchUser(username, request.Password, request.Roles);
+                switch (result)
+                {
+                    case PatchUserResult.Success:
+                        return Ok();
+                    case PatchUserResult.NotExists:
+                        return NotFound();
+                    default:
+                        throw new Exception("Unreachable code.");
+                }
+            }
+            else
+            {
+                if (User.Identity.Name != username)
+                    return StatusCode(403, new MessageResponse("Can't patch other user when you are not admin."));
+                if (request.Roles != null)
+                    return StatusCode(403, new MessageResponse("Can't patch roles when you are not admin."));
+
+                var result = await _userService.PatchUser(username, request.Password, null);
+                switch (result)
+                {
+                    case PatchUserResult.Success:
+                        return Ok();
+                    case PatchUserResult.NotExists:
+                        return NotFound(new MessageResponse("This username no longer exists. Please update your token."));
+                    default:
+                        throw new Exception("Unreachable code.");
+                }
             }
         }
 
