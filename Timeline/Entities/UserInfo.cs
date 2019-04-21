@@ -17,24 +17,31 @@ namespace Timeline.Entities
             Roles = roles;
         }
 
-        public UserInfo(User user)
+        public static UserInfo Create(User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-
-            Username = user.Name;
-
-            if (user.RoleString == null)
-                Roles = null;
-            else
-                Roles = user.RoleString.Split(',').Select(r => r.Trim()).ToArray();
+            return Create(user.Name, user.RoleString);
         }
+
+        public static UserInfo Create(string username, string roleString) => new UserInfo
+        {
+            Username = username,
+            Roles = RolesFromString(roleString)
+        };
 
         public string Username { get; set; }
         public string[] Roles { get; set; }
 
         public static IEqualityComparer<UserInfo> EqualityComparer { get; } = new EqualityComparerImpl();
         public static IComparer<UserInfo> Comparer { get; } = Comparer<UserInfo>.Create(Compare);
+
+        private static string[] RolesFromString(string roleString)
+        {
+            if (roleString == null)
+                return null;
+            return roleString.Split(',').Select(r => r.Trim()).ToArray();
+        }
 
         private class EqualityComparerImpl : IEqualityComparer<UserInfo>
         {

@@ -132,8 +132,6 @@ namespace Timeline.Services
 
         public async Task<CreateTokenResult> CreateToken(string username, string password)
         {
-            var users = _databaseContext.Users.ToList();
-
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
             if (user == null)
@@ -146,7 +144,7 @@ namespace Timeline.Services
 
             if (verifyResult)
             {
-                var userInfo = new UserInfo(user);
+                var userInfo = UserInfo.Create(user);
 
                 return new CreateTokenResult
                 {
@@ -171,7 +169,10 @@ namespace Timeline.Services
                 return null;
             }
 
-            var user = await _databaseContext.Users.Where(u => u.Id == userId.Value).SingleOrDefaultAsync();
+            var user = await _databaseContext.Users
+                .Where(u => u.Id == userId.Value)
+                .Select(u => UserInfo.Create(u.Name, u.RoleString))
+                .SingleOrDefaultAsync();
 
             if (user == null)
             {
@@ -179,19 +180,22 @@ namespace Timeline.Services
                 return null;
             }
 
-            return new UserInfo(user);
+            return user;
         }
 
         public async Task<UserInfo> GetUser(string username)
         {
             return await _databaseContext.Users
                 .Where(user => user.Name == username)
-                .Select(user => new UserInfo(user)).SingleOrDefaultAsync();
+                .Select(user => UserInfo.Create(user.Name, user.RoleString))
+                .SingleOrDefaultAsync();
         }
 
         public async Task<UserInfo[]> ListUsers()
         {
-            return await _databaseContext.Users.Select(user => new UserInfo(user)).ToArrayAsync();
+            return await _databaseContext.Users
+                .Select(user => UserInfo.Create(user.Name, user.RoleString))
+                .ToArrayAsync();
         }
 
         public async Task<PutUserResult> PutUser(string username, string password, string[] roles)
