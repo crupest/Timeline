@@ -79,6 +79,14 @@ namespace Timeline.Controllers
             }
         }
 
+        [HttpGet("user/{username}/avatar"), Authorize]
+        public async Task<IActionResult> GetAvatar([FromRoute] string username)
+        {
+            // TODO: test user existence.
+            var url = await _userService.GetAvatarUrl(username);
+            return Redirect(url);
+        }
+
         [HttpPost("userop/changepassword"), Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {

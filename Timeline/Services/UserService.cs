@@ -140,6 +140,8 @@ namespace Timeline.Services
         /// <see cref="ChangePasswordResult.NotExists"/> if user does not exist.
         /// <see cref="ChangePasswordResult.BadOldPassword"/> if old password is wrong.</returns>
         Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword);
+
+        Task<string> GetAvatarUrl(string username);
     }
 
     public class UserService : IUserService
@@ -148,13 +150,15 @@ namespace Timeline.Services
         private readonly DatabaseContext _databaseContext;
         private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
+        private readonly ITencentCloudCosService _cosService;
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
+        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService, ITencentCloudCosService cosService)
         {
             _logger = logger;
             _databaseContext = databaseContext;
             _jwtService = jwtService;
             _passwordService = passwordService;
+            _cosService = cosService;
         }
 
         public async Task<CreateTokenResult> CreateToken(string username, string password)
@@ -293,6 +297,15 @@ namespace Timeline.Services
             user.EncryptedPassword = _passwordService.HashPassword(newPassword);
             await _databaseContext.SaveChangesAsync();
             return ChangePasswordResult.Success;
+        }
+
+        public async Task<string> GetAvatarUrl(string username)
+        {
+            var exists = await _cosService.Exists("avatar", username);
+            if (exists)
+                return _cosService.GetObjectUrl("avatar", username);
+            else
+                return _cosService.GetObjectUrl("avatar", "__default");
         }
     }
 }
