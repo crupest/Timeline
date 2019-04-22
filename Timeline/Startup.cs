@@ -81,8 +81,8 @@ namespace Timeline
                 });
             });
 
-            services.Configure<TencentCosConfig>(Configuration.GetSection(nameof(TencentCosConfig)));
-            services.AddSingleton<ITencentCloudCosService, TencentCloudCosService>();
+            services.Configure<QCloudCosConfig>(Configuration.GetSection(nameof(QCloudCosConfig)));
+            services.AddSingleton<IQCloudCosService, QCloudCosService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

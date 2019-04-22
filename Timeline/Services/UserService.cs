@@ -150,9 +150,9 @@ namespace Timeline.Services
         private readonly DatabaseContext _databaseContext;
         private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
-        private readonly ITencentCloudCosService _cosService;
+        private readonly IQCloudCosService _cosService;
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService, ITencentCloudCosService cosService)
+        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService, IQCloudCosService cosService)
         {
             _logger = logger;
             _databaseContext = databaseContext;
@@ -301,7 +301,7 @@ namespace Timeline.Services
 
         public async Task<string> GetAvatarUrl(string username)
         {
-            var exists = await _cosService.Exists("avatar", username);
+            var exists = await _cosService.ObjectExists("avatar", username);
             if (exists)
                 return _cosService.GetObjectUrl("avatar", username);
             else
