@@ -66,6 +66,11 @@ namespace Timeline.Services
                 }
                 if (serverException != null)
                 {
+                    if (serverException.statusCode == 404)
+                    {
+                        t.SetResult(false);
+                        return;
+                    }
                     _logger.LogError(serverException, "An server error occured when test cos object existence. Bucket : {} . Key : {} .", bucket, key);
                     t.SetException(serverException);
                     return;
