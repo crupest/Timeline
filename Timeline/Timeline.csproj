@@ -12,6 +12,5 @@
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
-        <PackageReference Include="Tencent.QCloud.Cos.Sdk.NetCore" Version="5.4.1.1" />
     </ItemGroup>
 </Project>

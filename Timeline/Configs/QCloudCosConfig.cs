@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace Timeline.Configs
+﻿namespace Timeline.Configs
 {
-    public class TencentCosConfig
+    public class QCloudCosConfig
     {
         public string AppId { get; set; }
         public string Region { get; set; }
