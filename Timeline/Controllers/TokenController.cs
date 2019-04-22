@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Timeline.Entities;
+using Timeline.Entities.Http;
 using Timeline.Services;
 
 namespace Timeline.Controllers
