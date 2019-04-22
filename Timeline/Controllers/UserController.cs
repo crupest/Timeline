@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Entities.Http;
 using Timeline.Services;
 
 namespace Timeline.Controllers
@@ -48,50 +49,29 @@ namespace Timeline.Controllers
             }
         }
 
-        [HttpPatch("user/{username}"), Authorize]
+        [HttpPatch("user/{username}"), Authorize(Roles = "admin")]
         public async Task<IActionResult> Patch([FromBody] UserModifyRequest request, [FromRoute] string username)
         {
-            if (User.IsInRole("admin"))
+            var result = await _userService.PatchUser(username, request.Password, request.Roles);
+            switch (result)
             {
-                var result = await _userService.PatchUser(username, request.Password, request.Roles);
-                switch (result)
-                {
-                    case PatchUserResult.Success:
-                        return Ok();
-                    case PatchUserResult.NotExists:
-                        return NotFound();
-                    default:
-                        throw new Exception("Unreachable code.");
-                }
-            }
-            else
-            {
-                if (User.Identity.Name != username)
-                    return StatusCode(403, new MessageResponse("Can't patch other user when you are not admin."));
-                if (request.Roles != null)
-                    return StatusCode(403, new MessageResponse("Can't patch roles when you are not admin."));
-
-                var result = await _userService.PatchUser(username, request.Password, null);
-                switch (result)
-                {
-                    case PatchUserResult.Success:
-                        return Ok();
-                    case PatchUserResult.NotExists:
-                        return NotFound(new MessageResponse("This username no longer exists. Please update your token."));
-                    default:
-                        throw new Exception("Unreachable code.");
-                }
+                case PatchUserResult.Success:
+                    return Ok();
+                case PatchUserResult.NotExists:
+                    return NotFound();
+                default:
+                    throw new Exception("Unreachable code.");
             }
         }
 
         [HttpDelete("user/{username}"), Authorize(Roles = "admin")]
-        public async Task<ActionResult<UserDeleteResponse>> Delete([FromRoute] string username)
+        public async Task<IActionResult> Delete([FromRoute] string username)
         {
             var result = await _userService.DeleteUser(username);
             switch (result)
             {
-                case DeleteUserResult.Success:
-                    return Ok(UserDeleteResponse.Success);
+                case DeleteUserResult.Deleted:
+                    return Ok(UserDeleteResponse.Deleted);
                 case DeleteUserResult.NotExists:
                     return Ok(UserDeleteResponse.NotExists);
                 default:

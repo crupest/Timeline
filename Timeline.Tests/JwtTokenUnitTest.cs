@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http;
-using Timeline.Entities;
+using Timeline.Entities.Http;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Xunit;

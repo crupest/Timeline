@@ -1,4 +1,4 @@
-﻿namespace Timeline.Entities
+﻿namespace Timeline.Entities.Http
 {
     public class CreateTokenRequest
     {

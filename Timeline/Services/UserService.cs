@@ -40,9 +40,9 @@ namespace Timeline.Services
     public enum DeleteUserResult
     {
         /// <summary>
-        /// Succeed to delete user.
+        /// A existing user is deleted.
         /// </summary>
-        Success,
+        Deleted,
         /// <summary>
         /// A user of given username does not exist.
         /// </summary>
@@ -105,12 +105,12 @@ namespace Timeline.Services
 
         /// <summary>
         /// Delete a user of given username.
-        /// Return <see cref="DeleteUserResult.Success"/> if success to delete.
+        /// Return <see cref="DeleteUserResult.Deleted"/> if the user is deleted.
         /// Return <see cref="DeleteUserResult.NotExists"/> if the user of given username
         /// does not exist.
         /// </summary>
         /// <param name="username">Username of thet user to delete.</param>
-        /// <returns><see cref="DeleteUserResult.Success"/> if success to delete.
+        /// <returns><see cref="DeleteUserResult.Deleted"/> if the user is deleted.
         /// <see cref="DeleteUserResult.NotExists"/> if the user doesn't exist.</returns>
         Task<DeleteUserResult> DeleteUser(string username);
     }
@@ -250,7 +250,7 @@ namespace Timeline.Services
 
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
-            return DeleteUserResult.Success;
+            return DeleteUserResult.Deleted;
         }
     }
 }

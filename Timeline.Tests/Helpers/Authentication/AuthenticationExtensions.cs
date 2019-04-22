@@ -4,7 +4,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timeline.Entities;
+using Timeline.Entities.Http;
 using Xunit;
 
 namespace Timeline.Tests.Helpers.Authentication
