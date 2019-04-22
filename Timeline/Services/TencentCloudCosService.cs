@@ -52,31 +52,31 @@ namespace Timeline.Services
             _server.HeadObject(request, delegate (CosResult result)
             {
                 if (result.httpCode >= 200 && result.httpCode < 300)
-                    t.SetResult(true);
+                    t.TrySetResult(true);
                 else
-                    t.SetResult(false);
+                    t.TrySetResult(false);
             },
             delegate (CosClientException clientException, CosServerException serverException)
             {
                 if (clientException != null)
                 {
                     _logger.LogError(clientException, "An client error occured when test cos object existence. Bucket : {} . Key : {} .", bucket, key);
-                    t.SetException(clientException);
+                    t.TrySetException(clientException);
                     return;
                 }
                 if (serverException != null)
                 {
                     if (serverException.statusCode == 404)
                     {
-                        t.SetResult(false);
+                        t.TrySetResult(false);
                         return;
                     }
                     _logger.LogError(serverException, "An server error occured when test cos object existence. Bucket : {} . Key : {} .", bucket, key);
-                    t.SetException(serverException);
+                    t.TrySetException(serverException);
                     return;
                 }
                 _logger.LogError("An unknown error occured when test cos object existence. Bucket : {} . Key : {} .", bucket, key);
-                t.SetException(new Exception("Unknown exception when test cos object existence."));
+                t.TrySetException(new Exception("Unknown exception when test cos object existence."));
             });
 
             return t.Task;
