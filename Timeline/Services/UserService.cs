@@ -49,6 +49,22 @@ namespace Timeline.Services
         NotExists
     }
 
+    public enum ChangePasswordResult
+    {
+        /// <summary>
+        /// Success to change password.
+        /// </summary>
+        Success,
+        /// <summary>
+        /// The user does not exists.
+        /// </summary>
+        NotExists,
+        /// <summary>
+        /// Old password is wrong.
+        /// </summary>
+        BadOldPassword
+    }
+
     public interface IUserService
     {
         /// <summary>
@@ -113,6 +129,17 @@ namespace Timeline.Services
         /// <returns><see cref="DeleteUserResult.Deleted"/> if the user is deleted.
         /// <see cref="DeleteUserResult.NotExists"/> if the user doesn't exist.</returns>
         Task<DeleteUserResult> DeleteUser(string username);
+
+        /// <summary>
+        /// Try to change a user's password with old password.
+        /// </summary>
+        /// <param name="username">The name of user to change password of.</param>
+        /// <param name="oldPassword">The user's old password.</param>
+        /// <param name="newPassword">The user's new password.</param>
+        /// <returns><see cref="ChangePasswordResult.Success"/> if success.
+        /// <see cref="ChangePasswordResult.NotExists"/> if user does not exist.
+        /// <see cref="ChangePasswordResult.BadOldPassword"/> if old password is wrong.</returns>
+        Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword);
     }
 
     public class UserService : IUserService
@@ -251,6 +278,21 @@ namespace Timeline.Services
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
             return DeleteUserResult.Deleted;
+        }
+
+        public async Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword)
+        {
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+            if (user == null)
+                return ChangePasswordResult.NotExists;
+
+            var verifyResult = _passwordService.VerifyPassword(user.EncryptedPassword, oldPassword);
+            if (!verifyResult)
+                return ChangePasswordResult.BadOldPassword;
+
+            user.EncryptedPassword = _passwordService.HashPassword(newPassword);
+            await _databaseContext.SaveChangesAsync();
+            return ChangePasswordResult.Success;
         }
     }
 }

@@ -78,5 +78,22 @@ namespace Timeline.Controllers
                     throw new Exception("Uncreachable code.");
             }
         }
+
+        [HttpPost("userop/changepassword"), Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var result = await _userService.ChangePassword(User.Identity.Name, request.OldPassword, request.NewPassword);
+            switch (result)
+            {
+                case ChangePasswordResult.Success:
+                    return Ok(ChangePasswordResponse.Success);
+                case ChangePasswordResult.BadOldPassword:
+                    return Ok(ChangePasswordResponse.BadOldPassword);
+                case ChangePasswordResult.NotExists:
+                    return Ok(ChangePasswordResponse.NotExists);
+                default:
+                    throw new Exception("Uncreachable code.");
+            }
+        }
     }
 }
