@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,13 +21,15 @@ namespace Timeline.Services
 
     public class QCloudCosService : IQCloudCosService
     {
-        private readonly QCloudCosConfig _config;
+        private readonly IOptionsMonitor<QCloudCosConfig> _config;
         private readonly ILogger<QCloudCosService> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public QCloudCosService(IOptions<QCloudCosConfig> config, ILogger<QCloudCosService> logger)
+        public QCloudCosService(IOptionsMonitor<QCloudCosConfig> config, ILogger<QCloudCosService> logger, IHttpClientFactory httpClientFactory)
         {
-            _config = config.Value;
+            _config = config;
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
         public class QCloudCredentials
@@ -45,6 +48,17 @@ namespace Timeline.Services
 
         public class TimeDuration
         {
+            public TimeDuration()
+            {
+
+            }
+
+            public TimeDuration(DateTimeOffset start, DateTimeOffset end)
+            {
+                Start = start;
+                End = end;
+            }
+
             public DateTimeOffset Start { get; set; }
             public DateTimeOffset End { get; set; }
         }
@@ -57,14 +71,15 @@ namespace Timeline.Services
             Debug.Assert(request != null);
             Debug.Assert(request.Method != null);
             Debug.Assert(request.Uri != null);
-            Debug.Assert(request.Parameters != null);
-            Debug.Assert(request.Headers != null);
             Debug.Assert(signValidTime != null);
             Debug.Assert(signValidTime.Start < signValidTime.End, "Start must be before End in sign valid time.");
 
             List<(string key, string value)> Transform(IEnumerable<KeyValuePair<string, string>> raw)
             {
-                var sorted= raw.Select(p => (key: p.Key.ToLower(), value: WebUtility.UrlEncode(p.Value))).ToList();
+                if (raw == null)
+                    return new List<(string key, string value)>();
+
+                var sorted = raw.Select(p => (key: p.Key.ToLower(), value: WebUtility.UrlEncode(p.Value))).ToList();
                 sorted.Sort((left, right) => string.CompareOrdinal(left.key, right.key));
                 return sorted;
             }
@@ -103,7 +118,7 @@ namespace Timeline.Services
             }
 
             var httpString = new StringBuilder()
-                .Append(request.Method).Append('\n')
+                .Append(request.Method.ToLower()).Append('\n')
                 .Append(request.Uri).Append('\n')
                 .Append(Join(transformedParameters)).Append('\n')
                 .Append(Join(transformedHeaders)).Append('\n')
@@ -130,9 +145,64 @@ namespace Timeline.Services
             return Join(result);
         }
 
-        public Task<bool> ObjectExists(string bucket, string key)
+        private QCloudCredentials GetCredentials()
         {
-            throw new NotImplementedException();
+            var config = _config.CurrentValue;
+            return new QCloudCredentials
+            {
+                SecretId = config.SecretId,
+                SecretKey = config.SecretKey
+            };
+        }
+
+        private string GetHost(string bucket)
+        {
+            var config = _config.CurrentValue;
+            return $"{bucket}-{config.AppId}.cos.{config.Region}.myqcloud.com";
+        }
+
+        public async Task<bool> ObjectExists(string bucket, string key)
+        {
+            if (bucket == null)
+                throw new ArgumentNullException(nameof(bucket));
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            var client = _httpClientFactory.CreateClient();
+
+            var host = GetHost(bucket);
+
+            var request = new HttpRequestMessage();
+            request.Method = HttpMethod.Head;
+            request.RequestUri = new Uri($"https://{host}/{key}");
+            request.Headers.Host = host;
+            request.Headers.Date = DateTimeOffset.Now;
+            request.Headers.TryAddWithoutValidation("Authorization", GenerateSign(GetCredentials(), new RequestInfo
+            {
+                Method = "head",
+                Uri = "/" + key,
+                Headers = new Dictionary<string, string>
+                {
+                    ["Host"] = host
+                }
+            }, new TimeDuration(DateTimeOffset.Now, DateTimeOffset.Now.AddMinutes(2))));
+
+            try
+            {
+                var response = await client.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                    return true;
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    return false;
+
+                throw new Exception($"Unknown response code. {response.ToString()}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "An error occured when test a cos object existence.");
+                return false;
+            }
         }
 
         public string GetObjectUrl(string bucket, string key)
