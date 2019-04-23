@@ -15,7 +15,6 @@ namespace Timeline.Tests.Helpers
             return factory.WithWebHostBuilder(builder =>
             {
                 builder
-                    .UseEnvironment(EnvironmentConstants.TestEnvironmentName)
                     .ConfigureLogging(logging =>
                     {
                         logging.AddXunit(outputHelper);

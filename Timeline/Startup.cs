@@ -81,6 +81,8 @@ namespace Timeline
                 });
             });
 
+            services.AddHttpClient();
+
             services.Configure<QCloudCosConfig>(Configuration.GetSection(nameof(QCloudCosConfig)));
             services.AddSingleton<IQCloudCosService, QCloudCosService>();
         }
@@ -88,15 +90,6 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            if (Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-            }
-
             app.UseCors(corsPolicyName);
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
