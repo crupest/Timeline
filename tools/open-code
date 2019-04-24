@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export DOTNET_ROOT=/opt/dotnet
+export MSBuildSDKsPath=$DOTNET_ROOT/sdk/$(${DOTNET_ROOT}/dotnet --version)/Sdks
+
+code $(dirname "$0")/..
+
+exit
