@@ -301,11 +301,11 @@ namespace Timeline.Services
 
         public async Task<string> GetAvatarUrl(string username)
         {
-            var exists = await _cosService.ObjectExists("avatar", username);
+            var exists = await _cosService.IsObjectExists("avatar", username);
             if (exists)
-                return _cosService.GetObjectUrl("avatar", username);
+                return _cosService.GenerateObjectGetUrl("avatar", username);
             else
-                return _cosService.GetObjectUrl("avatar", "__default");
+                return _cosService.GenerateObjectGetUrl("avatar", "__default");
         }
     }
 }

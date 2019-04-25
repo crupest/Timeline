@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Timeline.Configs;
 
@@ -15,8 +16,21 @@ namespace Timeline.Services
 {
     public interface IQCloudCosService
     {
-        Task<bool> ObjectExists(string bucket, string key);
-        string GetObjectUrl(string bucket, string key);
+        /// <summary>
+        /// Test if an object in the bucket exists.
+        /// </summary>
+        /// <param name="bucket">The bucket name.</param>
+        /// <param name="key">The object key.</param>
+        /// <returns>True if exists. False if not.</returns>
+        Task<bool> IsObjectExists(string bucket, string key);
+
+        /// <summary>
+        /// Generate a presignated url to access the object.
+        /// </summary>
+        /// <param name="bucket">The bucket name.</param>
+        /// <param name="key">The object key.</param>
+        /// <returns>The presignated url.</returns>
+        string GenerateObjectGetUrl(string bucket, string key);
     }
 
     public class QCloudCosService : IQCloudCosService
@@ -30,6 +44,13 @@ namespace Timeline.Services
             _config = config;
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+        }
+
+        private const string BucketNamePattern = @"^(([a-z0-9][a-z0-9-]*[a-z0-9])|[a-z0-9])$";
+
+        public static bool ValidateBucketName(string bucketName)
+        {
+            return Regex.IsMatch(bucketName, BucketNamePattern);
         }
 
         public class QCloudCredentials
@@ -161,26 +182,29 @@ namespace Timeline.Services
             return $"{bucket}-{config.AppId}.cos.{config.Region}.myqcloud.com";
         }
 
-        public async Task<bool> ObjectExists(string bucket, string key)
+        public async Task<bool> IsObjectExists(string bucket, string key)
         {
             if (bucket == null)
                 throw new ArgumentNullException(nameof(bucket));
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
+            if (!ValidateBucketName(bucket))
+                throw new ArgumentException($"Bucket name is not valid. Param is {bucket} .", nameof(bucket));
 
             var client = _httpClientFactory.CreateClient();
 
             var host = GetHost(bucket);
+            var encodedKey = WebUtility.UrlEncode(key);
 
             var request = new HttpRequestMessage();
             request.Method = HttpMethod.Head;
-            request.RequestUri = new Uri($"https://{host}/{key}");
+            request.RequestUri = new Uri($"https://{host}/{encodedKey}");
             request.Headers.Host = host;
             request.Headers.Date = DateTimeOffset.Now;
             request.Headers.TryAddWithoutValidation("Authorization", GenerateSign(GetCredentials(), new RequestInfo
             {
                 Method = "head",
-                Uri = "/" + key,
+                Uri = "/" + encodedKey,
                 Headers = new Dictionary<string, string>
                 {
                     ["Host"] = host
@@ -205,9 +229,29 @@ namespace Timeline.Services
             }
         }
 
-        public string GetObjectUrl(string bucket, string key)
+        public string GenerateObjectGetUrl(string bucket, string key)
         {
-            throw new NotImplementedException();
+            if (bucket == null)
+                throw new ArgumentNullException(nameof(bucket));
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+            if (!ValidateBucketName(bucket))
+                throw new ArgumentException($"Bucket name is not valid. Param is {bucket} .", nameof(bucket));
+
+            var host = GetHost(bucket);
+            var encodedKey = WebUtility.UrlEncode(key);
+
+            var signature = GenerateSign(GetCredentials(), new RequestInfo
+            {
+                Method = "get",
+                Uri = "/" + encodedKey,
+                Headers = new Dictionary<string, string>
+                {
+                    ["Host"] = host
+                }
+            }, new TimeDuration(DateTimeOffset.Now, DateTimeOffset.Now.AddMinutes(6)));
+
+            return $"https://{host}/{encodedKey}?{signature}";
         }
     }
 }
