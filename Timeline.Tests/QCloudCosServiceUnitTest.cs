@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
@@ -17,6 +18,19 @@ namespace Timeline.Tests
         public QCloudCosServiceUnitTest(WebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
             _factory = factory.WithTestConfig(outputHelper);
+            _factory.CreateDefaultClient().Dispose(); // Ensure test server is created.
+        }
+
+        [Fact]
+        public void ValidateBucketNameTest()
+        {
+            Assert.True(QCloudCosService.ValidateBucketName("hello"));
+            Assert.True(QCloudCosService.ValidateBucketName("hello0123"));
+            Assert.True(QCloudCosService.ValidateBucketName("hello0123-hello"));
+            Assert.False(QCloudCosService.ValidateBucketName("-hello"));
+            Assert.False(QCloudCosService.ValidateBucketName("hello-"));
+            Assert.False(QCloudCosService.ValidateBucketName("helloU"));
+            Assert.False(QCloudCosService.ValidateBucketName("hello!"));
         }
 
         [Fact]
@@ -50,21 +64,40 @@ namespace Timeline.Tests
             Assert.Equal("q-sign-algorithm=sha1&q-ak=AKIDQjz3ltompVjBni5LitkWHFlFpwkn9U5q&q-sign-time=1417773892;1417853898&q-key-time=1417773892;1417853898&q-header-list=host;x-cos-content-sha1;x-cos-storage-class&q-url-param-list=&q-signature=0ab12f43e74cbe148d705cd9fae8adc9a6d39cc1", QCloudCosService.GenerateSign(credential, request, signValidTime));
         }
 
-        /*
+/*
+// Tests in this part need secret configs in cos.
+#region SecretTests
         [Fact]
         public async Task ObjectExistsTest()
         {
-            _factory.CreateDefaultClient().Dispose();
-
             using (var serviceScope = _factory.Server.Host.Services.CreateScope())
             {
                 var services = serviceScope.ServiceProvider;
                 var service = services.GetRequiredService<IQCloudCosService>();
-                Assert.True(await service.ObjectExists("avatar", "__default"));
-                Assert.False(await service.ObjectExists("avatar", "haha"));
-                Assert.False(await service.ObjectExists("haha", "haha"));
+                Assert.True(await service.IsObjectExists("avatar", "__default"));
+                Assert.False(await service.IsObjectExists("avatar", "haha"));
+                Assert.False(await service.IsObjectExists("haha", "haha"));                
             }
         }
-        */
+
+        // Although this test does not pass on my archlunux system. But the GenerateObjectGetUrl actually works well.
+        // And I don't know why.
+        [Fact]
+        public async Task GenerateObjectGetUrlTest()
+        {
+            using (var serviceScope = _factory.Server.Host.Services.CreateScope())
+            {
+                var services = serviceScope.ServiceProvider;
+                var service = services.GetRequiredService<IQCloudCosService>();
+                var url = service.GenerateObjectGetUrl("avatar", "__default");
+                using (var client = _factory.CreateClient())
+                {
+                    var res = await client.GetAsync(url);
+                    Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+                }
+            }
+        }
+#endregion
+*/
     }
 }
