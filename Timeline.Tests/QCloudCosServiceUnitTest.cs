@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
@@ -80,8 +81,6 @@ namespace Timeline.Tests
             }
         }
 
-        // Although this test does not pass on my archlunux system. But the GenerateObjectGetUrl actually works well.
-        // And I don't know why.
         [Fact]
         public async Task GenerateObjectGetUrlTest()
         {
@@ -90,7 +89,9 @@ namespace Timeline.Tests
                 var services = serviceScope.ServiceProvider;
                 var service = services.GetRequiredService<IQCloudCosService>();
                 var url = service.GenerateObjectGetUrl("avatar", "__default");
-                using (var client = _factory.CreateClient())
+                // never use the following line! Because client created by factory can't access Internet.
+                //using (var client = _factory.CreateClient())
+                using (var client = services.GetRequiredService<IHttpClientFactory>().CreateClient())
                 {
                     var res = await client.GetAsync(url);
                     Assert.Equal(HttpStatusCode.OK, res.StatusCode);
