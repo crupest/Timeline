@@ -82,7 +82,10 @@ namespace Timeline.Controllers
         [HttpGet("user/{username}/avatar"), Authorize]
         public async Task<IActionResult> GetAvatar([FromRoute] string username)
         {
-            // TODO: test user existence.
+            var existence = (await _userService.GetUser(username)) != null;
+            if (!existence)
+                return NotFound();
+
             var url = await _userService.GetAvatarUrl(username);
             return Redirect(url);
         }
