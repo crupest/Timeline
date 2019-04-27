@@ -2,8 +2,12 @@
 
 [![Build Status](https://dev.azure.com/crupest-web/Timeline/_apis/build/status/crupest.Timeline?branchName=master)](https://dev.azure.com/crupest-web/Timeline/_build/latest?definitionId=3&branchName=master)
 
-This is the first web app consisting of front-end and back-end of [me](https://github.com/crupest).
+This is the first web app back-end of [me](https://github.com/crupest).
+
+It is written in C# and built with [Asp.Net Core](https://github.com/aspnet/AspNetCore).
 
 The final product is hosting on my [Tencent Cloud](https://cloud.tencent.com/) Cloud Virtual Machine on [https://crupest.xyz](https://crupest.xyz).
 
 Feel free to comment by opening an issue.
+
+`tools/open-code` file is a simple *bash* script that fixes the problem that *OminiSharp* in C# extension on vscode can't work using *dotnet* in Arch official package repository on Arch Linux. See [this page](https://bugs.archlinux.org/task/60903).
