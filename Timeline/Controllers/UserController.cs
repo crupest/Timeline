@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Entities.Http;
@@ -82,13 +84,37 @@ namespace Timeline.Controllers
         [HttpGet("user/{username}/avatar"), Authorize]
         public async Task<IActionResult> GetAvatar([FromRoute] string username)
         {
-            var existence = (await _userService.GetUser(username)) != null;
-            if (!existence)
-                return NotFound();
-
             var url = await _userService.GetAvatarUrl(username);
+            if (url == null)
+                return NotFound();
             return Redirect(url);
         }
+
+        [HttpPut("user/{username}/avatar"), Authorize]
+        [Consumes("image/png", "image/gif", "image/jpeg", "image/svg+xml")]
+        public async Task<IActionResult> PutAvatar([FromRoute] string username, [FromHeader(Name="Content-Type")] string contentType)
+        {
+            bool isAdmin = User.IsInRole("admin");
+            if (!isAdmin)
+            {
+                if (username != User.Identity.Name)
+                    return StatusCode(StatusCodes.Status403Forbidden, PutAvatarResponse.Forbidden);
+            }
+
+            var stream = new MemoryStream();
+            await Request.Body.CopyToAsync(stream);
+            var result = await _userService.PutAvatar(username, stream.ToArray(), contentType);
+            switch (result)
+            {
+                case PutAvatarResult.Success:
+                    return Ok(PutAvatarResponse.Success);
+                case PutAvatarResult.UserNotExists:
+                    return BadRequest(PutAvatarResponse.NotExists);
+                default:
+                    throw new Exception("Unknown put avatar result.");
+            }
+        }
+
 
         [HttpPost("userop/changepassword"), Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)

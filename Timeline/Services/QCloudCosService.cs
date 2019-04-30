@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,6 +24,14 @@ namespace Timeline.Services
         /// <param name="key">The object key.</param>
         /// <returns>True if exists. False if not.</returns>
         Task<bool> IsObjectExists(string bucket, string key);
+
+        /// <summary>
+        /// Upload an object use put method.
+        /// </summary>
+        /// <param name="bucket">The bucket name.</param>
+        /// <param name="key">The object key.</param>
+        /// <param name="data">The data to upload.</param>
+        Task PutObject(string bucket, string key, byte[] data, string contentType);
 
         /// <summary>
         /// Generate a presignated url to access the object.
@@ -226,6 +235,68 @@ namespace Timeline.Services
             {
                 _logger.LogError(e, "An error occured when test a cos object existence.");
                 return false;
+            }
+        }
+
+        public async Task PutObject(string bucket, string key, byte[] data, string contentType)
+        {
+            if (bucket == null)
+                throw new ArgumentNullException(nameof(bucket));
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+            if (!ValidateBucketName(bucket))
+                throw new ArgumentException($"Bucket name is not valid. Param is {bucket} .", nameof(bucket));
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            var host = GetHost(bucket);
+            var encodedKey = WebUtility.UrlEncode(key);
+            var md5 = Convert.ToBase64String(MD5.Create().ComputeHash(data));
+
+            const string kContentMD5HeaderName = "Content-MD5";
+            const string kContentTypeHeaderName = "Content-Type";
+
+            var httpRequest = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"https://{host}/{encodedKey}")
+            };
+            httpRequest.Headers.Host = host;
+            httpRequest.Headers.Date = DateTimeOffset.Now;
+            var httpContent = new ByteArrayContent(data);
+            httpContent.Headers.Add(kContentMD5HeaderName, md5);
+            httpRequest.Content = httpContent;
+
+            var signedHeaders = new Dictionary<string, string>
+            {
+                ["Host"] = host,
+                [kContentMD5HeaderName] = md5
+            };
+
+            if (contentType != null)
+            {
+                httpContent.Headers.Add(kContentTypeHeaderName, contentType);
+                signedHeaders.Add(kContentTypeHeaderName, contentType);
+            }
+
+            httpRequest.Headers.TryAddWithoutValidation("Authorization", GenerateSign(GetCredentials(), new RequestInfo
+            {
+                Method = "put",
+                Uri = "/" + encodedKey,
+                Headers = signedHeaders
+            }, new TimeDuration(DateTimeOffset.Now, DateTimeOffset.Now.AddMinutes(10))));
+
+            var client = _httpClientFactory.CreateClient();
+
+            try
+            {
+                var response = await client.SendAsync(httpRequest);
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception($"Not success status code. {response.ToString()}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "An error occured when test a cos object existence.");
             }
         }
 

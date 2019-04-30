@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
@@ -63,6 +64,18 @@ namespace Timeline.Services
         /// Old password is wrong.
         /// </summary>
         BadOldPassword
+    }
+
+    public enum PutAvatarResult
+    {
+        /// <summary>
+        /// Success to upload avatar.
+        /// </summary>
+        Success,
+        /// <summary>
+        /// The user does not exists.
+        /// </summary>
+        UserNotExists
     }
 
     public interface IUserService
@@ -141,7 +154,14 @@ namespace Timeline.Services
         /// <see cref="ChangePasswordResult.BadOldPassword"/> if old password is wrong.</returns>
         Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword);
 
+        /// <summary>
+        /// Get the true avatar url of a user.
+        /// </summary>
+        /// <param name="username">The name of user.</param>
+        /// <returns>The url if user exists. Null if user does not exist.</returns>
         Task<string> GetAvatarUrl(string username);
+
+        Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType);
     }
 
     public class UserService : IUserService
@@ -301,11 +321,33 @@ namespace Timeline.Services
 
         public async Task<string> GetAvatarUrl(string username)
         {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+
+            if ((await GetUser(username)) == null)
+                return null;
+
             var exists = await _cosService.IsObjectExists("avatar", username);
             if (exists)
                 return _cosService.GenerateObjectGetUrl("avatar", username);
             else
                 return _cosService.GenerateObjectGetUrl("avatar", "__default");
+        }
+
+        public async Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType)
+        {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+            if (mimeType == null)
+                throw new ArgumentNullException(nameof(mimeType));
+
+            if ((await GetUser(username)) == null)
+                return PutAvatarResult.UserNotExists;
+
+            await _cosService.PutObject("avatar", username, data, mimeType);
+            return PutAvatarResult.Success;
         }
     }
 }
