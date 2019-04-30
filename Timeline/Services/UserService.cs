@@ -161,6 +161,14 @@ namespace Timeline.Services
         /// <returns>The url if user exists. Null if user does not exist.</returns>
         Task<string> GetAvatarUrl(string username);
 
+        /// <summary>
+        /// Put a avatar of a user.
+        /// </summary>
+        /// <param name="username">The name of user.</param>
+        /// <param name="data">The data of avatar image.</param>
+        /// <param name="mimeType">The mime type of the image.</param>
+        /// <returns>Return <see cref="PutAvatarResult.Success"/> if success.
+        /// Return <see cref="PutAvatarResult.UserNotExists"/> if user does not exist.</returns>
         Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType);
     }
 
