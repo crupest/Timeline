@@ -234,7 +234,7 @@ namespace Timeline.Services
             catch (Exception e)
             {
                 _logger.LogError(e, "An error occured when test a cos object existence.");
-                return false;
+                throw;
             }
         }
 
@@ -297,6 +297,7 @@ namespace Timeline.Services
             catch (Exception e)
             {
                 _logger.LogError(e, "An error occured when test a cos object existence.");
+                throw;
             }
         }
 
