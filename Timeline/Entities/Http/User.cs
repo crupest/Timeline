@@ -40,4 +40,15 @@
         public static ReturnCodeMessageResponse BadOldPassword { get; } = new ReturnCodeMessageResponse(BadOldPasswordCode, "Old password is wrong.");
         public static ReturnCodeMessageResponse NotExists { get; } = new ReturnCodeMessageResponse(NotExistsCode, "Username does not exists, please update token.");
     }
+
+    public static class PutAvatarResponse
+    {
+        public const int SuccessCode = 0;
+        public const int ForbiddenCode = 1;
+        public const int NotExistsCode = 2;
+
+        public static ReturnCodeMessageResponse Success {get;} = new ReturnCodeMessageResponse(SuccessCode, "Success to upload avatar.");
+        public static ReturnCodeMessageResponse Forbidden {get;} = new ReturnCodeMessageResponse(ForbiddenCode, "You are not allowed to upload the user's avatar.");
+        public static ReturnCodeMessageResponse NotExists {get;} = new ReturnCodeMessageResponse(NotExistsCode, "The username does not exists. If you are a user, try update your token.");
+    }
 }
