@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.Tasks;
 using Timeline.Configs;
 using Timeline.Formatters;
 using Timeline.Models;
@@ -44,7 +45,7 @@ namespace Timeline
                     if (Environment.IsProduction())
                         builder.WithOrigins("https://www.crupest.xyz", "https://crupest.xyz").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                     else
-                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                 });
             });
 
@@ -54,6 +55,18 @@ namespace Timeline
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o =>
                 {
+                    o.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = delegate (MessageReceivedContext context)
+                        {
+                            context.Request.Query.TryGetValue("token", out var value);
+                            if (value.Count == 1)
+                            {
+                                context.Token = value[0];
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                     o.TokenValidationParameters.ValidateIssuer = true;
                     o.TokenValidationParameters.ValidateAudience = true;
                     o.TokenValidationParameters.ValidateIssuerSigningKey = true;
