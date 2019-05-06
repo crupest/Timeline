@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Timeline.Models;
-using Timeline.Services;
 using Xunit.Abstractions;
 
 namespace Timeline.Tests.Helpers
@@ -16,7 +15,6 @@ namespace Timeline.Tests.Helpers
             return factory.WithWebHostBuilder(builder =>
             {
                 builder
-                    .UseEnvironment(EnvironmentConstants.TestEnvironmentName)
                     .ConfigureLogging(logging =>
                     {
                         logging.AddXunit(outputHelper);
@@ -42,28 +40,10 @@ namespace Timeline.Tests.Helpers
                             var scopedServices = scope.ServiceProvider;
                             var db = scopedServices.GetRequiredService<DatabaseContext>();
 
-                            var passwordService = new PasswordService(null);
-
                             // Ensure the database is created.
                             db.Database.EnsureCreated();
 
-                            db.Users.AddRange(new User[] {
-                                new User
-                                {
-                                    Id = 0,
-                                    Name = "user",
-                                    EncryptedPassword = passwordService.HashPassword("user"),
-                                    RoleString = "user"
-                                },
-                                new User
-                                {
-                                    Id = 0,
-                                    Name = "admin",
-                                    EncryptedPassword = passwordService.HashPassword("admin"),
-                                    RoleString = "user,admin"
-                                }
-                            });
-
+                            db.Users.AddRange(TestMockUsers.MockUsers);
                             db.SaveChanges();
                         }
                     });
