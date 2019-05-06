@@ -26,7 +26,7 @@ namespace Timeline.Tests
         {
             using (var client = _factory.CreateDefaultClient())
             {
-                var response = await client.GetAsync(NeedAuthorizeUrl);                
+                var response = await client.GetAsync(NeedAuthorizeUrl);
                 Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }
         }
@@ -34,10 +34,9 @@ namespace Timeline.Tests
         [Fact]
         public async Task AuthenticationTest()
         {
-            using (var client = _factory.CreateDefaultClient())
+            using (var client = await _factory.CreateClientWithUser("user", "user"))
             {
-                var token = (await client.CreateUserTokenAsync("user", "user")).Token;
-                var response = await client.SendWithAuthenticationAsync(token, NeedAuthorizeUrl);
+                var response = await client.GetAsync(NeedAuthorizeUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
@@ -58,12 +57,11 @@ namespace Timeline.Tests
         [Fact]
         public async Task AdminAuthorizationTest()
         {
-            using (var client = _factory.CreateDefaultClient())
+            using (var client = await _factory.CreateClientWithUser("admin", "admin"))
             {
-                var token = (await client.CreateUserTokenAsync("admin", "admin")).Token;
-                var response1 = await client.SendWithAuthenticationAsync(token, BothUserAndAdminUrl);
+                var response1 = await client.GetAsync(BothUserAndAdminUrl);
                 Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
-                var response2 = await client.SendWithAuthenticationAsync(token, OnlyAdminUrl);
+                var response2 = await client.GetAsync(OnlyAdminUrl);
                 Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
             }
         }

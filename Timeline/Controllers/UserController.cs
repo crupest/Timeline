@@ -1,90 +1,135 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Entities.Http;
 using Timeline.Services;
 
 namespace Timeline.Controllers
 {
-    [Route("[controller]")]
     public class UserController : Controller
     {
-        private static class LoggingEventIds
-        {
-            public const int LogInSucceeded = 4000;
-            public const int LogInFailed = 4001;
-        }
-
         private readonly IUserService _userService;
-        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _logger = logger;
         }
 
-        [HttpPost("[action]")]
-        [AllowAnonymous]
-        public async Task<ActionResult<CreateTokenResponse>> CreateToken([FromBody] CreateTokenRequest request)
+        [HttpGet("users"), Authorize(Roles = "admin")]
+        public async Task<ActionResult<UserInfo[]>> List()
         {
-            var result = await _userService.CreateToken(request.Username, request.Password);
+            return Ok(await _userService.ListUsers());
+        }
 
-            if (result == null)
+        [HttpGet("user/{username}"), Authorize]
+        public async Task<IActionResult> Get([FromRoute] string username)
+        {
+            var user = await _userService.GetUser(username);
+            if (user == null)
             {
-                _logger.LogInformation(LoggingEventIds.LogInFailed, "Attemp to login with username: {} and password: {} failed.", request.Username, request.Password);
-                return Ok(new CreateTokenResponse
-                {
-                    Success = false
-                });
+                return NotFound();
             }
-
-            _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.", request.Username);
-
-            return Ok(new CreateTokenResponse
-            {
-                Success = true,
-                Token = result.Token,
-                UserInfo = result.UserInfo
-            });
+            return Ok(user);
         }
 
-        [HttpPost("[action]")]
-        [AllowAnonymous]
-        public async Task<ActionResult<VerifyTokenResponse>> VerifyToken([FromBody] VerifyTokenRequest request)
+        [HttpPut("user/{username}"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> Put([FromBody] UserModifyRequest request, [FromRoute] string username)
         {
-            var result = await _userService.VerifyToken(request.Token);
-
-            if (result == null)
-            {
-                return Ok(new VerifyTokenResponse
-                {
-                    IsValid = false,
-                });
-            }
-
-            return Ok(new VerifyTokenResponse
-            {
-                IsValid = true,
-                UserInfo = result
-            });
-        }
-
-        [HttpPost("[action]")]
-        [Authorize(Roles = "admin")]
-        public async Task<ActionResult<CreateUserResponse>> CreateUser([FromBody] CreateUserRequest request)
-        {
-            var result = await _userService.CreateUser(request.Username, request.Password, request.Roles);
+            var result = await _userService.PutUser(username, request.Password, request.Roles);
             switch (result)
             {
-                case CreateUserResult.Success:
-                    return Ok(new CreateUserResponse { ReturnCode = CreateUserResponse.SuccessCode });
-                case CreateUserResult.AlreadyExists:
-                    return Ok(new CreateUserResponse { ReturnCode = CreateUserResponse.AlreadyExistsCode });
+                case PutUserResult.Created:
+                    return CreatedAtAction("Get", new { username }, UserPutResponse.Created);
+                case PutUserResult.Modified:
+                    return Ok(UserPutResponse.Modified);
                 default:
                     throw new Exception("Unreachable code.");
+            }
+        }
+
+        [HttpPatch("user/{username}"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> Patch([FromBody] UserModifyRequest request, [FromRoute] string username)
+        {
+            var result = await _userService.PatchUser(username, request.Password, request.Roles);
+            switch (result)
+            {
+                case PatchUserResult.Success:
+                    return Ok();
+                case PatchUserResult.NotExists:
+                    return NotFound();
+                default:
+                    throw new Exception("Unreachable code.");
+            }
+        }
+
+        [HttpDelete("user/{username}"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> Delete([FromRoute] string username)
+        {
+            var result = await _userService.DeleteUser(username);
+            switch (result)
+            {
+                case DeleteUserResult.Deleted:
+                    return Ok(UserDeleteResponse.Deleted);
+                case DeleteUserResult.NotExists:
+                    return Ok(UserDeleteResponse.NotExists);
+                default:
+                    throw new Exception("Uncreachable code.");
+            }
+        }
+
+        [HttpGet("user/{username}/avatar"), Authorize]
+        public async Task<IActionResult> GetAvatar([FromRoute] string username)
+        {
+            var url = await _userService.GetAvatarUrl(username);
+            if (url == null)
+                return NotFound();
+            return Redirect(url);
+        }
+
+        [HttpPut("user/{username}/avatar"), Authorize]
+        [Consumes("image/png", "image/gif", "image/jpeg", "image/svg+xml")]
+        public async Task<IActionResult> PutAvatar([FromRoute] string username, [FromHeader(Name="Content-Type")] string contentType)
+        {
+            bool isAdmin = User.IsInRole("admin");
+            if (!isAdmin)
+            {
+                if (username != User.Identity.Name)
+                    return StatusCode(StatusCodes.Status403Forbidden, PutAvatarResponse.Forbidden);
+            }
+
+            var stream = new MemoryStream();
+            await Request.Body.CopyToAsync(stream);
+            var result = await _userService.PutAvatar(username, stream.ToArray(), contentType);
+            switch (result)
+            {
+                case PutAvatarResult.Success:
+                    return Ok(PutAvatarResponse.Success);
+                case PutAvatarResult.UserNotExists:
+                    return BadRequest(PutAvatarResponse.NotExists);
+                default:
+                    throw new Exception("Unknown put avatar result.");
+            }
+        }
+
+
+        [HttpPost("userop/changepassword"), Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var result = await _userService.ChangePassword(User.Identity.Name, request.OldPassword, request.NewPassword);
+            switch (result)
+            {
+                case ChangePasswordResult.Success:
+                    return Ok(ChangePasswordResponse.Success);
+                case ChangePasswordResult.BadOldPassword:
+                    return Ok(ChangePasswordResponse.BadOldPassword);
+                case ChangePasswordResult.NotExists:
+                    return Ok(ChangePasswordResponse.NotExists);
+                default:
+                    throw new Exception("Uncreachable code.");
             }
         }
     }
