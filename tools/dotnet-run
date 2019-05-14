@@ -1,0 +1,2 @@
+#!/bin/bash
+konsole -e dotnet run --project $(dirname "$0")/../Timeline/Timeline.csproj
