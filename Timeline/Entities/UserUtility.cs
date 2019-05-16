@@ -1,0 +1,49 @@
+using System;
+using System.Linq;
+using Timeline.Entities;
+using Timeline.Models;
+
+namespace Timeline.Entities
+{
+    public static class UserUtility
+    {
+        public const string UserRole = "user";
+        public const string AdminRole = "admin";
+
+        public static string[] UserRoleArray { get; } = new string[] { UserRole };
+        public static string[] AdminRoleArray { get; } = new string[] { UserRole, AdminRole };
+
+        public static string[] IsAdminToRoleArray(bool isAdmin)
+        {
+            return isAdmin ? AdminRoleArray : UserRoleArray;
+        }
+
+        public static bool RoleArrayToIsAdmin(string[] roles)
+        {
+            return roles.Contains(AdminRole);
+        }
+
+        public static string[] RoleStringToRoleArray(string roleString)
+        {
+            return roleString.Split(',').ToArray();
+        }
+
+        public static string RoleArrayToRoleString(string[] roles)
+        {
+            return string.Join(',', roles);
+        }
+
+        public static string IsAdminToRoleString(bool isAdmin)
+        {
+            return RoleArrayToRoleString(IsAdminToRoleArray(isAdmin));
+        }
+
+        public static UserInfo CreateUserInfo(User user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            return new UserInfo(user.Name, RoleArrayToIsAdmin(RoleStringToRoleArray(user.RoleString)));
+        }
+
+    }
+}

@@ -28,8 +28,8 @@ namespace Timeline.Tests.Helpers
 
             MockUsers = mockUsers;
 
-            var mockUserInfos = mockUsers.Select(u => UserInfo.Create(u)).ToList();
-            mockUserInfos.Sort(UserInfo.Comparer);
+            var mockUserInfos = mockUsers.Select(u => UserUtility.CreateUserInfo(u)).ToList();
+            mockUserInfos.Sort(UserInfoComparers.Comparer);
             MockUserInfos = mockUserInfos;
         }
 

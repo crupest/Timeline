@@ -78,7 +78,7 @@ namespace Timeline.Tests
                 Assert.True(result.IsValid);
                 Assert.NotNull(result.UserInfo);
                 Assert.Equal(createTokenResult.UserInfo.Username, result.UserInfo.Username);
-                Assert.Equal(createTokenResult.UserInfo.Roles, result.UserInfo.Roles);
+                Assert.Equal(createTokenResult.UserInfo.IsAdmin, result.UserInfo.IsAdmin);
             }
         }
     }

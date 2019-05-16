@@ -11,24 +11,28 @@ using Timeline.Entities;
 
 namespace Timeline.Services
 {
+    public class TokenInfo
+    {
+        public string Name { get; set; }
+        public string[] Roles { get; set; }
+    }
+
     public interface IJwtService
     {
         /// <summary>
         /// Create a JWT token for a given user info.
         /// </summary>
-        /// <param name="userId">The user id contained in generate token.</param>
-        /// <param name="username">The username contained in token.</param>
-        /// <param name="roles">The roles contained in token.</param>
+        /// <param name="tokenInfo">The info to generate token.</param>
         /// <returns>Return the generated token.</returns>
-        string GenerateJwtToken(long userId, string username, string[] roles);
+        string GenerateJwtToken(TokenInfo tokenInfo);
 
         /// <summary>
         /// Verify a JWT token.
         /// Return null is <paramref name="token"/> is null.
         /// </summary>
         /// <param name="token">The token string to verify.</param>
-        /// <returns>Return null if <paramref name="token"/> is null or token is invalid. Return the saved user info otherwise.</returns>
-        UserInfo VerifyJwtToken(string token);
+        /// <returns>Return null if <paramref name="token"/> is null or token is invalid. Return the saved info otherwise.</returns>
+        TokenInfo VerifyJwtToken(string token);
 
     }
 
@@ -44,14 +48,20 @@ namespace Timeline.Services
             _logger = logger;
         }
 
-        public string GenerateJwtToken(long id, string username, string[] roles)
+        public string GenerateJwtToken(TokenInfo tokenInfo)
         {
+            if (tokenInfo == null)
+                throw new ArgumentNullException(nameof(tokenInfo));
+            if (tokenInfo.Name == null)
+                throw new ArgumentException("Name is null.", nameof(tokenInfo));
+            if (tokenInfo.Roles == null)
+                throw new ArgumentException("Roles is null.", nameof(tokenInfo));
+
             var jwtConfig = _jwtConfig.CurrentValue;
 
             var identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id.ToString()));
-            identity.AddClaim(new Claim(identity.NameClaimType, username));
-            identity.AddClaims(roles.Select(role => new Claim(identity.RoleClaimType, role)));
+            identity.AddClaim(new Claim(identity.NameClaimType, tokenInfo.Name));
+            identity.AddClaims(tokenInfo.Roles.Select(role => new Claim(identity.RoleClaimType, role)));
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
@@ -71,7 +81,7 @@ namespace Timeline.Services
         }
 
 
-        public UserInfo VerifyJwtToken(string token)
+        public TokenInfo VerifyJwtToken(string token)
         {
             if (token == null)
                 return null;
@@ -90,8 +100,11 @@ namespace Timeline.Services
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey))
                 }, out SecurityToken validatedToken);
 
-                return new UserInfo(principal.Identity.Name,
-                    principal.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray());
+                return new TokenInfo
+                {
+                    Name = principal.Identity.Name,
+                    Roles = principal.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray()
+                };
             }
             catch (Exception e)
             {

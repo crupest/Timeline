@@ -1,9 +1,15 @@
 ﻿namespace Timeline.Entities.Http
 {
-    public class UserModifyRequest
+    public class UserPutRequest
     {
         public string Password { get; set; }
-        public string[] Roles { get; set; }
+        public bool IsAdmin { get; set; }
+    }
+
+    public class UserPatchRequest
+    {
+        public string Password { get; set; }
+        public bool? IsAdmin { get; set; }
     }
 
     public static class UserPutResponse
@@ -47,8 +53,8 @@
         public const int ForbiddenCode = 1;
         public const int NotExistsCode = 2;
 
-        public static ReturnCodeMessageResponse Success {get;} = new ReturnCodeMessageResponse(SuccessCode, "Success to upload avatar.");
-        public static ReturnCodeMessageResponse Forbidden {get;} = new ReturnCodeMessageResponse(ForbiddenCode, "You are not allowed to upload the user's avatar.");
-        public static ReturnCodeMessageResponse NotExists {get;} = new ReturnCodeMessageResponse(NotExistsCode, "The username does not exists. If you are a user, try update your token.");
+        public static ReturnCodeMessageResponse Success { get; } = new ReturnCodeMessageResponse(SuccessCode, "Success to upload avatar.");
+        public static ReturnCodeMessageResponse Forbidden { get; } = new ReturnCodeMessageResponse(ForbiddenCode, "You are not allowed to upload the user's avatar.");
+        public static ReturnCodeMessageResponse NotExists { get; } = new ReturnCodeMessageResponse(NotExistsCode, "The username does not exists. If you are a user, try update your token.");
     }
 }
