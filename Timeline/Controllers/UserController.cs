@@ -37,9 +37,9 @@ namespace Timeline.Controllers
         }
 
         [HttpPut("user/{username}"), Authorize(Roles = "admin")]
-        public async Task<IActionResult> Put([FromBody] UserModifyRequest request, [FromRoute] string username)
+        public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
-            var result = await _userService.PutUser(username, request.Password, request.Roles);
+            var result = await _userService.PutUser(username, request.Password, request.IsAdmin);
             switch (result)
             {
                 case PutUserResult.Created:
@@ -52,9 +52,9 @@ namespace Timeline.Controllers
         }
 
         [HttpPatch("user/{username}"), Authorize(Roles = "admin")]
-        public async Task<IActionResult> Patch([FromBody] UserModifyRequest request, [FromRoute] string username)
+        public async Task<IActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute] string username)
         {
-            var result = await _userService.PatchUser(username, request.Password, request.Roles);
+            var result = await _userService.PatchUser(username, request.Password, request.IsAdmin);
             switch (result)
             {
                 case PatchUserResult.Success:

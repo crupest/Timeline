@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
+using static Timeline.Entities.UserUtility;
 
 namespace Timeline.Services
 {
@@ -120,7 +121,7 @@ namespace Timeline.Services
         /// <param name="roles">Array of roles of user.</param>
         /// <returns>Return <see cref="PutUserResult.Created"/> if a new user is created.
         /// Return <see cref="PutUserResult.Modified"/> if a existing user is modified.</returns>
-        Task<PutUserResult> PutUser(string username, string password, string[] roles);
+        Task<PutUserResult> PutUser(string username, string password, bool isAdmin);
 
         /// <summary>
         /// Partially modify a use of given username.
@@ -130,7 +131,7 @@ namespace Timeline.Services
         /// <param name="roles">New roles. If not modify, then null.</param>
         /// <returns>Return <see cref="PatchUserResult.Success"/> if modification succeeds.
         /// Return <see cref="PatchUserResult.NotExists"/> if the user of given username doesn't exist.</returns>
-        Task<PatchUserResult> PatchUser(string username, string password, string[] roles);
+        Task<PatchUserResult> PatchUser(string username, string password, bool? isAdmin);
 
         /// <summary>
         /// Delete a user of given username.
@@ -203,12 +204,16 @@ namespace Timeline.Services
 
             if (verifyResult)
             {
-                var userInfo = UserInfo.Create(user);
-
+                var roles = RoleStringToRoleArray(user.RoleString);
+                var token = _jwtService.GenerateJwtToken(new TokenInfo
+                {
+                    Name = username,
+                    Roles = roles
+                });
                 return new CreateTokenResult
                 {
-                    Token = _jwtService.GenerateJwtToken(user.Id, userInfo.Username, userInfo.Roles),
-                    UserInfo = userInfo
+                    Token = token,
+                    UserInfo = new UserInfo(username, RoleArrayToIsAdmin(roles))
                 };
             }
             else
@@ -220,33 +225,33 @@ namespace Timeline.Services
 
         public async Task<UserInfo> VerifyToken(string token)
         {
-            var userInfo = _jwtService.VerifyJwtToken(token);
+            var tokenInfo = _jwtService.VerifyJwtToken(token);
 
-            if (userInfo == null)
+            if (tokenInfo == null)
             {
                 _logger.LogInformation($"Verify token falied. Reason: invalid token. Token: {token} .");
                 return null;
             }
 
-            return await Task.FromResult(userInfo);
+            return await Task.FromResult(new UserInfo(tokenInfo.Name, RoleArrayToIsAdmin(tokenInfo.Roles)));
         }
 
         public async Task<UserInfo> GetUser(string username)
         {
             return await _databaseContext.Users
                 .Where(user => user.Name == username)
-                .Select(user => UserInfo.Create(user.Name, user.RoleString))
+                .Select(user => CreateUserInfo(user))
                 .SingleOrDefaultAsync();
         }
 
         public async Task<UserInfo[]> ListUsers()
         {
             return await _databaseContext.Users
-                .Select(user => UserInfo.Create(user.Name, user.RoleString))
+                .Select(user => CreateUserInfo(user))
                 .ToArrayAsync();
         }
 
-        public async Task<PutUserResult> PutUser(string username, string password, string[] roles)
+        public async Task<PutUserResult> PutUser(string username, string password, bool isAdmin)
         {
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
@@ -256,20 +261,20 @@ namespace Timeline.Services
                 {
                     Name = username,
                     EncryptedPassword = _passwordService.HashPassword(password),
-                    RoleString = string.Join(',', roles)
+                    RoleString = IsAdminToRoleString(isAdmin)
                 });
                 await _databaseContext.SaveChangesAsync();
                 return PutUserResult.Created;
             }
 
             user.EncryptedPassword = _passwordService.HashPassword(password);
-            user.RoleString = string.Join(',', roles);
+            user.RoleString = IsAdminToRoleString(isAdmin);
             await _databaseContext.SaveChangesAsync();
 
             return PutUserResult.Modified;
         }
 
-        public async Task<PatchUserResult> PatchUser(string username, string password, string[] roles)
+        public async Task<PatchUserResult> PatchUser(string username, string password, bool? isAdmin)
         {
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
@@ -284,10 +289,10 @@ namespace Timeline.Services
                 user.EncryptedPassword = _passwordService.HashPassword(password);
             }
 
-            if (roles != null)
+            if (isAdmin != null)
             {
                 modified = true;
-                user.RoleString = string.Join(',', roles);
+                user.RoleString = IsAdminToRoleString(isAdmin.Value);
             }
 
             if (modified)

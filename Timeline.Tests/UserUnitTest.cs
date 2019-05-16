@@ -28,8 +28,8 @@ namespace Timeline.Tests
                 var res1 = await client.GetAsync("users");
                 Assert.Equal(HttpStatusCode.OK, res1.StatusCode);
                 var users = JsonConvert.DeserializeObject<UserInfo[]>(await res1.Content.ReadAsStringAsync()).ToList();
-                users.Sort(UserInfo.Comparer);
-                Assert.Equal(TestMockUsers.MockUserInfos, users, UserInfo.EqualityComparer);
+                users.Sort(UserInfoComparers.Comparer);
+                Assert.Equal(TestMockUsers.MockUserInfos, users, UserInfoComparers.EqualityComparer);
             }
         }
     }
