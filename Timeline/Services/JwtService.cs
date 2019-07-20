@@ -7,7 +7,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using Timeline.Configs;
-using Timeline.Entities;
 
 namespace Timeline.Services
 {
