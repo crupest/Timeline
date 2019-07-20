@@ -18,6 +18,9 @@ namespace Timeline.Models
 
         [Column("roles"), Required]
         public string RoleString { get; set; }
+
+        [Column("version"), Required]
+        public long Version { get; set; }
     }
 
     public class DatabaseContext : DbContext
