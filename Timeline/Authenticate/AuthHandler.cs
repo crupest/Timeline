@@ -23,9 +23,7 @@ namespace Timeline.Authenticate
         /// </summary>
         public string TokenQueryParamKey { get; set; } = "token";
 
-        public TokenValidationParameters TokenValidationParameters { get;
-            set; } 
-            = new TokenValidationParameters();
+        public TokenValidationParameters TokenValidationParameters { get; set; } = new TokenValidationParameters();
     }
 
     class AuthHandler : AuthenticationHandler<AuthOptions>
