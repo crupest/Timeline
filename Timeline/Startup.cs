@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.Tasks;
+using Timeline.Authenticate;
 using Timeline.Configs;
 using Timeline.Formatters;
 using Timeline.Models;
@@ -53,28 +54,16 @@ namespace Timeline
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o =>
-                {
-                    o.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = delegate (MessageReceivedContext context)
-                        {
-                            context.Request.Query.TryGetValue("token", out var value);
-                            if (value.Count == 1)
-                            {
-                                context.Token = value[0];
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
-                    o.TokenValidationParameters.ValidateIssuer = true;
-                    o.TokenValidationParameters.ValidateAudience = true;
-                    o.TokenValidationParameters.ValidateIssuerSigningKey = true;
-                    o.TokenValidationParameters.ValidateLifetime = true;
-                    o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
-                    o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
-                    o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
-                });
+                .AddScheme<AuthOptions, AuthHandler>(AuthConstants.Scheme, AuthConstants.DisplayName, o =>
+                 {
+                     o.TokenValidationParameters.ValidateIssuer = true;
+                     o.TokenValidationParameters.ValidateAudience = true;
+                     o.TokenValidationParameters.ValidateIssuerSigningKey = true;
+                     o.TokenValidationParameters.ValidateLifetime = true;
+                     o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
+                     o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
+                     o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
+                 });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
