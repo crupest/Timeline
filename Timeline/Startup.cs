@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Threading.Tasks;
 using Timeline.Authenticate;
 using Timeline.Configs;
 using Timeline.Formatters;
@@ -87,6 +86,8 @@ namespace Timeline
 
             services.Configure<QCloudCosConfig>(Configuration.GetSection(nameof(QCloudCosConfig)));
             services.AddSingleton<IQCloudCosService, QCloudCosService>();
+
+            services.AddMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

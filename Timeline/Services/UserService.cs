@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -12,7 +13,41 @@ namespace Timeline.Services
     public class CreateTokenResult
     {
         public string Token { get; set; }
-        public UserInfo UserInfo { get; set; }
+        public UserInfo User { get; set; }
+    }
+
+    [Serializable]
+    public class UserNotExistException : Exception
+    {
+        public UserNotExistException(): base("The user does not exist.") { }
+        public UserNotExistException(string message) : base(message) { }
+        public UserNotExistException(string message, Exception inner) : base(message, inner) { }
+        protected UserNotExistException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+    [Serializable]
+    public class BadPasswordException : Exception
+    {
+        public BadPasswordException(): base("Password is wrong.") { }
+        public BadPasswordException(string message) : base(message) { }
+        public BadPasswordException(string message, Exception inner) : base(message, inner) { }
+        protected BadPasswordException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+
+    [Serializable]
+    public class BadTokenVersionException : Exception
+    {
+        public BadTokenVersionException(): base("Token version is expired.") { }
+        public BadTokenVersionException(string message) : base(message) { }
+        public BadTokenVersionException(string message, Exception inner) : base(message, inner) { }
+        protected BadTokenVersionException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
     public enum PutUserResult
@@ -85,9 +120,12 @@ namespace Timeline.Services
         /// Try to anthenticate with the given username and password.
         /// If success, create a token and return the user info.
         /// </summary>
-        /// <param name="username">The username of the user to be anthenticated.</param>
-        /// <param name="password">The password of the user to be anthenticated.</param>
-        /// <returns>Return null if anthentication failed. An <see cref="CreateTokenResult"/> containing the created token and user info if anthentication succeeded.</returns>
+        /// <param name="username">The username of the user to anthenticate.</param>
+        /// <param name="password">The password of the user to anthenticate.</param>
+        /// <returns>An <see cref="CreateTokenResult"/> containing the created token and user info.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
+        /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
         Task<CreateTokenResult> CreateToken(string username, string password);
 
         /// <summary>
@@ -95,7 +133,11 @@ namespace Timeline.Services
         /// If success, return the user info.
         /// </summary>
         /// <param name="token">The token to verify.</param>
-        /// <returns>Return null if verification failed. The user info if verification succeeded.</returns>
+        /// <returns>The user info specified by the token.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
+        /// <exception cref="JwtTokenVerifyException">Thrown when the token is of bad format. Thrown by <see cref="JwtService.VerifyJwtToken(string)"/>.</exception>
+        /// <exception cref="UserNotExistException">Thrown when the user specified by the token does not exist. Usually it has been deleted after the token was issued.</exception>
+        /// <exception cref="BadTokenVersionException">Thrown when the version in the token is expired. User needs to recreate the token.</exception>
         Task<UserInfo> VerifyToken(string token);
 
         /// <summary>
@@ -173,67 +215,122 @@ namespace Timeline.Services
         Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType);
     }
 
+    internal class UserCache
+    {
+        public string Username { get; set; }
+        public bool IsAdmin { get; set; }
+        public long Version { get; set; }
+
+        public UserInfo ToUserInfo()
+        {
+            return new UserInfo(Username, IsAdmin);
+        }
+    }
+
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
+
+        private readonly IMemoryCache _memoryCache;
         private readonly DatabaseContext _databaseContext;
+
         private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
         private readonly IQCloudCosService _cosService;
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService, IQCloudCosService cosService)
+        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService, IQCloudCosService cosService)
         {
             _logger = logger;
+            _memoryCache = memoryCache;
             _databaseContext = databaseContext;
             _jwtService = jwtService;
             _passwordService = passwordService;
             _cosService = cosService;
         }
 
+        private string GenerateCacheKeyByUserId(long id) => $"user:{id}";
+
+        private void RemoveCache(long id)
+        {
+            _memoryCache.Remove(GenerateCacheKeyByUserId(id));
+        }
+
         public async Task<CreateTokenResult> CreateToken(string username, string password)
         {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (password == null)
+                throw new ArgumentNullException(nameof(password));
+
+            // We need password info, so always check the database.
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
             if (user == null)
             {
-                _logger.LogInformation($"Create token failed with invalid username. Username = {username} Password = {password} .");
-                return null;
+                var e = new UserNotExistException();
+                _logger.LogInformation(e, $"Create token failed. Reason: invalid username. Username = {username} Password = {password} .");
+                throw e;
             }
 
-            var verifyResult = _passwordService.VerifyPassword(user.EncryptedPassword, password);
+            if (!_passwordService.VerifyPassword(user.EncryptedPassword, password))
+            {
+                var e = new BadPasswordException();
+                _logger.LogInformation(e, $"Create token failed. Reason: invalid password. Username = {username} Password = {password} .");
+                throw e;
+            }
 
-            if (verifyResult)
+            var token = _jwtService.GenerateJwtToken(new TokenInfo
             {
-                var roles = RoleStringToRoleArray(user.RoleString);
-                var token = _jwtService.GenerateJwtToken(new TokenInfo
-                {
-                    Name = username,
-                    Roles = roles
-                });
-                return new CreateTokenResult
-                {
-                    Token = token,
-                    UserInfo = new UserInfo(username, RoleArrayToIsAdmin(roles))
-                };
-            }
-            else
+                Id = user.Id,
+                Version = user.Version
+            });
+            return new CreateTokenResult
             {
-                _logger.LogInformation($"Create token failed with invalid password. Username = {username} Password = {password} .");
-                return null;
-            }
+                Token = token,
+                User = CreateUserInfo(user)
+            };
         }
 
         public async Task<UserInfo> VerifyToken(string token)
         {
-            var tokenInfo = _jwtService.VerifyJwtToken(token);
-
-            if (tokenInfo == null)
+            TokenInfo tokenInfo;
+            try
             {
-                _logger.LogInformation($"Verify token falied. Reason: invalid token. Token: {token} .");
-                return null;
+                tokenInfo = _jwtService.VerifyJwtToken(token);
+            }
+            catch (JwtTokenVerifyException e)
+            {
+                _logger.LogInformation(e, $"Verify token falied. Reason: invalid token. Token: {token} .");
+                throw e;
             }
 
-            return await Task.FromResult(new UserInfo(tokenInfo.Name, RoleArrayToIsAdmin(tokenInfo.Roles)));
+            var id = tokenInfo.Id;
+            var key = GenerateCacheKeyByUserId(id);
+            if (!_memoryCache.TryGetValue<UserCache>(key, out var cache))
+            {
+                // no cache, check the database
+                var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+
+                if (user == null)
+                {
+                    var e = new UserNotExistException();
+                    _logger.LogInformation(e, $"Verify token falied. Reason: invalid id. Token: {token} Id: {id}.");
+                    throw e;
+                }
+
+                // create cache
+                cache = CreateUserCache(user);
+                _memoryCache.CreateEntry(key).SetValue(cache);
+            }
+
+            if (tokenInfo.Version != cache.Version)
+            {
+                var e = new BadTokenVersionException();
+                _logger.LogInformation(e, $"Verify token falied. Reason: invalid version. Token: {token} Id: {id} Username: {cache.Username} Version: {tokenInfo.Version} Version in cache: {cache.Version}.");
+                throw e;
+            }
+
+            return cache.ToUserInfo();
         }
 
         public async Task<UserInfo> GetUser(string username)
@@ -261,7 +358,8 @@ namespace Timeline.Services
                 {
                     Name = username,
                     EncryptedPassword = _passwordService.HashPassword(password),
-                    RoleString = IsAdminToRoleString(isAdmin)
+                    RoleString = IsAdminToRoleString(isAdmin),
+                    Version = 0
                 });
                 await _databaseContext.SaveChangesAsync();
                 return PutUserResult.Created;
@@ -269,7 +367,11 @@ namespace Timeline.Services
 
             user.EncryptedPassword = _passwordService.HashPassword(password);
             user.RoleString = IsAdminToRoleString(isAdmin);
+            user.Version += 1;
             await _databaseContext.SaveChangesAsync();
+
+            //clear cache
+            RemoveCache(user.Id);
 
             return PutUserResult.Modified;
         }
@@ -298,6 +400,8 @@ namespace Timeline.Services
             if (modified)
             {
                 await _databaseContext.SaveChangesAsync();
+                //clear cache
+                RemoveCache(user.Id);
             }
 
             return PatchUserResult.Success;
@@ -314,6 +418,9 @@ namespace Timeline.Services
 
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
+            //clear cache
+            RemoveCache(user.Id);
+
             return DeleteUserResult.Deleted;
         }
 
@@ -329,6 +436,9 @@ namespace Timeline.Services
 
             user.EncryptedPassword = _passwordService.HashPassword(newPassword);
             await _databaseContext.SaveChangesAsync();
+            //clear cache
+            RemoveCache(user.Id);
+
             return ChangePasswordResult.Success;
         }
 
