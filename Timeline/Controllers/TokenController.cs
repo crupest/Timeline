@@ -46,7 +46,7 @@ namespace Timeline.Controllers
             {
                 Success = true,
                 Token = result.Token,
-                UserInfo = result.UserInfo
+                UserInfo = result.User
             });
         }
 

@@ -11,7 +11,7 @@ namespace Timeline.Services
 {
     public class TokenInfo
     {
-        public string Name { get; set; }
+        public long Id { get; set; }
         public long Version { get; set; }
     }
 
@@ -34,6 +34,7 @@ namespace Timeline.Services
         /// <param name="tokenInfo">The info to generate token.</param>
         /// <param name="expires">The expire time. If null then use current time with offset in config.</param>
         /// <returns>Return the generated token.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="tokenInfo"/> is null.</exception>
         string GenerateJwtToken(TokenInfo tokenInfo, DateTime? expires = null);
 
         /// <summary>
@@ -41,7 +42,8 @@ namespace Timeline.Services
         /// Return null is <paramref name="token"/> is null.
         /// </summary>
         /// <param name="token">The token string to verify.</param>
-        /// <returns>Return null if <paramref name="token"/> is null. Return the saved info otherwise.</returns>
+        /// <returns>Return the saved info in token.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
         /// <exception cref="JwtTokenVerifyException">Thrown when the token is invalid.</exception>
         TokenInfo VerifyJwtToken(string token);
 
@@ -53,25 +55,21 @@ namespace Timeline.Services
 
         private readonly IOptionsMonitor<JwtConfig> _jwtConfig;
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
-        private readonly ILogger<JwtService> _logger;
 
-        public JwtService(IOptionsMonitor<JwtConfig> jwtConfig, ILogger<JwtService> logger)
+        public JwtService(IOptionsMonitor<JwtConfig> jwtConfig)
         {
             _jwtConfig = jwtConfig;
-            _logger = logger;
         }
 
         public string GenerateJwtToken(TokenInfo tokenInfo, DateTime? expires = null)
         {
             if (tokenInfo == null)
                 throw new ArgumentNullException(nameof(tokenInfo));
-            if (tokenInfo.Name == null)
-                throw new ArgumentException("Name of token info is null.", nameof(tokenInfo));
 
             var config = _jwtConfig.CurrentValue;
 
             var identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim(identity.NameClaimType, tokenInfo.Name));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, tokenInfo.Id.ToString(), ClaimValueTypes.Integer64));
             identity.AddClaim(new Claim(VersionClaimType, tokenInfo.Version.ToString(), ClaimValueTypes.Integer64));
 
             var tokenDescriptor = new SecurityTokenDescriptor()
@@ -95,7 +93,7 @@ namespace Timeline.Services
         public TokenInfo VerifyJwtToken(string token)
         {
             if (token == null)
-                return null;
+                throw new ArgumentNullException(nameof(token));
 
             var config = _jwtConfig.CurrentValue;
             try
@@ -111,6 +109,12 @@ namespace Timeline.Services
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey))
                 }, out _);
 
+                var idClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (idClaim == null)
+                    throw new JwtTokenVerifyException("Id claim does not exist.");
+                if (!long.TryParse(idClaim, out var id))
+                    throw new JwtTokenVerifyException("Can't convert id claim into a integer number.");
+
                 var versionClaim = principal.FindFirstValue(VersionClaimType);
                 if (versionClaim == null)
                     throw new JwtTokenVerifyException("Version claim does not exist.");
@@ -119,18 +123,13 @@ namespace Timeline.Services
 
                 return new TokenInfo
                 {
-                    Name = principal.Identity.Name,
+                    Id = id,
                     Version = version
                 };
             }
             catch (SecurityTokenException e)
             {
                 throw new JwtTokenVerifyException("Validate token failed caused by a SecurityTokenException. See inner exception.", e);
-            }
-            catch (ArgumentException e) // This usually means code logic error.
-            {
-                _logger.LogError(e, "Arguments passed to ValidateToken are bad.");
-                throw e;
             }
         }
     }
