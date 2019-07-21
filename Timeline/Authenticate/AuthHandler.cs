@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
-using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Timeline.Services;
 
 namespace Timeline.Authenticate
 {
@@ -22,18 +23,18 @@ namespace Timeline.Authenticate
         /// The query param key to search for token. If null then query params are not searched for token. Default to <c>"token"</c>.
         /// </summary>
         public string TokenQueryParamKey { get; set; } = "token";
-
-        public TokenValidationParameters TokenValidationParameters { get; set; } = new TokenValidationParameters();
     }
 
     class AuthHandler : AuthenticationHandler<AuthOptions>
     {
         private readonly ILogger<AuthHandler> _logger;
+        private readonly IUserService _userService;
 
-        public AuthHandler(IOptionsMonitor<AuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+        public AuthHandler(IOptionsMonitor<AuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserService userService)
             : base(options, logger, encoder, clock)
         {
             _logger = logger.CreateLogger<AuthHandler>();
+            _userService = userService;
         }
 
         // return null if no token is found
@@ -73,21 +74,23 @@ namespace Timeline.Authenticate
                 return AuthenticateResult.NoResult();
             }
 
-            var handler = new JwtSecurityTokenHandler();
             try
             {
-                var principal = handler.ValidateToken(token, Options.TokenValidationParameters, out var validatedToken);
+                var userInfo = await _userService.VerifyToken(token);
+
+                var identity = new ClaimsIdentity();
+                identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
+                identity.AddClaims(Entities.UserUtility.IsAdminToRoleArray(userInfo.IsAdmin).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
+
+                var principal = new ClaimsPrincipal();
+                principal.AddIdentity(identity);
+
                 return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthConstants.Scheme));
-            }
-            catch (SecurityTokenException e)
-            {
-                _logger.LogInformation(e, "A jwt token validation failed.");
-                return AuthenticateResult.Fail(e);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Arguments passed to the JwtSecurityTokenHandler.ValidateToken are bad.");
-                throw e;
+                _logger.LogInformation(e, "A jwt token validation failed.");
+                return AuthenticateResult.Fail(e);
             }
         }
     }

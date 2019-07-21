@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Timeline.Authenticate;
 using Timeline.Configs;
 using Timeline.Formatters;
@@ -53,16 +51,7 @@ namespace Timeline
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddScheme<AuthOptions, AuthHandler>(AuthConstants.Scheme, AuthConstants.DisplayName, o =>
-                 {
-                     o.TokenValidationParameters.ValidateIssuer = true;
-                     o.TokenValidationParameters.ValidateAudience = true;
-                     o.TokenValidationParameters.ValidateIssuerSigningKey = true;
-                     o.TokenValidationParameters.ValidateLifetime = true;
-                     o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
-                     o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
-                     o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
-                 });
+                .AddScheme<AuthOptions, AuthHandler>(AuthConstants.Scheme, AuthConstants.DisplayName, o => { });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
