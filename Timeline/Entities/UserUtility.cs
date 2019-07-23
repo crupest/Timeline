@@ -7,8 +7,8 @@ namespace Timeline.Entities
 {
     public static class UserUtility
     {
-        public const string UserRole = "user";
-        public const string AdminRole = "admin";
+        public const string UserRole = UserRoles.User;
+        public const string AdminRole = UserRoles.Admin;
 
         public static string[] UserRoleArray { get; } = new string[] { UserRole };
         public static string[] AdminRoleArray { get; } = new string[] { UserRole, AdminRole };
