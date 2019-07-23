@@ -8,9 +8,8 @@
 
     public class CreateTokenResponse
     {
-        public bool Success { get; set; }
         public string Token { get; set; }
-        public UserInfo UserInfo { get; set; }
+        public UserInfo User { get; set; }
     }
 
     public class VerifyTokenRequest
@@ -20,7 +19,6 @@
 
     public class VerifyTokenResponse
     {
-        public bool IsValid { get; set; }
-        public UserInfo UserInfo { get; set; }
+        public UserInfo User { get; set; }
     }
 }
