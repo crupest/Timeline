@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Services;
 

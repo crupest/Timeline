@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Timeline.Authenticate;
 using Timeline.Configs;
-using Timeline.Formatters;
 using Timeline.Models;
 using Timeline.Services;
 
@@ -31,10 +29,7 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(options =>
-            {
-                options.InputFormatters.Add(new StringInputFormatter());
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddCors(options =>
             {
@@ -50,7 +45,7 @@ namespace Timeline
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(AuthConstants.Scheme)
                 .AddScheme<AuthOptions, AuthHandler>(AuthConstants.Scheme, AuthConstants.DisplayName, o => { });
 
             services.AddScoped<IUserService, UserService>();
@@ -72,9 +67,6 @@ namespace Timeline
             });
 
             services.AddHttpClient();
-
-            services.Configure<QCloudCosConfig>(Configuration.GetSection(nameof(QCloudCosConfig)));
-            services.AddSingleton<IQCloudCosService, QCloudCosService>();
 
             services.AddMemoryCache();
         }
