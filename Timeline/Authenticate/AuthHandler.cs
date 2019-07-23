@@ -78,7 +78,7 @@ namespace Timeline.Authenticate
             {
                 var userInfo = await _userService.VerifyToken(token);
 
-                var identity = new ClaimsIdentity();
+                var identity = new ClaimsIdentity(AuthConstants.Scheme);
                 identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
                 identity.AddClaims(Entities.UserUtility.IsAdminToRoleArray(userInfo.IsAdmin).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
 
