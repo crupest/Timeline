@@ -4,6 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Timeline.Models
 {
+    public static class UserRoles
+    {
+        public const string Admin = "admin";
+        public const string User = "user";
+    }
+
     [Table("user")]
     public class User
     {

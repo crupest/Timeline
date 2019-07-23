@@ -21,12 +21,12 @@ namespace Timeline.Controllers
 
         private static class ErrorCodes
         {
-            public const int Create_UserNotExist = 1001;
-            public const int Create_BadPassword = 1002;
+            public const int Create_UserNotExist = -1001;
+            public const int Create_BadPassword = -1002;
 
-            public const int Verify_BadToken = 2001;
-            public const int Verify_UserNotExist = 2002;
-            public const int Verify_BadVersion = 2003;
+            public const int Verify_BadToken = -2001;
+            public const int Verify_UserNotExist = -2002;
+            public const int Verify_BadVersion = -2003;
         }
 
         private readonly IUserService _userService;
@@ -55,14 +55,14 @@ namespace Timeline.Controllers
             catch(UserNotExistException e)
             {
                 var code = ErrorCodes.Create_UserNotExist;
-                _logger.LogInformation(LoggingEventIds.LogInFailed, e, "Attemp to login failed. Code: {} Username: {} Password: {} .", code, request.Username, request.Password);
-                return BadRequest(new CommonErrorResponse(code, "Bad username or password."));
+                _logger.LogInformation(LoggingEventIds.LogInFailed, e, "Attemp to login failed because user does not exist. Code: {} Username: {} Password: {} .", code, request.Username, request.Password);
+                return BadRequest(new CommonResponse(code, "Bad username or password."));
             }
             catch (BadPasswordException e)
             {
                 var code = ErrorCodes.Create_BadPassword;
-                _logger.LogInformation(LoggingEventIds.LogInFailed, e, "Attemp to login failed. Code: {} Username: {} Password: {} .", code, request.Username, request.Password);
-                return BadRequest(new CommonErrorResponse(code, "Bad username or password."));
+                _logger.LogInformation(LoggingEventIds.LogInFailed, e, "Attemp to login failed because password is wrong. Code: {} Username: {} Password: {} .", code, request.Username, request.Password);
+                return BadRequest(new CommonResponse(code, "Bad username or password."));
             }
         }
 
@@ -82,20 +82,20 @@ namespace Timeline.Controllers
             catch (JwtTokenVerifyException e)
             {
                 var code = ErrorCodes.Verify_BadToken;
-                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token. Code: {} Token: {}.", code, request.Token);
-                return BadRequest(new CommonErrorResponse(code, "A token of bad format."));
+                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because of bad format. Code: {} Token: {}.", code, request.Token);
+                return BadRequest(new CommonResponse(code, "A token of bad format."));
             }
             catch (UserNotExistException e)
             {
                 var code = ErrorCodes.Verify_UserNotExist;
-                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token. Code: {} Token: {}.", code, request.Token);
-                return BadRequest(new CommonErrorResponse(code, "The user does not exist. Administrator might have deleted this user."));
+                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because user does not exist. Code: {} Token: {}.", code, request.Token);
+                return BadRequest(new CommonResponse(code, "The user does not exist. Administrator might have deleted this user."));
             }
             catch (BadTokenVersionException e)
             {
                 var code = ErrorCodes.Verify_BadToken;
-                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token. Code: {} Token: {}.", code, request.Token);
-                return BadRequest(new CommonErrorResponse(code, "The token is expired. Try recreate a token."));
+                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because version is old. Code: {} Token: {}.", code, request.Token);
+                return BadRequest(new CommonResponse(code, "The token is expired. Try recreate a token."));
             }
         }
     }

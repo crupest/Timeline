@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 using System.Threading.Tasks;
+using Timeline.Authenticate;
 using Timeline.Entities;
 using Timeline.Entities.Http;
 using Timeline.Services;
@@ -12,125 +12,113 @@ namespace Timeline.Controllers
 {
     public class UserController : Controller
     {
+        private static class ErrorCodes
+        {
+            public const int Get_NotExists = -1001;
+
+            public const int Put_NoPassword = -2001;
+
+            public const int Patch_NotExists = -3001;
+
+            public const int ChangePassword_BadOldPassword = -4001;
+        }
+
+        private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UserController(ILogger<UserController> logger, IUserService userService)
         {
+            _logger = logger;
             _userService = userService;
         }
 
-        [HttpGet("users"), Authorize(Roles = "admin")]
+        [HttpGet("users"), AdminAuthorize]
         public async Task<ActionResult<UserInfo[]>> List()
         {
             return Ok(await _userService.ListUsers());
         }
 
-        [HttpGet("user/{username}"), Authorize]
+        [HttpGet("user/{username}"), AdminAuthorize]
         public async Task<IActionResult> Get([FromRoute] string username)
         {
             var user = await _userService.GetUser(username);
             if (user == null)
             {
-                return NotFound();
+                _logger.LogInformation("Attempt to get a non-existent user. Username: {} .", username);
+                return NotFound(new CommonResponse(ErrorCodes.Get_NotExists, "The user does not exist."));
             }
             return Ok(user);
         }
 
-        [HttpPut("user/{username}"), Authorize(Roles = "admin")]
+        [HttpPut("user/{username}"), AdminAuthorize]
         public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
+            if (request.Password == null)
+            {
+                _logger.LogInformation("Attempt to put a user without a password. Username: {} .", username);
+                return BadRequest();
+            }
+
             var result = await _userService.PutUser(username, request.Password, request.IsAdmin);
             switch (result)
             {
-                case PutUserResult.Created:
-                    return CreatedAtAction("Get", new { username }, UserPutResponse.Created);
-                case PutUserResult.Modified:
-                    return Ok(UserPutResponse.Modified);
+                case PutResult.Created:
+                    _logger.LogInformation("Created a user. Username: {} .", username);
+                    return CreatedAtAction("Get", new { username }, CommonPutResponse.Created);
+                case PutResult.Modified:
+                    _logger.LogInformation("Modified a user. Username: {} .", username);
+                    return Ok(CommonPutResponse.Modified);
                 default:
                     throw new Exception("Unreachable code.");
             }
         }
 
-        [HttpPatch("user/{username}"), Authorize(Roles = "admin")]
+        [HttpPatch("user/{username}"), AdminAuthorize]
         public async Task<IActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute] string username)
         {
-            var result = await _userService.PatchUser(username, request.Password, request.IsAdmin);
-            switch (result)
+            try
             {
-                case PatchUserResult.Success:
-                    return Ok();
-                case PatchUserResult.NotExists:
-                    return NotFound();
-                default:
-                    throw new Exception("Unreachable code.");
+                await _userService.PatchUser(username, request.Password, request.IsAdmin);
+                return Ok();
+            }
+            catch (UserNotExistException e)
+            {
+                _logger.LogInformation(e, "Attempt to patch a non-existent user. Username: {} .", username);
+                return BadRequest(new CommonResponse(ErrorCodes.Patch_NotExists, "The user does not exist."));
             }
         }
 
-        [HttpDelete("user/{username}"), Authorize(Roles = "admin")]
+        [HttpDelete("user/{username}"), AdminAuthorize]
         public async Task<IActionResult> Delete([FromRoute] string username)
         {
-            var result = await _userService.DeleteUser(username);
-            switch (result)
+            try
             {
-                case DeleteUserResult.Deleted:
-                    return Ok(UserDeleteResponse.Deleted);
-                case DeleteUserResult.NotExists:
-                    return Ok(UserDeleteResponse.NotExists);
-                default:
-                    throw new Exception("Uncreachable code.");
+                await _userService.DeleteUser(username);
+                _logger.LogInformation("A user is deleted. Username: {} .", username);
+                return Ok(CommonDeleteResponse.Deleted);
+            }
+            catch (UserNotExistException e)
+            {
+                _logger.LogInformation(e, "Attempt to delete a non-existent user. Username: {} .", username);
+                return Ok(CommonDeleteResponse.NotExists);
             }
         }
-
-        [HttpGet("user/{username}/avatar"), Authorize]
-        public async Task<IActionResult> GetAvatar([FromRoute] string username)
-        {
-            var url = await _userService.GetAvatarUrl(username);
-            if (url == null)
-                return NotFound();
-            return Redirect(url);
-        }
-
-        [HttpPut("user/{username}/avatar"), Authorize]
-        [Consumes("image/png", "image/gif", "image/jpeg", "image/svg+xml")]
-        public async Task<IActionResult> PutAvatar([FromRoute] string username, [FromHeader(Name="Content-Type")] string contentType)
-        {
-            bool isAdmin = User.IsInRole("admin");
-            if (!isAdmin)
-            {
-                if (username != User.Identity.Name)
-                    return StatusCode(StatusCodes.Status403Forbidden, PutAvatarResponse.Forbidden);
-            }
-
-            var stream = new MemoryStream();
-            await Request.Body.CopyToAsync(stream);
-            var result = await _userService.PutAvatar(username, stream.ToArray(), contentType);
-            switch (result)
-            {
-                case PutAvatarResult.Success:
-                    return Ok(PutAvatarResponse.Success);
-                case PutAvatarResult.UserNotExists:
-                    return BadRequest(PutAvatarResponse.NotExists);
-                default:
-                    throw new Exception("Unknown put avatar result.");
-            }
-        }
-
 
         [HttpPost("userop/changepassword"), Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
-            var result = await _userService.ChangePassword(User.Identity.Name, request.OldPassword, request.NewPassword);
-            switch (result)
+            try
             {
-                case ChangePasswordResult.Success:
-                    return Ok(ChangePasswordResponse.Success);
-                case ChangePasswordResult.BadOldPassword:
-                    return Ok(ChangePasswordResponse.BadOldPassword);
-                case ChangePasswordResult.NotExists:
-                    return Ok(ChangePasswordResponse.NotExists);
-                default:
-                    throw new Exception("Uncreachable code.");
+                await _userService.ChangePassword(User.Identity.Name, request.OldPassword, request.NewPassword);
+                _logger.LogInformation("A user changed password. Username: {} .", User.Identity.Name);
+                return Ok();
             }
+            catch (BadPasswordException e)
+            {
+                _logger.LogInformation(e, "A user attempt to change password but old password is wrong. Username: {} .", User.Identity.Name);
+                return BadRequest(new CommonResponse(ErrorCodes.ChangePassword_BadOldPassword, "Old password is wrong."));
+            }
+            // User can't be non-existent or the token is bad. 
         }
     }
 }
