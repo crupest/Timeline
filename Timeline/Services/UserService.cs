@@ -153,16 +153,14 @@ namespace Timeline.Services
 
         private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
-        private readonly IQCloudCosService _cosService;
 
-        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService, IQCloudCosService cosService)
+        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
         {
             _logger = logger;
             _memoryCache = memoryCache;
             _databaseContext = databaseContext;
             _jwtService = jwtService;
             _passwordService = passwordService;
-            _cosService = cosService;
         }
 
         private string GenerateCacheKeyByUserId(long id) => $"user:{id}";

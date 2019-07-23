@@ -126,7 +126,7 @@ namespace Timeline.Services
                     Version = version
                 };
             }
-            catch (SecurityTokenException e)
+            catch (Exception e)
             {
                 throw new JwtTokenVerifyException("Validate token failed caused by a SecurityTokenException. See inner exception.", e);
             }
