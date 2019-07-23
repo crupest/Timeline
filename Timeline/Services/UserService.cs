@@ -50,70 +50,6 @@ namespace Timeline.Services
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
-    public enum PutUserResult
-    {
-        /// <summary>
-        /// A new user is created.
-        /// </summary>
-        Created,
-        /// <summary>
-        /// A existing user is modified.
-        /// </summary>
-        Modified
-    }
-
-    public enum PatchUserResult
-    {
-        /// <summary>
-        /// Succeed to modify user.
-        /// </summary>
-        Success,
-        /// <summary>
-        /// A user of given username does not exist.
-        /// </summary>
-        NotExists
-    }
-
-    public enum DeleteUserResult
-    {
-        /// <summary>
-        /// A existing user is deleted.
-        /// </summary>
-        Deleted,
-        /// <summary>
-        /// A user of given username does not exist.
-        /// </summary>
-        NotExists
-    }
-
-    public enum ChangePasswordResult
-    {
-        /// <summary>
-        /// Success to change password.
-        /// </summary>
-        Success,
-        /// <summary>
-        /// The user does not exists.
-        /// </summary>
-        NotExists,
-        /// <summary>
-        /// Old password is wrong.
-        /// </summary>
-        BadOldPassword
-    }
-
-    public enum PutAvatarResult
-    {
-        /// <summary>
-        /// Success to upload avatar.
-        /// </summary>
-        Success,
-        /// <summary>
-        /// The user does not exists.
-        /// </summary>
-        UserNotExists
-    }
-
     public interface IUserService
     {
         /// <summary>
@@ -160,31 +96,29 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">Username of user.</param>
         /// <param name="password">Password of user.</param>
-        /// <param name="roles">Array of roles of user.</param>
-        /// <returns>Return <see cref="PutUserResult.Created"/> if a new user is created.
-        /// Return <see cref="PutUserResult.Modified"/> if a existing user is modified.</returns>
-        Task<PutUserResult> PutUser(string username, string password, bool isAdmin);
+        /// <param name="isAdmin">Whether the user is administrator.</param>
+        /// <returns>Return <see cref="PutResult.Created"/> if a new user is created.
+        /// Return <see cref="PutResult.Modified"/> if a existing user is modified.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
+        Task<PutResult> PutUser(string username, string password, bool isAdmin);
 
         /// <summary>
-        /// Partially modify a use of given username.
+        /// Partially modify a user of given username.
         /// </summary>
-        /// <param name="username">Username of the user to modify.</param>
-        /// <param name="password">New password. If not modify, then null.</param>
-        /// <param name="roles">New roles. If not modify, then null.</param>
-        /// <returns>Return <see cref="PatchUserResult.Success"/> if modification succeeds.
-        /// Return <see cref="PatchUserResult.NotExists"/> if the user of given username doesn't exist.</returns>
-        Task<PatchUserResult> PatchUser(string username, string password, bool? isAdmin);
+        /// <param name="username">Username of the user to modify. Can't be null.</param>
+        /// <param name="password">New password. Null if not modify.</param>
+        /// <param name="isAdmin">Whether the user is administrator. Null if not modify.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
+        Task PatchUser(string username, string password, bool? isAdmin);
 
         /// <summary>
         /// Delete a user of given username.
-        /// Return <see cref="DeleteUserResult.Deleted"/> if the user is deleted.
-        /// Return <see cref="DeleteUserResult.NotExists"/> if the user of given username
-        /// does not exist.
         /// </summary>
-        /// <param name="username">Username of thet user to delete.</param>
-        /// <returns><see cref="DeleteUserResult.Deleted"/> if the user is deleted.
-        /// <see cref="DeleteUserResult.NotExists"/> if the user doesn't exist.</returns>
-        Task<DeleteUserResult> DeleteUser(string username);
+        /// <param name="username">Username of thet user to delete. Can't be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
+        Task DeleteUser(string username);
 
         /// <summary>
         /// Try to change a user's password with old password.
@@ -192,27 +126,10 @@ namespace Timeline.Services
         /// <param name="username">The name of user to change password of.</param>
         /// <param name="oldPassword">The user's old password.</param>
         /// <param name="newPassword">The user's new password.</param>
-        /// <returns><see cref="ChangePasswordResult.Success"/> if success.
-        /// <see cref="ChangePasswordResult.NotExists"/> if user does not exist.
-        /// <see cref="ChangePasswordResult.BadOldPassword"/> if old password is wrong.</returns>
-        Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword);
-
-        /// <summary>
-        /// Get the true avatar url of a user.
-        /// </summary>
-        /// <param name="username">The name of user.</param>
-        /// <returns>The url if user exists. Null if user does not exist.</returns>
-        Task<string> GetAvatarUrl(string username);
-
-        /// <summary>
-        /// Put a avatar of a user.
-        /// </summary>
-        /// <param name="username">The name of user.</param>
-        /// <param name="data">The data of avatar image.</param>
-        /// <param name="mimeType">The mime type of the image.</param>
-        /// <returns>Return <see cref="PutAvatarResult.Success"/> if success.
-        /// Return <see cref="PutAvatarResult.UserNotExists"/> if user does not exist.</returns>
-        Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType);
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> or <paramref name="oldPassword"/> or <paramref name="newPassword"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
+        /// <exception cref="BadPasswordException">Thrown if the old password is wrong.</exception>
+        Task ChangePassword(string username, string oldPassword, string newPassword);
     }
 
     internal class UserCache
@@ -348,8 +265,13 @@ namespace Timeline.Services
                 .ToArrayAsync();
         }
 
-        public async Task<PutUserResult> PutUser(string username, string password, bool isAdmin)
+        public async Task<PutResult> PutUser(string username, string password, bool isAdmin)
         {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (password == null)
+                throw new ArgumentNullException(nameof(password));
+
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
             if (user == null)
@@ -362,7 +284,7 @@ namespace Timeline.Services
                     Version = 0
                 });
                 await _databaseContext.SaveChangesAsync();
-                return PutUserResult.Created;
+                return PutResult.Created;
             }
 
             user.EncryptedPassword = _passwordService.HashPassword(password);
@@ -373,15 +295,17 @@ namespace Timeline.Services
             //clear cache
             RemoveCache(user.Id);
 
-            return PutUserResult.Modified;
+            return PutResult.Modified;
         }
 
-        public async Task<PatchUserResult> PatchUser(string username, string password, bool? isAdmin)
+        public async Task PatchUser(string username, string password, bool? isAdmin)
         {
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
 
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-                return PatchUserResult.NotExists;
+                throw new UserNotExistException();
 
             bool modified = false;
 
@@ -399,78 +323,50 @@ namespace Timeline.Services
 
             if (modified)
             {
+                user.Version += 1;
                 await _databaseContext.SaveChangesAsync();
                 //clear cache
                 RemoveCache(user.Id);
             }
-
-            return PatchUserResult.Success;
         }
 
-        public async Task<DeleteUserResult> DeleteUser(string username)
+        public async Task DeleteUser(string username)
         {
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
 
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-            {
-                return DeleteUserResult.NotExists;
-            }
+                throw new UserNotExistException();
 
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
             //clear cache
             RemoveCache(user.Id);
-
-            return DeleteUserResult.Deleted;
         }
 
-        public async Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword)
+        public async Task ChangePassword(string username, string oldPassword, string newPassword)
         {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (oldPassword == null)
+                throw new ArgumentNullException(nameof(oldPassword));
+            if (newPassword == null)
+                throw new ArgumentNullException(nameof(newPassword));
+
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-                return ChangePasswordResult.NotExists;
+                throw new UserNotExistException();
 
             var verifyResult = _passwordService.VerifyPassword(user.EncryptedPassword, oldPassword);
             if (!verifyResult)
-                return ChangePasswordResult.BadOldPassword;
+                throw new BadPasswordException();
 
             user.EncryptedPassword = _passwordService.HashPassword(newPassword);
+            user.Version += 1;
             await _databaseContext.SaveChangesAsync();
             //clear cache
             RemoveCache(user.Id);
-
-            return ChangePasswordResult.Success;
-        }
-
-        public async Task<string> GetAvatarUrl(string username)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-
-            if ((await GetUser(username)) == null)
-                return null;
-
-            var exists = await _cosService.IsObjectExists("avatar", username);
-            if (exists)
-                return _cosService.GenerateObjectGetUrl("avatar", username);
-            else
-                return _cosService.GenerateObjectGetUrl("avatar", "__default");
-        }
-
-        public async Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-            if (mimeType == null)
-                throw new ArgumentNullException(nameof(mimeType));
-
-            if ((await GetUser(username)) == null)
-                return PutAvatarResult.UserNotExists;
-
-            await _cosService.PutObject("avatar", username, data, mimeType);
-            return PutAvatarResult.Success;
         }
     }
 }
