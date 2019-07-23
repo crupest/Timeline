@@ -1,29 +1,19 @@
 ﻿namespace Timeline.Entities.Http
 {
-    public class ReturnCodeMessageResponse
+    public class CommonErrorResponse
     {
-        public ReturnCodeMessageResponse()
+        public CommonErrorResponse()
         {
 
         }
 
-        public ReturnCodeMessageResponse(int code)
+        public CommonErrorResponse(int code, string message)
         {
-            ReturnCode = code;
-        }
-
-        public ReturnCodeMessageResponse(string message)
-        {
+            Code = code;
             Message = message;
         }
 
-        public ReturnCodeMessageResponse(int code, string message)
-        {
-            ReturnCode = code;
-            Message = message;
-        }
-
-        public int? ReturnCode { get; set; } = null;
-        public string Message { get; set; } = null;
+        public int Code { get; set; }
+        public string Message { get; set; }
     }
 }
