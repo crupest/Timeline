@@ -4,6 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Timeline.Models
 {
+    public static class UserRoles
+    {
+        public const string Admin = "admin";
+        public const string User = "user";
+    }
+
     [Table("user")]
     public class User
     {
@@ -18,6 +24,9 @@ namespace Timeline.Models
 
         [Column("roles"), Required]
         public string RoleString { get; set; }
+
+        [Column("version"), Required]
+        public long Version { get; set; }
     }
 
     public class DatabaseContext : DbContext

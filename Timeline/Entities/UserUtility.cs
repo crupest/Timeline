@@ -1,14 +1,14 @@
 using System;
 using System.Linq;
-using Timeline.Entities;
 using Timeline.Models;
+using Timeline.Services;
 
 namespace Timeline.Entities
 {
     public static class UserUtility
     {
-        public const string UserRole = "user";
-        public const string AdminRole = "admin";
+        public const string UserRole = UserRoles.User;
+        public const string AdminRole = UserRoles.Admin;
 
         public static string[] UserRoleArray { get; } = new string[] { UserRole };
         public static string[] AdminRoleArray { get; } = new string[] { UserRole, AdminRole };
@@ -38,12 +38,23 @@ namespace Timeline.Entities
             return RoleArrayToRoleString(IsAdminToRoleArray(isAdmin));
         }
 
+        public static bool RoleStringToIsAdmin(string roleString)
+        {
+            return RoleArrayToIsAdmin(RoleStringToRoleArray(roleString));
+        }
+
         public static UserInfo CreateUserInfo(User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            return new UserInfo(user.Name, RoleArrayToIsAdmin(RoleStringToRoleArray(user.RoleString)));
+            return new UserInfo(user.Name, RoleStringToIsAdmin(user.RoleString));
         }
 
+        internal static UserCache CreateUserCache(User user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            return new UserCache { Username = user.Name, IsAdmin = RoleStringToIsAdmin(user.RoleString), Version = user.Version };
+        }
     }
 }

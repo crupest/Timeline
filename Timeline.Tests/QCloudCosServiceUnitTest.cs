@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
@@ -65,40 +61,40 @@ namespace Timeline.Tests
             Assert.Equal("q-sign-algorithm=sha1&q-ak=AKIDQjz3ltompVjBni5LitkWHFlFpwkn9U5q&q-sign-time=1417773892;1417853898&q-key-time=1417773892;1417853898&q-header-list=host;x-cos-content-sha1;x-cos-storage-class&q-url-param-list=&q-signature=0ab12f43e74cbe148d705cd9fae8adc9a6d39cc1", QCloudCosService.GenerateSign(credential, request, signValidTime));
         }
 
-/*
-// Tests in this part need secret configs in cos.
-#region SecretTests
-        [Fact]
-        public async Task ObjectExistsTest()
-        {
-            using (var serviceScope = _factory.Server.Host.Services.CreateScope())
-            {
-                var services = serviceScope.ServiceProvider;
-                var service = services.GetRequiredService<IQCloudCosService>();
-                Assert.True(await service.IsObjectExists("avatar", "__default"));
-                Assert.False(await service.IsObjectExists("avatar", "haha"));
-                Assert.False(await service.IsObjectExists("haha", "haha"));                
-            }
-        }
-
-        [Fact]
-        public async Task GenerateObjectGetUrlTest()
-        {
-            using (var serviceScope = _factory.Server.Host.Services.CreateScope())
-            {
-                var services = serviceScope.ServiceProvider;
-                var service = services.GetRequiredService<IQCloudCosService>();
-                var url = service.GenerateObjectGetUrl("avatar", "__default");
-                // never use the following line! Because client created by factory can't access Internet.
-                //using (var client = _factory.CreateClient())
-                using (var client = services.GetRequiredService<IHttpClientFactory>().CreateClient())
+        /*
+        // Tests in this part need secret configs in cos.
+        #region SecretTests
+                [Fact]
+                public async Task ObjectExistsTest()
                 {
-                    var res = await client.GetAsync(url);
-                    Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+                    using (var serviceScope = _factory.Server.Host.Services.CreateScope())
+                    {
+                        var services = serviceScope.ServiceProvider;
+                        var service = services.GetRequiredService<IQCloudCosService>();
+                        Assert.True(await service.IsObjectExists("avatar", "__default"));
+                        Assert.False(await service.IsObjectExists("avatar", "haha"));
+                        Assert.False(await service.IsObjectExists("haha", "haha"));                
+                    }
                 }
-            }
-        }
-#endregion
-*/
+
+                [Fact]
+                public async Task GenerateObjectGetUrlTest()
+                {
+                    using (var serviceScope = _factory.Server.Host.Services.CreateScope())
+                    {
+                        var services = serviceScope.ServiceProvider;
+                        var service = services.GetRequiredService<IQCloudCosService>();
+                        var url = service.GenerateObjectGetUrl("avatar", "__default");
+                        // never use the following line! Because client created by factory can't access Internet.
+                        //using (var client = _factory.CreateClient())
+                        using (var client = services.GetRequiredService<IHttpClientFactory>().CreateClient())
+                        {
+                            var res = await client.GetAsync(url);
+                            Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+                        }
+                    }
+                }
+        #endregion
+        */
     }
 }

@@ -12,8 +12,21 @@ namespace Timeline.Controllers
     {
         private static class LoggingEventIds
         {
-            public const int LogInSucceeded = 4000;
-            public const int LogInFailed = 4001;
+            public const int LogInSucceeded = 1000;
+            public const int LogInFailed = 1001;
+
+            public const int VerifySucceeded = 2000;
+            public const int VerifyFailed = 2001;
+        }
+
+        private static class ErrorCodes
+        {
+            public const int Create_UserNotExist = -1001;
+            public const int Create_BadPassword = -1002;
+
+            public const int Verify_BadToken = -2001;
+            public const int Verify_UserNotExist = -2002;
+            public const int Verify_BadVersion = -2003;
         }
 
         private readonly IUserService _userService;
@@ -27,48 +40,63 @@ namespace Timeline.Controllers
 
         [HttpPost("create")]
         [AllowAnonymous]
-        public async Task<ActionResult<CreateTokenResponse>> Create([FromBody] CreateTokenRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateTokenRequest request)
         {
-            var result = await _userService.CreateToken(request.Username, request.Password);
-
-            if (result == null)
+            try
             {
-                _logger.LogInformation(LoggingEventIds.LogInFailed, "Attemp to login with username: {} and password: {} failed.", request.Username, request.Password);
+                var result = await _userService.CreateToken(request.Username, request.Password);
+                _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login succeeded. Username: {} .", request.Username);
                 return Ok(new CreateTokenResponse
                 {
-                    Success = false
+                    Token = result.Token,
+                    User = result.User
                 });
             }
-
-            _logger.LogInformation(LoggingEventIds.LogInSucceeded, "Login with username: {} succeeded.", request.Username);
-
-            return Ok(new CreateTokenResponse
+            catch(UserNotExistException e)
             {
-                Success = true,
-                Token = result.Token,
-                UserInfo = result.UserInfo
-            });
+                var code = ErrorCodes.Create_UserNotExist;
+                _logger.LogInformation(LoggingEventIds.LogInFailed, e, "Attemp to login failed because user does not exist. Code: {} Username: {} Password: {} .", code, request.Username, request.Password);
+                return BadRequest(new CommonResponse(code, "Bad username or password."));
+            }
+            catch (BadPasswordException e)
+            {
+                var code = ErrorCodes.Create_BadPassword;
+                _logger.LogInformation(LoggingEventIds.LogInFailed, e, "Attemp to login failed because password is wrong. Code: {} Username: {} Password: {} .", code, request.Username, request.Password);
+                return BadRequest(new CommonResponse(code, "Bad username or password."));
+            }
         }
 
         [HttpPost("verify")]
         [AllowAnonymous]
-        public async Task<ActionResult<VerifyTokenResponse>> Verify([FromBody] VerifyTokenRequest request)
+        public async Task<IActionResult> Verify([FromBody] VerifyTokenRequest request)
         {
-            var result = await _userService.VerifyToken(request.Token);
-
-            if (result == null)
+            try
             {
+                var result = await _userService.VerifyToken(request.Token);
+                _logger.LogInformation(LoggingEventIds.VerifySucceeded, "Verify token succeeded. Username: {} Token: {} .", result.Username, request.Token);
                 return Ok(new VerifyTokenResponse
                 {
-                    IsValid = false,
+                    User = result
                 });
             }
-
-            return Ok(new VerifyTokenResponse
+            catch (JwtTokenVerifyException e)
             {
-                IsValid = true,
-                UserInfo = result
-            });
+                var code = ErrorCodes.Verify_BadToken;
+                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because of bad format. Code: {} Token: {}.", code, request.Token);
+                return BadRequest(new CommonResponse(code, "A token of bad format."));
+            }
+            catch (UserNotExistException e)
+            {
+                var code = ErrorCodes.Verify_UserNotExist;
+                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because user does not exist. Code: {} Token: {}.", code, request.Token);
+                return BadRequest(new CommonResponse(code, "The user does not exist. Administrator might have deleted this user."));
+            }
+            catch (BadTokenVersionException e)
+            {
+                var code = ErrorCodes.Verify_BadToken;
+                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because version is old. Code: {} Token: {}.", code, request.Token);
+                return BadRequest(new CommonResponse(code, "The token is expired. Try recreate a token."));
+            }
         }
     }
 }
