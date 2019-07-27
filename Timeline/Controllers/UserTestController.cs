@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Timeline.Authenticate;
 
 namespace Timeline.Controllers
 {
@@ -8,21 +9,21 @@ namespace Timeline.Controllers
     {
         [HttpGet("[action]")]
         [Authorize]
-        public ActionResult NeedAuthorize()
+        public ActionResult Authorize()
         {
             return Ok();
         }
 
         [HttpGet("[action]")]
-        [Authorize(Roles = "user,admin")]
-        public ActionResult BothUserAndAdmin()
+        [UserAuthorize]
+        public new ActionResult User()
         {
             return Ok();
         }
 
         [HttpGet("[action]")]
-        [Authorize(Roles = "admin")]
-        public ActionResult OnlyAdmin()
+        [AdminAuthorize]
+        public ActionResult Admin()
         {
             return Ok();
         }

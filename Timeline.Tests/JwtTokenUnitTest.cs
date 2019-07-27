@@ -28,11 +28,7 @@ namespace Timeline.Tests
             using (var client = _factory.CreateDefaultClient())
             {
                 var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = "???", Password = "???" });
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
-                Assert.False(result.Success);
-                Assert.Null(result.Token);
-                Assert.Null(result.UserInfo);
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
         }
 
@@ -44,9 +40,8 @@ namespace Timeline.Tests
                 var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = "user", Password = "user" });
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
-                Assert.True(result.Success);
                 Assert.NotNull(result.Token);
-                Assert.NotNull(result.UserInfo);
+                Assert.NotNull(result.User);
             }
         }
 
@@ -56,11 +51,7 @@ namespace Timeline.Tests
             using (var client = _factory.CreateDefaultClient())
             {
                 var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = "bad token hahaha" });
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-                var validationInfo = JsonConvert.DeserializeObject<VerifyTokenResponse>(await response.Content.ReadAsStringAsync());
-                Assert.False(validationInfo.IsValid);
-                Assert.Null(validationInfo.UserInfo);
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
         }
 
@@ -75,10 +66,9 @@ namespace Timeline.Tests
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
                 var result = JsonConvert.DeserializeObject<VerifyTokenResponse>(await response.Content.ReadAsStringAsync());
-                Assert.True(result.IsValid);
-                Assert.NotNull(result.UserInfo);
-                Assert.Equal(createTokenResult.UserInfo.Username, result.UserInfo.Username);
-                Assert.Equal(createTokenResult.UserInfo.IsAdmin, result.UserInfo.IsAdmin);
+                Assert.NotNull(result.User);
+                Assert.Equal(createTokenResult.User.Username, result.User.Username);
+                Assert.Equal(createTokenResult.User.IsAdmin, result.User.IsAdmin);
             }
         }
     }

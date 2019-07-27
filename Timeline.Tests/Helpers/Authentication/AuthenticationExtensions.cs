@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Entities.Http;
-using Xunit;
 
 namespace Timeline.Tests.Helpers.Authentication
 {
@@ -13,15 +11,10 @@ namespace Timeline.Tests.Helpers.Authentication
     {
         private const string CreateTokenUrl = "/token/create";
 
-        public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, bool assertSuccess = true)
+        public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password)
         {
             var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password });
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
             var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
-            if (assertSuccess)
-                Assert.True(result.Success);
-
             return result;
         }
 

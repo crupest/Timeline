@@ -1,29 +1,37 @@
 ﻿namespace Timeline.Entities.Http
 {
-    public class ReturnCodeMessageResponse
+    public class CommonResponse
     {
-        public ReturnCodeMessageResponse()
+        public CommonResponse()
         {
 
         }
 
-        public ReturnCodeMessageResponse(int code)
+        public CommonResponse(int code, string message)
         {
-            ReturnCode = code;
-        }
-
-        public ReturnCodeMessageResponse(string message)
-        {
+            Code = code;
             Message = message;
         }
 
-        public ReturnCodeMessageResponse(int code, string message)
-        {
-            ReturnCode = code;
-            Message = message;
-        }
+        public int Code { get; set; }
+        public string Message { get; set; }
+    }
 
-        public int? ReturnCode { get; set; } = null;
-        public string Message { get; set; } = null;
+    public static class CommonPutResponse
+    {
+        public const int CreatedCode = 0;
+        public const int ModifiedCode = 1;
+
+        public static CommonResponse Created { get; } = new CommonResponse(CreatedCode, "A new item is created.");
+        public static CommonResponse Modified { get; } = new CommonResponse(ModifiedCode, "An existent item is modified.");
+    }
+
+    public static class CommonDeleteResponse
+    {
+        public const int DeletedCode = 0;
+        public const int NotExistsCode = 1;
+
+        public static CommonResponse Deleted { get; } = new CommonResponse(DeletedCode, "An existent item is deleted.");
+        public static CommonResponse NotExists { get; } = new CommonResponse(NotExistsCode, "The item does not exist.");
     }
 }

@@ -1,77 +1,85 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using Timeline.Configs;
-using Timeline.Entities;
 
 namespace Timeline.Services
 {
     public class TokenInfo
     {
-        public string Name { get; set; }
-        public string[] Roles { get; set; }
+        public long Id { get; set; }
+        public long Version { get; set; }
+    }
+
+    [Serializable]
+    public class JwtTokenVerifyException : Exception
+    {
+        public JwtTokenVerifyException() { }
+        public JwtTokenVerifyException(string message) : base(message) { }
+        public JwtTokenVerifyException(string message, Exception inner) : base(message, inner) { }
+        protected JwtTokenVerifyException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
     public interface IJwtService
     {
         /// <summary>
-        /// Create a JWT token for a given user info.
+        /// Create a JWT token for a given token info.
         /// </summary>
         /// <param name="tokenInfo">The info to generate token.</param>
+        /// <param name="expires">The expire time. If null then use current time with offset in config.</param>
         /// <returns>Return the generated token.</returns>
-        string GenerateJwtToken(TokenInfo tokenInfo);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="tokenInfo"/> is null.</exception>
+        string GenerateJwtToken(TokenInfo tokenInfo, DateTime? expires = null);
 
         /// <summary>
         /// Verify a JWT token.
         /// Return null is <paramref name="token"/> is null.
         /// </summary>
         /// <param name="token">The token string to verify.</param>
-        /// <returns>Return null if <paramref name="token"/> is null or token is invalid. Return the saved info otherwise.</returns>
+        /// <returns>Return the saved info in token.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
+        /// <exception cref="JwtTokenVerifyException">Thrown when the token is invalid.</exception>
         TokenInfo VerifyJwtToken(string token);
 
     }
 
     public class JwtService : IJwtService
     {
+        private const string VersionClaimType = "timeline_version";
+
         private readonly IOptionsMonitor<JwtConfig> _jwtConfig;
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
-        private readonly ILogger<JwtService> _logger;
 
-        public JwtService(IOptionsMonitor<JwtConfig> jwtConfig, ILogger<JwtService> logger)
+        public JwtService(IOptionsMonitor<JwtConfig> jwtConfig)
         {
             _jwtConfig = jwtConfig;
-            _logger = logger;
         }
 
-        public string GenerateJwtToken(TokenInfo tokenInfo)
+        public string GenerateJwtToken(TokenInfo tokenInfo, DateTime? expires = null)
         {
             if (tokenInfo == null)
                 throw new ArgumentNullException(nameof(tokenInfo));
-            if (tokenInfo.Name == null)
-                throw new ArgumentException("Name is null.", nameof(tokenInfo));
-            if (tokenInfo.Roles == null)
-                throw new ArgumentException("Roles is null.", nameof(tokenInfo));
 
-            var jwtConfig = _jwtConfig.CurrentValue;
+            var config = _jwtConfig.CurrentValue;
 
             var identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim(identity.NameClaimType, tokenInfo.Name));
-            identity.AddClaims(tokenInfo.Roles.Select(role => new Claim(identity.RoleClaimType, role)));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, tokenInfo.Id.ToString(), ClaimValueTypes.Integer64));
+            identity.AddClaim(new Claim(VersionClaimType, tokenInfo.Version.ToString(), ClaimValueTypes.Integer64));
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = identity,
-                Issuer = jwtConfig.Issuer,
-                Audience = jwtConfig.Audience,
+                Issuer = config.Issuer,
+                Audience = config.Audience,
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey)), SecurityAlgorithms.HmacSha384),
+                    new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey)), SecurityAlgorithms.HmacSha384),
                 IssuedAt = DateTime.Now,
-                Expires = DateTime.Now.AddDays(1)
+                Expires = expires.GetValueOrDefault(DateTime.Now.AddSeconds(config.DefaultExpireOffset))
             };
 
             var token = _tokenHandler.CreateToken(tokenDescriptor);
@@ -84,7 +92,7 @@ namespace Timeline.Services
         public TokenInfo VerifyJwtToken(string token)
         {
             if (token == null)
-                return null;
+                throw new ArgumentNullException(nameof(token));
 
             var config = _jwtConfig.CurrentValue;
             try
@@ -98,18 +106,29 @@ namespace Timeline.Services
                     ValidIssuer = config.Issuer,
                     ValidAudience = config.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey))
-                }, out SecurityToken validatedToken);
+                }, out _);
+
+                var idClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (idClaim == null)
+                    throw new JwtTokenVerifyException("Id claim does not exist.");
+                if (!long.TryParse(idClaim, out var id))
+                    throw new JwtTokenVerifyException("Can't convert id claim into a integer number.");
+
+                var versionClaim = principal.FindFirstValue(VersionClaimType);
+                if (versionClaim == null)
+                    throw new JwtTokenVerifyException("Version claim does not exist.");
+                if (!long.TryParse(versionClaim, out var version))
+                    throw new JwtTokenVerifyException("Can't convert version claim into a integer number.");
 
                 return new TokenInfo
                 {
-                    Name = principal.Identity.Name,
-                    Roles = principal.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray()
+                    Id = id,
+                    Version = version
                 };
             }
             catch (Exception e)
             {
-                _logger.LogInformation(e, "Token validation failed! Token is {} .", token);
-                return null;
+                throw new JwtTokenVerifyException("Validate token failed caused by a SecurityTokenException. See inner exception.", e);
             }
         }
     }

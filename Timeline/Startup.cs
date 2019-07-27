@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -7,11 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Threading.Tasks;
+using Timeline.Authenticate;
 using Timeline.Configs;
-using Timeline.Formatters;
 using Timeline.Models;
 using Timeline.Services;
 
@@ -33,10 +29,7 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(options =>
-            {
-                options.InputFormatters.Add(new StringInputFormatter());
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddCors(options =>
             {
@@ -52,29 +45,8 @@ namespace Timeline
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o =>
-                {
-                    o.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = delegate (MessageReceivedContext context)
-                        {
-                            context.Request.Query.TryGetValue("token", out var value);
-                            if (value.Count == 1)
-                            {
-                                context.Token = value[0];
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
-                    o.TokenValidationParameters.ValidateIssuer = true;
-                    o.TokenValidationParameters.ValidateAudience = true;
-                    o.TokenValidationParameters.ValidateIssuerSigningKey = true;
-                    o.TokenValidationParameters.ValidateLifetime = true;
-                    o.TokenValidationParameters.ValidIssuer = jwtConfig.Issuer;
-                    o.TokenValidationParameters.ValidAudience = jwtConfig.Audience;
-                    o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.SigningKey));
-                });
+            services.AddAuthentication(AuthConstants.Scheme)
+                .AddScheme<AuthOptions, AuthHandler>(AuthConstants.Scheme, AuthConstants.DisplayName, o => { });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
@@ -96,8 +68,7 @@ namespace Timeline
 
             services.AddHttpClient();
 
-            services.Configure<QCloudCosConfig>(Configuration.GetSection(nameof(QCloudCosConfig)));
-            services.AddSingleton<IQCloudCosService, QCloudCosService>();
+            services.AddMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

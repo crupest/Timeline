@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -12,71 +13,41 @@ namespace Timeline.Services
     public class CreateTokenResult
     {
         public string Token { get; set; }
-        public UserInfo UserInfo { get; set; }
+        public UserInfo User { get; set; }
     }
 
-    public enum PutUserResult
+    [Serializable]
+    public class UserNotExistException : Exception
     {
-        /// <summary>
-        /// A new user is created.
-        /// </summary>
-        Created,
-        /// <summary>
-        /// A existing user is modified.
-        /// </summary>
-        Modified
+        public UserNotExistException(): base("The user does not exist.") { }
+        public UserNotExistException(string message) : base(message) { }
+        public UserNotExistException(string message, Exception inner) : base(message, inner) { }
+        protected UserNotExistException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
-    public enum PatchUserResult
+    [Serializable]
+    public class BadPasswordException : Exception
     {
-        /// <summary>
-        /// Succeed to modify user.
-        /// </summary>
-        Success,
-        /// <summary>
-        /// A user of given username does not exist.
-        /// </summary>
-        NotExists
+        public BadPasswordException(): base("Password is wrong.") { }
+        public BadPasswordException(string message) : base(message) { }
+        public BadPasswordException(string message, Exception inner) : base(message, inner) { }
+        protected BadPasswordException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
-    public enum DeleteUserResult
-    {
-        /// <summary>
-        /// A existing user is deleted.
-        /// </summary>
-        Deleted,
-        /// <summary>
-        /// A user of given username does not exist.
-        /// </summary>
-        NotExists
-    }
 
-    public enum ChangePasswordResult
+    [Serializable]
+    public class BadTokenVersionException : Exception
     {
-        /// <summary>
-        /// Success to change password.
-        /// </summary>
-        Success,
-        /// <summary>
-        /// The user does not exists.
-        /// </summary>
-        NotExists,
-        /// <summary>
-        /// Old password is wrong.
-        /// </summary>
-        BadOldPassword
-    }
-
-    public enum PutAvatarResult
-    {
-        /// <summary>
-        /// Success to upload avatar.
-        /// </summary>
-        Success,
-        /// <summary>
-        /// The user does not exists.
-        /// </summary>
-        UserNotExists
+        public BadTokenVersionException(): base("Token version is expired.") { }
+        public BadTokenVersionException(string message) : base(message) { }
+        public BadTokenVersionException(string message, Exception inner) : base(message, inner) { }
+        protected BadTokenVersionException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
     public interface IUserService
@@ -85,9 +56,12 @@ namespace Timeline.Services
         /// Try to anthenticate with the given username and password.
         /// If success, create a token and return the user info.
         /// </summary>
-        /// <param name="username">The username of the user to be anthenticated.</param>
-        /// <param name="password">The password of the user to be anthenticated.</param>
-        /// <returns>Return null if anthentication failed. An <see cref="CreateTokenResult"/> containing the created token and user info if anthentication succeeded.</returns>
+        /// <param name="username">The username of the user to anthenticate.</param>
+        /// <param name="password">The password of the user to anthenticate.</param>
+        /// <returns>An <see cref="CreateTokenResult"/> containing the created token and user info.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
+        /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
         Task<CreateTokenResult> CreateToken(string username, string password);
 
         /// <summary>
@@ -95,7 +69,11 @@ namespace Timeline.Services
         /// If success, return the user info.
         /// </summary>
         /// <param name="token">The token to verify.</param>
-        /// <returns>Return null if verification failed. The user info if verification succeeded.</returns>
+        /// <returns>The user info specified by the token.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
+        /// <exception cref="JwtTokenVerifyException">Thrown when the token is of bad format. Thrown by <see cref="JwtService.VerifyJwtToken(string)"/>.</exception>
+        /// <exception cref="UserNotExistException">Thrown when the user specified by the token does not exist. Usually it has been deleted after the token was issued.</exception>
+        /// <exception cref="BadTokenVersionException">Thrown when the version in the token is expired. User needs to recreate the token.</exception>
         Task<UserInfo> VerifyToken(string token);
 
         /// <summary>
@@ -118,31 +96,29 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">Username of user.</param>
         /// <param name="password">Password of user.</param>
-        /// <param name="roles">Array of roles of user.</param>
-        /// <returns>Return <see cref="PutUserResult.Created"/> if a new user is created.
-        /// Return <see cref="PutUserResult.Modified"/> if a existing user is modified.</returns>
-        Task<PutUserResult> PutUser(string username, string password, bool isAdmin);
+        /// <param name="isAdmin">Whether the user is administrator.</param>
+        /// <returns>Return <see cref="PutResult.Created"/> if a new user is created.
+        /// Return <see cref="PutResult.Modified"/> if a existing user is modified.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
+        Task<PutResult> PutUser(string username, string password, bool isAdmin);
 
         /// <summary>
-        /// Partially modify a use of given username.
+        /// Partially modify a user of given username.
         /// </summary>
-        /// <param name="username">Username of the user to modify.</param>
-        /// <param name="password">New password. If not modify, then null.</param>
-        /// <param name="roles">New roles. If not modify, then null.</param>
-        /// <returns>Return <see cref="PatchUserResult.Success"/> if modification succeeds.
-        /// Return <see cref="PatchUserResult.NotExists"/> if the user of given username doesn't exist.</returns>
-        Task<PatchUserResult> PatchUser(string username, string password, bool? isAdmin);
+        /// <param name="username">Username of the user to modify. Can't be null.</param>
+        /// <param name="password">New password. Null if not modify.</param>
+        /// <param name="isAdmin">Whether the user is administrator. Null if not modify.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
+        Task PatchUser(string username, string password, bool? isAdmin);
 
         /// <summary>
         /// Delete a user of given username.
-        /// Return <see cref="DeleteUserResult.Deleted"/> if the user is deleted.
-        /// Return <see cref="DeleteUserResult.NotExists"/> if the user of given username
-        /// does not exist.
         /// </summary>
-        /// <param name="username">Username of thet user to delete.</param>
-        /// <returns><see cref="DeleteUserResult.Deleted"/> if the user is deleted.
-        /// <see cref="DeleteUserResult.NotExists"/> if the user doesn't exist.</returns>
-        Task<DeleteUserResult> DeleteUser(string username);
+        /// <param name="username">Username of thet user to delete. Can't be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
+        Task DeleteUser(string username);
 
         /// <summary>
         /// Try to change a user's password with old password.
@@ -150,90 +126,126 @@ namespace Timeline.Services
         /// <param name="username">The name of user to change password of.</param>
         /// <param name="oldPassword">The user's old password.</param>
         /// <param name="newPassword">The user's new password.</param>
-        /// <returns><see cref="ChangePasswordResult.Success"/> if success.
-        /// <see cref="ChangePasswordResult.NotExists"/> if user does not exist.
-        /// <see cref="ChangePasswordResult.BadOldPassword"/> if old password is wrong.</returns>
-        Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword);
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> or <paramref name="oldPassword"/> or <paramref name="newPassword"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
+        /// <exception cref="BadPasswordException">Thrown if the old password is wrong.</exception>
+        Task ChangePassword(string username, string oldPassword, string newPassword);
+    }
 
-        /// <summary>
-        /// Get the true avatar url of a user.
-        /// </summary>
-        /// <param name="username">The name of user.</param>
-        /// <returns>The url if user exists. Null if user does not exist.</returns>
-        Task<string> GetAvatarUrl(string username);
+    internal class UserCache
+    {
+        public string Username { get; set; }
+        public bool IsAdmin { get; set; }
+        public long Version { get; set; }
 
-        /// <summary>
-        /// Put a avatar of a user.
-        /// </summary>
-        /// <param name="username">The name of user.</param>
-        /// <param name="data">The data of avatar image.</param>
-        /// <param name="mimeType">The mime type of the image.</param>
-        /// <returns>Return <see cref="PutAvatarResult.Success"/> if success.
-        /// Return <see cref="PutAvatarResult.UserNotExists"/> if user does not exist.</returns>
-        Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType);
+        public UserInfo ToUserInfo()
+        {
+            return new UserInfo(Username, IsAdmin);
+        }
     }
 
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
+
+        private readonly IMemoryCache _memoryCache;
         private readonly DatabaseContext _databaseContext;
+
         private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
-        private readonly IQCloudCosService _cosService;
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService, IQCloudCosService cosService)
+        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
         {
             _logger = logger;
+            _memoryCache = memoryCache;
             _databaseContext = databaseContext;
             _jwtService = jwtService;
             _passwordService = passwordService;
-            _cosService = cosService;
+        }
+
+        private string GenerateCacheKeyByUserId(long id) => $"user:{id}";
+
+        private void RemoveCache(long id)
+        {
+            _memoryCache.Remove(GenerateCacheKeyByUserId(id));
         }
 
         public async Task<CreateTokenResult> CreateToken(string username, string password)
         {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (password == null)
+                throw new ArgumentNullException(nameof(password));
+
+            // We need password info, so always check the database.
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
             if (user == null)
             {
-                _logger.LogInformation($"Create token failed with invalid username. Username = {username} Password = {password} .");
-                return null;
+                var e = new UserNotExistException();
+                _logger.LogInformation(e, $"Create token failed. Reason: invalid username. Username = {username} Password = {password} .");
+                throw e;
             }
 
-            var verifyResult = _passwordService.VerifyPassword(user.EncryptedPassword, password);
+            if (!_passwordService.VerifyPassword(user.EncryptedPassword, password))
+            {
+                var e = new BadPasswordException();
+                _logger.LogInformation(e, $"Create token failed. Reason: invalid password. Username = {username} Password = {password} .");
+                throw e;
+            }
 
-            if (verifyResult)
+            var token = _jwtService.GenerateJwtToken(new TokenInfo
             {
-                var roles = RoleStringToRoleArray(user.RoleString);
-                var token = _jwtService.GenerateJwtToken(new TokenInfo
-                {
-                    Name = username,
-                    Roles = roles
-                });
-                return new CreateTokenResult
-                {
-                    Token = token,
-                    UserInfo = new UserInfo(username, RoleArrayToIsAdmin(roles))
-                };
-            }
-            else
+                Id = user.Id,
+                Version = user.Version
+            });
+            return new CreateTokenResult
             {
-                _logger.LogInformation($"Create token failed with invalid password. Username = {username} Password = {password} .");
-                return null;
-            }
+                Token = token,
+                User = CreateUserInfo(user)
+            };
         }
 
         public async Task<UserInfo> VerifyToken(string token)
         {
-            var tokenInfo = _jwtService.VerifyJwtToken(token);
-
-            if (tokenInfo == null)
+            TokenInfo tokenInfo;
+            try
             {
-                _logger.LogInformation($"Verify token falied. Reason: invalid token. Token: {token} .");
-                return null;
+                tokenInfo = _jwtService.VerifyJwtToken(token);
+            }
+            catch (JwtTokenVerifyException e)
+            {
+                _logger.LogInformation(e, $"Verify token falied. Reason: invalid token. Token: {token} .");
+                throw e;
             }
 
-            return await Task.FromResult(new UserInfo(tokenInfo.Name, RoleArrayToIsAdmin(tokenInfo.Roles)));
+            var id = tokenInfo.Id;
+            var key = GenerateCacheKeyByUserId(id);
+            if (!_memoryCache.TryGetValue<UserCache>(key, out var cache))
+            {
+                // no cache, check the database
+                var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+
+                if (user == null)
+                {
+                    var e = new UserNotExistException();
+                    _logger.LogInformation(e, $"Verify token falied. Reason: invalid id. Token: {token} Id: {id}.");
+                    throw e;
+                }
+
+                // create cache
+                cache = CreateUserCache(user);
+                _memoryCache.CreateEntry(key).SetValue(cache);
+            }
+
+            if (tokenInfo.Version != cache.Version)
+            {
+                var e = new BadTokenVersionException();
+                _logger.LogInformation(e, $"Verify token falied. Reason: invalid version. Token: {token} Id: {id} Username: {cache.Username} Version: {tokenInfo.Version} Version in cache: {cache.Version}.");
+                throw e;
+            }
+
+            return cache.ToUserInfo();
         }
 
         public async Task<UserInfo> GetUser(string username)
@@ -251,8 +263,13 @@ namespace Timeline.Services
                 .ToArrayAsync();
         }
 
-        public async Task<PutUserResult> PutUser(string username, string password, bool isAdmin)
+        public async Task<PutResult> PutUser(string username, string password, bool isAdmin)
         {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (password == null)
+                throw new ArgumentNullException(nameof(password));
+
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
             if (user == null)
@@ -261,25 +278,32 @@ namespace Timeline.Services
                 {
                     Name = username,
                     EncryptedPassword = _passwordService.HashPassword(password),
-                    RoleString = IsAdminToRoleString(isAdmin)
+                    RoleString = IsAdminToRoleString(isAdmin),
+                    Version = 0
                 });
                 await _databaseContext.SaveChangesAsync();
-                return PutUserResult.Created;
+                return PutResult.Created;
             }
 
             user.EncryptedPassword = _passwordService.HashPassword(password);
             user.RoleString = IsAdminToRoleString(isAdmin);
+            user.Version += 1;
             await _databaseContext.SaveChangesAsync();
 
-            return PutUserResult.Modified;
+            //clear cache
+            RemoveCache(user.Id);
+
+            return PutResult.Modified;
         }
 
-        public async Task<PatchUserResult> PatchUser(string username, string password, bool? isAdmin)
+        public async Task PatchUser(string username, string password, bool? isAdmin)
         {
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
 
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-                return PatchUserResult.NotExists;
+                throw new UserNotExistException();
 
             bool modified = false;
 
@@ -297,70 +321,50 @@ namespace Timeline.Services
 
             if (modified)
             {
+                user.Version += 1;
                 await _databaseContext.SaveChangesAsync();
+                //clear cache
+                RemoveCache(user.Id);
             }
-
-            return PatchUserResult.Success;
         }
 
-        public async Task<DeleteUserResult> DeleteUser(string username)
+        public async Task DeleteUser(string username)
         {
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
 
+            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-            {
-                return DeleteUserResult.NotExists;
-            }
+                throw new UserNotExistException();
 
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
-            return DeleteUserResult.Deleted;
+            //clear cache
+            RemoveCache(user.Id);
         }
 
-        public async Task<ChangePasswordResult> ChangePassword(string username, string oldPassword, string newPassword)
+        public async Task ChangePassword(string username, string oldPassword, string newPassword)
         {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (oldPassword == null)
+                throw new ArgumentNullException(nameof(oldPassword));
+            if (newPassword == null)
+                throw new ArgumentNullException(nameof(newPassword));
+
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-                return ChangePasswordResult.NotExists;
+                throw new UserNotExistException();
 
             var verifyResult = _passwordService.VerifyPassword(user.EncryptedPassword, oldPassword);
             if (!verifyResult)
-                return ChangePasswordResult.BadOldPassword;
+                throw new BadPasswordException();
 
             user.EncryptedPassword = _passwordService.HashPassword(newPassword);
+            user.Version += 1;
             await _databaseContext.SaveChangesAsync();
-            return ChangePasswordResult.Success;
-        }
-
-        public async Task<string> GetAvatarUrl(string username)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-
-            if ((await GetUser(username)) == null)
-                return null;
-
-            var exists = await _cosService.IsObjectExists("avatar", username);
-            if (exists)
-                return _cosService.GenerateObjectGetUrl("avatar", username);
-            else
-                return _cosService.GenerateObjectGetUrl("avatar", "__default");
-        }
-
-        public async Task<PutAvatarResult> PutAvatar(string username, byte[] data, string mimeType)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-            if (mimeType == null)
-                throw new ArgumentNullException(nameof(mimeType));
-
-            if ((await GetUser(username)) == null)
-                return PutAvatarResult.UserNotExists;
-
-            await _cosService.PutObject("avatar", username, data, mimeType);
-            return PutAvatarResult.Success;
+            //clear cache
+            RemoveCache(user.Id);
         }
     }
 }

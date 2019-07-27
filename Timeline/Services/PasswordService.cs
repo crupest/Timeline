@@ -24,6 +24,8 @@ namespace Timeline.Services
         bool VerifyPassword(string hashedPassword, string providedPassword);
     }
 
+    //TODO! Use exceptions!!!
+
     /// <summary>
     /// Copied from https://github.com/aspnet/AspNetCore/blob/master/src/Identity/Extensions.Core/src/PasswordHasher.cs
     /// Remove V2 format and unnecessary format version check.
