@@ -43,15 +43,9 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download Pipeline Artifact'
-            inputs:
-              artifactName: timeline
-              path: '$(System.DefaultWorkingDirectory)/Timeline/'
-          
           - script: |
               rm -rf /var/timeline/*
-              cp -r $SYSTEM_DEFAULTWORKINGDIRECTORY/Timeline/. /var/timeline/
+              cp -r $PIPELINE_WORKSPACE/timeline/. /var/timeline/
               sudo systemctl restart timeline.service
             displayName: 'Command Line Script'
             failOnStderr: true
