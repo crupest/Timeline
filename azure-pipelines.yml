@@ -30,7 +30,7 @@ steps:
 - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --no-restore --output ./publish/
   displayName: Dotnet Publish
 
-- task: PublishPipelineArtifact@0
+- task: PublishPipelineArtifact@1
   inputs:
-    artifactName: 'timeline'
-    targetPath: Timeline/publish
+    path: 'Timeline/publish'
+    artifact: 'timeline'
