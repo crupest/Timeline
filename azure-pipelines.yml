@@ -1,36 +1,56 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
 - master
 
 variables:
   buildConfiguration: 'Release'
   ASPNETCORE_ENVIRONMENT: 'Development'
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - script: |
+        dotnet restore Timeline/Timeline.csproj --configfile nuget.config
+        dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
+      displayName: Dotnet Restore
 
-pool:
-  vmImage: 'Ubuntu-16.04'
-steps:
-- script: |
-    dotnet restore Timeline/Timeline.csproj --configfile nuget.config
-    dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
-  displayName: Dotnet Restore
+    - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx
+      displayName: Dotnet Test
 
-- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx
-  displayName: Dotnet Test
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testRunner: VSTest
+        testResultsFiles: '**/*.trx'
 
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/*.trx'
+    - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --no-restore --output ./publish/
+      displayName: Dotnet Publish
 
-- script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --no-restore --output ./publish/
-  displayName: Dotnet Publish
+    - task: PublishPipelineArtifact@0
+      inputs:
+        artifactName: 'timeline'
+        targetPath: Timeline/publish
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    path: 'Timeline/publish'
-    artifact: 'timeline'
+- stage: Deploy
+  jobs:
+  - deployment: Deploy
+    pool:
+      name: 'crupest-qcloud-servers'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Pipeline Artifact'
+            inputs:
+              artifactName: timeline
+              path: '$(System.DefaultWorkingDirectory)/Timeline/'
+          
+          - script: |
+              rm -rf /var/timeline/*
+              cp -r $SYSTEM_DEFAULTWORKINGDIRECTORY/Timeline/. /var/timeline/
+              sudo systemctl restart timeline.service
+            displayName: 'Command Line Script'
+            failOnStderr: true
