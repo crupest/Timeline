@@ -38,6 +38,7 @@ stages:
   - deployment: Deploy
     pool:
       name: 'crupest-qcloud-servers'
+    environment: 'timeline-server'
     strategy:
       runOnce:
         deploy:
