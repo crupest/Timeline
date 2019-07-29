@@ -1,0 +1,24 @@
+variables:
+  buildConfiguration: 'Debug'
+  ASPNETCORE_ENVIRONMENT: 'Development'
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - script: |
+        dotnet restore Timeline/Timeline.csproj --configfile nuget.config
+        dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
+      displayName: Dotnet Restore
+
+    - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx
+      displayName: Dotnet Test
+
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testRunner: VSTest
+        testResultsFiles: '**/*.trx'
+
