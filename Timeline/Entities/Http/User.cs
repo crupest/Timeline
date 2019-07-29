@@ -3,13 +3,13 @@
     public class UserPutRequest
     {
         public string Password { get; set; }
-        public bool IsAdmin { get; set; }
+        public bool Administrator { get; set; }
     }
 
     public class UserPatchRequest
     {
         public string Password { get; set; }
-        public bool? IsAdmin { get; set; }
+        public bool? Administrator { get; set; }
     }
 
     public class ChangePasswordRequest
