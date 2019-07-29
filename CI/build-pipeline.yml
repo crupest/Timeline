@@ -1,3 +1,6 @@
+trigger:
+- master
+
 variables:
   buildConfiguration: 'Debug'
   ASPNETCORE_ENVIRONMENT: 'Development'
