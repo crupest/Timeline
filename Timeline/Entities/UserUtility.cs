@@ -54,7 +54,7 @@ namespace Timeline.Entities
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            return new UserCache { Username = user.Name, IsAdmin = RoleStringToIsAdmin(user.RoleString), Version = user.Version };
+            return new UserCache { Username = user.Name, Administrator = RoleStringToIsAdmin(user.RoleString), Version = user.Version };
         }
     }
 }
