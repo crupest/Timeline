@@ -68,7 +68,7 @@ namespace Timeline.Tests
                 var result = JsonConvert.DeserializeObject<VerifyTokenResponse>(await response.Content.ReadAsStringAsync());
                 Assert.NotNull(result.User);
                 Assert.Equal(createTokenResult.User.Username, result.User.Username);
-                Assert.Equal(createTokenResult.User.IsAdmin, result.User.IsAdmin);
+                Assert.Equal(createTokenResult.User.Administrator, result.User.Administrator);
             }
         }
     }

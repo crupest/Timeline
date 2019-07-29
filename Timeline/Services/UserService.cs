@@ -96,21 +96,21 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">Username of user.</param>
         /// <param name="password">Password of user.</param>
-        /// <param name="isAdmin">Whether the user is administrator.</param>
+        /// <param name="administrator">Whether the user is administrator.</param>
         /// <returns>Return <see cref="PutResult.Created"/> if a new user is created.
         /// Return <see cref="PutResult.Modified"/> if a existing user is modified.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
-        Task<PutResult> PutUser(string username, string password, bool isAdmin);
+        Task<PutResult> PutUser(string username, string password, bool administrator);
 
         /// <summary>
         /// Partially modify a user of given username.
         /// </summary>
         /// <param name="username">Username of the user to modify. Can't be null.</param>
         /// <param name="password">New password. Null if not modify.</param>
-        /// <param name="isAdmin">Whether the user is administrator. Null if not modify.</param>
+        /// <param name="administrator">Whether the user is administrator. Null if not modify.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
-        Task PatchUser(string username, string password, bool? isAdmin);
+        Task PatchUser(string username, string password, bool? administrator);
 
         /// <summary>
         /// Delete a user of given username.
@@ -135,12 +135,12 @@ namespace Timeline.Services
     internal class UserCache
     {
         public string Username { get; set; }
-        public bool IsAdmin { get; set; }
+        public bool Administrator { get; set; }
         public long Version { get; set; }
 
         public UserInfo ToUserInfo()
         {
-            return new UserInfo(Username, IsAdmin);
+            return new UserInfo(Username, Administrator);
         }
     }
 
@@ -263,7 +263,7 @@ namespace Timeline.Services
                 .ToArrayAsync();
         }
 
-        public async Task<PutResult> PutUser(string username, string password, bool isAdmin)
+        public async Task<PutResult> PutUser(string username, string password, bool administrator)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -278,7 +278,7 @@ namespace Timeline.Services
                 {
                     Name = username,
                     EncryptedPassword = _passwordService.HashPassword(password),
-                    RoleString = IsAdminToRoleString(isAdmin),
+                    RoleString = IsAdminToRoleString(administrator),
                     Version = 0
                 });
                 await _databaseContext.SaveChangesAsync();
@@ -286,7 +286,7 @@ namespace Timeline.Services
             }
 
             user.EncryptedPassword = _passwordService.HashPassword(password);
-            user.RoleString = IsAdminToRoleString(isAdmin);
+            user.RoleString = IsAdminToRoleString(administrator);
             user.Version += 1;
             await _databaseContext.SaveChangesAsync();
 
@@ -296,7 +296,7 @@ namespace Timeline.Services
             return PutResult.Modified;
         }
 
-        public async Task PatchUser(string username, string password, bool? isAdmin)
+        public async Task PatchUser(string username, string password, bool? administrator)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -313,10 +313,10 @@ namespace Timeline.Services
                 user.EncryptedPassword = _passwordService.HashPassword(password);
             }
 
-            if (isAdmin != null)
+            if (administrator != null)
             {
                 modified = true;
-                user.RoleString = IsAdminToRoleString(isAdmin.Value);
+                user.RoleString = IsAdminToRoleString(administrator.Value);
             }
 
             if (modified)
