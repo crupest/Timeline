@@ -3,11 +3,11 @@ trigger:
 
 pr: none
 
-variables:
-  buildConfiguration: 'Release'
-  ASPNETCORE_ENVIRONMENT: 'Production'
 stages:
 - stage: Build
+  variables:
+    buildConfiguration: 'Release'
+    ASPNETCORE_ENVIRONMENT: 'Development'
   jobs:
   - job: Build
     pool:
