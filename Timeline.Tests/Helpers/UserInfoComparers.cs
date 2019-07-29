@@ -20,7 +20,7 @@ namespace Timeline.Tests.Helpers
 
             int IEqualityComparer<UserInfo>.GetHashCode(UserInfo obj)
             {
-                return obj.Username.GetHashCode() ^ obj.IsAdmin.GetHashCode();
+                return obj.Username.GetHashCode() ^ obj.Administrator.GetHashCode();
             }
         }
 
@@ -40,10 +40,10 @@ namespace Timeline.Tests.Helpers
             if (uc != 0)
                 return uc;
 
-            if (left.IsAdmin == right.IsAdmin)
+            if (left.Administrator == right.Administrator)
                 return 0;
 
-            return left.IsAdmin ? -1 : 1;
+            return left.Administrator ? -1 : 1;
         }
     }
 }

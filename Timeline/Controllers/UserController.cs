@@ -59,7 +59,7 @@ namespace Timeline.Controllers
                 return BadRequest();
             }
 
-            var result = await _userService.PutUser(username, request.Password, request.IsAdmin);
+            var result = await _userService.PutUser(username, request.Password, request.Administrator);
             switch (result)
             {
                 case PutResult.Created:
@@ -78,7 +78,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                await _userService.PatchUser(username, request.Password, request.IsAdmin);
+                await _userService.PatchUser(username, request.Password, request.Administrator);
                 return Ok();
             }
             catch (UserNotExistException e)
