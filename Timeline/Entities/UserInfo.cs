@@ -6,18 +6,18 @@ namespace Timeline.Entities
         {
         }
 
-        public UserInfo(string username, bool isAdmin)
+        public UserInfo(string username, bool administrator)
         {
             Username = username;
-            IsAdmin = isAdmin;
+            Administrator = administrator;
         }
 
         public string Username { get; set; }
-        public bool IsAdmin { get; set; }
+        public bool Administrator { get; set; }
 
         public override string ToString()
         {
-            return $"Username: {Username} ; IsAdmin: {IsAdmin}";
+            return $"Username: {Username} ; Administrator: {Administrator}";
         }
     }
 }
