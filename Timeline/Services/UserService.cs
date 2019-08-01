@@ -58,11 +58,12 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">The username of the user to anthenticate.</param>
         /// <param name="password">The password of the user to anthenticate.</param>
+        /// <param name="expires">The expired time point. Null then use default. See <see cref="JwtService.GenerateJwtToken(TokenInfo, DateTime?)"/> for what is default.</param>
         /// <returns>An <see cref="CreateTokenResult"/> containing the created token and user info.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
-        Task<CreateTokenResult> CreateToken(string username, string password);
+        Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires = null);
 
         /// <summary>
         /// Verify the given token.
@@ -170,7 +171,7 @@ namespace Timeline.Services
             _memoryCache.Remove(GenerateCacheKeyByUserId(id));
         }
 
-        public async Task<CreateTokenResult> CreateToken(string username, string password)
+        public async Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -198,7 +199,7 @@ namespace Timeline.Services
             {
                 Id = user.Id,
                 Version = user.Version
-            });
+            }, expires);
             return new CreateTokenResult
             {
                 Token = token,
