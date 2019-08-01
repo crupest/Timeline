@@ -17,12 +17,52 @@ namespace Timeline.Services
     [Serializable]
     public class JwtTokenVerifyException : Exception
     {
-        public JwtTokenVerifyException() { }
-        public JwtTokenVerifyException(string message) : base(message) { }
-        public JwtTokenVerifyException(string message, Exception inner) : base(message, inner) { }
+        public static class ErrorCodes
+        {
+            // Codes in -1000 ~ -1999 usually means the user provides a token that is not created by this server.
+
+            public const int Others = -1001;
+            public const int NoIdClaim = -1002;
+            public const int IdClaimBadFormat = -1003;
+            public const int NoVersionClaim = -1004;
+            public const int VersionClaimBadFormat = -1005;
+
+            /// <summary>
+            /// Corresponds to <see cref="SecurityTokenExpiredException"/>.
+            /// </summary>
+            public const int Expired = -2001;
+        }
+
+        public JwtTokenVerifyException(int code) : base(GetErrorMessage(code)) { ErrorCode = code; }
+        public JwtTokenVerifyException(string message, int code) : base(message) { ErrorCode = code; }
+        public JwtTokenVerifyException(Exception inner, int code) : base(GetErrorMessage(code), inner) { ErrorCode = code; }
+        public JwtTokenVerifyException(string message, Exception inner, int code) : base(message, inner) { ErrorCode = code; }
         protected JwtTokenVerifyException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        public int ErrorCode { get; private set; }
+
+        private static string GetErrorMessage(int errorCode)
+        {
+            switch (errorCode)
+            {
+                case ErrorCodes.Others:
+                    return "Uncommon error, see inner exception for more information.";
+                case ErrorCodes.NoIdClaim:
+                    return "Id claim does not exist.";
+                case ErrorCodes.IdClaimBadFormat:
+                    return "Id claim is not a number.";
+                case ErrorCodes.NoVersionClaim:
+                    return "Version claim does not exist.";
+                case ErrorCodes.VersionClaimBadFormat:
+                    return "Version claim is not a number";
+                case ErrorCodes.Expired:
+                    return "Token is expired.";
+                default:
+                    return "Unknown error code.";
+            }
+        }
     }
 
     public interface IJwtService
@@ -110,15 +150,15 @@ namespace Timeline.Services
 
                 var idClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (idClaim == null)
-                    throw new JwtTokenVerifyException("Id claim does not exist.");
+                    throw new JwtTokenVerifyException(JwtTokenVerifyException.ErrorCodes.NoIdClaim);
                 if (!long.TryParse(idClaim, out var id))
-                    throw new JwtTokenVerifyException("Can't convert id claim into a integer number.");
+                    throw new JwtTokenVerifyException(JwtTokenVerifyException.ErrorCodes.IdClaimBadFormat);
 
                 var versionClaim = principal.FindFirstValue(VersionClaimType);
                 if (versionClaim == null)
-                    throw new JwtTokenVerifyException("Version claim does not exist.");
+                    throw new JwtTokenVerifyException(JwtTokenVerifyException.ErrorCodes.NoVersionClaim);
                 if (!long.TryParse(versionClaim, out var version))
-                    throw new JwtTokenVerifyException("Can't convert version claim into a integer number.");
+                    throw new JwtTokenVerifyException(JwtTokenVerifyException.ErrorCodes.VersionClaimBadFormat);
 
                 return new TokenInfo
                 {
@@ -126,9 +166,13 @@ namespace Timeline.Services
                     Version = version
                 };
             }
+            catch (SecurityTokenExpiredException e)
+            {
+                throw new JwtTokenVerifyException(e, JwtTokenVerifyException.ErrorCodes.Expired);
+            }
             catch (Exception e)
             {
-                throw new JwtTokenVerifyException("Validate token failed caused by a SecurityTokenException. See inner exception.", e);
+                throw new JwtTokenVerifyException(e, JwtTokenVerifyException.ErrorCodes.Others);
             }
         }
     }

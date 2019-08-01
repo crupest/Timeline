@@ -27,6 +27,7 @@ namespace Timeline.Controllers
             public const int Verify_BadToken = -2001;
             public const int Verify_UserNotExist = -2002;
             public const int Verify_BadVersion = -2003;
+            public const int Verify_Expired = -2004;
         }
 
         private readonly IUserService _userService;
@@ -81,9 +82,18 @@ namespace Timeline.Controllers
             }
             catch (JwtTokenVerifyException e)
             {
-                var code = ErrorCodes.Verify_BadToken;
-                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because of bad format. Code: {} Token: {}.", code, request.Token);
-                return BadRequest(new CommonResponse(code, "A token of bad format."));
+                if (e.ErrorCode == JwtTokenVerifyException.ErrorCodes.Expired)
+                {
+                    var code = ErrorCodes.Verify_Expired;
+                    _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a expired token. Code: {} Token: {}.", code, request.Token);
+                    return BadRequest(new CommonResponse(code, "A expired token."));
+                }
+                else
+                {
+                    var code = ErrorCodes.Verify_BadToken;
+                    _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because of bad format. Code: {} Token: {}.", code, request.Token);
+                    return BadRequest(new CommonResponse(code, "A token of bad format."));
+                }
             }
             catch (UserNotExistException e)
             {

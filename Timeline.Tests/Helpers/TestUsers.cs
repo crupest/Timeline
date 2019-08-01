@@ -17,13 +17,15 @@ namespace Timeline.Tests.Helpers
             {
                 Name = "user",
                 EncryptedPassword = passwordService.HashPassword("user"),
-                RoleString = "user"
+                RoleString = "user",
+                Version = 0,
             });
             mockUsers.Add(new User
             {
                 Name = "admin",
                 EncryptedPassword = passwordService.HashPassword("admin"),
-                RoleString = "user,admin"
+                RoleString = "user,admin",
+                Version = 0,
             });
 
             MockUsers = mockUsers;

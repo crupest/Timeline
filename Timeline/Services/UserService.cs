@@ -208,6 +208,9 @@ namespace Timeline.Services
 
         public async Task<UserInfo> VerifyToken(string token)
         {
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
+
             TokenInfo tokenInfo;
             try
             {

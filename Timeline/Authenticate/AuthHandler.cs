@@ -87,6 +87,10 @@ namespace Timeline.Authenticate
 
                 return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthConstants.Scheme));
             }
+            catch (ArgumentException)
+            {
+                throw; // this exception usually means server error.
+            }
             catch (Exception e)
             {
                 _logger.LogInformation(e, "A jwt token validation failed.");
