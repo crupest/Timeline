@@ -94,10 +94,12 @@ namespace Timeline.Services
 
         private readonly IOptionsMonitor<JwtConfig> _jwtConfig;
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
+        private readonly IClock _clock;
 
-        public JwtService(IOptionsMonitor<JwtConfig> jwtConfig)
+        public JwtService(IOptionsMonitor<JwtConfig> jwtConfig, IClock clock)
         {
             _jwtConfig = jwtConfig;
+            _clock = clock;
         }
 
         public string GenerateJwtToken(TokenInfo tokenInfo, DateTime? expires = null)
@@ -118,8 +120,8 @@ namespace Timeline.Services
                 Audience = config.Audience,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey)), SecurityAlgorithms.HmacSha384),
-                IssuedAt = DateTime.Now,
-                Expires = expires.GetValueOrDefault(DateTime.Now.AddSeconds(config.DefaultExpireOffset))
+                IssuedAt = _clock.GetCurrentTime(),
+                Expires = expires.GetValueOrDefault(_clock.GetCurrentTime().AddSeconds(config.DefaultExpireOffset))
             };
 
             var token = _tokenHandler.CreateToken(tokenDescriptor);

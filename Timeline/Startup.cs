@@ -51,6 +51,7 @@ namespace Timeline
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddTransient<IPasswordService, PasswordService>();
+            services.AddTransient<IClock, Clock>();
 
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
