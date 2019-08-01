@@ -11,7 +11,7 @@ namespace Timeline.Tests.Helpers
         static TestMockUsers()
         {
             var mockUsers = new List<User>();
-            var passwordService = new PasswordService(null);
+            var passwordService = new PasswordService();
 
             mockUsers.Add(new User
             {
