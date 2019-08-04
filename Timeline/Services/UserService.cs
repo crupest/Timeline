@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
 using static Timeline.Entities.UserUtility;
+using static Timeline.Helpers.MyLogHelper;
 
 namespace Timeline.Services
 {
@@ -19,35 +20,86 @@ namespace Timeline.Services
     [Serializable]
     public class UserNotExistException : Exception
     {
-        public UserNotExistException() : base("The user does not exist.") { }
-        public UserNotExistException(string message) : base(message) { }
+        private const string message = "The user does not exist.";
+
+        public UserNotExistException(string username)
+            : base(FormatLogMessage(message, Pair("Username", username)))
+        {
+            Username = username;
+        }
+
+        public UserNotExistException(long id)
+            : base(FormatLogMessage(message, Pair("Id", id)))
+        {
+            Id = id;
+        }
+
         public UserNotExistException(string message, Exception inner) : base(message, inner) { }
+
         protected UserNotExistException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        /// <summary>
+        /// The username that does not exist. May be null then <see cref="Id"/> is not null.
+        /// </summary>
+        public string Username { get; private set; }
+
+        /// <summary>
+        /// The id that does not exist. May be null then <see cref="Username"/> is not null.
+        /// </summary>
+        public long? Id { get; private set; }
     }
 
     [Serializable]
     public class BadPasswordException : Exception
     {
-        public BadPasswordException() : base("Password is wrong.") { }
-        public BadPasswordException(string message) : base(message) { }
+        public BadPasswordException(string badPassword)
+            : base(FormatLogMessage("Password is wrong.", Pair("Bad Password", badPassword)))
+        {
+            Password = badPassword;
+        }
+
         public BadPasswordException(string message, Exception inner) : base(message, inner) { }
+
         protected BadPasswordException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        /// <summary>
+        /// The wrong password.
+        /// </summary>
+        public string Password { get; private set; }
     }
 
 
     [Serializable]
     public class BadTokenVersionException : Exception
     {
-        public BadTokenVersionException() : base("Token version is expired.") { }
-        public BadTokenVersionException(string message) : base(message) { }
+        public BadTokenVersionException(long tokenVersion, long requiredVersion)
+            : base(FormatLogMessage("Token version is expired.",
+                Pair("Token Version", tokenVersion),
+                Pair("Required Version", requiredVersion)))
+        {
+            TokenVersion = tokenVersion;
+            RequiredVersion = requiredVersion;
+        }
+
         public BadTokenVersionException(string message, Exception inner) : base(message, inner) { }
+
         protected BadTokenVersionException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        /// <summary>
+        /// The version in the token.
+        /// </summary>
+        public long TokenVersion { get; private set; }
+
+        /// <summary>
+        /// The version required.
+        /// </summary>
+        public long RequiredVersion { get; private set; }
     }
 
     public interface IUserService
@@ -170,7 +222,9 @@ namespace Timeline.Services
 
         private void RemoveCache(long id)
         {
-            _memoryCache.Remove(GenerateCacheKeyByUserId(id));
+            var key = GenerateCacheKeyByUserId(id);
+            _memoryCache.Remove(key);
+            _logger.LogInformation(FormatLogMessage("A cache entry is removed.", Pair("Key", key)));
         }
 
         public async Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires)
@@ -184,24 +238,17 @@ namespace Timeline.Services
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
             if (user == null)
-            {
-                var e = new UserNotExistException();
-                _logger.LogInformation(e, $"Create token failed. Reason: invalid username. Username = {username} Password = {password} .");
-                throw e;
-            }
+                throw new UserNotExistException(username);
 
             if (!_passwordService.VerifyPassword(user.EncryptedPassword, password))
-            {
-                var e = new BadPasswordException();
-                _logger.LogInformation(e, $"Create token failed. Reason: invalid password. Username = {username} Password = {password} .");
-                throw e;
-            }
+                throw new BadPasswordException(password);
 
             var token = _jwtService.GenerateJwtToken(new TokenInfo
             {
                 Id = user.Id,
                 Version = user.Version
             }, expires);
+
             return new CreateTokenResult
             {
                 Token = token,
@@ -215,15 +262,7 @@ namespace Timeline.Services
                 throw new ArgumentNullException(nameof(token));
 
             TokenInfo tokenInfo;
-            try
-            {
-                tokenInfo = _jwtService.VerifyJwtToken(token);
-            }
-            catch (JwtTokenVerifyException e)
-            {
-                _logger.LogInformation(e, $"Verify token falied. Reason: invalid token. Token: {token} .");
-                throw e;
-            }
+            tokenInfo = _jwtService.VerifyJwtToken(token);
 
             var id = tokenInfo.Id;
             var key = GenerateCacheKeyByUserId(id);
@@ -233,23 +272,16 @@ namespace Timeline.Services
                 var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
                 if (user == null)
-                {
-                    var e = new UserNotExistException();
-                    _logger.LogInformation(e, $"Verify token falied. Reason: invalid id. Token: {token} Id: {id}.");
-                    throw e;
-                }
+                    throw new UserNotExistException(id);
 
                 // create cache
                 cache = CreateUserCache(user);
                 _memoryCache.CreateEntry(key).SetValue(cache);
+                _logger.LogInformation(FormatLogMessage("A cache entry is created.", Pair("Key", key)));
             }
 
             if (tokenInfo.Version != cache.Version)
-            {
-                var e = new BadTokenVersionException();
-                _logger.LogInformation(e, $"Verify token falied. Reason: invalid version. Token: {token} Id: {id} Username: {cache.Username} Version: {tokenInfo.Version} Version in cache: {cache.Version}.");
-                throw e;
-            }
+                throw new BadTokenVersionException(tokenInfo.Version, cache.Version);
 
             return cache.ToUserInfo();
         }
@@ -280,14 +312,16 @@ namespace Timeline.Services
 
             if (user == null)
             {
-                await _databaseContext.AddAsync(new User
+                var newUser = new User
                 {
                     Name = username,
                     EncryptedPassword = _passwordService.HashPassword(password),
                     RoleString = IsAdminToRoleString(administrator),
                     Version = 0
-                });
+                };
+                await _databaseContext.AddAsync(newUser);
                 await _databaseContext.SaveChangesAsync();
+                _logger.LogInformation(FormatLogMessage("A new user entry is added to the database.", Pair("Id", newUser.Id)));
                 return PutResult.Created;
             }
 
@@ -295,6 +329,7 @@ namespace Timeline.Services
             user.RoleString = IsAdminToRoleString(administrator);
             user.Version += 1;
             await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation(FormatLogMessage("A user entry is updated to the database.", Pair("Id", user.Id)));
 
             //clear cache
             RemoveCache(user.Id);
@@ -309,7 +344,7 @@ namespace Timeline.Services
 
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-                throw new UserNotExistException();
+                throw new UserNotExistException(username);
 
             if (password != null)
             {
@@ -323,6 +358,8 @@ namespace Timeline.Services
 
             user.Version += 1;
             await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation(FormatLogMessage("A user entry is updated to the database.", Pair("Id", user.Id)));
+
             //clear cache
             RemoveCache(user.Id);
         }
@@ -334,10 +371,12 @@ namespace Timeline.Services
 
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-                throw new UserNotExistException();
+                throw new UserNotExistException(username);
 
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation(FormatLogMessage("A user entry is removed from the database.", Pair("Id", user.Id)));
+
             //clear cache
             RemoveCache(user.Id);
         }
@@ -353,11 +392,11 @@ namespace Timeline.Services
 
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
             if (user == null)
-                throw new UserNotExistException();
+                throw new UserNotExistException(username);
 
             var verifyResult = _passwordService.VerifyPassword(user.EncryptedPassword, oldPassword);
             if (!verifyResult)
-                throw new BadPasswordException();
+                throw new BadPasswordException(oldPassword);
 
             user.EncryptedPassword = _passwordService.HashPassword(newPassword);
             user.Version += 1;
