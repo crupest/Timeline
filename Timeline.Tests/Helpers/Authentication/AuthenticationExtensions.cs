@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Entities.Http;
@@ -24,17 +23,6 @@ namespace Timeline.Tests.Helpers.Authentication
             var token = (await client.CreateUserTokenAsync(username, password)).Token;
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
             return client;
-        }
-
-        public static async Task<HttpResponseMessage> SendWithAuthenticationAsync(this HttpClient client, string token, string path, Action<HttpRequestMessage> requestBuilder = null)
-        {
-            var request = new HttpRequestMessage
-            {
-                RequestUri = new Uri(client.BaseAddress, path),
-            };
-            request.Headers.Add("Authorization", "Bearer " + token);
-            requestBuilder?.Invoke(request);
-            return await client.SendAsync(request);
         }
     }
 }

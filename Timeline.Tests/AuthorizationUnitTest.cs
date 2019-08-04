@@ -44,12 +44,11 @@ namespace Timeline.Tests
         [Fact]
         public async Task UserAuthorizationTest()
         {
-            using (var client = _factory.CreateDefaultClient())
+            using (var client = await _factory.CreateClientWithUser("user", "user"))
             {
-                var token = (await client.CreateUserTokenAsync("user", "user")).Token;
-                var response1 = await client.SendWithAuthenticationAsync(token, UserUrl);
+                var response1 = await client.GetAsync(UserUrl);
                 Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
-                var response2 = await client.SendWithAuthenticationAsync(token, AdminUrl);
+                var response2 = await client.GetAsync(AdminUrl);
                 Assert.Equal(HttpStatusCode.Forbidden, response2.StatusCode);
             }
         }
