@@ -7,7 +7,7 @@ namespace Timeline.Tests.Helpers
 {
     public class TestClock : IClock
     {
-        DateTime? MockCurrentTime { get; set; } = null;
+        public DateTime? MockCurrentTime { get; set; } = null;
 
         public DateTime GetCurrentTime()
         {

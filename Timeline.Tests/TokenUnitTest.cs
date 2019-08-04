@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -132,11 +133,28 @@ namespace Timeline.Tests
         }
 
         [Fact]
+        public async void VerifyTokenTest_Expired()
+        {
+            using (var client = _factory.CreateDefaultClient())
+            {
+                // I can only control the token expired time but not current time
+                // because verify logic is encapsuled in other library.
+                var mockClock = _factory.GetTestClock();
+                mockClock.MockCurrentTime = DateTime.Now - TimeSpan.FromDays(2);
+                var token = (await client.CreateUserTokenAsync("user", "user", 1)).Token;
+                var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
+                var body = await response.ReadBodyAsJson<CommonResponse>();
+                Assert.Equal(TokenController.ErrorCodes.Verify_Expired, body.Code);
+                mockClock.MockCurrentTime = null;
+            }
+        }
+
+        [Fact]
         public async void VerifyTokenTest_Success()
         {
             using (var client = _factory.CreateDefaultClient())
             {
-                var createTokenResult = await client.CreateUserTokenAsync("admin", "admin");
+                var createTokenResult = await client.CreateUserTokenAsync("user", "user");
                 var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = createTokenResult.Token });
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var body = JsonConvert.DeserializeObject<VerifyTokenResponse>(await response.Content.ReadAsStringAsync());

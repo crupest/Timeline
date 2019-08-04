@@ -121,7 +121,8 @@ namespace Timeline.Services
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey)), SecurityAlgorithms.HmacSha384),
                 IssuedAt = _clock.GetCurrentTime(),
-                Expires = expires.GetValueOrDefault(_clock.GetCurrentTime().AddSeconds(config.DefaultExpireOffset))
+                Expires = expires.GetValueOrDefault(_clock.GetCurrentTime().AddSeconds(config.DefaultExpireOffset)),
+                NotBefore = _clock.GetCurrentTime() // I must explicitly set this or it will use the current time by default and mock is not work in which case test will not pass.
             };
 
             var token = _tokenHandler.CreateToken(tokenDescriptor);
