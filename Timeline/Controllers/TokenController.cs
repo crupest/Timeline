@@ -119,7 +119,7 @@ namespace Timeline.Controllers
             }
             catch (BadTokenVersionException e)
             {
-                var code = ErrorCodes.Verify_BadToken;
+                var code = ErrorCodes.Verify_BadVersion;
                 _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because version is old. Code: {} Token: {}.", code, request.Token);
                 return BadRequest(new CommonResponse(code, "The token is expired. Try recreate a token."));
             }
