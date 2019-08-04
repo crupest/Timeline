@@ -7,6 +7,7 @@ using Timeline.Authenticate;
 using Timeline.Entities;
 using Timeline.Entities.Http;
 using Timeline.Services;
+using static Timeline.Helpers.MyLogHelper;
 
 namespace Timeline.Controllers
 {
@@ -44,7 +45,7 @@ namespace Timeline.Controllers
             var user = await _userService.GetUser(username);
             if (user == null)
             {
-                _logger.LogInformation("Attempt to get a non-existent user. Username: {} .", username);
+                _logger.LogInformation(FormatLogMessage("Attempt to get a non-existent user.", Pair("Username", username)));
                 return NotFound(new CommonResponse(ErrorCodes.Get_NotExists, "The user does not exist."));
             }
             return Ok(user);
@@ -53,7 +54,7 @@ namespace Timeline.Controllers
         [HttpPut("user/{username}"), AdminAuthorize]
         public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
-            if (request.Password == null)
+            if (request.Password == null) // This place will be refactored.
             {
                 _logger.LogInformation("Attempt to put a user without a password. Username: {} .", username);
                 return BadRequest();
@@ -63,10 +64,10 @@ namespace Timeline.Controllers
             switch (result)
             {
                 case PutResult.Created:
-                    _logger.LogInformation("Created a user. Username: {} .", username);
+                    _logger.LogInformation(FormatLogMessage("A user is created.", Pair("Username", username)));
                     return CreatedAtAction("Get", new { username }, CommonPutResponse.Created);
                 case PutResult.Modified:
-                    _logger.LogInformation("Modified a user. Username: {} .", username);
+                    _logger.LogInformation(FormatLogMessage("A user is modified.", Pair("Username", username)));
                     return Ok(CommonPutResponse.Modified);
                 default:
                     throw new Exception("Unreachable code.");
@@ -83,7 +84,7 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, "Attempt to patch a non-existent user. Username: {} .", username);
+                _logger.LogInformation(e, FormatLogMessage("Attempt to patch a non-existent user.", Pair("Username", username)));
                 return BadRequest(new CommonResponse(ErrorCodes.Patch_NotExists, "The user does not exist."));
             }
         }
@@ -94,12 +95,12 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.DeleteUser(username);
-                _logger.LogInformation("A user is deleted. Username: {} .", username);
+                _logger.LogInformation(FormatLogMessage("A user is deleted.", Pair("Username", username)));
                 return Ok(CommonDeleteResponse.Deleted);
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, "Attempt to delete a non-existent user. Username: {} .", username);
+                _logger.LogInformation(e, FormatLogMessage("Attempt to delete a non-existent user.", Pair("Username", username)));
                 return Ok(CommonDeleteResponse.NotExists);
             }
         }
@@ -110,12 +111,13 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.ChangePassword(User.Identity.Name, request.OldPassword, request.NewPassword);
-                _logger.LogInformation("A user changed password. Username: {} .", User.Identity.Name);
+                _logger.LogInformation(FormatLogMessage("A user changed password.", Pair("Username", User.Identity.Name)));
                 return Ok();
             }
             catch (BadPasswordException e)
             {
-                _logger.LogInformation(e, "A user attempt to change password but old password is wrong. Username: {} .", User.Identity.Name);
+                _logger.LogInformation(e, FormatLogMessage("A user attempt to change password but old password is wrong.",
+                    Pair("Username", User.Identity.Name), Pair("Old Password", request.OldPassword)));
                 return BadRequest(new CommonResponse(ErrorCodes.ChangePassword_BadOldPassword, "Old password is wrong."));
             }
             // User can't be non-existent or the token is bad. 
