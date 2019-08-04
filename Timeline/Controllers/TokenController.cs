@@ -20,7 +20,7 @@ namespace Timeline.Controllers
             public const int VerifyFailed = 2001;
         }
 
-        private static class ErrorCodes
+        public static class ErrorCodes
         {
             public const int Create_UserNotExist = -1001;
             public const int Create_BadPassword = -1002;
