@@ -4,6 +4,8 @@
     {
         public string Username { get; set; }
         public string Password { get; set; }
+        // in day
+        public double? ExpireOffset { get; set; }
     }
 
     public class CreateTokenResponse

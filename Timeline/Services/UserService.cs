@@ -19,7 +19,7 @@ namespace Timeline.Services
     [Serializable]
     public class UserNotExistException : Exception
     {
-        public UserNotExistException(): base("The user does not exist.") { }
+        public UserNotExistException() : base("The user does not exist.") { }
         public UserNotExistException(string message) : base(message) { }
         public UserNotExistException(string message, Exception inner) : base(message, inner) { }
         protected UserNotExistException(
@@ -30,7 +30,7 @@ namespace Timeline.Services
     [Serializable]
     public class BadPasswordException : Exception
     {
-        public BadPasswordException(): base("Password is wrong.") { }
+        public BadPasswordException() : base("Password is wrong.") { }
         public BadPasswordException(string message) : base(message) { }
         public BadPasswordException(string message, Exception inner) : base(message, inner) { }
         protected BadPasswordException(
@@ -42,7 +42,7 @@ namespace Timeline.Services
     [Serializable]
     public class BadTokenVersionException : Exception
     {
-        public BadTokenVersionException(): base("Token version is expired.") { }
+        public BadTokenVersionException() : base("Token version is expired.") { }
         public BadTokenVersionException(string message) : base(message) { }
         public BadTokenVersionException(string message, Exception inner) : base(message, inner) { }
         protected BadTokenVersionException(
@@ -58,11 +58,12 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">The username of the user to anthenticate.</param>
         /// <param name="password">The password of the user to anthenticate.</param>
+        /// <param name="expires">The expired time point. Null then use default. See <see cref="JwtService.GenerateJwtToken(TokenInfo, DateTime?)"/> for what is default.</param>
         /// <returns>An <see cref="CreateTokenResult"/> containing the created token and user info.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
-        Task<CreateTokenResult> CreateToken(string username, string password);
+        Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires = null);
 
         /// <summary>
         /// Verify the given token.
@@ -104,6 +105,8 @@ namespace Timeline.Services
 
         /// <summary>
         /// Partially modify a user of given username.
+        /// 
+        /// Note that whether actually modified or not, Version of the user will always increase.
         /// </summary>
         /// <param name="username">Username of the user to modify. Can't be null.</param>
         /// <param name="password">New password. Null if not modify.</param>
@@ -170,7 +173,7 @@ namespace Timeline.Services
             _memoryCache.Remove(GenerateCacheKeyByUserId(id));
         }
 
-        public async Task<CreateTokenResult> CreateToken(string username, string password)
+        public async Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -198,7 +201,7 @@ namespace Timeline.Services
             {
                 Id = user.Id,
                 Version = user.Version
-            });
+            }, expires);
             return new CreateTokenResult
             {
                 Token = token,
@@ -208,6 +211,9 @@ namespace Timeline.Services
 
         public async Task<UserInfo> VerifyToken(string token)
         {
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
+
             TokenInfo tokenInfo;
             try
             {
@@ -305,27 +311,20 @@ namespace Timeline.Services
             if (user == null)
                 throw new UserNotExistException();
 
-            bool modified = false;
-
             if (password != null)
             {
-                modified = true;
                 user.EncryptedPassword = _passwordService.HashPassword(password);
             }
 
             if (administrator != null)
             {
-                modified = true;
                 user.RoleString = IsAdminToRoleString(administrator.Value);
             }
 
-            if (modified)
-            {
-                user.Version += 1;
-                await _databaseContext.SaveChangesAsync();
-                //clear cache
-                RemoveCache(user.Id);
-            }
+            user.Version += 1;
+            await _databaseContext.SaveChangesAsync();
+            //clear cache
+            RemoveCache(user.Id);
         }
 
         public async Task DeleteUser(string username)

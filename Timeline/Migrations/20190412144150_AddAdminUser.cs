@@ -8,7 +8,7 @@ namespace Timeline.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData("user", new string[] { "name", "password", "roles" },
-                new string[] { "crupest", new PasswordService(null).HashPassword("yang0101"), "user,admin" });
+                new string[] { "crupest", new PasswordService().HashPassword("yang0101"), "user,admin" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

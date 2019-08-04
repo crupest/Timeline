@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class AuthorizationUnitTest : IClassFixture<WebApplicationFactory<Startup>>
+    public class AuthorizationUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
     {
         private const string AuthorizeUrl = "Test/User/Authorize";
         private const string UserUrl = "Test/User/User";
@@ -16,9 +16,9 @@ namespace Timeline.Tests
 
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public AuthorizationUnitTest(WebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+        public AuthorizationUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
-            _factory = factory.WithTestConfig(outputHelper);
+            _factory = factory.WithTestLogging(outputHelper);
         }
 
         [Fact]
@@ -44,12 +44,11 @@ namespace Timeline.Tests
         [Fact]
         public async Task UserAuthorizationTest()
         {
-            using (var client = _factory.CreateDefaultClient())
+            using (var client = await _factory.CreateClientWithUser("user", "user"))
             {
-                var token = (await client.CreateUserTokenAsync("user", "user")).Token;
-                var response1 = await client.SendWithAuthenticationAsync(token, UserUrl);
+                var response1 = await client.GetAsync(UserUrl);
                 Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
-                var response2 = await client.SendWithAuthenticationAsync(token, AdminUrl);
+                var response2 = await client.GetAsync(AdminUrl);
                 Assert.Equal(HttpStatusCode.Forbidden, response2.StatusCode);
             }
         }

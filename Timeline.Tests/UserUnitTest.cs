@@ -11,13 +11,13 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class UserUnitTest : IClassFixture<WebApplicationFactory<Startup>>
+    public class UserUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
     {
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public UserUnitTest(WebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+        public UserUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
-            _factory = factory.WithTestConfig(outputHelper);
+            _factory = factory.WithTestLogging(outputHelper);
         }
 
         [Fact]
