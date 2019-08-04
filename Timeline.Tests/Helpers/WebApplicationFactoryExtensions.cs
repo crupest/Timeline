@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Timeline.Models;
+using Timeline.Services;
 using Xunit.Abstractions;
 
 namespace Timeline.Tests.Helpers
@@ -46,6 +48,10 @@ namespace Timeline.Tests.Helpers
                             db.Users.AddRange(TestMockUsers.MockUsers);
                             db.SaveChanges();
                         }
+                    })
+                    .ConfigureTestServices(services =>
+                    {
+                        services.AddSingleton<IClock, TestClock>();
                     });
             });
         }
