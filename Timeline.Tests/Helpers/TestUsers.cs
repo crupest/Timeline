@@ -11,19 +11,21 @@ namespace Timeline.Tests.Helpers
         static TestMockUsers()
         {
             var mockUsers = new List<User>();
-            var passwordService = new PasswordService(null);
+            var passwordService = new PasswordService();
 
             mockUsers.Add(new User
             {
                 Name = "user",
                 EncryptedPassword = passwordService.HashPassword("user"),
-                RoleString = "user"
+                RoleString = UserUtility.IsAdminToRoleString(false),
+                Version = 0,
             });
             mockUsers.Add(new User
             {
                 Name = "admin",
                 EncryptedPassword = passwordService.HashPassword("admin"),
-                RoleString = "user,admin"
+                RoleString = UserUtility.IsAdminToRoleString(true),
+                Version = 0,
             });
 
             MockUsers = mockUsers;

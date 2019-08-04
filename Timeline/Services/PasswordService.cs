@@ -1,37 +1,59 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
 namespace Timeline.Services
 {
+    /// <summary>
+    /// Hashed password is of bad format.
+    /// </summary>
+    /// <seealso cref="IPasswordService.VerifyPassword(string, string)"/>
+    [Serializable]
+    public class HashedPasswordBadFromatException : Exception
+    {
+        public HashedPasswordBadFromatException(string hashedPassword, string message) : base(message) { HashedPassword = hashedPassword; }
+        public HashedPasswordBadFromatException(string hashedPassword, string message, Exception inner) : base(message, inner) { HashedPassword = hashedPassword; }
+        protected HashedPasswordBadFromatException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        public string HashedPassword { get; private set; }
+    }
+
     public interface IPasswordService
     {
         /// <summary>
-        /// Returns a hashed representation of the supplied <paramref name="password"/>.
+        /// Hash a password.
         /// </summary>
         /// <param name="password">The password to hash.</param>
         /// <returns>A hashed representation of the supplied <paramref name="password"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="password"/> is null.</exception>
         string HashPassword(string password);
 
         /// <summary>
-        /// Returns a boolean indicating the result of a password hash comparison.
+        /// Verify whether the password fits into the hashed one.
+        /// 
+        /// Usually you only need to check the returned bool value.
+        /// Catching <see cref="HashedPasswordBadFromatException"/> usually is not necessary.
+        /// Because if your program logic is right and always call <see cref="HashPassword(string)"/>
+        /// and <see cref="VerifyPassword(string, string)"/> in pair, this exception will never be thrown.
+        /// A thrown one usually means the data you saved is corupted, which is a critical problem.
         /// </summary>
-        /// <param name="hashedPassword">The hash value for a user's stored password.</param>
+        /// <param name="hashedPassword">The hashed password.</param>
         /// <param name="providedPassword">The password supplied for comparison.</param>
-        /// <returns>True indicating success. Otherwise false.</returns>
+        /// <returns>True indicating password is right. Otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="hashedPassword"/> or <paramref name="providedPassword"/> is null.</exception>
+        /// <exception cref="HashedPasswordBadFromatException">Thrown when the hashed password is of bad format.</exception>
         bool VerifyPassword(string hashedPassword, string providedPassword);
     }
-
-    //TODO! Use exceptions!!!
 
     /// <summary>
     /// Copied from https://github.com/aspnet/AspNetCore/blob/master/src/Identity/Extensions.Core/src/PasswordHasher.cs
     /// Remove V2 format and unnecessary format version check.
     /// Remove configuration options.
     /// Remove user related parts.
-    /// Add log for wrong format.
+    /// Change the exceptions.
     /// </summary>
     public class PasswordService : IPasswordService
     {
@@ -45,16 +67,11 @@ namespace Timeline.Services
         * (All UInt32s are stored big-endian.)
         */
 
-        private static EventId BadFormatEventId { get; } = new EventId(4000, "BadFormatPassword");
-
         private readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
-        private readonly ILogger<PasswordService> _logger;
 
-        public PasswordService(ILogger<PasswordService> logger)
+        public PasswordService()
         {
-            _logger = logger;
         }
-
 
         // Compares two byte arrays for equality. The method is specifically written so that the loop is not optimized.
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
@@ -109,31 +126,27 @@ namespace Timeline.Services
             return outputBytes;
         }
 
-        private void LogBadFormatError(string hashedPassword, string message, Exception exception = null)
-        {
-            if (_logger == null)
-                return;
-
-            if (exception != null)
-                _logger.LogError(BadFormatEventId, exception, $"{message} Hashed password is {hashedPassword} .");
-            else
-                _logger.LogError(BadFormatEventId, $"{message} Hashed password is {hashedPassword} .");
-        }
-
-        public virtual bool VerifyPassword(string hashedPassword, string providedPassword)
+        public bool VerifyPassword(string hashedPassword, string providedPassword)
         {
             if (hashedPassword == null)
                 throw new ArgumentNullException(nameof(hashedPassword));
             if (providedPassword == null)
                 throw new ArgumentNullException(nameof(providedPassword));
 
-            byte[] decodedHashedPassword = Convert.FromBase64String(hashedPassword);
+            byte[] decodedHashedPassword;
+            try
+            {
+                decodedHashedPassword = Convert.FromBase64String(hashedPassword);
+            }
+            catch (FormatException e)
+            {
+                throw new HashedPasswordBadFromatException(hashedPassword, "Not of valid base64 format. See inner exception.", e);
+            }
 
             // read the format marker from the hashed password
             if (decodedHashedPassword.Length == 0)
             {
-                LogBadFormatError(hashedPassword, "Decoded hashed password is of length 0.");
-                return false;
+                throw new HashedPasswordBadFromatException(hashedPassword, "Decoded hashed password is of length 0.");
             }
             switch (decodedHashedPassword[0])
             {
@@ -141,8 +154,7 @@ namespace Timeline.Services
                     return VerifyHashedPasswordV3(decodedHashedPassword, providedPassword, hashedPassword);
 
                 default:
-                    LogBadFormatError(hashedPassword, "Unknown format marker.");
-                    return false; // unknown format marker
+                    throw new HashedPasswordBadFromatException(hashedPassword, "Unknown format marker.");
             }
         }
 
@@ -158,8 +170,7 @@ namespace Timeline.Services
                 // Read the salt: must be >= 128 bits
                 if (saltLength < 128 / 8)
                 {
-                    LogBadFormatError(hashedPasswordString, "Salt length < 128 bits.");
-                    return false;
+                    throw new HashedPasswordBadFromatException(hashedPasswordString, "Salt length < 128 bits.");
                 }
                 byte[] salt = new byte[saltLength];
                 Buffer.BlockCopy(hashedPassword, 13, salt, 0, salt.Length);
@@ -168,8 +179,7 @@ namespace Timeline.Services
                 int subkeyLength = hashedPassword.Length - 13 - salt.Length;
                 if (subkeyLength < 128 / 8)
                 {
-                    LogBadFormatError(hashedPasswordString, "Subkey length < 128 bits.");
-                    return false;
+                    throw new HashedPasswordBadFromatException(hashedPasswordString, "Subkey length < 128 bits.");
                 }
                 byte[] expectedSubkey = new byte[subkeyLength];
                 Buffer.BlockCopy(hashedPassword, 13 + salt.Length, expectedSubkey, 0, expectedSubkey.Length);
@@ -183,8 +193,7 @@ namespace Timeline.Services
                 // This should never occur except in the case of a malformed payload, where
                 // we might go off the end of the array. Regardless, a malformed payload
                 // implies verification failed.
-                LogBadFormatError(hashedPasswordString, "See exception.", e);
-                return false;
+                throw new HashedPasswordBadFromatException(hashedPasswordString, "See inner exception.", e);
             }
         }
 
