@@ -9,6 +9,11 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: sdk
+    version: 2.2.x
+
 - script: |
     dotnet restore Timeline/Timeline.csproj --configfile nuget.config
     dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
