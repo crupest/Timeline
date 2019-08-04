@@ -32,4 +32,4 @@ steps:
   condition: succeededOrFailed()
   inputs:
     codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '**/coverage.cobertura.xml'
+    summaryFileLocation: '**/TestResults/*/coverage.cobertura.xml'
