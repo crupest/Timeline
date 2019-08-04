@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class AuthorizationUnitTest : IClassFixture<WebApplicationFactory<Startup>>
+    public class AuthorizationUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
     {
         private const string AuthorizeUrl = "Test/User/Authorize";
         private const string UserUrl = "Test/User/User";
@@ -16,9 +16,9 @@ namespace Timeline.Tests
 
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public AuthorizationUnitTest(WebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+        public AuthorizationUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
-            _factory = factory.WithTestConfig(outputHelper);
+            _factory = factory.WithTestLogging(outputHelper);
         }
 
         [Fact]

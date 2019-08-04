@@ -6,9 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Timeline.Controllers;
-using Timeline.Entities;
 using Timeline.Entities.Http;
-using Timeline.Models;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
@@ -17,16 +15,16 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class TokenUnitTest : IClassFixture<WebApplicationFactory<Startup>>
+    public class TokenUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
     {
         private const string CreateTokenUrl = "token/create";
         private const string VerifyTokenUrl = "token/verify";
 
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public TokenUnitTest(WebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+        public TokenUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
-            _factory = factory.WithTestConfig(outputHelper);
+            _factory = factory.WithTestLogging(outputHelper);
         }
 
         [Fact]
