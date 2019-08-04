@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Timeline.Entities;
 
 namespace Timeline.Tests.Helpers
