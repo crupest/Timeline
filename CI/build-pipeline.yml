@@ -14,7 +14,7 @@ steps:
     dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
   displayName: Dotnet Restore
 
-- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx
+- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage"
   displayName: Dotnet Test
 
 - task: PublishTestResults@2
@@ -22,3 +22,9 @@ steps:
   inputs:
     testRunner: VSTest
     testResultsFiles: '**/*.trx'
+
+- task: PublishCodeCoverageResults@1
+  condition: succeededOrFailed()
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '**/coverage.cobertura.xml'
