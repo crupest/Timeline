@@ -24,12 +24,12 @@ namespace Timeline.Tests.Helpers
                     .ConfigureServices(services =>
                     {
                         var serviceProvider = new ServiceCollection()
-                            .AddEntityFrameworkInMemoryDatabase()
+                            .AddEntityFrameworkSqlite()
                             .BuildServiceProvider();
 
                         services.AddDbContext<DatabaseContext>(options =>
                         {
-                            options.UseInMemoryDatabase("timeline");
+                            options.UseSqlite("Data Source=:memory:;"); //TODO! This not work!
                             options.UseInternalServiceProvider(serviceProvider);
                         });
 

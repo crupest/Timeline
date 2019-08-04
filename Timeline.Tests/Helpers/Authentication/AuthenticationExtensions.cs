@@ -10,9 +10,9 @@ namespace Timeline.Tests.Helpers.Authentication
     {
         private const string CreateTokenUrl = "/token/create";
 
-        public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password)
+        public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, double? expireOffset = null)
         {
-            var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password });
+            var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, ExpireOffset = expireOffset });
             var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
             return result;
         }
