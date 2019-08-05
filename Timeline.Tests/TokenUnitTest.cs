@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Timeline.Controllers;
-using Timeline.Entities.Http;
+using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
@@ -28,7 +28,37 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void CreateTokenTest_UserNotExist()
+        public async void CreateToken_MissingUsername()
+        {
+            using (var client = _factory.CreateDefaultClient())
+            {
+                await InvalidModelTestHelpers.TestPostInvalidModel(client, CreateTokenUrl,
+                    new CreateTokenRequest { Username = null, Password = "user" });
+            }
+        }
+
+        [Fact]
+        public async void CreateToken_InvalidModel_MissingPassword()
+        {
+            using (var client = _factory.CreateDefaultClient())
+            {
+                await InvalidModelTestHelpers.TestPostInvalidModel(client, CreateTokenUrl,
+                    new CreateTokenRequest { Username = "user", Password = null });
+            }
+        }
+
+        [Fact]
+        public async void CreateToken_InvalidModel_BadExpireOffset()
+        {
+            using (var client = _factory.CreateDefaultClient())
+            {
+                await InvalidModelTestHelpers.TestPostInvalidModel(client, CreateTokenUrl,
+                    new CreateTokenRequest { Username = "user", Password = "user", ExpireOffset = -1000 });
+            }
+        }
+
+        [Fact]
+        public async void CreateToken_UserNotExist()
         {
             using (var client = _factory.CreateDefaultClient())
             {
@@ -40,7 +70,7 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void CreateTokenTest_BadPassword()
+        public async void CreateToken_BadPassword()
         {
             using (var client = _factory.CreateDefaultClient())
             {
@@ -52,19 +82,7 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void CreateTokenTest_BadExpireOffset()
-        {
-            using (var client = _factory.CreateDefaultClient())
-            {
-                var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = "???", Password = "???", ExpireOffset = -1000 });
-                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-                var body = await response.ReadBodyAsJson<CommonResponse>();
-                Assert.Equal(TokenController.ErrorCodes.Create_BadExpireOffset, body.Code);
-            }
-        }
-
-        [Fact]
-        public async void CreateTokenTest_Success()
+        public async void CreateToken_Success()
         {
             using (var client = _factory.CreateDefaultClient())
             {
@@ -77,7 +95,17 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void VerifyTokenTest_BadToken()
+        public async void VerifyToken_InvalidModel_MissingToken()
+        {
+            using (var client = _factory.CreateDefaultClient())
+            {
+                await InvalidModelTestHelpers.TestPostInvalidModel(client, VerifyTokenUrl,
+                    new VerifyTokenRequest { Token = null });
+            }
+        }
+
+        [Fact]
+        public async void VerifyToken_BadToken()
         {
             using (var client = _factory.CreateDefaultClient())
             {
@@ -89,7 +117,7 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void VerifyTokenTest_BadVersion_AND_UserNotExist()
+        public async void VerifyToken_BadVersion_AND_UserNotExist()
         {
             using (var client = _factory.CreateDefaultClient())
             {
@@ -131,7 +159,7 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void VerifyTokenTest_Expired()
+        public async void VerifyToken_Expired()
         {
             using (var client = _factory.CreateDefaultClient())
             {
@@ -148,7 +176,7 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void VerifyTokenTest_Success()
+        public async void VerifyToken_Success()
         {
             using (var client = _factory.CreateDefaultClient())
             {

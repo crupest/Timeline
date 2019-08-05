@@ -1,11 +1,16 @@
-﻿namespace Timeline.Entities.Http
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Timeline.Models.Http
 {
     public class CreateTokenRequest
     {
+        [Required]
         public string Username { get; set; }
+        [Required]
         public string Password { get; set; }
-        // in day
-        public double? ExpireOffset { get; set; }
+        // in days, optional
+        [Range(1, 365)]
+        public int? ExpireOffset { get; set; }
     }
 
     public class CreateTokenResponse
@@ -16,6 +21,7 @@
 
     public class VerifyTokenRequest
     {
+        [Required]
         public string Token { get; set; }
     }
 

@@ -5,13 +5,14 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Entities.Http;
+using Timeline.Models.Http;
 using Timeline.Services;
 using static Timeline.Helpers.MyLogHelper;
 
 namespace Timeline.Controllers
 {
     [Route("token")]
+    [ApiController]
     public class TokenController : Controller
     {
         private static class LoggingEventIds
@@ -60,22 +61,9 @@ namespace Timeline.Controllers
                     Pair("Expire Offset (in days)", request.ExpireOffset)));
             }
 
-            TimeSpan? expireOffset = null;
-            if (request.ExpireOffset != null)
-            {
-                if (request.ExpireOffset.Value <= 0.0)
-                {
-                    const string message = "Expire time is not bigger than 0.";
-                    var code = ErrorCodes.Create_BadExpireOffset;
-                    LogFailure(message, code);
-                    return BadRequest(new CommonResponse(code, message));
-                }
-                expireOffset = TimeSpan.FromDays(request.ExpireOffset.Value);
-            }
-
             try
             {
-                var expiredTime = expireOffset == null ? null : (DateTime?)(_clock.GetCurrentTime() + expireOffset.Value);
+                var expiredTime = request.ExpireOffset == null ? null : (DateTime?)(_clock.GetCurrentTime().AddDays(request.ExpireOffset.Value));
                 var result = await _userService.CreateToken(request.Username, request.Password, expiredTime);
                 _logger.LogInformation(LoggingEventIds.CreateSucceeded, FormatLogMessage("Attemp to login succeeded.",
                     Pair("Username", request.Username),

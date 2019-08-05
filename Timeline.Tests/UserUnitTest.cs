@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Timeline.Entities;
+using Timeline.Models;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Xunit;

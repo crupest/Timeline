@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Timeline.Models;
+using Timeline.Entities;
 using Timeline.Services;
 using Xunit.Abstractions;
 
