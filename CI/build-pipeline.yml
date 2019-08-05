@@ -9,12 +9,17 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: sdk
+    version: 2.2.x
+
 - script: |
     dotnet restore Timeline/Timeline.csproj --configfile nuget.config
     dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
   displayName: Dotnet Restore
 
-- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx
+- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage"
   displayName: Dotnet Test
 
 - task: PublishTestResults@2
@@ -22,3 +27,9 @@ steps:
   inputs:
     testRunner: VSTest
     testResultsFiles: '**/*.trx'
+
+- task: PublishCodeCoverageResults@1
+  condition: succeededOrFailed()
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '**/TestResults/*/coverage.cobertura.xml'
