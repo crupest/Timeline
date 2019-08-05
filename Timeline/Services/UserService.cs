@@ -6,8 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
-using static Timeline.Entities.UserUtility;
 using static Timeline.Helpers.MyLogHelper;
+using static Timeline.Models.UserUtility;
 
 namespace Timeline.Services
 {

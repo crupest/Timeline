@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timeline.Entities.Http;
+using Timeline.Models.Http;
 
 namespace Timeline.Tests.Helpers.Authentication
 {
@@ -10,7 +10,7 @@ namespace Timeline.Tests.Helpers.Authentication
     {
         private const string CreateTokenUrl = "/token/create";
 
-        public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, double? expireOffset = null)
+        public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, int? expireOffset = null)
         {
             var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, ExpireOffset = expireOffset });
             var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());

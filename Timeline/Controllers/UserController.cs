@@ -4,13 +4,14 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Timeline.Authenticate;
-using Timeline.Entities;
-using Timeline.Entities.Http;
+using Timeline.Models;
+using Timeline.Models.Http;
 using Timeline.Services;
 using static Timeline.Helpers.MyLogHelper;
 
 namespace Timeline.Controllers
 {
+    [ApiController]
     public class UserController : Controller
     {
         private static class ErrorCodes

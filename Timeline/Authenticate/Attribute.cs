@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Timeline.Models;
+using Timeline.Entities;
 
 namespace Timeline.Authenticate
 {

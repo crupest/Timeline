@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Timeline.Models
+namespace Timeline.Entities
 {
     public static class UserRoles
     {

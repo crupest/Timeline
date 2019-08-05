@@ -1,7 +1,21 @@
-﻿namespace Timeline.Entities.Http
+﻿namespace Timeline.Models.Http
 {
     public class CommonResponse
     {
+        public static class ErrorCodes
+        {
+            /// <summary>
+            /// Used when the model is invaid.
+            /// For example a required field is null.
+            /// </summary>
+            public const int InvalidModel = -100;
+        }
+
+        public static CommonResponse InvalidModel(string message)
+        {
+            return new CommonResponse(ErrorCodes.InvalidModel, message);
+        }
+
         public CommonResponse()
         {
 
