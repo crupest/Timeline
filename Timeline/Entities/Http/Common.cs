@@ -1,4 +1,4 @@
-﻿namespace Timeline.Entities.Http
+namespace Timeline.Entities.Http
 {
     public class CommonResponse
     {

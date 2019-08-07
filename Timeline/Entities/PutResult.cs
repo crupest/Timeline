@@ -1,4 +1,4 @@
-﻿namespace Timeline.Entities
+namespace Timeline.Entities
 {
     /// <summary>
     /// Represents the result of a "put" operation.
