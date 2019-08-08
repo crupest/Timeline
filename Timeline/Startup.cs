@@ -89,7 +89,7 @@ namespace Timeline
 
             app.UseAuthentication();
 
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc();
         }
     }
 }
