@@ -7,7 +7,7 @@ namespace Timeline.Models.Http
         [Required]
         public string Password { get; set; }
         [Required]
-        public bool Administrator { get; set; }
+        public bool? Administrator { get; set; }
     }
 
     public class UserPatchRequest

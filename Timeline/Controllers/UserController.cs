@@ -18,8 +18,6 @@ namespace Timeline.Controllers
         {
             public const int Get_NotExists = -1001;
 
-            public const int Put_NoPassword = -2001;
-
             public const int Patch_NotExists = -3001;
 
             public const int ChangePassword_BadOldPassword = -4001;
@@ -55,13 +53,7 @@ namespace Timeline.Controllers
         [HttpPut("user/{username}"), AdminAuthorize]
         public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
-            if (request.Password == null) // This place will be refactored.
-            {
-                _logger.LogInformation("Attempt to put a user without a password. Username: {} .", username);
-                return BadRequest();
-            }
-
-            var result = await _userService.PutUser(username, request.Password, request.Administrator);
+            var result = await _userService.PutUser(username, request.Password, request.Administrator.Value);
             switch (result)
             {
                 case PutResult.Created:
