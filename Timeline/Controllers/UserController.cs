@@ -16,11 +16,11 @@ namespace Timeline.Controllers
     {
         private static class ErrorCodes
         {
-            public const int Get_NotExists = -1001;
+            public const int Get_NotExist = -1001;
 
-            public const int Patch_NotExists = -3001;
+            public const int Patch_NotExist = -2001;
 
-            public const int ChangePassword_BadOldPassword = -4001;
+            public const int ChangePassword_BadOldPassword = -3001;
         }
 
         private readonly ILogger<UserController> _logger;
@@ -38,19 +38,19 @@ namespace Timeline.Controllers
             return Ok(await _userService.ListUsers());
         }
 
-        [HttpGet("user/{username}"), AdminAuthorize]
+        [HttpGet("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Get([FromRoute] string username)
         {
             var user = await _userService.GetUser(username);
             if (user == null)
             {
                 _logger.LogInformation(FormatLogMessage("Attempt to get a non-existent user.", Pair("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Get_NotExists, "The user does not exist."));
+                return NotFound(new CommonResponse(ErrorCodes.Get_NotExist, "The user does not exist."));
             }
             return Ok(user);
         }
 
-        [HttpPut("user/{username}"), AdminAuthorize]
+        [HttpPut("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
             var result = await _userService.PutUser(username, request.Password, request.Administrator.Value);
@@ -67,7 +67,7 @@ namespace Timeline.Controllers
             }
         }
 
-        [HttpPatch("user/{username}"), AdminAuthorize]
+        [HttpPatch("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute] string username)
         {
             try
@@ -78,11 +78,11 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, FormatLogMessage("Attempt to patch a non-existent user.", Pair("Username", username)));
-                return BadRequest(new CommonResponse(ErrorCodes.Patch_NotExists, "The user does not exist."));
+                return BadRequest(new CommonResponse(ErrorCodes.Patch_NotExist  , "The user does not exist."));
             }
         }
 
-        [HttpDelete("user/{username}"), AdminAuthorize]
+        [HttpDelete("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Delete([FromRoute] string username)
         {
             try
