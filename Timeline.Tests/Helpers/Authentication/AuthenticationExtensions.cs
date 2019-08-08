@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
+using Timeline.Tests.Mock.Data;
 
 namespace Timeline.Tests.Helpers.Authentication
 {
@@ -17,12 +18,22 @@ namespace Timeline.Tests.Helpers.Authentication
             return result;
         }
 
-        public static async Task<HttpClient> CreateClientWithUser<T>(this WebApplicationFactory<T> factory, string username, string password) where T : class
+        public static async Task<HttpClient> CreateClientWithCredential<T>(this WebApplicationFactory<T> factory, string username, string password) where T : class
         {
             var client = factory.CreateDefaultClient();
             var token = (await client.CreateUserTokenAsync(username, password)).Token;
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
             return client;
+        }
+
+        public static Task<HttpClient> CreateClientAsUser<T>(this WebApplicationFactory<T> factory) where T : class
+        {
+            return factory.CreateClientWithCredential(MockUsers.UserUsername, MockUsers.UserPassword);
+        }
+
+        public static Task<HttpClient> CreateClientAsAdmin<T>(this WebApplicationFactory<T> factory) where T : class
+        {
+            return factory.CreateClientWithCredential(MockUsers.AdminUsername, MockUsers.AdminPassword);
         }
     }
 }
