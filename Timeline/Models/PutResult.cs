@@ -1,4 +1,4 @@
-﻿namespace Timeline.Models
+namespace Timeline.Models
 {
     /// <summary>
     /// Represents the result of a "put" operation.

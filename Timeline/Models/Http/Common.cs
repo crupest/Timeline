@@ -1,4 +1,4 @@
-﻿namespace Timeline.Models.Http
+namespace Timeline.Models.Http
 {
     public class CommonResponse
     {
