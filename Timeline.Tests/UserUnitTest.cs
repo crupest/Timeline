@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
+using Timeline.Tests.Mock.Data;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,13 +24,13 @@ namespace Timeline.Tests
         [Fact]
         public async Task UserTest()
         {
-            using (var client = await _factory.CreateClientWithUser("admin", "admin"))
+            using (var client = await _factory.CreateClientAsAdmin())
             {
                 var res1 = await client.GetAsync("users");
                 Assert.Equal(HttpStatusCode.OK, res1.StatusCode);
                 var users = JsonConvert.DeserializeObject<UserInfo[]>(await res1.Content.ReadAsStringAsync()).ToList();
                 users.Sort(UserInfoComparers.Comparer);
-                Assert.Equal(TestMockUsers.MockUserInfos, users, UserInfoComparers.EqualityComparer);
+                Assert.Equal(MockUsers.UserInfos, users, UserInfoComparers.EqualityComparer);
             }
         }
     }

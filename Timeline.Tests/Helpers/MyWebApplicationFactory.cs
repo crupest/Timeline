@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Timeline.Entities;
 using Timeline.Services;
+using Timeline.Tests.Mock.Data;
+using Timeline.Tests.Mock.Services;
 using Xunit.Abstractions;
 
 namespace Timeline.Tests.Helpers
@@ -34,7 +36,7 @@ namespace Timeline.Tests.Helpers
             using (var context = new DatabaseContext(options))
             {
                 context.Database.EnsureCreated();
-                context.Users.AddRange(TestMockUsers.MockUsers);
+                context.Users.AddRange(MockUsers.Users);
                 context.SaveChanges();
             }
         }

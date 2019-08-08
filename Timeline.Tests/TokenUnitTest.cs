@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Timeline.Controllers;
@@ -10,6 +9,8 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
+using Timeline.Tests.Mock.Data;
+using Timeline.Tests.Mock.Services;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -53,7 +54,12 @@ namespace Timeline.Tests
             using (var client = _factory.CreateDefaultClient())
             {
                 await InvalidModelTestHelpers.TestPostInvalidModel(client, CreateTokenUrl,
-                    new CreateTokenRequest { Username = "user", Password = "user", ExpireOffset = -1000 });
+                    new CreateTokenRequest
+                    {
+                        Username = MockUsers.UserUsername,
+                        Password = MockUsers.UserPassword,
+                        ExpireOffset = -1000
+                    });
             }
         }
 
@@ -62,7 +68,8 @@ namespace Timeline.Tests
         {
             using (var client = _factory.CreateDefaultClient())
             {
-                var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = "usernotexist", Password = "???" });
+                var response = await client.PostAsJsonAsync(CreateTokenUrl,
+                    new CreateTokenRequest { Username = "usernotexist", Password = "???" });
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 var body = await response.ReadBodyAsJson<CommonResponse>();
                 Assert.Equal(TokenController.ErrorCodes.Create_UserNotExist, body.Code);
@@ -74,7 +81,8 @@ namespace Timeline.Tests
         {
             using (var client = _factory.CreateDefaultClient())
             {
-                var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = "user", Password = "???" });
+                var response = await client.PostAsJsonAsync(CreateTokenUrl,
+                    new CreateTokenRequest { Username = MockUsers.UserUsername, Password = "???" });
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 var body = await response.ReadBodyAsJson<CommonResponse>();
                 Assert.Equal(TokenController.ErrorCodes.Create_BadPassword, body.Code);
@@ -86,11 +94,12 @@ namespace Timeline.Tests
         {
             using (var client = _factory.CreateDefaultClient())
             {
-                var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = "user", Password = "user" });
+                var response = await client.PostAsJsonAsync(CreateTokenUrl,
+                    new CreateTokenRequest { Username = MockUsers.UserUsername, Password = MockUsers.UserPassword });
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var body = await response.ReadBodyAsJson<CreateTokenResponse>();
                 Assert.NotEmpty(body.Token);
-                Assert.Equal(TestMockUsers.MockUserInfos.Where(u => u.Username == "user").Single(), body.User, UserInfoComparers.EqualityComparer);
+                Assert.Equal(MockUsers.UserUserInfo, body.User, UserInfoComparers.EqualityComparer);
             }
         }
 
@@ -167,8 +176,9 @@ namespace Timeline.Tests
                 // because verify logic is encapsuled in other library.
                 var mockClock = _factory.GetTestClock();
                 mockClock.MockCurrentTime = DateTime.Now - TimeSpan.FromDays(2);
-                var token = (await client.CreateUserTokenAsync("user", "user", 1)).Token;
-                var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
+                var token = (await client.CreateUserTokenAsync(MockUsers.UserUsername, MockUsers.UserPassword, 1)).Token;
+                var response = await client.PostAsJsonAsync(VerifyTokenUrl,
+                    new VerifyTokenRequest { Token = token });
                 var body = await response.ReadBodyAsJson<CommonResponse>();
                 Assert.Equal(TokenController.ErrorCodes.Verify_Expired, body.Code);
                 mockClock.MockCurrentTime = null;
@@ -180,11 +190,12 @@ namespace Timeline.Tests
         {
             using (var client = _factory.CreateDefaultClient())
             {
-                var createTokenResult = await client.CreateUserTokenAsync("user", "user");
-                var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = createTokenResult.Token });
+                var createTokenResult = await client.CreateUserTokenAsync(MockUsers.UserUsername, MockUsers.UserPassword);
+                var response = await client.PostAsJsonAsync(VerifyTokenUrl,
+                    new VerifyTokenRequest { Token = createTokenResult.Token });
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var body = JsonConvert.DeserializeObject<VerifyTokenResponse>(await response.Content.ReadAsStringAsync());
-                Assert.Equal(TestMockUsers.MockUserInfos.Where(u => u.Username == "user").Single(), body.User, UserInfoComparers.EqualityComparer);
+                Assert.Equal(MockUsers.UserUserInfo, body.User, UserInfoComparers.EqualityComparer);
             }
         }
     }
