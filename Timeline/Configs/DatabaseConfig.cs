@@ -1,4 +1,4 @@
-﻿namespace Timeline.Configs
+namespace Timeline.Configs
 {
     public class DatabaseConfig
     {
