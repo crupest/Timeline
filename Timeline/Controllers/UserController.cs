@@ -4,24 +4,23 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Timeline.Authenticate;
-using Timeline.Entities;
-using Timeline.Entities.Http;
+using Timeline.Models;
+using Timeline.Models.Http;
 using Timeline.Services;
 using static Timeline.Helpers.MyLogHelper;
 
 namespace Timeline.Controllers
 {
+    [ApiController]
     public class UserController : Controller
     {
-        private static class ErrorCodes
+        public static class ErrorCodes
         {
-            public const int Get_NotExists = -1001;
+            public const int Get_NotExist = -1001;
 
-            public const int Put_NoPassword = -2001;
+            public const int Patch_NotExist = -2001;
 
-            public const int Patch_NotExists = -3001;
-
-            public const int ChangePassword_BadOldPassword = -4001;
+            public const int ChangePassword_BadOldPassword = -3001;
         }
 
         private readonly ILogger<UserController> _logger;
@@ -39,28 +38,22 @@ namespace Timeline.Controllers
             return Ok(await _userService.ListUsers());
         }
 
-        [HttpGet("user/{username}"), AdminAuthorize]
+        [HttpGet("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Get([FromRoute] string username)
         {
             var user = await _userService.GetUser(username);
             if (user == null)
             {
                 _logger.LogInformation(FormatLogMessage("Attempt to get a non-existent user.", Pair("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Get_NotExists, "The user does not exist."));
+                return NotFound(new CommonResponse(ErrorCodes.Get_NotExist, "The user does not exist."));
             }
             return Ok(user);
         }
 
-        [HttpPut("user/{username}"), AdminAuthorize]
+        [HttpPut("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
-            if (request.Password == null) // This place will be refactored.
-            {
-                _logger.LogInformation("Attempt to put a user without a password. Username: {} .", username);
-                return BadRequest();
-            }
-
-            var result = await _userService.PutUser(username, request.Password, request.Administrator);
+            var result = await _userService.PutUser(username, request.Password, request.Administrator.Value);
             switch (result)
             {
                 case PutResult.Created:
@@ -74,7 +67,7 @@ namespace Timeline.Controllers
             }
         }
 
-        [HttpPatch("user/{username}"), AdminAuthorize]
+        [HttpPatch("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute] string username)
         {
             try
@@ -85,11 +78,11 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, FormatLogMessage("Attempt to patch a non-existent user.", Pair("Username", username)));
-                return BadRequest(new CommonResponse(ErrorCodes.Patch_NotExists, "The user does not exist."));
+                return NotFound(new CommonResponse(ErrorCodes.Patch_NotExist, "The user does not exist."));
             }
         }
 
-        [HttpDelete("user/{username}"), AdminAuthorize]
+        [HttpDelete("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Delete([FromRoute] string username)
         {
             try

@@ -19,7 +19,7 @@ steps:
     dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
   displayName: Dotnet Restore
 
-- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage"
+- script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './coverletArgs.runsettings'
   displayName: Dotnet Test
 
 - task: PublishTestResults@2

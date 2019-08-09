@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Timeline.Models;
 using Timeline.Services;
 
 namespace Timeline.Authenticate
@@ -80,7 +81,7 @@ namespace Timeline.Authenticate
 
                 var identity = new ClaimsIdentity(AuthConstants.Scheme);
                 identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
-                identity.AddClaims(Entities.UserUtility.IsAdminToRoleArray(userInfo.Administrator).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
+                identity.AddClaims(UserUtility.IsAdminToRoleArray(userInfo.Administrator).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
                 principal.AddIdentity(identity);
