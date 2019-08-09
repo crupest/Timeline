@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Timeline.Entities;
+using Timeline.Models;
 
 namespace Timeline.Tests.Helpers
 {

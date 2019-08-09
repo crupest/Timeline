@@ -34,7 +34,7 @@ namespace Timeline.Tests
         [Fact]
         public async Task AuthenticationTest()
         {
-            using (var client = await _factory.CreateClientWithUser("user", "user"))
+            using (var client = await _factory.CreateClientAsUser())
             {
                 var response = await client.GetAsync(AuthorizeUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -44,7 +44,7 @@ namespace Timeline.Tests
         [Fact]
         public async Task UserAuthorizationTest()
         {
-            using (var client = await _factory.CreateClientWithUser("user", "user"))
+            using (var client = await _factory.CreateClientAsUser())
             {
                 var response1 = await client.GetAsync(UserUrl);
                 Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
@@ -56,7 +56,7 @@ namespace Timeline.Tests
         [Fact]
         public async Task AdminAuthorizationTest()
         {
-            using (var client = await _factory.CreateClientWithUser("admin", "admin"))
+            using (var client = await _factory.CreateClientAsAdmin())
             {
                 var response1 = await client.GetAsync(UserUrl);
                 Assert.Equal(HttpStatusCode.OK, response1.StatusCode);

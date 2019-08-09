@@ -1,4 +1,4 @@
-namespace Timeline.Entities
+namespace Timeline.Models
 {
     public sealed class UserInfo
     {

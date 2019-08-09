@@ -8,7 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Timeline.Authenticate;
 using Timeline.Configs;
-using Timeline.Models;
+using Timeline.Entities;
+using Timeline.Helpers;
 using Timeline.Services;
 
 namespace Timeline
@@ -29,7 +30,11 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .ConfigureApiBehaviorOptions(options =>{
+                    options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddCors(options =>
             {
@@ -84,7 +89,7 @@ namespace Timeline
 
             app.UseAuthentication();
 
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc();
         }
     }
 }

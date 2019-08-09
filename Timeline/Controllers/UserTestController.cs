@@ -5,6 +5,7 @@ using Timeline.Authenticate;
 namespace Timeline.Controllers
 {
     [Route("Test/User")]
+    [ApiController]
     public class UserTestController : Controller
     {
         [HttpGet("[action]")]

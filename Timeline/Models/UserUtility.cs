@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using Timeline.Models;
+using Timeline.Entities;
 using Timeline.Services;
 
-namespace Timeline.Entities
+namespace Timeline.Models
 {
     public static class UserUtility
     {
