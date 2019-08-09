@@ -14,6 +14,7 @@ namespace Timeline.Tests.Helpers.Authentication
         public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, int? expireOffset = null)
         {
             var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, ExpireOffset = expireOffset });
+            response.AssertOk();
             var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
             return result;
         }
