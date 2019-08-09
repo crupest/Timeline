@@ -14,7 +14,7 @@ namespace Timeline.Controllers
     [ApiController]
     public class UserController : Controller
     {
-        private static class ErrorCodes
+        public static class ErrorCodes
         {
             public const int Get_NotExist = -1001;
 
@@ -78,7 +78,7 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, FormatLogMessage("Attempt to patch a non-existent user.", Pair("Username", username)));
-                return BadRequest(new CommonResponse(ErrorCodes.Patch_NotExist  , "The user does not exist."));
+                return NotFound(new CommonResponse(ErrorCodes.Patch_NotExist, "The user does not exist."));
             }
         }
 
