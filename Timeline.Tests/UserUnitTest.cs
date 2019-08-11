@@ -1,5 +1,5 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Controllers;
@@ -28,15 +28,9 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 var res = await client.GetAsync("users");
-                Assert.Equal(HttpStatusCode.OK, res.StatusCode);
-
                 // Because tests are running asyncronized. So database may be modified and
                 // we can't check the exact user lists at this point. So only check the format.
-
-                // var users = (await res.ReadBodyAsJson<UserInfo[]>()).ToList();
-                // users.Sort(UserInfoComparers.Comparer);
-                // Assert.Equal(MockUsers.UserInfos, users, UserInfoComparers.EqualityComparer);
-                await res.ReadBodyAsJson<UserInfo[]>();
+                res.Should().HaveStatusCodeOk().And.Should().HaveBodyAsJson<UserInfo[]>();
             }
         }
 
@@ -46,9 +40,9 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 var res = await client.GetAsync("users/" + MockUsers.UserUsername);
-                res.AssertOk();
-                var user = await res.ReadBodyAsJson<UserInfo>();
-                Assert.Equal(MockUsers.UserUserInfo, user, UserInfoComparers.EqualityComparer);
+                res.Should().HaveStatusCodeOk()
+                    .And.Should().HaveBodyAsJson<UserInfo>()
+                    .Which.Should().BeEquivalentTo(MockUsers.UserUserInfo);
             }
         }
 
@@ -58,9 +52,8 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 var res = await client.GetAsync("users/usernotexist");
-                res.AssertNotFound();
-                var body = await res.ReadBodyAsJson<CommonResponse>();
-                Assert.Equal(UserController.ErrorCodes.Get_NotExist, body.Code);
+                res.Should().HaveStatusCodeNotFound()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.Get_NotExist);
             }
         }
 
@@ -80,9 +73,9 @@ namespace Timeline.Tests
                 async Task CheckAdministrator(bool administrator)
                 {
                     var res = await client.GetAsync(url);
-                    res.AssertOk();
-                    var body = await res.ReadBodyAsJson<UserInfo>();
-                    Assert.Equal(administrator, body.Administrator);
+                    res.Should().HaveStatusCodeOk()
+                        .And.Should().HaveBodyAsJson<UserInfo>()
+                        .Which.Administrator.Should().Be(administrator);
                 }
 
                 {
@@ -92,7 +85,7 @@ namespace Timeline.Tests
                         Password = password,
                         Administrator = false
                     });
-                    await res.AssertIsPutCreated();
+                    res.Should().BePutCreated();
                     await CheckAdministrator(false);
                 }
 
@@ -103,38 +96,37 @@ namespace Timeline.Tests
                         Password = password,
                         Administrator = true
                     });
-                    await res.AssertIsPutModified();
+                    res.Should().BePutModified();
                     await CheckAdministrator(true);
                 }
 
                 // Patch Not Exist
                 {
                     var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
-                    res.AssertNotFound();
-                    var body = await res.ReadBodyAsJson<CommonResponse>();
-                    Assert.Equal(UserController.ErrorCodes.Patch_NotExist, body.Code);
+                    res.Should().HaveStatusCodeNotFound()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.Patch_NotExist);
                 }
 
                 // Patch Success
                 {
                     var res = await client.PatchAsJsonAsync(url, new UserPatchRequest { Administrator = false });
-                    res.AssertOk();
+                    res.Should().HaveStatusCodeOk();
                     await CheckAdministrator(false);
                 }
 
                 // Delete Deleted
                 {
                     var res = await client.DeleteAsync(url);
-                    await res.AssertIsDeleteDeleted();
+                    res.Should().BeDeleteDeleted();
 
                     var res2 = await client.GetAsync(url);
-                    res2.AssertNotFound();
+                    res2.Should().HaveStatusCodeNotFound();
                 }
 
                 // Delete Not Exist
                 {
                     var res = await client.DeleteAsync(url);
-                    await res.AssertIsDeleteNotExist();
+                    res.Should().BeDeleteNotExist();
                 }
             }
         }
@@ -176,9 +168,8 @@ namespace Timeline.Tests
                 using (var client = await _factory.CreateClientAsUser())
                 {
                     var res = await client.PostAsJsonAsync(url, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
-                    res.AssertBadRequest();
-                    var body = await res.ReadBodyAsJson<CommonResponse>();
-                    Assert.Equal(UserController.ErrorCodes.ChangePassword_BadOldPassword, body.Code);
+                    res.Should().HaveStatusCodeBadRequest()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.ChangePassword_BadOldPassword);
                 }
             }
 
@@ -192,14 +183,14 @@ namespace Timeline.Tests
                 using (var client = await _factory.CreateClientAsAdmin())
                 {
                     var res = await client.PutAsJsonAsync("users/" + username, new UserPutRequest { Password = password, Administrator = false });
-                    Assert.Equal(HttpStatusCode.Created, res.StatusCode);
+                    res.Should().BePutCreated();
                 }
 
                 using (var client = await _factory.CreateClientWithCredential(username, password))
                 {
                     const string newPassword = "new";
                     var res = await client.PostAsJsonAsync(url, new ChangePasswordRequest { OldPassword = password, NewPassword = newPassword });
-                    res.AssertOk();
+                    res.Should().HaveStatusCodeOk();
                     await client.CreateUserTokenAsync(username, newPassword);
                 }
             }
