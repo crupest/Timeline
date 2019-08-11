@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
+using FluentAssertions.Formatting;
 using FluentAssertions.Primitives;
 using Newtonsoft.Json;
 using System;
@@ -9,9 +10,31 @@ using Timeline.Models.Http;
 
 namespace Timeline.Tests.Helpers
 {
-    public class HttpResponseMessageAssertions
-        : ReferenceTypeAssertions<HttpResponseMessage, HttpResponseMessageAssertions>
+    public class HttpResponseMessageValueFormatter : IValueFormatter
     {
+        public bool CanHandle(object value)
+        {
+            return value is HttpResponseMessage;
+        }
+
+        public string Format(object value, FormattingContext context, FormatChild formatChild)
+        {
+            string newline = context.UseLineBreaks ? Environment.NewLine : "";
+            string padding = new string('\t', context.Depth);
+
+            var res = (HttpResponseMessage)value;
+            return $"{newline}{padding} Status Code: {res.StatusCode} ; Body: {res.Content.ReadAsStringAsync().Result} ;";
+        }
+    }
+
+    public class HttpResponseMessageAssertions
+            : ReferenceTypeAssertions<HttpResponseMessage, HttpResponseMessageAssertions>
+    {
+        static HttpResponseMessageAssertions()
+        {
+            Formatter.AddFormatter(new HttpResponseMessageValueFormatter());
+        }
+
         public HttpResponseMessageAssertions(HttpResponseMessage instance)
         {
             Subject = instance;
@@ -23,7 +46,7 @@ namespace Timeline.Tests.Helpers
         {
             Execute.Assertion.BecauseOf(because, becauseArgs)
                 .ForCondition(Subject.StatusCode == expected)
-                .FailWith("Expected status code is {}, but found {}.", expected, Subject.StatusCode);
+                .FailWith("Expected status code of {context:HttpResponseMessage} to be {0}{reason}, but found {1}.\nResponse is {2}.", expected, Subject.StatusCode, Subject);
             return new AndConstraint<HttpResponseMessage>(Subject);
         }
 
@@ -37,7 +60,7 @@ namespace Timeline.Tests.Helpers
             }
             catch (Exception e)
             {
-                a.FailWith("Failed to read response body. Exception is {}.", e);
+                a.FailWith("Failed to read response body of {context:HttpResponseMessage}{reason}.\nException is {0}.", e);
                 return new AndWhichConstraint<HttpResponseMessage, T>(Subject, null);
             }
 
@@ -48,7 +71,7 @@ namespace Timeline.Tests.Helpers
             }
             catch (Exception e)
             {
-                a.FailWith("Failed to convert response body to {}. Exception is {}.", typeof(T).FullName, e);
+                a.FailWith("Failed to convert response body of {context:HttpResponseMessage} to {0}{reason}.\nResponse is {1}.\nException is {2}.", typeof(T).FullName, Subject, e);
                 return new AndWhichConstraint<HttpResponseMessage, T>(Subject, null);
             }
         }
