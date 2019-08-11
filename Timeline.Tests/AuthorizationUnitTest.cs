@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Threading.Tasks;
@@ -5,7 +6,6 @@ using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Xunit;
 using Xunit.Abstractions;
-using FluentAssertions;
 
 namespace Timeline.Tests
 {
