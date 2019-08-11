@@ -1,8 +1,7 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using System;
-using System.Net;
 using System.Net.Http;
 using Timeline.Controllers;
 using Timeline.Models.Http;
@@ -70,9 +69,8 @@ namespace Timeline.Tests
             {
                 var response = await client.PostAsJsonAsync(CreateTokenUrl,
                     new CreateTokenRequest { Username = "usernotexist", Password = "???" });
-                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-                var body = await response.ReadBodyAsJson<CommonResponse>();
-                Assert.Equal(TokenController.ErrorCodes.Create_UserNotExist, body.Code);
+                response.Should().HaveStatusCodeBadRequest()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Create_UserNotExist);
             }
         }
 
@@ -83,9 +81,8 @@ namespace Timeline.Tests
             {
                 var response = await client.PostAsJsonAsync(CreateTokenUrl,
                     new CreateTokenRequest { Username = MockUsers.UserUsername, Password = "???" });
-                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-                var body = await response.ReadBodyAsJson<CommonResponse>();
-                Assert.Equal(TokenController.ErrorCodes.Create_BadPassword, body.Code);
+                response.Should().HaveStatusCodeBadRequest()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Create_BadPassword);
             }
         }
 
@@ -96,10 +93,10 @@ namespace Timeline.Tests
             {
                 var response = await client.PostAsJsonAsync(CreateTokenUrl,
                     new CreateTokenRequest { Username = MockUsers.UserUsername, Password = MockUsers.UserPassword });
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                var body = await response.ReadBodyAsJson<CreateTokenResponse>();
-                Assert.NotEmpty(body.Token);
-                Assert.Equal(MockUsers.UserUserInfo, body.User, UserInfoComparers.EqualityComparer);
+                var body = response.Should().HaveStatusCodeOk()
+                   .And.Should().HaveBodyAsJson<CreateTokenResponse>().Which;
+                body.Token.Should().NotBeNullOrWhiteSpace();
+                body.User.Should().BeEquivalentTo(MockUsers.UserUserInfo);
             }
         }
 
@@ -119,9 +116,8 @@ namespace Timeline.Tests
             using (var client = _factory.CreateDefaultClient())
             {
                 var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = "bad token hahaha" });
-                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-                var body = await response.ReadBodyAsJson<CommonResponse>();
-                Assert.Equal(TokenController.ErrorCodes.Verify_BadToken, body.Code);
+                response.Should().HaveStatusCodeBadRequest()
+                     .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_BadToken);
             }
         }
 
@@ -148,9 +144,9 @@ namespace Timeline.Tests
 
                     // test against bad version
                     var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
-                    Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-                    var body = await response.ReadBodyAsJson<CommonResponse>();
-                    Assert.Equal(TokenController.ErrorCodes.Verify_BadVersion, body.Code);
+                    response.Should().HaveStatusCodeBadRequest()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_BadVersion);
+
 
                     // create another token
                     var token2 = (await client.CreateUserTokenAsync(username, password)).Token;
@@ -160,9 +156,8 @@ namespace Timeline.Tests
 
                     // test against user not exist
                     var response2 = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
-                    Assert.Equal(HttpStatusCode.BadRequest, response2.StatusCode);
-                    var body2 = await response2.ReadBodyAsJson<CommonResponse>();
-                    Assert.Equal(TokenController.ErrorCodes.Verify_UserNotExist, body2.Code);
+                    response2.Should().HaveStatusCodeBadRequest()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_UserNotExist);
                 }
             }
         }
@@ -179,8 +174,8 @@ namespace Timeline.Tests
                 var token = (await client.CreateUserTokenAsync(MockUsers.UserUsername, MockUsers.UserPassword, 1)).Token;
                 var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                     new VerifyTokenRequest { Token = token });
-                var body = await response.ReadBodyAsJson<CommonResponse>();
-                Assert.Equal(TokenController.ErrorCodes.Verify_Expired, body.Code);
+                response.Should().HaveStatusCodeBadRequest()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_Expired);
                 mockClock.MockCurrentTime = null;
             }
         }
@@ -193,9 +188,9 @@ namespace Timeline.Tests
                 var createTokenResult = await client.CreateUserTokenAsync(MockUsers.UserUsername, MockUsers.UserPassword);
                 var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                     new VerifyTokenRequest { Token = createTokenResult.Token });
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                var body = JsonConvert.DeserializeObject<VerifyTokenResponse>(await response.Content.ReadAsStringAsync());
-                Assert.Equal(MockUsers.UserUserInfo, body.User, UserInfoComparers.EqualityComparer);
+                response.Should().HaveStatusCodeOk()
+                    .And.Should().HaveBodyAsJson<VerifyTokenResponse>()
+                    .Which.User.Should().BeEquivalentTo(MockUsers.UserUserInfo);
             }
         }
     }
