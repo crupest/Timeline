@@ -1,8 +1,7 @@
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using System;
-using System.Net;
 using System.Net.Http;
 using Timeline.Controllers;
 using Timeline.Models.Http;
@@ -13,7 +12,6 @@ using Timeline.Tests.Mock.Data;
 using Timeline.Tests.Mock.Services;
 using Xunit;
 using Xunit.Abstractions;
-using FluentAssertions;
 
 namespace Timeline.Tests
 {
