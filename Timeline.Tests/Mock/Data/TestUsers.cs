@@ -3,7 +3,6 @@ using System.Linq;
 using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Services;
-using Timeline.Tests.Helpers;
 
 namespace Timeline.Tests.Mock.Data
 {
@@ -34,13 +33,12 @@ namespace Timeline.Tests.Mock.Data
             var mockUserInfos = mockUsers.Select(u => UserUtility.CreateUserInfo(u)).ToList();
             UserUserInfo = mockUserInfos[0];
             AdminUserInfo = mockUserInfos[1];
-            mockUserInfos.Sort(UserInfoComparers.Comparer);
             UserInfos = mockUserInfos;
         }
 
         public const string UserUsername = "user";
         public const string AdminUsername = "admin";
-        public const string UserPassword= "user";
+        public const string UserPassword = "user";
         public const string AdminPassword = "admin";
 
         internal static IReadOnlyList<User> Users { get; }

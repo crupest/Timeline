@@ -5,6 +5,7 @@ using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Xunit;
 using Xunit.Abstractions;
+using FluentAssertions;
 
 namespace Timeline.Tests
 {
@@ -27,7 +28,7 @@ namespace Timeline.Tests
             using (var client = _factory.CreateDefaultClient())
             {
                 var response = await client.GetAsync(AuthorizeUrl);
-                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+                response.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
             }
         }
 
@@ -37,7 +38,7 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsUser())
             {
                 var response = await client.GetAsync(AuthorizeUrl);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                response.Should().HaveStatusCode(HttpStatusCode.OK);
             }
         }
 
@@ -47,9 +48,9 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsUser())
             {
                 var response1 = await client.GetAsync(UserUrl);
-                Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+                response1.Should().HaveStatusCode(HttpStatusCode.OK);
                 var response2 = await client.GetAsync(AdminUrl);
-                Assert.Equal(HttpStatusCode.Forbidden, response2.StatusCode);
+                response2.Should().HaveStatusCode(HttpStatusCode.Forbidden);
             }
         }
 
@@ -59,9 +60,9 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 var response1 = await client.GetAsync(UserUrl);
-                Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+                response1.Should().HaveStatusCode(HttpStatusCode.OK);
                 var response2 = await client.GetAsync(AdminUrl);
-                Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+                response2.Should().HaveStatusCode(HttpStatusCode.OK);
             }
         }
     }
