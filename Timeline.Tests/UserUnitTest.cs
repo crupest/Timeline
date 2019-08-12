@@ -79,6 +79,17 @@ namespace Timeline.Tests
                 }
 
                 {
+                    // Put Bad Username.
+                    var res = await client.PutAsJsonAsync("users/dsf fddf", new UserPutRequest
+                    {
+                        Password = password,
+                        Administrator = false
+                    });
+                    res.Should().HaveStatusCodeBadRequest()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.Put_BadUsername);
+                }
+
+                {
                     // Put Created.
                     var res = await client.PutAsJsonAsync(url, new UserPutRequest
                     {
