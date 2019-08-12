@@ -18,9 +18,11 @@ namespace Timeline.Controllers
         {
             public const int Get_NotExist = -1001;
 
-            public const int Patch_NotExist = -2001;
+            public const int Put_BadUsername = -2001;
 
-            public const int ChangePassword_BadOldPassword = -3001;
+            public const int Patch_NotExist = -3001;
+
+            public const int ChangePassword_BadOldPassword = -4001;
         }
 
         private readonly ILogger<UserController> _logger;
@@ -53,17 +55,25 @@ namespace Timeline.Controllers
         [HttpPut("users/{username}"), AdminAuthorize]
         public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
-            var result = await _userService.PutUser(username, request.Password, request.Administrator.Value);
-            switch (result)
+            try
             {
-                case PutResult.Created:
-                    _logger.LogInformation(FormatLogMessage("A user is created.", Pair("Username", username)));
-                    return CreatedAtAction("Get", new { username }, CommonPutResponse.Created);
-                case PutResult.Modified:
-                    _logger.LogInformation(FormatLogMessage("A user is modified.", Pair("Username", username)));
-                    return Ok(CommonPutResponse.Modified);
-                default:
-                    throw new Exception("Unreachable code.");
+                var result = await _userService.PutUser(username, request.Password, request.Administrator.Value);
+                switch (result)
+                {
+                    case PutResult.Created:
+                        _logger.LogInformation(FormatLogMessage("A user is created.", Pair("Username", username)));
+                        return CreatedAtAction("Get", new { username }, CommonPutResponse.Created);
+                    case PutResult.Modified:
+                        _logger.LogInformation(FormatLogMessage("A user is modified.", Pair("Username", username)));
+                        return Ok(CommonPutResponse.Modified);
+                    default:
+                        throw new Exception("Unreachable code.");
+                }
+            }
+            catch (UsernameBadFormatException e)
+            {
+                _logger.LogInformation(e, FormatLogMessage("Attempt to create a user with bad username failed.", Pair("Username", username)));
+                return BadRequest(new CommonResponse(ErrorCodes.Put_BadUsername, "Username is of bad format."));
             }
         }
 
