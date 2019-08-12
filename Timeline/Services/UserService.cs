@@ -278,6 +278,8 @@ namespace Timeline.Services
         private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
 
+        private readonly UsernameValidator _usernameValidator;
+
         public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
         {
             _logger = logger;
@@ -285,6 +287,8 @@ namespace Timeline.Services
             _databaseContext = databaseContext;
             _jwtService = jwtService;
             _passwordService = passwordService;
+
+            _usernameValidator = new UsernameValidator();
         }
 
         private string GenerateCacheKeyByUserId(long id) => $"user:{id}";
@@ -376,6 +380,11 @@ namespace Timeline.Services
                 throw new ArgumentNullException(nameof(username));
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
+
+            if (!_usernameValidator.Validate(username, out var message))
+            {
+                throw new UsernameBadFormatException(username, message);
+            }
 
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
 
