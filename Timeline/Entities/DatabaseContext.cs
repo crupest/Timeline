@@ -10,13 +10,13 @@ namespace Timeline.Entities
         public const string User = "user";
     }
 
-    [Table("user")]
+    [Table("users")]
     public class User
     {
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Column("name"), Required]
+        [Column("name"), MaxLength(26), Required]
         public string Name { get; set; }
 
         [Column("password"), Required]
@@ -34,6 +34,12 @@ namespace Timeline.Entities
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
+
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().Property(e => e.Version).HasDefaultValue(0);
 
         }
 
