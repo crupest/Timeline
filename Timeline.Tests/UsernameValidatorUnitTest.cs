@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using System;
-using Timeline.Services;
+using Timeline.Models.Validation;
 using Xunit;
 
 namespace Timeline.Tests
