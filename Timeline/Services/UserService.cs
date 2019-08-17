@@ -3,10 +3,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
+using Timeline.Models.Validation;
 using static Timeline.Helpers.MyLogHelper;
 using static Timeline.Models.UserUtility;
 
@@ -119,56 +119,6 @@ namespace Timeline.Services
         /// Username of bad format.
         /// </summary>
         public string Username { get; private set; }
-    }
-
-    public class UsernameValidator
-    {
-        public const int MaxLength = 26;
-        public const string RegexPattern = @"^[a-zA-Z0-9_][a-zA-Z0-9-_]*$";
-
-        private readonly Regex _regex = new Regex(RegexPattern);
-
-        /// <summary>
-        /// Validate a username.
-        /// </summary>
-        /// <param name="username">The username. Can't be null.</param>
-        /// <param name="message">Set as error message if there is error. Or null if no error.</param>
-        /// <returns>True if validation passed. Otherwise false.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
-        public bool Validate(string username, out string message)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-
-            if (username.Length == 0)
-            {
-                message = "An empty string is not permitted.";
-                return false;
-            }
-
-            if (username.Length > 26)
-            {
-                message = $"Too long, more than 26 characters is not premitted, found {username.Length}.";
-                return false;
-            }
-
-            foreach ((char c, int i) in username.Select((c, i) => (c, i)))
-                if (char.IsWhiteSpace(c))
-                {
-                    message = $"A whitespace is found at {i} . Whitespace is not permited.";
-                    return false;
-                }
-
-            var match = _regex.Match(username);
-            if (!match.Success)
-            {
-                message = "Regex match failed.";
-                return false;
-            }
-
-            message = null;
-            return true;
-        }
     }
 
     public interface IUserService
