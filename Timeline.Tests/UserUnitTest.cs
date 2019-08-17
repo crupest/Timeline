@@ -185,6 +185,80 @@ namespace Timeline.Tests
             }
         }
 
+
+        public class ChangeUsernameUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
+        {
+            private const string url = "userop/changeusername";
+
+            private readonly WebApplicationFactory<Startup> _factory;
+            private readonly Action _disposeAction;
+
+            public ChangeUsernameUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+            {
+                _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+            }
+
+            public void Dispose()
+            {
+                _disposeAction();
+            }
+
+            [Fact]
+            public async Task InvalidModel()
+            {
+                using (var client = await _factory.CreateClientAsAdmin())
+                {
+                    // missing old username
+                    await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
+                        new ChangeUsernameRequest { OldUsername= null, NewUsername= "hhh" });
+                    // missing new username
+                    await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
+                        new ChangeUsernameRequest { OldUsername= "hhh", NewUsername= null });
+                    // bad username
+                    await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
+                        new ChangeUsernameRequest { OldUsername = "hhh", NewUsername = "???" });
+                }
+            }
+
+            [Fact]
+            public async Task UserNotExist()
+            {
+                using (var client = await _factory.CreateClientAsAdmin())
+                {
+                    var res = await client.PostAsJsonAsync(url,
+                        new ChangeUsernameRequest{ OldUsername= "usernotexist", NewUsername= "newUsername" });
+                    res.Should().HaveStatusCodeBadRequest()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.ChangeUsername_NotExist);
+                }
+            }
+
+            [Fact]
+            public async Task UserAlreadyExist()
+            {
+                using (var client = await _factory.CreateClientAsAdmin())
+                {
+                    var res = await client.PostAsJsonAsync(url,
+                        new ChangeUsernameRequest { OldUsername = MockUsers.UserUsername, NewUsername = MockUsers.AdminUsername });
+                    res.Should().HaveStatusCodeBadRequest()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.ChangeUsername_AlreadyExist);
+                }
+            }
+
+            [Fact]
+            public async Task Success()
+            {
+                using (var client = await _factory.CreateClientAsAdmin())
+                {
+                    const string newUsername = "hahaha";
+                    var res = await client.PostAsJsonAsync(url,
+                        new ChangeUsernameRequest { OldUsername = MockUsers.UserUsername, NewUsername = newUsername });
+                    res.Should().HaveStatusCodeOk();
+                    await client.CreateUserTokenAsync(newUsername, MockUsers.UserPassword);
+                }
+            }
+        }
+
+
         public class ChangePasswordUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
         {
             private const string url = "userop/changepassword";
@@ -201,7 +275,6 @@ namespace Timeline.Tests
             {
                 _disposeAction();
             }
-
 
             [Fact]
             public async Task InvalidModel()
