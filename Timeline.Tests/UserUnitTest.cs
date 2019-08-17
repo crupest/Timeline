@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Controllers;
@@ -13,13 +14,19 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class UserUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
+    public class UserUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
     {
         private readonly WebApplicationFactory<Startup> _factory;
+        private readonly Action _disposeAction;
 
         public UserUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
-            _factory = factory.WithTestLogging(outputHelper);
+            _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+        }
+
+        public void Dispose()
+        {
+            _disposeAction();
         }
 
         [Fact]
@@ -28,9 +35,8 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 var res = await client.GetAsync("users");
-                // Because tests are running asyncronized. So database may be modified and
-                // we can't check the exact user lists at this point. So only check the format.
-                res.Should().HaveStatusCodeOk().And.Should().HaveBodyAsJson<UserInfo[]>();
+                res.Should().HaveStatusCodeOk().And.Should().HaveBodyAsJson<UserInfo[]>()
+                    .Which.Should().BeEquivalentTo(MockUsers.UserInfos);
             }
         }
 
@@ -58,118 +64,156 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async Task Put_Patch_Delete_User()
+        public async Task Put_InvalidModel()
         {
             using (var client = await _factory.CreateClientAsAdmin())
             {
-                const string username = "putpatchdeleteuser";
-                const string password = "password";
+                const string url = "users/aaaaaaaa";
+                // missing password
+                await InvalidModelTestHelpers.TestPutInvalidModel(client, url, new UserPutRequest { Password = null, Administrator = false });
+                // missing administrator
+                await InvalidModelTestHelpers.TestPutInvalidModel(client, url, new UserPutRequest { Password = "???", Administrator = null });
+            }
+        }
+
+        [Fact]
+        public async Task Put_BadUsername()
+        {
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
+                var res = await client.PutAsJsonAsync("users/dsf fddf", new UserPutRequest
+                {
+                    Password = "???",
+                    Administrator = false
+                });
+                res.Should().HaveStatusCodeBadRequest()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.Put_BadUsername);
+            }
+        }
+
+        private async Task CheckAdministrator(HttpClient client, string username, bool administrator)
+        {
+            var res = await client.GetAsync("users/" + username);
+            res.Should().HaveStatusCodeOk()
+                .And.Should().HaveBodyAsJson<UserInfo>()
+                .Which.Administrator.Should().Be(administrator);
+        }
+
+        [Fact]
+        public async Task Put_Modiefied()
+        {
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
+                var res = await client.PutAsJsonAsync("users/" + MockUsers.UserUsername, new UserPutRequest
+                {
+                    Password = "password",
+                    Administrator = false
+                });
+                res.Should().BePutModified();
+                await CheckAdministrator(client, MockUsers.UserUsername, false);
+            }
+        }
+
+        [Fact]
+        public async Task Put_Created()
+        {
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
+                const string username = "puttest";
                 const string url = "users/" + username;
 
-                // Put Invalid Model
-                await InvalidModelTestHelpers.TestPutInvalidModel(client, url, new UserPutRequest { Password = null, Administrator = false });
-                await InvalidModelTestHelpers.TestPutInvalidModel(client, url, new UserPutRequest { Password = password, Administrator = null });
-
-                async Task CheckAdministrator(bool administrator)
+                var res = await client.PutAsJsonAsync(url, new UserPutRequest
                 {
-                    var res = await client.GetAsync(url);
-                    res.Should().HaveStatusCodeOk()
-                        .And.Should().HaveBodyAsJson<UserInfo>()
-                        .Which.Administrator.Should().Be(administrator);
-                }
+                    Password = "password",
+                    Administrator = false
+                });
+                res.Should().BePutCreated();
+                await CheckAdministrator(client, username, false);
+            }
+        }
 
-                {
-                    // Put Bad Username.
-                    var res = await client.PutAsJsonAsync("users/dsf fddf", new UserPutRequest
-                    {
-                        Password = password,
-                        Administrator = false
-                    });
-                    res.Should().HaveStatusCodeBadRequest()
-                        .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.Put_BadUsername);
-                }
+        [Fact]
+        public async Task Patch_NotExist()
+        {
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
+                var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
+                res.Should().HaveStatusCodeNotFound()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.Patch_NotExist);
+            }
+        }
 
+        [Fact]
+        public async Task Patch_Success()
+        {
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
                 {
-                    // Put Created.
-                    var res = await client.PutAsJsonAsync(url, new UserPutRequest
-                    {
-                        Password = password,
-                        Administrator = false
-                    });
-                    res.Should().BePutCreated();
-                    await CheckAdministrator(false);
-                }
-
-                {
-                    // Put Modified.
-                    var res = await client.PutAsJsonAsync(url, new UserPutRequest
-                    {
-                        Password = password,
-                        Administrator = true
-                    });
-                    res.Should().BePutModified();
-                    await CheckAdministrator(true);
-                }
-
-                // Patch Not Exist
-                {
-                    var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
-                    res.Should().HaveStatusCodeNotFound()
-                        .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.Patch_NotExist);
-                }
-
-                // Patch Success
-                {
-                    var res = await client.PatchAsJsonAsync(url, new UserPatchRequest { Administrator = false });
+                    var res = await client.PatchAsJsonAsync("users/" + MockUsers.UserUsername,
+                        new UserPatchRequest { Administrator = false });
                     res.Should().HaveStatusCodeOk();
-                    await CheckAdministrator(false);
+                    await CheckAdministrator(client, MockUsers.UserUsername, false);
                 }
+            }
+        }
 
-                // Delete Deleted
+        [Fact]
+        public async Task Delete_Deleted()
+        {
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
                 {
+                    var url = "users/" + MockUsers.UserUsername;
                     var res = await client.DeleteAsync(url);
                     res.Should().BeDeleteDeleted();
 
                     var res2 = await client.GetAsync(url);
                     res2.Should().HaveStatusCodeNotFound();
                 }
+            }
+        }
 
-                // Delete Not Exist
+        [Fact]
+        public async Task Delete_NotExist()
+        {
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
                 {
-                    var res = await client.DeleteAsync(url);
+                    var res = await client.DeleteAsync("users/usernotexist");
                     res.Should().BeDeleteNotExist();
                 }
             }
         }
 
-
-        public class ChangePasswordUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
+        public class ChangePasswordUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
         {
             private const string url = "userop/changepassword";
 
             private readonly WebApplicationFactory<Startup> _factory;
+            private readonly Action _disposeAction;
 
             public ChangePasswordUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
             {
-                _factory = factory.WithTestLogging(outputHelper);
+                _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+            }
+
+            public void Dispose()
+            {
+                _disposeAction();
             }
 
 
             [Fact]
-            public async Task InvalidModel_OldPassword()
+            public async Task InvalidModel()
             {
                 using (var client = await _factory.CreateClientAsUser())
                 {
-                    await InvalidModelTestHelpers.TestPostInvalidModel(client, url, new ChangePasswordRequest { OldPassword = null, NewPassword = "???" });
-                }
-            }
-
-            [Fact]
-            public async Task InvalidModel_NewPassword()
-            {
-                using (var client = await _factory.CreateClientAsUser())
-                {
-                    await InvalidModelTestHelpers.TestPostInvalidModel(client, url, new ChangePasswordRequest { OldPassword = "???", NewPassword = null });
+                    // missing old password
+                    await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
+                        new ChangePasswordRequest { OldPassword = null, NewPassword = "???" });
+                    // missing new password
+                    await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
+                        new ChangePasswordRequest { OldPassword = "???", NewPassword = null });
                 }
             }
 
@@ -187,22 +231,13 @@ namespace Timeline.Tests
             [Fact]
             public async Task Success()
             {
-                const string username = "changepasswordtest";
-                const string password = "password";
-
-                // create a new user to avoid interference
-                using (var client = await _factory.CreateClientAsAdmin())
-                {
-                    var res = await client.PutAsJsonAsync("users/" + username, new UserPutRequest { Password = password, Administrator = false });
-                    res.Should().BePutCreated();
-                }
-
-                using (var client = await _factory.CreateClientWithCredential(username, password))
+                using (var client = await _factory.CreateClientAsUser())
                 {
                     const string newPassword = "new";
-                    var res = await client.PostAsJsonAsync(url, new ChangePasswordRequest { OldPassword = password, NewPassword = newPassword });
+                    var res = await client.PostAsJsonAsync(url,
+                        new ChangePasswordRequest { OldPassword = MockUsers.UserPassword, NewPassword = newPassword });
                     res.Should().HaveStatusCodeOk();
-                    await client.CreateUserTokenAsync(username, newPassword);
+                    await client.CreateUserTokenAsync(MockUsers.UserUsername, newPassword);
                 }
             }
         }
