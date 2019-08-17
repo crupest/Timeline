@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using System;
-using Timeline.Services;
+using Timeline.Models.Validation;
 using Xunit;
 
 namespace Timeline.Tests
@@ -14,13 +14,6 @@ namespace Timeline.Tests
             _validator = validator;
         }
 
-        [Fact]
-        public void NullShouldThrow()
-        {
-            _validator.Invoking(v => v.Validate(null, out string message)).Should().Throw<ArgumentNullException>();
-        }
-
-
         private string FailAndMessage(string username)
         {
             var result = _validator.Validate(username, out var message);
@@ -31,7 +24,21 @@ namespace Timeline.Tests
         private void Succeed(string username)
         {
             _validator.Validate(username, out var message).Should().BeTrue();
-            message.Should().BeNull();
+            message.Should().Be(ValidationConstants.SuccessMessage);
+        }
+
+        [Fact]
+        public void Null()
+        {
+            FailAndMessage(null).Should().ContainEquivalentOf("null");
+        }
+
+        [Fact]
+        public void NotString()
+        {
+            var result = _validator.Validate(123, out var message);
+            result.Should().BeFalse();
+            message.Should().ContainEquivalentOf("type");
         }
 
         [Fact]

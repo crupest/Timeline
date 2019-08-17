@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
@@ -14,6 +15,15 @@ namespace Timeline.Models.Http
     {
         public string Password { get; set; }
         public bool? Administrator { get; set; }
+    }
+
+    public class ChangeUsernameRequest
+    {
+        [Required]
+        public string OldUsername { get; set; }
+
+        [Required, ValidateWith(typeof(UsernameValidator))]
+        public string NewUsername { get; set; }
     }
 
     public class ChangePasswordRequest

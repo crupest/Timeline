@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using Timeline.Tests.Helpers;
@@ -9,17 +10,23 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class AuthorizationUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
+    public class AuthorizationUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
     {
         private const string AuthorizeUrl = "Test/User/Authorize";
         private const string UserUrl = "Test/User/User";
         private const string AdminUrl = "Test/User/Admin";
 
         private readonly WebApplicationFactory<Startup> _factory;
+        private readonly Action _disposeAction;
 
         public AuthorizationUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
-            _factory = factory.WithTestLogging(outputHelper);
+            _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+        }
+
+        public void Dispose()
+        {
+            _disposeAction();
         }
 
         [Fact]
