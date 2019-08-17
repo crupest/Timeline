@@ -22,7 +22,10 @@ namespace Timeline.Controllers
 
             public const int Patch_NotExist = -3001;
 
-            public const int ChangePassword_BadOldPassword = -4001;
+            public const int ChangeUsername_NotExist = -4001;
+            public const int ChangeUsername_AlreadyExist = -4002;
+
+            public const int ChangePassword_BadOldPassword = -5001;
         }
 
         private readonly ILogger<UserController> _logger;
@@ -106,6 +109,31 @@ namespace Timeline.Controllers
                 _logger.LogInformation(e, FormatLogMessage("Attempt to delete a non-existent user.", Pair("Username", username)));
                 return Ok(CommonDeleteResponse.NotExists);
             }
+        }
+
+        [HttpPost("userop/changeusername"), AdminAuthorize]
+        public async Task<IActionResult> ChangeUsername([FromBody] ChangeUsernameRequest request)
+        {
+            try
+            {
+                await _userService.ChangeUsername(request.OldUsername, request.NewUsername);
+                _logger.LogInformation(FormatLogMessage("A user changed username.",
+                    Pair("Old Username", request.OldUsername), Pair("New Username", request.NewUsername)));
+                return Ok();
+            }
+            catch (UserNotExistException e)
+            {
+                _logger.LogInformation(e, FormatLogMessage("Attempt to change a non-existent user's username failed.",
+                    Pair("Old Username", request.OldUsername), Pair("New Username", request.NewUsername)));
+                return BadRequest(new CommonResponse(ErrorCodes.ChangeUsername_NotExist, $"The user {request.OldUsername} does not exist."));
+            }
+            catch (UserAlreadyExistException e)
+            {
+                _logger.LogInformation(e, FormatLogMessage("Attempt to change a user's username to a existent one failed.",
+                    Pair("Old Username", request.OldUsername), Pair("New Username", request.NewUsername)));
+                return BadRequest(new CommonResponse(ErrorCodes.ChangeUsername_AlreadyExist, $"The user {request.NewUsername} already exists."));
+            }
+            // there is no need to catch bad format exception because it is already checked in model validation.
         }
 
         [HttpPost("userop/changepassword"), Authorize]

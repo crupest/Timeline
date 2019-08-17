@@ -121,6 +121,26 @@ namespace Timeline.Services
         public string Username { get; private set; }
     }
 
+
+    /// <summary>
+    /// Thrown when the user already exists.
+    /// </summary>
+    [Serializable]
+    public class UserAlreadyExistException : Exception
+    {
+        public UserAlreadyExistException(string username) : base($"User {username} already exists.") { Username = username; }
+        public UserAlreadyExistException(string username, string message) : base(message) { Username = username; }
+        public UserAlreadyExistException(string message, Exception inner) : base(message, inner) { }
+        protected UserAlreadyExistException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        /// <summary>
+        /// The username that already exists.
+        /// </summary>
+        public string Username { get; set; }
+    }
+
     public interface IUserService
     {
         /// <summary>
@@ -204,6 +224,17 @@ namespace Timeline.Services
         /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown if the old password is wrong.</exception>
         Task ChangePassword(string username, string oldPassword, string newPassword);
+
+        /// <summary>
+        /// Change a user's username.
+        /// </summary>
+        /// <param name="oldUsername">The user's old username.</param>
+        /// <param name="newUsername">The new username.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="oldUsername"/> or <paramref name="newUsername"/> is null or empty.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with old username does not exist.</exception>
+        /// <exception cref="UsernameBadFormatException">Thrown if the new username is not accepted because of bad format.</exception>
+        /// <exception cref="UserAlreadyExistException">Thrown if user with the new username already exists.</exception>
+        Task ChangeUsername(string oldUsername, string newUsername);
     }
 
     internal class UserCache
@@ -430,6 +461,32 @@ namespace Timeline.Services
             user.Version += 1;
             await _databaseContext.SaveChangesAsync();
             //clear cache
+            RemoveCache(user.Id);
+        }
+
+        public async Task ChangeUsername(string oldUsername, string newUsername)
+        {
+            if (string.IsNullOrEmpty(oldUsername))
+                throw new ArgumentException("Old username is null or empty", nameof(oldUsername));
+            if (string.IsNullOrEmpty(newUsername))
+                throw new ArgumentException("New username is null or empty", nameof(newUsername));
+
+            if (!_usernameValidator.Validate(newUsername, out var message))
+                throw new UsernameBadFormatException(newUsername, $"New username is of bad format. {message}");
+
+            var user = await _databaseContext.Users.Where(u => u.Name == oldUsername).SingleOrDefaultAsync();
+            if (user == null)
+                throw new UserNotExistException(oldUsername);
+
+            var conflictUser = await _databaseContext.Users.Where(u => u.Name == newUsername).SingleOrDefaultAsync();
+            if (conflictUser != null)
+                throw new UserAlreadyExistException(newUsername);
+
+            user.Name = newUsername;
+            user.Version += 1;
+            await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation(FormatLogMessage("A user entry changed name field.",
+                Pair("Id", user.Id), Pair("Old Username", oldUsername), Pair("New Username", newUsername)));
             RemoveCache(user.Id);
         }
     }
