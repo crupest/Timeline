@@ -5,6 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 using Timeline.Entities;
 using Timeline.Services;
 using Timeline.Tests.Mock.Data;
@@ -15,69 +16,57 @@ namespace Timeline.Tests.Helpers
 {
     public class MyWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
-        // We should keep the connection, so the database is persisted but not recreate every time.
-        // See https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/sqlite#writing-tests .
-        private readonly SqliteConnection _databaseConnection;
-
-        public MyWebApplicationFactory() : base()
-        {
-            _databaseConnection = new SqliteConnection("Data Source=:memory:;");
-            _databaseConnection.Open();
-
-            InitDatabase();
-        }
-
-        private void InitDatabase()
-        {
-            var options = new DbContextOptionsBuilder<DatabaseContext>()
-                    .UseSqlite(_databaseConnection)
-                    .Options;
-
-            using (var context = new DatabaseContext(options))
-            {
-                context.Database.EnsureCreated();
-                context.Users.AddRange(MockUsers.Users);
-                context.SaveChanges();
-            }
-        }
-
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services =>
-            {
-                services.AddEntityFrameworkSqlite();
-                services.AddDbContext<DatabaseContext>(options =>
-                {
-                    options.UseSqlite(_databaseConnection);
-                });
-            })
-            .ConfigureTestServices(services =>
+            builder.ConfigureTestServices(services =>
             {
                 services.AddSingleton<IClock, TestClock>();
             });
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _databaseConnection.Close();
-                _databaseConnection.Dispose();
-            }
-
-            base.Dispose(disposing);
         }
     }
 
     public static class WebApplicationFactoryExtensions
     {
-        public static WebApplicationFactory<TEntry> WithTestLogging<TEntry>(this WebApplicationFactory<TEntry> factory, ITestOutputHelper outputHelper) where TEntry : class
+        public static WebApplicationFactory<TEntry> WithTestConfig<TEntry>(this WebApplicationFactory<TEntry> factory, ITestOutputHelper outputHelper, out Action disposeAction) where TEntry : class
         {
+            // We should keep the connection, so the database is persisted but not recreate every time.
+            // See https://docs.microsoft.com/en-us/ef/core/miscellaneous/testing/sqlite#writing-tests .
+            SqliteConnection _databaseConnection = new SqliteConnection("Data Source=:memory:;");
+            _databaseConnection.Open();
+
+            {
+                var options = new DbContextOptionsBuilder<DatabaseContext>()
+                    .UseSqlite(_databaseConnection)
+                    .Options;
+
+                using (var context = new DatabaseContext(options))
+                {
+                    context.Database.EnsureCreated();
+                    context.Users.AddRange(MockUsers.Users);
+                    context.SaveChanges();
+                };
+            }
+
+            disposeAction = () =>
+            {
+                _databaseConnection.Close();
+                _databaseConnection.Dispose();
+            };
+
             return factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureLogging(logging =>
+                builder
+                .ConfigureLogging(logging =>
                 {
                     logging.AddXunit(outputHelper);
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddEntityFrameworkSqlite();
+                    services.AddDbContext<DatabaseContext>(options =>
+                    {
+                        options.UseSqlite(_databaseConnection);
+                    });
                 });
             });
         }
