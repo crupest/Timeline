@@ -3,10 +3,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
+using Timeline.Models.Validation;
 using static Timeline.Helpers.MyLogHelper;
 using static Timeline.Models.UserUtility;
 
@@ -121,54 +121,24 @@ namespace Timeline.Services
         public string Username { get; private set; }
     }
 
-    public class UsernameValidator
-    {
-        public const int MaxLength = 26;
-        public const string RegexPattern = @"^[a-zA-Z0-9_][a-zA-Z0-9-_]*$";
 
-        private readonly Regex _regex = new Regex(RegexPattern);
+    /// <summary>
+    /// Thrown when the user already exists.
+    /// </summary>
+    [Serializable]
+    public class UserAlreadyExistException : Exception
+    {
+        public UserAlreadyExistException(string username) : base($"User {username} already exists.") { Username = username; }
+        public UserAlreadyExistException(string username, string message) : base(message) { Username = username; }
+        public UserAlreadyExistException(string message, Exception inner) : base(message, inner) { }
+        protected UserAlreadyExistException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
         /// <summary>
-        /// Validate a username.
+        /// The username that already exists.
         /// </summary>
-        /// <param name="username">The username. Can't be null.</param>
-        /// <param name="message">Set as error message if there is error. Or null if no error.</param>
-        /// <returns>True if validation passed. Otherwise false.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
-        public bool Validate(string username, out string message)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-
-            if (username.Length == 0)
-            {
-                message = "An empty string is not permitted.";
-                return false;
-            }
-
-            if (username.Length > 26)
-            {
-                message = $"Too long, more than 26 characters is not premitted, found {username.Length}.";
-                return false;
-            }
-
-            foreach ((char c, int i) in username.Select((c, i) => (c, i)))
-                if (char.IsWhiteSpace(c))
-                {
-                    message = $"A whitespace is found at {i} . Whitespace is not permited.";
-                    return false;
-                }
-
-            var match = _regex.Match(username);
-            if (!match.Success)
-            {
-                message = "Regex match failed.";
-                return false;
-            }
-
-            message = null;
-            return true;
-        }
+        public string Username { get; set; }
     }
 
     public interface IUserService
@@ -254,6 +224,17 @@ namespace Timeline.Services
         /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown if the old password is wrong.</exception>
         Task ChangePassword(string username, string oldPassword, string newPassword);
+
+        /// <summary>
+        /// Change a user's username.
+        /// </summary>
+        /// <param name="oldUsername">The user's old username.</param>
+        /// <param name="newUsername">The new username.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="oldUsername"/> or <paramref name="newUsername"/> is null or empty.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user with old username does not exist.</exception>
+        /// <exception cref="UsernameBadFormatException">Thrown if the new username is not accepted because of bad format.</exception>
+        /// <exception cref="UserAlreadyExistException">Thrown if user with the new username already exists.</exception>
+        Task ChangeUsername(string oldUsername, string newUsername);
     }
 
     internal class UserCache
@@ -480,6 +461,32 @@ namespace Timeline.Services
             user.Version += 1;
             await _databaseContext.SaveChangesAsync();
             //clear cache
+            RemoveCache(user.Id);
+        }
+
+        public async Task ChangeUsername(string oldUsername, string newUsername)
+        {
+            if (string.IsNullOrEmpty(oldUsername))
+                throw new ArgumentException("Old username is null or empty", nameof(oldUsername));
+            if (string.IsNullOrEmpty(newUsername))
+                throw new ArgumentException("New username is null or empty", nameof(newUsername));
+
+            if (!_usernameValidator.Validate(newUsername, out var message))
+                throw new UsernameBadFormatException(newUsername, $"New username is of bad format. {message}");
+
+            var user = await _databaseContext.Users.Where(u => u.Name == oldUsername).SingleOrDefaultAsync();
+            if (user == null)
+                throw new UserNotExistException(oldUsername);
+
+            var conflictUser = await _databaseContext.Users.Where(u => u.Name == newUsername).SingleOrDefaultAsync();
+            if (conflictUser != null)
+                throw new UserAlreadyExistException(newUsername);
+
+            user.Name = newUsername;
+            user.Version += 1;
+            await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation(FormatLogMessage("A user entry changed name field.",
+                Pair("Id", user.Id), Pair("Old Username", oldUsername), Pair("New Username", newUsername)));
             RemoveCache(user.Id);
         }
     }

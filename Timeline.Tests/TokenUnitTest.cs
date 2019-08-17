@@ -15,43 +15,36 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class TokenUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>
+    public class TokenUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
     {
         private const string CreateTokenUrl = "token/create";
         private const string VerifyTokenUrl = "token/verify";
 
         private readonly WebApplicationFactory<Startup> _factory;
+        private readonly Action _disposeAction;
 
         public TokenUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
         {
-            _factory = factory.WithTestLogging(outputHelper);
+            _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+        }
+
+        public void Dispose()
+        {
+            _disposeAction();
         }
 
         [Fact]
-        public async void CreateToken_MissingUsername()
+        public async void CreateToken_InvalidModel()
         {
             using (var client = _factory.CreateDefaultClient())
             {
+                // missing username
                 await InvalidModelTestHelpers.TestPostInvalidModel(client, CreateTokenUrl,
                     new CreateTokenRequest { Username = null, Password = "user" });
-            }
-        }
-
-        [Fact]
-        public async void CreateToken_InvalidModel_MissingPassword()
-        {
-            using (var client = _factory.CreateDefaultClient())
-            {
+                // missing password
                 await InvalidModelTestHelpers.TestPostInvalidModel(client, CreateTokenUrl,
                     new CreateTokenRequest { Username = "user", Password = null });
-            }
-        }
-
-        [Fact]
-        public async void CreateToken_InvalidModel_BadExpireOffset()
-        {
-            using (var client = _factory.CreateDefaultClient())
-            {
+                // bad expire offset
                 await InvalidModelTestHelpers.TestPostInvalidModel(client, CreateTokenUrl,
                     new CreateTokenRequest
                     {
@@ -101,10 +94,11 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void VerifyToken_InvalidModel_MissingToken()
+        public async void VerifyToken_InvalidModel()
         {
             using (var client = _factory.CreateDefaultClient())
             {
+                // missing token
                 await InvalidModelTestHelpers.TestPostInvalidModel(client, VerifyTokenUrl,
                     new VerifyTokenRequest { Token = null });
             }
@@ -122,43 +116,42 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async void VerifyToken_BadVersion_AND_UserNotExist()
+        public async void VerifyToken_BadVersion()
         {
             using (var client = _factory.CreateDefaultClient())
             {
+                var token = (await client.CreateUserTokenAsync(MockUsers.UserUsername, MockUsers.UserPassword)).Token;
+
                 using (var scope = _factory.Server.Host.Services.CreateScope()) // UserService is scoped.
                 {
                     // create a user for test
                     var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-
-                    const string username = "verifytokentest0";
-                    const string password = "12345678";
-
-                    await userService.PutUser(username, password, false);
-
-                    // create a token
-                    var token = (await client.CreateUserTokenAsync(username, password)).Token;
-
-                    // increase version
-                    await userService.PatchUser(username, null, null);
-
-                    // test against bad version
-                    var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
-                    response.Should().HaveStatusCodeBadRequest()
-                        .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_BadVersion);
-
-
-                    // create another token
-                    var token2 = (await client.CreateUserTokenAsync(username, password)).Token;
-
-                    // delete user
-                    await userService.DeleteUser(username);
-
-                    // test against user not exist
-                    var response2 = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
-                    response2.Should().HaveStatusCodeBadRequest()
-                        .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_UserNotExist);
+                    await userService.PatchUser(MockUsers.UserUsername, null, null);
                 }
+
+                var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
+                response.Should().HaveStatusCodeBadRequest()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_BadVersion);
+            }
+        }
+
+        [Fact]
+        public async void VerifyToken_UserNotExist()
+        {
+            using (var client = _factory.CreateDefaultClient())
+            {
+                var token = (await client.CreateUserTokenAsync(MockUsers.UserUsername, MockUsers.UserPassword)).Token;
+
+                using (var scope = _factory.Server.Host.Services.CreateScope()) // UserService is scoped.
+                {
+                    // create a user for test
+                    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                    await userService.DeleteUser(MockUsers.UserUsername);
+                }
+
+                var response = await client.PostAsJsonAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = token });
+                response.Should().HaveStatusCodeBadRequest()
+                    .And.Should().HaveBodyAsCommonResponseWithCode(TokenController.ErrorCodes.Verify_UserNotExist);
             }
         }
 
