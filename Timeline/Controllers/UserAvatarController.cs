@@ -19,9 +19,28 @@ namespace Timeline.Controllers
 
             public const int Put_UserNotExist = -2001;
             public const int Put_Forbid = -2002;
+            public const int Put_BadFormat_CantDecode = -2011;
+            public const int Put_BadFormat_UnmatchedFormat = -2012;
+            public const int Put_BadFormat_BadSize = -2013;
 
             public const int Delete_UserNotExist = -3001;
             public const int Delete_Forbid = -3002;
+
+
+            public static int From(AvatarDataException.ErrorReason error)
+            {
+                switch (error)
+                {
+                    case AvatarDataException.ErrorReason.CantDecode:
+                        return Put_BadFormat_CantDecode;
+                    case AvatarDataException.ErrorReason.UnmatchedFormat:
+                        return Put_BadFormat_UnmatchedFormat;
+                    case AvatarDataException.ErrorReason.BadSize:
+                        return Put_BadFormat_BadSize;
+                    default:
+                        throw new Exception("Unknown AvatarDataException.ErrorReason value.");
+                }
+            }
         }
 
         private readonly ILogger<UserAvatarController> _logger;
@@ -43,9 +62,9 @@ namespace Timeline.Controllers
                 var avatar = await _service.GetAvatar(username);
                 return File(avatar.Data, avatar.Type);
             }
-            catch (UserNotExistException)
+            catch (UserNotExistException e)
             {
-                _logger.LogInformation($"Attempt to get a avatar of a non-existent user failed. Username: {username} .");
+                _logger.LogInformation(e, $"Attempt to get a avatar of a non-existent user failed. Username: {username} .");
                 return NotFound(new CommonResponse(ErrorCodes.Get_UserNotExist, "User does not exist."));
             }
         }
@@ -76,10 +95,15 @@ namespace Timeline.Controllers
                 _logger.LogInformation($"Succeed to put a avatar of a user. Username: {username} ; Mime Type: {Request.ContentType} .");
                 return Ok();
             }
-            catch (UserNotExistException)
+            catch (UserNotExistException e)
             {
-                _logger.LogInformation($"Attempt to put a avatar of a non-existent user failed. Username: {username} .");
+                _logger.LogInformation(e, $"Attempt to put a avatar of a non-existent user failed. Username: {username} .");
                 return BadRequest(new CommonResponse(ErrorCodes.Put_UserNotExist, "User does not exist."));
+            }
+            catch (AvatarDataException e)
+            {
+                _logger.LogInformation(e, $"Attempt to put a avatar of a bad format failed. Username: {username} .");
+                return BadRequest(new CommonResponse(ErrorCodes.From(e.Error), "Bad format."));
             }
         }
 
@@ -101,9 +125,9 @@ namespace Timeline.Controllers
                 _logger.LogInformation($"Succeed to delete a avatar of a user. Username: {username} .");
                 return Ok();
             }
-            catch (UserNotExistException)
+            catch (UserNotExistException e)
             {
-                _logger.LogInformation($"Attempt to delete a avatar of a non-existent user failed. Username: {username} .");
+                _logger.LogInformation(e, $"Attempt to delete a avatar of a non-existent user failed. Username: {username} .");
                 return BadRequest(new CommonResponse(ErrorCodes.Delete_UserNotExist, "User does not exist."));
             }
         }

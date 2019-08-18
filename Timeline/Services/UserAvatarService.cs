@@ -24,12 +24,29 @@ namespace Timeline.Services
     [Serializable]
     public class AvatarDataException : Exception
     {
-        public AvatarDataException(Avatar avatar, string message) : base(message) { Avatar = avatar; }
-        public AvatarDataException(Avatar avatar, string message, Exception inner) : base(message, inner) { Avatar = avatar; }
+        public enum ErrorReason
+        {
+            /// <summary>
+            /// Decoding image failed.
+            /// </summary>
+            CantDecode,
+            /// <summary>
+            /// Decoding succeeded but the real type is not the specified type.
+            /// </summary>
+            UnmatchedFormat,
+            /// <summary>
+            /// Image is not a square.
+            /// </summary>
+            BadSize
+        }
+
+        public AvatarDataException(Avatar avatar, ErrorReason error, string message) : base(message) { Avatar = avatar; Error = error; }
+        public AvatarDataException(Avatar avatar, ErrorReason error, string message, Exception inner) : base(message, inner) { Avatar = avatar; Error = error; }
         protected AvatarDataException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
+        public ErrorReason Error { get; set; }
         public Avatar Avatar { get; set; }
     }
 
@@ -49,7 +66,12 @@ namespace Timeline.Services
 
     public interface IUserAvatarValidator
     {
-        Task<(bool valid, string message)> Validate(Avatar avatar);
+        /// <summary>
+        /// Validate a avatar's format and size info.
+        /// </summary>
+        /// <param name="avatar">The avatar to validate.</param>
+        /// <exception cref="AvatarDataException">Thrown when validation failed.</exception>
+        Task Validate(Avatar avatar);
     }
 
     public interface IUserAvatarService
@@ -96,7 +118,7 @@ namespace Timeline.Services
 
     public class UserAvatarValidator : IUserAvatarValidator
     {
-        public Task<(bool valid, string message)> Validate(Avatar avatar)
+        public Task Validate(Avatar avatar)
         {
             return Task.Run(() =>
             {
@@ -105,15 +127,14 @@ namespace Timeline.Services
                     using (var image = Image.Load(avatar.Data, out IImageFormat format))
                     {
                         if (!format.MimeTypes.Contains(avatar.Type))
-                            return (false, "Image's actual mime type is not the specified one.");
+                            throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.UnmatchedFormat, "Image's actual mime type is not the specified one.");
                         if (image.Width != image.Height)
-                            return (false, "Image is not a square, aka width is not equal to height.");
+                            throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.BadSize, "Image is not a square, aka, width is not equal to height.");
                     }
-                    return (true, "A good avatar.");
                 }
                 catch (UnknownImageFormatException e)
                 {
-                    return (false, $"Failed to decode image. Exception: {e} .");
+                  throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.CantDecode, "Failed to decode image. See inner exception.", e);
                 }
             });
         }
@@ -196,9 +217,7 @@ namespace Timeline.Services
             }
             else
             {
-                (bool valid, string message) = await _avatarValidator.Validate(avatar);
-                if (!valid)
-                    throw new AvatarDataException(avatar, $"Failed to validate image. {message}");
+                await _avatarValidator.Validate(avatar);
 
                 if (avatarEntity == null)
                 {
