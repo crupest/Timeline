@@ -16,8 +16,6 @@ namespace Timeline
 {
     public class Startup
     {
-        private const string corsPolicyName = "MyPolicy";
-
         public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
             Environment = environment;
@@ -35,17 +33,6 @@ namespace Timeline
                     options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(corsPolicyName, builder =>
-                {
-                    if (Environment.IsProduction())
-                        builder.WithOrigins("https://www.crupest.xyz", "https://crupest.xyz").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-                    else
-                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-                });
-            });
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
@@ -82,8 +69,6 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            app.UseCors(corsPolicyName);
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
