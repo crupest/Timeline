@@ -6,8 +6,6 @@ using SixLabors.ImageSharp.Formats.Png;
 using System;
 using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Timeline.Controllers;
 using Timeline.Services;
