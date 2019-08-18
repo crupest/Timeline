@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using System;
 using System.IO;
 using System.Linq;
@@ -43,6 +45,11 @@ namespace Timeline.Services
         /// Get the default avatar.
         /// </summary>
         Task<Avatar> GetDefaultAvatar();
+    }
+
+    public interface IUserAvatarValidator
+    {
+        Task<(bool valid, string message)> Validate(Avatar avatar);
     }
 
     public interface IUserAvatarService
@@ -87,6 +94,31 @@ namespace Timeline.Services
         }
     }
 
+    public class UserAvatarValidator : IUserAvatarValidator
+    {
+        public Task<(bool valid, string message)> Validate(Avatar avatar)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    using (var image = Image.Load(avatar.Data, out IImageFormat format))
+                    {
+                        if (!format.MimeTypes.Contains(avatar.Type))
+                            return (false, "Image's actual mime type is not the specified one.");
+                        if (image.Width != image.Height)
+                            return (false, "Image is not a square, aka width is not equal to height.");
+                    }
+                    return (true, "A good avatar.");
+                }
+                catch (UnknownImageFormatException e)
+                {
+                    return (false, $"Failed to decode image. Exception: {e} .");
+                }
+            });
+        }
+    }
+
     public class UserAvatarService : IUserAvatarService
     {
 
@@ -95,12 +127,14 @@ namespace Timeline.Services
         private readonly DatabaseContext _database;
 
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
+        private readonly IUserAvatarValidator _avatarValidator;
 
-        public UserAvatarService(ILogger<UserAvatarService> logger, DatabaseContext database, IDefaultUserAvatarProvider defaultUserAvatarProvider)
+        public UserAvatarService(ILogger<UserAvatarService> logger, DatabaseContext database, IDefaultUserAvatarProvider defaultUserAvatarProvider, IUserAvatarValidator avatarValidator)
         {
             _logger = logger;
             _database = database;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
+            _avatarValidator = avatarValidator;
         }
 
         public async Task<Avatar> GetAvatar(string username)
@@ -157,11 +191,15 @@ namespace Timeline.Services
                 {
                     _database.UserAvatars.Remove(avatarEntity);
                     await _database.SaveChangesAsync();
+                    _logger.LogInformation("Removed an entry in user_avatars.");
                 }
             }
             else
             {
-                // TODO: Use image library to check the format to prohibit bad data.
+                (bool valid, string message) = await _avatarValidator.Validate(avatar);
+                if (!valid)
+                    throw new AvatarDataException(avatar, $"Failed to validate image. {message}");
+
                 if (avatarEntity == null)
                 {
                     user.Avatar = new UserAvatar
@@ -176,6 +214,7 @@ namespace Timeline.Services
                     avatarEntity.Data = avatar.Data;
                 }
                 await _database.SaveChangesAsync();
+                _logger.LogInformation("Added or modified an entry in user_avatars.");
             }
         }
     }
@@ -186,6 +225,7 @@ namespace Timeline.Services
         {
             services.AddScoped<IUserAvatarService, UserAvatarService>();
             services.AddSingleton<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
+            services.AddSingleton<IUserAvatarValidator, UserAvatarValidator>();
         }
     }
 }
