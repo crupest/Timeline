@@ -61,19 +61,11 @@ namespace Timeline.Tests
         [Fact]
         public void UnmatchedFormat()
         {
-            Avatar avatar;
-            using (var image = new Image<Rgba32>(100, 100))
+            Avatar avatar = new Avatar
             {
-                using (var stream = new MemoryStream())
-                {
-                    image.SaveAsPng(stream);
-                    avatar = new Avatar
-                    {
-                        Data = stream.ToArray(),
-                        Type = "image/jpeg"
-                    };
-                }
-            }
+                Data = ImageHelper.CreatePngWithSize(100, 100),
+                Type = "image/jpeg"
+            };
             _validator.Awaiting(v => v.Validate(avatar))
                     .Should().Throw<AvatarDataException>()
                     .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.UnmatchedFormat);
@@ -82,19 +74,11 @@ namespace Timeline.Tests
         [Fact]
         public void BadSize()
         {
-            Avatar avatar;
-            using (var image = new Image<Rgba32>(100, 200))
+            Avatar avatar = new Avatar
             {
-                using (var stream = new MemoryStream())
-                {
-                    image.SaveAsPng(stream);
-                    avatar = new Avatar
-                    {
-                        Data = stream.ToArray(),
-                        Type = PngFormat.Instance.DefaultMimeType
-                    };
-                }
-            }
+                Data = ImageHelper.CreatePngWithSize(100, 200),
+                Type = PngFormat.Instance.DefaultMimeType
+            };
             _validator.Awaiting(v => v.Validate(avatar))
                     .Should().Throw<AvatarDataException>()
                     .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.BadSize);
@@ -103,19 +87,11 @@ namespace Timeline.Tests
         [Fact]
         public void Success()
         {
-            Avatar avatar;
-            using (var image = new Image<Rgba32>(100, 100))
+            Avatar avatar = new Avatar
             {
-                using (var stream = new MemoryStream())
-                {
-                    image.SaveAsPng(stream);
-                    avatar = new Avatar
-                    {
-                        Data = stream.ToArray(),
-                        Type = PngFormat.Instance.DefaultMimeType
-                    };
-                }
-            }
+                Data = ImageHelper.CreatePngWithSize(100, 100),
+                Type = PngFormat.Instance.DefaultMimeType
+            };
             _validator.Awaiting(v => v.Validate(avatar))
                     .Should().NotThrow();
         }
