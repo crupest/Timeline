@@ -27,6 +27,8 @@ namespace Timeline.Entities
 
         [Column("version"), Required]
         public long Version { get; set; }
+
+        public UserAvatar Avatar { get; set; }
     }
 
     public class DatabaseContext : DbContext
@@ -44,5 +46,6 @@ namespace Timeline.Entities
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<UserAvatar> UserAvatars { get; set; }
     }
 }
