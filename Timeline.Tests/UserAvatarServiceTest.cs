@@ -1,11 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Formats.Png;
 using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
