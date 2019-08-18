@@ -5,12 +5,6 @@
         <UserSecretsId>1f6fb74d-4277-4bc0-aeea-b1fc5ffb0b43</UserSecretsId>
         <Authors>crupest</Authors>
     </PropertyGroup>
-    <ItemGroup>
-      <Compile Remove="Migrations\20190817094126_Enhance.cs" />
-      <Compile Remove="Migrations\20190817094126_Enhance.Designer.cs" />
-      <Compile Remove="Migrations\20190817094254_Enhance.cs" />
-      <Compile Remove="Migrations\20190817094254_Enhance.Designer.cs" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.App" />
