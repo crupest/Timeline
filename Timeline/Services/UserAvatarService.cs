@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -176,6 +177,15 @@ namespace Timeline.Services
                 }
                 await _database.SaveChangesAsync();
             }
+        }
+    }
+
+    public static class UserAvatarServiceCollectionExtensions
+    {
+        public static void AddUserAvatarService(this IServiceCollection services)
+        {
+            services.AddScoped<IUserAvatarService, UserAvatarService>();
+            services.AddSingleton<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
         }
     }
 }
