@@ -24,7 +24,15 @@ namespace Timeline.Tests
         }
     }
 
-    public class UserAvatarServiceTest : IDisposable, IClassFixture<MockDefaultUserAvatarProvider>
+    public class MockUserAvatarValidator : IUserAvatarValidator
+    {
+        public Task<(bool, string)> Validate(Avatar avatar)
+        {
+            return Task.FromResult((true, "Validate succeed."));
+        }
+    }
+
+    public class UserAvatarServiceTest : IDisposable, IClassFixture<MockDefaultUserAvatarProvider>, IClassFixture<MockUserAvatarValidator>
     {
         private static Avatar MockAvatar { get; } = new Avatar
         {
@@ -45,14 +53,14 @@ namespace Timeline.Tests
 
         private readonly UserAvatarService _service;
 
-        public UserAvatarServiceTest(ITestOutputHelper outputHelper, MockDefaultUserAvatarProvider mockDefaultUserAvatarProvider)
+        public UserAvatarServiceTest(ITestOutputHelper outputHelper, MockDefaultUserAvatarProvider mockDefaultUserAvatarProvider, MockUserAvatarValidator mockUserAvatarValidator)
         {
             _mockDefaultUserAvatarProvider = mockDefaultUserAvatarProvider;
 
             _loggerFactory = MyTestLoggerFactory.Create(outputHelper);
             _database = new TestDatabase();
 
-            _service = new UserAvatarService(_loggerFactory.CreateLogger<UserAvatarService>(), _database.DatabaseContext, _mockDefaultUserAvatarProvider);
+            _service = new UserAvatarService(_loggerFactory.CreateLogger<UserAvatarService>(), _database.DatabaseContext, _mockDefaultUserAvatarProvider, mockUserAvatarValidator);
         }
 
         public void Dispose()
