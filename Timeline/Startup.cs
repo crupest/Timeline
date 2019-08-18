@@ -58,6 +58,8 @@ namespace Timeline
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClock, Clock>();
 
+            services.AddUserAvatarService();
+
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
             services.AddDbContext<DatabaseContext>(options =>
