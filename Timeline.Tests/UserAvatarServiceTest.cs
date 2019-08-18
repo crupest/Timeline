@@ -26,9 +26,9 @@ namespace Timeline.Tests
 
     public class MockUserAvatarValidator : IUserAvatarValidator
     {
-        public Task<(bool, string)> Validate(Avatar avatar)
+        public Task Validate(Avatar avatar)
         {
-            return Task.FromResult((true, "Validate succeed."));
+            return Task.CompletedTask;
         }
     }
 
