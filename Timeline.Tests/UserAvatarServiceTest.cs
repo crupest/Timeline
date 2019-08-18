@@ -1,7 +1,11 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Formats.Png;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +33,91 @@ namespace Timeline.Tests
         public Task Validate(Avatar avatar)
         {
             return Task.CompletedTask;
+        }
+    }
+
+    public class UserAvatarValidatorTest : IClassFixture<UserAvatarValidator>
+    {
+        private readonly UserAvatarValidator _validator;
+
+        public UserAvatarValidatorTest(UserAvatarValidator validator)
+        {
+            _validator = validator;
+        }
+
+        [Fact]
+        public void CantDecode()
+        {
+            Avatar avatar = new Avatar
+            {
+                Data = Encoding.ASCII.GetBytes("This is not a image."),
+                Type = "image/png"
+            };
+            _validator.Awaiting(v => v.Validate(avatar))
+                    .Should().Throw<AvatarDataException>()
+                    .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.CantDecode);
+        }
+
+        [Fact]
+        public void UnmatchedFormat()
+        {
+            Avatar avatar;
+            using (var image = new Image<Rgba32>(100, 100))
+            {
+                using (var stream = new MemoryStream())
+                {
+                    image.SaveAsPng(stream);
+                    avatar = new Avatar
+                    {
+                        Data = stream.ToArray(),
+                        Type = "image/jpeg"
+                    };
+                }
+            }
+            _validator.Awaiting(v => v.Validate(avatar))
+                    .Should().Throw<AvatarDataException>()
+                    .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.UnmatchedFormat);
+        }
+
+        [Fact]
+        public void BadSize()
+        {
+            Avatar avatar;
+            using (var image = new Image<Rgba32>(100, 200))
+            {
+                using (var stream = new MemoryStream())
+                {
+                    image.SaveAsPng(stream);
+                    avatar = new Avatar
+                    {
+                        Data = stream.ToArray(),
+                        Type = PngFormat.Instance.DefaultMimeType
+                    };
+                }
+            }
+            _validator.Awaiting(v => v.Validate(avatar))
+                    .Should().Throw<AvatarDataException>()
+                    .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.BadSize);
+        }
+
+        [Fact]
+        public void Success()
+        {
+            Avatar avatar;
+            using (var image = new Image<Rgba32>(100, 100))
+            {
+                using (var stream = new MemoryStream())
+                {
+                    image.SaveAsPng(stream);
+                    avatar = new Avatar
+                    {
+                        Data = stream.ToArray(),
+                        Type = PngFormat.Instance.DefaultMimeType
+                    };
+                }
+            }
+            _validator.Awaiting(v => v.Validate(avatar))
+                    .Should().NotThrow();
         }
     }
 
