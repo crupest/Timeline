@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -37,6 +38,10 @@ namespace Timeline.Tests.Helpers
             {
                 var options = new DbContextOptionsBuilder<DatabaseContext>()
                     .UseSqlite(_databaseConnection)
+                    .ConfigureWarnings(builder =>
+                    {
+                        builder.Throw(RelationalEventId.QueryClientEvaluationWarning);
+                    })
                     .Options;
 
                 using (var context = new DatabaseContext(options))
