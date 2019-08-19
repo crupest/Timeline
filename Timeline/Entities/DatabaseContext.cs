@@ -28,6 +28,7 @@ namespace Timeline.Entities
         [Column("version"), Required]
         public long Version { get; set; }
 
+        [Required]
         public UserAvatar Avatar { get; set; }
     }
 
@@ -42,7 +43,6 @@ namespace Timeline.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().Property(e => e.Version).HasDefaultValue(0);
-
         }
 
         public DbSet<User> Users { get; set; }

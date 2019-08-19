@@ -17,11 +17,15 @@ namespace Timeline.Tests
 {
     public class MockDefaultUserAvatarProvider : IDefaultUserAvatarProvider
     {
-        public static Avatar Avatar { get; } = new Avatar { Type = "image/test", Data = Encoding.ASCII.GetBytes("test") };
-
-        public Task<Avatar> GetDefaultAvatar()
+        public static AvatarInfo AvatarInfo { get; } = new AvatarInfo
         {
-            return Task.FromResult(Avatar);
+            Avatar = new Avatar { Type = "image/test", Data = Encoding.ASCII.GetBytes("test") },
+            LastModified = DateTime.Now
+        };
+
+        public Task<AvatarInfo> GetDefaultAvatar()
+        {
+            return Task.FromResult(AvatarInfo);
         }
     }
 
@@ -153,7 +157,7 @@ namespace Timeline.Tests
         public async Task GetAvatar_ShouldReturn_Default()
         {
             const string username = MockUsers.UserUsername;
-            (await _service.GetAvatar(username)).Should().BeEquivalentTo(await _mockDefaultUserAvatarProvider.GetDefaultAvatar());
+            (await _service.GetAvatar(username)).Avatar.Should().BeEquivalentTo((await _mockDefaultUserAvatarProvider.GetDefaultAvatar()).Avatar);
         }
 
         [Fact]
@@ -173,7 +177,7 @@ namespace Timeline.Tests
                 await context.SaveChangesAsync();
             }
 
-            (await _service.GetAvatar(username)).Should().BeEquivalentTo(MockAvatar);
+            (await _service.GetAvatar(username)).Avatar.Should().BeEquivalentTo(MockAvatar);
         }
 
         [Fact]
@@ -223,7 +227,8 @@ namespace Timeline.Tests
 
             // delete
             await _service.SetAvatar(username, null);
-            user.Avatar.Should().BeNull();
+            user.Avatar.Type.Should().BeNull();
+            user.Avatar.Data.Should().BeNull();
         }
     }
 }
