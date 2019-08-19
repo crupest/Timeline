@@ -46,9 +46,7 @@ namespace Timeline.Tests.Helpers
 
                 using (var context = new DatabaseContext(options))
                 {
-                    context.Database.EnsureCreated();
-                    context.Users.AddRange(MockUsers.Users);
-                    context.SaveChanges();
+                    TestDatabase.InitDatabase(context);
                 };
             }
 

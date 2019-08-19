@@ -57,10 +57,22 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<IActionResult> Get(string username)
         {
+            const string IfModifiedSinceHeaderKey = "If-Modified-Since";
             try
             {
-                var avatar = await _service.GetAvatar(username);
-                return File(avatar.Data, avatar.Type);
+                var avatarInfo = await _service.GetAvatar(username);
+                var avatar = avatarInfo.Avatar;
+                if (Request.Headers.TryGetValue(IfModifiedSinceHeaderKey, out var value))
+                {
+                    var t = DateTime.Parse(value);
+                    if (t > avatarInfo.LastModified)
+                    {
+                        Response.Headers.Add(IfModifiedSinceHeaderKey, avatarInfo.LastModified.ToString("r"));
+                        return StatusCode(StatusCodes.Status304NotModified);
+                    }
+                }
+
+                return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), null);
             }
             catch (UserNotExistException e)
             {

@@ -8,6 +8,13 @@ namespace Timeline.Tests.Mock.Data
 {
     public class TestDatabase : IDisposable
     {
+        public static void InitDatabase(DatabaseContext context)
+        {
+            context.Database.EnsureCreated();
+            context.Users.AddRange(MockUsers.CreateMockUsers());
+            context.SaveChanges();
+        }
+
         private readonly SqliteConnection _databaseConnection;
         private readonly DatabaseContext _databaseContext;
 
@@ -26,10 +33,7 @@ namespace Timeline.Tests.Mock.Data
 
             _databaseContext = new DatabaseContext(options);
 
-            // init with mock data
-            _databaseContext.Database.EnsureCreated();
-            _databaseContext.Users.AddRange(MockUsers.Users);
-            _databaseContext.SaveChanges();
+            InitDatabase(_databaseContext);
         }
 
         public void Dispose()

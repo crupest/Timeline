@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Formats.Png;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Controllers;
 using Timeline.Services;
@@ -62,6 +63,17 @@ namespace Timeline.Tests.IntegratedTests
 
                 await GetReturnDefault();
                 await GetReturnDefault("admin");
+
+                {
+                    var request = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
+                        Method = HttpMethod.Get,
+                    };
+                    request.Headers.Add("If-Modified-Since", DateTime.Now.ToString("r"));
+                    var res = await client.SendAsync(request);
+                    res.Should().HaveStatusCode(HttpStatusCode.NotModified);
+                }
 
                 {
                     var res = await client.PutByteArrayAsync("users/user/avatar", new[] { (byte)0x00 }, "image/notaccept");
