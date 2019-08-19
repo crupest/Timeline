@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Timeline.Authenticate;
+using Timeline.Filters;
 using Timeline.Models.Http;
 using Timeline.Services;
 
@@ -22,6 +23,9 @@ namespace Timeline.Controllers
             public const int Put_BadFormat_CantDecode = -2011;
             public const int Put_BadFormat_UnmatchedFormat = -2012;
             public const int Put_BadFormat_BadSize = -2013;
+            public const int Put_Content_TooBig = -2021;
+            public const int Put_Content_UnmatchedLength_Less = -2022;
+            public const int Put_Content_UnmatchedLength_Bigger = -2023;
 
             public const int Delete_UserNotExist = -3001;
             public const int Delete_Forbid = -3002;
@@ -55,7 +59,7 @@ namespace Timeline.Controllers
 
         [HttpGet("users/{username}/avatar")]
         [Authorize]
-        public async Task<IActionResult> Get(string username)
+        public async Task<IActionResult> Get([FromRoute] string username)
         {
             const string IfModifiedSinceHeaderKey = "If-Modified-Since";
             try
@@ -83,9 +87,15 @@ namespace Timeline.Controllers
 
         [HttpPut("users/{username}/avatar")]
         [Authorize]
+        [RequireContentType, RequireContentLength]
         [Consumes("image/png", "image/jpeg", "image/gif", "image/webp")]
         public async Task<IActionResult> Put(string username)
         {
+            var contentLength = Request.ContentLength.Value;
+            if (contentLength > 1000 * 1000 * 10)
+                return BadRequest(new CommonResponse(ErrorCodes.Put_Content_TooBig,
+                    "Content can't be bigger than 10MB."));
+
             if (!User.IsAdmin() && User.Identity.Name != username)
             {
                 _logger.LogInformation($"Attempt to put a avatar of other user as a non-admin failed. Operator Username: {User.Identity.Name} ;  Username To Put Avatar: {username} .");
@@ -95,8 +105,16 @@ namespace Timeline.Controllers
 
             try
             {
-                var data = new byte[Convert.ToInt32(Request.ContentLength)];
-                await Request.Body.ReadAsync(data, 0, data.Length);
+                var data = new byte[contentLength];
+                var bytesRead = await Request.Body.ReadAsync(data);
+
+                if (bytesRead != contentLength)
+                    return BadRequest(new CommonResponse(ErrorCodes.Put_Content_UnmatchedLength_Less,
+                        $"Content length in header is {contentLength} but actual length is {bytesRead}."));
+
+                if (Request.Body.ReadByte() != -1)
+                    return BadRequest(new CommonResponse(ErrorCodes.Put_Content_UnmatchedLength_Bigger,
+                        $"Content length in header is {contentLength} but actual length is bigger than that."));
 
                 await _service.SetAvatar(username, new Avatar
                 {
@@ -121,7 +139,7 @@ namespace Timeline.Controllers
 
         [HttpDelete("users/{username}/avatar")]
         [Authorize]
-        public async Task<IActionResult> Delete(string username)
+        public async Task<IActionResult> Delete([FromRoute] string username)
         {
             if (!User.IsAdmin() && User.Identity.Name != username)
             {
