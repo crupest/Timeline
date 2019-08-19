@@ -9,11 +9,30 @@ namespace Timeline.Models.Http
             /// For example a required field is null.
             /// </summary>
             public const int InvalidModel = -100;
+
+            public const int Header_Missing_ContentType = -111;
+            public const int Header_Missing_ContentLength = -112;
+            public const int Header_Zero_ContentLength = -113;
         }
 
         public static CommonResponse InvalidModel(string message)
         {
             return new CommonResponse(ErrorCodes.InvalidModel, message);
+        }
+
+        public static CommonResponse MissingContentType()
+        {
+            return new CommonResponse(ErrorCodes.Header_Missing_ContentType, "Header Content-Type is required.");
+        }
+
+        public static CommonResponse MissingContentLength()
+        {
+            return new CommonResponse(ErrorCodes.Header_Missing_ContentLength, "Header Content-Length is missing or of bad format.");
+        }
+
+        public static CommonResponse ZeroContentLength()
+        {
+            return new CommonResponse(ErrorCodes.Header_Zero_ContentLength, "Header Content-Length must not be 0.");
         }
 
         public CommonResponse()
