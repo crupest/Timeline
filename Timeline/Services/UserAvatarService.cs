@@ -18,6 +18,12 @@ namespace Timeline.Services
         public byte[] Data { get; set; }
     }
 
+    public class AvatarInfo
+    {
+        public Avatar Avatar { get; set; }
+        public DateTime LastModified { get; set; }
+    }
+
     /// <summary>
     /// Thrown when avatar is of bad format.
     /// </summary>
@@ -61,7 +67,7 @@ namespace Timeline.Services
         /// <summary>
         /// Get the default avatar.
         /// </summary>
-        Task<Avatar> GetDefaultAvatar();
+        Task<AvatarInfo> GetDefaultAvatar();
     }
 
     public interface IUserAvatarValidator
@@ -80,10 +86,10 @@ namespace Timeline.Services
         /// Get avatar of a user. If the user has no avatar, a default one is returned.
         /// </summary>
         /// <param name="username">The username of the user to get avatar of.</param>
-        /// <returns>The avatar.</returns>
+        /// <returns>The avatar info.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="username"/> is null or empty.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
-        Task<Avatar> GetAvatar(string username);
+        Task<AvatarInfo> GetAvatar(string username);
 
         /// <summary>
         /// Set avatar for a user.
@@ -106,12 +112,17 @@ namespace Timeline.Services
             _environment = environment;
         }
 
-        public async Task<Avatar> GetDefaultAvatar()
+        public async Task<AvatarInfo> GetDefaultAvatar()
         {
-            return new Avatar
+            var path = Path.Combine(_environment.ContentRootPath, "default-avatar.png");
+            return new AvatarInfo
             {
-                Type = "image/png",
-                Data = await File.ReadAllBytesAsync(Path.Combine(_environment.ContentRootPath, "default-avatar.png"))
+                Avatar = new Avatar
+                {
+                    Type = "image/png",
+                    Data = await File.ReadAllBytesAsync(path)
+                },
+                LastModified = File.GetLastWriteTime(path)
             };
         }
     }
@@ -134,7 +145,7 @@ namespace Timeline.Services
                 }
                 catch (UnknownImageFormatException e)
                 {
-                  throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.CantDecode, "Failed to decode image. See inner exception.", e);
+                    throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.CantDecode, "Failed to decode image. See inner exception.", e);
                 }
             });
         }
@@ -158,7 +169,7 @@ namespace Timeline.Services
             _avatarValidator = avatarValidator;
         }
 
-        public async Task<Avatar> GetAvatar(string username)
+        public async Task<AvatarInfo> GetAvatar(string username)
         {
             if (string.IsNullOrEmpty(username))
                 throw new ArgumentException("Username is null or empty.", nameof(username));
@@ -170,16 +181,26 @@ namespace Timeline.Services
             await _database.Entry(user).Reference(u => u.Avatar).LoadAsync();
             var avatar = user.Avatar;
 
-            if (avatar == null)
+            if ((avatar.Type == null) == (avatar.Data == null))
+                _logger.LogCritical("Database corupted! One of type and data of a avatar is null but the other is not.");
+                // TODO: Throw an exception to indicate this.
+
+            if (avatar.Data == null)
             {
-                return await _defaultUserAvatarProvider.GetDefaultAvatar();
+                var defaultAvatar = await _defaultUserAvatarProvider.GetDefaultAvatar();
+                defaultAvatar.LastModified = defaultAvatar.LastModified > avatar.LastModified ? defaultAvatar.LastModified : avatar.LastModified;
+                return defaultAvatar;
             }
             else
             {
-                return new Avatar
+                return new AvatarInfo
                 {
-                    Type = avatar.Type,
-                    Data = avatar.Data
+                    Avatar = new Avatar
+                    {
+                        Type = avatar.Type,
+                        Data = avatar.Data
+                    },
+                    LastModified = avatar.LastModified
                 };
             }
         }
@@ -206,34 +227,25 @@ namespace Timeline.Services
 
             if (avatar == null)
             {
-                if (avatarEntity == null)
+                if (avatarEntity.Data == null)
                     return;
                 else
                 {
-                    _database.UserAvatars.Remove(avatarEntity);
+                    avatarEntity.Data = null;
+                    avatarEntity.Type = null;
+                    avatarEntity.LastModified = DateTime.Now;
                     await _database.SaveChangesAsync();
-                    _logger.LogInformation("Removed an entry in user_avatars.");
+                    _logger.LogInformation("Updated an entry in user_avatars.");
                 }
             }
             else
             {
                 await _avatarValidator.Validate(avatar);
-
-                if (avatarEntity == null)
-                {
-                    user.Avatar = new UserAvatar
-                    {
-                        Type = avatar.Type,
-                        Data = avatar.Data
-                    };
-                }
-                else
-                {
-                    avatarEntity.Type = avatar.Type;
-                    avatarEntity.Data = avatar.Data;
-                }
+                avatarEntity.Type = avatar.Type;
+                avatarEntity.Data = avatar.Data;
+                avatarEntity.LastModified = DateTime.Now;
                 await _database.SaveChangesAsync();
-                _logger.LogInformation("Added or modified an entry in user_avatars.");
+                _logger.LogInformation("Updated an entry in user_avatars.");
             }
         }
     }

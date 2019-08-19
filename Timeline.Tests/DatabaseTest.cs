@@ -1,0 +1,37 @@
+﻿using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using Timeline.Entities;
+using Timeline.Tests.Mock.Data;
+using Xunit;
+
+namespace Timeline.Tests
+{
+    public class DatabaseTest : IDisposable
+    {
+        private readonly TestDatabase _database;
+        private readonly DatabaseContext _context;
+
+        public DatabaseTest()
+        {
+            _database = new TestDatabase();
+            _context = _database.DatabaseContext;
+        }
+
+        public void Dispose()
+        {
+            _database.Dispose();
+        }
+
+        [Fact]
+        public void DeleteUserShouldAlsoDeleteAvatar()
+        {
+            _context.UserAvatars.Count().Should().Be(2);
+            var user = _context.Users.First();
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            _context.UserAvatars.Count().Should().Be(1);
+        }
+    }
+}
