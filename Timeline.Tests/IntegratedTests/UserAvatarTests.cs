@@ -7,8 +7,10 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Timeline.Controllers;
+using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
@@ -76,13 +78,60 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", new[] { (byte)0x00 }, "image/notaccept");
-                    res.Should().HaveStatusCode(HttpStatusCode.UnsupportedMediaType);
+                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    var res = await client.PutAsync("users/user/avatar", content);
+                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_Missing_ContentLength);
+                }
+
+                {
+                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    content.Headers.ContentLength = 1;
+                    var res = await client.PutAsync("users/user/avatar", content);
+                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_Missing_ContentType);
+                }
+
+                {
+                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    content.Headers.ContentLength = 0;
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    var res = await client.PutAsync("users/user/avatar", content);
+                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_Zero_ContentLength);
                 }
 
                 {
                     var res = await client.PutByteArrayAsync("users/user/avatar", new[] { (byte)0x00 }, "image/notaccept");
                     res.Should().HaveStatusCode(HttpStatusCode.UnsupportedMediaType);
+                }
+
+                {
+                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    content.Headers.ContentLength = 1000 * 1000 * 11;
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    var res = await client.PutAsync("users/user/avatar", content);
+                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserAvatarController.ErrorCodes.Put_Content_TooBig);
+                }
+
+                {
+                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    content.Headers.ContentLength = 2;
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    var res = await client.PutAsync("users/user/avatar", content);
+                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserAvatarController.ErrorCodes.Put_Content_UnmatchedLength_Less);
+                }
+
+                {
+                    var content = new ByteArrayContent(new[] { (byte)0x00, (byte)0x01 });
+                    content.Headers.ContentLength = 1;
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    var res = await client.PutAsync("users/user/avatar", content);
+                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserAvatarController.ErrorCodes.Put_Content_UnmatchedLength_Bigger);
                 }
 
                 {
