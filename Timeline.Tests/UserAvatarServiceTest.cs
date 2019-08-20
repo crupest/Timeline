@@ -17,11 +17,18 @@ namespace Timeline.Tests
 {
     public class MockDefaultUserAvatarProvider : IDefaultUserAvatarProvider
     {
+        public static string ETag { get; } = "Hahaha";
+
         public static AvatarInfo AvatarInfo { get; } = new AvatarInfo
         {
             Avatar = new Avatar { Type = "image/test", Data = Encoding.ASCII.GetBytes("test") },
             LastModified = DateTime.Now
         };
+
+        public Task<string> GetDefaultAvatarETag()
+        {
+            return Task.FromResult(ETag);
+        }
 
         public Task<AvatarInfo> GetDefaultAvatar()
         {
@@ -100,22 +107,54 @@ namespace Timeline.Tests
 
     public class UserAvatarServiceTest : IDisposable, IClassFixture<MockDefaultUserAvatarProvider>, IClassFixture<MockUserAvatarValidator>
     {
-        private static Avatar MockAvatar { get; } = new Avatar
+        private UserAvatar MockAvatarEntity1 { get; } = new UserAvatar
         {
             Type = "image/testaaa",
-            Data = Encoding.ASCII.GetBytes("amock")
+            Data = Encoding.ASCII.GetBytes("amock"),
+            ETag = "aaaa",
+            LastModified = DateTime.Now
         };
 
-        private static Avatar MockAvatar2 { get; } = new Avatar
+        private UserAvatar MockAvatarEntity2 { get; } = new UserAvatar
         {
             Type = "image/testbbb",
-            Data = Encoding.ASCII.GetBytes("bmock")
+            Data = Encoding.ASCII.GetBytes("bmock"),
+            ETag = "bbbb",
+            LastModified = DateTime.Now + TimeSpan.FromMinutes(1)
         };
+
+        private Avatar ToAvatar(UserAvatar entity)
+        {
+            return new Avatar
+            {
+                Data = entity.Data,
+                Type = entity.Type
+            };
+        }
+
+        private AvatarInfo ToAvatarInfo(UserAvatar entity)
+        {
+            return new AvatarInfo
+            {
+                Avatar = ToAvatar(entity),
+                LastModified = entity.LastModified
+            };
+        }
+
+        private void Set(UserAvatar to, UserAvatar from)
+        {
+            to.Type = from.Type;
+            to.Data = from.Data;
+            to.ETag = from.ETag;
+            to.LastModified = from.LastModified;
+        }
 
         private readonly MockDefaultUserAvatarProvider _mockDefaultUserAvatarProvider;
 
         private readonly LoggerFactory _loggerFactory;
         private readonly TestDatabase _database;
+
+        private readonly IETagGenerator _eTagGenerator;
 
         private readonly UserAvatarService _service;
 
@@ -126,13 +165,55 @@ namespace Timeline.Tests
             _loggerFactory = MyTestLoggerFactory.Create(outputHelper);
             _database = new TestDatabase();
 
-            _service = new UserAvatarService(_loggerFactory.CreateLogger<UserAvatarService>(), _database.DatabaseContext, _mockDefaultUserAvatarProvider, mockUserAvatarValidator);
+            _eTagGenerator = new ETagGenerator();
+
+            _service = new UserAvatarService(_loggerFactory.CreateLogger<UserAvatarService>(), _database.DatabaseContext, _mockDefaultUserAvatarProvider, mockUserAvatarValidator, _eTagGenerator);
         }
 
         public void Dispose()
         {
             _loggerFactory.Dispose();
             _database.Dispose();
+        }
+
+        [Fact]
+        public void GetAvatarETag_ShouldThrow_ArgumentException()
+        {
+            // no need to await because arguments are checked syncronizedly.
+            _service.Invoking(s => s.GetAvatarETag(null)).Should().Throw<ArgumentException>()
+                .Where(e => e.ParamName == "username" && e.Message.Contains("null", StringComparison.OrdinalIgnoreCase));
+            _service.Invoking(s => s.GetAvatarETag("")).Should().Throw<ArgumentException>()
+                .Where(e => e.ParamName == "username" && e.Message.Contains("empty", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
+        public void GetAvatarETag_ShouldThrow_UserNotExistException()
+        {
+            const string username = "usernotexist";
+            _service.Awaiting(s => s.GetAvatarETag(username)).Should().Throw<UserNotExistException>()
+                .Where(e => e.Username == username);
+        }
+
+        [Fact]
+        public async Task GetAvatarETag_ShouldReturn_Default()
+        {
+            const string username = MockUsers.UserUsername;
+            (await _service.GetAvatarETag(username)).Should().BeEquivalentTo((await _mockDefaultUserAvatarProvider.GetDefaultAvatarETag()));
+        }
+
+        [Fact]
+        public async Task GetAvatarETag_ShouldReturn_Data()
+        {
+            const string username = MockUsers.UserUsername;
+            {
+                // create mock data
+                var context = _database.DatabaseContext;
+                var user = await context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
+                Set(user.Avatar, MockAvatarEntity1);
+                await context.SaveChangesAsync();
+            }
+
+            (await _service.GetAvatarETag(username)).Should().BeEquivalentTo(MockAvatarEntity1.ETag);
         }
 
         [Fact]
@@ -169,24 +250,21 @@ namespace Timeline.Tests
                 // create mock data
                 var context = _database.DatabaseContext;
                 var user = await context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
-                user.Avatar = new UserAvatar
-                {
-                    Type = MockAvatar.Type,
-                    Data = MockAvatar.Data
-                };
+                Set(user.Avatar, MockAvatarEntity1);
                 await context.SaveChangesAsync();
             }
 
-            (await _service.GetAvatar(username)).Avatar.Should().BeEquivalentTo(MockAvatar);
+            (await _service.GetAvatar(username)).Should().BeEquivalentTo(ToAvatarInfo(MockAvatarEntity1));
         }
 
         [Fact]
         public void SetAvatar_ShouldThrow_ArgumentException()
         {
+            var avatar = ToAvatar(MockAvatarEntity1);
             // no need to await because arguments are checked syncronizedly.
-            _service.Invoking(s => s.SetAvatar(null, MockAvatar)).Should().Throw<ArgumentException>()
+            _service.Invoking(s => s.SetAvatar(null, avatar)).Should().Throw<ArgumentException>()
                 .Where(e => e.ParamName == "username" && e.Message.Contains("null", StringComparison.OrdinalIgnoreCase));
-            _service.Invoking(s => s.SetAvatar("", MockAvatar)).Should().Throw<ArgumentException>()
+            _service.Invoking(s => s.SetAvatar("", avatar)).Should().Throw<ArgumentException>()
                 .Where(e => e.ParamName == "username" && e.Message.Contains("empty", StringComparison.OrdinalIgnoreCase));
 
             _service.Invoking(s => s.SetAvatar("aaa", new Avatar { Type = null, Data = new[] { (byte)0x00 } })).Should().Throw<ArgumentException>()
@@ -202,7 +280,7 @@ namespace Timeline.Tests
         public void SetAvatar_ShouldThrow_UserNotExistException()
         {
             const string username = "usernotexist";
-            _service.Awaiting(s => s.SetAvatar(username, MockAvatar)).Should().Throw<UserNotExistException>()
+            _service.Awaiting(s => s.SetAvatar(username, ToAvatar(MockAvatarEntity1))).Should().Throw<UserNotExistException>()
                 .Where(e => e.Username == username);
         }
 
@@ -214,21 +292,26 @@ namespace Timeline.Tests
             var user = await _database.DatabaseContext.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
 
             // create
-            await _service.SetAvatar(username, MockAvatar);
+            var avatar1 = ToAvatar(MockAvatarEntity1);
+            await _service.SetAvatar(username, avatar1);
             user.Avatar.Should().NotBeNull();
-            user.Avatar.Type.Should().Be(MockAvatar.Type);
-            user.Avatar.Data.Should().Equal(MockAvatar.Data);
+            user.Avatar.Type.Should().Be(avatar1.Type);
+            user.Avatar.Data.Should().Equal(avatar1.Data);
+            user.Avatar.ETag.Should().NotBeNull();
 
             // modify
-            await _service.SetAvatar(username, MockAvatar2);
+            var avatar2 = ToAvatar(MockAvatarEntity2);
+            await _service.SetAvatar(username, avatar2);
             user.Avatar.Should().NotBeNull();
-            user.Avatar.Type.Should().Be(MockAvatar2.Type);
-            user.Avatar.Data.Should().Equal(MockAvatar2.Data);
+            user.Avatar.Type.Should().Be(MockAvatarEntity2.Type);
+            user.Avatar.Data.Should().Equal(MockAvatarEntity2.Data);
+            user.Avatar.ETag.Should().NotBeNull();
 
             // delete
             await _service.SetAvatar(username, null);
             user.Avatar.Type.Should().BeNull();
             user.Avatar.Data.Should().BeNull();
+            user.Avatar.ETag.Should().BeNull();
         }
     }
 }
