@@ -16,6 +16,9 @@ namespace Timeline.Entities
         [Column("type")]
         public string Type { get; set; }
 
+        [Column("etag"), MaxLength(30)]
+        public string ETag { get; set; }
+
         [Column("last_modified"), Required]
         public DateTime LastModified { get; set; }
 
@@ -28,6 +31,7 @@ namespace Timeline.Entities
                 Id = 0,
                 Data = null,
                 Type = null,
+                ETag = null,
                 LastModified = lastModified
             };
         }
