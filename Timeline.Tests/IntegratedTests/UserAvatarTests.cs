@@ -63,7 +63,16 @@ namespace Timeline.Tests.IntegratedTests
                     body.Should().Equal(defaultAvatarData);
                 }
 
-                await GetReturnDefault();
+                EntityTagHeaderValue eTag;
+                {
+                    var res = await client.GetAsync($"users/user/avatar");
+                    res.Should().HaveStatusCodeOk();
+                    res.Content.Headers.ContentType.MediaType.Should().Be("image/png");
+                    var body = await res.Content.ReadAsByteArrayAsync();
+                    body.Should().Equal(defaultAvatarData);
+                    eTag = res.Headers.ETag;
+                }
+
                 await GetReturnDefault("admin");
 
                 {
@@ -72,7 +81,19 @@ namespace Timeline.Tests.IntegratedTests
                         RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
                         Method = HttpMethod.Get,
                     };
-                    request.Headers.Add("If-Modified-Since", DateTime.Now.ToString("r"));
+                    request.Headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
+                    var res = await client.SendAsync(request);
+                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_BadFormat_IfNonMatch);
+                }
+
+                {
+                    var request = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
+                        Method = HttpMethod.Get,
+                    };
+                    request.Headers.Add ("If-None-Match", eTag.ToString());
                     var res = await client.SendAsync(request);
                     res.Should().HaveStatusCode(HttpStatusCode.NotModified);
                 }

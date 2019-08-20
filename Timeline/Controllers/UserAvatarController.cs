@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Authenticate;
 using Timeline.Filters;
@@ -61,22 +63,23 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<IActionResult> Get([FromRoute] string username)
         {
-            const string IfModifiedSinceHeaderKey = "If-Modified-Since";
+            const string IfNonMatchHeaderKey = "If-None-Match";
             try
             {
-                var avatarInfo = await _service.GetAvatar(username);
-                var avatar = avatarInfo.Avatar;
-                if (Request.Headers.TryGetValue(IfModifiedSinceHeaderKey, out var value))
+                var eTag = new EntityTagHeaderValue($"\"{await _service.GetAvatarETag(username)}\"");
+
+                if (Request.Headers.TryGetValue(IfNonMatchHeaderKey, out var value))
                 {
-                    var t = DateTime.Parse(value);
-                    if (t > avatarInfo.LastModified)
-                    {
-                        Response.Headers.Add(IfModifiedSinceHeaderKey, avatarInfo.LastModified.ToString("r"));
+                    if (!EntityTagHeaderValue.TryParseStrictList(value, out var eTagList))
+                        return BadRequest(CommonResponse.BadIfNonMatch());
+
+                    if (eTagList.First(e => e.Equals(eTag)) != null)
                         return StatusCode(StatusCodes.Status304NotModified);
-                    }
                 }
 
-                return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), null);
+                var avatarInfo = await _service.GetAvatar(username);
+                var avatar = avatarInfo.Avatar;
+                return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
             }
             catch (UserNotExistException e)
             {
