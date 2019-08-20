@@ -43,7 +43,7 @@ namespace Timeline.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().Property(e => e.Version).HasDefaultValue(0);
-            modelBuilder.Entity<User>().HasIndex(e => e.Name);
+            modelBuilder.Entity<User>().HasIndex(e => e.Name).IsUnique();
         }
 
         public DbSet<User> Users { get; set; }
