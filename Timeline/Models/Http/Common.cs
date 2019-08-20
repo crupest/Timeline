@@ -13,6 +13,7 @@ namespace Timeline.Models.Http
             public const int Header_Missing_ContentType = -111;
             public const int Header_Missing_ContentLength = -112;
             public const int Header_Zero_ContentLength = -113;
+            public const int Header_BadFormat_IfNonMatch = -114;
         }
 
         public static CommonResponse InvalidModel(string message)
@@ -33,6 +34,11 @@ namespace Timeline.Models.Http
         public static CommonResponse ZeroContentLength()
         {
             return new CommonResponse(ErrorCodes.Header_Zero_ContentLength, "Header Content-Length must not be 0.");
+        }
+
+        public static CommonResponse BadIfNonMatch()
+        {
+            return new CommonResponse(ErrorCodes.Header_BadFormat_IfNonMatch, "Header If-Non-Match is of bad format.");
         }
 
         public CommonResponse()

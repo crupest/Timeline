@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -65,6 +66,12 @@ namespace Timeline.Services
     public interface IDefaultUserAvatarProvider
     {
         /// <summary>
+        /// Get the etag of default avatar.
+        /// </summary>
+        /// <returns></returns>
+        Task<string> GetDefaultAvatarETag();
+
+        /// <summary>
         /// Get the default avatar.
         /// </summary>
         Task<AvatarInfo> GetDefaultAvatar();
@@ -82,6 +89,15 @@ namespace Timeline.Services
 
     public interface IUserAvatarService
     {
+        /// <summary>
+        /// Get the etag of a user's avatar.
+        /// </summary>
+        /// <param name="username">The username of the user to get avatar etag of.</param>
+        /// <returns>The etag.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="username"/> is null or empty.</exception>
+        /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
+        Task<string> GetAvatarETag(string username);
+
         /// <summary>
         /// Get avatar of a user. If the user has no avatar, a default one is returned.
         /// </summary>
@@ -107,22 +123,46 @@ namespace Timeline.Services
     {
         private readonly IHostingEnvironment _environment;
 
-        public DefaultUserAvatarProvider(IHostingEnvironment environment)
+        private readonly IETagGenerator _eTagGenerator;
+
+        private byte[] _cacheData;
+        private DateTime _cacheLastModified;
+        private string _cacheETag;
+
+        public DefaultUserAvatarProvider(IHostingEnvironment environment, IETagGenerator eTagGenerator)
         {
             _environment = environment;
+            _eTagGenerator = eTagGenerator;
+        }
+
+        private async Task CheckAndInit()
+        {
+            if (_cacheData != null)
+                return;
+
+            var path = Path.Combine(_environment.ContentRootPath, "default-avatar.png");
+            _cacheData = await File.ReadAllBytesAsync(path);
+            _cacheLastModified = File.GetLastWriteTime(path);
+            _cacheETag = _eTagGenerator.Generate(_cacheData);
+        }
+
+        public async Task<string> GetDefaultAvatarETag()
+        {
+            await CheckAndInit();
+            return _cacheETag;
         }
 
         public async Task<AvatarInfo> GetDefaultAvatar()
         {
-            var path = Path.Combine(_environment.ContentRootPath, "default-avatar.png");
+            await CheckAndInit();
             return new AvatarInfo
             {
                 Avatar = new Avatar
                 {
                     Type = "image/png",
-                    Data = await File.ReadAllBytesAsync(path)
+                    Data = _cacheData
                 },
-                LastModified = File.GetLastWriteTime(path)
+                LastModified = _cacheLastModified
             };
         }
     }
@@ -161,12 +201,36 @@ namespace Timeline.Services
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
         private readonly IUserAvatarValidator _avatarValidator;
 
-        public UserAvatarService(ILogger<UserAvatarService> logger, DatabaseContext database, IDefaultUserAvatarProvider defaultUserAvatarProvider, IUserAvatarValidator avatarValidator)
+        private readonly IETagGenerator _eTagGenerator;
+
+        public UserAvatarService(
+            ILogger<UserAvatarService> logger,
+            DatabaseContext database,
+            IDefaultUserAvatarProvider defaultUserAvatarProvider,
+            IUserAvatarValidator avatarValidator,
+            IETagGenerator eTagGenerator)
         {
             _logger = logger;
             _database = database;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
             _avatarValidator = avatarValidator;
+            _eTagGenerator = eTagGenerator;
+        }
+
+        public async Task<string> GetAvatarETag(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+                throw new ArgumentException("Username is null or empty.", nameof(username));
+
+            var userId = await _database.Users.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
+            if (userId == 0)
+                throw new UserNotExistException(username);
+
+            var eTag = (await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.ETag }).SingleAsync()).ETag;
+            if (eTag == null)
+                return await _defaultUserAvatarProvider.GetDefaultAvatarETag();
+            else
+                return eTag;
         }
 
         public async Task<AvatarInfo> GetAvatar(string username)
@@ -174,16 +238,17 @@ namespace Timeline.Services
             if (string.IsNullOrEmpty(username))
                 throw new ArgumentException("Username is null or empty.", nameof(username));
 
-            var user = await _database.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
-            if (user == null)
+            var userId = await _database.Users.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
+            if (userId == 0)
                 throw new UserNotExistException(username);
 
-            await _database.Entry(user).Reference(u => u.Avatar).LoadAsync();
-            var avatar = user.Avatar;
+            var avatar = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.Type, a.Data, a.LastModified }).SingleAsync();
 
-            if ((avatar.Type == null) == (avatar.Data == null))
+            if ((avatar.Type == null) != (avatar.Data == null))
+            {
                 _logger.LogCritical("Database corupted! One of type and data of a avatar is null but the other is not.");
-                // TODO: Throw an exception to indicate this.
+                throw new DatabaseCorruptedException();
+            }
 
             if (avatar.Data == null)
             {
@@ -218,12 +283,11 @@ namespace Timeline.Services
                     throw new ArgumentException("Data of avatar is null.", nameof(avatar));
             }
 
-            var user = await _database.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
-            if (user == null)
+            var userId = await _database.Users.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
+            if (userId == 0)
                 throw new UserNotExistException(username);
 
-            await _database.Entry(user).Reference(u => u.Avatar).LoadAsync();
-            var avatarEntity = user.Avatar;
+            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleAsync();
 
             if (avatar == null)
             {
@@ -233,6 +297,7 @@ namespace Timeline.Services
                 {
                     avatarEntity.Data = null;
                     avatarEntity.Type = null;
+                    avatarEntity.ETag = null;
                     avatarEntity.LastModified = DateTime.Now;
                     await _database.SaveChangesAsync();
                     _logger.LogInformation("Updated an entry in user_avatars.");
@@ -243,6 +308,7 @@ namespace Timeline.Services
                 await _avatarValidator.Validate(avatar);
                 avatarEntity.Type = avatar.Type;
                 avatarEntity.Data = avatar.Data;
+                avatarEntity.ETag = _eTagGenerator.Generate(avatar.Data);
                 avatarEntity.LastModified = DateTime.Now;
                 await _database.SaveChangesAsync();
                 _logger.LogInformation("Updated an entry in user_avatars.");
@@ -254,6 +320,7 @@ namespace Timeline.Services
     {
         public static void AddUserAvatarService(this IServiceCollection services)
         {
+            services.TryAddTransient<IETagGenerator, ETagGenerator>();
             services.AddScoped<IUserAvatarService, UserAvatarService>();
             services.AddSingleton<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
             services.AddSingleton<IUserAvatarValidator, UserAvatarValidator>();

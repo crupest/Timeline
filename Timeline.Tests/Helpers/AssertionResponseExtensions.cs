@@ -23,7 +23,8 @@ namespace Timeline.Tests.Helpers
             string padding = new string('\t', context.Depth);
 
             var res = (HttpResponseMessage)value;
-            return $"{newline}{padding} Status Code: {res.StatusCode} ; Body: {res.Content.ReadAsStringAsync().Result} ;";
+            var body = res.Content.ReadAsStringAsync().Result;
+            return $"{newline}{padding} Status Code: {res.StatusCode} ; Body: {body.Substring(0, Math.Min(body.Length, 20))} ;";
         }
     }
 
