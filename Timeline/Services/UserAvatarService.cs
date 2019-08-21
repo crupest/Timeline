@@ -219,12 +219,7 @@ namespace Timeline.Services
 
         public async Task<string> GetAvatarETag(string username)
         {
-            if (string.IsNullOrEmpty(username))
-                throw new ArgumentException("Username is null or empty.", nameof(username));
-
-            var userId = await _database.Users.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
-            if (userId == 0)
-                throw new UserNotExistException(username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
 
             var eTag = (await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.ETag }).SingleAsync()).ETag;
             if (eTag == null)
@@ -235,12 +230,7 @@ namespace Timeline.Services
 
         public async Task<AvatarInfo> GetAvatar(string username)
         {
-            if (string.IsNullOrEmpty(username))
-                throw new ArgumentException("Username is null or empty.", nameof(username));
-
-            var userId = await _database.Users.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
-            if (userId == 0)
-                throw new UserNotExistException(username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
 
             var avatar = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.Type, a.Data, a.LastModified }).SingleAsync();
 
@@ -272,9 +262,6 @@ namespace Timeline.Services
 
         public async Task SetAvatar(string username, Avatar avatar)
         {
-            if (string.IsNullOrEmpty(username))
-                throw new ArgumentException("Username is null or empty.", nameof(username));
-
             if (avatar != null)
             {
                 if (string.IsNullOrEmpty(avatar.Type))
@@ -283,9 +270,7 @@ namespace Timeline.Services
                     throw new ArgumentException("Data of avatar is null.", nameof(avatar));
             }
 
-            var userId = await _database.Users.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
-            if (userId == 0)
-                throw new UserNotExistException(username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
 
             var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleAsync();
 
