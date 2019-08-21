@@ -53,6 +53,7 @@ namespace Timeline.Services
                 };
                 _databaseContext.UserDetails.Add(detail);
                 await _databaseContext.SaveChangesAsync();
+                _logger.LogInformation("An entity is created in user_details.");
             }
             return detail;
         }
@@ -85,6 +86,7 @@ namespace Timeline.Services
                 detailEntity.Description = detail.Description;
 
             await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation("An entity is updated in user_details.");
         }
     }
 }
