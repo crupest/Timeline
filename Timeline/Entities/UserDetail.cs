@@ -12,7 +12,7 @@ namespace Timeline.Entities
         [Column("qq"), MaxLength(15)]
         public string QQ { get; set; }
 
-        [Column("email"), MaxLength(30)]
+        [Column("email"), MaxLength(50)]
         public string EMail { get; set; }
 
         [Column("phone_number"), MaxLength(15)]
