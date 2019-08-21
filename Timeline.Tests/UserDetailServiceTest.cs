@@ -123,58 +123,89 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public async Task UpdateDetail_Should_Work()
+        public async Task UpdateDetail_Empty_Should_Work()
         {
-            UserDetailEntity entity;
-
             await _service.UpdateUserDetail(MockUsers.UserUsername, new UserDetail());
 
+            var context = _database.DatabaseContext;
+            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+            var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
+            entity.QQ.Should().BeNullOrEmpty();
+            entity.EMail.Should().BeNullOrEmpty();
+            entity.PhoneNumber.Should().BeNullOrEmpty();
+            entity.Description.Should().BeNullOrEmpty();
+        }
+
+        [Theory]
+        [InlineData(nameof(UserDetail.QQ), nameof(UserDetailEntity.QQ), "12345678910", "987654321")]
+        [InlineData(nameof(UserDetail.EMail), nameof(UserDetailEntity.EMail), "aaa@aaa.aaa", "bbb@bbb.bbb")]
+        [InlineData(nameof(UserDetail.PhoneNumber), nameof(UserDetailEntity.PhoneNumber), "12345678910", "987654321")]
+        [InlineData(nameof(UserDetail.Description), nameof(UserDetailEntity.Description), "descriptionA", "descriptionB")]
+        public async Task UpdateDetail_Single_Should_Work(string propertyName, string entityPropertyName, string mockData1, string mockData2)
+        {
+
+            UserDetail CreateWith(string propertyValue)
             {
-                var context = _database.DatabaseContext;
-                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
-                entity = context.UserDetails.Where(e => e.UserId == userId).Single();
-                entity.QQ.Should().BeNullOrEmpty();
-                entity.EMail.Should().BeNullOrEmpty();
-                entity.PhoneNumber.Should().BeNullOrEmpty();
-                entity.Description.Should().BeNullOrEmpty();
+                var detail = new UserDetail();
+                typeof(UserDetail).GetProperty(propertyName).SetValue(detail, propertyValue);
+                return detail;
             }
 
-            const string email = "ha@aaa.net";
-            const string phoneNumber = "12345678910";
-            const string description = "hahaha";
+            await _service.UpdateUserDetail(MockUsers.UserUsername, CreateWith(mockData1));
 
-            await _service.UpdateUserDetail(MockUsers.UserUsername, new UserDetail
-            {
-                EMail = email,
-                PhoneNumber = phoneNumber,
-                Description = description
-            });
+            var context = _database.DatabaseContext;
+            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+            var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
 
+            void TestWith(string propertyValue)
             {
-                var context = _database.DatabaseContext;
-                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
-                entity = context.UserDetails.Where(e => e.UserId == userId).Single();
-                entity.QQ.Should().BeNullOrEmpty();
-                entity.EMail.Should().Be(email);
-                entity.PhoneNumber.Should().Be(phoneNumber);
-                entity.Description.Should().Be(description);
+                typeof(UserDetailEntity).GetProperty(entityPropertyName).GetValue(entity).Should().Equals(propertyValue);
+                foreach (var p in typeof(UserDetailEntity).GetProperties().Where(p => p.Name != entityPropertyName))
+                    (p.GetValue(entity) as string).Should().BeNullOrEmpty();
             }
 
-            const string newDescription = "new description";
+            TestWith(mockData1);
 
-            await _service.UpdateUserDetail(MockUsers.UserUsername, new UserDetail
+            await _service.UpdateUserDetail(MockUsers.UserUsername, CreateWith(mockData2));
+            TestWith(mockData2);
+            await _service.UpdateUserDetail(MockUsers.UserUsername, CreateWith(""));
+            TestWith("");
+        }
+
+        [Fact]
+        public async Task UpdateDetail_Multiple_Should_Work()
+        {
+            var detail = new UserDetail
             {
-                EMail = null,
+                QQ = "12345678",
+                EMail = "aaa@aaa.aaa",
+                PhoneNumber = "11111111111",
+                Description = "aaaaaaaaaa"
+            };
+
+            await _service.UpdateUserDetail(MockUsers.UserUsername, detail);
+
+            var context = _database.DatabaseContext;
+            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+            var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
+            entity.QQ.Should().Equals(detail.QQ);
+            entity.EMail.Should().Equals(detail.EMail);
+            entity.PhoneNumber.Should().Equals(detail.PhoneNumber);
+            entity.Description.Should().Equals(detail.Description);
+
+            var detail2 = new UserDetail
+            {
+                QQ = null,
+                EMail = "bbb@bbb.bbb",
                 PhoneNumber = "",
-                Description = newDescription
-            });
+                Description = "bbbbbbbbb"
+            };
 
-            {
-                entity.QQ.Should().BeNullOrEmpty();
-                entity.EMail.Should().Be(email);
-                entity.PhoneNumber.Should().BeNullOrEmpty();
-                entity.Description.Should().Be(newDescription);
-            }
+            await _service.UpdateUserDetail(MockUsers.UserUsername, detail2);
+            entity.QQ.Should().Equals(detail.QQ);
+            entity.EMail.Should().Equals(detail2.EMail);
+            entity.PhoneNumber.Should().BeNullOrEmpty();
+            entity.Description.Should().Equals(detail2.Description);
         }
     }
 }
