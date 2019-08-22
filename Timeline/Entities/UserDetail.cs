@@ -9,6 +9,9 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [Column("nickname"), MaxLength(15)]
+        public string Nickname { get; set; }
+
         [Column("qq"), MaxLength(15)]
         public string QQ { get; set; }
 

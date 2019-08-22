@@ -1,10 +1,14 @@
-﻿using Timeline.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using Timeline.Entities;
 using Timeline.Models.Validation;
 
 namespace Timeline.Models
 {
     public class UserDetail
     {
+        [MaxLength(10)]
+        public string Nickname { get; set; }
+
         [ValidateWith(typeof(UserDetailValidators.QQValidator))]
         public string QQ { get; set; }
 
@@ -28,6 +32,7 @@ namespace Timeline.Models
         {
             return new UserDetail
             {
+                Nickname = CoerceEmptyToNull(entity.Nickname),
                 QQ = CoerceEmptyToNull(entity.QQ),
                 EMail = CoerceEmptyToNull(entity.EMail),
                 PhoneNumber = CoerceEmptyToNull(entity.PhoneNumber),

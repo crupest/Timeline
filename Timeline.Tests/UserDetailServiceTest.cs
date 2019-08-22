@@ -35,6 +35,68 @@ namespace Timeline.Tests
         }
 
         [Fact]
+        public void GetNickname_ShouldThrow_ArgumentException()
+        {
+            // no need to await because arguments are checked syncronizedly.
+            _service.Invoking(s => s.GetUserNickname(null)).Should().Throw<ArgumentException>()
+                .Where(e => e.ParamName == "username" && e.Message.Contains("null", StringComparison.OrdinalIgnoreCase));
+            _service.Invoking(s => s.GetUserNickname("")).Should().Throw<ArgumentException>()
+                .Where(e => e.ParamName == "username" && e.Message.Contains("empty", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
+        public void GetNickname_ShouldThrow_UserNotExistException()
+        {
+            const string username = "usernotexist";
+            _service.Awaiting(s => s.GetUserNickname(username)).Should().Throw<UserNotExistException>()
+                .Where(e => e.Username == username);
+        }
+
+        [Fact]
+        public async Task GetNickname_Should_Create_And_ReturnDefault()
+        {
+            {
+                var nickname = await _service.GetUserNickname(MockUsers.UserUsername);
+                nickname.Should().BeNull();
+            }
+
+            {
+                var context = _database.DatabaseContext;
+                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+                var detail = context.UserDetails.Where(e => e.UserId == userId).Single();
+                detail.Nickname.Should().BeNullOrEmpty();
+                detail.QQ.Should().BeNullOrEmpty();
+                detail.EMail.Should().BeNullOrEmpty();
+                detail.PhoneNumber.Should().BeNullOrEmpty();
+                detail.Description.Should().BeNullOrEmpty();
+            }
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("nickname")]
+        public async Task GetNickname_Should_ReturnData(string nickname)
+        {
+            {
+                var context = _database.DatabaseContext;
+                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+                var entity = new UserDetailEntity
+                {
+                    Nickname = nickname,
+                    UserId = userId
+                };
+                context.Add(entity);
+                await context.SaveChangesAsync();
+            }
+
+            {
+                var n = await _service.GetUserNickname(MockUsers.UserUsername);
+                n.Should().Equals(string.IsNullOrEmpty(nickname) ? null : nickname);
+            }
+        }
+
+        [Fact]
         public void GetDetail_ShouldThrow_ArgumentException()
         {
             // no need to await because arguments are checked syncronizedly.
@@ -64,6 +126,7 @@ namespace Timeline.Tests
                 var context = _database.DatabaseContext;
                 var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
                 var detail = context.UserDetails.Where(e => e.UserId == userId).Single();
+                detail.Nickname.Should().BeNullOrEmpty();
                 detail.QQ.Should().BeNullOrEmpty();
                 detail.EMail.Should().BeNullOrEmpty();
                 detail.PhoneNumber.Should().BeNullOrEmpty();
@@ -77,12 +140,11 @@ namespace Timeline.Tests
             const string email = "ha@aaa.net";
             const string description = "hahaha";
 
-            var context = _database.DatabaseContext;
-            UserDetailEntity entity;
 
             {
+                var context = _database.DatabaseContext;
                 var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
-                entity = new UserDetailEntity
+                var entity = new UserDetailEntity
                 {
                     EMail = email,
                     Description = description,
@@ -130,6 +192,7 @@ namespace Timeline.Tests
             var context = _database.DatabaseContext;
             var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
             var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
+            entity.Nickname.Should().BeNullOrEmpty();
             entity.QQ.Should().BeNullOrEmpty();
             entity.EMail.Should().BeNullOrEmpty();
             entity.PhoneNumber.Should().BeNullOrEmpty();
@@ -137,6 +200,7 @@ namespace Timeline.Tests
         }
 
         [Theory]
+        [InlineData(nameof(UserDetail.Nickname), nameof(UserDetailEntity.Nickname), "aaaa", "bbbb")]
         [InlineData(nameof(UserDetail.QQ), nameof(UserDetailEntity.QQ), "12345678910", "987654321")]
         [InlineData(nameof(UserDetail.EMail), nameof(UserDetailEntity.EMail), "aaa@aaa.aaa", "bbb@bbb.bbb")]
         [InlineData(nameof(UserDetail.PhoneNumber), nameof(UserDetailEntity.PhoneNumber), "12345678910", "987654321")]
