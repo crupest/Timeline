@@ -12,6 +12,15 @@ namespace Timeline.Services
     public interface IUserDetailService
     {
         /// <summary>
+        /// Get the nickname of user.
+        /// </summary>
+        /// <param name="username">The username to get nickname of.</param>
+        /// <returns>The user's nickname. Null if not set.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="username"/> is null or empty.</exception>
+        /// <exception cref="UserNotExistException">Thrown if user doesn't exist.</exception>
+        Task<string> GetUserNickname(string username);
+
+        /// <summary>
         /// Get the detail of user.
         /// </summary>
         /// <param name="username">The username to get user detail of.</param>
@@ -42,21 +51,43 @@ namespace Timeline.Services
             _databaseContext = databaseContext;
         }
 
+        private async Task<UserDetailEntity> CreateEntity(long userId)
+        {
+            var entity = new UserDetailEntity()
+            {
+                UserId = userId
+            };
+            _databaseContext.UserDetails.Add(entity);
+            await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation("An entity is created in user_details.");
+            return entity;
+        }
+
         // Check the existence of user detail entry
         private async Task<UserDetailEntity> CheckAndInit(long userId)
         {
             var detail = await _databaseContext.UserDetails.Where(e => e.UserId == userId).SingleOrDefaultAsync();
             if (detail == null)
             {
-                detail = new UserDetailEntity()
-                {
-                    UserId = userId
-                };
-                _databaseContext.UserDetails.Add(detail);
-                await _databaseContext.SaveChangesAsync();
-                _logger.LogInformation("An entity is created in user_details.");
+                detail = await CreateEntity(userId);
             }
             return detail;
+        }
+
+        public async Task<string> GetUserNickname(string username)
+        {
+            var userId = await DatabaseExtensions.CheckAndGetUser(_databaseContext.Users, username);
+            var detail = await _databaseContext.UserDetails.Where(e => e.UserId == userId).Select(e => new { e.Nickname }).SingleOrDefaultAsync();
+            if (detail == null)
+            {
+                var entity = await CreateEntity(userId);
+                return null;
+            }
+            else
+            {
+                var nickname = detail.Nickname;
+                return string.IsNullOrEmpty(nickname) ? null : nickname;
+            }
         }
 
         public async Task<UserDetail> GetUserDetail(string username)
@@ -73,6 +104,9 @@ namespace Timeline.Services
 
             var userId = await DatabaseExtensions.CheckAndGetUser(_databaseContext.Users, username);
             var detailEntity = await CheckAndInit(userId);
+
+            if (detail.Nickname != null)
+                detailEntity.Nickname = detail.Nickname;
 
             if (detail.QQ != null)
                 detailEntity.QQ = detail.QQ;
