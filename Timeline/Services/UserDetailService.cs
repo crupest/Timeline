@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -87,6 +88,14 @@ namespace Timeline.Services
 
             await _databaseContext.SaveChangesAsync();
             _logger.LogInformation("An entity is updated in user_details.");
+        }
+    }
+
+    public static class UserDetailServiceCollectionExtensions
+    {
+        public static void AddUserDetailService(this IServiceCollection services)
+        {
+            services.AddScoped<IUserDetailService, UserDetailService>();
         }
     }
 }
