@@ -1,8 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Timeline.Controllers;
@@ -37,6 +35,12 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await _factory.CreateClientAsUser())
             {
                 {
+                    var res = await client.GetAsync($"users/usernotexist/nickname");
+                    res.Should().HaveStatusCodeNotFound()
+                        .And.Should().HaveBodyAsCommonResponseWithCode(UserDetailController.ErrorCodes.GetNickname_UserNotExist);
+                }
+
+                {
                     var res = await client.GetAsync($"users/usernotexist/details");
                     res.Should().HaveStatusCodeNotFound()
                         .And.Should().HaveBodyAsCommonResponseWithCode(UserDetailController.ErrorCodes.Get_UserNotExist);
@@ -61,15 +65,24 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var res = await client.PatchAsJsonAsync($"users/{MockUsers.UserUsername}/details", new UserDetail
                     {
+                        Nickname = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                         QQ = "aaaaaaa",
-                        EMail = "aaaaaa"
+                        EMail = "aaaaaa",
+                        PhoneNumber = "aaaaaaaa"
                     });
-                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.InvalidModel);
+                    var body = res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
+                        .And.Should().HaveBodyAsCommonResponse().Which;
+                    body.Code.Should().Be(CommonResponse.ErrorCodes.InvalidModel);
+                    foreach (var key in new string[] { "nickname", "qq", "email", "phonenumber" })
+                    {
+                        body.Message.Should().ContainEquivalentOf(key);
+                    }
                 }
+
 
                 var detail = new UserDetail
                 {
+                    Nickname = "aaa",
                     QQ = "1234567",
                     EMail = "aaaa@aaa.net",
                     Description = "aaaaaaaaa"
@@ -79,6 +92,15 @@ namespace Timeline.Tests.IntegratedTests
                     var res = await client.PatchAsJsonAsync($"users/{MockUsers.UserUsername}/details", detail);
                     res.Should().HaveStatusCodeOk();
                     await GetAndTest(detail);
+                }
+
+                {
+                    var res = await client.GetAsync($"users/{MockUsers.UserUsername}/nickname");
+                    res.Should().HaveStatusCodeOk().And.Should().HaveBodyAsJson<UserDetail>()
+                        .Which.Should().BeEquivalentTo(new UserDetail
+                        {
+                            Nickname = detail.Nickname
+                        });
                 }
 
                 var detail2 = new UserDetail
@@ -93,6 +115,7 @@ namespace Timeline.Tests.IntegratedTests
                     res.Should().HaveStatusCodeOk();
                     await GetAndTest(new UserDetail
                     {
+                        Nickname = detail.Nickname,
                         QQ = null,
                         EMail = detail.EMail,
                         PhoneNumber = detail2.PhoneNumber,

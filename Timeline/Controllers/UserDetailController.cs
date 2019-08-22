@@ -10,7 +10,7 @@ using Timeline.Services;
 
 namespace Timeline.Controllers
 {
-    [Route("users/{username}/details")]
+    [Route("users/{username}")]
     [ProducesErrorResponseType(typeof(CommonResponse))]
     [ApiController]
     public class UserDetailController : Controller
@@ -22,6 +22,7 @@ namespace Timeline.Controllers
             public const int Patch_Forbid = -2001;
             public const int Patch_UserNotExist = -2002;
 
+            public const int GetNickname_UserNotExist = -3001;
         }
 
         private readonly ILogger<UserDetailController> _logger;
@@ -33,7 +34,27 @@ namespace Timeline.Controllers
             _service = service;
         }
 
-        [HttpGet()]
+        [HttpGet("nickname")]
+        [UserAuthorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDetail))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetNickname([FromRoute] string username)
+        {
+            try
+            {
+                var nickname = await _service.GetUserNickname(username);
+                return Ok(new UserDetail
+                {
+                    Nickname = nickname
+                });
+            }
+            catch (UserNotExistException)
+            {
+                return NotFound(new CommonResponse(ErrorCodes.GetNickname_UserNotExist, "The user does not exist."));
+            }
+        }
+
+        [HttpGet("details")]
         [UserAuthorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDetail))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -50,7 +71,7 @@ namespace Timeline.Controllers
             }
         }
 
-        [HttpPatch()]
+        [HttpPatch("details")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(void))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
