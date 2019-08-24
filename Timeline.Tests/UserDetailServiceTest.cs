@@ -66,7 +66,7 @@ namespace Timeline.Tests
                 var detail = context.UserDetails.Where(e => e.UserId == userId).Single();
                 detail.Nickname.Should().BeNullOrEmpty();
                 detail.QQ.Should().BeNullOrEmpty();
-                detail.EMail.Should().BeNullOrEmpty();
+                detail.Email.Should().BeNullOrEmpty();
                 detail.PhoneNumber.Should().BeNullOrEmpty();
                 detail.Description.Should().BeNullOrEmpty();
             }
@@ -128,7 +128,7 @@ namespace Timeline.Tests
                 var detail = context.UserDetails.Where(e => e.UserId == userId).Single();
                 detail.Nickname.Should().BeNullOrEmpty();
                 detail.QQ.Should().BeNullOrEmpty();
-                detail.EMail.Should().BeNullOrEmpty();
+                detail.Email.Should().BeNullOrEmpty();
                 detail.PhoneNumber.Should().BeNullOrEmpty();
                 detail.Description.Should().BeNullOrEmpty();
             }
@@ -146,7 +146,7 @@ namespace Timeline.Tests
                 var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
                 var entity = new UserDetailEntity
                 {
-                    EMail = email,
+                    Email = email,
                     Description = description,
                     UserId = userId
                 };
@@ -158,7 +158,7 @@ namespace Timeline.Tests
                 var detail = await _service.GetUserDetail(MockUsers.UserUsername);
                 detail.Should().BeEquivalentTo(new UserDetail
                 {
-                    EMail = email,
+                    Email = email,
                     Description = description
                 });
             }
@@ -194,7 +194,7 @@ namespace Timeline.Tests
             var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
             entity.Nickname.Should().BeNullOrEmpty();
             entity.QQ.Should().BeNullOrEmpty();
-            entity.EMail.Should().BeNullOrEmpty();
+            entity.Email.Should().BeNullOrEmpty();
             entity.PhoneNumber.Should().BeNullOrEmpty();
             entity.Description.Should().BeNullOrEmpty();
         }
@@ -202,7 +202,7 @@ namespace Timeline.Tests
         [Theory]
         [InlineData(nameof(UserDetail.Nickname), nameof(UserDetailEntity.Nickname), "aaaa", "bbbb")]
         [InlineData(nameof(UserDetail.QQ), nameof(UserDetailEntity.QQ), "12345678910", "987654321")]
-        [InlineData(nameof(UserDetail.EMail), nameof(UserDetailEntity.EMail), "aaa@aaa.aaa", "bbb@bbb.bbb")]
+        [InlineData(nameof(UserDetail.Email), nameof(UserDetailEntity.Email), "aaa@aaa.aaa", "bbb@bbb.bbb")]
         [InlineData(nameof(UserDetail.PhoneNumber), nameof(UserDetailEntity.PhoneNumber), "12345678910", "987654321")]
         [InlineData(nameof(UserDetail.Description), nameof(UserDetailEntity.Description), "descriptionA", "descriptionB")]
         public async Task UpdateDetail_Single_Should_Work(string propertyName, string entityPropertyName, string mockData1, string mockData2)
@@ -242,7 +242,7 @@ namespace Timeline.Tests
             var detail = new UserDetail
             {
                 QQ = "12345678",
-                EMail = "aaa@aaa.aaa",
+                Email = "aaa@aaa.aaa",
                 PhoneNumber = "11111111111",
                 Description = "aaaaaaaaaa"
             };
@@ -253,21 +253,21 @@ namespace Timeline.Tests
             var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
             var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
             entity.QQ.Should().Equals(detail.QQ);
-            entity.EMail.Should().Equals(detail.EMail);
+            entity.Email.Should().Equals(detail.Email);
             entity.PhoneNumber.Should().Equals(detail.PhoneNumber);
             entity.Description.Should().Equals(detail.Description);
 
             var detail2 = new UserDetail
             {
                 QQ = null,
-                EMail = "bbb@bbb.bbb",
+                Email = "bbb@bbb.bbb",
                 PhoneNumber = "",
                 Description = "bbbbbbbbb"
             };
 
             await _service.UpdateUserDetail(MockUsers.UserUsername, detail2);
             entity.QQ.Should().Equals(detail.QQ);
-            entity.EMail.Should().Equals(detail2.EMail);
+            entity.Email.Should().Equals(detail2.Email);
             entity.PhoneNumber.Should().BeNullOrEmpty();
             entity.Description.Should().Equals(detail2.Description);
         }
