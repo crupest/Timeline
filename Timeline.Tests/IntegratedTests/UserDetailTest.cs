@@ -67,7 +67,7 @@ namespace Timeline.Tests.IntegratedTests
                     {
                         Nickname = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                         QQ = "aaaaaaa",
-                        EMail = "aaaaaa",
+                        Email = "aaaaaa",
                         PhoneNumber = "aaaaaaaa"
                     });
                     var body = res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
@@ -84,7 +84,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     Nickname = "aaa",
                     QQ = "1234567",
-                    EMail = "aaaa@aaa.net",
+                    Email = "aaaa@aaa.net",
                     Description = "aaaaaaaaa"
                 };
 
@@ -117,7 +117,7 @@ namespace Timeline.Tests.IntegratedTests
                     {
                         Nickname = detail.Nickname,
                         QQ = null,
-                        EMail = detail.EMail,
+                        Email = detail.Email,
                         PhoneNumber = detail2.PhoneNumber,
                         Description = detail2.Description
                     });

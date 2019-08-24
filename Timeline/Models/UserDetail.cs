@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Timeline.Entities;
 using Timeline.Models.Validation;
+using Newtonsoft.Json;
 
 namespace Timeline.Models
 {
@@ -10,10 +11,11 @@ namespace Timeline.Models
         public string Nickname { get; set; }
 
         [ValidateWith(typeof(UserDetailValidators.QQValidator))]
+        [JsonProperty(PropertyName = "qq")]
         public string QQ { get; set; }
 
         [ValidateWith(typeof(UserDetailValidators.EMailValidator))]
-        public string EMail { get; set; }
+        public string Email { get; set; }
 
         [ValidateWith(typeof(UserDetailValidators.PhoneNumberValidator))]
         public string PhoneNumber { get; set; }
@@ -34,7 +36,7 @@ namespace Timeline.Models
             {
                 Nickname = CoerceEmptyToNull(entity.Nickname),
                 QQ = CoerceEmptyToNull(entity.QQ),
-                EMail = CoerceEmptyToNull(entity.EMail),
+                Email = CoerceEmptyToNull(entity.Email),
                 PhoneNumber = CoerceEmptyToNull(entity.PhoneNumber),
                 Description = CoerceEmptyToNull(entity.Description)
             };

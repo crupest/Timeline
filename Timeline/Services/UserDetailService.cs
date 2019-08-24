@@ -111,8 +111,8 @@ namespace Timeline.Services
             if (detail.QQ != null)
                 detailEntity.QQ = detail.QQ;
 
-            if (detail.EMail != null)
-                detailEntity.EMail = detail.EMail;
+            if (detail.Email != null)
+                detailEntity.Email = detail.Email;
 
             if (detail.PhoneNumber != null)
                 detailEntity.PhoneNumber = detail.PhoneNumber;
