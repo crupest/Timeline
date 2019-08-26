@@ -80,7 +80,7 @@ namespace Timeline.Controllers
                 var avatarInfo = await _service.GetAvatar(username);
                 var avatar = avatarInfo.Avatar;
 
-                Response.Headers.Add("Cache-Control", "no-cache, must-revalidate");
+                Response.Headers.Add("Cache-Control", "no-cache, must-revalidate, max-age=1");
                 return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
             }
             catch (UserNotExistException e)
