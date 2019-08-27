@@ -77,7 +77,7 @@ namespace Timeline.Controllers
                     if (!EntityTagHeaderValue.TryParseStrictList(value, out var eTagList))
                         return BadRequest(CommonResponse.BadIfNonMatch());
 
-                    if (eTagList.First(e => e.Equals(eTag)) != null)
+                    if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
                     {
                         Response.Headers.Add(CacheControlHeaderKey, CacheControlHeaderValue);
                         Response.Headers.Add("ETag", eTagValue);

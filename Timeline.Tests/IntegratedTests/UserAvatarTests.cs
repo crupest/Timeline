@@ -93,6 +93,17 @@ namespace Timeline.Tests.IntegratedTests
                         RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
                         Method = HttpMethod.Get,
                     };
+                    request.Headers.TryAddWithoutValidation("If-None-Match", "\"aaa\"");
+                    var res = await client.SendAsync(request);
+                    res.Should().HaveStatusCode(HttpStatusCode.OK);
+                }
+
+                {
+                    var request = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
+                        Method = HttpMethod.Get,
+                    };
                     request.Headers.Add ("If-None-Match", eTag.ToString());
                     var res = await client.SendAsync(request);
                     res.Should().HaveStatusCode(HttpStatusCode.NotModified);
