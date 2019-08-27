@@ -64,9 +64,13 @@ namespace Timeline.Controllers
         public async Task<IActionResult> Get([FromRoute] string username)
         {
             const string IfNonMatchHeaderKey = "If-None-Match";
+            const string CacheControlHeaderKey = "Cache-Control";
+            const string CacheControlHeaderValue = "no-cache, must-revalidate, max-age=1";
+
             try
             {
-                var eTag = new EntityTagHeaderValue($"\"{await _service.GetAvatarETag(username)}\"");
+                var eTagValue = $"\"{await _service.GetAvatarETag(username)}\"";
+                var eTag = new EntityTagHeaderValue(eTagValue);
 
                 if (Request.Headers.TryGetValue(IfNonMatchHeaderKey, out var value))
                 {
@@ -74,13 +78,17 @@ namespace Timeline.Controllers
                         return BadRequest(CommonResponse.BadIfNonMatch());
 
                     if (eTagList.First(e => e.Equals(eTag)) != null)
+                    {
+                        Response.Headers.Add(CacheControlHeaderKey, CacheControlHeaderValue);
+                        Response.Headers.Add("ETag", eTagValue);
                         return StatusCode(StatusCodes.Status304NotModified);
+                    }
                 }
 
                 var avatarInfo = await _service.GetAvatar(username);
                 var avatar = avatarInfo.Avatar;
 
-                Response.Headers.Add("Cache-Control", "no-cache, must-revalidate, max-age=1");
+                Response.Headers.Add(CacheControlHeaderKey, CacheControlHeaderValue);
                 return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
             }
             catch (UserNotExistException e)
