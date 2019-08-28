@@ -70,6 +70,10 @@ namespace Timeline.Tests.IntegratedTests
                     res.Content.Headers.ContentType.MediaType.Should().Be("image/png");
                     var body = await res.Content.ReadAsByteArrayAsync();
                     body.Should().Equal(defaultAvatarData);
+                    var cacheControl = res.Headers.CacheControl;
+                    cacheControl.NoCache.Should().BeTrue();
+                    cacheControl.NoStore.Should().BeFalse();
+                    cacheControl.MaxAge.Should().NotBeNull().And.Be(TimeSpan.Zero);
                     eTag = res.Headers.ETag;
                 }
 
