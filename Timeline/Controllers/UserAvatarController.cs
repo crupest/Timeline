@@ -61,11 +61,10 @@ namespace Timeline.Controllers
 
         [HttpGet("users/{username}/avatar")]
         [Authorize]
+        [ResponseCache(NoStore = false, Location = ResponseCacheLocation.None, Duration = 0)]
         public async Task<IActionResult> Get([FromRoute] string username)
         {
             const string IfNonMatchHeaderKey = "If-None-Match";
-            const string CacheControlHeaderKey = "Cache-Control";
-            const string CacheControlHeaderValue = "no-cache, must-revalidate, max-age=1";
 
             try
             {
@@ -79,7 +78,6 @@ namespace Timeline.Controllers
 
                     if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
                     {
-                        Response.Headers.Add(CacheControlHeaderKey, CacheControlHeaderValue);
                         Response.Headers.Add("ETag", eTagValue);
                         return StatusCode(StatusCodes.Status304NotModified);
                     }
@@ -88,7 +86,6 @@ namespace Timeline.Controllers
                 var avatarInfo = await _service.GetAvatar(username);
                 var avatar = avatarInfo.Avatar;
 
-                Response.Headers.Add(CacheControlHeaderKey, CacheControlHeaderValue);
                 return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
             }
             catch (UserNotExistException e)
