@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Gif;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -108,7 +112,7 @@ namespace Timeline.Tests.IntegratedTests
                         RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
                         Method = HttpMethod.Get,
                     };
-                    request.Headers.Add ("If-None-Match", eTag.ToString());
+                    request.Headers.Add("If-None-Match", eTag.ToString());
                     var res = await client.SendAsync(request);
                     res.Should().HaveStatusCode(HttpStatusCode.NotModified);
                 }
@@ -197,6 +201,19 @@ namespace Timeline.Tests.IntegratedTests
                     res2.Content.Headers.ContentType.MediaType.Should().Be(mockAvatar.Type);
                     var body = await res2.Content.ReadAsByteArrayAsync();
                     body.Should().Equal(mockAvatar.Data);
+                }
+
+                IEnumerable<(string, IImageFormat)> formats = new (string, IImageFormat)[]
+                {
+                    ("image/jpeg", JpegFormat.Instance),
+                    ("image/gif", GifFormat.Instance),
+                    ("image/png", PngFormat.Instance),
+                };
+
+                foreach ((var mimeType, var format) in formats)
+                {
+                    var res = await client.PutByteArrayAsync("users/user/avatar", ImageHelper.CreateImageWithSize(100, 100, format), mimeType);
+                    res.Should().HaveStatusCode(HttpStatusCode.OK);
                 }
 
                 {
