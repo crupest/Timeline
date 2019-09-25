@@ -151,7 +151,7 @@ namespace Timeline.Tests
 
         private readonly MockDefaultUserAvatarProvider _mockDefaultUserAvatarProvider;
 
-        private readonly LoggerFactory _loggerFactory;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly TestDatabase _database;
 
         private readonly IETagGenerator _eTagGenerator;
@@ -162,7 +162,7 @@ namespace Timeline.Tests
         {
             _mockDefaultUserAvatarProvider = mockDefaultUserAvatarProvider;
 
-            _loggerFactory = MyTestLoggerFactory.Create(outputHelper);
+            _loggerFactory = Logging.Create(outputHelper);
             _database = new TestDatabase();
 
             _eTagGenerator = new ETagGenerator();

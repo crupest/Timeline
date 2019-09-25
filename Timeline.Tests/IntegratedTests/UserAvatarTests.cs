@@ -55,7 +55,7 @@ namespace Timeline.Tests.IntegratedTests
                         .And.Should().HaveBodyAsCommonResponseWithCode(UserAvatarController.ErrorCodes.Get_UserNotExist);
                 }
 
-                var env = _factory.Server.Host.Services.GetRequiredService<IHostingEnvironment>();
+                var env = _factory.Server.Host.Services.GetRequiredService<IWebHostEnvironment>();
                 var defaultAvatarData = await File.ReadAllBytesAsync(Path.Combine(env.ContentRootPath, "default-avatar.png"));
 
                 async Task GetReturnDefault(string username = "user")

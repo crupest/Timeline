@@ -58,11 +58,7 @@ namespace Timeline.Tests.Helpers
 
             return factory.WithWebHostBuilder(builder =>
             {
-                builder
-                .ConfigureLogging(logging =>
-                {
-                    logging.AddXunit(outputHelper);
-                })
+                builder.ConfigureTestLogging()
                 .ConfigureServices(services =>
                 {
                     services.AddEntityFrameworkSqlite();
