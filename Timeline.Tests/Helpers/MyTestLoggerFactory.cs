@@ -1,14 +1,25 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Testing;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit.Abstractions;
 
 namespace Timeline.Tests.Helpers
 {
-    public static class MyTestLoggerFactory
+    public static class Logging
     {
-        public static LoggerFactory Create(ITestOutputHelper outputHelper)
+        public static ILoggerFactory Create(ITestOutputHelper outputHelper)
         {
-            return new LoggerFactory(new[] { new XunitLoggerProvider(outputHelper) });
+            // TODO: Use test output.
+            return NullLoggerFactory.Instance;
+        }
+
+        public static IWebHostBuilder ConfigureTestLogging(this IWebHostBuilder builder)
+        {
+            builder.ConfigureLogging(logging =>
+            {
+                //logging.AddXunit(outputHelper);
+            });
+            return builder;
         }
     }
 }

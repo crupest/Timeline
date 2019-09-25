@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Timeline.Authenticate;
 using Timeline.Configs;
 using Timeline.Entities;
@@ -16,23 +16,23 @@ namespace Timeline
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Environment = environment;
             Configuration = configuration;
         }
 
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-                .ConfigureApiBehaviorOptions(options =>{
+                .ConfigureApiBehaviorOptions(options =>
+                {
                     options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                });
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
@@ -75,9 +75,13 @@ namespace Timeline
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
+            app.UseRouting();
+
             app.UseAuthentication();
 
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+            {
+            });
         }
     }
 }

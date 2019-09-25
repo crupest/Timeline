@@ -2,6 +2,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 
 namespace Timeline
 {
@@ -10,7 +11,7 @@ namespace Timeline
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args)
-            .ConfigureAppConfiguration((context, config) => 
+            .ConfigureAppConfiguration((context, config) =>
             {
                 if (context.HostingEnvironment.IsProduction())
                     config.AddJsonFile(new PhysicalFileProvider("/etc/webapp/timeline/"), "config.json", true, true);

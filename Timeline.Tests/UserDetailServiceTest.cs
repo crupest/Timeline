@@ -15,14 +15,14 @@ namespace Timeline.Tests
 {
     public class UserDetailServiceTest : IDisposable
     {
-        private readonly LoggerFactory _loggerFactory;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly TestDatabase _database;
 
         private readonly UserDetailService _service;
 
         public UserDetailServiceTest(ITestOutputHelper outputHelper)
         {
-            _loggerFactory = MyTestLoggerFactory.Create(outputHelper);
+            _loggerFactory = Logging.Create(outputHelper);
             _database = new TestDatabase();
 
             _service = new UserDetailService(_loggerFactory.CreateLogger<UserDetailService>(), _database.DatabaseContext);

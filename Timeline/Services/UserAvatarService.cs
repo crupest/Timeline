@@ -121,7 +121,7 @@ namespace Timeline.Services
 
     public class DefaultUserAvatarProvider : IDefaultUserAvatarProvider
     {
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
 
         private readonly IETagGenerator _eTagGenerator;
 
@@ -129,7 +129,7 @@ namespace Timeline.Services
         private DateTime _cacheLastModified;
         private string _cacheETag;
 
-        public DefaultUserAvatarProvider(IHostingEnvironment environment, IETagGenerator eTagGenerator)
+        public DefaultUserAvatarProvider(IWebHostEnvironment environment, IETagGenerator eTagGenerator)
         {
             _environment = environment;
             _eTagGenerator = eTagGenerator;
