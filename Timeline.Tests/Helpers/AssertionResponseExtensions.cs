@@ -110,29 +110,39 @@ namespace Timeline.Tests.Helpers
             return assertions.HaveBodyAsJson<CommonResponse>(because, becauseArgs);
         }
 
+        public static AndWhichConstraint<HttpResponseMessage, CommonDataResponse<T>> HaveBodyAsCommonDataResponse<T>(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        {
+            return assertions.HaveBodyAsJson<CommonDataResponse<T>>(because, becauseArgs);
+        }
+
         public static void HaveBodyAsCommonResponseWithCode(this HttpResponseMessageAssertions assertions, int expected, string because = "", params object[] becauseArgs)
         {
             assertions.HaveBodyAsCommonResponse(because, becauseArgs).Which.Code.Should().Be(expected, because, becauseArgs);
         }
 
-        public static void BePutCreated(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static void HaveBodyAsCommonDataResponseWithCode<T>(this HttpResponseMessageAssertions assertions, int expected, string because = "", params object[] becauseArgs)
         {
-            assertions.HaveStatusCodeCreated(because, becauseArgs).And.Should().HaveBodyAsCommonResponse(because, becauseArgs).Which.Should().BeEquivalentTo(CommonPutResponse.Created, because, becauseArgs);
+            assertions.HaveBodyAsCommonDataResponse<T>(because, becauseArgs).Which.Code.Should().Be(expected, because, becauseArgs);
         }
 
-        public static void BePutModified(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static void BePutCreate(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
-            assertions.HaveStatusCodeOk(because, becauseArgs).And.Should().HaveBodyAsCommonResponse(because, becauseArgs).Which.Should().BeEquivalentTo(CommonPutResponse.Modified, because, becauseArgs);
+            assertions.HaveStatusCodeCreated(because, becauseArgs).And.Should().HaveBodyAsCommonDataResponse<CommonPutResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonPutResponse.Create(), because, becauseArgs);
         }
 
-        public static void BeDeleteDeleted(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static void BePutModify(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
-            assertions.HaveStatusCodeOk(because, becauseArgs).And.Should().HaveBodyAsCommonResponse(because, becauseArgs).Which.Should().BeEquivalentTo(CommonDeleteResponse.Deleted, because, becauseArgs);
+            assertions.HaveStatusCodeOk(because, becauseArgs).And.Should().HaveBodyAsCommonDataResponse<CommonPutResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonPutResponse.Modify(), because, becauseArgs);
+        }
+
+        public static void BeDeleteDelete(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        {
+            assertions.HaveStatusCodeOk(because, becauseArgs).And.Should().HaveBodyAsCommonDataResponse<CommonDeleteResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonDeleteResponse.Delete(), because, becauseArgs);
         }
 
         public static void BeDeleteNotExist(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
-            assertions.HaveStatusCodeOk(because, becauseArgs).And.Should().HaveBodyAsCommonResponse(because, becauseArgs).Which.Should().BeEquivalentTo(CommonDeleteResponse.NotExists, because, becauseArgs);
+            assertions.HaveStatusCodeOk(because, becauseArgs).And.Should().HaveBodyAsCommonDataResponse<CommonDeleteResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonDeleteResponse.NotExist(), because, becauseArgs);
         }
     }
 }

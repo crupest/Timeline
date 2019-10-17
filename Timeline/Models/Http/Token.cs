@@ -10,7 +10,7 @@ namespace Timeline.Models.Http
         public string Password { get; set; }
         // in days, optional
         [Range(1, 365)]
-        public int? ExpireOffset { get; set; }
+        public int? Expire { get; set; }
     }
 
     public class CreateTokenResponse

@@ -10,23 +10,23 @@ using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Timeline.Tests.Mock.Data;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
-    public class UserUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
+    public class UserUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
+        private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
-        private readonly Action _disposeAction;
 
-        public UserUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+        public UserUnitTest(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+            _testApp = new TestApplication(factory);
+            _factory = _testApp.Factory;
         }
 
         public void Dispose()
         {
-            _disposeAction();
+            _testApp.Dispose();
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace Timeline.Tests
             {
                 var res = await client.GetAsync("users");
                 res.Should().HaveStatusCodeOk().And.Should().HaveBodyAsJson<UserInfo[]>()
-                    .Which.Should().BeEquivalentTo(MockUsers.UserInfos);
+                    .Which.Should().BeEquivalentTo(MockUser.UserInfoList);
             }
         }
 
@@ -45,10 +45,10 @@ namespace Timeline.Tests
         {
             using (var client = await _factory.CreateClientAsAdmin())
             {
-                var res = await client.GetAsync("users/" + MockUsers.UserUsername);
+                var res = await client.GetAsync("users/" + MockUser.User.Username);
                 res.Should().HaveStatusCodeOk()
                     .And.Should().HaveBodyAsJson<UserInfo>()
-                    .Which.Should().BeEquivalentTo(MockUsers.UserUserInfo);
+                    .Which.Should().BeEquivalentTo(MockUser.User.Info);
             }
         }
 
@@ -104,13 +104,13 @@ namespace Timeline.Tests
         {
             using (var client = await _factory.CreateClientAsAdmin())
             {
-                var res = await client.PutAsJsonAsync("users/" + MockUsers.UserUsername, new UserPutRequest
+                var res = await client.PutAsJsonAsync("users/" + MockUser.User.Username, new UserPutRequest
                 {
                     Password = "password",
                     Administrator = false
                 });
-                res.Should().BePutModified();
-                await CheckAdministrator(client, MockUsers.UserUsername, false);
+                res.Should().BePutModify();
+                await CheckAdministrator(client, MockUser.User.Username, false);
             }
         }
 
@@ -127,7 +127,7 @@ namespace Timeline.Tests
                     Password = "password",
                     Administrator = false
                 });
-                res.Should().BePutCreated();
+                res.Should().BePutCreate();
                 await CheckAdministrator(client, username, false);
             }
         }
@@ -149,10 +149,10 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 {
-                    var res = await client.PatchAsJsonAsync("users/" + MockUsers.UserUsername,
+                    var res = await client.PatchAsJsonAsync("users/" + MockUser.User.Username,
                         new UserPatchRequest { Administrator = false });
                     res.Should().HaveStatusCodeOk();
-                    await CheckAdministrator(client, MockUsers.UserUsername, false);
+                    await CheckAdministrator(client, MockUser.User.Username, false);
                 }
             }
         }
@@ -163,9 +163,9 @@ namespace Timeline.Tests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 {
-                    var url = "users/" + MockUsers.UserUsername;
+                    var url = "users/" + MockUser.User.Username;
                     var res = await client.DeleteAsync(url);
-                    res.Should().BeDeleteDeleted();
+                    res.Should().BeDeleteDelete();
 
                     var res2 = await client.GetAsync(url);
                     res2.Should().HaveStatusCodeNotFound();
@@ -186,21 +186,22 @@ namespace Timeline.Tests
         }
 
 
-        public class ChangeUsernameUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
+        public class ChangeUsernameUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
         {
             private const string url = "userop/changeusername";
 
+            private readonly TestApplication _testApp;
             private readonly WebApplicationFactory<Startup> _factory;
-            private readonly Action _disposeAction;
 
-            public ChangeUsernameUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+            public ChangeUsernameUnitTest(WebApplicationFactory<Startup> factory)
             {
-                _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+                _testApp = new TestApplication(factory);
+                _factory = _testApp.Factory;
             }
 
             public void Dispose()
             {
-                _disposeAction();
+                _testApp.Dispose();
             }
 
             [Fact]
@@ -210,10 +211,10 @@ namespace Timeline.Tests
                 {
                     // missing old username
                     await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
-                        new ChangeUsernameRequest { OldUsername= null, NewUsername= "hhh" });
+                        new ChangeUsernameRequest { OldUsername = null, NewUsername = "hhh" });
                     // missing new username
                     await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
-                        new ChangeUsernameRequest { OldUsername= "hhh", NewUsername= null });
+                        new ChangeUsernameRequest { OldUsername = "hhh", NewUsername = null });
                     // bad username
                     await InvalidModelTestHelpers.TestPostInvalidModel(client, url,
                         new ChangeUsernameRequest { OldUsername = "hhh", NewUsername = "???" });
@@ -226,7 +227,7 @@ namespace Timeline.Tests
                 using (var client = await _factory.CreateClientAsAdmin())
                 {
                     var res = await client.PostAsJsonAsync(url,
-                        new ChangeUsernameRequest{ OldUsername= "usernotexist", NewUsername= "newUsername" });
+                        new ChangeUsernameRequest { OldUsername = "usernotexist", NewUsername = "newUsername" });
                     res.Should().HaveStatusCodeBadRequest()
                         .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.ChangeUsername_NotExist);
                 }
@@ -238,7 +239,7 @@ namespace Timeline.Tests
                 using (var client = await _factory.CreateClientAsAdmin())
                 {
                     var res = await client.PostAsJsonAsync(url,
-                        new ChangeUsernameRequest { OldUsername = MockUsers.UserUsername, NewUsername = MockUsers.AdminUsername });
+                        new ChangeUsernameRequest { OldUsername = MockUser.User.Username, NewUsername = MockUser.Admin.Username });
                     res.Should().HaveStatusCodeBadRequest()
                         .And.Should().HaveBodyAsCommonResponseWithCode(UserController.ErrorCodes.ChangeUsername_AlreadyExist);
                 }
@@ -251,29 +252,30 @@ namespace Timeline.Tests
                 {
                     const string newUsername = "hahaha";
                     var res = await client.PostAsJsonAsync(url,
-                        new ChangeUsernameRequest { OldUsername = MockUsers.UserUsername, NewUsername = newUsername });
+                        new ChangeUsernameRequest { OldUsername = MockUser.User.Username, NewUsername = newUsername });
                     res.Should().HaveStatusCodeOk();
-                    await client.CreateUserTokenAsync(newUsername, MockUsers.UserPassword);
+                    await client.CreateUserTokenAsync(newUsername, MockUser.User.Password);
                 }
             }
         }
 
 
-        public class ChangePasswordUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
+        public class ChangePasswordUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
         {
             private const string url = "userop/changepassword";
 
+            private readonly TestApplication _testApp;
             private readonly WebApplicationFactory<Startup> _factory;
-            private readonly Action _disposeAction;
 
-            public ChangePasswordUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+            public ChangePasswordUnitTest(WebApplicationFactory<Startup> factory)
             {
-                _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+                _testApp = new TestApplication(factory);
+                _factory = _testApp.Factory;
             }
 
             public void Dispose()
             {
-                _disposeAction();
+                _testApp.Dispose();
             }
 
             [Fact]
@@ -308,9 +310,9 @@ namespace Timeline.Tests
                 {
                     const string newPassword = "new";
                     var res = await client.PostAsJsonAsync(url,
-                        new ChangePasswordRequest { OldPassword = MockUsers.UserPassword, NewPassword = newPassword });
+                        new ChangePasswordRequest { OldPassword = MockUser.User.Password, NewPassword = newPassword });
                     res.Should().HaveStatusCodeOk();
-                    await client.CreateUserTokenAsync(MockUsers.UserUsername, newPassword);
+                    await client.CreateUserTokenAsync(MockUser.User.Username, newPassword);
                 }
             }
         }

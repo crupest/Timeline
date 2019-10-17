@@ -65,10 +65,10 @@ namespace Timeline.Controllers
                 {
                     case PutResult.Created:
                         _logger.LogInformation(FormatLogMessage("A user is created.", Pair("Username", username)));
-                        return CreatedAtAction("Get", new { username }, CommonPutResponse.Created);
+                        return CreatedAtAction("Get", new { username }, CommonPutResponse.Create());
                     case PutResult.Modified:
                         _logger.LogInformation(FormatLogMessage("A user is modified.", Pair("Username", username)));
-                        return Ok(CommonPutResponse.Modified);
+                        return Ok(CommonPutResponse.Modify());
                     default:
                         throw new Exception("Unreachable code.");
                 }
@@ -102,12 +102,12 @@ namespace Timeline.Controllers
             {
                 await _userService.DeleteUser(username);
                 _logger.LogInformation(FormatLogMessage("A user is deleted.", Pair("Username", username)));
-                return Ok(CommonDeleteResponse.Deleted);
+                return Ok(CommonDeleteResponse.Delete());
             }
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, FormatLogMessage("Attempt to delete a non-existent user.", Pair("Username", username)));
-                return Ok(CommonDeleteResponse.NotExists);
+                return Ok(CommonDeleteResponse.NotExist());
             }
         }
 
