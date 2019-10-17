@@ -24,7 +24,7 @@ stages:
           dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
         displayName: Dotnet Restore
 
-      - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './coverletArgs.runsettings'
+      - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
         displayName: Dotnet Test
 
       - task: PublishTestResults@2
@@ -51,7 +51,7 @@ stages:
     pool:
       vmImage: 'ubuntu-18.04'
     steps:
-    - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./publish/
+    - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./Timeline/publish/
       displayName: Dotnet Publish
 
     - task: PublishPipelineArtifact@1
