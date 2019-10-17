@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,28 +9,24 @@ using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Mock.Data;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Timeline.Tests
 {
     public class UserDetailServiceTest : IDisposable
     {
-        private readonly ILoggerFactory _loggerFactory;
         private readonly TestDatabase _database;
 
         private readonly UserDetailService _service;
 
-        public UserDetailServiceTest(ITestOutputHelper outputHelper)
+        public UserDetailServiceTest()
         {
-            _loggerFactory = Logging.Create(outputHelper);
             _database = new TestDatabase();
 
-            _service = new UserDetailService(_loggerFactory.CreateLogger<UserDetailService>(), _database.DatabaseContext);
+            _service = new UserDetailService(NullLogger<UserDetailService>.Instance, _database.DatabaseContext);
         }
 
         public void Dispose()
         {
-            _loggerFactory.Dispose();
             _database.Dispose();
         }
 
@@ -56,13 +52,13 @@ namespace Timeline.Tests
         public async Task GetNickname_Should_Create_And_ReturnDefault()
         {
             {
-                var nickname = await _service.GetUserNickname(MockUsers.UserUsername);
+                var nickname = await _service.GetUserNickname(MockUser.User.Username);
                 nickname.Should().BeNull();
             }
 
             {
                 var context = _database.DatabaseContext;
-                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUser.User.Username);
                 var detail = context.UserDetails.Where(e => e.UserId == userId).Single();
                 detail.Nickname.Should().BeNullOrEmpty();
                 detail.QQ.Should().BeNullOrEmpty();
@@ -80,7 +76,7 @@ namespace Timeline.Tests
         {
             {
                 var context = _database.DatabaseContext;
-                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUser.User.Username);
                 var entity = new UserDetailEntity
                 {
                     Nickname = nickname,
@@ -91,7 +87,7 @@ namespace Timeline.Tests
             }
 
             {
-                var n = await _service.GetUserNickname(MockUsers.UserUsername);
+                var n = await _service.GetUserNickname(MockUser.User.Username);
                 n.Should().Equals(string.IsNullOrEmpty(nickname) ? null : nickname);
             }
         }
@@ -118,13 +114,13 @@ namespace Timeline.Tests
         public async Task GetDetail_Should_Create_And_ReturnDefault()
         {
             {
-                var detail = await _service.GetUserDetail(MockUsers.UserUsername);
+                var detail = await _service.GetUserDetail(MockUser.User.Username);
                 detail.Should().BeEquivalentTo(new UserDetail());
             }
 
             {
                 var context = _database.DatabaseContext;
-                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUser.User.Username);
                 var detail = context.UserDetails.Where(e => e.UserId == userId).Single();
                 detail.Nickname.Should().BeNullOrEmpty();
                 detail.QQ.Should().BeNullOrEmpty();
@@ -143,7 +139,7 @@ namespace Timeline.Tests
 
             {
                 var context = _database.DatabaseContext;
-                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+                var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUser.User.Username);
                 var entity = new UserDetailEntity
                 {
                     Email = email,
@@ -155,7 +151,7 @@ namespace Timeline.Tests
             }
 
             {
-                var detail = await _service.GetUserDetail(MockUsers.UserUsername);
+                var detail = await _service.GetUserDetail(MockUser.User.Username);
                 detail.Should().BeEquivalentTo(new UserDetail
                 {
                     Email = email,
@@ -187,10 +183,10 @@ namespace Timeline.Tests
         [Fact]
         public async Task UpdateDetail_Empty_Should_Work()
         {
-            await _service.UpdateUserDetail(MockUsers.UserUsername, new UserDetail());
+            await _service.UpdateUserDetail(MockUser.User.Username, new UserDetail());
 
             var context = _database.DatabaseContext;
-            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUser.User.Username);
             var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
             entity.Nickname.Should().BeNullOrEmpty();
             entity.QQ.Should().BeNullOrEmpty();
@@ -215,10 +211,10 @@ namespace Timeline.Tests
                 return detail;
             }
 
-            await _service.UpdateUserDetail(MockUsers.UserUsername, CreateWith(mockData1));
+            await _service.UpdateUserDetail(MockUser.User.Username, CreateWith(mockData1));
 
             var context = _database.DatabaseContext;
-            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUser.User.Username);
             var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
 
             void TestWith(string propertyValue)
@@ -230,9 +226,9 @@ namespace Timeline.Tests
 
             TestWith(mockData1);
 
-            await _service.UpdateUserDetail(MockUsers.UserUsername, CreateWith(mockData2));
+            await _service.UpdateUserDetail(MockUser.User.Username, CreateWith(mockData2));
             TestWith(mockData2);
-            await _service.UpdateUserDetail(MockUsers.UserUsername, CreateWith(""));
+            await _service.UpdateUserDetail(MockUser.User.Username, CreateWith(""));
             TestWith("");
         }
 
@@ -247,10 +243,10 @@ namespace Timeline.Tests
                 Description = "aaaaaaaaaa"
             };
 
-            await _service.UpdateUserDetail(MockUsers.UserUsername, detail);
+            await _service.UpdateUserDetail(MockUser.User.Username, detail);
 
             var context = _database.DatabaseContext;
-            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUsers.UserUsername);
+            var userId = await DatabaseExtensions.CheckAndGetUser(context.Users, MockUser.User.Username);
             var entity = context.UserDetails.Where(e => e.UserId == userId).Single();
             entity.QQ.Should().Equals(detail.QQ);
             entity.Email.Should().Equals(detail.Email);
@@ -265,7 +261,7 @@ namespace Timeline.Tests
                 Description = "bbbbbbbbb"
             };
 
-            await _service.UpdateUserDetail(MockUsers.UserUsername, detail2);
+            await _service.UpdateUserDetail(MockUser.User.Username, detail2);
             entity.QQ.Should().Equals(detail.QQ);
             entity.Email.Should().Equals(detail2.Email);
             entity.PhoneNumber.Should().BeNullOrEmpty();

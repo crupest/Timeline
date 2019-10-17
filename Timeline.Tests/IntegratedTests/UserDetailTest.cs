@@ -5,28 +5,27 @@ using System.Net;
 using System.Threading.Tasks;
 using Timeline.Controllers;
 using Timeline.Models;
-using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Timeline.Tests.Mock.Data;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class UserDetailTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
+    public class UserDetailTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
+        private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
-        private readonly Action _disposeAction;
 
-        public UserDetailTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+        public UserDetailTest(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+            _testApp = new TestApplication(factory);
+            _factory = _testApp.Factory;
         }
 
         public void Dispose()
         {
-            _disposeAction();
+            _testApp.Dispose();
         }
 
         [Fact]
@@ -48,7 +47,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 async Task GetAndTest(UserDetail d)
                 {
-                    var res = await client.GetAsync($"users/{MockUsers.UserUsername}/details");
+                    var res = await client.GetAsync($"users/{MockUser.User.Username}/details");
                     res.Should().HaveStatusCodeOk()
                         .And.Should().HaveBodyAsJson<UserDetail>()
                         .Which.Should().BeEquivalentTo(d);
@@ -57,13 +56,13 @@ namespace Timeline.Tests.IntegratedTests
                 await GetAndTest(new UserDetail());
 
                 {
-                    var res = await client.PatchAsJsonAsync($"users/{MockUsers.AdminUsername}/details", new UserDetail());
+                    var res = await client.PatchAsJsonAsync($"users/{MockUser.Admin.Username}/details", new UserDetail());
                     res.Should().HaveStatusCode(HttpStatusCode.Forbidden)
                         .And.Should().HaveBodyAsCommonResponseWithCode(UserDetailController.ErrorCodes.Patch_Forbid);
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync($"users/{MockUsers.UserUsername}/details", new UserDetail
+                    var res = await client.PatchAsJsonAsync($"users/{MockUser.User.Username}/details", new UserDetail
                     {
                         Nickname = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                         QQ = "aaaaaaa",
@@ -72,7 +71,7 @@ namespace Timeline.Tests.IntegratedTests
                     });
                     var body = res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.Should().HaveBodyAsCommonResponse().Which;
-                    body.Code.Should().Be(CommonResponse.ErrorCodes.InvalidModel);
+                    body.Code.Should().Be(ErrorCodes.Http.Common.InvalidModel);
                     foreach (var key in new string[] { "nickname", "qq", "email", "phonenumber" })
                     {
                         body.Message.Should().ContainEquivalentOf(key);
@@ -89,13 +88,13 @@ namespace Timeline.Tests.IntegratedTests
                 };
 
                 {
-                    var res = await client.PatchAsJsonAsync($"users/{MockUsers.UserUsername}/details", detail);
+                    var res = await client.PatchAsJsonAsync($"users/{MockUser.User.Username}/details", detail);
                     res.Should().HaveStatusCodeOk();
                     await GetAndTest(detail);
                 }
 
                 {
-                    var res = await client.GetAsync($"users/{MockUsers.UserUsername}/nickname");
+                    var res = await client.GetAsync($"users/{MockUser.User.Username}/nickname");
                     res.Should().HaveStatusCodeOk().And.Should().HaveBodyAsJson<UserDetail>()
                         .Which.Should().BeEquivalentTo(new UserDetail
                         {
@@ -111,7 +110,7 @@ namespace Timeline.Tests.IntegratedTests
                 };
 
                 {
-                    var res = await client.PatchAsJsonAsync($"users/{MockUsers.UserUsername}/details", detail2);
+                    var res = await client.PatchAsJsonAsync($"users/{MockUser.User.Username}/details", detail2);
                     res.Should().HaveStatusCodeOk();
                     await GetAndTest(new UserDetail
                     {
@@ -131,7 +130,7 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await _factory.CreateClientAsAdmin())
             {
                 {
-                    var res = await client.PatchAsJsonAsync($"users/{MockUsers.UserUsername}/details", new UserDetail());
+                    var res = await client.PatchAsJsonAsync($"users/{MockUser.User.Username}/details", new UserDetail());
                     res.Should().HaveStatusCodeOk();
                 }
 

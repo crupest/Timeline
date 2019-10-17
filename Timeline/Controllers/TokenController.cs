@@ -3,11 +3,35 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services;
-using static Timeline.Helpers.MyLogHelper;
+using Timeline.Helpers;
+
+namespace Timeline
+{
+    public static partial class ErrorCodes
+    {
+        public static partial class Http
+        {
+            public static class Token // bbb = 001
+            {
+                public static class Create // cc = 01
+                {
+                    public const int BadCredential = 10010101;
+                }
+
+                public static class Verify // cc = 02
+                {
+                    public const int BadFormat = 10010201;
+                    public const int UserNotExist = 10010202;
+                    public const int OldVersion = 10010203;
+                    public const int Expired = 10010204;
+                }
+            }
+        }
+    }
+}
 
 namespace Timeline.Controllers
 {
@@ -15,27 +39,6 @@ namespace Timeline.Controllers
     [ApiController]
     public class TokenController : Controller
     {
-        private static class LoggingEventIds
-        {
-            public const int CreateSucceeded = 1000;
-            public const int CreateFailed = 1001;
-
-            public const int VerifySucceeded = 2000;
-            public const int VerifyFailed = 2001;
-        }
-
-        public static class ErrorCodes
-        {
-            public const int Create_UserNotExist = -1001;
-            public const int Create_BadPassword = -1002;
-            public const int Create_BadExpireOffset = -1003;
-
-            public const int Verify_BadToken = -2001;
-            public const int Verify_UserNotExist = -2002;
-            public const int Verify_BadVersion = -2003;
-            public const int Verify_Expired = -2004;
-        }
-
         private readonly IUserService _userService;
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
@@ -51,23 +54,28 @@ namespace Timeline.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateTokenRequest request)
         {
-            void LogFailure(string reason, int code, Exception e = null)
+            void LogFailure(string reason, Exception e = null)
             {
-                _logger.LogInformation(LoggingEventIds.CreateFailed, e, FormatLogMessage("Attemp to login failed.",
-                    Pair("Reason", reason),
-                    Pair("Code", code),
-                    Pair("Username", request.Username),
-                    Pair("Password", request.Password),
-                    Pair("Expire Offset (in days)", request.ExpireOffset)));
+                _logger.LogInformation(e, Log.Format("Attemp to login failed.",
+                    ("Reason", reason),
+                    ("Username", request.Username),
+                    ("Password", request.Password),
+                    ("Expire (in days)", request.Expire)
+                ));
             }
 
             try
             {
-                var expiredTime = request.ExpireOffset == null ? null : (DateTime?)(_clock.GetCurrentTime().AddDays(request.ExpireOffset.Value));
-                var result = await _userService.CreateToken(request.Username, request.Password, expiredTime);
-                _logger.LogInformation(LoggingEventIds.CreateSucceeded, FormatLogMessage("Attemp to login succeeded.",
-                    Pair("Username", request.Username),
-                    Pair("Expire Time", expiredTime == null ? "default" : expiredTime.Value.ToString())));
+                DateTime? expireTime = null;
+                if (request.Expire != null)
+                    expireTime = _clock.GetCurrentTime().AddDays(request.Expire.Value);
+
+                var result = await _userService.CreateToken(request.Username, request.Password, expireTime);
+
+                _logger.LogInformation(Log.Format("Attemp to login succeeded.",
+                    ("Username", request.Username),
+                    ("Expire At", expireTime?.ToString() ?? "default")
+                ));
                 return Ok(new CreateTokenResponse
                 {
                     Token = result.Token,
@@ -76,15 +84,15 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException e)
             {
-                var code = ErrorCodes.Create_UserNotExist;
-                LogFailure("User does not exist.", code, e);
-                return BadRequest(new CommonResponse(code, "Bad username or password."));
+                LogFailure("User does not exist.", e);
+                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
+                    "Bad username or password."));
             }
             catch (BadPasswordException e)
             {
-                var code = ErrorCodes.Create_BadPassword;
-                LogFailure("Password is wrong.", code, e);
-                return BadRequest(new CommonResponse(code, "Bad username or password."));
+                LogFailure("Password is wrong.", e);
+                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
+                    "Bad username or password."));
             }
         }
 
@@ -92,22 +100,20 @@ namespace Timeline.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Verify([FromBody] VerifyTokenRequest request)
         {
-            void LogFailure(string reason, int code, Exception e = null, params KeyValuePair<string, object>[] otherProperties)
+            void LogFailure(string reason, Exception e = null, params (string, object)[] otherProperties)
             {
-                var properties = new KeyValuePair<string, object>[3 + otherProperties.Length];
-                properties[0] = Pair("Reason", reason);
-                properties[1] = Pair("Code", code);
-                properties[2] = Pair("Token", request.Token);
-                otherProperties.CopyTo(properties, 3);
-                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, FormatLogMessage("Token verification failed.", properties));
+                var properties = new (string, object)[2 + otherProperties.Length];
+                properties[0] = ("Reason", reason);
+                properties[1] = ("Token", request.Token);
+                otherProperties.CopyTo(properties, 2);
+                _logger.LogInformation(e, Log.Format("Token verification failed.", properties));
             }
 
             try
             {
                 var result = await _userService.VerifyToken(request.Token);
-                _logger.LogInformation(LoggingEventIds.VerifySucceeded,
-                    FormatLogMessage("Token verification succeeded.",
-                    Pair("Username", result.Username), Pair("Token", request.Token)));
+                _logger.LogInformation(Log.Format("Token verification succeeded.",
+                    ("Username", result.Username), ("Token", request.Token)));
                 return Ok(new VerifyTokenResponse
                 {
                     User = result
@@ -118,33 +124,28 @@ namespace Timeline.Controllers
                 if (e.ErrorCode == JwtTokenVerifyException.ErrorCodes.Expired)
                 {
                     const string message = "Token is expired.";
-                    var code = ErrorCodes.Verify_Expired;
                     var innerException = e.InnerException as SecurityTokenExpiredException;
-                    LogFailure(message, code, e, Pair("Expires", innerException.Expires));
-                    return BadRequest(new CommonResponse(code, message));
+                    LogFailure(message, e, ("Expires", innerException.Expires), ("Current Time", _clock.GetCurrentTime()));
+                    return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.Expired, message));
                 }
                 else
                 {
                     const string message = "Token is of bad format.";
-                    var code = ErrorCodes.Verify_BadToken;
-                    LogFailure(message, code, e);
-                    return BadRequest(new CommonResponse(code, message));
+                    LogFailure(message, e);
+                    return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.BadFormat, message));
                 }
             }
             catch (UserNotExistException e)
             {
                 const string message = "User does not exist. Administrator might have deleted this user.";
-                var code = ErrorCodes.Verify_UserNotExist;
-                LogFailure(message, code, e);
-                return BadRequest(new CommonResponse(code, message));
+                LogFailure(message, e);
+                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.UserNotExist, message));
             }
             catch (BadTokenVersionException e)
             {
-                const string message = "Token has a old version.";
-                var code = ErrorCodes.Verify_BadVersion;
-                LogFailure(message, code, e);
-                _logger.LogInformation(LoggingEventIds.VerifyFailed, e, "Attemp to verify a bad token because version is old. Code: {} Token: {}.", code, request.Token);
-                return BadRequest(new CommonResponse(code, message));
+                const string message = "Token has an old version.";
+                LogFailure(message, e, ("Token Version", e.TokenVersion), ("Required Version", e.RequiredVersion));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.OldVersion, message));
             }
         }
     }

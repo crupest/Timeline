@@ -10,36 +10,33 @@ namespace Timeline.Tests.Mock.Data
         public static void InitDatabase(DatabaseContext context)
         {
             context.Database.EnsureCreated();
-            context.Users.AddRange(MockUsers.CreateMockUsers());
+            context.Users.AddRange(MockUser.CreateMockEntities());
             context.SaveChanges();
         }
 
-        private readonly SqliteConnection _databaseConnection;
-        private readonly DatabaseContext _databaseContext;
-
         public TestDatabase()
         {
-            _databaseConnection = new SqliteConnection("Data Source=:memory:;");
-            _databaseConnection.Open();
+            DatabaseConnection = new SqliteConnection("Data Source=:memory:;");
+            DatabaseConnection.Open();
 
             var options = new DbContextOptionsBuilder<DatabaseContext>()
-                .UseSqlite(_databaseConnection)
+                .UseSqlite(DatabaseConnection)
                 .Options;
 
-            _databaseContext = new DatabaseContext(options);
+            DatabaseContext = new DatabaseContext(options);
 
-            InitDatabase(_databaseContext);
+            InitDatabase(DatabaseContext);
         }
 
         public void Dispose()
         {
-            _databaseContext.Dispose();
+            DatabaseContext.Dispose();
 
-            _databaseConnection.Close();
-            _databaseConnection.Dispose();
+            DatabaseConnection.Close();
+            DatabaseConnection.Dispose();
         }
 
-        public SqliteConnection DatabaseConnection => _databaseConnection;
-        public DatabaseContext DatabaseContext => _databaseContext;
+        public SqliteConnection DatabaseConnection { get; }
+        public DatabaseContext DatabaseContext { get; }
     }
 }

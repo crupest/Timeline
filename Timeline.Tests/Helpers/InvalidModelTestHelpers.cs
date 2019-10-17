@@ -1,6 +1,5 @@
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timeline.Models.Http;
 
 namespace Timeline.Tests.Helpers
 {
@@ -10,14 +9,14 @@ namespace Timeline.Tests.Helpers
         {
             var response = await client.PostAsJsonAsync(url, body);
             response.Should().HaveStatusCodeBadRequest()
-                .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.InvalidModel);
+                .And.Should().HaveBodyAsCommonResponseWithCode(ErrorCodes.Http.Common.InvalidModel);
         }
 
         public static async Task TestPutInvalidModel<T>(HttpClient client, string url, T body)
         {
             var response = await client.PutAsJsonAsync(url, body);
             response.Should().HaveStatusCodeBadRequest()
-                .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.InvalidModel);
+                .And.Should().HaveBodyAsCommonResponseWithCode(ErrorCodes.Http.Common.InvalidModel);
         }
     }
 }

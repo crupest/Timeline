@@ -1,52 +1,50 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Services;
 
 namespace Timeline.Tests.Mock.Data
 {
-    public static class MockUsers
+    public class MockUser
     {
-        static MockUsers()
+        public MockUser(string username, string password, bool administrator)
         {
-            var mockUserInfos = CreateMockUsers().Select(u => UserUtility.CreateUserInfo(u)).ToList();
-            UserUserInfo = mockUserInfos[0];
-            AdminUserInfo = mockUserInfos[1];
-            UserInfos = mockUserInfos;
+            Info = new UserInfo(username, administrator);
+            Password = password;
         }
 
-        public const string UserUsername = "user";
-        public const string AdminUsername = "admin";
-        public const string UserPassword = "user";
-        public const string AdminPassword = "admin";
+        public UserInfo Info { get; set; }
+        public string Username => Info.Username;
+        public string Password { get; set; }
+        public bool Administrator => Info.Administrator;
 
-        // emmmmmmm. Never reuse the user instances because EF Core uses them which will cause strange things.
-        internal static IEnumerable<User> CreateMockUsers()
+
+        public static MockUser User { get; } = new MockUser("user", "userpassword", false);
+        public static MockUser Admin { get; } = new MockUser("admin", "adminpassword", true);
+
+        public static IReadOnlyList<UserInfo> UserInfoList { get; } = new List<UserInfo> { User.Info, Admin.Info };
+
+        // emmmmmmm. Never reuse the user instances because EF Core uses them, which will cause strange things.
+        public static IEnumerable<User> CreateMockEntities()
         {
-            var users = new List<User>();
             var passwordService = new PasswordService();
-            users.Add(new User
+            User Create(MockUser user)
             {
-                Name = UserUsername,
-                EncryptedPassword = passwordService.HashPassword(UserPassword),
-                RoleString = UserUtility.IsAdminToRoleString(false),
-                Avatar = UserAvatar.Create(DateTime.Now)
-            });
-            users.Add(new User
+                return new User
+                {
+                    Name = user.Username,
+                    EncryptedPassword = passwordService.HashPassword(user.Password),
+                    RoleString = UserUtility.IsAdminToRoleString(user.Administrator),
+                    Avatar = UserAvatar.Create(DateTime.Now)
+                };
+            }
+
+            return new List<User>
             {
-                Name = AdminUsername,
-                EncryptedPassword = passwordService.HashPassword(AdminPassword),
-                RoleString = UserUtility.IsAdminToRoleString(true),
-                Avatar = UserAvatar.Create(DateTime.Now)
-            });
-            return users;
+                Create(User),
+                Create(Admin)
+            };
         }
-
-        public static IReadOnlyList<UserInfo> UserInfos { get; }
-
-        public static UserInfo AdminUserInfo { get; }
-        public static UserInfo UserUserInfo { get; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SixLabors.ImageSharp.Formats.Png;
 using System;
 using System.Linq;
@@ -151,28 +152,26 @@ namespace Timeline.Tests
 
         private readonly MockDefaultUserAvatarProvider _mockDefaultUserAvatarProvider;
 
-        private readonly ILoggerFactory _loggerFactory;
         private readonly TestDatabase _database;
 
         private readonly IETagGenerator _eTagGenerator;
 
         private readonly UserAvatarService _service;
 
-        public UserAvatarServiceTest(ITestOutputHelper outputHelper, MockDefaultUserAvatarProvider mockDefaultUserAvatarProvider, MockUserAvatarValidator mockUserAvatarValidator)
+        public UserAvatarServiceTest(MockDefaultUserAvatarProvider mockDefaultUserAvatarProvider, MockUserAvatarValidator mockUserAvatarValidator)
         {
             _mockDefaultUserAvatarProvider = mockDefaultUserAvatarProvider;
 
-            _loggerFactory = Logging.Create(outputHelper);
             _database = new TestDatabase();
 
             _eTagGenerator = new ETagGenerator();
 
-            _service = new UserAvatarService(_loggerFactory.CreateLogger<UserAvatarService>(), _database.DatabaseContext, _mockDefaultUserAvatarProvider, mockUserAvatarValidator, _eTagGenerator);
+            _service = new UserAvatarService(NullLogger<UserAvatarService>.Instance, _database.DatabaseContext, _mockDefaultUserAvatarProvider, mockUserAvatarValidator, _eTagGenerator);
         }
+
 
         public void Dispose()
         {
-            _loggerFactory.Dispose();
             _database.Dispose();
         }
 
@@ -197,14 +196,14 @@ namespace Timeline.Tests
         [Fact]
         public async Task GetAvatarETag_ShouldReturn_Default()
         {
-            const string username = MockUsers.UserUsername;
+            string username = MockUser.User.Username;
             (await _service.GetAvatarETag(username)).Should().BeEquivalentTo((await _mockDefaultUserAvatarProvider.GetDefaultAvatarETag()));
         }
 
         [Fact]
         public async Task GetAvatarETag_ShouldReturn_Data()
         {
-            const string username = MockUsers.UserUsername;
+            string username = MockUser.User.Username;
             {
                 // create mock data
                 var context = _database.DatabaseContext;
@@ -237,14 +236,14 @@ namespace Timeline.Tests
         [Fact]
         public async Task GetAvatar_ShouldReturn_Default()
         {
-            const string username = MockUsers.UserUsername;
+            string username = MockUser.User.Username;
             (await _service.GetAvatar(username)).Avatar.Should().BeEquivalentTo((await _mockDefaultUserAvatarProvider.GetDefaultAvatar()).Avatar);
         }
 
         [Fact]
         public async Task GetAvatar_ShouldReturn_Data()
         {
-            const string username = MockUsers.UserUsername;
+            string username = MockUser.User.Username;
 
             {
                 // create mock data
@@ -287,7 +286,7 @@ namespace Timeline.Tests
         [Fact]
         public async Task SetAvatar_Should_Work()
         {
-            const string username = MockUsers.UserUsername;
+            string username = MockUser.User.Username;
 
             var user = await _database.DatabaseContext.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
 

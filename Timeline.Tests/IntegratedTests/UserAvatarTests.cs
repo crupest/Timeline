@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats.Gif;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,28 +14,27 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Timeline.Controllers;
-using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class UserAvatarUnitTest : IClassFixture<MyWebApplicationFactory<Startup>>, IDisposable
+    public class UserAvatarUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
+        private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
-        private readonly Action _disposeAction;
 
-        public UserAvatarUnitTest(MyWebApplicationFactory<Startup> factory, ITestOutputHelper outputHelper)
+        public UserAvatarUnitTest(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory.WithTestConfig(outputHelper, out _disposeAction);
+            _testApp = new TestApplication(factory);
+            _factory = _testApp.Factory;
         }
 
         public void Dispose()
         {
-            _disposeAction();
+            _testApp.Dispose();
         }
 
         [Fact]
@@ -92,7 +91,7 @@ namespace Timeline.Tests.IntegratedTests
                     request.Headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
                     var res = await client.SendAsync(request);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_BadFormat_IfNonMatch);
+                        .And.Should().HaveBodyAsCommonResponseWithCode(ErrorCodes.Http.Common.Header.BadFormat_IfNonMatch);
                 }
 
                 {
@@ -122,7 +121,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_Missing_ContentLength);
+                        .And.Should().HaveBodyAsCommonResponseWithCode(ErrorCodes.Http.Common.Header.Missing_ContentLength);
                 }
 
                 {
@@ -130,7 +129,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentLength = 1;
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_Missing_ContentType);
+                        .And.Should().HaveBodyAsCommonResponseWithCode(ErrorCodes.Http.Common.Header.Missing_ContentType);
                 }
 
                 {
@@ -139,7 +138,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveBodyAsCommonResponseWithCode(CommonResponse.ErrorCodes.Header_Zero_ContentLength);
+                        .And.Should().HaveBodyAsCommonResponseWithCode(ErrorCodes.Http.Common.Header.Zero_ContentLength);
                 }
 
                 {
