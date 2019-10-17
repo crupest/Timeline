@@ -7,6 +7,7 @@ stages:
 
   jobs:
     - job: build
+      displayName: Build Debug and Test
       pool:
         vmImage: 'ubuntu-18.04'
       variables:
@@ -16,7 +17,7 @@ stages:
       - task: UseDotNet@2
         inputs:
           packageType: sdk
-          version: 2.2.x
+          version: 3.x
 
       - script: |
           dotnet restore Timeline/Timeline.csproj --configfile nuget.config
@@ -40,6 +41,7 @@ stages:
 
 - stage: deploy
   displayName: Build Release and Deploy
+  dependsOn: build
   variables:
     buildConfiguration: 'Release'
 
