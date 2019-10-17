@@ -1,0 +1,78 @@
+trigger:
+- master
+
+stages:
+- stage: build
+  displayName: Routine Build and Test
+
+  jobs:
+    - job: build
+      displayName: Build Debug and Test
+      pool:
+        vmImage: 'ubuntu-18.04'
+      variables:
+        buildConfiguration: 'Debug'
+        ASPNETCORE_ENVIRONMENT: 'Development'
+      steps:
+      - task: UseDotNet@2
+        inputs:
+          packageType: sdk
+          version: 3.0.x
+
+      - script: |
+          dotnet restore Timeline/Timeline.csproj --configfile nuget.config
+          dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
+        displayName: Dotnet Restore
+
+      - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
+        displayName: Dotnet Test
+
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: VSTest
+          testResultsFiles: '**/*.trx'
+
+      - task: PublishCodeCoverageResults@1
+        condition: succeededOrFailed()
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '**/TestResults/*/coverage.cobertura.xml'
+
+- stage: deploy
+  displayName: Build Release and Deploy
+  dependsOn: build
+  variables:
+    buildConfiguration: 'Release'
+
+  jobs:
+  - job: build
+    displayName: Build Release Artifact
+    pool:
+      vmImage: 'ubuntu-18.04'
+    steps:
+    - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./Timeline/publish/
+      displayName: Dotnet Publish
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: 'timeline'
+        targetPath: Timeline/publish
+
+  - deployment: deploy
+    displayName: Deploy to Server
+    pool:
+      name: 'Default'
+    environment: 'timeline-server'
+    dependsOn: build
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              rm -rf /var/timeline/*
+              cp -r $PIPELINE_WORKSPACE/timeline/. /var/timeline/
+              sudo systemctl restart timeline.service
+            displayName: 'Copy Files and Restart Service'
+            failOnStderr: true
+
