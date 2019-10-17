@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -34,9 +35,18 @@ namespace Timeline
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
-
             services.AddAuthentication(AuthConstants.Scheme)
                 .AddScheme<AuthOptions, AuthHandler>(AuthConstants.Scheme, AuthConstants.DisplayName, o => { });
+
+            var corsConfig = Configuration.GetSection("Cors").Get<string[]>();
+            services.AddCors(setup =>
+            {
+                setup.AddDefaultPolicy(new CorsPolicyBuilder()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins(corsConfig).Build()
+                );
+            });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
@@ -67,6 +77,8 @@ namespace Timeline
             });
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
