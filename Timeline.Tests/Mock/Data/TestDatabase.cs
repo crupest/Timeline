@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using Timeline.Entities;
 
@@ -25,10 +24,6 @@ namespace Timeline.Tests.Mock.Data
 
             var options = new DbContextOptionsBuilder<DatabaseContext>()
                 .UseSqlite(_databaseConnection)
-                .ConfigureWarnings(builder =>
-                {
-                    builder.Throw(RelationalEventId.QueryClientEvaluationWarning);
-                })
                 .Options;
 
             _databaseContext = new DatabaseContext(options);

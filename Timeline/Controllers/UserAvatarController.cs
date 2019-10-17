@@ -122,7 +122,8 @@ namespace Timeline.Controllers
                     return BadRequest(new CommonResponse(ErrorCodes.Put_Content_UnmatchedLength_Less,
                         $"Content length in header is {contentLength} but actual length is {bytesRead}."));
 
-                if (Request.Body.ReadByte() != -1)
+                var extraByte = new byte[1];
+                if (await Request.Body.ReadAsync(extraByte) != 0)
                     return BadRequest(new CommonResponse(ErrorCodes.Put_Content_UnmatchedLength_Bigger,
                         $"Content length in header is {contentLength} but actual length is bigger than that."));
 
