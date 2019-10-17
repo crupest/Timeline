@@ -2,10 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Timeline.Authenticate;
 using Timeline.Configs;
 using Timeline.Entities;
@@ -52,14 +50,7 @@ namespace Timeline
 
             services.AddDbContext<DatabaseContext>(options =>
             {
-                options.UseMySql(databaseConfig.ConnectionString)
-                .ConfigureWarnings(warnings =>
-                {
-                    if (Environment.IsProduction())
-                        warnings.Log(RelationalEventId.QueryClientEvaluationWarning);
-                    else
-                        warnings.Throw(RelationalEventId.QueryClientEvaluationWarning);
-                });
+                options.UseMySql(databaseConfig.ConnectionString);
             });
 
             services.AddHttpClient();
@@ -78,9 +69,11 @@ namespace Timeline
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
             });
         }
     }
