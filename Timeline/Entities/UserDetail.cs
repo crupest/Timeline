@@ -10,19 +10,19 @@ namespace Timeline.Entities
         public long Id { get; set; }
 
         [Column("nickname"), MaxLength(15)]
-        public string Nickname { get; set; }
+        public string? Nickname { get; set; }
 
         [Column("qq"), MaxLength(15)]
-        public string QQ { get; set; }
+        public string? QQ { get; set; }
 
         [Column("email"), MaxLength(50)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Column("phone_number"), MaxLength(15)]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [Column("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public long UserId { get; set; }
     }

@@ -17,20 +17,20 @@ namespace Timeline.Entities
         public long Id { get; set; }
 
         [Column("name"), MaxLength(26), Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Column("password"), Required]
-        public string EncryptedPassword { get; set; }
+        public string EncryptedPassword { get; set; } = default!;
 
         [Column("roles"), Required]
-        public string RoleString { get; set; }
+        public string RoleString { get; set; } = default!;
 
         [Column("version"), Required]
         public long Version { get; set; }
 
-        public UserAvatar Avatar { get; set; }
+        public UserAvatar? Avatar { get; set; }
 
-        public UserDetailEntity Detail { get; set; }
+        public UserDetailEntity? Detail { get; set; }
     }
 
     public class DatabaseContext : DbContext
