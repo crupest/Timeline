@@ -79,6 +79,17 @@ namespace Timeline.Tests.Controllers
                 .Which.Code.Should().Be(Create.BadCredential);
         }
 
+        [Fact]
+        public async Task Verify_Ok()
+        {
+            const string token = "aaaaaaaaaaaaaa";
+            _mockUserService.Setup(s => s.VerifyToken(token)).ReturnsAsync(MockUser.User.Info);
+            var action = await _controller.Verify(new VerifyTokenRequest { Token = token });
+            action.Should().BeAssignableTo<OkObjectResult>()
+                .Which.Value.Should().BeAssignableTo<VerifyTokenResponse>()
+                .Which.User.Should().BeEquivalentTo(MockUser.User.Info);
+        }
+
         // TODO! Verify unit tests
     }
 }

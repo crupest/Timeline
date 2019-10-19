@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,7 +11,8 @@ namespace Timeline.Tests.Helpers
     {
         public static Task<HttpResponseMessage> PatchAsJsonAsync<T>(this HttpClient client, string url, T body)
         {
-            return client.PatchAsync(url, new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json"));
+            return client.PatchAsync(url, new StringContent(
+                JsonConvert.SerializeObject(body), Encoding.UTF8, MediaTypeNames.Application.Json));
         }
 
         public static Task<HttpResponseMessage> PutByteArrayAsync(this HttpClient client, string url, byte[] body, string mimeType)

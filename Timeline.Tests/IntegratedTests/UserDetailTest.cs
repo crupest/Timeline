@@ -35,21 +35,21 @@ namespace Timeline.Tests.IntegratedTests
             {
                 {
                     var res = await client.GetAsync($"users/usernotexist/nickname");
-                    res.Should().HaveStatusCodeNotFound()
-                        .And.Should().HaveBodyAsCommonResponseWithCode(UserDetailController.ErrorCodes.GetNickname_UserNotExist);
+                    res.Should().HaveStatusCode(404)
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(UserDetailController.ErrorCodes.GetNickname_UserNotExist);
                 }
 
                 {
                     var res = await client.GetAsync($"users/usernotexist/details");
-                    res.Should().HaveStatusCodeNotFound()
-                        .And.Should().HaveBodyAsCommonResponseWithCode(UserDetailController.ErrorCodes.Get_UserNotExist);
+                    res.Should().HaveStatusCode(404)
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(UserDetailController.ErrorCodes.Get_UserNotExist);
                 }
 
                 async Task GetAndTest(UserDetail d)
                 {
                     var res = await client.GetAsync($"users/{MockUser.User.Username}/details");
-                    res.Should().HaveStatusCodeOk()
-                        .And.Should().HaveBodyAsJson<UserDetail>()
+                    res.Should().HaveStatusCode(200)
+                        .And.Should().HaveJsonBody<UserDetail>()
                         .Which.Should().BeEquivalentTo(d);
                 }
 
@@ -58,7 +58,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var res = await client.PatchAsJsonAsync($"users/{MockUser.Admin.Username}/details", new UserDetail());
                     res.Should().HaveStatusCode(HttpStatusCode.Forbidden)
-                        .And.Should().HaveBodyAsCommonResponseWithCode(UserDetailController.ErrorCodes.Patch_Forbid);
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(UserDetailController.ErrorCodes.Patch_Forbid);
                 }
 
                 {
@@ -70,7 +70,7 @@ namespace Timeline.Tests.IntegratedTests
                         PhoneNumber = "aaaaaaaa"
                     });
                     var body = res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveBodyAsCommonResponse().Which;
+                        .And.Should().HaveCommonBody().Which;
                     body.Code.Should().Be(ErrorCodes.Http.Common.InvalidModel);
                     foreach (var key in new string[] { "nickname", "qq", "email", "phonenumber" })
                     {
@@ -89,13 +89,13 @@ namespace Timeline.Tests.IntegratedTests
 
                 {
                     var res = await client.PatchAsJsonAsync($"users/{MockUser.User.Username}/details", detail);
-                    res.Should().HaveStatusCodeOk();
+                    res.Should().HaveStatusCode(200);
                     await GetAndTest(detail);
                 }
 
                 {
                     var res = await client.GetAsync($"users/{MockUser.User.Username}/nickname");
-                    res.Should().HaveStatusCodeOk().And.Should().HaveBodyAsJson<UserDetail>()
+                    res.Should().HaveStatusCode(200).And.Should().HaveJsonBody<UserDetail>()
                         .Which.Should().BeEquivalentTo(new UserDetail
                         {
                             Nickname = detail.Nickname
@@ -111,7 +111,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 {
                     var res = await client.PatchAsJsonAsync($"users/{MockUser.User.Username}/details", detail2);
-                    res.Should().HaveStatusCodeOk();
+                    res.Should().HaveStatusCode(200);
                     await GetAndTest(new UserDetail
                     {
                         Nickname = detail.Nickname,
@@ -131,13 +131,13 @@ namespace Timeline.Tests.IntegratedTests
             {
                 {
                     var res = await client.PatchAsJsonAsync($"users/{MockUser.User.Username}/details", new UserDetail());
-                    res.Should().HaveStatusCodeOk();
+                    res.Should().HaveStatusCode(200);
                 }
 
                 {
                     var res = await client.PatchAsJsonAsync($"users/usernotexist/details", new UserDetail());
-                    res.Should().HaveStatusCodeNotFound()
-                        .And.Should().HaveBodyAsCommonResponseWithCode(UserDetailController.ErrorCodes.Patch_UserNotExist);
+                    res.Should().HaveStatusCode(404)
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(UserDetailController.ErrorCodes.Patch_UserNotExist);
                 }
             }
         }

@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Validation;
 using static Timeline.Helpers.MyLogHelper;
@@ -23,14 +24,20 @@ namespace Timeline.Services
     {
         private const string message = "The user does not exist.";
 
+        public UserNotExistException()
+            : base(message)
+        {
+
+        }
+
         public UserNotExistException(string username)
-            : base(FormatLogMessage(message, Pair("Username", username)))
+            : base(Log.Format(message, ("Username", username)))
         {
             Username = username;
         }
 
         public UserNotExistException(long id)
-            : base(FormatLogMessage(message, Pair("Id", id)))
+            : base(Log.Format(message, ("Id", id)))
         {
             Id = id;
         }
@@ -42,21 +49,29 @@ namespace Timeline.Services
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
         /// <summary>
-        /// The username that does not exist. May be null then <see cref="Id"/> is not null.
+        /// The username that does not exist.
         /// </summary>
-        public string Username { get; private set; }
+        public string Username { get; set; }
 
         /// <summary>
-        /// The id that does not exist. May be null then <see cref="Username"/> is not null.
+        /// The id that does not exist.
         /// </summary>
-        public long? Id { get; private set; }
+        public long? Id { get; set; }
     }
 
     [Serializable]
     public class BadPasswordException : Exception
     {
+        private const string message = "Password is wrong.";
+
+        public BadPasswordException()
+            : base(message)
+        {
+
+        }
+
         public BadPasswordException(string badPassword)
-            : base(FormatLogMessage("Password is wrong.", Pair("Bad Password", badPassword)))
+            : base(Log.Format(message, ("Bad Password", badPassword)))
         {
             Password = badPassword;
         }
@@ -70,22 +85,31 @@ namespace Timeline.Services
         /// <summary>
         /// The wrong password.
         /// </summary>
-        public string Password { get; private set; }
+        public string Password { get; set; }
     }
 
 
     [Serializable]
     public class BadTokenVersionException : Exception
     {
+        private const string message = "Token version is expired.";
+
+        public BadTokenVersionException()
+            : base(message)
+        {
+
+        }
+
         public BadTokenVersionException(long tokenVersion, long requiredVersion)
-            : base(FormatLogMessage("Token version is expired.",
-                Pair("Token Version", tokenVersion),
-                Pair("Required Version", requiredVersion)))
+            : base(Log.Format(message,
+                ("Token Version", tokenVersion),
+                ("Required Version", requiredVersion)))
         {
             TokenVersion = tokenVersion;
             RequiredVersion = requiredVersion;
         }
 
+        public BadTokenVersionException(string message) : base(message) { }
         public BadTokenVersionException(string message, Exception inner) : base(message, inner) { }
 
         protected BadTokenVersionException(
@@ -95,12 +119,12 @@ namespace Timeline.Services
         /// <summary>
         /// The version in the token.
         /// </summary>
-        public long TokenVersion { get; private set; }
+        public long? TokenVersion { get; set; }
 
         /// <summary>
         /// The version required.
         /// </summary>
-        public long RequiredVersion { get; private set; }
+        public long? RequiredVersion { get; set; }
     }
 
     /// <summary>
@@ -109,6 +133,12 @@ namespace Timeline.Services
     [Serializable]
     public class UsernameBadFormatException : Exception
     {
+        private const string message = "Username is of bad format.";
+
+        public UsernameBadFormatException() : base(message) { }
+        public UsernameBadFormatException(string message) : base(message) { }
+        public UsernameBadFormatException(string message, Exception inner) : base(message, inner) { }
+
         public UsernameBadFormatException(string username, string message) : base(message) { Username = username; }
         public UsernameBadFormatException(string username, string message, Exception inner) : base(message, inner) { Username = username; }
         protected UsernameBadFormatException(
@@ -128,7 +158,10 @@ namespace Timeline.Services
     [Serializable]
     public class UserAlreadyExistException : Exception
     {
-        public UserAlreadyExistException(string username) : base($"User {username} already exists.") { Username = username; }
+        private const string message = "User already exists.";
+
+        public UserAlreadyExistException() : base(message) { }
+        public UserAlreadyExistException(string username) : base(Log.Format(message, ("Username", username))) { Username = username; }
         public UserAlreadyExistException(string username, string message) : base(message) { Username = username; }
         public UserAlreadyExistException(string message, Exception inner) : base(message, inner) { }
         protected UserAlreadyExistException(

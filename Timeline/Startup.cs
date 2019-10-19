@@ -27,11 +27,12 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
+            services.AddControllers()
                 .ConfigureApiBehaviorOptions(options =>
                 {
                     options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
-                });
+                })
+                .AddNewtonsoftJson();
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
