@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Controllers;
 using Timeline.Models.Http;
@@ -88,6 +89,26 @@ namespace Timeline.Tests.Controllers
             action.Should().BeAssignableTo<OkObjectResult>()
                 .Which.Value.Should().BeAssignableTo<VerifyTokenResponse>()
                 .Which.User.Should().BeEquivalentTo(MockUser.User.Info);
+        }
+
+        public static IEnumerable<object[]> Verify_BadRequest_Data()
+        {
+            yield return new object[] { new JwtTokenVerifyException(JwtTokenVerifyException.ErrorCodes.Expired), Verify.Expired };
+            yield return new object[] { new JwtTokenVerifyException(JwtTokenVerifyException.ErrorCodes.IdClaimBadFormat), Verify.BadFormat };
+            yield return new object[] { new BadTokenVersionException(), Verify.OldVersion };
+            yield return new object[] { new UserNotExistException(), Verify.UserNotExist };
+        }
+
+        [Theory]
+        [MemberData(nameof(Verify_BadRequest_Data))]
+        public async Task Verify_BadRequest(Exception e, int code)
+        {
+            const string token = "aaaaaaaaaaaaaa";
+            _mockUserService.Setup(s => s.VerifyToken(token)).ThrowsAsync(e);
+            var action = await _controller.Verify(new VerifyTokenRequest { Token = token });
+            action.Should().BeAssignableTo<BadRequestObjectResult>()
+                .Which.Value.Should().BeAssignableTo<CommonResponse>()
+                .Which.Code.Should().Be(code);
         }
 
         // TODO! Verify unit tests

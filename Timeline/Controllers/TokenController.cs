@@ -54,7 +54,7 @@ namespace Timeline.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateTokenRequest request)
         {
-            void LogFailure(string reason, Exception e = null)
+            void LogFailure(string reason, Exception? e = null)
             {
                 _logger.LogInformation(e, Log.Format("Attemp to login failed.",
                     ("Reason", reason),
@@ -100,7 +100,7 @@ namespace Timeline.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Verify([FromBody] VerifyTokenRequest request)
         {
-            void LogFailure(string reason, Exception e = null, params (string, object)[] otherProperties)
+            void LogFailure(string reason, Exception? e = null, params (string, object?)[] otherProperties)
             {
                 var properties = new (string, object)[2 + otherProperties.Length];
                 properties[0] = ("Reason", reason);
@@ -125,7 +125,7 @@ namespace Timeline.Controllers
                 {
                     const string message = "Token is expired.";
                     var innerException = e.InnerException as SecurityTokenExpiredException;
-                    LogFailure(message, e, ("Expires", innerException.Expires), ("Current Time", _clock.GetCurrentTime()));
+                    LogFailure(message, e, ("Expires", innerException?.Expires), ("Current Time", _clock.GetCurrentTime()));
                     return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.Expired, message));
                 }
                 else

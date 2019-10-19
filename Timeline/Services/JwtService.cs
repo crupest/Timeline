@@ -33,6 +33,12 @@ namespace Timeline.Services
             public const int Expired = -2001;
         }
 
+        private const string message = "Jwt token is bad.";
+
+        public JwtTokenVerifyException() : base(message) { }
+        public JwtTokenVerifyException(string message) : base(message) { }
+        public JwtTokenVerifyException(string message, Exception inner) : base(message, inner) { }
+
         public JwtTokenVerifyException(int code) : base(GetErrorMessage(code)) { ErrorCode = code; }
         public JwtTokenVerifyException(string message, int code) : base(message) { ErrorCode = code; }
         public JwtTokenVerifyException(Exception inner, int code) : base(GetErrorMessage(code), inner) { ErrorCode = code; }
@@ -41,7 +47,7 @@ namespace Timeline.Services
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        public int ErrorCode { get; private set; }
+        public int ErrorCode { get; set; }
 
         private static string GetErrorMessage(int errorCode)
         {

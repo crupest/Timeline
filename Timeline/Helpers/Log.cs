@@ -25,7 +25,7 @@ namespace Timeline.Helpers
 
     public static class Log
     {
-        public static string Format(string summary, params (string, object)[] properties)
+        public static string Format(string summary, params (string, object?)[] properties)
         {
             var builder = new StringBuilder();
             builder.Append(summary);

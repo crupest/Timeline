@@ -8,21 +8,21 @@ namespace Timeline.Models
     public class UserDetail
     {
         [MaxLength(10)]
-        public string Nickname { get; set; }
+        public string? Nickname { get; set; }
 
         [ValidateWith(typeof(UserDetailValidators.QQValidator))]
         [JsonProperty(PropertyName = "qq")]
-        public string QQ { get; set; }
+        public string? QQ { get; set; }
 
         [ValidateWith(typeof(UserDetailValidators.EMailValidator))]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [ValidateWith(typeof(UserDetailValidators.PhoneNumberValidator))]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        private static string CoerceEmptyToNull(string value)
+        private static string? CoerceEmptyToNull(string? value)
         {
             if (string.IsNullOrEmpty(value))
                 return null;

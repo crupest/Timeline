@@ -13,6 +13,7 @@ using Timeline.Services;
 
 namespace Timeline
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class Startup
     {
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -68,6 +69,7 @@ namespace Timeline
 
             services.AddMemoryCache();
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)

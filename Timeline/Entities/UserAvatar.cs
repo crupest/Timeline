@@ -11,13 +11,13 @@ namespace Timeline.Entities
         public long Id { get; set; }
 
         [Column("data")]
-        public byte[] Data { get; set; }
+        public byte[]? Data { get; set; }
 
         [Column("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [Column("etag"), MaxLength(30)]
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         [Column("last_modified"), Required]
         public DateTime LastModified { get; set; }
