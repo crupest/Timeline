@@ -11,10 +11,6 @@ namespace Timeline.Tests.IntegratedTests
 {
     public class AuthorizationUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
-        private const string AuthorizeUrl = "Test/User/Authorize";
-        private const string UserUrl = "Test/User/User";
-        private const string AdminUrl = "Test/User/Admin";
-
         private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
 
@@ -28,6 +24,11 @@ namespace Timeline.Tests.IntegratedTests
         {
             _testApp.Dispose();
         }
+
+        private const string BaseUrl = "testing/auth/";
+        private const string AuthorizeUrl = BaseUrl + "Authorize";
+        private const string UserUrl = BaseUrl + "User";
+        private const string AdminUrl = BaseUrl + "Admin";
 
         [Fact]
         public async Task UnauthenticationTest()
