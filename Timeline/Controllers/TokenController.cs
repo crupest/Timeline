@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Helpers;
+using Microsoft.Extensions.Localization;
+using System.Globalization;
 
 namespace Timeline
 {
@@ -42,12 +44,14 @@ namespace Timeline.Controllers
         private readonly IUserService _userService;
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
+        private readonly IStringLocalizer<TokenController> _localizer;
 
-        public TokenController(IUserService userService, ILogger<TokenController> logger, IClock clock)
+        public TokenController(IUserService userService, ILogger<TokenController> logger, IClock clock, IStringLocalizer<TokenController> localizer)
         {
             _userService = userService;
             _logger = logger;
             _clock = clock;
+            _localizer = localizer;
         }
 
         [HttpPost("create")]
@@ -56,7 +60,7 @@ namespace Timeline.Controllers
         {
             void LogFailure(string reason, Exception? e = null)
             {
-                _logger.LogInformation(e, Log.Format("Attemp to login failed.",
+                _logger.LogInformation(e, Log.Format(_localizer["LogCreateFailure"],
                     ("Reason", reason),
                     ("Username", request.Username),
                     ("Password", request.Password),
@@ -72,9 +76,9 @@ namespace Timeline.Controllers
 
                 var result = await _userService.CreateToken(request.Username, request.Password, expireTime);
 
-                _logger.LogInformation(Log.Format("Attemp to login succeeded.",
+                _logger.LogInformation(Log.Format(_localizer["LogCreateSuccess"],
                     ("Username", request.Username),
-                    ("Expire At", expireTime?.ToString() ?? "default")
+                    ("Expire At", expireTime?.ToString(CultureInfo.CurrentUICulture.DateTimeFormat) ?? "default")
                 ));
                 return Ok(new CreateTokenResponse
                 {
@@ -84,15 +88,15 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException e)
             {
-                LogFailure("User does not exist.", e);
+                LogFailure(_localizer["LogUserNotExist"], e);
                 return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
-                    "Bad username or password."));
+                    _localizer["ErrorBadCredential"]));
             }
             catch (BadPasswordException e)
             {
-                LogFailure("Password is wrong.", e);
+                LogFailure(_localizer["LogBadPassword"], e);
                 return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
-                    "Bad username or password."));
+                     _localizer["ErrorBadCredential"]));
             }
         }
 
@@ -102,17 +106,17 @@ namespace Timeline.Controllers
         {
             void LogFailure(string reason, Exception? e = null, params (string, object?)[] otherProperties)
             {
-                var properties = new (string, object)[2 + otherProperties.Length];
+                var properties = new (string, object?)[2 + otherProperties.Length];
                 properties[0] = ("Reason", reason);
                 properties[1] = ("Token", request.Token);
                 otherProperties.CopyTo(properties, 2);
-                _logger.LogInformation(e, Log.Format("Token verification failed.", properties));
+                _logger.LogInformation(e, Log.Format(_localizer["LogVerifyFailure"], properties));
             }
 
             try
             {
                 var result = await _userService.VerifyToken(request.Token);
-                _logger.LogInformation(Log.Format("Token verification succeeded.",
+                _logger.LogInformation(Log.Format(_localizer["LogVerifySuccess"],
                     ("Username", result.Username), ("Token", request.Token)));
                 return Ok(new VerifyTokenResponse
                 {
@@ -123,27 +127,27 @@ namespace Timeline.Controllers
             {
                 if (e.ErrorCode == JwtTokenVerifyException.ErrorCodes.Expired)
                 {
-                    const string message = "Token is expired.";
+                    string message = _localizer["ErrorVerifyExpire"];
                     var innerException = e.InnerException as SecurityTokenExpiredException;
                     LogFailure(message, e, ("Expires", innerException?.Expires), ("Current Time", _clock.GetCurrentTime()));
                     return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.Expired, message));
                 }
                 else
                 {
-                    const string message = "Token is of bad format.";
+                    string message = _localizer["ErrorVerifyBadFormat"];
                     LogFailure(message, e);
                     return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.BadFormat, message));
                 }
             }
             catch (UserNotExistException e)
             {
-                const string message = "User does not exist. Administrator might have deleted this user.";
+                string message = _localizer["ErrorVerifyUserNotExist"];
                 LogFailure(message, e);
                 return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.UserNotExist, message));
             }
             catch (BadTokenVersionException e)
             {
-                const string message = "Token has an old version.";
+                string message = _localizer["ErrorVerifyOldVersion"];
                 LogFailure(message, e, ("Token Version", e.TokenVersion), ("Required Version", e.RequiredVersion));
                 return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.OldVersion, message));
             }

@@ -15,7 +15,7 @@ using static Timeline.ErrorCodes.Http.Token;
 
 namespace Timeline.Tests.Controllers
 {
-    public class TokenControllerTest
+    public class TokenControllerTest : IDisposable
     {
         private readonly Mock<IUserService> _mockUserService = new Mock<IUserService>();
         private readonly TestClock _mockClock = new TestClock();
@@ -24,7 +24,14 @@ namespace Timeline.Tests.Controllers
 
         public TokenControllerTest()
         {
-            _controller = new TokenController(_mockUserService.Object, NullLogger<TokenController>.Instance, _mockClock);
+            _controller = new TokenController(_mockUserService.Object,
+                NullLogger<TokenController>.Instance, _mockClock,
+                new MockStringLocalizer<TokenController>());
+        }
+
+        public void Dispose()
+        {
+            _controller.Dispose();
         }
 
         [Theory]
@@ -110,7 +117,5 @@ namespace Timeline.Tests.Controllers
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
                 .Which.Code.Should().Be(code);
         }
-
-        // TODO! Verify unit tests
     }
 }
