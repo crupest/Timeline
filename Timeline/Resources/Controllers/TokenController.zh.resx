@@ -118,18 +118,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ErrorBadCredential" xml:space="preserve">
-    <value>Username or password is invalid.</value>
+    <value>用户名或密码错误。</value>
   </data>
   <data name="ErrorVerifyBadFormat" xml:space="preserve">
-    <value>The token is of bad format. It might not be created by the server.</value>
+    <value>符号格式错误。这个符号可能不是这个服务器创建的。</value>
   </data>
   <data name="ErrorVerifyExpire" xml:space="preserve">
-    <value>The token is expired.</value>
+    <value>符号过期了。</value>
   </data>
   <data name="ErrorVerifyOldVersion" xml:space="preserve">
-    <value>Token has an old version. User might have update some info.</value>
+    <value>符号是一个旧版本。用户可能已经更新了信息。</value>
   </data>
   <data name="ErrorVerifyUserNotExist" xml:space="preserve">
-    <value>User does not exist. Administrator might have deleted this user.</value>
+    <value>用户不存在。管理员可能已经删除了这个用户。</value>
   </data>
 </root>

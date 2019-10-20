@@ -117,19 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ErrorBadCredential" xml:space="preserve">
-    <value>Username or password is invalid.</value>
+  <data name="LogBadPassword" xml:space="preserve">
+    <value>The password is wrong.</value>
   </data>
-  <data name="ErrorVerifyBadFormat" xml:space="preserve">
+  <data name="LogCreateFailure" xml:space="preserve">
+    <value>A user failed to create a token.</value>
+  </data>
+  <data name="LogCreateSuccess" xml:space="preserve">
+    <value>A user succeeded to create a token.</value>
+  </data>
+  <data name="LogUserNotExist" xml:space="preserve">
+    <value>The user does not exist.</value>
+  </data>
+  <data name="LogVerifyBadFormat" xml:space="preserve">
     <value>The token is of bad format. It might not be created by the server.</value>
   </data>
-  <data name="ErrorVerifyExpire" xml:space="preserve">
+  <data name="LogVerifyExpire" xml:space="preserve">
     <value>The token is expired.</value>
   </data>
-  <data name="ErrorVerifyOldVersion" xml:space="preserve">
+  <data name="LogVerifyFailure" xml:space="preserve">
+    <value>A token failed to be verified.</value>
+  </data>
+  <data name="LogVerifyOldVersion" xml:space="preserve">
     <value>Token has an old version. User might have update some info.</value>
   </data>
-  <data name="ErrorVerifyUserNotExist" xml:space="preserve">
+  <data name="LogVerifySuccess" xml:space="preserve">
+    <value>A token succeeded to be verified.</value>
+  </data>
+  <data name="LogVerifyUserNotExist" xml:space="preserve">
     <value>User does not exist. Administrator might have deleted this user.</value>
   </data>
 </root>

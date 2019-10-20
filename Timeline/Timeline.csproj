@@ -28,14 +28,24 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\Controllers\TokenController.en.Designer.cs">
+      <Compile Update="Resources\Controllers\TokenController.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
-        <DependentUpon>TokenController.en.resx</DependentUpon>
+        <DependentUpon>TokenController.resx</DependentUpon>
       </Compile>
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Update="Resources\Controllers\TokenController.resx">
+        <SubType>Designer</SubType>
+        <LastGenOutput>TokenController.Designer.cs</LastGenOutput>
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Controllers\TokenController.zh.resx">
+        <SubType>Designer</SubType>
+        <LastGenOutput>TokenController.en.Designer.cs</LastGenOutput>
+        <Generator>PublicResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\TokenController.en.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>
         <LastGenOutput>TokenController.en.Designer.cs</LastGenOutput>

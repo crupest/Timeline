@@ -94,7 +94,7 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task VerifyToken_BadToken()
+        public async Task VerifyToken_BadFormat()
         {
             using var client = _factory.CreateDefaultClient();
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
@@ -105,7 +105,7 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task VerifyToken_BadVersion()
+        public async Task VerifyToken_OldVersion()
         {
             using var client = _factory.CreateDefaultClient();
             var token = (await client.CreateUserTokenAsync(MockUser.User.Username, MockUser.User.Password)).Token;
