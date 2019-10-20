@@ -127,29 +127,31 @@ namespace Timeline.Controllers
             {
                 if (e.ErrorCode == JwtTokenVerifyException.ErrorCodes.Expired)
                 {
-                    string message = _localizer["ErrorVerifyExpire"];
                     var innerException = e.InnerException as SecurityTokenExpiredException;
-                    LogFailure(message, e, ("Expires", innerException?.Expires), ("Current Time", _clock.GetCurrentTime()));
-                    return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.Expired, message));
+                    LogFailure(_localizer["LogVerifyExpire"], e, ("Expires", innerException?.Expires),
+                        ("Current Time", _clock.GetCurrentTime()));
+                    return BadRequest(new CommonResponse(
+                        ErrorCodes.Http.Token.Verify.Expired, _localizer["ErrorVerifyExpire"]));
                 }
                 else
                 {
-                    string message = _localizer["ErrorVerifyBadFormat"];
-                    LogFailure(message, e);
-                    return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.BadFormat, message));
+                    LogFailure(_localizer["LogVerifyBadFormat"], e);
+                    return BadRequest(new CommonResponse(
+                        ErrorCodes.Http.Token.Verify.BadFormat, _localizer["ErrorVerifyBadFormat"]));
                 }
             }
             catch (UserNotExistException e)
             {
-                string message = _localizer["ErrorVerifyUserNotExist"];
-                LogFailure(message, e);
-                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.UserNotExist, message));
+                LogFailure(_localizer["LogVerifyUserNotExist"], e);
+                return BadRequest(new CommonResponse(
+                    ErrorCodes.Http.Token.Verify.UserNotExist, _localizer["ErrorVerifyUserNotExist"]));
             }
             catch (BadTokenVersionException e)
             {
-                string message = _localizer["ErrorVerifyOldVersion"];
-                LogFailure(message, e, ("Token Version", e.TokenVersion), ("Required Version", e.RequiredVersion));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Verify.OldVersion, message));
+                LogFailure(_localizer["LogVerifyOldVersion"], e,
+                    ("Token Version", e.TokenVersion), ("Required Version", e.RequiredVersion));
+                return BadRequest(new CommonResponse(
+                    ErrorCodes.Http.Token.Verify.OldVersion, _localizer["ErrorVerifyOldVersion"]));
             }
         }
     }

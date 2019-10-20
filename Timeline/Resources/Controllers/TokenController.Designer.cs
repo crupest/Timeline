@@ -61,11 +61,92 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The password is wrong..
+        /// </summary>
+        public static string LogBadPassword {
+            get {
+                return ResourceManager.GetString("LogBadPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A user failed to create a token..
+        /// </summary>
+        public static string LogCreateFailure {
+            get {
+                return ResourceManager.GetString("LogCreateFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A user succeeded to create a token..
         /// </summary>
         public static string LogCreateSuccess {
             get {
                 return ResourceManager.GetString("LogCreateSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user does not exist..
+        /// </summary>
+        public static string LogUserNotExist {
+            get {
+                return ResourceManager.GetString("LogUserNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is of bad format. It might not be created by the server..
+        /// </summary>
+        public static string LogVerifyBadFormat {
+            get {
+                return ResourceManager.GetString("LogVerifyBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is expired..
+        /// </summary>
+        public static string LogVerifyExpire {
+            get {
+                return ResourceManager.GetString("LogVerifyExpire", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A token failed to be verified..
+        /// </summary>
+        public static string LogVerifyFailure {
+            get {
+                return ResourceManager.GetString("LogVerifyFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Token has an old version. User might have update some info..
+        /// </summary>
+        public static string LogVerifyOldVersion {
+            get {
+                return ResourceManager.GetString("LogVerifyOldVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A token succeeded to be verified..
+        /// </summary>
+        public static string LogVerifySuccess {
+            get {
+                return ResourceManager.GetString("LogVerifySuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User does not exist. Administrator might have deleted this user..
+        /// </summary>
+        public static string LogVerifyUserNotExist {
+            get {
+                return ResourceManager.GetString("LogVerifyUserNotExist", resourceCulture);
             }
         }
     }
