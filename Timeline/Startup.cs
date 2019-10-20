@@ -50,6 +50,11 @@ namespace Timeline
                 );
             });
 
+            services.AddLocalization(options =>
+            {
+                options.ResourcesPath = "Resources";
+            });
+
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddTransient<IPasswordService, PasswordService>();
