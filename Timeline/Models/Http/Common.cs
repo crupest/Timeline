@@ -1,3 +1,6 @@
+using Microsoft.Extensions.Localization;
+using Timeline.Helpers;
+
 namespace Timeline.Models.Http
 {
     public class CommonResponse
@@ -55,7 +58,7 @@ namespace Timeline.Models.Http
             Data = data;
         }
 
-        public T Data { get; set; }
+        public T Data { get; set; } = default!;
     }
 
     public static class CommonPutResponse
@@ -70,10 +73,18 @@ namespace Timeline.Models.Http
             public bool Create { get; set; }
         }
 
-        public static CommonDataResponse<ResponseData> Create() =>
-            new CommonDataResponse<ResponseData>(0, "A new item is created.", new ResponseData(true));
-        public static CommonDataResponse<ResponseData> Modify() =>
-            new CommonDataResponse<ResponseData>(0, "An existent item is modified.", new ResponseData(false));
+        internal static CommonDataResponse<ResponseData> Create(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Http.Common");
+            return new CommonDataResponse<ResponseData>(0, localizer["ResponsePutCreate"], new ResponseData(true));
+        }
+
+        internal static CommonDataResponse<ResponseData> Modify(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Http.Common");
+            return new CommonDataResponse<ResponseData>(0, localizer["ResponsePutModify"], new ResponseData(false));
+
+        }
     }
 
     public static class CommonDeleteResponse
@@ -88,9 +99,16 @@ namespace Timeline.Models.Http
             public bool Delete { get; set; }
         }
 
-        public static CommonDataResponse<ResponseData> Delete() =>
-            new CommonDataResponse<ResponseData>(0, "An existent item is deleted.", new ResponseData(true));
-        public static CommonDataResponse<ResponseData> NotExist() =>
-            new CommonDataResponse<ResponseData>(0, "The item does not exist.", new ResponseData(false));
+        internal static CommonDataResponse<ResponseData> Delete(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Http.Common");
+            return new CommonDataResponse<ResponseData>(0, localizer["ResponseDeleteDelete"], new ResponseData(true));
+        }
+
+        internal static CommonDataResponse<ResponseData> NotExist(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Http.Common");
+            return new CommonDataResponse<ResponseData>(0, localizer["ResponseDeleteNotExist"], new ResponseData(false));
+        }
     }
 }

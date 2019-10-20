@@ -1,40 +1,73 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Threading.Tasks;
 using Timeline.Authenticate;
+using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
-using static Timeline.Helpers.MyLogHelper;
+
+namespace Timeline
+{
+    public static partial class ErrorCodes
+    {
+        public static partial class Http
+        {
+            public static class User // bbb = 002
+            {
+                public static class Get // cc = 01
+                {
+                    public const int NotExist = 10020101; // dd = 01
+                }
+
+                public static class Put // cc = 02
+                {
+                    public const int BadUsername = 10020201; // dd = 01
+                }
+
+                public static class Patch // cc = 03
+                {
+                    public const int NotExist = 10020301; // dd = 01
+                }
+
+                public static class Op // cc = 1x
+                {
+                    public static class ChangeUsername // cc = 11
+                    {
+                        public const int NotExist = 10021101; // dd = 01
+                        public const int AlreadyExist = 10021102; // dd = 02
+                    }
+
+                    public static class ChangePassword // cc = 12
+                    {
+                        public const int BadOldPassword = 10021201; // dd = 01
+                    }
+                }
+
+            }
+        }
+    }
+}
 
 namespace Timeline.Controllers
 {
     [ApiController]
     public class UserController : Controller
     {
-        public static class ErrorCodes
-        {
-            public const int Get_NotExist = -1001;
-
-            public const int Put_BadUsername = -2001;
-
-            public const int Patch_NotExist = -3001;
-
-            public const int ChangeUsername_NotExist = -4001;
-            public const int ChangeUsername_AlreadyExist = -4002;
-
-            public const int ChangePassword_BadOldPassword = -5001;
-        }
 
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IStringLocalizerFactory _localizerFactory;
+        private readonly IStringLocalizer _localizer;
 
-        public UserController(ILogger<UserController> logger, IUserService userService)
+        public UserController(ILogger<UserController> logger, IUserService userService, IStringLocalizerFactory localizerFactory)
         {
             _logger = logger;
             _userService = userService;
+            _localizerFactory = localizerFactory;
+            _localizer = localizerFactory.Create(GetType());
         }
 
         [HttpGet("users"), AdminAuthorize]
@@ -49,8 +82,8 @@ namespace Timeline.Controllers
             var user = await _userService.GetUser(username);
             if (user == null)
             {
-                _logger.LogInformation(FormatLogMessage("Attempt to get a non-existent user.", Pair("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Get_NotExist, "The user does not exist."));
+                _logger.LogInformation(Log.Format(_localizer["LogGetUserNotExist"], ("Username", username)));
+                return NotFound(new CommonResponse(ErrorCodes.Http.User.Get.NotExist, _localizer["ErrorGetUserNotExist"]));
             }
             return Ok(user);
         }
@@ -60,23 +93,23 @@ namespace Timeline.Controllers
         {
             try
             {
-                var result = await _userService.PutUser(username, request.Password, request.Administrator.Value);
+                var result = await _userService.PutUser(username, request.Password, request.Administrator!.Value);
                 switch (result)
                 {
                     case PutResult.Created:
-                        _logger.LogInformation(FormatLogMessage("A user is created.", Pair("Username", username)));
-                        return CreatedAtAction("Get", new { username }, CommonPutResponse.Create());
+                        _logger.LogInformation(Log.Format(_localizer["LogPutCreate"], ("Username", username)));
+                        return CreatedAtAction("Get", new { username }, CommonPutResponse.Create(_localizerFactory));
                     case PutResult.Modified:
-                        _logger.LogInformation(FormatLogMessage("A user is modified.", Pair("Username", username)));
-                        return Ok(CommonPutResponse.Modify());
+                        _logger.LogInformation(Log.Format(_localizer["LogPutModify"], ("Username", username)));
+                        return Ok(CommonPutResponse.Modify(_localizerFactory));
                     default:
-                        throw new Exception("Unreachable code.");
+                        throw new InvalidBranchException();
                 }
             }
             catch (UsernameBadFormatException e)
             {
-                _logger.LogInformation(e, FormatLogMessage("Attempt to create a user with bad username failed.", Pair("Username", username)));
-                return BadRequest(new CommonResponse(ErrorCodes.Put_BadUsername, "Username is of bad format."));
+                _logger.LogInformation(e, Log.Format(_localizer["LogPutBadUsername"], ("Username", username)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Put.BadUsername, _localizer["ErrorPutBadUsername"]));
             }
         }
 
@@ -90,8 +123,8 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, FormatLogMessage("Attempt to patch a non-existent user.", Pair("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Patch_NotExist, "The user does not exist."));
+                _logger.LogInformation(e, Log.Format(_localizer["LogPatchUserNotExist"], ("Username", username)));
+                return NotFound(new CommonResponse(ErrorCodes.Http.User.Patch.NotExist, _localizer["ErrorPatchUserNotExist"]));
             }
         }
 
@@ -101,13 +134,13 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.DeleteUser(username);
-                _logger.LogInformation(FormatLogMessage("A user is deleted.", Pair("Username", username)));
-                return Ok(CommonDeleteResponse.Delete());
+                _logger.LogInformation(Log.Format(_localizer["LogDeleteDelete"], ("Username", username)));
+                return Ok(CommonDeleteResponse.Delete(_localizerFactory));
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, FormatLogMessage("Attempt to delete a non-existent user.", Pair("Username", username)));
-                return Ok(CommonDeleteResponse.NotExist());
+                _logger.LogInformation(e, Log.Format(_localizer["LogDeleteUserNotExist"], ("Username", username)));
+                return Ok(CommonDeleteResponse.NotExist(_localizerFactory));
             }
         }
 
