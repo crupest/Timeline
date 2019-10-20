@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Timeline.Authenticate;
 
-namespace Timeline.Controllers
+namespace Timeline.Controllers.Testing
 {
-    [Route("Test/User")]
+    [Route("testing/auth")]
     [ApiController]
-    public class UserTestController : Controller
+    public class TestingAuthController : Controller
     {
         [HttpGet("[action]")]
         [Authorize]
