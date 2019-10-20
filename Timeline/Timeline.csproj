@@ -28,27 +28,31 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\Controllers\TokenController.Designer.cs">
+      <Compile Update="Resources\Common.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
-        <DependentUpon>TokenController.resx</DependentUpon>
+        <DependentUpon>Common.resx</DependentUpon>
       </Compile>
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Update="Resources\Common.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Common.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\TokenController.resx">
         <SubType>Designer</SubType>
-        <LastGenOutput>TokenController.Designer.cs</LastGenOutput>
-        <Generator>PublicResXFileCodeGenerator</Generator>
+        <Generator></Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\TokenController.zh.resx">
         <SubType>Designer</SubType>
-        <LastGenOutput>TokenController.en.Designer.cs</LastGenOutput>
-        <Generator>PublicResXFileCodeGenerator</Generator>
+        <Generator></Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\TokenController.en.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-        <LastGenOutput>TokenController.en.Designer.cs</LastGenOutput>
+        <Generator></Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Controllers\UserController.resx">
+        <Generator></Generator>
       </EmbeddedResource>
     </ItemGroup>
 </Project>
