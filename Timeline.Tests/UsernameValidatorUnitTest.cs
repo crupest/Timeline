@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Timeline.Models.Validation;
+using Timeline.Tests.Mock.Services;
 using Xunit;
 
 namespace Timeline.Tests
@@ -15,14 +16,14 @@ namespace Timeline.Tests
 
         private string FailAndMessage(string username)
         {
-            var result = _validator.Validate(username, out var message);
+            var result = _validator.Validate(username, TestStringLocalizerFactory.Create(), out var message);
             result.Should().BeFalse();
             return message;
         }
 
         private void Succeed(string username)
         {
-            _validator.Validate(username, out var message).Should().BeTrue();
+            _validator.Validate(username, TestStringLocalizerFactory.Create(), out var message).Should().BeTrue();
             message.Should().Be(ValidationConstants.SuccessMessage);
         }
 
@@ -35,7 +36,7 @@ namespace Timeline.Tests
         [Fact]
         public void NotString()
         {
-            var result = _validator.Validate(123, out var message);
+            var result = _validator.Validate(123, TestStringLocalizerFactory.Create(), out var message);
             result.Should().BeFalse();
             message.Should().ContainEquivalentOf("type");
         }

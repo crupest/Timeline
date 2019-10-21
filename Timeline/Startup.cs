@@ -64,7 +64,6 @@ namespace Timeline
             services.AddTransient<IClock, Clock>();
 
             services.AddUserAvatarService();
-            services.AddUserDetailService();
 
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 

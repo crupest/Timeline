@@ -86,13 +86,13 @@ namespace Timeline.Models.Http
 
         internal static CommonPutResponse Create(IStringLocalizerFactory localizerFactory)
         {
-            var localizer = localizerFactory.Create("Http.Common");
+            var localizer = localizerFactory.Create("Models.Http.Common");
             return new CommonPutResponse(0, localizer["ResponsePutCreate"], true);
         }
 
         internal static CommonPutResponse Modify(IStringLocalizerFactory localizerFactory)
         {
-            var localizer = localizerFactory.Create("Http.Common");
+            var localizer = localizerFactory.Create("Models.Http.Common");
             return new CommonPutResponse(0, localizer["ResponsePutModify"], false);
 
         }
@@ -123,13 +123,13 @@ namespace Timeline.Models.Http
 
         internal static CommonDeleteResponse Delete(IStringLocalizerFactory localizerFactory)
         {
-            var localizer = localizerFactory.Create("Http.Common");
+            var localizer = localizerFactory.Create("Models.Http.Common");
             return new CommonDeleteResponse(0, localizer["ResponseDeleteDelete"], true);
         }
 
         internal static CommonDeleteResponse NotExist(IStringLocalizerFactory localizerFactory)
         {
-            var localizer = localizerFactory.Create("Http.Common");
+            var localizer = localizerFactory.Create("Models.Models.Http.Common");
             return new CommonDeleteResponse(0, localizer["ResponseDeleteNotExist"], false);
         }
     }

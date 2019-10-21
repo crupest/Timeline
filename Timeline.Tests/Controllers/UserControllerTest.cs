@@ -69,8 +69,8 @@ namespace Timeline.Tests.Controllers
         }
 
         [Theory]
-        [InlineData(PutResult.Created, true)]
-        [InlineData(PutResult.Modified, false)]
+        [InlineData(PutResult.Create, true)]
+        [InlineData(PutResult.Modify, false)]
         public async Task Put_Success(PutResult result, bool create)
         {
             const string username = "aaa";
@@ -176,7 +176,7 @@ namespace Timeline.Tests.Controllers
 
         [Theory]
         [InlineData(typeof(UserNotExistException), Op.ChangeUsername.NotExist)]
-        [InlineData(typeof(UserAlreadyExistException), Op.ChangeUsername.AlreadyExist)]
+        [InlineData(typeof(UsernameConfictException), Op.ChangeUsername.AlreadyExist)]
         public async Task Op_ChangeUsername_Failure(Type exceptionType, int code)
         {
             const string oldUsername = "aaa";

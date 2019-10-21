@@ -8,6 +8,7 @@ using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
+using static Timeline.Resources.Controllers.UserController;
 
 namespace Timeline
 {
@@ -82,7 +83,7 @@ namespace Timeline.Controllers
             var user = await _userService.GetUser(username);
             if (user == null)
             {
-                _logger.LogInformation(Log.Format(_localizer["LogGetUserNotExist"], ("Username", username)));
+                _logger.LogInformation(Log.Format(LogGetUserNotExist, ("Username", username)));
                 return NotFound(new CommonResponse(ErrorCodes.Http.User.Get.NotExist, _localizer["ErrorGetUserNotExist"]));
             }
             return Ok(user);
@@ -96,11 +97,11 @@ namespace Timeline.Controllers
                 var result = await _userService.PutUser(username, request.Password, request.Administrator!.Value);
                 switch (result)
                 {
-                    case PutResult.Created:
-                        _logger.LogInformation(Log.Format(_localizer["LogPutCreate"], ("Username", username)));
+                    case PutResult.Create:
+                        _logger.LogInformation(Log.Format(LogPutCreate, ("Username", username)));
                         return CreatedAtAction("Get", new { username }, CommonPutResponse.Create(_localizerFactory));
-                    case PutResult.Modified:
-                        _logger.LogInformation(Log.Format(_localizer["LogPutModify"], ("Username", username)));
+                    case PutResult.Modify:
+                        _logger.LogInformation(Log.Format(LogPutModify, ("Username", username)));
                         return Ok(CommonPutResponse.Modify(_localizerFactory));
                     default:
                         throw new InvalidBranchException();
@@ -108,7 +109,7 @@ namespace Timeline.Controllers
             }
             catch (UsernameBadFormatException e)
             {
-                _logger.LogInformation(e, Log.Format(_localizer["LogPutBadUsername"], ("Username", username)));
+                _logger.LogInformation(e, Log.Format(LogPutBadUsername, ("Username", username)));
                 return BadRequest(new CommonResponse(ErrorCodes.Http.User.Put.BadUsername, _localizer["ErrorPutBadUsername"]));
             }
         }
@@ -123,7 +124,7 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, Log.Format(_localizer["LogPatchUserNotExist"], ("Username", username)));
+                _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
                 return NotFound(new CommonResponse(ErrorCodes.Http.User.Patch.NotExist, _localizer["ErrorPatchUserNotExist"]));
             }
         }
@@ -134,12 +135,12 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.DeleteUser(username);
-                _logger.LogInformation(Log.Format(_localizer["LogDeleteDelete"], ("Username", username)));
+                _logger.LogInformation(Log.Format(LogDeleteDelete, ("Username", username)));
                 return Ok(CommonDeleteResponse.Delete(_localizerFactory));
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, Log.Format(_localizer["LogDeleteUserNotExist"], ("Username", username)));
+                _logger.LogInformation(e, Log.Format(LogDeleteNotExist, ("Username", username)));
                 return Ok(CommonDeleteResponse.NotExist(_localizerFactory));
             }
         }
@@ -150,19 +151,19 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.ChangeUsername(request.OldUsername, request.NewUsername);
-                _logger.LogInformation(Log.Format(_localizer["LogChangeUsernameSuccess"],
+                _logger.LogInformation(Log.Format(LogChangeUsernameSuccess,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
                 return Ok();
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, Log.Format(_localizer["LogChangeUsernameNotExist"],
+                _logger.LogInformation(e, Log.Format(LogChangeUsernameNotExist,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
                 return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.NotExist, _localizer["ErrorChangeUsernameNotExist", request.OldUsername]));
             }
-            catch (UserAlreadyExistException e)
+            catch (UsernameConfictException e)
             {
-                _logger.LogInformation(e, Log.Format(_localizer["LogChangeUsernameAlreadyExist"],
+                _logger.LogInformation(e, Log.Format(LogChangeUsernameAlreadyExist,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
                 return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.AlreadyExist, _localizer["ErrorChangeUsernameAlreadyExist"]));
             }
@@ -175,12 +176,12 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.ChangePassword(User.Identity.Name!, request.OldPassword, request.NewPassword);
-                _logger.LogInformation(Log.Format(_localizer["LogChangePasswordSuccess"], ("Username", User.Identity.Name)));
+                _logger.LogInformation(Log.Format(LogChangePasswordSuccess, ("Username", User.Identity.Name)));
                 return Ok();
             }
             catch (BadPasswordException e)
             {
-                _logger.LogInformation(e, Log.Format(_localizer["LogChangePasswordBadPassword"],
+                _logger.LogInformation(e, Log.Format(LogChangePasswordBadPassword,
                     ("Username", User.Identity.Name), ("Old Password", request.OldPassword)));
                 return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangePassword.BadOldPassword,
                     _localizer["ErrorChangePasswordBadPassword"]));
