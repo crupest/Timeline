@@ -9,6 +9,7 @@ using Timeline.Services;
 using Timeline.Helpers;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
+using static Timeline.Resources.Controllers.TokenController;
 
 namespace Timeline
 {
@@ -60,7 +61,7 @@ namespace Timeline.Controllers
         {
             void LogFailure(string reason, Exception? e = null)
             {
-                _logger.LogInformation(e, Log.Format(_localizer["LogCreateFailure"],
+                _logger.LogInformation(e, Log.Format(LogCreateFailure,
                     ("Reason", reason),
                     ("Username", request.Username),
                     ("Password", request.Password),
@@ -76,7 +77,7 @@ namespace Timeline.Controllers
 
                 var result = await _userService.CreateToken(request.Username, request.Password, expireTime);
 
-                _logger.LogInformation(Log.Format(_localizer["LogCreateSuccess"],
+                _logger.LogInformation(Log.Format(LogCreateSuccess,
                     ("Username", request.Username),
                     ("Expire At", expireTime?.ToString(CultureInfo.CurrentUICulture.DateTimeFormat) ?? "default")
                 ));
@@ -88,13 +89,13 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException e)
             {
-                LogFailure(_localizer["LogUserNotExist"], e);
+                LogFailure(LogUserNotExist, e);
                 return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
                     _localizer["ErrorBadCredential"]));
             }
             catch (BadPasswordException e)
             {
-                LogFailure(_localizer["LogBadPassword"], e);
+                LogFailure(LogBadPassword, e);
                 return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
                      _localizer["ErrorBadCredential"]));
             }
@@ -110,48 +111,49 @@ namespace Timeline.Controllers
                 properties[0] = ("Reason", reason);
                 properties[1] = ("Token", request.Token);
                 otherProperties.CopyTo(properties, 2);
-                _logger.LogInformation(e, Log.Format(_localizer["LogVerifyFailure"], properties));
+                _logger.LogInformation(e, Log.Format(LogVerifyFailure, properties));
             }
 
             try
             {
                 var result = await _userService.VerifyToken(request.Token);
-                _logger.LogInformation(Log.Format(_localizer["LogVerifySuccess"],
+                _logger.LogInformation(Log.Format(LogVerifySuccess,
                     ("Username", result.Username), ("Token", request.Token)));
                 return Ok(new VerifyTokenResponse
                 {
                     User = result
                 });
             }
-            catch (JwtTokenVerifyException e)
+            catch (JwtVerifyException e)
             {
-                if (e.ErrorCode == JwtTokenVerifyException.ErrorCodes.Expired)
+                if (e.ErrorCode == JwtVerifyException.ErrorCodes.Expired)
                 {
                     var innerException = e.InnerException as SecurityTokenExpiredException;
-                    LogFailure(_localizer["LogVerifyExpire"], e, ("Expires", innerException?.Expires),
+                    LogFailure(LogVerifyExpire, e, ("Expires", innerException?.Expires),
                         ("Current Time", _clock.GetCurrentTime()));
                     return BadRequest(new CommonResponse(
                         ErrorCodes.Http.Token.Verify.Expired, _localizer["ErrorVerifyExpire"]));
                 }
+                else if (e.ErrorCode == JwtVerifyException.ErrorCodes.OldVersion)
+                {
+                    var innerException = e.InnerException as JwtBadVersionException;
+                    LogFailure(LogVerifyOldVersion, e,
+                        ("Token Version", innerException?.TokenVersion), ("Required Version", innerException?.RequiredVersion));
+                    return BadRequest(new CommonResponse(
+                        ErrorCodes.Http.Token.Verify.OldVersion, _localizer["ErrorVerifyOldVersion"]));
+                }
                 else
                 {
-                    LogFailure(_localizer["LogVerifyBadFormat"], e);
+                    LogFailure(LogVerifyBadFormat, e);
                     return BadRequest(new CommonResponse(
                         ErrorCodes.Http.Token.Verify.BadFormat, _localizer["ErrorVerifyBadFormat"]));
                 }
             }
             catch (UserNotExistException e)
             {
-                LogFailure(_localizer["LogVerifyUserNotExist"], e);
+                LogFailure(LogVerifyUserNotExist, e);
                 return BadRequest(new CommonResponse(
                     ErrorCodes.Http.Token.Verify.UserNotExist, _localizer["ErrorVerifyUserNotExist"]));
-            }
-            catch (BadTokenVersionException e)
-            {
-                LogFailure(_localizer["LogVerifyOldVersion"], e,
-                    ("Token Version", e.TokenVersion), ("Required Version", e.RequiredVersion));
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Verify.OldVersion, _localizer["ErrorVerifyOldVersion"]));
             }
         }
     }

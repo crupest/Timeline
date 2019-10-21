@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Microsoft.Extensions.Localization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Timeline.Models.Validation
@@ -10,7 +11,7 @@ namespace Timeline.Models.Validation
 
         private readonly Regex _regex = new Regex(RegexPattern);
 
-        protected override bool DoValidate(string value, out string message)
+        protected override bool DoValidate(string value, IStringLocalizerFactory localizerFactory, out string message)
         {
             if (value.Length == 0)
             {

@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Validation;
 using static Timeline.Helpers.MyLogHelper;
@@ -15,163 +15,8 @@ namespace Timeline.Services
 {
     public class CreateTokenResult
     {
-        public string Token { get; set; }
-        public UserInfo User { get; set; }
-    }
-
-    [Serializable]
-    public class UserNotExistException : Exception
-    {
-        private const string message = "The user does not exist.";
-
-        public UserNotExistException()
-            : base(message)
-        {
-
-        }
-
-        public UserNotExistException(string username)
-            : base(Log.Format(message, ("Username", username)))
-        {
-            Username = username;
-        }
-
-        public UserNotExistException(long id)
-            : base(Log.Format(message, ("Id", id)))
-        {
-            Id = id;
-        }
-
-        public UserNotExistException(string message, Exception inner) : base(message, inner) { }
-
-        protected UserNotExistException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        /// <summary>
-        /// The username that does not exist.
-        /// </summary>
-        public string Username { get; set; }
-
-        /// <summary>
-        /// The id that does not exist.
-        /// </summary>
-        public long? Id { get; set; }
-    }
-
-    [Serializable]
-    public class BadPasswordException : Exception
-    {
-        private const string message = "Password is wrong.";
-
-        public BadPasswordException()
-            : base(message)
-        {
-
-        }
-
-        public BadPasswordException(string badPassword)
-            : base(Log.Format(message, ("Bad Password", badPassword)))
-        {
-            Password = badPassword;
-        }
-
-        public BadPasswordException(string message, Exception inner) : base(message, inner) { }
-
-        protected BadPasswordException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        /// <summary>
-        /// The wrong password.
-        /// </summary>
-        public string Password { get; set; }
-    }
-
-
-    [Serializable]
-    public class BadTokenVersionException : Exception
-    {
-        private const string message = "Token version is expired.";
-
-        public BadTokenVersionException()
-            : base(message)
-        {
-
-        }
-
-        public BadTokenVersionException(long tokenVersion, long requiredVersion)
-            : base(Log.Format(message,
-                ("Token Version", tokenVersion),
-                ("Required Version", requiredVersion)))
-        {
-            TokenVersion = tokenVersion;
-            RequiredVersion = requiredVersion;
-        }
-
-        public BadTokenVersionException(string message) : base(message) { }
-        public BadTokenVersionException(string message, Exception inner) : base(message, inner) { }
-
-        protected BadTokenVersionException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        /// <summary>
-        /// The version in the token.
-        /// </summary>
-        public long? TokenVersion { get; set; }
-
-        /// <summary>
-        /// The version required.
-        /// </summary>
-        public long? RequiredVersion { get; set; }
-    }
-
-    /// <summary>
-    /// Thrown when username is of bad format.
-    /// </summary>
-    [Serializable]
-    public class UsernameBadFormatException : Exception
-    {
-        private const string message = "Username is of bad format.";
-
-        public UsernameBadFormatException() : base(message) { }
-        public UsernameBadFormatException(string message) : base(message) { }
-        public UsernameBadFormatException(string message, Exception inner) : base(message, inner) { }
-
-        public UsernameBadFormatException(string username, string message) : base(message) { Username = username; }
-        public UsernameBadFormatException(string username, string message, Exception inner) : base(message, inner) { Username = username; }
-        protected UsernameBadFormatException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        /// <summary>
-        /// Username of bad format.
-        /// </summary>
-        public string Username { get; private set; }
-    }
-
-
-    /// <summary>
-    /// Thrown when the user already exists.
-    /// </summary>
-    [Serializable]
-    public class UserAlreadyExistException : Exception
-    {
-        private const string message = "User already exists.";
-
-        public UserAlreadyExistException() : base(message) { }
-        public UserAlreadyExistException(string username) : base(Log.Format(message, ("Username", username))) { Username = username; }
-        public UserAlreadyExistException(string username, string message) : base(message) { Username = username; }
-        public UserAlreadyExistException(string message, Exception inner) : base(message, inner) { }
-        protected UserAlreadyExistException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        /// <summary>
-        /// The username that already exists.
-        /// </summary>
-        public string Username { get; set; }
+        public string Token { get; set; } = default!;
+        public UserInfo User { get; set; } = default!;
     }
 
     public interface IUserService
@@ -196,9 +41,8 @@ namespace Timeline.Services
         /// <param name="token">The token to verify.</param>
         /// <returns>The user info specified by the token.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
-        /// <exception cref="JwtTokenVerifyException">Thrown when the token is of bad format. Thrown by <see cref="JwtService.VerifyJwtToken(string)"/>.</exception>
+        /// <exception cref="JwtVerifyException">Thrown when the token is of bad format. Thrown by <see cref="JwtService.VerifyJwtToken(string)"/>.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user specified by the token does not exist. Usually it has been deleted after the token was issued.</exception>
-        /// <exception cref="BadTokenVersionException">Thrown when the version in the token is expired. User needs to recreate the token.</exception>
         Task<UserInfo> VerifyToken(string token);
 
         /// <summary>
@@ -221,10 +65,12 @@ namespace Timeline.Services
         /// <param name="username">Username of user.</param>
         /// <param name="password">Password of user.</param>
         /// <param name="administrator">Whether the user is administrator.</param>
-        /// <returns>Return <see cref="PutResult.Created"/> if a new user is created.
-        /// Return <see cref="PutResult.Modified"/> if a existing user is modified.</returns>
-        /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
+        /// <returns>
+        /// Return <see cref="PutResult.Create"/> if a new user is created.
+        /// Return <see cref="PutResult.Modify"/> if a existing user is modified.
+        /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
+        /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
         Task<PutResult> PutUser(string username, string password, bool administrator);
 
         /// <summary>
@@ -237,7 +83,7 @@ namespace Timeline.Services
         /// <param name="administrator">Whether the user is administrator. Null if not modify.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
-        Task PatchUser(string username, string password, bool? administrator);
+        Task PatchUser(string username, string? password, bool? administrator);
 
         /// <summary>
         /// Delete a user of given username.
@@ -266,13 +112,13 @@ namespace Timeline.Services
         /// <exception cref="ArgumentException">Thrown if <paramref name="oldUsername"/> or <paramref name="newUsername"/> is null or empty.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user with old username does not exist.</exception>
         /// <exception cref="UsernameBadFormatException">Thrown if the new username is not accepted because of bad format.</exception>
-        /// <exception cref="UserAlreadyExistException">Thrown if user with the new username already exists.</exception>
+        /// <exception cref="UsernameConfictException">Thrown if user with the new username already exists.</exception>
         Task ChangeUsername(string oldUsername, string newUsername);
     }
 
     internal class UserCache
     {
-        public string Username { get; set; }
+        public string Username { get; set; } = default!;
         public bool Administrator { get; set; }
         public long Version { get; set; }
 
@@ -294,13 +140,16 @@ namespace Timeline.Services
 
         private readonly UsernameValidator _usernameValidator;
 
-        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
+        private readonly IStringLocalizerFactory _localizerFactory;
+
+        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, IStringLocalizerFactory localizerFactory, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
         {
             _logger = logger;
             _memoryCache = memoryCache;
             _databaseContext = databaseContext;
             _jwtService = jwtService;
             _passwordService = passwordService;
+            _localizerFactory = localizerFactory;
 
             _usernameValidator = new UsernameValidator();
         }
@@ -368,7 +217,7 @@ namespace Timeline.Services
             }
 
             if (tokenInfo.Version != cache.Version)
-                throw new BadTokenVersionException(tokenInfo.Version, cache.Version);
+                throw new JwtVerifyException(new JwtBadVersionException(tokenInfo.Version, cache.Version), JwtVerifyException.ErrorCodes.OldVersion);
 
             return cache.ToUserInfo();
         }
@@ -395,7 +244,7 @@ namespace Timeline.Services
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
 
-            if (!_usernameValidator.Validate(username, out var message))
+            if (!_usernameValidator.Validate(username, _localizerFactory, out var message))
             {
                 throw new UsernameBadFormatException(username, message);
             }
@@ -414,7 +263,7 @@ namespace Timeline.Services
                 await _databaseContext.AddAsync(newUser);
                 await _databaseContext.SaveChangesAsync();
                 _logger.LogInformation(FormatLogMessage("A new user entry is added to the database.", Pair("Id", newUser.Id)));
-                return PutResult.Created;
+                return PutResult.Create;
             }
 
             user.EncryptedPassword = _passwordService.HashPassword(password);
@@ -426,7 +275,7 @@ namespace Timeline.Services
             //clear cache
             RemoveCache(user.Id);
 
-            return PutResult.Modified;
+            return PutResult.Modify;
         }
 
         public async Task PatchUser(string username, string password, bool? administrator)
@@ -504,7 +353,7 @@ namespace Timeline.Services
             if (string.IsNullOrEmpty(newUsername))
                 throw new ArgumentException("New username is null or empty", nameof(newUsername));
 
-            if (!_usernameValidator.Validate(newUsername, out var message))
+            if (!_usernameValidator.Validate(newUsername, _localizerFactory, out var message))
                 throw new UsernameBadFormatException(newUsername, $"New username is of bad format. {message}");
 
             var user = await _databaseContext.Users.Where(u => u.Name == oldUsername).SingleOrDefaultAsync();
@@ -513,7 +362,7 @@ namespace Timeline.Services
 
             var conflictUser = await _databaseContext.Users.Where(u => u.Name == newUsername).SingleOrDefaultAsync();
             if (conflictUser != null)
-                throw new UserAlreadyExistException(newUsername);
+                throw new UsernameConfictException(newUsername);
 
             user.Name = newUsername;
             user.Version += 1;
