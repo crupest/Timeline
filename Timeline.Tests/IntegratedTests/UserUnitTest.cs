@@ -4,13 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timeline.Controllers;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
 using Timeline.Tests.Mock.Data;
 using Xunit;
+using static Timeline.ErrorCodes.Http.User;
 
 namespace Timeline.Tests.IntegratedTests
 {
@@ -57,7 +57,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.GetAsync("users/usernotexist");
             res.Should().HaveStatusCode(404)
                 .And.Should().HaveCommonBody()
-                .Which.Code.Should().Be(UserController.ErrorCodes.Get_NotExist);
+                .Which.Code.Should().Be(Get.NotExist);
         }
 
         public static IEnumerable<object[]> Put_InvalidModel_Data()
@@ -88,7 +88,7 @@ namespace Timeline.Tests.IntegratedTests
             });
             res.Should().HaveStatusCode(400)
                 .And.Should().HaveCommonBody()
-                .Which.Code.Should().Be(UserController.ErrorCodes.Put_BadUsername);
+                .Which.Code.Should().Be(Put.BadUsername);
         }
 
         private async Task CheckAdministrator(HttpClient client, string username, bool administrator)
@@ -108,7 +108,7 @@ namespace Timeline.Tests.IntegratedTests
                 Password = "password",
                 Administrator = false
             });
-            res.Should().BePutModify();
+            res.Should().BePut(false);
             await CheckAdministrator(client, MockUser.User.Username, false);
         }
 
@@ -124,7 +124,7 @@ namespace Timeline.Tests.IntegratedTests
                 Password = "password",
                 Administrator = false
             });
-            res.Should().BePutCreate();
+            res.Should().BePut(true);
             await CheckAdministrator(client, username, false);
         }
 
@@ -135,7 +135,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
             res.Should().HaveStatusCode(404)
                 .And.Should().HaveCommonBody()
-                .Which.Code.Should().Be(UserController.ErrorCodes.Patch_NotExist);
+                .Which.Code.Should().Be(Patch.NotExist);
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await _factory.CreateClientAsAdmin();
             var url = "users/" + MockUser.User.Username;
             var res = await client.DeleteAsync(url);
-            res.Should().BeDeleteDelete();
+            res.Should().BeDelete(true);
 
             var res2 = await client.GetAsync(url);
             res2.Should().HaveStatusCode(404);
@@ -167,7 +167,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await _factory.CreateClientAsAdmin();
             var res = await client.DeleteAsync("users/usernotexist");
-            res.Should().BeDeleteNotExist();
+            res.Should().BeDelete(false);
         }
 
 
@@ -214,7 +214,7 @@ namespace Timeline.Tests.IntegratedTests
                     new ChangeUsernameRequest { OldUsername = "usernotexist", NewUsername = "newUsername" });
                 res.Should().HaveStatusCode(400)
                     .And.Should().HaveCommonBody()
-                    .Which.Code.Should().Be(UserController.ErrorCodes.ChangeUsername_NotExist);
+                    .Which.Code.Should().Be(Op.ChangeUsername.NotExist);
             }
 
             [Fact]
@@ -225,7 +225,7 @@ namespace Timeline.Tests.IntegratedTests
                     new ChangeUsernameRequest { OldUsername = MockUser.User.Username, NewUsername = MockUser.Admin.Username });
                 res.Should().HaveStatusCode(400)
                     .And.Should().HaveCommonBody()
-                    .Which.Code.Should().Be(UserController.ErrorCodes.ChangeUsername_AlreadyExist);
+                    .Which.Code.Should().Be(Op.ChangeUsername.AlreadyExist);
             }
 
             [Fact]
@@ -282,7 +282,7 @@ namespace Timeline.Tests.IntegratedTests
                 var res = await client.PostAsJsonAsync(url, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
                 res.Should().HaveStatusCode(400)
                     .And.Should().HaveCommonBody()
-                    .Which.Code.Should().Be(UserController.ErrorCodes.ChangePassword_BadOldPassword);
+                    .Which.Code.Should().Be(Op.ChangePassword.BadOldPassword);
             }
 
             [Fact]

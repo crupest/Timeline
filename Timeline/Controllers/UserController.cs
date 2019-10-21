@@ -77,7 +77,7 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("users/{username}"), AdminAuthorize]
-        public async Task<IActionResult> Get([FromRoute] string username)
+        public async Task<ActionResult<UserInfo>> Get([FromRoute] string username)
         {
             var user = await _userService.GetUser(username);
             if (user == null)
@@ -89,7 +89,7 @@ namespace Timeline.Controllers
         }
 
         [HttpPut("users/{username}"), AdminAuthorize]
-        public async Task<IActionResult> Put([FromBody] UserPutRequest request, [FromRoute] string username)
+        public async Task<ActionResult<CommonPutResponse>> Put([FromBody] UserPutRequest request, [FromRoute] string username)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace Timeline.Controllers
         }
 
         [HttpPatch("users/{username}"), AdminAuthorize]
-        public async Task<IActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute] string username)
+        public async Task<ActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute] string username)
         {
             try
             {
@@ -129,7 +129,7 @@ namespace Timeline.Controllers
         }
 
         [HttpDelete("users/{username}"), AdminAuthorize]
-        public async Task<IActionResult> Delete([FromRoute] string username)
+        public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute] string username)
         {
             try
             {
@@ -145,44 +145,45 @@ namespace Timeline.Controllers
         }
 
         [HttpPost("userop/changeusername"), AdminAuthorize]
-        public async Task<IActionResult> ChangeUsername([FromBody] ChangeUsernameRequest request)
+        public async Task<ActionResult> ChangeUsername([FromBody] ChangeUsernameRequest request)
         {
             try
             {
                 await _userService.ChangeUsername(request.OldUsername, request.NewUsername);
-                _logger.LogInformation(FormatLogMessage("A user changed username.",
-                    Pair("Old Username", request.OldUsername), Pair("New Username", request.NewUsername)));
+                _logger.LogInformation(Log.Format(_localizer["LogChangeUsernameSuccess"],
+                    ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
                 return Ok();
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, FormatLogMessage("Attempt to change a non-existent user's username failed.",
-                    Pair("Old Username", request.OldUsername), Pair("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.ChangeUsername_NotExist, $"The user {request.OldUsername} does not exist."));
+                _logger.LogInformation(e, Log.Format(_localizer["LogChangeUsernameNotExist"],
+                    ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.NotExist, _localizer["ErrorChangeUsernameNotExist", request.OldUsername]));
             }
             catch (UserAlreadyExistException e)
             {
-                _logger.LogInformation(e, FormatLogMessage("Attempt to change a user's username to a existent one failed.",
-                    Pair("Old Username", request.OldUsername), Pair("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.ChangeUsername_AlreadyExist, $"The user {request.NewUsername} already exists."));
+                _logger.LogInformation(e, Log.Format(_localizer["LogChangeUsernameAlreadyExist"],
+                    ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.AlreadyExist, _localizer["ErrorChangeUsernameAlreadyExist"]));
             }
             // there is no need to catch bad format exception because it is already checked in model validation.
         }
 
         [HttpPost("userop/changepassword"), Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             try
             {
-                await _userService.ChangePassword(User.Identity.Name, request.OldPassword, request.NewPassword);
-                _logger.LogInformation(FormatLogMessage("A user changed password.", Pair("Username", User.Identity.Name)));
+                await _userService.ChangePassword(User.Identity.Name!, request.OldPassword, request.NewPassword);
+                _logger.LogInformation(Log.Format(_localizer["LogChangePasswordSuccess"], ("Username", User.Identity.Name)));
                 return Ok();
             }
             catch (BadPasswordException e)
             {
-                _logger.LogInformation(e, FormatLogMessage("A user attempt to change password but old password is wrong.",
-                    Pair("Username", User.Identity.Name), Pair("Old Password", request.OldPassword)));
-                return BadRequest(new CommonResponse(ErrorCodes.ChangePassword_BadOldPassword, "Old password is wrong."));
+                _logger.LogInformation(e, Log.Format(_localizer["LogChangePasswordBadPassword"],
+                    ("Username", User.Identity.Name), ("Old Password", request.OldPassword)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangePassword.BadOldPassword,
+                    _localizer["ErrorChangePasswordBadPassword"]));
             }
             // User can't be non-existent or the token is bad. 
         }

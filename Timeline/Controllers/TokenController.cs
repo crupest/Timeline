@@ -56,7 +56,7 @@ namespace Timeline.Controllers
 
         [HttpPost("create")]
         [AllowAnonymous]
-        public async Task<IActionResult> Create([FromBody] CreateTokenRequest request)
+        public async Task<ActionResult<CreateTokenResponse>> Create([FromBody] CreateTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null)
             {
@@ -102,7 +102,7 @@ namespace Timeline.Controllers
 
         [HttpPost("verify")]
         [AllowAnonymous]
-        public async Task<IActionResult> Verify([FromBody] VerifyTokenRequest request)
+        public async Task<ActionResult<VerifyTokenResponse>> Verify([FromBody] VerifyTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null, params (string, object?)[] otherProperties)
             {
