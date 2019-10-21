@@ -117,6 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LogChangePasswordBadPassword" xml:space="preserve">
+    <value>Attempt to change password with wrong old password failed.</value>
+  </data>
+  <data name="LogChangePasswordSuccess" xml:space="preserve">
+    <value>A user has changed password.</value>
+  </data>
+  <data name="LogChangeUsernameAlreadyExist" xml:space="preserve">
+    <value>Attempt to change a user's username to a existent one failed.</value>
+  </data>
+  <data name="LogChangeUsernameNotExist" xml:space="preserve">
+    <value>Attempt to change a username of a user that does not exist failed.</value>
+  </data>
+  <data name="LogChangeUsernameSuccess" xml:space="preserve">
+    <value>A user has changed username.</value>
+  </data>
   <data name="LogDeleteDelete" xml:space="preserve">
     <value>A user has been deleted.</value>
   </data>

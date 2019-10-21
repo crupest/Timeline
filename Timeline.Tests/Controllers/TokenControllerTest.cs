@@ -20,13 +20,14 @@ namespace Timeline.Tests.Controllers
         private readonly Mock<IUserService> _mockUserService = new Mock<IUserService>();
         private readonly TestClock _mockClock = new TestClock();
 
+
         private readonly TokenController _controller;
 
         public TokenControllerTest()
         {
             _controller = new TokenController(_mockUserService.Object,
                 NullLogger<TokenController>.Instance, _mockClock,
-                new MockStringLocalizer<TokenController>());
+                TestStringLocalizerFactory.Create().Create<TokenController>());
         }
 
         public void Dispose()
@@ -53,7 +54,7 @@ namespace Timeline.Tests.Controllers
                 Password = "p",
                 Expire = expire
             });
-            action.Should().BeAssignableTo<OkObjectResult>()
+            action.Result.Should().BeAssignableTo<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(createResult);
         }
 
@@ -67,7 +68,7 @@ namespace Timeline.Tests.Controllers
                 Password = "p",
                 Expire = null
             });
-            action.Should().BeAssignableTo<BadRequestObjectResult>()
+            action.Result.Should().BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
                 .Which.Code.Should().Be(Create.BadCredential);
         }
@@ -82,7 +83,7 @@ namespace Timeline.Tests.Controllers
                 Password = "p",
                 Expire = null
             });
-            action.Should().BeAssignableTo<BadRequestObjectResult>()
+            action.Result.Should().BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
                 .Which.Code.Should().Be(Create.BadCredential);
         }
@@ -93,7 +94,7 @@ namespace Timeline.Tests.Controllers
             const string token = "aaaaaaaaaaaaaa";
             _mockUserService.Setup(s => s.VerifyToken(token)).ReturnsAsync(MockUser.User.Info);
             var action = await _controller.Verify(new VerifyTokenRequest { Token = token });
-            action.Should().BeAssignableTo<OkObjectResult>()
+            action.Result.Should().BeAssignableTo<OkObjectResult>()
                 .Which.Value.Should().BeAssignableTo<VerifyTokenResponse>()
                 .Which.User.Should().BeEquivalentTo(MockUser.User.Info);
         }
@@ -113,7 +114,7 @@ namespace Timeline.Tests.Controllers
             const string token = "aaaaaaaaaaaaaa";
             _mockUserService.Setup(s => s.VerifyToken(token)).ThrowsAsync(e);
             var action = await _controller.Verify(new VerifyTokenRequest { Token = token });
-            action.Should().BeAssignableTo<BadRequestObjectResult>()
+            action.Result.Should().BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
                 .Which.Code.Should().Be(code);
         }

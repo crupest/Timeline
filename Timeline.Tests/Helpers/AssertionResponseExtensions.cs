@@ -82,22 +82,14 @@ namespace Timeline.Tests.Helpers
             {
                 body = Subject.Content.ReadAsStringAsync().Result;
             }
-            catch (Exception e)
+            catch (AggregateException e)
             {
-                a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string{reason}, but failed to read it or it was not a string. Exception is {0}.", e);
+                a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string{reason}, but failed to read it or it was not a string. Exception is {0}.", e.InnerExceptions);
                 return new AndWhichConstraint<HttpResponseMessage, T>(Subject, null);
             }
 
-            try
-            {
-                var result = JsonConvert.DeserializeObject<T>(body);
-                return new AndWhichConstraint<HttpResponseMessage, T>(Subject, result);
-            }
-            catch (Exception e)
-            {
-                a.FailWith("Expected response body of {context:HttpResponseMessage} to be able to convert to {0} instance{reason}, but failed. Exception is {1}.", typeof(T).FullName, e);
-                return new AndWhichConstraint<HttpResponseMessage, T>(Subject, null);
-            }
+            var result = JsonConvert.DeserializeObject<T>(body);
+            return new AndWhichConstraint<HttpResponseMessage, T>(Subject, result);
         }
     }
 
@@ -118,28 +110,22 @@ namespace Timeline.Tests.Helpers
             return assertions.HaveJsonBody<CommonDataResponse<TData>>(because, becauseArgs);
         }
 
-        public static void BePutCreate(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static void BePut(this HttpResponseMessageAssertions assertions, bool create, string because = "", params object[] becauseArgs)
         {
-            assertions.HaveStatusCode(201, because, becauseArgs)
-                .And.Should().HaveCommonDataBody<CommonPutResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonPutResponse.Create(), because, becauseArgs);
+            var body = assertions.HaveStatusCode(create ? 201 : 200, because, becauseArgs)
+                .And.Should().HaveJsonBody<CommonPutResponse>(because, becauseArgs)
+                .Which;
+            body.Code.Should().Be(0);
+            body.Data.Create.Should().Be(create);
         }
 
-        public static void BePutModify(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static void BeDelete(this HttpResponseMessageAssertions assertions, bool delete, string because = "", params object[] becauseArgs)
         {
-            assertions.HaveStatusCode(200, because, becauseArgs)
-                .And.Should().HaveCommonDataBody<CommonPutResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonPutResponse.Modify(), because, becauseArgs);
-        }
-
-        public static void BeDeleteDelete(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
-        {
-            assertions.HaveStatusCode(200, because, becauseArgs)
-                .And.Should().HaveCommonDataBody<CommonDeleteResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonDeleteResponse.Delete(), because, becauseArgs);
-        }
-
-        public static void BeDeleteNotExist(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
-        {
-            assertions.HaveStatusCode(200, because, becauseArgs)
-                .And.Should().HaveCommonDataBody<CommonDeleteResponse.ResponseData>(because, becauseArgs).Which.Should().BeEquivalentTo(CommonDeleteResponse.NotExist(), because, becauseArgs);
+            var body = assertions.HaveStatusCode(200, because, becauseArgs)
+                .And.Should().HaveJsonBody<CommonDeleteResponse>(because, becauseArgs)
+                .Which;
+            body.Code.Should().Be(0);
+            body.Data.Delete.Should().Be(delete);
         }
 
         public static void BeInvalidModel(this HttpResponseMessageAssertions assertions, string message = null)
