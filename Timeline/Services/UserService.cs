@@ -140,16 +140,13 @@ namespace Timeline.Services
 
         private readonly UsernameValidator _usernameValidator;
 
-        private readonly IStringLocalizerFactory _localizerFactory;
-
-        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, IStringLocalizerFactory localizerFactory, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
+        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
         {
             _logger = logger;
             _memoryCache = memoryCache;
             _databaseContext = databaseContext;
             _jwtService = jwtService;
             _passwordService = passwordService;
-            _localizerFactory = localizerFactory;
 
             _usernameValidator = new UsernameValidator();
         }
@@ -244,9 +241,10 @@ namespace Timeline.Services
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
 
-            if (!_usernameValidator.Validate(username, _localizerFactory, out var message))
+            var (result, messageGenerator) = _usernameValidator.Validate(username);
+            if (!result)
             {
-                throw new UsernameBadFormatException(username, message);
+                throw new UsernameBadFormatException(username, messageGenerator(null));
             }
 
             var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
@@ -353,8 +351,12 @@ namespace Timeline.Services
             if (string.IsNullOrEmpty(newUsername))
                 throw new ArgumentException("New username is null or empty", nameof(newUsername));
 
-            if (!_usernameValidator.Validate(newUsername, _localizerFactory, out var message))
-                throw new UsernameBadFormatException(newUsername, $"New username is of bad format. {message}");
+
+            var (result, messageGenerator) = _usernameValidator.Validate(newUsername);
+            if (!result)
+            {
+                throw new UsernameBadFormatException(newUsername, $"New username is of bad format. {messageGenerator(null)}");
+            }
 
             var user = await _databaseContext.Users.Where(u => u.Name == oldUsername).SingleOrDefaultAsync();
             if (user == null)

@@ -117,19 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="InvariantValidatorMessageBadType" xml:space="preserve">
-    <value>Value is not of type {0}.</value>
+  <data name="InvariantValidationMessageEmptyString" xml:space="preserve">
+    <value>An empty string is not allowed.</value>
   </data>
-  <data name="InvariantValidatorMessageNull" xml:space="preserve">
-    <value>Value can't be null.</value>
+  <data name="InvariantValidationMessageInvalidChar" xml:space="preserve">
+    <value>Invalid character, only alphabet, digit, underscore and hyphen are allowed. </value>
   </data>
-  <data name="InvariantValidatorMessageSuccess" xml:space="preserve">
-    <value>Validation succeeded.</value>
-  </data>
-  <data name="ValidateWithAttributeCreateFail" xml:space="preserve">
-    <value>Failed to create a validator instance from default constructor. See inner exception.</value>
-  </data>
-  <data name="ValidateWithAttributeNotValidator" xml:space="preserve">
-    <value>Given type is not assignable to IValidator.</value>
+  <data name="InvariantValidationMessageTooLong" xml:space="preserve">
+    <value>Too long, more than 26 characters is not premitted.</value>
   </data>
 </root>

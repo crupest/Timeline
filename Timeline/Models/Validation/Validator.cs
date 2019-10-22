@@ -7,8 +7,15 @@ using Timeline.Helpers;
 namespace Timeline.Models.Validation
 {
     /// <summary>
+    /// Generate a message from a localizer factory.
+    /// If localizerFactory is null, it should return a neutral-cultural message.
+    /// </summary>
+    /// <param name="localizerFactory">The localizer factory. Could be null.</param>
+    /// <returns>The message.</returns>
+    public delegate string ValidationMessageGenerator(IStringLocalizerFactory? localizerFactory);
+
+    /// <summary>
     /// A validator to validate value.
-    /// See <see cref="Validate(object?, out string)"/>.
     /// </summary>
     public interface IValidator
     {
@@ -16,14 +23,8 @@ namespace Timeline.Models.Validation
         /// Validate given value.
         /// </summary>
         /// <param name="value">The value to validate.</param>
-        /// <param name="message">The validation message.</param>
-        /// <returns>True if validation passed. Otherwise false.</returns>
-        bool Validate(object? value, IStringLocalizerFactory localizerFactory, out string message);
-    }
-
-    public static class ValidationConstants
-    {
-        public const string SuccessMessage = "Validation succeeded.";
+        /// <returns>Validation success or not and the message generator.</returns>
+        (bool, ValidationMessageGenerator) Validate(object? value);
     }
 
     /// <summary>
@@ -39,36 +40,32 @@ namespace Timeline.Models.Validation
     /// </remarks>
     public abstract class Validator<T> : IValidator
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
-        public bool Validate(object? value, IStringLocalizerFactory localizerFactory, out string message)
+        public (bool, ValidationMessageGenerator) Validate(object? value)
         {
             if (value == null)
             {
-                var localizer = localizerFactory.Create("Models.Validation.Validator");
-                message = localizer["ValidatorMessageNull"];
-                return false;
+                return (false, factory =>
+                    factory?.Create("Models.Validation.Validator")?["ValidatorMessageNull"]
+                    ?? Resources.Models.Validation.Validator.InvariantValidatorMessageNull
+                );
             }
 
             if (value is T v)
             {
-                return DoValidate(v, localizerFactory, out message);
+                return DoValidate(v);
             }
             else
             {
-                var localizer = localizerFactory.Create("Models.Validation.Validator");
-                message = localizer["ValidatorMessageBadType", typeof(T).FullName];
-                return false;
+                return (false, factory =>
+                    factory?.Create("Models.Validation.Validator")?["ValidatorMessageBadType", typeof(T).FullName]
+                    ?? Resources.Models.Validation.Validator.InvariantValidatorMessageBadType);
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
-        protected static string GetSuccessMessage(IStringLocalizerFactory factory)
-        {
-            var localizer = factory.Create("Models.Validation.Validator");
-            return localizer["ValidatorMessageSuccess"];
-        }
+        protected static ValidationMessageGenerator SuccessMessageGenerator { get; } = factory =>
+            factory?.Create("Models.Validation.Validator")?["ValidatorMessageSuccess"] ?? Resources.Models.Validation.Validator.InvariantValidatorMessageSuccess;
 
-        protected abstract bool DoValidate(T value, IStringLocalizerFactory localizerFactory, out string message);
+        protected abstract (bool, ValidationMessageGenerator) DoValidate(T value);
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
@@ -113,11 +110,16 @@ namespace Timeline.Models.Validation
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var localizerFactory = validationContext.GetRequiredService<IStringLocalizerFactory>();
-            if (_validator.Validate(value, localizerFactory, out var message))
+            var (result, messageGenerator) = _validator.Validate(value);
+            if (result)
+            {
                 return ValidationResult.Success;
+            }
             else
-                return new ValidationResult(message);
+            {
+                var localizerFactory = validationContext.GetRequiredService<IStringLocalizerFactory>();
+                return new ValidationResult(messageGenerator(localizerFactory));
+            }
         }
     }
 }
