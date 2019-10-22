@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Timeline.Models.Validation;
-using Timeline.Tests.Mock.Services;
 using Xunit;
 
 namespace Timeline.Tests
@@ -16,15 +15,9 @@ namespace Timeline.Tests
 
         private string FailAndMessage(string username)
         {
-            var result = _validator.Validate(username, TestStringLocalizerFactory.Create(), out var message);
+            var (result, messageGenerator) = _validator.Validate(username);
             result.Should().BeFalse();
-            return message;
-        }
-
-        private void Succeed(string username)
-        {
-            _validator.Validate(username, TestStringLocalizerFactory.Create(), out var message).Should().BeTrue();
-            message.Should().Be(ValidationConstants.SuccessMessage);
+            return messageGenerator(null);
         }
 
         [Fact]
@@ -36,8 +29,9 @@ namespace Timeline.Tests
         [Fact]
         public void NotString()
         {
-            var result = _validator.Validate(123, TestStringLocalizerFactory.Create(), out var message);
+            var (result, messageGenerator) = _validator.Validate(123);
             result.Should().BeFalse();
+            var message = messageGenerator(null);
             message.Should().ContainEquivalentOf("type");
         }
 
@@ -47,31 +41,14 @@ namespace Timeline.Tests
             FailAndMessage("").Should().ContainEquivalentOf("empty");
         }
 
-        [Fact]
-        public void WhiteSpace()
+        [Theory]
+        [InlineData("!")]
+        [InlineData("!abc")]
+        [InlineData("ab c")]
+        public void BadCharactor(string value)
         {
-            FailAndMessage(" ").Should().ContainEquivalentOf("whitespace");
-            FailAndMessage("\t").Should().ContainEquivalentOf("whitespace");
-            FailAndMessage("\n").Should().ContainEquivalentOf("whitespace");
-
-            FailAndMessage("a b").Should().ContainEquivalentOf("whitespace");
-            FailAndMessage("a\tb").Should().ContainEquivalentOf("whitespace");
-            FailAndMessage("a\nb").Should().ContainEquivalentOf("whitespace");
-        }
-
-        [Fact]
-        public void BadCharactor()
-        {
-            FailAndMessage("!").Should().ContainEquivalentOf("regex");
-            FailAndMessage("!abc").Should().ContainEquivalentOf("regex");
-            FailAndMessage("ab!c").Should().ContainEquivalentOf("regex");
-        }
-
-        [Fact]
-        public void BadBegin()
-        {
-            FailAndMessage("-").Should().ContainEquivalentOf("regex");
-            FailAndMessage("-abc").Should().ContainEquivalentOf("regex");
+            FailAndMessage(value).Should().ContainEquivalentOf("invalid")
+                .And.ContainEquivalentOf("character");
         }
 
         [Fact]
@@ -80,14 +57,20 @@ namespace Timeline.Tests
             FailAndMessage(new string('a', 40)).Should().ContainEquivalentOf("long");
         }
 
-        [Fact]
-        public void Success()
+        [Theory]
+        [InlineData("abc")]
+        [InlineData("-abc")]
+        [InlineData("_abc")]
+        [InlineData("abc-")]
+        [InlineData("abc_")]
+        [InlineData("a-bc")]
+        [InlineData("a-b-c")]
+        [InlineData("a-b_c")]
+        public void Success(string value)
         {
-            Succeed("abc");
-            Succeed("_abc");
-            Succeed("a-bc");
-            Succeed("a-b-c");
-            Succeed("a-b_c");
+
+            var (result, _) = _validator.Validate(value);
+            result.Should().BeTrue();
         }
     }
 }

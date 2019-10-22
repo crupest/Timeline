@@ -49,6 +49,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>UserController.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>UsernameValidator.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Models\Validation\Validator.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -81,6 +86,13 @@
       <EmbeddedResource Update="Resources\Controllers\UserController.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserController.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>UsernameValidator.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Models\Validation\Validator.en.resx">
+        <Generator></Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
         <Generator>ResXFileCodeGenerator</Generator>

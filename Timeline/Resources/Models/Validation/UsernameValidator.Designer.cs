@@ -22,14 +22,14 @@ namespace Timeline.Resources.Models.Validation {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Validator {
+    internal class UsernameValidator {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Validator() {
+        internal UsernameValidator() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Models.Validation {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Validation.Validator", typeof(Validator).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Validation.UsernameValidator", typeof(UsernameValidator).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,47 +61,29 @@ namespace Timeline.Resources.Models.Validation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Value is not of type {0}..
+        ///   Looks up a localized string similar to An empty string is not allowed..
         /// </summary>
-        internal static string InvariantValidatorMessageBadType {
+        internal static string InvariantValidationMessageEmptyString {
             get {
-                return ResourceManager.GetString("InvariantValidatorMessageBadType", resourceCulture);
+                return ResourceManager.GetString("InvariantValidationMessageEmptyString", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Value can&apos;t be null..
+        ///   Looks up a localized string similar to Invalid character, only alphabet, digit, underscore and hyphen are allowed. .
         /// </summary>
-        internal static string InvariantValidatorMessageNull {
+        internal static string InvariantValidationMessageInvalidChar {
             get {
-                return ResourceManager.GetString("InvariantValidatorMessageNull", resourceCulture);
+                return ResourceManager.GetString("InvariantValidationMessageInvalidChar", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Validation succeeded..
+        ///   Looks up a localized string similar to Too long, more than 26 characters is not premitted..
         /// </summary>
-        internal static string InvariantValidatorMessageSuccess {
+        internal static string InvariantValidationMessageTooLong {
             get {
-                return ResourceManager.GetString("InvariantValidatorMessageSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to create a validator instance from default constructor. See inner exception..
-        /// </summary>
-        internal static string ValidateWithAttributeCreateFail {
-            get {
-                return ResourceManager.GetString("ValidateWithAttributeCreateFail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Given type is not assignable to IValidator..
-        /// </summary>
-        internal static string ValidateWithAttributeNotValidator {
-            get {
-                return ResourceManager.GetString("ValidateWithAttributeNotValidator", resourceCulture);
+                return ResourceManager.GetString("InvariantValidationMessageTooLong", resourceCulture);
             }
         }
     }
