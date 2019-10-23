@@ -34,6 +34,11 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="Resources\Authentication\AuthHandler.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>AuthHandler.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Common.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -64,9 +69,18 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Exception.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Services\UserService.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>UserService.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Update="Resources\Authentication\AuthHandler.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>AuthHandler.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Common.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Common.Designer.cs</LastGenOutput>
@@ -101,6 +115,10 @@
       <EmbeddedResource Update="Resources\Services\Exception.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Exception.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Services\UserService.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>UserService.Designer.cs</LastGenOutput>
       </EmbeddedResource>
     </ItemGroup>
 </Project>

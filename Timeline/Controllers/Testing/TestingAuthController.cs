@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Timeline.Authenticate;
+using Timeline.Authentication;
 
 namespace Timeline.Controllers.Testing
 {

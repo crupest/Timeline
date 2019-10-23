@@ -12,8 +12,8 @@ namespace Timeline.Models
             Administrator = administrator;
         }
 
-        public string Username { get; set; }
-        public bool Administrator { get; set; }
+        public string Username { get; set; } = default!;
+        public bool Administrator { get; set; } = default!;
 
         public override string ToString()
         {

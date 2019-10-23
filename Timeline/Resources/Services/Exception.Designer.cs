@@ -70,6 +70,69 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The hashes password is of bad format. It might not be created by server..
+        /// </summary>
+        internal static string HashedPasswordBadFromatException {
+            get {
+                return ResourceManager.GetString("HashedPasswordBadFromatException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not of valid base64 format. See inner exception..
+        /// </summary>
+        internal static string HashedPasswordBadFromatExceptionNotBase64 {
+            get {
+                return ResourceManager.GetString("HashedPasswordBadFromatExceptionNotBase64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decoded hashed password is of length 0..
+        /// </summary>
+        internal static string HashedPasswordBadFromatExceptionNotLength0 {
+            get {
+                return ResourceManager.GetString("HashedPasswordBadFromatExceptionNotLength0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to See inner exception..
+        /// </summary>
+        internal static string HashedPasswordBadFromatExceptionNotOthers {
+            get {
+                return ResourceManager.GetString("HashedPasswordBadFromatExceptionNotOthers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Salt length &lt; 128 bits..
+        /// </summary>
+        internal static string HashedPasswordBadFromatExceptionNotSaltTooShort {
+            get {
+                return ResourceManager.GetString("HashedPasswordBadFromatExceptionNotSaltTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subkey length &lt; 128 bits..
+        /// </summary>
+        internal static string HashedPasswordBadFromatExceptionNotSubkeyTooShort {
+            get {
+                return ResourceManager.GetString("HashedPasswordBadFromatExceptionNotSubkeyTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown format marker..
+        /// </summary>
+        internal static string HashedPasswordBadFromatExceptionNotUnknownMarker {
+            get {
+                return ResourceManager.GetString("HashedPasswordBadFromatExceptionNotUnknownMarker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The version of the jwt token is old..
         /// </summary>
         internal static string JwtBadVersionException {

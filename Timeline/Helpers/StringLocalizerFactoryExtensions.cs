@@ -10,5 +10,10 @@ namespace Timeline.Helpers
         {
             return factory.Create(basename, new AssemblyName(typeof(StringLocalizerFactoryExtensions).Assembly.FullName!).Name);
         }
+
+        internal static StringLocalizer<T> Create<T>(this IStringLocalizerFactory factory)
+        {
+            return new StringLocalizer<T>(factory);
+        }
     }
 }

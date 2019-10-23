@@ -35,7 +35,7 @@ namespace Timeline.Tests.Mock.Data
                 {
                     Name = user.Username,
                     EncryptedPassword = passwordService.HashPassword(user.Password),
-                    RoleString = UserUtility.IsAdminToRoleString(user.Administrator),
+                    RoleString = UserRoleConvert.ToString(user.Administrator),
                     Avatar = UserAvatar.Create(DateTime.Now)
                 };
             }

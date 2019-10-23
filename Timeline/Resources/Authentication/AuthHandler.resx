@@ -117,67 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BadPasswordException" xml:space="preserve">
-    <value>The password is wrong.</value>
+  <data name="LogTokenFoundInHeader" xml:space="preserve">
+    <value>Token is found in authorization header. Token is {0} .</value>
   </data>
-  <data name="HashedPasswordBadFromatException" xml:space="preserve">
-    <value>The hashes password is of bad format. It might not be created by server.</value>
+  <data name="LogTokenFoundInQuery" xml:space="preserve">
+    <value>Token is found in query param with key "{0}". Token is {1} .</value>
   </data>
-  <data name="HashedPasswordBadFromatExceptionNotBase64" xml:space="preserve">
-    <value>Not of valid base64 format. See inner exception.</value>
+  <data name="LogTokenNotFound" xml:space="preserve">
+    <value>No jwt token is found.</value>
   </data>
-  <data name="HashedPasswordBadFromatExceptionNotLength0" xml:space="preserve">
-    <value>Decoded hashed password is of length 0.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotOthers" xml:space="preserve">
-    <value>See inner exception.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotSaltTooShort" xml:space="preserve">
-    <value>Salt length &lt; 128 bits.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotSubkeyTooShort" xml:space="preserve">
-    <value>Subkey length &lt; 128 bits.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotUnknownMarker" xml:space="preserve">
-    <value>Unknown format marker.</value>
-  </data>
-  <data name="JwtBadVersionException" xml:space="preserve">
-    <value>The version of the jwt token is old.</value>
-  </data>
-  <data name="JwtVerifyException" xml:space="preserve">
-    <value>The token didn't pass verification because {0}, see inner exception for information.</value>
-  </data>
-  <data name="JwtVerifyExceptionExpired" xml:space="preserve">
-    <value>token is expired.</value>
-  </data>
-  <data name="JwtVerifyExceptionIdClaimBadFormat" xml:space="preserve">
-    <value>id claim is not a number.</value>
-  </data>
-  <data name="JwtVerifyExceptionNoIdClaim" xml:space="preserve">
-    <value>id claim does not exist.</value>
-  </data>
-  <data name="JwtVerifyExceptionNoVersionClaim" xml:space="preserve">
-    <value>version claim does not exist.</value>
-  </data>
-  <data name="JwtVerifyExceptionOldVersion" xml:space="preserve">
-    <value>version of token is old.</value>
-  </data>
-  <data name="JwtVerifyExceptionOthers" xml:space="preserve">
-    <value>uncommon error.</value>
-  </data>
-  <data name="JwtVerifyExceptionUnknown" xml:space="preserve">
-    <value>unknown error code.</value>
-  </data>
-  <data name="JwtVerifyExceptionVersionClaimBadFormat" xml:space="preserve">
-    <value>version claim is not a number.</value>
-  </data>
-  <data name="UsernameBadFormatException" xml:space="preserve">
-    <value>The username is of bad format.</value>
-  </data>
-  <data name="UsernameConfictException" xml:space="preserve">
-    <value>The username already exists.</value>
-  </data>
-  <data name="UserNotExistException" xml:space="preserve">
-    <value>The user does not exist.</value>
+  <data name="LogTokenValidationFail" xml:space="preserve">
+    <value>A jwt token validation failed.</value>
   </data>
 </root>

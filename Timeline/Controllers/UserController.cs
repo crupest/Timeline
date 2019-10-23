@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Timeline.Authenticate;
+using Timeline.Authentication;
 using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Http;
+using Timeline.Models.Validation;
 using Timeline.Services;
 using static Timeline.Resources.Controllers.UserController;
 
@@ -21,11 +22,6 @@ namespace Timeline
                 public static class Get // cc = 01
                 {
                     public const int NotExist = 10020101; // dd = 01
-                }
-
-                public static class Put // cc = 02
-                {
-                    public const int BadUsername = 10020201; // dd = 01
                 }
 
                 public static class Patch // cc = 03
@@ -78,7 +74,7 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("users/{username}"), AdminAuthorize]
-        public async Task<ActionResult<UserInfo>> Get([FromRoute] string username)
+        public async Task<ActionResult<UserInfo>> Get([FromRoute][Username] string username)
         {
             var user = await _userService.GetUser(username);
             if (user == null)
@@ -90,32 +86,24 @@ namespace Timeline.Controllers
         }
 
         [HttpPut("users/{username}"), AdminAuthorize]
-        public async Task<ActionResult<CommonPutResponse>> Put([FromBody] UserPutRequest request, [FromRoute] string username)
+        public async Task<ActionResult<CommonPutResponse>> Put([FromBody] UserPutRequest request, [FromRoute][Username] string username)
         {
-            try
+            var result = await _userService.PutUser(username, request.Password, request.Administrator!.Value);
+            switch (result)
             {
-                var result = await _userService.PutUser(username, request.Password, request.Administrator!.Value);
-                switch (result)
-                {
-                    case PutResult.Create:
-                        _logger.LogInformation(Log.Format(LogPutCreate, ("Username", username)));
-                        return CreatedAtAction("Get", new { username }, CommonPutResponse.Create(_localizerFactory));
-                    case PutResult.Modify:
-                        _logger.LogInformation(Log.Format(LogPutModify, ("Username", username)));
-                        return Ok(CommonPutResponse.Modify(_localizerFactory));
-                    default:
-                        throw new InvalidBranchException();
-                }
-            }
-            catch (UsernameBadFormatException e)
-            {
-                _logger.LogInformation(e, Log.Format(LogPutBadUsername, ("Username", username)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Put.BadUsername, _localizer["ErrorPutBadUsername"]));
+                case PutResult.Create:
+                    _logger.LogInformation(Log.Format(LogPutCreate, ("Username", username)));
+                    return CreatedAtAction("Get", new { username }, CommonPutResponse.Create(_localizerFactory));
+                case PutResult.Modify:
+                    _logger.LogInformation(Log.Format(LogPutModify, ("Username", username)));
+                    return Ok(CommonPutResponse.Modify(_localizerFactory));
+                default:
+                    throw new InvalidBranchException();
             }
         }
 
         [HttpPatch("users/{username}"), AdminAuthorize]
-        public async Task<ActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute] string username)
+        public async Task<ActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute][Username] string username)
         {
             try
             {
@@ -130,7 +118,7 @@ namespace Timeline.Controllers
         }
 
         [HttpDelete("users/{username}"), AdminAuthorize]
-        public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute] string username)
+        public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute][Username] string username)
         {
             try
             {

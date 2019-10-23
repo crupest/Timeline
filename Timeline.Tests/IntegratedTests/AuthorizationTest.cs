@@ -9,12 +9,12 @@ using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class AuthorizationUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class AuthorizationTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
         private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public AuthorizationUnitTest(WebApplicationFactory<Startup> factory)
+        public AuthorizationTest(WebApplicationFactory<Startup> factory)
         {
             _testApp = new TestApplication(factory);
             _factory = _testApp.Factory;
