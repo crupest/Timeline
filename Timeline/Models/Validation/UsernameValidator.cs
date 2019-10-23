@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Timeline.Models.Validation
 {
@@ -34,6 +35,17 @@ namespace Timeline.Models.Validation
             }
 
             return (true, SuccessMessageGenerator);
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
+        AllowMultiple = false)]
+    public class UsernameAttribute : ValidateWithAttribute
+    {
+        public UsernameAttribute()
+            : base(typeof(UsernameValidator))
+        {
+
         }
     }
 }

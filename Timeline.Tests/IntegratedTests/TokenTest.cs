@@ -15,7 +15,7 @@ using static Timeline.ErrorCodes.Http.Token;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class TokenUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class TokenTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
         private const string CreateTokenUrl = "token/create";
         private const string VerifyTokenUrl = "token/verify";
@@ -23,7 +23,7 @@ namespace Timeline.Tests.IntegratedTests
         private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public TokenUnitTest(WebApplicationFactory<Startup> factory)
+        public TokenTest(WebApplicationFactory<Startup> factory)
         {
             _testApp = new TestApplication(factory);
             _factory = _testApp.Factory;

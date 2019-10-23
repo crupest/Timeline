@@ -14,12 +14,12 @@ using static Timeline.ErrorCodes.Http.User;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class UserUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class UserTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
         private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public UserUnitTest(WebApplicationFactory<Startup> factory)
+        public UserTest(WebApplicationFactory<Startup> factory)
         {
             _testApp = new TestApplication(factory);
             _factory = _testApp.Factory;
@@ -31,7 +31,7 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task Get_Users_List()
+        public async Task Get_List_Success()
         {
             using var client = await _factory.CreateClientAsAdmin();
             var res = await client.GetAsync("users");
@@ -41,13 +41,21 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task Get_Users_User()
+        public async Task Get_Single_Success()
         {
             using var client = await _factory.CreateClientAsAdmin();
             var res = await client.GetAsync("users/" + MockUser.User.Username);
             res.Should().HaveStatusCode(200)
                 .And.Should().HaveJsonBody<UserInfo>()
                 .Which.Should().BeEquivalentTo(MockUser.User.Info);
+        }
+
+        [Fact]
+        public async Task Get_InvalidModel()
+        {
+            using var client = await _factory.CreateClientAsAdmin();
+            var res = await client.GetAsync("users/aaa!a");
+            res.Should().BeInvalidModel();
         }
 
         [Fact]
@@ -62,33 +70,19 @@ namespace Timeline.Tests.IntegratedTests
 
         public static IEnumerable<object[]> Put_InvalidModel_Data()
         {
-            yield return new object[] { null, false };
-            yield return new object[] { "p", null };
+            yield return new object[] { "aaa", null, false };
+            yield return new object[] { "aaa", "p", null };
+            yield return new object[] { "aa!a", "p", false };
         }
 
         [Theory]
         [MemberData(nameof(Put_InvalidModel_Data))]
-        public async Task Put_InvalidModel(string password, bool? administrator)
+        public async Task Put_InvalidModel(string username, string password, bool? administrator)
         {
             using var client = await _factory.CreateClientAsAdmin();
-            const string url = "users/aaaaaaaa";
-            (await client.PutAsJsonAsync(url,
+            (await client.PutAsJsonAsync("users/" + username,
                 new UserPutRequest { Password = password, Administrator = administrator }))
                 .Should().BeInvalidModel();
-        }
-
-        [Fact]
-        public async Task Put_BadUsername()
-        {
-            using var client = await _factory.CreateClientAsAdmin();
-            var res = await client.PutAsJsonAsync("users/dsf fddf", new UserPutRequest
-            {
-                Password = "???",
-                Administrator = false
-            });
-            res.Should().HaveStatusCode(400)
-                .And.Should().HaveCommonBody()
-                .Which.Code.Should().Be(Put.BadUsername);
         }
 
         private async Task CheckAdministrator(HttpClient client, string username, bool administrator)
@@ -139,6 +133,14 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
+        public async Task Patch_InvalidModel()
+        {
+            using var client = await _factory.CreateClientAsAdmin();
+            var res = await client.PatchAsJsonAsync("users/aaa!a", new UserPatchRequest { });
+            res.Should().BeInvalidModel();
+        }
+
+        [Fact]
         public async Task Patch_Success()
         {
             using var client = await _factory.CreateClientAsAdmin();
@@ -148,6 +150,15 @@ namespace Timeline.Tests.IntegratedTests
                 res.Should().HaveStatusCode(200);
                 await CheckAdministrator(client, MockUser.User.Username, false);
             }
+        }
+
+        [Fact]
+        public async Task Delete_InvalidModel()
+        {
+            using var client = await _factory.CreateClientAsAdmin();
+            var url = "users/aaa!a";
+            var res = await client.DeleteAsync(url);
+            res.Should().BeInvalidModel();
         }
 
         [Fact]
@@ -176,7 +187,8 @@ namespace Timeline.Tests.IntegratedTests
         {
             yield return new[] { null, "uuu" };
             yield return new[] { "uuu", null };
-            yield return new[] { "uuu", "???" };
+            yield return new[] { "a!a", "uuu" };
+            yield return new[] { "uuu", "a!a" };
         }
 
         [Theory]
@@ -258,7 +270,8 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.PostAsJsonAsync(changePasswordUrl,
                 new ChangePasswordRequest { OldPassword = MockUser.User.Password, NewPassword = newPassword });
             res.Should().HaveStatusCode(200);
-            await client.CreateUserTokenAsync(MockUser.User.Username, newPassword);
+            await _factory.CreateDefaultClient() // don't use client above, because it sets authorization header
+                .CreateUserTokenAsync(MockUser.User.Username, newPassword);
         }
     }
 }

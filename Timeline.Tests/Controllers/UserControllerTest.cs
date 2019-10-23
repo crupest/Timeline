@@ -90,23 +90,6 @@ namespace Timeline.Tests.Controllers
         }
 
         [Fact]
-        public async Task Put_BadUsername()
-        {
-            const string username = "aaa";
-            const string password = "ppp";
-            const bool administrator = true;
-            _mockUserService.Setup(s => s.PutUser(username, password, administrator)).ThrowsAsync(new UsernameBadFormatException());
-            var action = await _controller.Put(new UserPutRequest
-            {
-                Password = password,
-                Administrator = administrator
-            }, username);
-            action.Result.Should().BeAssignableTo<BadRequestObjectResult>()
-                .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(Put.BadUsername);
-        }
-
-        [Fact]
         public async Task Patch_Success()
         {
             const string username = "aaa";

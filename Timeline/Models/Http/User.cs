@@ -20,9 +20,11 @@ namespace Timeline.Models.Http
     public class ChangeUsernameRequest
     {
         [Required]
+        [Username]
         public string OldUsername { get; set; } = default!;
 
-        [Required, ValidateWith(typeof(UsernameValidator))]
+        [Required]
+        [Username]
         public string NewUsername { get; set; } = default!;
     }
 

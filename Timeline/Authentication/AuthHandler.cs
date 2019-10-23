@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Services;
 
-namespace Timeline.Authenticate
+namespace Timeline.Authentication
 {
     static class AuthConstants
     {
@@ -18,7 +18,7 @@ namespace Timeline.Authenticate
         public const string DisplayName = "My Jwt Auth Scheme";
     }
 
-    class AuthOptions : AuthenticationSchemeOptions
+    public class AuthOptions : AuthenticationSchemeOptions
     {
         /// <summary>
         /// The query param key to search for token. If null then query params are not searched for token. Default to <c>"token"</c>.
@@ -26,7 +26,7 @@ namespace Timeline.Authenticate
         public string TokenQueryParamKey { get; set; } = "token";
     }
 
-    class AuthHandler : AuthenticationHandler<AuthOptions>
+    public class AuthHandler : AuthenticationHandler<AuthOptions>
     {
         private readonly ILogger<AuthHandler> _logger;
         private readonly IUserService _userService;
@@ -39,14 +39,14 @@ namespace Timeline.Authenticate
         }
 
         // return null if no token is found
-        private string ExtractToken()
+        private string? ExtractToken()
         {
             // check the authorization header
             string header = Request.Headers[HeaderNames.Authorization];
-            if (!string.IsNullOrEmpty(header) && header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(header) && header.StartsWith("Bearer ", StringComparison.InvariantCultureIgnoreCase))
             {
                 var token = header.Substring("Bearer ".Length).Trim();
-                _logger.LogInformation("Token is found in authorization header. Token is {} .", token);
+                _logger.LogInformation(Resources.Authentication.AuthHandler.LogTokenFoundInHeader, token);
                 return token;
             }
 
@@ -57,7 +57,7 @@ namespace Timeline.Authenticate
                 string token = Request.Query[paramQueryKey];
                 if (!string.IsNullOrEmpty(token))
                 {
-                    _logger.LogInformation("Token is found in query param with key \"{}\". Token is {} .", paramQueryKey, token);
+                    _logger.LogInformation(Resources.Authentication.AuthHandler.LogTokenFoundInQuery, paramQueryKey, token);
                     return token;
                 }
             }
@@ -71,7 +71,7 @@ namespace Timeline.Authenticate
             var token = ExtractToken();
             if (string.IsNullOrEmpty(token))
             {
-                _logger.LogInformation("No jwt token is found.");
+                _logger.LogInformation(Resources.Authentication.AuthHandler.LogTokenNotFound);
                 return AuthenticateResult.NoResult();
             }
 
@@ -81,20 +81,16 @@ namespace Timeline.Authenticate
 
                 var identity = new ClaimsIdentity(AuthConstants.Scheme);
                 identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
-                identity.AddClaims(UserUtility.IsAdminToRoleArray(userInfo.Administrator).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
+                identity.AddClaims(UserRoleConvert.ToArray(userInfo.Administrator).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
                 principal.AddIdentity(identity);
 
                 return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthConstants.Scheme));
             }
-            catch (ArgumentException)
+            catch (Exception e) when (e! is ArgumentException)
             {
-                throw; // this exception usually means server error.
-            }
-            catch (Exception e)
-            {
-                _logger.LogInformation(e, "A jwt token validation failed.");
+                _logger.LogInformation(e, Resources.Authentication.AuthHandler.LogTokenValidationFail);
                 return AuthenticateResult.Fail(e);
             }
         }

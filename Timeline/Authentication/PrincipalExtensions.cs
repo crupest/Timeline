@@ -1,11 +1,11 @@
 ﻿using System.Security.Principal;
 using Timeline.Entities;
 
-namespace Timeline.Authenticate
+namespace Timeline.Authentication
 {
-    public static class PrincipalExtensions
+    internal static class PrincipalExtensions
     {
-        public static bool IsAdmin(this IPrincipal principal)
+        internal static bool IsAdministrator(this IPrincipal principal)
         {
             return principal.IsInRole(UserRoles.Admin);
         }

@@ -8,7 +8,7 @@ namespace Timeline.Models.Validation
 {
     /// <summary>
     /// Generate a message from a localizer factory.
-    /// If localizerFactory is null, it should return a neutral-cultural message.
+    /// If localizerFactory is null, it should return a culture-invariant message.
     /// </summary>
     /// <param name="localizerFactory">The localizer factory. Could be null.</param>
     /// <returns>The message.</returns>

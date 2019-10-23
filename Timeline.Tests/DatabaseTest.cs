@@ -32,21 +32,5 @@ namespace Timeline.Tests
             _context.SaveChanges();
             _context.UserAvatars.Count().Should().Be(1);
         }
-
-        [Fact]
-        public void DeleteUserShouldAlsoDeleteDetail()
-        {
-            var user = _context.Users.First();
-            _context.UserDetails.Add(new UserDetailEntity
-            {
-                UserId = user.Id
-            });
-            _context.SaveChanges();
-            _context.UserDetails.Count().Should().Be(1);
-
-            _context.Users.Remove(user);
-            _context.SaveChanges();
-            _context.UserDetails.Count().Should().Be(0);
-        }
     }
 }

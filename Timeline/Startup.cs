@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Globalization;
-using Timeline.Authenticate;
+using Timeline.Authentication;
 using Timeline.Configs;
 using Timeline.Entities;
 using Timeline.Helpers;

@@ -6,7 +6,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Timeline.Authenticate;
+using Timeline.Authentication;
 using Timeline.Filters;
 using Timeline.Models.Http;
 using Timeline.Services;
@@ -106,7 +106,7 @@ namespace Timeline.Controllers
                 return BadRequest(new CommonResponse(ErrorCodes.Put_Content_TooBig,
                     "Content can't be bigger than 10MB."));
 
-            if (!User.IsAdmin() && User.Identity.Name != username)
+            if (!User.IsAdministrator() && User.Identity.Name != username)
             {
                 _logger.LogInformation($"Attempt to put a avatar of other user as a non-admin failed. Operator Username: {User.Identity.Name} ;  Username To Put Avatar: {username} .");
                 return StatusCode(StatusCodes.Status403Forbidden,
@@ -152,7 +152,7 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute] string username)
         {
-            if (!User.IsAdmin() && User.Identity.Name != username)
+            if (!User.IsAdministrator() && User.Identity.Name != username)
             {
                 _logger.LogInformation($"Attempt to delete a avatar of other user as a non-admin failed. Operator Username: {User.Identity.Name} ;  Username To Put Avatar: {username} .");
                 return StatusCode(StatusCodes.Status403Forbidden,
