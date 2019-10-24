@@ -1,11 +1,21 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using System;
 using System.ComponentModel.DataAnnotations;
+using Timeline.Helpers;
 
 namespace Timeline.Models.Validation
 {
     /// <summary>
+    /// Generate a message from a localizer factory.
+    /// If localizerFactory is null, it should return a culture-invariant message.
+    /// </summary>
+    /// <param name="localizerFactory">The localizer factory. Could be null.</param>
+    /// <returns>The message.</returns>
+    public delegate string ValidationMessageGenerator(IStringLocalizerFactory? localizerFactory);
+
+    /// <summary>
     /// A validator to validate value.
-    /// See <see cref="Validate(object, out string)"/>.
     /// </summary>
     public interface IValidator
     {
@@ -13,14 +23,8 @@ namespace Timeline.Models.Validation
         /// Validate given value.
         /// </summary>
         /// <param name="value">The value to validate.</param>
-        /// <param name="message">The validation message.</param>
-        /// <returns>True if validation passed. Otherwise false.</returns>
-        bool Validate(object value, out string message);
-    }
-
-    public static class ValidationConstants
-    {
-        public const string SuccessMessage = "Validation succeeded.";
+        /// <returns>Validation success or not and the message generator.</returns>
+        (bool, ValidationMessageGenerator) Validate(object? value);
     }
 
     /// <summary>
@@ -36,27 +40,32 @@ namespace Timeline.Models.Validation
     /// </remarks>
     public abstract class Validator<T> : IValidator
     {
-        public bool Validate(object value, out string message)
+        public (bool, ValidationMessageGenerator) Validate(object? value)
         {
             if (value == null)
             {
-                message = "Value is null.";
-                return false;
+                return (false, factory =>
+                    factory?.Create("Models.Validation.Validator")?["ValidatorMessageNull"]
+                    ?? Resources.Models.Validation.Validator.InvariantValidatorMessageNull
+                );
             }
 
             if (value is T v)
             {
-
-                return DoValidate(v, out message);
+                return DoValidate(v);
             }
             else
             {
-                message = $"Value is not of type {typeof(T).Name}";
-                return false;
+                return (false, factory =>
+                    factory?.Create("Models.Validation.Validator")?["ValidatorMessageBadType", typeof(T).FullName]
+                    ?? Resources.Models.Validation.Validator.InvariantValidatorMessageBadType);
             }
         }
 
-        protected abstract bool DoValidate(T value, out string message);
+        protected static ValidationMessageGenerator SuccessMessageGenerator { get; } = factory =>
+            factory?.Create("Models.Validation.Validator")?["ValidatorMessageSuccess"] ?? Resources.Models.Validation.Validator.InvariantValidatorMessageSuccess;
+
+        protected abstract (bool, ValidationMessageGenerator) DoValidate(T value);
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
@@ -84,24 +93,33 @@ namespace Timeline.Models.Validation
                 throw new ArgumentNullException(nameof(validatorType));
 
             if (!typeof(IValidator).IsAssignableFrom(validatorType))
-                throw new ArgumentException("Given type is not assignable to IValidator.", nameof(validatorType));
+                throw new ArgumentException(
+                Resources.Models.Validation.Validator.ValidateWithAttributeNotValidator,
+                nameof(validatorType));
 
             try
             {
-                _validator = Activator.CreateInstance(validatorType) as IValidator;
+                _validator = (Activator.CreateInstance(validatorType) as IValidator)!;
             }
             catch (Exception e)
             {
-                throw new ArgumentException("Failed to create a validator instance from default constructor. See inner exception.", e);
+                throw new ArgumentException(
+                    Resources.Models.Validation.Validator.ValidateWithAttributeCreateFail, e);
             }
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (_validator.Validate(value, out var message))
+            var (result, messageGenerator) = _validator.Validate(value);
+            if (result)
+            {
                 return ValidationResult.Success;
+            }
             else
-                return new ValidationResult(string.Format("Field {0} is bad. {1}", validationContext.DisplayName, message));
+            {
+                var localizerFactory = validationContext.GetRequiredService<IStringLocalizerFactory>();
+                return new ValidationResult(messageGenerator(localizerFactory));
+            }
         }
     }
 }

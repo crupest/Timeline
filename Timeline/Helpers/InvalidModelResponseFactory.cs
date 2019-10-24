@@ -6,6 +6,7 @@ namespace Timeline.Helpers
 {
     public static class InvalidModelResponseFactory
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public static IActionResult Factory(ActionContext context)
         {
             var modelState = context.ModelState;

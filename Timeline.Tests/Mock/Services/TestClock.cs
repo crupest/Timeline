@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using Timeline.Services;
 
@@ -12,14 +10,6 @@ namespace Timeline.Tests.Mock.Services
         public DateTime GetCurrentTime()
         {
             return MockCurrentTime.GetValueOrDefault(DateTime.Now);
-        }
-    }
-
-    public static class TestClockWebApplicationFactoryExtensions
-    {
-        public static TestClock GetTestClock<T>(this WebApplicationFactory<T> factory) where T : class
-        {
-            return factory.Server.Host.Services.GetRequiredService<IClock>() as TestClock;
         }
     }
 }

@@ -13,8 +13,8 @@ namespace Timeline.Tests.Helpers.Authentication
 
         public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, int? expireOffset = null)
         {
-            var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, ExpireOffset = expireOffset });
-            response.Should().HaveStatusCodeOk();
+            var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, Expire = expireOffset });
+            response.Should().HaveStatusCode(200);
             var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
             return result;
         }
@@ -29,12 +29,12 @@ namespace Timeline.Tests.Helpers.Authentication
 
         public static Task<HttpClient> CreateClientAsUser<T>(this WebApplicationFactory<T> factory) where T : class
         {
-            return factory.CreateClientWithCredential(MockUsers.UserUsername, MockUsers.UserPassword);
+            return factory.CreateClientWithCredential(MockUser.User.Username, MockUser.User.Password);
         }
 
         public static Task<HttpClient> CreateClientAsAdmin<T>(this WebApplicationFactory<T> factory) where T : class
         {
-            return factory.CreateClientWithCredential(MockUsers.AdminUsername, MockUsers.AdminPassword);
+            return factory.CreateClientWithCredential(MockUser.Admin.Username, MockUser.Admin.Password);
         }
     }
 }

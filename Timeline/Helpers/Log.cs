@@ -3,20 +3,19 @@ using System.Text;
 
 namespace Timeline.Helpers
 {
-    public static class MyLogHelper
+    public static class Log
     {
-        public static KeyValuePair<string, object> Pair(string key, object value) => new KeyValuePair<string, object>(key, value);
-
-        public static string FormatLogMessage(string summary, params KeyValuePair<string, object>[] properties)
+        public static string Format(string summary, params (string, object?)[] properties)
         {
             var builder = new StringBuilder();
             builder.Append(summary);
             foreach (var property in properties)
             {
+                var (key, value) = property;
                 builder.AppendLine();
-                builder.Append(property.Key);
+                builder.Append(key);
                 builder.Append(" : ");
-                builder.Append(property.Value);
+                builder.Append(value);
             }
             return builder.ToString();
         }

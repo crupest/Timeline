@@ -10,51 +10,22 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Helpers;
+using Timeline.Models.Validation;
 
 namespace Timeline.Services
 {
     public class Avatar
     {
-        public string Type { get; set; }
-        public byte[] Data { get; set; }
+        public string Type { get; set; } = default!;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "DTO Object")]
+        public byte[] Data { get; set; } = default!;
     }
 
     public class AvatarInfo
     {
-        public Avatar Avatar { get; set; }
+        public Avatar Avatar { get; set; } = default!;
         public DateTime LastModified { get; set; }
-    }
-
-    /// <summary>
-    /// Thrown when avatar is of bad format.
-    /// </summary>
-    [Serializable]
-    public class AvatarDataException : Exception
-    {
-        public enum ErrorReason
-        {
-            /// <summary>
-            /// Decoding image failed.
-            /// </summary>
-            CantDecode,
-            /// <summary>
-            /// Decoding succeeded but the real type is not the specified type.
-            /// </summary>
-            UnmatchedFormat,
-            /// <summary>
-            /// Image is not a square.
-            /// </summary>
-            BadSize
-        }
-
-        public AvatarDataException(Avatar avatar, ErrorReason error, string message) : base(message) { Avatar = avatar; Error = error; }
-        public AvatarDataException(Avatar avatar, ErrorReason error, string message, Exception inner) : base(message, inner) { Avatar = avatar; Error = error; }
-        protected AvatarDataException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        public ErrorReason Error { get; set; }
-        public Avatar Avatar { get; set; }
     }
 
     /// <summary>
@@ -83,7 +54,7 @@ namespace Timeline.Services
         /// Validate a avatar's format and size info.
         /// </summary>
         /// <param name="avatar">The avatar to validate.</param>
-        /// <exception cref="AvatarDataException">Thrown when validation failed.</exception>
+        /// <exception cref="AvatarFormatException">Thrown when validation failed.</exception>
         Task Validate(Avatar avatar);
     }
 
@@ -94,16 +65,18 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">The username of the user to get avatar etag of.</param>
         /// <returns>The etag.</returns>
-        /// <exception cref="ArgumentException">Thrown if <paramref name="username"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
+        /// <exception cref="UsernameBadFormatException">Thrown if the <paramref name="username"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
         Task<string> GetAvatarETag(string username);
 
         /// <summary>
-        /// Get avatar of a user. If the user has no avatar, a default one is returned.
+        /// Get avatar of a user. If the user has no avatar set, a default one is returned.
         /// </summary>
         /// <param name="username">The username of the user to get avatar of.</param>
         /// <returns>The avatar info.</returns>
-        /// <exception cref="ArgumentException">Thrown if <paramref name="username"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
+        /// <exception cref="UsernameBadFormatException">Thrown if the <paramref name="username"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
         Task<AvatarInfo> GetAvatar(string username);
 
@@ -112,38 +85,41 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">The username of the user to set avatar for.</param>
         /// <param name="avatar">The avatar. Can be null to delete the saved avatar.</param>
-        /// <exception cref="ArgumentException">Throw if <paramref name="username"/> is null or empty.
-        /// Or thrown if <paramref name="avatar"/> is not null but <see cref="Avatar.Type"/> is null or empty or <see cref="Avatar.Data"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Throw if <paramref name="username"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if any field in <paramref name="avatar"/> is null when <paramref name="avatar"/> is not null.</exception>
+        /// <exception cref="UsernameBadFormatException">Thrown if the <paramref name="username"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
-        /// <exception cref="AvatarDataException">Thrown if avatar is of bad format.</exception>
-        Task SetAvatar(string username, Avatar avatar);
+        /// <exception cref="AvatarFormatException">Thrown if avatar is of bad format.</exception>
+        Task SetAvatar(string username, Avatar? avatar);
     }
 
+    // TODO! : Make this configurable.
     public class DefaultUserAvatarProvider : IDefaultUserAvatarProvider
     {
-        private readonly IWebHostEnvironment _environment;
-
         private readonly IETagGenerator _eTagGenerator;
 
-        private byte[] _cacheData;
-        private DateTime _cacheLastModified;
-        private string _cacheETag;
+        private readonly string _avatarPath;
 
+        private byte[] _cacheData = default!;
+        private DateTime _cacheLastModified;
+        private string _cacheETag = default!;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "DI.")]
         public DefaultUserAvatarProvider(IWebHostEnvironment environment, IETagGenerator eTagGenerator)
         {
-            _environment = environment;
+            _avatarPath = Path.Combine(environment.ContentRootPath, "default-avatar.png");
             _eTagGenerator = eTagGenerator;
         }
 
         private async Task CheckAndInit()
         {
-            if (_cacheData != null)
-                return;
-
-            var path = Path.Combine(_environment.ContentRootPath, "default-avatar.png");
-            _cacheData = await File.ReadAllBytesAsync(path);
-            _cacheLastModified = File.GetLastWriteTime(path);
-            _cacheETag = _eTagGenerator.Generate(_cacheData);
+            var path = _avatarPath;
+            if (_cacheData == null || File.GetLastWriteTime(path) > _cacheLastModified)
+            {
+                _cacheData = await File.ReadAllBytesAsync(path);
+                _cacheLastModified = File.GetLastWriteTime(path);
+                _cacheETag = await _eTagGenerator.Generate(_cacheData);
+            }
         }
 
         public async Task<string> GetDefaultAvatarETag()
@@ -175,17 +151,15 @@ namespace Timeline.Services
             {
                 try
                 {
-                    using (var image = Image.Load(avatar.Data, out IImageFormat format))
-                    {
-                        if (!format.MimeTypes.Contains(avatar.Type))
-                            throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.UnmatchedFormat, "Image's actual mime type is not the specified one.");
-                        if (image.Width != image.Height)
-                            throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.BadSize, "Image is not a square, aka, width is not equal to height.");
-                    }
+                    using var image = Image.Load(avatar.Data, out IImageFormat format);
+                    if (!format.MimeTypes.Contains(avatar.Type))
+                        throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.UnmatchedFormat);
+                    if (image.Width != image.Height)
+                        throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.BadSize);
                 }
                 catch (UnknownImageFormatException e)
                 {
-                    throw new AvatarDataException(avatar, AvatarDataException.ErrorReason.CantDecode, "Failed to decode image. See inner exception.", e);
+                    throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.CantDecode, e);
                 }
             });
         }
@@ -203,25 +177,32 @@ namespace Timeline.Services
 
         private readonly IETagGenerator _eTagGenerator;
 
+        private readonly UsernameValidator _usernameValidator;
+
+        private readonly IClock _clock;
+
         public UserAvatarService(
             ILogger<UserAvatarService> logger,
             DatabaseContext database,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
             IUserAvatarValidator avatarValidator,
-            IETagGenerator eTagGenerator)
+            IETagGenerator eTagGenerator,
+            IClock clock)
         {
             _logger = logger;
             _database = database;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
             _avatarValidator = avatarValidator;
             _eTagGenerator = eTagGenerator;
+            _usernameValidator = new UsernameValidator();
+            _clock = clock;
         }
 
         public async Task<string> GetAvatarETag(string username)
         {
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);
 
-            var eTag = (await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.ETag }).SingleAsync()).ETag;
+            var eTag = (await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.ETag }).SingleOrDefaultAsync())?.ETag;
             if (eTag == null)
                 return await _defaultUserAvatarProvider.GetDefaultAvatarETag();
             else
@@ -230,73 +211,88 @@ namespace Timeline.Services
 
         public async Task<AvatarInfo> GetAvatar(string username)
         {
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);
 
-            var avatar = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.Type, a.Data, a.LastModified }).SingleAsync();
+            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.Type, a.Data, a.LastModified }).SingleOrDefaultAsync();
 
-            if ((avatar.Type == null) != (avatar.Data == null))
+            if (avatarEntity != null)
             {
-                _logger.LogCritical("Database corupted! One of type and data of a avatar is null but the other is not.");
-                throw new DatabaseCorruptedException();
-            }
-
-            if (avatar.Data == null)
-            {
-                var defaultAvatar = await _defaultUserAvatarProvider.GetDefaultAvatar();
-                defaultAvatar.LastModified = defaultAvatar.LastModified > avatar.LastModified ? defaultAvatar.LastModified : avatar.LastModified;
-                return defaultAvatar;
-            }
-            else
-            {
-                return new AvatarInfo
+                if (!LanguageHelper.AreSame(avatarEntity.Data == null, avatarEntity.Type == null))
                 {
-                    Avatar = new Avatar
+                    var message = Resources.Services.UserAvatarService.DatabaseCorruptedDataAndTypeNotSame;
+                    _logger.LogCritical(message);
+                    throw new DatabaseCorruptedException(message);
+                }
+
+                if (avatarEntity.Data != null)
+                {
+                    return new AvatarInfo
                     {
-                        Type = avatar.Type,
-                        Data = avatar.Data
-                    },
-                    LastModified = avatar.LastModified
-                };
+                        Avatar = new Avatar
+                        {
+                            Type = avatarEntity.Type!,
+                            Data = avatarEntity.Data
+                        },
+                        LastModified = avatarEntity.LastModified
+                    };
+                }
             }
+            var defaultAvatar = await _defaultUserAvatarProvider.GetDefaultAvatar();
+            if (avatarEntity != null)
+                defaultAvatar.LastModified = defaultAvatar.LastModified > avatarEntity.LastModified ? defaultAvatar.LastModified : avatarEntity.LastModified;
+            return defaultAvatar;
         }
 
-        public async Task SetAvatar(string username, Avatar avatar)
+        public async Task SetAvatar(string username, Avatar? avatar)
         {
             if (avatar != null)
             {
-                if (string.IsNullOrEmpty(avatar.Type))
-                    throw new ArgumentException("Type of avatar is null or empty.", nameof(avatar));
                 if (avatar.Data == null)
-                    throw new ArgumentException("Data of avatar is null.", nameof(avatar));
+                    throw new ArgumentException(Resources.Services.UserAvatarService.ArgumentAvatarDataNull, nameof(avatar));
+                if (string.IsNullOrEmpty(avatar.Type))
+                    throw new ArgumentException(Resources.Services.UserAvatarService.ArgumentAvatarTypeNullOrEmpty, nameof(avatar));
             }
 
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
-
-            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleAsync();
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);
+            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
 
             if (avatar == null)
             {
-                if (avatarEntity.Data == null)
+                if (avatarEntity == null || avatarEntity.Data == null)
+                {
                     return;
+                }
                 else
                 {
                     avatarEntity.Data = null;
                     avatarEntity.Type = null;
                     avatarEntity.ETag = null;
-                    avatarEntity.LastModified = DateTime.Now;
+                    avatarEntity.LastModified = _clock.GetCurrentTime();
                     await _database.SaveChangesAsync();
-                    _logger.LogInformation("Updated an entry in user_avatars.");
+                    _logger.LogInformation(Resources.Services.UserAvatarService.LogUpdateEntity);
                 }
             }
             else
             {
                 await _avatarValidator.Validate(avatar);
-                avatarEntity.Type = avatar.Type;
+                var create = avatarEntity == null;
+                if (create)
+                {
+                    avatarEntity = new UserAvatar();
+                }
+                avatarEntity!.Type = avatar.Type;
                 avatarEntity.Data = avatar.Data;
-                avatarEntity.ETag = _eTagGenerator.Generate(avatar.Data);
-                avatarEntity.LastModified = DateTime.Now;
+                avatarEntity.ETag = await _eTagGenerator.Generate(avatar.Data);
+                avatarEntity.LastModified = _clock.GetCurrentTime();
+                avatarEntity.UserId = userId;
+                if (create)
+                {
+                    _database.UserAvatars.Add(avatarEntity);
+                }
                 await _database.SaveChangesAsync();
-                _logger.LogInformation("Updated an entry in user_avatars.");
+                _logger.LogInformation(create ?
+                    Resources.Services.UserAvatarService.LogCreateEntity
+                    : Resources.Services.UserAvatarService.LogUpdateEntity);
             }
         }
     }
@@ -308,7 +304,7 @@ namespace Timeline.Services
             services.TryAddTransient<IETagGenerator, ETagGenerator>();
             services.AddScoped<IUserAvatarService, UserAvatarService>();
             services.AddSingleton<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
-            services.AddSingleton<IUserAvatarValidator, UserAvatarValidator>();
+            services.AddTransient<IUserAvatarValidator, UserAvatarValidator>();
         }
     }
 }
