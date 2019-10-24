@@ -88,7 +88,7 @@ namespace Timeline.Authentication
 
                 return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthConstants.Scheme));
             }
-            catch (Exception e) when (e! is ArgumentException)
+            catch (Exception e) when (!(e is ArgumentException))
             {
                 _logger.LogInformation(e, Resources.Authentication.AuthHandler.LogTokenValidationFail);
                 return AuthenticateResult.Fail(e);
