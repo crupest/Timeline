@@ -155,7 +155,7 @@ namespace Timeline.Services
             _usernameValidator = new UsernameValidator();
         }
 
-        private string GenerateCacheKeyByUserId(long id) => $"user:{id}";
+        private static string GenerateCacheKeyByUserId(long id) => $"user:{id}";
 
         private void RemoveCache(long id)
         {
