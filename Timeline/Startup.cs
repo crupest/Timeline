@@ -72,8 +72,6 @@ namespace Timeline
                 options.UseMySql(databaseConfig.ConnectionString);
             });
 
-            services.AddHttpClient();
-
             services.AddMemoryCache();
         }
 

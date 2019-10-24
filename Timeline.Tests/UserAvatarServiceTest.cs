@@ -106,7 +106,7 @@ namespace Timeline.Tests
             Data = Encoding.ASCII.GetBytes($"mock{key}")
         };
 
-        private Avatar ToAvatar(UserAvatar entity)
+        private static Avatar ToAvatar(UserAvatar entity)
         {
             return new Avatar
             {
@@ -115,21 +115,13 @@ namespace Timeline.Tests
             };
         }
 
-        private AvatarInfo ToAvatarInfo(UserAvatar entity)
+        private static AvatarInfo ToAvatarInfo(UserAvatar entity)
         {
             return new AvatarInfo
             {
                 Avatar = ToAvatar(entity),
                 LastModified = entity.LastModified
             };
-        }
-
-        private void Set(UserAvatar to, UserAvatar from)
-        {
-            to.Type = from.Type;
-            to.Data = from.Data;
-            to.ETag = from.ETag;
-            to.LastModified = from.LastModified;
         }
 
         private readonly Mock<IDefaultUserAvatarProvider> _mockDefaultAvatarProvider;
