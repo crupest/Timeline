@@ -120,8 +120,8 @@
   <data name="ArgumentAvatarDataNull" xml:space="preserve">
     <value>Data of avatar is null.</value>
   </data>
-  <data name="ArgumentAvatarTypeNull" xml:space="preserve">
-    <value>Type of avatar is null.</value>
+  <data name="ArgumentAvatarTypeNullOrEmpty" xml:space="preserve">
+    <value>Type of avatar is null or empty.</value>
   </data>
   <data name="DatabaseCorruptedDataAndTypeNotSame" xml:space="preserve">
     <value>Database corupted! One of type and data of a avatar is null but the other is not.</value>

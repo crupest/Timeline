@@ -26,11 +26,21 @@ namespace Timeline.Tests
         [Fact]
         public void DeleteUserShouldAlsoDeleteAvatar()
         {
-            _context.UserAvatars.Count().Should().Be(2);
             var user = _context.Users.First();
-            _context.Users.Remove(user);
+            _context.UserAvatars.Count().Should().Be(0);
+            _context.UserAvatars.Add(new UserAvatar
+            {
+                Data = null,
+                Type = null,
+                ETag = null,
+                LastModified = DateTime.Now,
+                UserId = user.Id
+            });
             _context.SaveChanges();
             _context.UserAvatars.Count().Should().Be(1);
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            _context.UserAvatars.Count().Should().Be(0);
         }
     }
 }

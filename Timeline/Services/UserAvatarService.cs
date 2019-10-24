@@ -118,7 +118,7 @@ namespace Timeline.Services
             {
                 _cacheData = await File.ReadAllBytesAsync(path);
                 _cacheLastModified = File.GetLastWriteTime(path);
-                _cacheETag = _eTagGenerator.Generate(_cacheData);
+                _cacheETag = await _eTagGenerator.Generate(_cacheData);
             }
         }
 
@@ -179,12 +179,15 @@ namespace Timeline.Services
 
         private readonly UsernameValidator _usernameValidator;
 
+        private readonly IClock _clock;
+
         public UserAvatarService(
             ILogger<UserAvatarService> logger,
             DatabaseContext database,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
             IUserAvatarValidator avatarValidator,
-            IETagGenerator eTagGenerator)
+            IETagGenerator eTagGenerator,
+            IClock clock)
         {
             _logger = logger;
             _database = database;
@@ -192,6 +195,7 @@ namespace Timeline.Services
             _avatarValidator = avatarValidator;
             _eTagGenerator = eTagGenerator;
             _usernameValidator = new UsernameValidator();
+            _clock = clock;
         }
 
         public async Task<string> GetAvatarETag(string username)
@@ -245,8 +249,8 @@ namespace Timeline.Services
             {
                 if (avatar.Data == null)
                     throw new ArgumentException(Resources.Services.UserAvatarService.ArgumentAvatarDataNull, nameof(avatar));
-                if (avatar.Type == null)
-                    throw new ArgumentException(Resources.Services.UserAvatarService.ArgumentAvatarTypeNull, nameof(avatar));
+                if (string.IsNullOrEmpty(avatar.Type))
+                    throw new ArgumentException(Resources.Services.UserAvatarService.ArgumentAvatarTypeNullOrEmpty, nameof(avatar));
             }
 
             var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);
@@ -263,7 +267,7 @@ namespace Timeline.Services
                     avatarEntity.Data = null;
                     avatarEntity.Type = null;
                     avatarEntity.ETag = null;
-                    avatarEntity.LastModified = DateTime.Now;
+                    avatarEntity.LastModified = _clock.GetCurrentTime();
                     await _database.SaveChangesAsync();
                     _logger.LogInformation(Resources.Services.UserAvatarService.LogUpdateEntity);
                 }
@@ -278,8 +282,9 @@ namespace Timeline.Services
                 }
                 avatarEntity!.Type = avatar.Type;
                 avatarEntity.Data = avatar.Data;
-                avatarEntity.ETag = _eTagGenerator.Generate(avatar.Data);
-                avatarEntity.LastModified = DateTime.Now;
+                avatarEntity.ETag = await _eTagGenerator.Generate(avatar.Data);
+                avatarEntity.LastModified = _clock.GetCurrentTime();
+                avatarEntity.UserId = userId;
                 if (create)
                 {
                     _database.UserAvatars.Add(avatarEntity);
