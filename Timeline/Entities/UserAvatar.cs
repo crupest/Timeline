@@ -24,17 +24,5 @@ namespace Timeline.Entities
         public DateTime LastModified { get; set; }
 
         public long UserId { get; set; }
-
-        public static UserAvatar Create(DateTime lastModified)
-        {
-            return new UserAvatar
-            {
-                Id = 0,
-                Data = null,
-                Type = null,
-                ETag = null,
-                LastModified = lastModified
-            };
-        }
     }
 }

@@ -40,6 +40,7 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "HttpMessageRequest should be disposed ???")]
         public async Task Test()
         {
             Avatar mockAvatar = new Avatar
@@ -262,6 +263,25 @@ namespace Timeline.Tests.IntegratedTests
                     var res = await client.DeleteAsync("users/usernotexist/avatar");
                     res.Should().HaveStatusCode(400)
                         .And.Should().HaveCommonBody().Which.Code.Should().Be(Delete.UserNotExist);
+                }
+            }
+
+            // bad username check
+            using (var client = await _factory.CreateClientAsAdmin())
+            {
+                {
+                    var res = await client.GetAsync("users/u!ser/avatar");
+                    res.Should().BeInvalidModel();
+                }
+
+                {
+                    var res = await client.PutByteArrayAsync("users/u!ser/avatar", ImageHelper.CreatePngWithSize(100, 100), "image/png");
+                    res.Should().BeInvalidModel();
+                }
+
+                {
+                    var res = await client.DeleteAsync("users/u!ser/avatar");
+                    res.Should().BeInvalidModel();
                 }
             }
         }

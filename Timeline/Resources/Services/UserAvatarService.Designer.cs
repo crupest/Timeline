@@ -70,11 +70,11 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type of avatar is null..
+        ///   Looks up a localized string similar to Type of avatar is null or empty..
         /// </summary>
-        internal static string ArgumentAvatarTypeNull {
+        internal static string ArgumentAvatarTypeNullOrEmpty {
             get {
-                return ResourceManager.GetString("ArgumentAvatarTypeNull", resourceCulture);
+                return ResourceManager.GetString("ArgumentAvatarTypeNullOrEmpty", resourceCulture);
             }
         }
         
