@@ -17,10 +17,17 @@
 
                 public static class Header // cc = 01
                 {
-                    public const int Missing_ContentType = 10010101; // dd = 01
-                    public const int Missing_ContentLength = 10010102; // dd = 02
-                    public const int Zero_ContentLength = 10010103; // dd = 03
-                    public const int BadFormat_IfNonMatch = 10010104; // dd = 04
+                    public const int Missing_ContentType = 10000101; // dd = 01
+                    public const int Missing_ContentLength = 10000102; // dd = 02
+                    public const int Zero_ContentLength = 10000103; // dd = 03
+                    public const int BadFormat_IfNonMatch = 10000104; // dd = 04
+                }
+
+                public static class Content // cc = 02
+                {
+                    public const int TooBig = 1000201;
+                    public const int UnmatchedLength_Smaller = 10030202;
+                    public const int UnmatchedLength_Bigger = 10030203;
                 }
             }
         }

@@ -63,8 +63,8 @@ namespace Timeline.Tests
                 Type = "image/png"
             };
             _validator.Awaiting(v => v.Validate(avatar))
-                    .Should().Throw<AvatarDataException>()
-                    .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.CantDecode);
+                    .Should().Throw<AvatarFormatException>()
+                    .Where(e => e.Avatar == avatar && e.Error == AvatarFormatException.ErrorReason.CantDecode);
         }
 
         [Fact]
@@ -76,8 +76,8 @@ namespace Timeline.Tests
                 Type = "image/jpeg"
             };
             _validator.Awaiting(v => v.Validate(avatar))
-                    .Should().Throw<AvatarDataException>()
-                    .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.UnmatchedFormat);
+                    .Should().Throw<AvatarFormatException>()
+                    .Where(e => e.Avatar == avatar && e.Error == AvatarFormatException.ErrorReason.UnmatchedFormat);
         }
 
         [Fact]
@@ -89,8 +89,8 @@ namespace Timeline.Tests
                 Type = PngFormat.Instance.DefaultMimeType
             };
             _validator.Awaiting(v => v.Validate(avatar))
-                    .Should().Throw<AvatarDataException>()
-                    .Where(e => e.Avatar == avatar && e.Error == AvatarDataException.ErrorReason.BadSize);
+                    .Should().Throw<AvatarFormatException>()
+                    .Where(e => e.Avatar == avatar && e.Error == AvatarFormatException.ErrorReason.BadSize);
         }
 
         [Fact]

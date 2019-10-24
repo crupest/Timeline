@@ -117,37 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ContentTooBig" xml:space="preserve">
-    <value>Body is too big. It can't be bigger than {0}.</value>
+  <data name="ArgumentAvatarDataNull" xml:space="preserve">
+    <value>Data of avatar is null.</value>
   </data>
-  <data name="ContentUnmatchedLengthBigger" xml:space="preserve">
-    <value>Actual body length is bigger than it in header.</value>
+  <data name="ArgumentAvatarTypeNull" xml:space="preserve">
+    <value>Type of avatar is null.</value>
   </data>
-  <data name="ContentUnmatchedLengthSmaller" xml:space="preserve">
-    <value>Actual body length is smaller than it in header.</value>
+  <data name="DatabaseCorruptedDataAndTypeNotSame" xml:space="preserve">
+    <value>Database corupted! One of type and data of a avatar is null but the other is not.</value>
   </data>
-  <data name="DeleteDelete" xml:space="preserve">
-    <value>An existent item is deleted.</value>
+  <data name="LogCreateEntity" xml:space="preserve">
+    <value>Created an entry in user_avatars.</value>
   </data>
-  <data name="DeleteNotExist" xml:space="preserve">
-    <value>The item does not exist, so nothing is changed.</value>
-  </data>
-  <data name="HeaderBadIfNonMatch" xml:space="preserve">
-    <value>Header If-Non-Match is of bad format.</value>
-  </data>
-  <data name="HeaderMissingContentLength" xml:space="preserve">
-    <value>Header Content-Length is missing or of bad format.</value>
-  </data>
-  <data name="HeaderMissingContentType" xml:space="preserve">
-    <value>Header Content-Type is required.</value>
-  </data>
-  <data name="HeaderZeroContentLength" xml:space="preserve">
-    <value>Header Content-Length must not be 0.</value>
-  </data>
-  <data name="PutCreate" xml:space="preserve">
-    <value>A new item is created.</value>
-  </data>
-  <data name="PutModify" xml:space="preserve">
-    <value>An existent item is modified.</value>
+  <data name="LogUpdateEntity" xml:space="preserve">
+    <value>Updated an entry in user_avatars.</value>
   </data>
 </root>

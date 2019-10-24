@@ -117,6 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AvatarFormatException" xml:space="preserve">
+    <value>Avartar is of bad format because {0}.</value>
+  </data>
+  <data name="AvatarFormatExceptionBadSize" xml:space="preserve">
+    <value>image is not a square, aka, width is not equal to height</value>
+  </data>
+  <data name="AvatarFormatExceptionCantDecode" xml:space="preserve">
+    <value>failed to decode image, see inner exception</value>
+  </data>
+  <data name="AvatarFormatExceptionUnknownError" xml:space="preserve">
+    <value>unknown error</value>
+  </data>
+  <data name="AvatarFormatExceptionUnmatchedFormat" xml:space="preserve">
+    <value>image's actual mime type is not the specified one</value>
+  </data>
   <data name="BadPasswordException" xml:space="preserve">
     <value>The password is wrong.</value>
   </data>

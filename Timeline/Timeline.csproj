@@ -49,6 +49,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>TokenController.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Controllers\UserAvatarController.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>UserAvatarController.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Controllers\UserController.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -68,6 +73,11 @@
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>Exception.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Services\UserAvatarService.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>UserAvatarService.resx</DependentUpon>
       </Compile>
       <Compile Update="Resources\Services\UserService.Designer.cs">
         <DesignTime>True</DesignTime>
@@ -97,6 +107,10 @@
       <EmbeddedResource Update="Resources\Controllers\TokenController.en.resx">
         <Generator></Generator>
       </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Controllers\UserAvatarController.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>UserAvatarController.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\UserController.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserController.Designer.cs</LastGenOutput>
@@ -115,6 +129,10 @@
       <EmbeddedResource Update="Resources\Services\Exception.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Exception.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Services\UserAvatarService.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>UserAvatarService.Designer.cs</LastGenOutput>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Services\UserService.resx">
         <Generator>ResXFileCodeGenerator</Generator>
