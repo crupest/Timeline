@@ -1,68 +1,75 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Timeline.Authenticate;
+using Timeline.Authentication;
 using Timeline.Filters;
+using Timeline.Helpers;
 using Timeline.Models.Http;
+using Timeline.Models.Validation;
 using Timeline.Services;
+
+namespace Timeline
+{
+    public static partial class ErrorCodes
+    {
+        public static partial class Http
+        {
+            public static class UserAvatar // bbb = 003
+            {
+                public static class Get // cc = 01
+                {
+                    public const int UserNotExist = 10030101;
+                }
+
+                public static class Put // cc = 02
+                {
+                    public const int UserNotExist = 10030201;
+                    public const int Forbid = 10030202;
+                    public const int BadFormat_CantDecode = 10030203;
+                    public const int BadFormat_UnmatchedFormat = 10030204;
+                    public const int BadFormat_BadSize = 10030205;
+
+                }
+
+                public static class Delete // cc = 03
+                {
+                    public const int UserNotExist = 10030301;
+                    public const int Forbid = 10030302;
+                }
+            }
+        }
+    }
+}
 
 namespace Timeline.Controllers
 {
     [ApiController]
     public class UserAvatarController : Controller
     {
-        public static class ErrorCodes
-        {
-            public const int Get_UserNotExist = -1001;
-
-            public const int Put_UserNotExist = -2001;
-            public const int Put_Forbid = -2002;
-            public const int Put_BadFormat_CantDecode = -2011;
-            public const int Put_BadFormat_UnmatchedFormat = -2012;
-            public const int Put_BadFormat_BadSize = -2013;
-            public const int Put_Content_TooBig = -2021;
-            public const int Put_Content_UnmatchedLength_Less = -2022;
-            public const int Put_Content_UnmatchedLength_Bigger = -2023;
-
-            public const int Delete_UserNotExist = -3001;
-            public const int Delete_Forbid = -3002;
-
-
-            public static int From(AvatarDataException.ErrorReason error)
-            {
-                switch (error)
-                {
-                    case AvatarDataException.ErrorReason.CantDecode:
-                        return Put_BadFormat_CantDecode;
-                    case AvatarDataException.ErrorReason.UnmatchedFormat:
-                        return Put_BadFormat_UnmatchedFormat;
-                    case AvatarDataException.ErrorReason.BadSize:
-                        return Put_BadFormat_BadSize;
-                    default:
-                        throw new Exception("Unknown AvatarDataException.ErrorReason value.");
-                }
-            }
-        }
-
         private readonly ILogger<UserAvatarController> _logger;
 
         private readonly IUserAvatarService _service;
 
-        public UserAvatarController(ILogger<UserAvatarController> logger, IUserAvatarService service)
+        private readonly IStringLocalizerFactory _localizerFactory;
+        private readonly IStringLocalizer<UserAvatarController> _localizer;
+
+        public UserAvatarController(ILogger<UserAvatarController> logger, IUserAvatarService service, IStringLocalizerFactory localizerFactory)
         {
             _logger = logger;
             _service = service;
+            _localizerFactory = localizerFactory;
+            _localizer = new StringLocalizer<UserAvatarController>(localizerFactory);
         }
 
         [HttpGet("users/{username}/avatar")]
-        [Authorize]
         [ResponseCache(NoStore = false, Location = ResponseCacheLocation.None, Duration = 0)]
-        public async Task<IActionResult> Get([FromRoute] string username)
+        public async Task<IActionResult> Get([FromRoute][Username] string username)
         {
             const string IfNonMatchHeaderKey = "If-None-Match";
 
@@ -74,11 +81,16 @@ namespace Timeline.Controllers
                 if (Request.Headers.TryGetValue(IfNonMatchHeaderKey, out var value))
                 {
                     if (!EntityTagHeaderValue.TryParseStrictList(value, out var eTagList))
-                        return BadRequest(CommonResponse.BadIfNonMatch());
+                    {
+                        _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogGetBadIfNoneMatch,
+                            ("Username", username), ("If-None-Match", value)));
+                        return BadRequest(HeaderErrorResponse.BadIfNonMatch(_localizerFactory));
+                    }
 
                     if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
                     {
                         Response.Headers.Add("ETag", eTagValue);
+                        _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogGetReturnNotModify, ("Username", username)));
                         return StatusCode(StatusCodes.Status304NotModified);
                     }
                 }
@@ -86,12 +98,13 @@ namespace Timeline.Controllers
                 var avatarInfo = await _service.GetAvatar(username);
                 var avatar = avatarInfo.Avatar;
 
+                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogGetReturnData, ("Username", username)));
                 return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, $"Attempt to get a avatar of a non-existent user failed. Username: {username} .");
-                return NotFound(new CommonResponse(ErrorCodes.Get_UserNotExist, "User does not exist."));
+                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogGetUserNotExist, ("Username", username)));
+                return NotFound(new CommonResponse(ErrorCodes.Http.UserAvatar.Get.UserNotExist, _localizer["ErrorGetUserNotExist"]));
             }
         }
 
@@ -99,18 +112,18 @@ namespace Timeline.Controllers
         [Authorize]
         [RequireContentType, RequireContentLength]
         [Consumes("image/png", "image/jpeg", "image/gif", "image/webp")]
-        public async Task<IActionResult> Put(string username)
+        public async Task<IActionResult> Put([FromRoute][Username] string username)
         {
-            var contentLength = Request.ContentLength.Value;
+            var contentLength = Request.ContentLength!.Value;
             if (contentLength > 1000 * 1000 * 10)
-                return BadRequest(new CommonResponse(ErrorCodes.Put_Content_TooBig,
-                    "Content can't be bigger than 10MB."));
+                return BadRequest(ContentErrorResponse.TooBig(_localizerFactory, "10MB"));
 
-            if (!User.IsAdmin() && User.Identity.Name != username)
+            if (!User.IsAdministrator() && User.Identity.Name != username)
             {
-                _logger.LogInformation($"Attempt to put a avatar of other user as a non-admin failed. Operator Username: {User.Identity.Name} ;  Username To Put Avatar: {username} .");
+                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogPutForbid,
+                    ("Operator Username", User.Identity.Name), ("Username To Put Avatar", username)));
                 return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Put_Forbid, "Normal user can't change other's avatar."));
+                    new CommonResponse(ErrorCodes.Http.UserAvatar.Put.Forbid, _localizer["ErrorPutForbid"]));
             }
 
             try
@@ -119,13 +132,11 @@ namespace Timeline.Controllers
                 var bytesRead = await Request.Body.ReadAsync(data);
 
                 if (bytesRead != contentLength)
-                    return BadRequest(new CommonResponse(ErrorCodes.Put_Content_UnmatchedLength_Less,
-                        $"Content length in header is {contentLength} but actual length is {bytesRead}."));
+                    return BadRequest(ContentErrorResponse.UnmatchedLength_Smaller(_localizerFactory));
 
                 var extraByte = new byte[1];
                 if (await Request.Body.ReadAsync(extraByte) != 0)
-                    return BadRequest(new CommonResponse(ErrorCodes.Put_Content_UnmatchedLength_Bigger,
-                        $"Content length in header is {contentLength} but actual length is bigger than that."));
+                    return BadRequest(ContentErrorResponse.UnmatchedLength_Bigger(_localizerFactory));
 
                 await _service.SetAvatar(username, new Avatar
                 {
@@ -133,43 +144,57 @@ namespace Timeline.Controllers
                     Type = Request.ContentType
                 });
 
-                _logger.LogInformation($"Succeed to put a avatar of a user. Username: {username} ; Mime Type: {Request.ContentType} .");
+                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogPutSuccess,
+                    ("Username", username), ("Mime Type", Request.ContentType)));
                 return Ok();
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, $"Attempt to put a avatar of a non-existent user failed. Username: {username} .");
-                return BadRequest(new CommonResponse(ErrorCodes.Put_UserNotExist, "User does not exist."));
+                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogPutUserNotExist, ("Username", username)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.UserAvatar.Put.UserNotExist, _localizer["ErrorPutUserNotExist"]));
             }
-            catch (AvatarDataException e)
+            catch (AvatarFormatException e)
             {
-                _logger.LogInformation(e, $"Attempt to put a avatar of a bad format failed. Username: {username} .");
-                return BadRequest(new CommonResponse(ErrorCodes.From(e.Error), "Bad format."));
+                var (code, message) = e.Error switch
+                {
+                    AvatarFormatException.ErrorReason.CantDecode =>
+                        (ErrorCodes.Http.UserAvatar.Put.BadFormat_CantDecode, _localizer["ErrorPutBadFormatCantDecode"]),
+                    AvatarFormatException.ErrorReason.UnmatchedFormat =>
+                       (ErrorCodes.Http.UserAvatar.Put.BadFormat_UnmatchedFormat, _localizer["ErrorPutBadFormatUnmatchedFormat"]),
+                    AvatarFormatException.ErrorReason.BadSize =>
+                       (ErrorCodes.Http.UserAvatar.Put.BadFormat_BadSize, _localizer["ErrorPutBadFormatBadSize"]),
+                    _ =>
+                        throw new Exception(Resources.Controllers.UserAvatarController.ExceptionUnknownAvatarFormatError)
+                };
+
+                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogPutUserBadFormat, ("Username", username)));
+                return BadRequest(new CommonResponse(code, message));
             }
         }
 
         [HttpDelete("users/{username}/avatar")]
         [Authorize]
-        public async Task<IActionResult> Delete([FromRoute] string username)
+        public async Task<IActionResult> Delete([FromRoute][Username] string username)
         {
-            if (!User.IsAdmin() && User.Identity.Name != username)
+            if (!User.IsAdministrator() && User.Identity.Name != username)
             {
-                _logger.LogInformation($"Attempt to delete a avatar of other user as a non-admin failed. Operator Username: {User.Identity.Name} ;  Username To Put Avatar: {username} .");
+                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogPutUserBadFormat,
+                    ("Operator Username", User.Identity.Name), ("Username To Delete Avatar", username)));
                 return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Delete_Forbid, "Normal user can't delete other's avatar."));
+                    new CommonResponse(ErrorCodes.Http.UserAvatar.Delete.Forbid, _localizer["ErrorDeleteForbid"]));
             }
 
             try
             {
                 await _service.SetAvatar(username, null);
 
-                _logger.LogInformation($"Succeed to delete a avatar of a user. Username: {username} .");
+                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogDeleteSuccess, ("Username", username)));
                 return Ok();
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, $"Attempt to delete a avatar of a non-existent user failed. Username: {username} .");
-                return BadRequest(new CommonResponse(ErrorCodes.Delete_UserNotExist, "User does not exist."));
+                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogDeleteNotExist, ("Username", username)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.UserAvatar.Delete.UserNotExist, _localizer["ErrorDeleteUserNotExist"]));
             }
         }
     }

@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using System.Resources;
 
 namespace Timeline
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {

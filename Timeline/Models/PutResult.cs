@@ -8,10 +8,10 @@ namespace Timeline.Models
         /// <summary>
         /// Indicates the item did not exist and now is created.
         /// </summary>
-        Created,
+        Create,
         /// <summary>
         /// Indicates the item exists already and is modified.
         /// </summary>
-        Modified
+        Modify
     }
 }

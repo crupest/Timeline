@@ -11,29 +11,18 @@ namespace Timeline.Entities
         public long Id { get; set; }
 
         [Column("data")]
-        public byte[] Data { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is data base entity.")]
+        public byte[]? Data { get; set; }
 
         [Column("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [Column("etag"), MaxLength(30)]
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         [Column("last_modified"), Required]
         public DateTime LastModified { get; set; }
 
         public long UserId { get; set; }
-
-        public static UserAvatar Create(DateTime lastModified)
-        {
-            return new UserAvatar
-            {
-                Id = 0,
-                Data = null,
-                Type = null,
-                ETag = null,
-                LastModified = lastModified
-            };
-        }
     }
 }
