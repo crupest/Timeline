@@ -11,6 +11,7 @@ namespace Timeline.Entities
         public long Id { get; set; }
 
         [Column("data")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is data base entity.")]
         public byte[]? Data { get; set; }
 
         [Column("type")]

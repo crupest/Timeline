@@ -117,37 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ContentTooBig" xml:space="preserve">
-    <value>Body is too big. It can't be bigger than {0}.</value>
+  <data name="ErrorDeleteForbid" xml:space="preserve">
+    <value>普通用户不能删除其他用户的头像。</value>
   </data>
-  <data name="ContentUnmatchedLengthBigger" xml:space="preserve">
-    <value>Actual body length is bigger than it in header.</value>
+  <data name="ErrorDeleteUserNotExist" xml:space="preserve">
+    <value>用户不存在。</value>
   </data>
-  <data name="ContentUnmatchedLengthSmaller" xml:space="preserve">
-    <value>Actual body length is smaller than it in header.</value>
+  <data name="ErrorGetUserNotExist" xml:space="preserve">
+    <value>用户不存在。</value>
   </data>
-  <data name="DeleteDelete" xml:space="preserve">
-    <value>An existent item is deleted.</value>
+  <data name="ErrorPutBadFormatBadSize" xml:space="preserve">
+    <value>图片不是正方形。</value>
   </data>
-  <data name="DeleteNotExist" xml:space="preserve">
-    <value>The item does not exist, so nothing is changed.</value>
+  <data name="ErrorPutBadFormatCantDecode" xml:space="preserve">
+    <value>解码图片失败。</value>
   </data>
-  <data name="HeaderBadIfNonMatch" xml:space="preserve">
-    <value>Header If-Non-Match is of bad format.</value>
+  <data name="ErrorPutBadFormatUnmatchedFormat" xml:space="preserve">
+    <value>图片格式与请求头中指示的不一样。</value>
   </data>
-  <data name="HeaderMissingContentLength" xml:space="preserve">
-    <value>Header Content-Length is missing or of bad format.</value>
+  <data name="ErrorPutForbid" xml:space="preserve">
+    <value>普通用户不能修改其他用户的头像。</value>
   </data>
-  <data name="HeaderMissingContentType" xml:space="preserve">
-    <value>Header Content-Type is required.</value>
-  </data>
-  <data name="HeaderZeroContentLength" xml:space="preserve">
-    <value>Header Content-Length must not be 0.</value>
-  </data>
-  <data name="PutCreate" xml:space="preserve">
-    <value>A new item is created.</value>
-  </data>
-  <data name="PutModify" xml:space="preserve">
-    <value>An existent item is modified.</value>
+  <data name="ErrorPutUserNotExist" xml:space="preserve">
+    <value>用户不存在。</value>
   </data>
 </root>

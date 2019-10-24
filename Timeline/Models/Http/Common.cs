@@ -5,29 +5,9 @@ namespace Timeline.Models.Http
 {
     public class CommonResponse
     {
-        public static CommonResponse InvalidModel(string message)
+        internal static CommonResponse InvalidModel(string message)
         {
             return new CommonResponse(ErrorCodes.Http.Common.InvalidModel, message);
-        }
-
-        public static CommonResponse MissingContentType()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.Missing_ContentType, "Header Content-Type is required.");
-        }
-
-        public static CommonResponse MissingContentLength()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.Missing_ContentLength, "Header Content-Length is missing or of bad format.");
-        }
-
-        public static CommonResponse ZeroContentLength()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.Zero_ContentLength, "Header Content-Length must not be 0.");
-        }
-
-        public static CommonResponse BadIfNonMatch()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.BadFormat_IfNonMatch, "Header If-Non-Match is of bad format.");
         }
 
         public CommonResponse()
@@ -44,6 +24,54 @@ namespace Timeline.Models.Http
         public int Code { get; set; }
         public string? Message { get; set; }
     }
+
+    internal static class HeaderErrorResponse
+    {
+        internal static CommonResponse MissingContentType(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Models.Http.Common");
+            return new CommonResponse(ErrorCodes.Http.Common.Header.Missing_ContentType, localizer["HeaderMissingContentType"]);
+        }
+
+        internal static CommonResponse MissingContentLength(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Models.Http.Common");
+            return new CommonResponse(ErrorCodes.Http.Common.Header.Missing_ContentLength, localizer["HeaderMissingContentLength"]);
+        }
+
+        internal static CommonResponse ZeroContentLength(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Models.Http.Common");
+            return new CommonResponse(ErrorCodes.Http.Common.Header.Zero_ContentLength, localizer["HeaderZeroContentLength"]);
+        }
+
+        internal static CommonResponse BadIfNonMatch(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Models.Http.Common");
+            return new CommonResponse(ErrorCodes.Http.Common.Header.BadFormat_IfNonMatch, localizer["HeaderBadIfNonMatch"]);
+        }
+    }
+
+    internal static class ContentErrorResponse
+    {
+        internal static CommonResponse TooBig(IStringLocalizerFactory localizerFactory, string maxLength)
+        {
+            var localizer = localizerFactory.Create("Models.Http.Common");
+            return new CommonResponse(ErrorCodes.Http.Common.Content.TooBig, localizer["ContentTooBig", maxLength]);
+        }
+
+        internal static CommonResponse UnmatchedLength_Smaller(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Models.Http.Common");
+            return new CommonResponse(ErrorCodes.Http.Common.Content.UnmatchedLength_Smaller, localizer["ContentUnmatchedLengthSmaller"]);
+        }
+        internal static CommonResponse UnmatchedLength_Bigger(IStringLocalizerFactory localizerFactory)
+        {
+            var localizer = localizerFactory.Create("Models.Http.Common");
+            return new CommonResponse(ErrorCodes.Http.Common.Content.UnmatchedLength_Bigger, localizer["ContentUnmatchedLengthBigger"]);
+        }
+    }
+
 
     public class CommonDataResponse<T> : CommonResponse
     {
@@ -87,13 +115,13 @@ namespace Timeline.Models.Http
         internal static CommonPutResponse Create(IStringLocalizerFactory localizerFactory)
         {
             var localizer = localizerFactory.Create("Models.Http.Common");
-            return new CommonPutResponse(0, localizer["ResponsePutCreate"], true);
+            return new CommonPutResponse(0, localizer["PutCreate"], true);
         }
 
         internal static CommonPutResponse Modify(IStringLocalizerFactory localizerFactory)
         {
             var localizer = localizerFactory.Create("Models.Http.Common");
-            return new CommonPutResponse(0, localizer["ResponsePutModify"], false);
+            return new CommonPutResponse(0, localizer["PutModify"], false);
 
         }
     }
@@ -124,13 +152,13 @@ namespace Timeline.Models.Http
         internal static CommonDeleteResponse Delete(IStringLocalizerFactory localizerFactory)
         {
             var localizer = localizerFactory.Create("Models.Http.Common");
-            return new CommonDeleteResponse(0, localizer["ResponseDeleteDelete"], true);
+            return new CommonDeleteResponse(0, localizer["DeleteDelete"], true);
         }
 
         internal static CommonDeleteResponse NotExist(IStringLocalizerFactory localizerFactory)
         {
             var localizer = localizerFactory.Create("Models.Models.Http.Common");
-            return new CommonDeleteResponse(0, localizer["ResponseDeleteNotExist"], false);
+            return new CommonDeleteResponse(0, localizer["DeleteNotExist"], false);
         }
     }
 }

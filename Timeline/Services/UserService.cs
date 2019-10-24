@@ -272,7 +272,7 @@ namespace Timeline.Services
                     Name = username,
                     EncryptedPassword = _passwordService.HashPassword(password),
                     RoleString = UserRoleConvert.ToString(administrator),
-                    Avatar = UserAvatar.Create(DateTime.Now)
+                    Avatar = null
                 };
                 await _databaseContext.AddAsync(newUser);
                 await _databaseContext.SaveChangesAsync();
