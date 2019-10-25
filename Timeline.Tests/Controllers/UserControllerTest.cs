@@ -27,9 +27,7 @@ namespace Timeline.Tests.Controllers
 
         public UserControllerTest()
         {
-            _controller = new UserController(NullLogger<UserController>.Instance,
-                _mockUserService.Object,
-                TestStringLocalizerFactory.Create());
+            _controller = new UserController(NullLogger<UserController>.Instance, _mockUserService.Object);
         }
 
         public void Dispose()

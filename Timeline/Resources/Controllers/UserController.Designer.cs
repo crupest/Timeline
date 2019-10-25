@@ -61,6 +61,60 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Old password is wrong..
+        /// </summary>
+        internal static string ErrorChangePasswordBadPassword {
+            get {
+                return ResourceManager.GetString("ErrorChangePasswordBadPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The new username {0} already exists..
+        /// </summary>
+        internal static string ErrorChangeUsernameAlreadyExist {
+            get {
+                return ResourceManager.GetString("ErrorChangeUsernameAlreadyExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The old username {0} does not exist..
+        /// </summary>
+        internal static string ErrorChangeUsernameNotExist {
+            get {
+                return ResourceManager.GetString("ErrorChangeUsernameNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user does not exist..
+        /// </summary>
+        internal static string ErrorGetUserNotExist {
+            get {
+                return ResourceManager.GetString("ErrorGetUserNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t patch a user that does not exist..
+        /// </summary>
+        internal static string ErrorPatchUserNotExist {
+            get {
+                return ResourceManager.GetString("ErrorPatchUserNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username is of bad format..
+        /// </summary>
+        internal static string ErrorPutBadUsername {
+            get {
+                return ResourceManager.GetString("ErrorPutBadUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempt to change password with wrong old password failed..
         /// </summary>
         internal static string LogChangePasswordBadPassword {

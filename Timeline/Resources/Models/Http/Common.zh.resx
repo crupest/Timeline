@@ -117,37 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ContentTooBig" xml:space="preserve">
+  <data name="MessageContentTooBig" xml:space="preserve">
     <value>请求体太大。它不能超过{0}.</value>
   </data>
-  <data name="ContentUnmatchedLengthBigger" xml:space="preserve">
+  <data name="MessageContentUnmatchedLengthBigger" xml:space="preserve">
     <value>实际的请求体长度比头中指示的大。</value>
   </data>
-  <data name="ContentUnmatchedLengthSmaller" xml:space="preserve">
+  <data name="MessageContentUnmatchedLengthSmaller" xml:space="preserve">
     <value>实际的请求体长度比头中指示的小。</value>
   </data>
-  <data name="DeleteDelete" xml:space="preserve">
+  <data name="MessageDeleteDelete" xml:space="preserve">
     <value>删除了一个项目。</value>
   </data>
-  <data name="DeleteNotExist" xml:space="preserve">
+  <data name="MessageDeleteNotExist" xml:space="preserve">
     <value>要删除的项目不存在，什么都没有修改。</value>
   </data>
-  <data name="HeaderBadIfNonMatch" xml:space="preserve">
+  <data name="MessageHeaderBadIfNonMatch" xml:space="preserve">
     <value>头If-Non-Match格式不对。</value>
   </data>
-  <data name="HeaderMissingContentLength" xml:space="preserve">
+  <data name="MessageHeaderMissingContentLength" xml:space="preserve">
     <value>头Content-Length缺失或者格式不对。</value>
   </data>
-  <data name="HeaderMissingContentType" xml:space="preserve">
+  <data name="MessageHeaderMissingContentType" xml:space="preserve">
     <value>缺少必需的头Content-Type。</value>
   </data>
-  <data name="HeaderZeroContentLength" xml:space="preserve">
+  <data name="MessageHeaderZeroContentLength" xml:space="preserve">
     <value>头Content-Length不能为0。</value>
   </data>
-  <data name="PutCreate" xml:space="preserve">
+  <data name="MessagePutCreate" xml:space="preserve">
     <value>创建了一个新项目。</value>
   </data>
-  <data name="PutModify" xml:space="preserve">
+  <data name="MessagePutModify" xml:space="preserve">
     <value>修改了一个已存在的项目。</value>
   </data>
 </root>

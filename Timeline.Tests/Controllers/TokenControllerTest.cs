@@ -25,9 +25,7 @@ namespace Timeline.Tests.Controllers
 
         public TokenControllerTest()
         {
-            _controller = new TokenController(_mockUserService.Object,
-                NullLogger<TokenController>.Instance, _mockClock,
-                TestStringLocalizerFactory.Create().Create<TokenController>());
+            _controller = new TokenController(_mockUserService.Object, NullLogger<TokenController>.Instance, _mockClock);
         }
 
         public void Dispose()

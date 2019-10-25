@@ -3,17 +3,10 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Timeline.Helpers;
+using static Timeline.Resources.Models.Validation.Validator;
 
 namespace Timeline.Models.Validation
 {
-    /// <summary>
-    /// Generate a message from a localizer factory.
-    /// If localizerFactory is null, it should return a culture-invariant message.
-    /// </summary>
-    /// <param name="localizerFactory">The localizer factory. Could be null.</param>
-    /// <returns>The message.</returns>
-    public delegate string ValidationMessageGenerator(IStringLocalizerFactory? localizerFactory);
-
     /// <summary>
     /// A validator to validate value.
     /// </summary>
@@ -23,8 +16,8 @@ namespace Timeline.Models.Validation
         /// Validate given value.
         /// </summary>
         /// <param name="value">The value to validate.</param>
-        /// <returns>Validation success or not and the message generator.</returns>
-        (bool, ValidationMessageGenerator) Validate(object? value);
+        /// <returns>Validation success or not and message.</returns>
+        (bool, string) Validate(object? value);
     }
 
     /// <summary>
@@ -40,14 +33,11 @@ namespace Timeline.Models.Validation
     /// </remarks>
     public abstract class Validator<T> : IValidator
     {
-        public (bool, ValidationMessageGenerator) Validate(object? value)
+        public (bool, string) Validate(object? value)
         {
             if (value == null)
             {
-                return (false, factory =>
-                    factory?.Create("Models.Validation.Validator")?["ValidatorMessageNull"]
-                    ?? Resources.Models.Validation.Validator.InvariantValidatorMessageNull
-                );
+                return (false, ValidatorMessageNull);
             }
 
             if (value is T v)
@@ -56,16 +46,13 @@ namespace Timeline.Models.Validation
             }
             else
             {
-                return (false, factory =>
-                    factory?.Create("Models.Validation.Validator")?["ValidatorMessageBadType", typeof(T).FullName]
-                    ?? Resources.Models.Validation.Validator.InvariantValidatorMessageBadType);
+                return (false, ValidatorMessageBadType);
             }
         }
 
-        protected static ValidationMessageGenerator SuccessMessageGenerator { get; } = factory =>
-            factory?.Create("Models.Validation.Validator")?["ValidatorMessageSuccess"] ?? Resources.Models.Validation.Validator.InvariantValidatorMessageSuccess;
+        protected static string GetSuccessMessage() => ValidatorMessageSuccess;
 
-        protected abstract (bool, ValidationMessageGenerator) DoValidate(T value);
+        protected abstract (bool, string) DoValidate(T value);
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
@@ -93,9 +80,7 @@ namespace Timeline.Models.Validation
                 throw new ArgumentNullException(nameof(validatorType));
 
             if (!typeof(IValidator).IsAssignableFrom(validatorType))
-                throw new ArgumentException(
-                Resources.Models.Validation.Validator.ValidateWithAttributeNotValidator,
-                nameof(validatorType));
+                throw new ArgumentException(ValidateWithAttributeExceptionNotValidator, nameof(validatorType));
 
             try
             {
@@ -103,22 +88,20 @@ namespace Timeline.Models.Validation
             }
             catch (Exception e)
             {
-                throw new ArgumentException(
-                    Resources.Models.Validation.Validator.ValidateWithAttributeCreateFail, e);
+                throw new ArgumentException(ValidateWithAttributeExceptionCreateFail, e);
             }
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var (result, messageGenerator) = _validator.Validate(value);
+            var (result, message) = _validator.Validate(value);
             if (result)
             {
                 return ValidationResult.Success;
             }
             else
             {
-                var localizerFactory = validationContext.GetRequiredService<IStringLocalizerFactory>();
-                return new ValidationResult(messageGenerator(localizerFactory));
+                return new ValidationResult(message);
             }
         }
     }
