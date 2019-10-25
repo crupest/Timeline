@@ -89,6 +89,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>UserAvatarService.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Services\UserDetailService.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>UserDetailService.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Services\UserService.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -145,6 +150,10 @@
       <EmbeddedResource Update="Resources\Services\UserAvatarService.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserAvatarService.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Services\UserDetailService.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>UserDetailService.Designer.cs</LastGenOutput>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Services\UserService.resx">
         <Generator>ResXFileCodeGenerator</Generator>
