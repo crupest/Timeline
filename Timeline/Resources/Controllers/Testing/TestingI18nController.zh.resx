@@ -117,19 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ErrorBadCredential" xml:space="preserve">
-    <value>Username or password is invalid.</value>
-  </data>
-  <data name="ErrorVerifyBadFormat" xml:space="preserve">
-    <value>The token is of bad format. It might not be created by the server.</value>
-  </data>
-  <data name="ErrorVerifyExpire" xml:space="preserve">
-    <value>The token is expired.</value>
-  </data>
-  <data name="ErrorVerifyOldVersion" xml:space="preserve">
-    <value>Token has an old version. User might have update some info.</value>
-  </data>
-  <data name="ErrorVerifyUserNotExist" xml:space="preserve">
-    <value>User does not exist. Administrator might have deleted this user.</value>
+  <data name="TestString" xml:space="preserve">
+    <value>中文测试字符串。</value>
   </data>
 </root>

@@ -13,8 +13,7 @@ namespace Timeline.Filters
         {
             if (context.HttpContext.Request.ContentType == null)
             {
-                var localizerFactory = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizerFactory>();
-                context.Result = new BadRequestObjectResult(HeaderErrorResponse.MissingContentType(localizerFactory));
+                context.Result = new BadRequestObjectResult(HeaderErrorResponse.MissingContentType());
             }
         }
     }
@@ -39,15 +38,13 @@ namespace Timeline.Filters
         {
             if (context.HttpContext.Request.ContentLength == null)
             {
-                var localizerFactory = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizerFactory>();
-                context.Result = new BadRequestObjectResult(HeaderErrorResponse.MissingContentLength(localizerFactory));
+                context.Result = new BadRequestObjectResult(HeaderErrorResponse.MissingContentLength());
                 return;
             }
 
             if (RequireNonZero && context.HttpContext.Request.ContentLength.Value == 0)
             {
-                var localizerFactory = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizerFactory>();
-                context.Result = new BadRequestObjectResult(HeaderErrorResponse.ZeroContentLength(localizerFactory));
+                context.Result = new BadRequestObjectResult(HeaderErrorResponse.ZeroContentLength());
                 return;
             }
         }

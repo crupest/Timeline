@@ -63,27 +63,27 @@ namespace Timeline.Resources.Services {
         /// <summary>
         ///   Looks up a localized string similar to Data of avatar is null..
         /// </summary>
-        internal static string ArgumentAvatarDataNull {
+        internal static string ExceptionAvatarDataNull {
             get {
-                return ResourceManager.GetString("ArgumentAvatarDataNull", resourceCulture);
+                return ResourceManager.GetString("ExceptionAvatarDataNull", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Type of avatar is null or empty..
         /// </summary>
-        internal static string ArgumentAvatarTypeNullOrEmpty {
+        internal static string ExceptionAvatarTypeNullOrEmpty {
             get {
-                return ResourceManager.GetString("ArgumentAvatarTypeNullOrEmpty", resourceCulture);
+                return ResourceManager.GetString("ExceptionAvatarTypeNullOrEmpty", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Database corupted! One of type and data of a avatar is null but the other is not..
         /// </summary>
-        internal static string DatabaseCorruptedDataAndTypeNotSame {
+        internal static string ExceptionDatabaseCorruptedDataAndTypeNotSame {
             get {
-                return ResourceManager.GetString("DatabaseCorruptedDataAndTypeNotSame", resourceCulture);
+                return ResourceManager.GetString("ExceptionDatabaseCorruptedDataAndTypeNotSame", resourceCulture);
             }
         }
         

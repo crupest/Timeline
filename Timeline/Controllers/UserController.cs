@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 using System.Threading.Tasks;
 using Timeline.Authentication;
 using Timeline.Helpers;
@@ -56,15 +56,11 @@ namespace Timeline.Controllers
 
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
-        private readonly IStringLocalizerFactory _localizerFactory;
-        private readonly IStringLocalizer _localizer;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IStringLocalizerFactory localizerFactory)
+        public UserController(ILogger<UserController> logger, IUserService userService)
         {
             _logger = logger;
             _userService = userService;
-            _localizerFactory = localizerFactory;
-            _localizer = localizerFactory.Create(GetType());
         }
 
         [HttpGet("users"), AdminAuthorize]
@@ -80,7 +76,7 @@ namespace Timeline.Controllers
             if (user == null)
             {
                 _logger.LogInformation(Log.Format(LogGetUserNotExist, ("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Http.User.Get.NotExist, _localizer["ErrorGetUserNotExist"]));
+                return NotFound(new CommonResponse(ErrorCodes.Http.User.Get.NotExist, ErrorGetUserNotExist));
             }
             return Ok(user);
         }
@@ -93,10 +89,10 @@ namespace Timeline.Controllers
             {
                 case PutResult.Create:
                     _logger.LogInformation(Log.Format(LogPutCreate, ("Username", username)));
-                    return CreatedAtAction("Get", new { username }, CommonPutResponse.Create(_localizerFactory));
+                    return CreatedAtAction("Get", new { username }, CommonPutResponse.Create());
                 case PutResult.Modify:
                     _logger.LogInformation(Log.Format(LogPutModify, ("Username", username)));
-                    return Ok(CommonPutResponse.Modify(_localizerFactory));
+                    return Ok(CommonPutResponse.Modify());
                 default:
                     throw new InvalidBranchException();
             }
@@ -113,7 +109,7 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Http.User.Patch.NotExist, _localizer["ErrorPatchUserNotExist"]));
+                return NotFound(new CommonResponse(ErrorCodes.Http.User.Patch.NotExist, ErrorPatchUserNotExist));
             }
         }
 
@@ -124,12 +120,12 @@ namespace Timeline.Controllers
             {
                 await _userService.DeleteUser(username);
                 _logger.LogInformation(Log.Format(LogDeleteDelete, ("Username", username)));
-                return Ok(CommonDeleteResponse.Delete(_localizerFactory));
+                return Ok(CommonDeleteResponse.Delete());
             }
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogDeleteNotExist, ("Username", username)));
-                return Ok(CommonDeleteResponse.NotExist(_localizerFactory));
+                return Ok(CommonDeleteResponse.NotExist());
             }
         }
 
@@ -147,13 +143,14 @@ namespace Timeline.Controllers
             {
                 _logger.LogInformation(e, Log.Format(LogChangeUsernameNotExist,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.NotExist, _localizer["ErrorChangeUsernameNotExist", request.OldUsername]));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.NotExist,
+                    string.Format(CultureInfo.CurrentCulture, ErrorChangeUsernameNotExist, request.OldUsername)));
             }
             catch (UsernameConfictException e)
             {
                 _logger.LogInformation(e, Log.Format(LogChangeUsernameAlreadyExist,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.AlreadyExist, _localizer["ErrorChangeUsernameAlreadyExist"]));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.AlreadyExist, ErrorChangeUsernameAlreadyExist));
             }
             // there is no need to catch bad format exception because it is already checked in model validation.
         }
@@ -172,7 +169,7 @@ namespace Timeline.Controllers
                 _logger.LogInformation(e, Log.Format(LogChangePasswordBadPassword,
                     ("Username", User.Identity.Name), ("Old Password", request.OldPassword)));
                 return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangePassword.BadOldPassword,
-                    _localizer["ErrorChangePasswordBadPassword"]));
+                    ErrorChangePasswordBadPassword));
             }
             // User can't be non-existent or the token is bad. 
         }

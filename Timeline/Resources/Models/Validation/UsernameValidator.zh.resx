@@ -117,13 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ValidationMessageEmptyString" xml:space="preserve">
+  <data name="MessageEmptyString" xml:space="preserve">
     <value>空字符串是不允许的。</value>
   </data>
-  <data name="ValidationMessageInvalidChar" xml:space="preserve">
+  <data name="MessageInvalidChar" xml:space="preserve">
     <value>无效的字符，只能使用字母、数字、下划线和连字符。</value>
   </data>
-  <data name="ValidationMessageTooLong" xml:space="preserve">
+  <data name="MessageTooLong" xml:space="preserve">
     <value>太长了，不能大于26个字符。</value>
   </data>
 </root>

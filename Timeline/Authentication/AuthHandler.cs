@@ -9,6 +9,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Services;
+using static Timeline.Resources.Authentication.AuthHandler;
 
 namespace Timeline.Authentication
 {
@@ -46,7 +47,7 @@ namespace Timeline.Authentication
             if (!string.IsNullOrEmpty(header) && header.StartsWith("Bearer ", StringComparison.InvariantCultureIgnoreCase))
             {
                 var token = header.Substring("Bearer ".Length).Trim();
-                _logger.LogInformation(Resources.Authentication.AuthHandler.LogTokenFoundInHeader, token);
+                _logger.LogInformation(LogTokenFoundInHeader, token);
                 return token;
             }
 
@@ -57,7 +58,7 @@ namespace Timeline.Authentication
                 string token = Request.Query[paramQueryKey];
                 if (!string.IsNullOrEmpty(token))
                 {
-                    _logger.LogInformation(Resources.Authentication.AuthHandler.LogTokenFoundInQuery, paramQueryKey, token);
+                    _logger.LogInformation(LogTokenFoundInQuery, paramQueryKey, token);
                     return token;
                 }
             }
@@ -71,7 +72,7 @@ namespace Timeline.Authentication
             var token = ExtractToken();
             if (string.IsNullOrEmpty(token))
             {
-                _logger.LogInformation(Resources.Authentication.AuthHandler.LogTokenNotFound);
+                _logger.LogInformation(LogTokenNotFound);
                 return AuthenticateResult.NoResult();
             }
 
@@ -90,7 +91,7 @@ namespace Timeline.Authentication
             }
             catch (Exception e) when (!(e is ArgumentException))
             {
-                _logger.LogInformation(e, Resources.Authentication.AuthHandler.LogTokenValidationFail);
+                _logger.LogInformation(e, LogTokenValidationFail);
                 return AuthenticateResult.Fail(e);
             }
         }
