@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
@@ -22,9 +21,9 @@ namespace Timeline.Services
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
-            var (result, messageGenerator) = validator.Validate(username);
+            var (result, message) = validator.Validate(username);
             if (!result)
-                throw new UsernameBadFormatException(username, messageGenerator(null));
+                throw new UsernameBadFormatException(username, message);
 
             var userId = await userDbSet.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
             if (userId == 0)

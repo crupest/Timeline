@@ -117,22 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ErrorChangePasswordBadPassword" xml:space="preserve">
-    <value>Old password is wrong.</value>
+  <data name="MessageContentTooBig" xml:space="preserve">
+    <value>Body is too big. It can't be bigger than {0}.</value>
   </data>
-  <data name="ErrorChangeUsernameAlreadyExist" xml:space="preserve">
-    <value>The new username {0} already exists.</value>
+  <data name="MessageContentUnmatchedLengthBigger" xml:space="preserve">
+    <value>Actual body length is bigger than it in header.</value>
   </data>
-  <data name="ErrorChangeUsernameNotExist" xml:space="preserve">
-    <value>The old username {0} does not exist.</value>
+  <data name="MessageContentUnmatchedLengthSmaller" xml:space="preserve">
+    <value>Actual body length is smaller than it in header.</value>
   </data>
-  <data name="ErrorGetUserNotExist" xml:space="preserve">
-    <value>The user does not exist.</value>
+  <data name="MessageDeleteDelete" xml:space="preserve">
+    <value>An existent item is deleted.</value>
   </data>
-  <data name="ErrorPatchUserNotExist" xml:space="preserve">
-    <value>Can't patch a user that does not exist.</value>
+  <data name="MessageDeleteNotExist" xml:space="preserve">
+    <value>The item does not exist, so nothing is changed.</value>
   </data>
-  <data name="ErrorPutBadUsername" xml:space="preserve">
-    <value>Username is of bad format.</value>
+  <data name="MessageHeaderBadIfNonMatch" xml:space="preserve">
+    <value>Header If-Non-Match is of bad format.</value>
+  </data>
+  <data name="MessageHeaderMissingContentLength" xml:space="preserve">
+    <value>Header Content-Length is missing or of bad format.</value>
+  </data>
+  <data name="MessageHeaderMissingContentType" xml:space="preserve">
+    <value>Header Content-Type is required.</value>
+  </data>
+  <data name="MessageHeaderZeroContentLength" xml:space="preserve">
+    <value>Header Content-Length must not be 0.</value>
+  </data>
+  <data name="MessagePutCreate" xml:space="preserve">
+    <value>A new item is created.</value>
+  </data>
+  <data name="MessagePutModify" xml:space="preserve">
+    <value>An existent item is modified.</value>
   </data>
 </root>

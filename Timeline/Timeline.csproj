@@ -44,6 +44,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Common.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Controllers\Testing\TestingI18nController.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>TestingI18nController.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Controllers\TokenController.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -58,6 +63,11 @@
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>UserController.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Models\Http\Common.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Common.resx</DependentUpon>
       </Compile>
       <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
         <DesignTime>True</DesignTime>
@@ -95,6 +105,10 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Common.Designer.cs</LastGenOutput>
       </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Controllers\Testing\TestingI18nController.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>TestingI18nController.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\TokenController.resx">
         <SubType>Designer</SubType>
         <Generator>ResXFileCodeGenerator</Generator>
@@ -102,9 +116,6 @@
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\TokenController.zh.resx">
         <SubType>Designer</SubType>
-        <Generator></Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Controllers\TokenController.en.resx">
         <Generator></Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\UserAvatarController.resx">
@@ -115,12 +126,13 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserController.Designer.cs</LastGenOutput>
       </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Models\Http\Common.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Common.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UsernameValidator.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Models\Validation\Validator.en.resx">
-        <Generator></Generator>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
         <Generator>ResXFileCodeGenerator</Generator>

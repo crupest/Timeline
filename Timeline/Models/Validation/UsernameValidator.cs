@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using static Timeline.Resources.Models.Validation.UsernameValidator;
 
 namespace Timeline.Models.Validation
 {
@@ -8,33 +9,27 @@ namespace Timeline.Models.Validation
         public const int MaxLength = 26;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Already checked in base class.")]
-        protected override (bool, ValidationMessageGenerator) DoValidate(string value)
+        protected override (bool, string) DoValidate(string value)
         {
             if (value.Length == 0)
             {
-                return (false, factory =>
-                    factory?.Create(typeof(UsernameValidator))?["ValidationMessageEmptyString"]
-                    ?? Resources.Models.Validation.UsernameValidator.InvariantValidationMessageEmptyString);
+                return (false, MessageEmptyString);
             }
 
             if (value.Length > 26)
             {
-                return (false, factory =>
-                    factory?.Create(typeof(UsernameValidator))?["ValidationMessageTooLong"]
-                    ?? Resources.Models.Validation.UsernameValidator.InvariantValidationMessageTooLong);
+                return (false, MessageTooLong);
             }
 
             foreach ((char c, int i) in value.Select((c, i) => (c, i)))
             {
                 if (!(char.IsLetterOrDigit(c) || c == '-' || c == '_'))
                 {
-                    return (false, factory =>
-                        factory?.Create(typeof(UsernameValidator))?["ValidationMessageInvalidChar"]
-                        ?? Resources.Models.Validation.UsernameValidator.InvariantValidationMessageInvalidChar);
+                    return (false, MessageInvalidChar);
                 }
             }
 
-            return (true, SuccessMessageGenerator);
+            return (true, GetSuccessMessage());
         }
     }
 

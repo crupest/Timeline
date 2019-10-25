@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Timeline.Tests
 {
+    [UseCulture("en")]
     public class UsernameValidatorUnitTest : IClassFixture<UsernameValidator>
     {
         private readonly UsernameValidator _validator;
@@ -15,9 +16,9 @@ namespace Timeline.Tests
 
         private string FailAndMessage(string username)
         {
-            var (result, messageGenerator) = _validator.Validate(username);
+            var (result, message) = _validator.Validate(username);
             result.Should().BeFalse();
-            return messageGenerator(null);
+            return message;
         }
 
         [Fact]
@@ -29,9 +30,8 @@ namespace Timeline.Tests
         [Fact]
         public void NotString()
         {
-            var (result, messageGenerator) = _validator.Validate(123);
+            var (result, message) = _validator.Validate(123);
             result.Should().BeFalse();
-            var message = messageGenerator(null);
             message.Should().ContainEquivalentOf("type");
         }
 
