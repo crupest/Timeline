@@ -28,5 +28,7 @@ namespace Timeline.Entities
         public long Version { get; set; }
 
         public UserAvatar? Avatar { get; set; }
+
+        public UserDetail? Detail { get; set; }
     }
 }
