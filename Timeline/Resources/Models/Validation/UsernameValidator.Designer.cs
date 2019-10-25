@@ -63,27 +63,27 @@ namespace Timeline.Resources.Models.Validation {
         /// <summary>
         ///   Looks up a localized string similar to An empty string is not allowed..
         /// </summary>
-        internal static string InvariantValidationMessageEmptyString {
+        internal static string MessageEmptyString {
             get {
-                return ResourceManager.GetString("InvariantValidationMessageEmptyString", resourceCulture);
+                return ResourceManager.GetString("MessageEmptyString", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid character, only alphabet, digit, underscore and hyphen are allowed. .
+        ///   Looks up a localized string similar to Invalid character, only alphabet, digit, underscore and hyphen are allowed..
         /// </summary>
-        internal static string InvariantValidationMessageInvalidChar {
+        internal static string MessageInvalidChar {
             get {
-                return ResourceManager.GetString("InvariantValidationMessageInvalidChar", resourceCulture);
+                return ResourceManager.GetString("MessageInvalidChar", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Too long, more than 26 characters is not premitted..
         /// </summary>
-        internal static string InvariantValidationMessageTooLong {
+        internal static string MessageTooLong {
             get {
-                return ResourceManager.GetString("InvariantValidationMessageTooLong", resourceCulture);
+                return ResourceManager.GetString("MessageTooLong", resourceCulture);
             }
         }
     }

@@ -10,4 +10,3 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Error code constant identifiers.", Scope = "type", Target = "Timeline.ErrorCodes")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Error code constant identifiers.", Scope = "type", Target = "Timeline.ErrorCodes")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1724:Type names should not match namespaces", Justification = "Error code constant identifiers.", Scope = "type", Target = "Timeline.ErrorCodes")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1824:Mark assemblies with NeutralResourcesLanguageAttribute", Justification = "Applying this breaks the function of resources in my app.")]

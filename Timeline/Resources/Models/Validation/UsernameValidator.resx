@@ -117,13 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="InvariantValidationMessageEmptyString" xml:space="preserve">
+  <data name="MessageEmptyString" xml:space="preserve">
     <value>An empty string is not allowed.</value>
   </data>
-  <data name="InvariantValidationMessageInvalidChar" xml:space="preserve">
-    <value>Invalid character, only alphabet, digit, underscore and hyphen are allowed. </value>
+  <data name="MessageInvalidChar" xml:space="preserve">
+    <value>Invalid character, only alphabet, digit, underscore and hyphen are allowed.</value>
   </data>
-  <data name="InvariantValidationMessageTooLong" xml:space="preserve">
+  <data name="MessageTooLong" xml:space="preserve">
     <value>Too long, more than 26 characters is not premitted.</value>
   </data>
 </root>

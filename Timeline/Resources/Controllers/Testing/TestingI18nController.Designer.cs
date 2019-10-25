@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources.Models.Validation {
+namespace Timeline.Resources.Controllers.Testing {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Timeline.Resources.Models.Validation {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Validator {
+    internal class TestingI18nController {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Validator() {
+        internal TestingI18nController() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Models.Validation {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Validation.Validator", typeof(Validator).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Controllers.Testing.TestingI18nController", typeof(TestingI18nController).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,47 +61,11 @@ namespace Timeline.Resources.Models.Validation {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to create a validator instance from default constructor. See inner exception..
+        ///   Looks up a localized string similar to English test string..
         /// </summary>
-        internal static string ValidateWithAttributeExceptionCreateFail {
+        internal static string TestString {
             get {
-                return ResourceManager.GetString("ValidateWithAttributeExceptionCreateFail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Given type is not assignable to IValidator..
-        /// </summary>
-        internal static string ValidateWithAttributeExceptionNotValidator {
-            get {
-                return ResourceManager.GetString("ValidateWithAttributeExceptionNotValidator", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Value is not of type {0}..
-        /// </summary>
-        internal static string ValidatorMessageBadType {
-            get {
-                return ResourceManager.GetString("ValidatorMessageBadType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Value can&apos;t be null..
-        /// </summary>
-        internal static string ValidatorMessageNull {
-            get {
-                return ResourceManager.GetString("ValidatorMessageNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Validation succeeded..
-        /// </summary>
-        internal static string ValidatorMessageSuccess {
-            get {
-                return ResourceManager.GetString("ValidatorMessageSuccess", resourceCulture);
+                return ResourceManager.GetString("TestString", resourceCulture);
             }
         }
     }

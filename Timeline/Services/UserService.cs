@@ -164,15 +164,15 @@ namespace Timeline.Services
             _logger.LogInformation(Log.Format(Resources.Services.UserService.LogCacheRemove, ("Key", key)));
         }
 
-        private void CheckUsernameFormat(string username, string? message = null)
+        private void CheckUsernameFormat(string username, string? additionalMessage = null)
         {
-            var (result, messageGenerator) = _usernameValidator.Validate(username);
+            var (result, message) = _usernameValidator.Validate(username);
             if (!result)
             {
-                if (message == null)
-                    throw new UsernameBadFormatException(username, messageGenerator(null));
+                if (additionalMessage == null)
+                    throw new UsernameBadFormatException(username, message);
                 else
-                    throw new UsernameBadFormatException(username, message + messageGenerator(null));
+                    throw new UsernameBadFormatException(username, additionalMessage + message);
             }
         }
 

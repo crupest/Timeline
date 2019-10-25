@@ -5,6 +5,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using System.Resources;
 
+[assembly: NeutralResourcesLanguage("en")]
+
 namespace Timeline
 {
     public static class Program

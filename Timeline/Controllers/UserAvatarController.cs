@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -13,6 +12,7 @@ using Timeline.Helpers;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
+using static Timeline.Resources.Controllers.UserAvatarController;
 
 namespace Timeline
 {
@@ -56,15 +56,10 @@ namespace Timeline.Controllers
 
         private readonly IUserAvatarService _service;
 
-        private readonly IStringLocalizerFactory _localizerFactory;
-        private readonly IStringLocalizer<UserAvatarController> _localizer;
-
-        public UserAvatarController(ILogger<UserAvatarController> logger, IUserAvatarService service, IStringLocalizerFactory localizerFactory)
+        public UserAvatarController(ILogger<UserAvatarController> logger, IUserAvatarService service)
         {
             _logger = logger;
             _service = service;
-            _localizerFactory = localizerFactory;
-            _localizer = new StringLocalizer<UserAvatarController>(localizerFactory);
         }
 
         [HttpGet("users/{username}/avatar")]
@@ -82,15 +77,15 @@ namespace Timeline.Controllers
                 {
                     if (!EntityTagHeaderValue.TryParseStrictList(value, out var eTagList))
                     {
-                        _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogGetBadIfNoneMatch,
+                        _logger.LogInformation(Log.Format(LogGetBadIfNoneMatch,
                             ("Username", username), ("If-None-Match", value)));
-                        return BadRequest(HeaderErrorResponse.BadIfNonMatch(_localizerFactory));
+                        return BadRequest(HeaderErrorResponse.BadIfNonMatch());
                     }
 
                     if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
                     {
                         Response.Headers.Add("ETag", eTagValue);
-                        _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogGetReturnNotModify, ("Username", username)));
+                        _logger.LogInformation(Log.Format(LogGetReturnNotModify, ("Username", username)));
                         return StatusCode(StatusCodes.Status304NotModified);
                     }
                 }
@@ -98,13 +93,13 @@ namespace Timeline.Controllers
                 var avatarInfo = await _service.GetAvatar(username);
                 var avatar = avatarInfo.Avatar;
 
-                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogGetReturnData, ("Username", username)));
+                _logger.LogInformation(Log.Format(LogGetReturnData, ("Username", username)));
                 return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogGetUserNotExist, ("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Http.UserAvatar.Get.UserNotExist, _localizer["ErrorGetUserNotExist"]));
+                _logger.LogInformation(e, Log.Format(LogGetUserNotExist, ("Username", username)));
+                return NotFound(new CommonResponse(ErrorCodes.Http.UserAvatar.Get.UserNotExist, ErrorGetUserNotExist));
             }
         }
 
@@ -116,14 +111,14 @@ namespace Timeline.Controllers
         {
             var contentLength = Request.ContentLength!.Value;
             if (contentLength > 1000 * 1000 * 10)
-                return BadRequest(ContentErrorResponse.TooBig(_localizerFactory, "10MB"));
+                return BadRequest(ContentErrorResponse.TooBig("10MB"));
 
             if (!User.IsAdministrator() && User.Identity.Name != username)
             {
-                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogPutForbid,
+                _logger.LogInformation(Log.Format(LogPutForbid,
                     ("Operator Username", User.Identity.Name), ("Username To Put Avatar", username)));
                 return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.UserAvatar.Put.Forbid, _localizer["ErrorPutForbid"]));
+                    new CommonResponse(ErrorCodes.Http.UserAvatar.Put.Forbid, ErrorPutForbid));
             }
 
             try
@@ -132,11 +127,11 @@ namespace Timeline.Controllers
                 var bytesRead = await Request.Body.ReadAsync(data);
 
                 if (bytesRead != contentLength)
-                    return BadRequest(ContentErrorResponse.UnmatchedLength_Smaller(_localizerFactory));
+                    return BadRequest(ContentErrorResponse.UnmatchedLength_Smaller());
 
                 var extraByte = new byte[1];
                 if (await Request.Body.ReadAsync(extraByte) != 0)
-                    return BadRequest(ContentErrorResponse.UnmatchedLength_Bigger(_localizerFactory));
+                    return BadRequest(ContentErrorResponse.UnmatchedLength_Bigger());
 
                 await _service.SetAvatar(username, new Avatar
                 {
@@ -144,30 +139,30 @@ namespace Timeline.Controllers
                     Type = Request.ContentType
                 });
 
-                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogPutSuccess,
+                _logger.LogInformation(Log.Format(LogPutSuccess,
                     ("Username", username), ("Mime Type", Request.ContentType)));
                 return Ok();
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogPutUserNotExist, ("Username", username)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.UserAvatar.Put.UserNotExist, _localizer["ErrorPutUserNotExist"]));
+                _logger.LogInformation(e, Log.Format(LogPutUserNotExist, ("Username", username)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.UserAvatar.Put.UserNotExist, ErrorPutUserNotExist));
             }
             catch (AvatarFormatException e)
             {
                 var (code, message) = e.Error switch
                 {
                     AvatarFormatException.ErrorReason.CantDecode =>
-                        (ErrorCodes.Http.UserAvatar.Put.BadFormat_CantDecode, _localizer["ErrorPutBadFormatCantDecode"]),
+                        (ErrorCodes.Http.UserAvatar.Put.BadFormat_CantDecode, ErrorPutBadFormatCantDecode),
                     AvatarFormatException.ErrorReason.UnmatchedFormat =>
-                       (ErrorCodes.Http.UserAvatar.Put.BadFormat_UnmatchedFormat, _localizer["ErrorPutBadFormatUnmatchedFormat"]),
+                       (ErrorCodes.Http.UserAvatar.Put.BadFormat_UnmatchedFormat, ErrorPutBadFormatUnmatchedFormat),
                     AvatarFormatException.ErrorReason.BadSize =>
-                       (ErrorCodes.Http.UserAvatar.Put.BadFormat_BadSize, _localizer["ErrorPutBadFormatBadSize"]),
+                       (ErrorCodes.Http.UserAvatar.Put.BadFormat_BadSize, ErrorPutBadFormatBadSize),
                     _ =>
-                        throw new Exception(Resources.Controllers.UserAvatarController.ExceptionUnknownAvatarFormatError)
+                        throw new Exception(ExceptionUnknownAvatarFormatError)
                 };
 
-                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogPutUserBadFormat, ("Username", username)));
+                _logger.LogInformation(e, Log.Format(LogPutUserBadFormat, ("Username", username)));
                 return BadRequest(new CommonResponse(code, message));
             }
         }
@@ -178,23 +173,23 @@ namespace Timeline.Controllers
         {
             if (!User.IsAdministrator() && User.Identity.Name != username)
             {
-                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogPutUserBadFormat,
+                _logger.LogInformation(Log.Format(LogPutUserBadFormat,
                     ("Operator Username", User.Identity.Name), ("Username To Delete Avatar", username)));
                 return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.UserAvatar.Delete.Forbid, _localizer["ErrorDeleteForbid"]));
+                    new CommonResponse(ErrorCodes.Http.UserAvatar.Delete.Forbid, ErrorDeleteForbid));
             }
 
             try
             {
                 await _service.SetAvatar(username, null);
 
-                _logger.LogInformation(Log.Format(Resources.Controllers.UserAvatarController.LogDeleteSuccess, ("Username", username)));
+                _logger.LogInformation(Log.Format(LogDeleteSuccess, ("Username", username)));
                 return Ok();
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, Log.Format(Resources.Controllers.UserAvatarController.LogDeleteNotExist, ("Username", username)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.UserAvatar.Delete.UserNotExist, _localizer["ErrorDeleteUserNotExist"]));
+                _logger.LogInformation(e, Log.Format(LogDeleteNotExist, ("Username", username)));
+                return BadRequest(new CommonResponse(ErrorCodes.Http.UserAvatar.Delete.UserNotExist, ErrorDeleteUserNotExist));
             }
         }
     }

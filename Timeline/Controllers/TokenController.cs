@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
+using Timeline.Helpers;
 using Timeline.Models.Http;
 using Timeline.Services;
-using Timeline.Helpers;
-using Microsoft.Extensions.Localization;
-using System.Globalization;
 using static Timeline.Resources.Controllers.TokenController;
 
 namespace Timeline
@@ -45,14 +44,12 @@ namespace Timeline.Controllers
         private readonly IUserService _userService;
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
-        private readonly IStringLocalizer<TokenController> _localizer;
 
-        public TokenController(IUserService userService, ILogger<TokenController> logger, IClock clock, IStringLocalizer<TokenController> localizer)
+        public TokenController(IUserService userService, ILogger<TokenController> logger, IClock clock)
         {
             _userService = userService;
             _logger = logger;
             _clock = clock;
-            _localizer = localizer;
         }
 
         [HttpPost("create")]
@@ -79,7 +76,7 @@ namespace Timeline.Controllers
 
                 _logger.LogInformation(Log.Format(LogCreateSuccess,
                     ("Username", request.Username),
-                    ("Expire At", expireTime?.ToString(CultureInfo.CurrentUICulture.DateTimeFormat) ?? "default")
+                    ("Expire At", expireTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat) ?? "default")
                 ));
                 return Ok(new CreateTokenResponse
                 {
@@ -90,14 +87,16 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 LogFailure(LogUserNotExist, e);
-                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
-                    _localizer["ErrorBadCredential"]));
+                return BadRequest(new CommonResponse(
+                    ErrorCodes.Http.Token.Create.BadCredential,
+                    ErrorBadCredential));
             }
             catch (BadPasswordException e)
             {
                 LogFailure(LogBadPassword, e);
-                return BadRequest(new CommonResponse(ErrorCodes.Http.Token.Create.BadCredential,
-                     _localizer["ErrorBadCredential"]));
+                return BadRequest(new CommonResponse(
+                    ErrorCodes.Http.Token.Create.BadCredential,
+                     ErrorBadCredential));
             }
         }
 
@@ -132,7 +131,7 @@ namespace Timeline.Controllers
                     LogFailure(LogVerifyExpire, e, ("Expires", innerException?.Expires),
                         ("Current Time", _clock.GetCurrentTime()));
                     return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.Expired, _localizer["ErrorVerifyExpire"]));
+                        ErrorCodes.Http.Token.Verify.Expired, ErrorVerifyExpire));
                 }
                 else if (e.ErrorCode == JwtVerifyException.ErrorCodes.OldVersion)
                 {
@@ -140,20 +139,20 @@ namespace Timeline.Controllers
                     LogFailure(LogVerifyOldVersion, e,
                         ("Token Version", innerException?.TokenVersion), ("Required Version", innerException?.RequiredVersion));
                     return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.OldVersion, _localizer["ErrorVerifyOldVersion"]));
+                        ErrorCodes.Http.Token.Verify.OldVersion, ErrorVerifyOldVersion));
                 }
                 else
                 {
                     LogFailure(LogVerifyBadFormat, e);
                     return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.BadFormat, _localizer["ErrorVerifyBadFormat"]));
+                        ErrorCodes.Http.Token.Verify.BadFormat, ErrorVerifyBadFormat));
                 }
             }
             catch (UserNotExistException e)
             {
                 LogFailure(LogVerifyUserNotExist, e);
                 return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Verify.UserNotExist, _localizer["ErrorVerifyUserNotExist"]));
+                    ErrorCodes.Http.Token.Verify.UserNotExist, ErrorVerifyUserNotExist));
             }
         }
     }

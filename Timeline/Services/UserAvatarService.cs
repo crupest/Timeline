@@ -219,7 +219,7 @@ namespace Timeline.Services
             {
                 if (!LanguageHelper.AreSame(avatarEntity.Data == null, avatarEntity.Type == null))
                 {
-                    var message = Resources.Services.UserAvatarService.DatabaseCorruptedDataAndTypeNotSame;
+                    var message = Resources.Services.UserAvatarService.ExceptionDatabaseCorruptedDataAndTypeNotSame;
                     _logger.LogCritical(message);
                     throw new DatabaseCorruptedException(message);
                 }
@@ -248,9 +248,9 @@ namespace Timeline.Services
             if (avatar != null)
             {
                 if (avatar.Data == null)
-                    throw new ArgumentException(Resources.Services.UserAvatarService.ArgumentAvatarDataNull, nameof(avatar));
+                    throw new ArgumentException(Resources.Services.UserAvatarService.ExceptionAvatarDataNull, nameof(avatar));
                 if (string.IsNullOrEmpty(avatar.Type))
-                    throw new ArgumentException(Resources.Services.UserAvatarService.ArgumentAvatarTypeNullOrEmpty, nameof(avatar));
+                    throw new ArgumentException(Resources.Services.UserAvatarService.ExceptionAvatarTypeNullOrEmpty, nameof(avatar));
             }
 
             var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);

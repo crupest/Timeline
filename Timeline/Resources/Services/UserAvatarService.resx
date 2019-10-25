@@ -117,13 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ArgumentAvatarDataNull" xml:space="preserve">
+  <data name="ExceptionAvatarDataNull" xml:space="preserve">
     <value>Data of avatar is null.</value>
   </data>
-  <data name="ArgumentAvatarTypeNullOrEmpty" xml:space="preserve">
+  <data name="ExceptionAvatarTypeNullOrEmpty" xml:space="preserve">
     <value>Type of avatar is null or empty.</value>
   </data>
-  <data name="DatabaseCorruptedDataAndTypeNotSame" xml:space="preserve">
+  <data name="ExceptionDatabaseCorruptedDataAndTypeNotSame" xml:space="preserve">
     <value>Database corupted! One of type and data of a avatar is null but the other is not.</value>
   </data>
   <data name="LogCreateEntity" xml:space="preserve">
