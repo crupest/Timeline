@@ -13,7 +13,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Timeline.Controllers;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
@@ -95,7 +94,7 @@ namespace Timeline.Tests.IntegratedTests
                     request.Headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
                     var res = await client.SendAsync(request);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.BadFormat_IfNonMatch);
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Header.IfNonMatch.BadFormat);
                 }
 
                 {
@@ -125,7 +124,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.Missing_ContentLength);
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Filter.Header.ContentLength.Missing); ;
                 }
 
                 {
@@ -133,7 +132,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentLength = 1;
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.Missing_ContentType);
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Filter.Header.ContentType.Missing);
                 }
 
                 {
@@ -142,7 +141,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.Zero_ContentLength);
+                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Filter.Header.ContentLength.Zero);
                 }
 
                 {

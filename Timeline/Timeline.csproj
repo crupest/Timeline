@@ -64,6 +64,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>UserController.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Filters.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Filters.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Models\Http\Common.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -119,10 +124,6 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>TokenController.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Controllers\TokenController.zh.resx">
-        <SubType>Designer</SubType>
-        <Generator></Generator>
-      </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\UserAvatarController.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserAvatarController.Designer.cs</LastGenOutput>
@@ -130,6 +131,10 @@
       <EmbeddedResource Update="Resources\Controllers\UserController.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserController.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Filters.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Filters.Designer.cs</LastGenOutput>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Models\Http\Common.resx">
         <Generator>ResXFileCodeGenerator</Generator>
@@ -159,5 +164,9 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserService.Designer.cs</LastGenOutput>
       </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Resources\Filters\" />
     </ItemGroup>
 </Project>
