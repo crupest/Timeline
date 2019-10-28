@@ -126,4 +126,7 @@
   <data name="MessageHeaderContentTypeMissing" xml:space="preserve">
     <value>Header Content-Type is required.</value>
   </data>
+  <data name="MessageUserNotExist" xml:space="preserve">
+    <value>The user does not exist.</value>
+  </data>
 </root>
