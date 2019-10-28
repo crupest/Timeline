@@ -86,5 +86,14 @@ namespace Timeline.Resources {
                 return ResourceManager.GetString("MessageHeaderContentTypeMissing", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user does not exist..
+        /// </summary>
+        internal static string MessageUserNotExist {
+            get {
+                return ResourceManager.GetString("MessageUserNotExist", resourceCulture);
+            }
+        }
     }
 }
