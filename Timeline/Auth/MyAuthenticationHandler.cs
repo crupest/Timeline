@@ -11,15 +11,15 @@ using Timeline.Models;
 using Timeline.Services;
 using static Timeline.Resources.Authentication.AuthHandler;
 
-namespace Timeline.Authentication
+namespace Timeline.Auth
 {
-    static class AuthConstants
+    public static class AuthenticationConstants
     {
         public const string Scheme = "Bearer";
         public const string DisplayName = "My Jwt Auth Scheme";
     }
 
-    public class AuthOptions : AuthenticationSchemeOptions
+    public class MyAuthenticationOptions : AuthenticationSchemeOptions
     {
         /// <summary>
         /// The query param key to search for token. If null then query params are not searched for token. Default to <c>"token"</c>.
@@ -27,15 +27,15 @@ namespace Timeline.Authentication
         public string TokenQueryParamKey { get; set; } = "token";
     }
 
-    public class AuthHandler : AuthenticationHandler<AuthOptions>
+    public class MyAuthenticationHandler : AuthenticationHandler<MyAuthenticationOptions>
     {
-        private readonly ILogger<AuthHandler> _logger;
+        private readonly ILogger<MyAuthenticationHandler> _logger;
         private readonly IUserService _userService;
 
-        public AuthHandler(IOptionsMonitor<AuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserService userService)
+        public MyAuthenticationHandler(IOptionsMonitor<MyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserService userService)
             : base(options, logger, encoder, clock)
         {
-            _logger = logger.CreateLogger<AuthHandler>();
+            _logger = logger.CreateLogger<MyAuthenticationHandler>();
             _userService = userService;
         }
 
@@ -80,14 +80,14 @@ namespace Timeline.Authentication
             {
                 var userInfo = await _userService.VerifyToken(token);
 
-                var identity = new ClaimsIdentity(AuthConstants.Scheme);
+                var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
                 identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
                 identity.AddClaims(UserRoleConvert.ToArray(userInfo.Administrator).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
                 principal.AddIdentity(identity);
 
-                return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthConstants.Scheme));
+                return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthenticationConstants.Scheme));
             }
             catch (Exception e) when (!(e is ArgumentException))
             {

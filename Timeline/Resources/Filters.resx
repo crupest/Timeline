@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LogSelfOrAdminNoUser" xml:space="preserve">
+    <value>You apply a SelfOrAdminAttribute on an action, but there is no user. Try add AuthorizeAttribute.</value>
+  </data>
+  <data name="LogSelfOrAdminNoUsername" xml:space="preserve">
+    <value>You apply a SelfOrAdminAttribute on an action, but it does not have a model named username.</value>
+  </data>
+  <data name="LogSelfOrAdminUsernameNotString" xml:space="preserve">
+    <value>You apply a SelfOrAdminAttribute on an action, found a model named username, but it is not string.</value>
+  </data>
   <data name="MessageHeaderContentLengthMissing" xml:space="preserve">
     <value>Header Content-Length is missing or of bad format.</value>
   </data>
@@ -125,6 +134,9 @@
   </data>
   <data name="MessageHeaderContentTypeMissing" xml:space="preserve">
     <value>Header Content-Type is required.</value>
+  </data>
+  <data name="MessageSelfOrAdminForbid" xml:space="preserve">
+    <value>You can't access the resource unless you are the owner or administrator.</value>
   </data>
   <data name="MessageUserNotExist" xml:space="preserve">
     <value>The user does not exist.</value>

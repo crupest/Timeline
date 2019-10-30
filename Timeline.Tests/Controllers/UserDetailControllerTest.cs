@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
@@ -42,6 +43,8 @@ namespace Timeline.Tests.Controllers
 
             var putNickname = typeof(UserDetailController).GetMethod(nameof(UserDetailController.PutNickname));
             putNickname.Should().BeDecoratedWith<HttpPutAttribute>()
+                .And.BeDecoratedWith<AuthorizeAttribute>()
+                .And.BeDecoratedWith<SelfOrAdminAttribute>()
                 .And.BeDecoratedWith<CatchUserNotExistExceptionAttribute>();
             putNickname.GetParameter("username").Should().BeDecoratedWith<UsernameAttribute>()
                 .And.BeDecoratedWith<FromRouteAttribute>();
@@ -53,6 +56,8 @@ namespace Timeline.Tests.Controllers
 
             var deleteNickname = typeof(UserDetailController).GetMethod(nameof(UserDetailController.DeleteNickname));
             deleteNickname.Should().BeDecoratedWith<HttpDeleteAttribute>()
+                .And.BeDecoratedWith<AuthorizeAttribute>()
+                .And.BeDecoratedWith<SelfOrAdminAttribute>()
                 .And.BeDecoratedWith<CatchUserNotExistExceptionAttribute>();
             deleteNickname.GetParameter("username").Should().BeDecoratedWith<UsernameAttribute>()
                 .And.BeDecoratedWith<FromRouteAttribute>();

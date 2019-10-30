@@ -126,6 +126,9 @@
   <data name="MessageHeaderContentTypeMissing" xml:space="preserve">
     <value>缺少必需的请求头Content-Type。</value>
   </data>
+  <data name="MessageSelfOrAdminForbid" xml:space="preserve">
+    <value>你无权访问该资源除非你是资源的拥有者或者管理员。</value>
+  </data>
   <data name="MessageUserNotExist" xml:space="preserve">
     <value>用户不存在。</value>
   </data>

@@ -8,9 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Globalization;
-using Timeline.Authentication;
+using Timeline.Auth;
 using Timeline.Configs;
 using Timeline.Entities;
+using Timeline.Formatters;
 using Timeline.Helpers;
 using Timeline.Services;
 
@@ -31,17 +32,22 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
+            services.AddControllers(setup =>
+            {
+                setup.InputFormatters.Add(new StringInputFormatter());
+            })
                 .ConfigureApiBehaviorOptions(options =>
                 {
                     options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
                 })
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(); // TODO: Remove this.
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
-            services.AddAuthentication(AuthConstants.Scheme)
-                .AddScheme<AuthOptions, AuthHandler>(AuthConstants.Scheme, AuthConstants.DisplayName, o => { });
+            services.AddAuthentication(AuthenticationConstants.Scheme)
+                .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
+            services.AddAuthorization();
+
 
             var corsConfig = Configuration.GetSection("Cors").Get<string[]>();
             services.AddCors(setup =>
@@ -62,8 +68,8 @@ namespace Timeline
             services.AddScoped<IJwtService, JwtService>();
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClock, Clock>();
-
             services.AddUserAvatarService();
+            services.AddScoped<IUserDetailService, UserDetailService>();
 
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
