@@ -4,6 +4,7 @@ using Timeline.Filters;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Timeline.Controllers
 {
@@ -25,6 +26,8 @@ namespace Timeline.Controllers
         }
 
         [HttpPut("users/{username}/nickname")]
+        [Authorize]
+        [SelfOrAdmin]
         [CatchUserNotExistException]
         public async Task<ActionResult> PutNickname([FromRoute][Username] string username,
             [FromBody][StringLength(10, MinimumLength = 1)] string body)
@@ -34,6 +37,8 @@ namespace Timeline.Controllers
         }
 
         [HttpDelete("users/{username}/nickname")]
+        [Authorize]
+        [SelfOrAdmin]
         [CatchUserNotExistException]
         public async Task<ActionResult> DeleteNickname([FromRoute][Username] string username)
         {

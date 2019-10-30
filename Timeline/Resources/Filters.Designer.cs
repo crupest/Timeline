@@ -61,6 +61,33 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, but there is no user. Try add AuthorizeAttribute..
+        /// </summary>
+        internal static string LogSelfOrAdminNoUser {
+            get {
+                return ResourceManager.GetString("LogSelfOrAdminNoUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, but it does not have a model named username..
+        /// </summary>
+        internal static string LogSelfOrAdminNoUsername {
+            get {
+                return ResourceManager.GetString("LogSelfOrAdminNoUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, found a model named username, but it is not string..
+        /// </summary>
+        internal static string LogSelfOrAdminUsernameNotString {
+            get {
+                return ResourceManager.GetString("LogSelfOrAdminUsernameNotString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Header Content-Length is missing or of bad format..
         /// </summary>
         internal static string MessageHeaderContentLengthMissing {
@@ -84,6 +111,15 @@ namespace Timeline.Resources {
         internal static string MessageHeaderContentTypeMissing {
             get {
                 return ResourceManager.GetString("MessageHeaderContentTypeMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t access the resource unless you are the owner or administrator..
+        /// </summary>
+        internal static string MessageSelfOrAdminForbid {
+            get {
+                return ResourceManager.GetString("MessageSelfOrAdminForbid", resourceCulture);
             }
         }
         

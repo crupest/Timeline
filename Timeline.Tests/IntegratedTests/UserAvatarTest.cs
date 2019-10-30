@@ -22,12 +22,12 @@ using static Timeline.ErrorCodes.Http.UserAvatar;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class UserAvatarUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class UserAvatarTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
         private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public UserAvatarUnitTest(WebApplicationFactory<Startup> factory)
+        public UserAvatarTest(WebApplicationFactory<Startup> factory)
         {
             _testApp = new TestApplication(factory);
             _factory = _testApp.Factory;

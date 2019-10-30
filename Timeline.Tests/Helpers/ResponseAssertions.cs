@@ -91,6 +91,11 @@ namespace Timeline.Tests.Helpers
             var result = JsonConvert.DeserializeObject<T>(body);
             return new AndWhichConstraint<HttpResponseMessage, T>(Subject, result);
         }
+
+        internal void HaveStatusCode(object statusCode)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public static class AssertionResponseExtensions

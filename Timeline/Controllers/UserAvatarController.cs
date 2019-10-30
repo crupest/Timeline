@@ -6,7 +6,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Timeline.Authentication;
+using Timeline.Auth;
 using Timeline.Filters;
 using Timeline.Helpers;
 using Timeline.Models.Http;
