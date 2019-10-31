@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources.Models.Http {
+namespace Timeline.Resources.Services {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Timeline.Resources.Models.Http {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Common {
+    internal class UserDetailService {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Common() {
+        internal UserDetailService() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Models.Http {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Http.Common", typeof(Common).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Services.UserDetailService", typeof(UserDetailService).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,74 +61,38 @@ namespace Timeline.Resources.Models.Http {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Body is too big. It can&apos;t be bigger than {0}..
+        ///   Looks up a localized string similar to Length of nickname can&apos;t be bigger than 10..
         /// </summary>
-        internal static string MessageContentTooBig {
+        internal static string ExceptionNicknameTooLong {
             get {
-                return ResourceManager.GetString("MessageContentTooBig", resourceCulture);
+                return ResourceManager.GetString("ExceptionNicknameTooLong", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Actual body length is bigger than it in header..
+        ///   Looks up a localized string similar to A user_details entity has been created. User id is {0}. Nickname is {1}..
         /// </summary>
-        internal static string MessageContentUnmatchedLengthBigger {
+        internal static string LogEntityNicknameCreate {
             get {
-                return ResourceManager.GetString("MessageContentUnmatchedLengthBigger", resourceCulture);
+                return ResourceManager.GetString("LogEntityNicknameCreate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Actual body length is smaller than it in header..
+        ///   Looks up a localized string similar to Nickname of a user_details entity has been updated to a new value. User id is {0}. New value is {1}..
         /// </summary>
-        internal static string MessageContentUnmatchedLengthSmaller {
+        internal static string LogEntityNicknameSetNotNull {
             get {
-                return ResourceManager.GetString("MessageContentUnmatchedLengthSmaller", resourceCulture);
+                return ResourceManager.GetString("LogEntityNicknameSetNotNull", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An existent item is deleted..
+        ///   Looks up a localized string similar to Nickname of a user_details entity has been updated to null. User id is {0}..
         /// </summary>
-        internal static string MessageDeleteDelete {
+        internal static string LogEntityNicknameSetToNull {
             get {
-                return ResourceManager.GetString("MessageDeleteDelete", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The item does not exist, so nothing is changed..
-        /// </summary>
-        internal static string MessageDeleteNotExist {
-            get {
-                return ResourceManager.GetString("MessageDeleteNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Header If-Non-Match is of bad format..
-        /// </summary>
-        internal static string MessageHeaderIfNonMatchBad {
-            get {
-                return ResourceManager.GetString("MessageHeaderIfNonMatchBad", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A new item is created..
-        /// </summary>
-        internal static string MessagePutCreate {
-            get {
-                return ResourceManager.GetString("MessagePutCreate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An existent item is modified..
-        /// </summary>
-        internal static string MessagePutModify {
-            get {
-                return ResourceManager.GetString("MessagePutModify", resourceCulture);
+                return ResourceManager.GetString("LogEntityNicknameSetToNull", resourceCulture);
             }
         }
     }

@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SixLabors.ImageSharp.Formats.Png;
@@ -13,11 +12,9 @@ using Timeline.Entities;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Mock.Data;
-using Timeline.Tests.Mock.Services;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace Timeline.Tests
+namespace Timeline.Tests.Services
 {
     public class UserAvatarValidatorTest : IClassFixture<UserAvatarValidator>
     {

@@ -14,31 +14,36 @@ namespace Timeline.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "3.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Timeline.Entities.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("EncryptedPassword")
                         .IsRequired()
-                        .HasColumnName("password");
+                        .HasColumnName("password")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnName("name")
+                        .HasColumnType("varchar(26)")
                         .HasMaxLength(26);
 
                     b.Property<string>("RoleString")
                         .IsRequired()
-                        .HasColumnName("roles");
+                        .HasColumnName("roles")
+                        .HasColumnType("longtext");
 
                     b.Property<long>("Version")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("version")
+                        .HasColumnType("bigint")
                         .HasDefaultValue(0L);
 
                     b.HasKey("Id");
@@ -53,22 +58,28 @@ namespace Timeline.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
+                        .HasColumnName("id")
+                        .HasColumnType("bigint");
 
                     b.Property<byte[]>("Data")
-                        .HasColumnName("data");
+                        .HasColumnName("data")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("ETag")
                         .HasColumnName("etag")
+                        .HasColumnType("varchar(30)")
                         .HasMaxLength(30);
 
                     b.Property<DateTime>("LastModified")
-                        .HasColumnName("last_modified");
+                        .HasColumnName("last_modified")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Type")
-                        .HasColumnName("type");
+                        .HasColumnName("type")
+                        .HasColumnType("longtext");
 
-                    b.Property<long>("UserId");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -78,32 +89,20 @@ namespace Timeline.Migrations
                     b.ToTable("user_avatars");
                 });
 
-            modelBuilder.Entity("Timeline.Entities.UserDetailEntity", b =>
+            modelBuilder.Entity("Timeline.Entities.UserDetail", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("Description")
-                        .HasColumnName("description");
-
-                    b.Property<string>("EMail")
-                        .HasColumnName("email")
-                        .HasMaxLength(50);
+                        .HasColumnName("id")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Nickname")
                         .HasColumnName("nickname")
-                        .HasMaxLength(15);
+                        .HasColumnType("varchar(26)")
+                        .HasMaxLength(26);
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnName("phone_number")
-                        .HasMaxLength(15);
-
-                    b.Property<string>("QQ")
-                        .HasColumnName("qq")
-                        .HasMaxLength(15);
-
-                    b.Property<long>("UserId");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -115,18 +114,20 @@ namespace Timeline.Migrations
 
             modelBuilder.Entity("Timeline.Entities.UserAvatar", b =>
                 {
-                    b.HasOne("Timeline.Entities.User")
+                    b.HasOne("Timeline.Entities.User", null)
                         .WithOne("Avatar")
                         .HasForeignKey("Timeline.Entities.UserAvatar", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("Timeline.Entities.UserDetailEntity", b =>
+            modelBuilder.Entity("Timeline.Entities.UserDetail", b =>
                 {
-                    b.HasOne("Timeline.Entities.User")
+                    b.HasOne("Timeline.Entities.User", null)
                         .WithOne("Detail")
-                        .HasForeignKey("Timeline.Entities.UserDetailEntity", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("Timeline.Entities.UserDetail", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

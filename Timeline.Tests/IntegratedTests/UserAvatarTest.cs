@@ -13,7 +13,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Timeline.Controllers;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
@@ -23,12 +22,12 @@ using static Timeline.ErrorCodes.Http.UserAvatar;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class UserAvatarUnitTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class UserAvatarTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
         private readonly TestApplication _testApp;
         private readonly WebApplicationFactory<Startup> _factory;
 
-        public UserAvatarUnitTest(WebApplicationFactory<Startup> factory)
+        public UserAvatarTest(WebApplicationFactory<Startup> factory)
         {
             _testApp = new TestApplication(factory);
             _factory = _testApp.Factory;
@@ -54,7 +53,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var res = await client.GetAsync("users/usernotexist/avatar");
                     res.Should().HaveStatusCode(404)
-                        .And.Should().HaveCommonBody()
+                        .And.HaveCommonBody()
                         .Which.Code.Should().Be(Get.UserNotExist);
                 }
 
@@ -95,7 +94,7 @@ namespace Timeline.Tests.IntegratedTests
                     request.Headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
                     var res = await client.SendAsync(request);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.BadFormat_IfNonMatch);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Header.IfNonMatch.BadFormat);
                 }
 
                 {
@@ -125,7 +124,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.Missing_ContentLength);
+                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Filter.Header.ContentLength.Missing); ;
                 }
 
                 {
@@ -133,7 +132,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentLength = 1;
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.Missing_ContentType);
+                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Filter.Header.ContentType.Missing);
                 }
 
                 {
@@ -142,7 +141,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Common.Header.Zero_ContentLength);
+                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Http.Filter.Header.ContentLength.Zero);
                 }
 
                 {
@@ -156,7 +155,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Content.TooBig);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Content.TooBig);
                 }
 
                 {
@@ -165,7 +164,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Content.UnmatchedLength_Smaller);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Content.UnmatchedLength_Smaller);
                 }
 
                 {
@@ -174,25 +173,25 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Content.UnmatchedLength_Bigger);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Content.UnmatchedLength_Bigger);
                 }
 
                 {
                     var res = await client.PutByteArrayAsync("users/user/avatar", new[] { (byte)0x00 }, "image/png");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Put.BadFormat_CantDecode);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Put.BadFormat_CantDecode);
                 }
 
                 {
                     var res = await client.PutByteArrayAsync("users/user/avatar", mockAvatar.Data, "image/jpeg");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Put.BadFormat_UnmatchedFormat);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Put.BadFormat_UnmatchedFormat);
                 }
 
                 {
                     var res = await client.PutByteArrayAsync("users/user/avatar", ImageHelper.CreatePngWithSize(100, 200), "image/png");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Put.BadFormat_BadSize);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Put.BadFormat_BadSize);
                 }
 
                 {
@@ -222,13 +221,13 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var res = await client.PutByteArrayAsync("users/admin/avatar", new[] { (byte)0x00 }, "image/png");
                     res.Should().HaveStatusCode(HttpStatusCode.Forbidden)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Put.Forbid);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Put.Forbid);
                 }
 
                 {
                     var res = await client.DeleteAsync("users/admin/avatar");
                     res.Should().HaveStatusCode(HttpStatusCode.Forbidden)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Delete.Forbid);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Delete.Forbid);
                 }
 
                 for (int i = 0; i < 2; i++) // double delete should work.
@@ -255,14 +254,14 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var res = await client.PutByteArrayAsync("users/usernotexist/avatar", new[] { (byte)0x00 }, "image/png");
                     res.Should().HaveStatusCode(400)
-                        .And.Should().HaveCommonBody()
+                        .And.HaveCommonBody()
                         .Which.Code.Should().Be(Put.UserNotExist);
                 }
 
                 {
                     var res = await client.DeleteAsync("users/usernotexist/avatar");
                     res.Should().HaveStatusCode(400)
-                        .And.Should().HaveCommonBody().Which.Code.Should().Be(Delete.UserNotExist);
+                        .And.HaveCommonBody().Which.Code.Should().Be(Delete.UserNotExist);
                 }
             }
 

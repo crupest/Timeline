@@ -117,28 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MessageContentTooBig" xml:space="preserve">
-    <value>请求体太大。它不能超过{0}.</value>
+  <data name="ExceptionNicknameTooLong" xml:space="preserve">
+    <value>Length of nickname can't be bigger than 10.</value>
   </data>
-  <data name="MessageContentUnmatchedLengthBigger" xml:space="preserve">
-    <value>实际的请求体长度比头中指示的大。</value>
+  <data name="LogEntityNicknameCreate" xml:space="preserve">
+    <value>A user_details entity has been created. User id is {0}. Nickname is {1}.</value>
   </data>
-  <data name="MessageContentUnmatchedLengthSmaller" xml:space="preserve">
-    <value>实际的请求体长度比头中指示的小。</value>
+  <data name="LogEntityNicknameSetNotNull" xml:space="preserve">
+    <value>Nickname of a user_details entity has been updated to a new value. User id is {0}. New value is {1}.</value>
   </data>
-  <data name="MessageDeleteDelete" xml:space="preserve">
-    <value>删除了一个项目。</value>
-  </data>
-  <data name="MessageDeleteNotExist" xml:space="preserve">
-    <value>要删除的项目不存在，什么都没有修改。</value>
-  </data>
-  <data name="MessageHeaderIfNonMatchBad" xml:space="preserve">
-    <value>请求头If-Non-Match格式不对。</value>
-  </data>
-  <data name="MessagePutCreate" xml:space="preserve">
-    <value>创建了一个新项目。</value>
-  </data>
-  <data name="MessagePutModify" xml:space="preserve">
-    <value>修改了一个已存在的项目。</value>
+  <data name="LogEntityNicknameSetToNull" xml:space="preserve">
+    <value>Nickname of a user_details entity has been updated to null. User id is {0}.</value>
   </data>
 </root>

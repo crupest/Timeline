@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Threading.Tasks;
-using Timeline.Authentication;
+using Timeline.Auth;
 using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Http;

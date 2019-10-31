@@ -132,17 +132,8 @@
   <data name="MessageDeleteNotExist" xml:space="preserve">
     <value>The item does not exist, so nothing is changed.</value>
   </data>
-  <data name="MessageHeaderBadIfNonMatch" xml:space="preserve">
+  <data name="MessageHeaderIfNonMatchBad" xml:space="preserve">
     <value>Header If-Non-Match is of bad format.</value>
-  </data>
-  <data name="MessageHeaderMissingContentLength" xml:space="preserve">
-    <value>Header Content-Length is missing or of bad format.</value>
-  </data>
-  <data name="MessageHeaderMissingContentType" xml:space="preserve">
-    <value>Header Content-Type is required.</value>
-  </data>
-  <data name="MessageHeaderZeroContentLength" xml:space="preserve">
-    <value>Header Content-Length must not be 0.</value>
   </data>
   <data name="MessagePutCreate" xml:space="preserve">
     <value>A new item is created.</value>

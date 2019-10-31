@@ -35,5 +35,17 @@ namespace Timeline.Tests.Helpers
             content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
             return client.PutAsync(url, content);
         }
+
+        public static Task<HttpResponseMessage> PutStringAsync(this HttpClient client, string url, string body, string mimeType = null)
+        {
+            return client.PutStringAsync(new Uri(url, UriKind.RelativeOrAbsolute), body, mimeType);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+        public static Task<HttpResponseMessage> PutStringAsync(this HttpClient client, Uri url, string body, string mimeType = null)
+        {
+            var content = new StringContent(body, Encoding.UTF8, mimeType ?? MediaTypeNames.Text.Plain);
+            return client.PutAsync(url, content);
+        }
     }
 }

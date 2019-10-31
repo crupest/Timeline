@@ -177,8 +177,6 @@ namespace Timeline.Services
 
         private readonly IETagGenerator _eTagGenerator;
 
-        private readonly UsernameValidator _usernameValidator;
-
         private readonly IClock _clock;
 
         public UserAvatarService(
@@ -194,13 +192,12 @@ namespace Timeline.Services
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
             _avatarValidator = avatarValidator;
             _eTagGenerator = eTagGenerator;
-            _usernameValidator = new UsernameValidator();
             _clock = clock;
         }
 
         public async Task<string> GetAvatarETag(string username)
         {
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
 
             var eTag = (await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.ETag }).SingleOrDefaultAsync())?.ETag;
             if (eTag == null)
@@ -211,7 +208,7 @@ namespace Timeline.Services
 
         public async Task<AvatarInfo> GetAvatar(string username)
         {
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
 
             var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.Type, a.Data, a.LastModified }).SingleOrDefaultAsync();
 
@@ -253,7 +250,7 @@ namespace Timeline.Services
                     throw new ArgumentException(Resources.Services.UserAvatarService.ExceptionAvatarTypeNullOrEmpty, nameof(avatar));
             }
 
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, _usernameValidator, username);
+            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
             var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
 
             if (avatar == null)

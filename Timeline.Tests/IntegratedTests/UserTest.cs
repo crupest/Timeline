@@ -36,7 +36,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await _factory.CreateClientAsAdmin();
             var res = await client.GetAsync("users");
             res.Should().HaveStatusCode(200)
-                .And.Should().HaveJsonBody<UserInfo[]>()
+                .And.HaveJsonBody<UserInfo[]>()
                 .Which.Should().BeEquivalentTo(MockUser.UserInfoList);
         }
 
@@ -46,7 +46,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await _factory.CreateClientAsAdmin();
             var res = await client.GetAsync("users/" + MockUser.User.Username);
             res.Should().HaveStatusCode(200)
-                .And.Should().HaveJsonBody<UserInfo>()
+                .And.HaveJsonBody<UserInfo>()
                 .Which.Should().BeEquivalentTo(MockUser.User.Info);
         }
 
@@ -64,7 +64,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await _factory.CreateClientAsAdmin();
             var res = await client.GetAsync("users/usernotexist");
             res.Should().HaveStatusCode(404)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Get.NotExist);
         }
 
@@ -89,7 +89,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             var res = await client.GetAsync("users/" + username);
             res.Should().HaveStatusCode(200)
-                .And.Should().HaveJsonBody<UserInfo>()
+                .And.HaveJsonBody<UserInfo>()
                 .Which.Administrator.Should().Be(administrator);
         }
 
@@ -128,7 +128,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await _factory.CreateClientAsAdmin();
             var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
             res.Should().HaveStatusCode(404)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Patch.NotExist);
         }
 
@@ -208,7 +208,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.PostAsJsonAsync(changeUsernameUrl,
                 new ChangeUsernameRequest { OldUsername = "usernotexist", NewUsername = "newUsername" });
             res.Should().HaveStatusCode(400)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Op.ChangeUsername.NotExist);
         }
 
@@ -219,7 +219,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.PostAsJsonAsync(changeUsernameUrl,
                 new ChangeUsernameRequest { OldUsername = MockUser.User.Username, NewUsername = MockUser.Admin.Username });
             res.Should().HaveStatusCode(400)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Op.ChangeUsername.AlreadyExist);
         }
 
@@ -258,7 +258,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await _factory.CreateClientAsUser();
             var res = await client.PostAsJsonAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
             res.Should().HaveStatusCode(400)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Op.ChangePassword.BadOldPassword);
         }
 

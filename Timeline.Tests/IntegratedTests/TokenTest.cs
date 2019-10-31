@@ -69,7 +69,7 @@ namespace Timeline.Tests.IntegratedTests
             var response = await client.PostAsJsonAsync(CreateTokenUrl,
                 new CreateTokenRequest { Username = username, Password = password });
             response.Should().HaveStatusCode(400)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Create.BadCredential);
         }
 
@@ -80,7 +80,7 @@ namespace Timeline.Tests.IntegratedTests
             var response = await client.PostAsJsonAsync(CreateTokenUrl,
                 new CreateTokenRequest { Username = MockUser.User.Username, Password = MockUser.User.Password });
             var body = response.Should().HaveStatusCode(200)
-               .And.Should().HaveJsonBody<CreateTokenResponse>().Which;
+               .And.HaveJsonBody<CreateTokenResponse>().Which;
             body.Token.Should().NotBeNullOrWhiteSpace();
             body.User.Should().BeEquivalentTo(MockUser.User.Info);
         }
@@ -100,7 +100,7 @@ namespace Timeline.Tests.IntegratedTests
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = "bad token hahaha" });
             response.Should().HaveStatusCode(400)
-                 .And.Should().HaveCommonBody()
+                 .And.HaveCommonBody()
                  .Which.Code.Should().Be(Verify.BadFormat);
         }
 
@@ -120,7 +120,7 @@ namespace Timeline.Tests.IntegratedTests
             (await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = token }))
                 .Should().HaveStatusCode(400)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Verify.OldVersion);
         }
 
@@ -139,7 +139,7 @@ namespace Timeline.Tests.IntegratedTests
             (await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = token }))
                 .Should().HaveStatusCode(400)
-                .And.Should().HaveCommonBody()
+                .And.HaveCommonBody()
                 .Which.Code.Should().Be(Verify.UserNotExist);
         }
 
@@ -169,7 +169,7 @@ namespace Timeline.Tests.IntegratedTests
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = createTokenResult.Token });
             response.Should().HaveStatusCode(200)
-                .And.Should().HaveJsonBody<VerifyTokenResponse>()
+                .And.HaveJsonBody<VerifyTokenResponse>()
                 .Which.User.Should().BeEquivalentTo(MockUser.User.Info);
         }
     }
