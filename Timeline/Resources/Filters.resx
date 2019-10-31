@@ -117,28 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MessageContentTooBig" xml:space="preserve">
-    <value>请求体太大。它不能超过{0}.</value>
+  <data name="LogSelfOrAdminNoUser" xml:space="preserve">
+    <value>You apply a SelfOrAdminAttribute on an action, but there is no user. Try add AuthorizeAttribute.</value>
   </data>
-  <data name="MessageContentUnmatchedLengthBigger" xml:space="preserve">
-    <value>实际的请求体长度比头中指示的大。</value>
+  <data name="LogSelfOrAdminNoUsername" xml:space="preserve">
+    <value>You apply a SelfOrAdminAttribute on an action, but it does not have a model named username.</value>
   </data>
-  <data name="MessageContentUnmatchedLengthSmaller" xml:space="preserve">
-    <value>实际的请求体长度比头中指示的小。</value>
+  <data name="LogSelfOrAdminUsernameNotString" xml:space="preserve">
+    <value>You apply a SelfOrAdminAttribute on an action, found a model named username, but it is not string.</value>
   </data>
-  <data name="MessageDeleteDelete" xml:space="preserve">
-    <value>删除了一个项目。</value>
+  <data name="MessageHeaderContentLengthMissing" xml:space="preserve">
+    <value>Header Content-Length is missing or of bad format.</value>
   </data>
-  <data name="MessageDeleteNotExist" xml:space="preserve">
-    <value>要删除的项目不存在，什么都没有修改。</value>
+  <data name="MessageHeaderContentLengthZero" xml:space="preserve">
+    <value>Header Content-Length must not be 0.</value>
   </data>
-  <data name="MessageHeaderIfNonMatchBad" xml:space="preserve">
-    <value>请求头If-Non-Match格式不对。</value>
+  <data name="MessageHeaderContentTypeMissing" xml:space="preserve">
+    <value>Header Content-Type is required.</value>
   </data>
-  <data name="MessagePutCreate" xml:space="preserve">
-    <value>创建了一个新项目。</value>
+  <data name="MessageSelfOrAdminForbid" xml:space="preserve">
+    <value>You can't access the resource unless you are the owner or administrator.</value>
   </data>
-  <data name="MessagePutModify" xml:space="preserve">
-    <value>修改了一个已存在的项目。</value>
+  <data name="MessageUserNotExist" xml:space="preserve">
+    <value>The user does not exist.</value>
   </data>
 </root>

@@ -27,24 +27,9 @@ namespace Timeline.Models.Http
 
     internal static class HeaderErrorResponse
     {
-        internal static CommonResponse MissingContentType()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.Missing_ContentType, MessageHeaderMissingContentType);
-        }
-
-        internal static CommonResponse MissingContentLength()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.Missing_ContentLength, MessageHeaderMissingContentLength);
-        }
-
-        internal static CommonResponse ZeroContentLength()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.Zero_ContentLength, MessageHeaderZeroContentLength);
-        }
-
         internal static CommonResponse BadIfNonMatch()
         {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.BadFormat_IfNonMatch, MessageHeaderBadIfNonMatch);
+            return new CommonResponse(ErrorCodes.Http.Common.Header.IfNonMatch.BadFormat, MessageHeaderIfNonMatchBad);
         }
     }
 

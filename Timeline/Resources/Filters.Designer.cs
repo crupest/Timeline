@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources.Models.Http {
+namespace Timeline.Resources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Timeline.Resources.Models.Http {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Common {
+    internal class Filters {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Common() {
+        internal Filters() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Models.Http {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Http.Common", typeof(Common).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Filters", typeof(Filters).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,74 +61,74 @@ namespace Timeline.Resources.Models.Http {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Body is too big. It can&apos;t be bigger than {0}..
+        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, but there is no user. Try add AuthorizeAttribute..
         /// </summary>
-        internal static string MessageContentTooBig {
+        internal static string LogSelfOrAdminNoUser {
             get {
-                return ResourceManager.GetString("MessageContentTooBig", resourceCulture);
+                return ResourceManager.GetString("LogSelfOrAdminNoUser", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Actual body length is bigger than it in header..
+        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, but it does not have a model named username..
         /// </summary>
-        internal static string MessageContentUnmatchedLengthBigger {
+        internal static string LogSelfOrAdminNoUsername {
             get {
-                return ResourceManager.GetString("MessageContentUnmatchedLengthBigger", resourceCulture);
+                return ResourceManager.GetString("LogSelfOrAdminNoUsername", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Actual body length is smaller than it in header..
+        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, found a model named username, but it is not string..
         /// </summary>
-        internal static string MessageContentUnmatchedLengthSmaller {
+        internal static string LogSelfOrAdminUsernameNotString {
             get {
-                return ResourceManager.GetString("MessageContentUnmatchedLengthSmaller", resourceCulture);
+                return ResourceManager.GetString("LogSelfOrAdminUsernameNotString", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An existent item is deleted..
+        ///   Looks up a localized string similar to Header Content-Length is missing or of bad format..
         /// </summary>
-        internal static string MessageDeleteDelete {
+        internal static string MessageHeaderContentLengthMissing {
             get {
-                return ResourceManager.GetString("MessageDeleteDelete", resourceCulture);
+                return ResourceManager.GetString("MessageHeaderContentLengthMissing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The item does not exist, so nothing is changed..
+        ///   Looks up a localized string similar to Header Content-Length must not be 0..
         /// </summary>
-        internal static string MessageDeleteNotExist {
+        internal static string MessageHeaderContentLengthZero {
             get {
-                return ResourceManager.GetString("MessageDeleteNotExist", resourceCulture);
+                return ResourceManager.GetString("MessageHeaderContentLengthZero", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Header If-Non-Match is of bad format..
+        ///   Looks up a localized string similar to Header Content-Type is required..
         /// </summary>
-        internal static string MessageHeaderIfNonMatchBad {
+        internal static string MessageHeaderContentTypeMissing {
             get {
-                return ResourceManager.GetString("MessageHeaderIfNonMatchBad", resourceCulture);
+                return ResourceManager.GetString("MessageHeaderContentTypeMissing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A new item is created..
+        ///   Looks up a localized string similar to You can&apos;t access the resource unless you are the owner or administrator..
         /// </summary>
-        internal static string MessagePutCreate {
+        internal static string MessageSelfOrAdminForbid {
             get {
-                return ResourceManager.GetString("MessagePutCreate", resourceCulture);
+                return ResourceManager.GetString("MessageSelfOrAdminForbid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An existent item is modified..
+        ///   Looks up a localized string similar to The user does not exist..
         /// </summary>
-        internal static string MessagePutModify {
+        internal static string MessageUserNotExist {
             get {
-                return ResourceManager.GetString("MessagePutModify", resourceCulture);
+                return ResourceManager.GetString("MessageUserNotExist", resourceCulture);
             }
         }
     }
