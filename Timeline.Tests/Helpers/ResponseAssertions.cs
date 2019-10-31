@@ -61,20 +61,20 @@ namespace Timeline.Tests.Helpers
 
         protected override string Identifier => "HttpResponseMessage";
 
-        public AndConstraint<HttpResponseMessage> HaveStatusCode(int expected, string because = "", params object[] becauseArgs)
+        public AndConstraint<HttpResponseMessageAssertions> HaveStatusCode(int expected, string because = "", params object[] becauseArgs)
         {
             return HaveStatusCode((HttpStatusCode)expected, because, becauseArgs);
         }
 
-        public AndConstraint<HttpResponseMessage> HaveStatusCode(HttpStatusCode expected, string because = "", params object[] becauseArgs)
+        public AndConstraint<HttpResponseMessageAssertions> HaveStatusCode(HttpStatusCode expected, string because = "", params object[] becauseArgs)
         {
             Execute.Assertion.BecauseOf(because, becauseArgs)
                 .ForCondition(Subject.StatusCode == expected)
                 .FailWith("Expected status code of {context:HttpResponseMessage} to be {0}{reason}, but found {1}.", expected, Subject.StatusCode);
-            return new AndConstraint<HttpResponseMessage>(Subject);
+            return new AndConstraint<HttpResponseMessageAssertions>(this);
         }
 
-        public AndWhichConstraint<HttpResponseMessage, T> HaveJsonBody<T>(string because = "", params object[] becauseArgs)
+        public AndWhichConstraint<HttpResponseMessageAssertions, T> HaveJsonBody<T>(string because = "", params object[] becauseArgs)
         {
             var a = Execute.Assertion.BecauseOf(because, becauseArgs);
             string body;
@@ -85,16 +85,11 @@ namespace Timeline.Tests.Helpers
             catch (AggregateException e)
             {
                 a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string{reason}, but failed to read it or it was not a string. Exception is {0}.", e.InnerExceptions);
-                return new AndWhichConstraint<HttpResponseMessage, T>(Subject, null);
+                return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, null);
             }
 
             var result = JsonConvert.DeserializeObject<T>(body);
-            return new AndWhichConstraint<HttpResponseMessage, T>(Subject, result);
-        }
-
-        internal void HaveStatusCode(object statusCode)
-        {
-            throw new NotImplementedException();
+            return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, result);
         }
     }
 
@@ -105,12 +100,12 @@ namespace Timeline.Tests.Helpers
             return new HttpResponseMessageAssertions(instance);
         }
 
-        public static AndWhichConstraint<HttpResponseMessage, CommonResponse> HaveCommonBody(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static AndWhichConstraint<HttpResponseMessageAssertions, CommonResponse> HaveCommonBody(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
             return assertions.HaveJsonBody<CommonResponse>(because, becauseArgs);
         }
 
-        public static AndWhichConstraint<HttpResponseMessage, CommonDataResponse<TData>> HaveCommonDataBody<TData>(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static AndWhichConstraint<HttpResponseMessageAssertions, CommonDataResponse<TData>> HaveCommonDataBody<TData>(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
             return assertions.HaveJsonBody<CommonDataResponse<TData>>(because, becauseArgs);
         }
@@ -118,7 +113,7 @@ namespace Timeline.Tests.Helpers
         public static void BePut(this HttpResponseMessageAssertions assertions, bool create, string because = "", params object[] becauseArgs)
         {
             var body = assertions.HaveStatusCode(create ? 201 : 200, because, becauseArgs)
-                .And.Should().HaveJsonBody<CommonPutResponse>(because, becauseArgs)
+                .And.HaveJsonBody<CommonPutResponse>(because, becauseArgs)
                 .Which;
             body.Code.Should().Be(0);
             body.Data.Create.Should().Be(create);
@@ -127,7 +122,7 @@ namespace Timeline.Tests.Helpers
         public static void BeDelete(this HttpResponseMessageAssertions assertions, bool delete, string because = "", params object[] becauseArgs)
         {
             var body = assertions.HaveStatusCode(200, because, becauseArgs)
-                .And.Should().HaveJsonBody<CommonDeleteResponse>(because, becauseArgs)
+                .And.HaveJsonBody<CommonDeleteResponse>(because, becauseArgs)
                 .Which;
             body.Code.Should().Be(0);
             body.Data.Delete.Should().Be(delete);
@@ -137,7 +132,7 @@ namespace Timeline.Tests.Helpers
         {
             message = string.IsNullOrEmpty(message) ? "" : ", " + message;
             assertions.HaveStatusCode(400, "Invalid Model Error must have 400 status code{0}", message)
-                .And.Should().HaveCommonBody("Invalid Model Error must have CommonResponse body{0}", message)
+                .And.HaveCommonBody("Invalid Model Error must have CommonResponse body{0}", message)
                 .Which.Code.Should().Be(ErrorCodes.Http.Common.InvalidModel,
                 "Invalid Model Error must have code {0} in body{1}",
                 ErrorCodes.Http.Common.InvalidModel, message);
