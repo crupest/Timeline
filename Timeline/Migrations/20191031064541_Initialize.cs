@@ -85,6 +85,7 @@ namespace Timeline.Migrations
                 column: "name",
                 unique: true);
 
+            // Add a init user. Username is "administrator". Password is "crupest".
             migrationBuilder.InsertData("users", new string[] { "name", "password", "roles" },
                 new object[] { "administrator", "AQAAAAEAACcQAAAAENsspZrk8Wo+UuMyg6QuWJsNvRg6gVu4K/TumVod3h9GVLX9zDVuQQds3o7V8QWJ2w==", "user,admin" });
         }
