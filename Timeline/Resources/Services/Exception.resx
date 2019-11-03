@@ -186,6 +186,18 @@
   <data name="JwtVerifyExceptionVersionClaimBadFormat" xml:space="preserve">
     <value>version claim is not a number.</value>
   </data>
+  <data name="TimelineMemberOperationException" xml:space="preserve">
+    <value>An exception happened when add or remove member on timeline.</value>
+  </data>
+  <data name="TimelineMemberOperationExceptionIndex" xml:space="preserve">
+    <value>An exception happened when operating on the {} member on timeline.</value>
+  </data>
+  <data name="TimelineNameBadFormatException" xml:space="preserve">
+    <value>Timeline name is of bad format. If this is a personal timeline, it means the username is of bad format and inner exception should be a UsernameBadFormatException.</value>
+  </data>
+  <data name="TimelineNotExistException" xml:space="preserve">
+    <value>Timeline does not exist. If this is a personal timeline, it means the user does not exist and inner exception should be a UserNotExistException.</value>
+  </data>
   <data name="UsernameBadFormatException" xml:space="preserve">
     <value>The username is of bad format.</value>
   </data>
