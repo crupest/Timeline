@@ -61,7 +61,7 @@ namespace Timeline.Services
         /// </exception>
         /// <exception cref="UsernameBadFormatException">Thrown if <paramref name="author"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown if <paramref name="author"/> does not exist.</exception>
-        Task<long> Post(string name, string author, string content, DateTime? time);
+        Task<long> CreatePost(string name, string author, string content, DateTime? time);
 
         /// <summary>
         /// Set the visibility permission of a timeline. 
@@ -104,37 +104,11 @@ namespace Timeline.Services
         Task SetDescription(string name, string description);
 
         /// <summary>
-        /// Add members to a timeline.
-        /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="usernames">A list of new members' usernames</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="usernames"/> is null.</exception>
-        /// <exception cref="TimelineNameBadFormatException">
-        /// Thrown when timeline name is of bad format.
-        /// For normal timeline, it means name is an empty string.
-        /// For personal timeline, it means the username is of bad format,
-        /// the inner exception should be a <see cref="UsernameBadFormatException"/>.
-        /// </exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
-        /// <exception cref="TimelineMemberOperationUserException">
-        /// Thrown when an exception occurs on users in the list.
-        /// The inner exception is <see cref="UsernameBadFormatException"/>
-        /// when one of the username is not valid.
-        /// The inner exception is <see cref="UserNotExistException"/>
-        /// when one of the user does not exist.
-        /// </exception>
-        Task AddMember(string name, IList<string> usernames);
-
-        /// <summary>
         /// Remove members to a timeline.
         /// </summary>
         /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="usernames">A list of members' usernames</param>
+        /// <param name="add">A list of usernames of members to add. May be null.</param>
+        /// <param name="remove">A list of usernames of members to remove. May be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
         /// <exception cref="TimelineNameBadFormatException">
         /// Thrown when timeline name is of bad format.
@@ -152,10 +126,64 @@ namespace Timeline.Services
         /// Thrown when an exception occurs on the user list.
         /// The inner exception is <see cref="UsernameBadFormatException"/>
         /// when one of the username is invalid.
-        /// The inner exception is <see cref="TimelineUserNotMemberException"/>
-        /// when one of the user is not a member of the timeline.
+        /// The inner exception is <see cref="UserNotExistException"/>
+        /// when one of the user to add does not exist.
         /// </exception>
-        Task RemoveMember(string name, IList<string> usernames);
+        /// <remarks>
+        /// Operating on a username that is of bad format always throws.
+        /// Add a user that already is a member has no effects.
+        /// Remove a user that is not a member also has not effects.
+        /// Add a user that does not exist will throw <see cref="TimelineMemberOperationUserException"/>.
+        /// But remove one does not throw.
+        /// </remarks>
+        Task ChangeMember(string name, IList<string>? add, IList<string>? remove);
+
+        /// <summary>
+        /// Verify whether a visitor has the permission to read a timeline.
+        /// </summary>
+        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="username">The user to check on. Null means visitor without account.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="TimelineNameBadFormatException">
+        /// Thrown when timeline name is of bad format.
+        /// For normal timeline, it means name is an empty string.
+        /// For personal timeline, it means the username is of bad format,
+        /// the inner exception should be a <see cref="UsernameBadFormatException"/>.
+        /// </exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline does not exist.
+        /// For normal timeline, it means the name does not exist.
+        /// For personal timeline, it means the user of that username does not exist
+        /// and the inner exception should be a <see cref="UserNotExistException"/>.
+        /// </exception>
+        /// <returns>True if can read, false if can't read.</returns>
+        Task<bool> HasReadPermission(string name, string? username);
+
+        /// <summary>
+        /// Verify whether a user is member of a timeline.
+        /// </summary>
+        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="username">The user to check on.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="username"/> is null.</exception>
+        /// <exception cref="TimelineNameBadFormatException">
+        /// Thrown when timeline name is of bad format.
+        /// For normal timeline, it means name is an empty string.
+        /// For personal timeline, it means the username is of bad format,
+        /// the inner exception should be a <see cref="UsernameBadFormatException"/>.
+        /// </exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline does not exist.
+        /// For normal timeline, it means the name does not exist.
+        /// For personal timeline, it means the user of that username does not exist
+        /// and the inner exception should be a <see cref="UserNotExistException"/>.
+        /// </exception>
+        /// <exception cref="UsernameBadFormatException">
+        /// Thrown when <paramref name="username"/> is not a valid username.
+        /// </exception>
+        /// <exception cref="UserNotExistException">
+        /// Thrown when user <paramref name="username"/> does not exist.</exception>
+        /// <returns>True if it is a member, false if not.</returns>
+        Task<bool> IsMemberOf(string name, string username);
     }
 
     /// <summary>
