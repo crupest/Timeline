@@ -268,6 +268,15 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The timeline with that name already exists..
+        /// </summary>
+        internal static string TimelineAlreadyExistException {
+            get {
+                return ResourceManager.GetString("TimelineAlreadyExistException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An exception happened when add or remove member on timeline..
         /// </summary>
         internal static string TimelineMemberOperationException {
@@ -300,6 +309,15 @@ namespace Timeline.Resources.Services {
         internal static string TimelineNotExistException {
             get {
                 return ResourceManager.GetString("TimelineNotExistException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The use is not a member of the timeline..
+        /// </summary>
+        internal static string TimelineUserNotMemberException {
+            get {
+                return ResourceManager.GetString("TimelineUserNotMemberException", resourceCulture);
             }
         }
         
