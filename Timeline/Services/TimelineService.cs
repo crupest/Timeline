@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
@@ -8,25 +7,6 @@ using Timeline.Models;
 
 namespace Timeline.Services
 {
-
-    [Serializable]
-    public class TimelineMemberOperationException : Exception
-    {
-        public TimelineMemberOperationException() : base(Resources.Services.Exception.TimelineMemberOperationException) { }
-        public TimelineMemberOperationException(string message) : base(message) { }
-        public TimelineMemberOperationException(string message, Exception inner) : base(message, inner) { }
-        protected TimelineMemberOperationException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        public TimelineMemberOperationException(int index, Exception inner) : base(MakeIndexMessage(index), inner) { Index = index; }
-
-        private static string MakeIndexMessage(int index) => string.Format(CultureInfo.CurrentCulture,
-            Resources.Services.Exception.TimelineMemberOperationExceptionIndex, index);
-
-        public int? Index { get; set; }
-    }
-
     /// <summary>
     /// This define the common interface of both personal timeline
     /// and normal timeline.
@@ -141,8 +121,12 @@ namespace Timeline.Services
         /// For personal timeline, it means the user of that username does not exist
         /// and the inner exception should be a <see cref="UserNotExistException"/>.
         /// </exception>
-        /// <exception cref="TimelineMemberOperationException">
-        /// TODO! complete this documents.
+        /// <exception cref="TimelineMemberOperationUserException">
+        /// Thrown when an exception occurs on users in the list.
+        /// The inner exception is <see cref="UsernameBadFormatException"/>
+        /// when one of the username is not valid.
+        /// The inner exception is <see cref="UserNotExistException"/>
+        /// when one of the user does not exist.
         /// </exception>
         Task AddMember(string name, IList<string> usernames);
 
@@ -164,6 +148,13 @@ namespace Timeline.Services
         /// For personal timeline, it means the user of that username does not exist
         /// and the inner exception should be a <see cref="UserNotExistException"/>.
         /// </exception>
+        /// <exception cref="TimelineMemberOperationUserException">
+        /// Thrown when an exception occurs on the user list.
+        /// The inner exception is <see cref="UsernameBadFormatException"/>
+        /// when one of the username is invalid.
+        /// The inner exception is <see cref="TimelineUserNotMemberException"/>
+        /// when one of the user is not a member of the timeline.
+        /// </exception>
         Task RemoveMember(string name, IList<string> usernames);
     }
 
@@ -177,6 +168,13 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="name">The name of the timeline.</param>
         /// <returns>The timeline info.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="TimelineNameBadFormatException">
+        /// Thrown when timeline name is invalid. Currently it means it is an empty string.
+        /// </exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with the name does not exist.
+        /// </exception>
         Task<TimelineInfo> GetTimeline(string name);
 
         /// <summary>
@@ -184,6 +182,18 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="name">The name of the timeline.</param>
         /// <param name="owner">The owner of the timeline.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="owner"/> is null.</exception>
+        /// <exception cref="TimelineNameBadFormatException">
+        /// Thrown when timeline name is invalid. Currently it means it is an empty string.
+        /// </exception>
+        /// <exception cref="TimelineAlreadyExistException">
+        /// Thrown when the timeline already exists.
+        /// </exception>
+        /// <exception cref="UsernameBadFormatException">
+        /// Thrown when the username of the owner is not valid.
+        /// </exception>
+        /// <exception cref="UserNotExistException">
+        /// Thrown when the owner user does not exist.</exception>
         Task CreateTimeline(string name, string owner);
     }
 
@@ -194,6 +204,15 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="username">The username of the owner of the personal timeline.</param>
         /// <returns>The timeline info.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="username"/> is null.
+        /// </exception>
+        /// <exception cref="TimelineNameBadFormatException">
+        /// Thrown when <paramref name="username"/> is of bad format. Inner exception MUST be <see cref="UsernameBadFormatException"/>.
+        /// </exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when the user does not exist. Inner exception MUST be <see cref="UserNotExistException"/>.
+        /// </exception>
         Task<BaseTimelineInfo> GetTimeline(string username);
     }
 }
