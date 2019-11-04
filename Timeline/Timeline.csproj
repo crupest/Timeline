@@ -49,6 +49,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>TestingI18nController.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Controllers\TimelineController.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>TimelineController.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Controllers\TokenController.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -118,6 +123,10 @@
       <EmbeddedResource Update="Resources\Controllers\Testing\TestingI18nController.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>TestingI18nController.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Controllers\TimelineController.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>TimelineController.Designer.cs</LastGenOutput>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Controllers\TokenController.resx">
         <SubType>Designer</SubType>
