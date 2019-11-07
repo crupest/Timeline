@@ -129,6 +129,12 @@
   <data name="MessageSelfOrAdminForbid" xml:space="preserve">
     <value>你无权访问该资源除非你是资源的拥有者或者管理员。</value>
   </data>
+  <data name="MessageTimelineNotExist" xml:space="preserve">
+    <value>请求的时间线不存在。</value>
+  </data>
+  <data name="MessageTimelineNotExistUser" xml:space="preserve">
+    <value>请求的个人时间线不存在因为该用户不存在。</value>
+  </data>
   <data name="MessageUserNotExist" xml:space="preserve">
     <value>用户不存在。</value>
   </data>

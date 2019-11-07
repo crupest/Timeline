@@ -124,6 +124,24 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The requested timeline does not exist..
+        /// </summary>
+        internal static string MessageTimelineNotExist {
+            get {
+                return ResourceManager.GetString("MessageTimelineNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested personal timeline does not exist because the user does not exist..
+        /// </summary>
+        internal static string MessageTimelineNotExistUser {
+            get {
+                return ResourceManager.GetString("MessageTimelineNotExistUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user does not exist..
         /// </summary>
         internal static string MessageUserNotExist {

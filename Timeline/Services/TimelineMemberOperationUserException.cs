@@ -6,6 +6,12 @@ namespace Timeline.Services
     [Serializable]
     public class TimelineMemberOperationUserException : Exception
     {
+        public enum MemberOperation
+        {
+            Add,
+            Remove
+        }
+
         public TimelineMemberOperationUserException() : base(Resources.Services.Exception.TimelineMemberOperationException) { }
         public TimelineMemberOperationUserException(string message) : base(message) { }
         public TimelineMemberOperationUserException(string message, Exception inner) : base(message, inner) { }
@@ -13,10 +19,13 @@ namespace Timeline.Services
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        public TimelineMemberOperationUserException(int index, string username, Exception inner) : base(MakeIndexMessage(index), inner) { Index = index; Username = username; }
+        public TimelineMemberOperationUserException(int index, MemberOperation operation, string username, Exception inner)
+            : base(MakeMessage(operation, index), inner) { Operation = operation; Index = index; Username = username; }
 
-        private static string MakeIndexMessage(int index) => string.Format(CultureInfo.CurrentCulture,
-            Resources.Services.Exception.TimelineMemberOperationExceptionIndex, index);
+        private static string MakeMessage(MemberOperation operation, int index) => string.Format(CultureInfo.CurrentCulture,
+            Resources.Services.Exception.TimelineMemberOperationExceptionDetail, operation, index);
+
+        public MemberOperation? Operation { get; set; }
 
         /// <summary>
         /// The index of the member on which the operation failed.

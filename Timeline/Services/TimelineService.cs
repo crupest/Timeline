@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
+using Timeline.Models.Http;
 
 namespace Timeline.Services
 {
@@ -45,7 +46,7 @@ namespace Timeline.Services
         /// <param name="author">The author's username.</param>
         /// <param name="content">The content.</param>
         /// <param name="time">The time of the post. If null, then use current time.</param>
-        /// <returns></returns>
+        /// <returns>The info of the created post.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="author"/> or <paramref name="content"/> is null.</exception>
         /// <exception cref="TimelineNameBadFormatException">
         /// Thrown when timeline name is of bad format.
@@ -61,14 +62,14 @@ namespace Timeline.Services
         /// </exception>
         /// <exception cref="UsernameBadFormatException">Thrown if <paramref name="author"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown if <paramref name="author"/> does not exist.</exception>
-        Task<long> CreatePost(string name, string author, string content, DateTime? time);
+        Task<TimelinePostCreateResponse> CreatePost(string name, string author, string content, DateTime? time);
 
         /// <summary>
-        /// Set the visibility permission of a timeline. 
+        /// Delete a post
         /// </summary>
         /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="visibility">The new visibility.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <param name="id">The id of the post to delete.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="username"/> is null.</exception>
         /// <exception cref="TimelineNameBadFormatException">
         /// Thrown when timeline name is of bad format.
         /// For normal timeline, it means name is an empty string.
@@ -81,14 +82,21 @@ namespace Timeline.Services
         /// For personal timeline, it means the user of that username does not exist
         /// and the inner exception should be a <see cref="UserNotExistException"/>.
         /// </exception>
-        Task SetVisibility(string name, TimelineVisibility visibility);
+        /// <exception cref="TimelinePostNotExistException">
+        /// Thrown when the post with given id does not exist or is deleted already.
+        /// </exception>
+        /// <remarks>
+        /// First use <see cref="IBaseTimelineService.HasPostModifyPermission(string, long, string)"/>
+        /// to check the permission.
+        /// </remarks>
+        Task DeletePost(string name, long id);
 
         /// <summary>
-        /// Set the description of a timeline.
+        /// Set the properties of a timeline. 
         /// </summary>
         /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="description">The new description.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="description"/> is null.</exception>
+        /// <param name="newProperties">The new properties. Null member means not to change.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="newProperties"/> is null.</exception>
         /// <exception cref="TimelineNameBadFormatException">
         /// Thrown when timeline name is of bad format.
         /// For normal timeline, it means name is an empty string.
@@ -101,7 +109,7 @@ namespace Timeline.Services
         /// For personal timeline, it means the user of that username does not exist
         /// and the inner exception should be a <see cref="UserNotExistException"/>.
         /// </exception>
-        Task SetDescription(string name, string description);
+        Task ChangeProperty(string name, TimelinePropertyChangeRequest newProperties);
 
         /// <summary>
         /// Remove members to a timeline.
@@ -158,6 +166,40 @@ namespace Timeline.Services
         /// </exception>
         /// <returns>True if can read, false if can't read.</returns>
         Task<bool> HasReadPermission(string name, string? username);
+
+        /// <summary>
+        /// Verify whether a user has the permission to modify a post.
+        /// </summary>
+        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="username">The user to check on.</param>
+        /// <returns>True if can modify, false if can't modify.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="username"/> is null.</exception>
+        /// <exception cref="TimelineNameBadFormatException">
+        /// Thrown when timeline name is of bad format.
+        /// For normal timeline, it means name is an empty string.
+        /// For personal timeline, it means the username is of bad format,
+        /// the inner exception should be a <see cref="UsernameBadFormatException"/>.
+        /// </exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline does not exist.
+        /// For normal timeline, it means the name does not exist.
+        /// For personal timeline, it means the user of that username does not exist
+        /// and the inner exception should be a <see cref="UserNotExistException"/>.
+        /// </exception>
+        /// <exception cref="TimelinePostNotExistException">
+        /// Thrown when the post with given id does not exist or is deleted already.
+        /// </exception>
+        /// <exception cref="UsernameBadFormatException">
+        /// Thrown when <paramref name="username"/> is of bad format.
+        /// </exception>
+        /// <exception cref="UserNotExistException">
+        /// Thrown when <paramref name="username"/> does not exist.
+        /// </exception>
+        /// <remarks>
+        /// This method does not check whether the user is administrator.
+        /// It only checks whether he is the author of the post or the owner of the timeline.
+        /// </remarks>
+        Task<bool> HasPostModifyPermission(string name, long id, string username);
 
         /// <summary>
         /// Verify whether a user is member of a timeline.

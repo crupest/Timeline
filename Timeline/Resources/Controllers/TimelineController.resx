@@ -120,6 +120,15 @@
   <data name="ExceptionStringToVisibility" xml:space="preserve">
     <value>An unknown timeline visibility value. Can't convert it.</value>
   </data>
+  <data name="LogUnknownTimelineMemberOperationUserException" xml:space="preserve">
+    <value>An unknown TimelineMemberOperationUserException is thrown. Can't recognize its inner exception. It is rethrown.</value>
+  </data>
+  <data name="MessageMemberUsernameBadFormat" xml:space="preserve">
+    <value>The {0}-st username to do operation {1} on is of bad format.</value>
+  </data>
+  <data name="MessageMemberUserNotExist" xml:space="preserve">
+    <value>The {0}-st user to do operation {1} on does not exist.</value>
+  </data>
   <data name="MessagePostsCreateForbid" xml:space="preserve">
     <value>You have no permission to create posts in the timeline.</value>
   </data>

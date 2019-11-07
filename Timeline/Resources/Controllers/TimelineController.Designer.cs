@@ -70,6 +70,33 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unknown TimelineMemberOperationUserException is thrown. Can&apos;t recognize its inner exception. It is rethrown..
+        /// </summary>
+        internal static string LogUnknownTimelineMemberOperationUserException {
+            get {
+                return ResourceManager.GetString("LogUnknownTimelineMemberOperationUserException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0}-st username to do operation {1} on is of bad format..
+        /// </summary>
+        internal static string MessageMemberUsernameBadFormat {
+            get {
+                return ResourceManager.GetString("MessageMemberUsernameBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0}-st user to do operation {1} on does not exist..
+        /// </summary>
+        internal static string MessageMemberUserNotExist {
+            get {
+                return ResourceManager.GetString("MessageMemberUserNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have no permission to create posts in the timeline..
         /// </summary>
         internal static string MessagePostsCreateForbid {

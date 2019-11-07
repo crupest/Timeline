@@ -286,11 +286,11 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An exception happened when operating on the {} member on timeline..
+        ///   Looks up a localized string similar to An exception happened when do operation {} on the {} member on timeline..
         /// </summary>
-        internal static string TimelineMemberOperationExceptionIndex {
+        internal static string TimelineMemberOperationExceptionDetail {
             get {
-                return ResourceManager.GetString("TimelineMemberOperationExceptionIndex", resourceCulture);
+                return ResourceManager.GetString("TimelineMemberOperationExceptionDetail", resourceCulture);
             }
         }
         
@@ -309,6 +309,15 @@ namespace Timeline.Resources.Services {
         internal static string TimelineNotExistException {
             get {
                 return ResourceManager.GetString("TimelineNotExistException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The timeline post does not exist. You can&apos;t do operation on it..
+        /// </summary>
+        internal static string TimelinePostNotExistException {
+            get {
+                return ResourceManager.GetString("TimelinePostNotExistException", resourceCulture);
             }
         }
         
