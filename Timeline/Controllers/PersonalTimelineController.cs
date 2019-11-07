@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Globalization;
 using System.Threading.Tasks;
 using Timeline.Auth;
-using Timeline.Entities;
 using Timeline.Filters;
 using Timeline.Models;
 using Timeline.Models.Http;
@@ -25,6 +23,7 @@ namespace Timeline
             {
                 public const int PostsGetForbid = 10040101;
                 public const int PostsCreateForbid = 10040102;
+                public const int MemberAddNotExist = 10040201;
             }
         }
     }
@@ -35,6 +34,8 @@ namespace Timeline.Controllers
     [ApiController]
     public class PersonalTimelineController : Controller
     {
+        private readonly ILogger<PersonalTimelineController> _logger;
+
         private readonly IPersonalTimelineService _service;
 
         private bool IsAdmin()
@@ -58,18 +59,21 @@ namespace Timeline.Controllers
             }
         }
 
-        public PersonalTimelineController(IPersonalTimelineService service)
+        public PersonalTimelineController(ILogger<PersonalTimelineController> logger, IPersonalTimelineService service)
         {
+            _logger = logger;
             _service = service;
         }
 
         [HttpGet("users/{username}/timeline")]
+        [CatchTimelineNotExistException]
         public async Task<ActionResult<BaseTimelineInfo>> TimelineGet([FromRoute][Username] string username)
         {
             return await _service.GetTimeline(username);
         }
 
         [HttpGet("users/{username}/timeline/posts")]
+        [CatchTimelineNotExistException]
         public async Task<ActionResult<IList<TimelinePostInfo>>> PostsGet([FromRoute][Username] string username)
         {
             if (!IsAdmin() && !await _service.HasReadPermission(username, GetAuthUsername()))
@@ -81,9 +85,10 @@ namespace Timeline.Controllers
             return await _service.GetPosts(username);
         }
 
-        [HttpPost("user/{username}/timeline/posts/create")]
+        [HttpPost("user/{username}/timeline/postop/create")]
         [Authorize]
-        public async Task<ActionResult> PostsCreate([FromRoute][Username] string username, [FromBody] TimelinePostCreateRequest body)
+        [CatchTimelineNotExistException]
+        public async Task<ActionResult<TimelinePostCreateResponse>> TimelinePost([FromRoute][Username] string username, [FromBody] TimelinePostCreateRequest body)
         {
             if (!IsAdmin() && !await _service.IsMemberOf(username, GetAuthUsername()!))
             {
@@ -91,51 +96,62 @@ namespace Timeline.Controllers
                     new CommonResponse(ErrorCodes.Http.Timeline.PostsCreateForbid, MessagePostsCreateForbid));
             }
 
-            await _service.CreatePost(username, User.Identity.Name!, body.Content, body.Time);
+            var res = await _service.CreatePost(username, User.Identity.Name!, body.Content, body.Time);
+            return res;
+        }
+
+        [HttpPost("user/{username}/timeline/postop/delete")]
+        [Authorize]
+        [CatchTimelineNotExistException]
+        public async Task<ActionResult> TimelinePostDelete([FromRoute][Username] string username, [FromBody] TimelinePostDeleteRequest body)
+        {
+            var postId = body.Id!.Value;
+            if (!IsAdmin() && !await _service.HasPostModifyPermission(username, postId, GetAuthUsername()!))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden,
+                    new CommonResponse(ErrorCodes.Http.Timeline.PostsCreateForbid, MessagePostsCreateForbid));
+            }
+            await _service.DeletePost(username, postId);
             return Ok();
         }
 
-        [HttpPut("user/{username}/timeline/description")]
+        [HttpPost("user/{username}/timeline/op/property")]
         [Authorize]
         [SelfOrAdmin]
-        public async Task<ActionResult> TimelinePutDescription([FromRoute][Username] string username, [FromBody] string body)
+        [CatchTimelineNotExistException]
+        public async Task<ActionResult> TimelineChangeProperty([FromRoute][Username] string username, [FromBody] TimelinePropertyChangeRequest body)
         {
-            await _service.SetDescription(username, body);
+            await _service.ChangeProperty(username, body);
             return Ok();
         }
 
-        private static TimelineVisibility StringToVisibility(string s)
-        {
-            if ("public".Equals(s, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return TimelineVisibility.Public;
-            }
-            else if ("register".Equals(s, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return TimelineVisibility.Register;
-            }
-            else if ("private".Equals(s, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return TimelineVisibility.Private;
-            }
-            throw new ArgumentException(ExceptionStringToVisibility);
-        }
-
-        [HttpPut("user/{username}/timeline/visibility")]
+        [HttpPost("user/{username}/timeline/op/member")]
         [Authorize]
         [SelfOrAdmin]
-        public async Task<ActionResult> TimelinePutVisibility([FromRoute][Username] string username, [FromBody][RegularExpression("public|register|private")] string body)
+        [CatchTimelineNotExistException]
+        public async Task<ActionResult> TimelineChangeMember([FromRoute][Username] string username, [FromBody] TimelineMemberChangeRequest body)
         {
-            await _service.SetVisibility(username, StringToVisibility(body));
-            return Ok();
-        }
+            try
+            {
+                await _service.ChangeMember(username, body.Add, body.Remove);
+                return Ok();
+            }
+            catch (TimelineMemberOperationUserException e)
+            {
+                if (e.InnerException is UsernameBadFormatException)
+                {
+                    return BadRequest(CommonResponse.InvalidModel(
+                        string.Format(CultureInfo.CurrentCulture, MessageMemberUsernameBadFormat, e.Index, e.Operation)));
+                }
+                else if (e.InnerException is UserNotExistException)
+                {
+                    return BadRequest(new CommonResponse(ErrorCodes.Http.Timeline.MemberAddNotExist,
+                        string.Format(CultureInfo.CurrentCulture, MessageMemberUserNotExist, e.Index, e.Operation)));
+                }
 
-        [HttpPost("user/{username}/timeline/members/change")]
-        [Authorize]
-        [SelfOrAdmin]
-        public async Task<ActionResult> TimelineMembersChange([FromRoute][Username] string username, [FromBody] TimelineMemberChangeRequest body)
-        {
-            //TODO!
+                _logger.LogError(e, LogUnknownTimelineMemberOperationUserException);
+                throw;
+            }
         }
     }
 }
