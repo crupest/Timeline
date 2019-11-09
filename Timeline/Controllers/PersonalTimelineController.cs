@@ -74,7 +74,7 @@ namespace Timeline.Controllers
 
         [HttpGet("users/{username}/timeline/posts")]
         [CatchTimelineNotExistException]
-        public async Task<ActionResult<IList<TimelinePostInfo>>> PostsGet([FromRoute][Username] string username)
+        public async Task<ActionResult<IList<TimelinePostInfo>>> PostListGet([FromRoute][Username] string username)
         {
             if (!IsAdmin() && !await _service.HasReadPermission(username, GetAuthUsername()))
             {
@@ -88,7 +88,7 @@ namespace Timeline.Controllers
         [HttpPost("user/{username}/timeline/postop/create")]
         [Authorize]
         [CatchTimelineNotExistException]
-        public async Task<ActionResult<TimelinePostCreateResponse>> TimelinePost([FromRoute][Username] string username, [FromBody] TimelinePostCreateRequest body)
+        public async Task<ActionResult<TimelinePostCreateResponse>> PostOperationCreate([FromRoute][Username] string username, [FromBody] TimelinePostCreateRequest body)
         {
             if (!IsAdmin() && !await _service.IsMemberOf(username, GetAuthUsername()!))
             {
@@ -103,7 +103,7 @@ namespace Timeline.Controllers
         [HttpPost("user/{username}/timeline/postop/delete")]
         [Authorize]
         [CatchTimelineNotExistException]
-        public async Task<ActionResult> TimelinePostDelete([FromRoute][Username] string username, [FromBody] TimelinePostDeleteRequest body)
+        public async Task<ActionResult> PostOperationDelete([FromRoute][Username] string username, [FromBody] TimelinePostDeleteRequest body)
         {
             var postId = body.Id!.Value;
             if (!IsAdmin() && !await _service.HasPostModifyPermission(username, postId, GetAuthUsername()!))

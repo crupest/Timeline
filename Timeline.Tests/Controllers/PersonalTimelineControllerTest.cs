@@ -65,14 +65,14 @@ namespace Timeline.Tests.Controllers
             }
 
             {
-                var m = type.GetMethod(nameof(PersonalTimelineController.PostsGet));
+                var m = type.GetMethod(nameof(PersonalTimelineController.PostListGet));
                 m.Should().BeDecoratedWith<CatchTimelineNotExistExceptionAttribute>()
                     .And.BeDecoratedWith<HttpGetAttribute>();
                 AssertUsernameParameter(m);
             }
 
             {
-                var m = type.GetMethod(nameof(PersonalTimelineController.TimelinePost));
+                var m = type.GetMethod(nameof(PersonalTimelineController.PostOperationCreate));
                 m.Should().BeDecoratedWith<CatchTimelineNotExistExceptionAttribute>()
                     .And.BeDecoratedWith<AuthorizeAttribute>()
                     .And.BeDecoratedWith<HttpPostAttribute>();
@@ -81,7 +81,7 @@ namespace Timeline.Tests.Controllers
             }
 
             {
-                var m = type.GetMethod(nameof(PersonalTimelineController.TimelinePostDelete));
+                var m = type.GetMethod(nameof(PersonalTimelineController.PostOperationDelete));
                 m.Should().BeDecoratedWith<CatchTimelineNotExistExceptionAttribute>()
                     .And.BeDecoratedWith<AuthorizeAttribute>()
                     .And.BeDecoratedWith<HttpPostAttribute>();
@@ -133,40 +133,107 @@ namespace Timeline.Tests.Controllers
         }
 
         [Fact]
-        public async Task PostsGet_Forbid()
+        public async Task PostListGet_Forbid()
         {
             const string username = "username";
             SetUser(false);
             _service.Setup(s => s.HasReadPermission(username, authUsername)).ReturnsAsync(false);
-            (await _controller.PostsGet(username)).Result
+            var result = (await _controller.PostListGet(username)).Result
                 .Should().BeAssignableTo<ObjectResult>()
-                .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostsGetForbid);
+                .Which;
+            result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+            result.Value.Should().BeAssignableTo<CommonResponse>()
+            .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostsGetForbid);
             _service.VerifyAll();
         }
 
         [Fact]
-        public async Task PostsGet_Admin_Success()
+        public async Task PostListGet_Admin_Success()
         {
             const string username = "username";
             SetUser(true);
             _service.Setup(s => s.GetPosts(username)).ReturnsAsync(new List<TimelinePostInfo>());
-            (await _controller.PostsGet(username)).Value
+            (await _controller.PostListGet(username)).Value
                 .Should().BeAssignableTo<IList<TimelinePostInfo>>()
                 .Which.Should().NotBeNull().And.BeEmpty();
             _service.VerifyAll();
         }
 
         [Fact]
-        public async Task PostsGet_User_Success()
+        public async Task PostListGet_User_Success()
         {
             const string username = "username";
             SetUser(false);
             _service.Setup(s => s.HasReadPermission(username, authUsername)).ReturnsAsync(true);
             _service.Setup(s => s.GetPosts(username)).ReturnsAsync(new List<TimelinePostInfo>());
-            (await _controller.PostsGet(username)).Value
+            (await _controller.PostListGet(username)).Value
                 .Should().BeAssignableTo<IList<TimelinePostInfo>>()
                 .Which.Should().NotBeNull().And.BeEmpty();
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task PostOperationCreate_Forbid()
+        {
+            const string username = "username";
+            const string content = "cccc";
+            SetUser(false);
+            _service.Setup(s => s.IsMemberOf(username, authUsername)).ReturnsAsync(false);
+            var result = (await _controller.PostOperationCreate(username, new TimelinePostCreateRequest
+            {
+                Content = content,
+                Time = null
+            })).Result.Should().NotBeNull().And.BeAssignableTo<ObjectResult>().Which;
+            result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+            result.Value.Should().BeAssignableTo<CommonResponse>()
+                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostsCreateForbid);
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task PostOperationCreate_Admin_Success()
+        {
+            const string username = "username";
+            const string content = "cccc";
+            var response = new TimelinePostCreateResponse
+            {
+                Id = 3,
+                Time = DateTime.Now
+            };
+            SetUser(true);
+            _service.Setup(s => s.CreatePost(username, authUsername, content, null)).ReturnsAsync(response);
+            var resultValue = (await _controller.PostOperationCreate(username, new TimelinePostCreateRequest
+            {
+                Content = content,
+                Time = null
+            })).Value;
+            resultValue.Should().NotBeNull()
+                .And.BeAssignableTo<TimelinePostCreateResponse>()
+                .And.BeEquivalentTo(response);
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task PostOperationCreate_User_Success()
+        {
+            const string username = "username";
+            const string content = "cccc";
+            var response = new TimelinePostCreateResponse
+            {
+                Id = 3,
+                Time = DateTime.Now
+            };
+            SetUser(false);
+            _service.Setup(s => s.IsMemberOf(username, authUsername)).ReturnsAsync(true);
+            _service.Setup(s => s.CreatePost(username, authUsername, content, null)).ReturnsAsync(response);
+            var resultValue = (await _controller.PostOperationCreate(username, new TimelinePostCreateRequest
+            {
+                Content = content,
+                Time = null
+            })).Value;
+            resultValue.Should().NotBeNull()
+                .And.BeAssignableTo<TimelinePostCreateResponse>()
+                .And.BeEquivalentTo(response);
             _service.VerifyAll();
         }
 
