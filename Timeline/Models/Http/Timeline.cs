@@ -9,7 +9,7 @@ namespace Timeline.Models.Http
 {
     public class TimelinePostCreateRequest
     {
-        [Required(AllowEmptyStrings = false)]
+        [Required(AllowEmptyStrings = true)]
         public string Content { get; set; } = default!;
 
         public DateTime? Time { get; set; }
