@@ -97,20 +97,38 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You have no permission to create posts in the timeline..
+        ///   Looks up a localized string similar to You have no permission to read posts of the timeline..
         /// </summary>
-        internal static string MessagePostsCreateForbid {
+        internal static string MessagePostListGetForbid {
             get {
-                return ResourceManager.GetString("MessagePostsCreateForbid", resourceCulture);
+                return ResourceManager.GetString("MessagePostListGetForbid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You have no permission to read posts of the timeline..
+        ///   Looks up a localized string similar to You have no permission to create posts in the timeline..
         /// </summary>
-        internal static string MessagePostsGetForbid {
+        internal static string MessagePostOperationCreateForbid {
             get {
-                return ResourceManager.GetString("MessagePostsGetForbid", resourceCulture);
+                return ResourceManager.GetString("MessagePostOperationCreateForbid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have no permission to delete posts in the timeline..
+        /// </summary>
+        internal static string MessagePostOperationDeleteForbid {
+            get {
+                return ResourceManager.GetString("MessagePostOperationDeleteForbid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The post to delete does not exist..
+        /// </summary>
+        internal static string MessagePostOperationDeleteNotExist {
+            get {
+                return ResourceManager.GetString("MessagePostOperationDeleteNotExist", resourceCulture);
             }
         }
     }

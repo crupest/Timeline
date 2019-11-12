@@ -21,9 +21,11 @@ namespace Timeline
         {
             public static class Timeline // ccc = 004
             {
-                public const int PostsGetForbid = 10040101;
-                public const int PostsCreateForbid = 10040102;
-                public const int MemberAddNotExist = 10040201;
+                public const int PostListGetForbid = 10040101;
+                public const int PostOperationCreateForbid = 10040102;
+                public const int PostOperationDeleteForbid = 10040103;
+                public const int PostOperationDeleteNotExist = 10040201;
+                public const int MemberAddNotExist = 10040301;
             }
         }
     }
@@ -79,7 +81,7 @@ namespace Timeline.Controllers
             if (!IsAdmin() && !await _service.HasReadPermission(username, GetAuthUsername()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.Timeline.PostsGetForbid, MessagePostsGetForbid));
+                    new CommonResponse(ErrorCodes.Http.Timeline.PostListGetForbid, MessagePostListGetForbid));
             }
 
             return await _service.GetPosts(username);
@@ -93,7 +95,7 @@ namespace Timeline.Controllers
             if (!IsAdmin() && !await _service.IsMemberOf(username, GetAuthUsername()!))
             {
                 return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.Timeline.PostsCreateForbid, MessagePostsCreateForbid));
+                    new CommonResponse(ErrorCodes.Http.Timeline.PostOperationCreateForbid, MessagePostOperationCreateForbid));
             }
 
             var res = await _service.CreatePost(username, User.Identity.Name!, body.Content, body.Time);
@@ -109,9 +111,18 @@ namespace Timeline.Controllers
             if (!IsAdmin() && !await _service.HasPostModifyPermission(username, postId, GetAuthUsername()!))
             {
                 return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.Timeline.PostsCreateForbid, MessagePostsCreateForbid));
+                    new CommonResponse(ErrorCodes.Http.Timeline.PostOperationDeleteForbid, MessagePostOperationCreateForbid));
             }
-            await _service.DeletePost(username, postId);
+            try
+            {
+                await _service.DeletePost(username, postId);
+            }
+            catch (TimelinePostNotExistException)
+            {
+                return BadRequest(new CommonResponse(
+                    ErrorCodes.Http.Timeline.PostOperationDeleteNotExist,
+                    MessagePostOperationDeleteNotExist));
+            }
             return Ok();
         }
 

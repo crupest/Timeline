@@ -143,7 +143,7 @@ namespace Timeline.Tests.Controllers
                 .Which;
             result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             result.Value.Should().BeAssignableTo<CommonResponse>()
-            .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostsGetForbid);
+            .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostListGetForbid);
             _service.VerifyAll();
         }
 
@@ -186,7 +186,7 @@ namespace Timeline.Tests.Controllers
             })).Result.Should().NotBeNull().And.BeAssignableTo<ObjectResult>().Which;
             result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             result.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostsCreateForbid);
+                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationCreateForbid);
             _service.VerifyAll();
         }
 
@@ -237,6 +237,153 @@ namespace Timeline.Tests.Controllers
             _service.VerifyAll();
         }
 
-        //TODO! Write all the other tests.
+        [Fact]
+        public async Task PostOperationDelete_Forbid()
+        {
+            const string username = "username";
+            const long postId = 2;
+            SetUser(false);
+            _service.Setup(s => s.HasPostModifyPermission(username, postId, authUsername)).ReturnsAsync(false);
+            var result = (await _controller.PostOperationDelete(username, new TimelinePostDeleteRequest
+            {
+                Id = postId
+            })).Should().NotBeNull().And.BeAssignableTo<ObjectResult>().Which;
+            result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+            result.Value.Should().BeAssignableTo<CommonResponse>()
+                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationDeleteForbid);
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task PostOperationDelete_NotExist()
+        {
+            const string username = "username";
+            const long postId = 2;
+            SetUser(true);
+            _service.Setup(s => s.DeletePost(username, postId)).ThrowsAsync(new TimelinePostNotExistException());
+            var result = (await _controller.PostOperationDelete(username, new TimelinePostDeleteRequest
+            {
+                Id = postId
+            })).Should().NotBeNull().And.BeAssignableTo<ObjectResult>().Which;
+            result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            result.Value.Should().BeAssignableTo<CommonResponse>()
+                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationDeleteNotExist);
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task PostOperationDelete_Admin_Success()
+        {
+            const string username = "username";
+            const long postId = 2;
+            SetUser(true);
+            _service.Setup(s => s.DeletePost(username, postId)).Returns(Task.CompletedTask);
+            var result = await _controller.PostOperationDelete(username, new TimelinePostDeleteRequest
+            {
+                Id = postId
+            });
+            result.Should().NotBeNull().And.BeAssignableTo<OkResult>();
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task PostOperationDelete_User_Success()
+        {
+            const string username = "username";
+            const long postId = 2;
+            SetUser(false);
+            _service.Setup(s => s.DeletePost(username, postId)).Returns(Task.CompletedTask);
+            _service.Setup(s => s.HasPostModifyPermission(username, postId, authUsername)).ReturnsAsync(true);
+            var result = await _controller.PostOperationDelete(username, new TimelinePostDeleteRequest
+            {
+                Id = postId
+            });
+            result.Should().NotBeNull().And.BeAssignableTo<OkResult>();
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task TimelineChangeProperty_Success()
+        {
+            const string username = "username";
+            var req = new TimelinePropertyChangeRequest
+            {
+                Description = "",
+                Visibility = Entities.TimelineVisibility.Private
+            };
+            _service.Setup(s => s.ChangeProperty(username, req)).Returns(Task.CompletedTask);
+            var result = await _controller.TimelineChangeProperty(username, req);
+            result.Should().NotBeNull().And.BeAssignableTo<OkResult>();
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task TimelineChangeMember_Success()
+        {
+            const string username = "username";
+            var add = new List<string> { "aaa" };
+            var remove = new List<string> { "rrr" };
+            _service.Setup(s => s.ChangeMember(username, add, remove)).Returns(Task.CompletedTask);
+            var result = await _controller.TimelineChangeMember(username, new TimelineMemberChangeRequest
+            {
+                Add = add,
+                Remove = remove
+            });
+            result.Should().NotBeNull().And.BeAssignableTo<OkResult>();
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task TimelineChangeMember_UsernameBadFormat()
+        {
+            const string username = "username";
+            var add = new List<string> { "aaa" };
+            var remove = new List<string> { "rrr" };
+            _service.Setup(s => s.ChangeMember(username, add, remove)).ThrowsAsync(
+                new TimelineMemberOperationUserException("test", new UsernameBadFormatException()));
+            var result = await _controller.TimelineChangeMember(username, new TimelineMemberChangeRequest
+            {
+                Add = add,
+                Remove = remove
+            });
+            result.Should().NotBeNull().And.BeAssignableTo<BadRequestObjectResult>()
+                .Which.Value.Should().BeAssignableTo<CommonResponse>()
+                .Which.Code.Should().Be(ErrorCodes.Http.Common.InvalidModel);
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task TimelineChangeMember_AddNotExist()
+        {
+            const string username = "username";
+            var add = new List<string> { "aaa" };
+            var remove = new List<string> { "rrr" };
+            _service.Setup(s => s.ChangeMember(username, add, remove)).ThrowsAsync(
+                new TimelineMemberOperationUserException("test", new UserNotExistException()));
+            var result = await _controller.TimelineChangeMember(username, new TimelineMemberChangeRequest
+            {
+                Add = add,
+                Remove = remove
+            });
+            result.Should().NotBeNull().And.BeAssignableTo<BadRequestObjectResult>()
+                .Which.Value.Should().BeAssignableTo<CommonResponse>()
+                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.MemberAddNotExist);
+            _service.VerifyAll();
+        }
+
+        [Fact]
+        public async Task TimelineChangeMember_UnknownTimelineMemberOperationUserException()
+        {
+            const string username = "username";
+            var add = new List<string> { "aaa" };
+            var remove = new List<string> { "rrr" };
+            _service.Setup(s => s.ChangeMember(username, add, remove)).ThrowsAsync(
+                new TimelineMemberOperationUserException("test", null));
+            await _controller.Awaiting(c => c.TimelineChangeMember(username, new TimelineMemberChangeRequest
+            {
+                Add = add,
+                Remove = remove
+            })).Should().ThrowAsync<TimelineMemberOperationUserException>(); // Should rethrow.
+        }
     }
 }
