@@ -129,10 +129,16 @@
   <data name="MessageMemberUserNotExist" xml:space="preserve">
     <value>The {0}-st user to do operation {1} on does not exist.</value>
   </data>
-  <data name="MessagePostsCreateForbid" xml:space="preserve">
+  <data name="MessagePostListGetForbid" xml:space="preserve">
+    <value>You have no permission to read posts of the timeline.</value>
+  </data>
+  <data name="MessagePostOperationCreateForbid" xml:space="preserve">
     <value>You have no permission to create posts in the timeline.</value>
   </data>
-  <data name="MessagePostsGetForbid" xml:space="preserve">
-    <value>You have no permission to read posts of the timeline.</value>
+  <data name="MessagePostOperationDeleteForbid" xml:space="preserve">
+    <value>You have no permission to delete posts in the timeline.</value>
+  </data>
+  <data name="MessagePostOperationDeleteNotExist" xml:space="preserve">
+    <value>The post to delete does not exist.</value>
   </data>
 </root>

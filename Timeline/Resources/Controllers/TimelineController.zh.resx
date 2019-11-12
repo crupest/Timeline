@@ -123,10 +123,16 @@
   <data name="MessageMemberUserNotExist" xml:space="preserve">
     <value>第{0}个做{1}操作的用户不存在。</value>
   </data>
-  <data name="MessagePostsCreateForbid" xml:space="preserve">
+  <data name="MessagePostListGetForbid" xml:space="preserve">
+    <value>你没有权限读取这个时间线消息。</value>
+  </data>
+  <data name="MessagePostOperationCreateForbid" xml:space="preserve">
     <value>你没有权限在这个时间线中创建消息。</value>
   </data>
-  <data name="MessagePostsGetForbid" xml:space="preserve">
-    <value>你没有权限读取这个时间线消息。</value>
+  <data name="MessagePostOperationDeleteForbid" xml:space="preserve">
+    <value>你没有权限在这个时间线中删除消息。</value>
+  </data>
+  <data name="MessagePostOperationDeleteNotExist" xml:space="preserve">
+    <value>要删除的消息不存在。</value>
   </data>
 </root>
