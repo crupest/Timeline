@@ -9,8 +9,8 @@ namespace Timeline.Services
     public class UsernameBadFormatException : Exception
     {
         public UsernameBadFormatException() : base(Resources.Services.Exception.UsernameBadFormatException) { }
-        public UsernameBadFormatException(string message) : base(message) { }
-        public UsernameBadFormatException(string message, Exception inner) : base(message, inner) { }
+        public UsernameBadFormatException(string username) : this() { Username = username; }
+        public UsernameBadFormatException(string username, Exception inner) : base(Resources.Services.Exception.UsernameBadFormatException, inner) { Username = username; }
 
         public UsernameBadFormatException(string username, string message) : base(message) { Username = username; }
         public UsernameBadFormatException(string username, string message, Exception inner) : base(message, inner) { Username = username; }
