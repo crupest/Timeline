@@ -25,7 +25,7 @@ namespace Timeline
                 public const int PostOperationCreateForbid = 10040102;
                 public const int PostOperationDeleteForbid = 10040103;
                 public const int PostOperationDeleteNotExist = 10040201;
-                public const int MemberAddNotExist = 10040301;
+                public const int ChangeMemberUserNotExist = 10040301;
             }
         }
     }
@@ -156,7 +156,7 @@ namespace Timeline.Controllers
                 }
                 else if (e.InnerException is UserNotExistException)
                 {
-                    return BadRequest(new CommonResponse(ErrorCodes.Http.Timeline.MemberAddNotExist,
+                    return BadRequest(new CommonResponse(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist,
                         string.Format(CultureInfo.CurrentCulture, MessageMemberUserNotExist, e.Index, e.Operation)));
                 }
 

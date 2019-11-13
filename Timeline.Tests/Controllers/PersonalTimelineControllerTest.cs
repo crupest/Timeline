@@ -367,7 +367,7 @@ namespace Timeline.Tests.Controllers
             });
             result.Should().NotBeNull().And.BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.MemberAddNotExist);
+                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist);
             _service.VerifyAll();
         }
 
