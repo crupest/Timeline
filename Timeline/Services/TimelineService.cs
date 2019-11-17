@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -214,6 +215,7 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="username">The user to check on.</param>
+        /// <returns>True if it is a member, false if not.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="username"/> is null.</exception>
         /// <exception cref="TimelineNameBadFormatException">
         /// Thrown when timeline name is of bad format.
@@ -231,8 +233,11 @@ namespace Timeline.Services
         /// Thrown when <paramref name="username"/> is not a valid username.
         /// </exception>
         /// <exception cref="UserNotExistException">
-        /// Thrown when user <paramref name="username"/> does not exist.</exception>
-        /// <returns>True if it is a member, false if not.</returns>
+        /// Thrown when user <paramref name="username"/> does not exist.
+        /// </exception>
+        /// <remarks>
+        /// Timeline owner is also considered as a member.
+        /// </remarks>
         Task<bool> IsMemberOf(string name, string username);
     }
 
@@ -296,7 +301,7 @@ namespace Timeline.Services
 
     public abstract class BaseTimelineService : IBaseTimelineService
     {
-        protected BaseTimelineService(DatabaseContext database, IClock clock)
+        protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IClock clock)
         {
             Clock = clock;
             Database = database;
@@ -600,12 +605,123 @@ namespace Timeline.Services
 
             var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
-            var postEntitu = await Database.Timelines. // TODO!
+            var postEntity = await Database.Timelines.Where(p => p.Id == id).Select(p => new { p.OwnerId }).SingleOrDefaultAsync();
 
-            if (timelineEntity.OwnerId == userId)
+            if (postEntity == null)
+                throw new TimelinePostNotExistException(id);
+
+            return timelineEntity.OwnerId == userId || postEntity.OwnerId == userId;
+        }
+
+        public async Task<bool> IsMemberOf(string name, string username)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+
             {
-                return true;
+                var (result, message) = UsernameValidator.Validate(username);
+                if (!result)
+                {
+                    throw new UsernameBadFormatException(username);
+                }
             }
+
+            var user = await Database.Users.Where(u => u.Name == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+
+            if (user == null)
+            {
+                throw new UserNotExistException(username);
+            }
+
+            var userId = user.Id;
+
+            var timelineId = await FindTimelineId(name);
+
+            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
+
+            if (userId == timelineEntity.OwnerId)
+                return true;
+
+            var timelineMemberEntity = await Database.TimelineMembers.Where(m => m.TimelineId == timelineId && m.UserId == userId).SingleOrDefaultAsync();
+
+            return timelineMemberEntity != null;
+        }
+    }
+
+    public class PersonalTimelineService : BaseTimelineService, IPersonalTimelineService
+    {
+        public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IClock clock)
+            : base(loggerFactory, database, clock)
+        {
+
+        }
+
+        protected override async Task<long> FindTimelineId(string name)
+        {
+            {
+                var (result, message) = UsernameValidator.Validate(name);
+                if (!result)
+                {
+                    throw new TimelineNameBadFormatException(name, new UsernameBadFormatException(name, message));
+                }
+            }
+
+            var userEntity = await Database.Users.Where(u => u.Name == name).Select(u => new { u.Id }).SingleOrDefaultAsync();
+
+            if (userEntity == null)
+            {
+                throw new TimelineNotExistException(name, new UserNotExistException(name));
+            }
+
+            var userId = userEntity.Id;
+
+            var timelineEntity = await Database.Timelines.Where(t => t.OwnerId == userId && t.Name == null).Select(t => new { t.Id }).SingleOrDefaultAsync();
+
+            if (timelineEntity != null)
+            {
+                return timelineEntity.Id;
+            }
+            else
+            {
+                var newTimelineEntity = new TimelineEntity
+                {
+                    Name = null,
+                    Description = null,
+                    OwnerId = userId,
+                    Visibility = TimelineVisibility.Register,
+                    CreateTime = Clock.GetCurrentTime(),
+                };
+                Database.Timelines.Add(newTimelineEntity);
+                await Database.SaveChangesAsync();
+
+                return newTimelineEntity.Id;
+            }
+        }
+
+        public async Task<BaseTimelineInfo> GetTimeline(string username)
+        {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+
+            var timelineId = await FindTimelineId(username);
+
+            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+
+            var timelineMemberEntities = await Database.TimelineMembers.Where(m => m.TimelineId == timelineId).Select(m => new { m.UserId }).ToListAsync();
+
+            var memberUsernameTasks = timelineMemberEntities.Select(m => Database.Users.Where(u => u.Id == m.UserId).Select(u => u.Name).SingleAsync()).ToArray();
+
+            var memberUsernames = await Task.WhenAll(memberUsernameTasks);
+
+            return new BaseTimelineInfo
+            {
+                Description = timelineEntity.Description,
+                Owner = username,
+                Visibility = timelineEntity.Visibility,
+                Members = memberUsernames.ToList()
+            };
         }
 
     }
