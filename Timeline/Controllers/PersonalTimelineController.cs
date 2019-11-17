@@ -87,7 +87,7 @@ namespace Timeline.Controllers
             return await _service.GetPosts(username);
         }
 
-        [HttpPost("user/{username}/timeline/postop/create")]
+        [HttpPost("users/{username}/timeline/postop/create")]
         [Authorize]
         [CatchTimelineNotExistException]
         public async Task<ActionResult<TimelinePostCreateResponse>> PostOperationCreate([FromRoute][Username] string username, [FromBody] TimelinePostCreateRequest body)
@@ -102,7 +102,7 @@ namespace Timeline.Controllers
             return res;
         }
 
-        [HttpPost("user/{username}/timeline/postop/delete")]
+        [HttpPost("users/{username}/timeline/postop/delete")]
         [Authorize]
         [CatchTimelineNotExistException]
         public async Task<ActionResult> PostOperationDelete([FromRoute][Username] string username, [FromBody] TimelinePostDeleteRequest body)
@@ -126,7 +126,7 @@ namespace Timeline.Controllers
             return Ok();
         }
 
-        [HttpPost("user/{username}/timeline/op/property")]
+        [HttpPost("users/{username}/timeline/op/property")]
         [Authorize]
         [SelfOrAdmin]
         [CatchTimelineNotExistException]
@@ -136,7 +136,7 @@ namespace Timeline.Controllers
             return Ok();
         }
 
-        [HttpPost("user/{username}/timeline/op/member")]
+        [HttpPost("users/{username}/timeline/op/member")]
         [Authorize]
         [SelfOrAdmin]
         [CatchTimelineNotExistException]

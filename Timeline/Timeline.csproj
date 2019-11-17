@@ -8,6 +8,12 @@
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="Resources\Filters\**" />
+      <Content Remove="Resources\Filters\**" />
+      <EmbeddedResource Remove="Resources\Filters\**" />
+      <None Remove="Resources\Filters\**" />
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="default-avatar.png">
@@ -173,9 +179,5 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>UserService.Designer.cs</LastGenOutput>
       </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Resources\Filters\" />
     </ItemGroup>
 </Project>
