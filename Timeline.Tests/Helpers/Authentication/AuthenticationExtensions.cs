@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
@@ -7,6 +8,13 @@ using Timeline.Tests.Mock.Data;
 
 namespace Timeline.Tests.Helpers.Authentication
 {
+    public enum AuthType
+    {
+        None,
+        User,
+        Admin
+    }
+
     public static class AuthenticationExtensions
     {
         private const string CreateTokenUrl = "/token/create";
@@ -35,6 +43,17 @@ namespace Timeline.Tests.Helpers.Authentication
         public static Task<HttpClient> CreateClientAsAdmin<T>(this WebApplicationFactory<T> factory) where T : class
         {
             return factory.CreateClientWithCredential(MockUser.Admin.Username, MockUser.Admin.Password);
+        }
+
+        public static Task<HttpClient> CreateClientAs<T>(this WebApplicationFactory<T> factory, AuthType authType) where T : class
+        {
+            return authType switch
+            {
+                AuthType.None => Task.FromResult(factory.CreateDefaultClient()),
+                AuthType.User => factory.CreateClientAsUser(),
+                AuthType.Admin => factory.CreateClientAsAdmin(),
+                _ => throw new InvalidOperationException("Unknown auth type.")
+            };
         }
     }
 }
