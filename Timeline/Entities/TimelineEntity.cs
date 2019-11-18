@@ -2,25 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Timeline.Models;
 
 namespace Timeline.Entities
 {
-    public enum TimelineVisibility
-    {
-        /// <summary>
-        /// All people including those without accounts.
-        /// </summary>
-        Public,
-        /// <summary>
-        /// Only people signed in.
-        /// </summary>
-        Register,
-        /// <summary>
-        /// Only member.
-        /// </summary>
-        Private
-    }
-
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is entity object.")]
     [Table("timelines")]
     public class TimelineEntity

@@ -286,7 +286,7 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An exception happened when do operation {} on the {} member on timeline..
+        ///   Looks up a localized string similar to An exception happened when do operation {0} on the {1} member on timeline..
         /// </summary>
         internal static string TimelineMemberOperationExceptionDetail {
             get {

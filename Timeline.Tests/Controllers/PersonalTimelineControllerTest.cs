@@ -309,7 +309,7 @@ namespace Timeline.Tests.Controllers
             var req = new TimelinePropertyChangeRequest
             {
                 Description = "",
-                Visibility = Entities.TimelineVisibility.Private
+                Visibility = TimelineVisibility.Private
             };
             _service.Setup(s => s.ChangeProperty(username, req)).Returns(Task.CompletedTask);
             var result = await _controller.TimelineChangeProperty(username, req);
