@@ -193,7 +193,7 @@
     <value>An exception happened when add or remove member on timeline.</value>
   </data>
   <data name="TimelineMemberOperationExceptionDetail" xml:space="preserve">
-    <value>An exception happened when do operation {} on the {} member on timeline.</value>
+    <value>An exception happened when do operation {0} on the {1} member on timeline.</value>
   </data>
   <data name="TimelineNameBadFormatException" xml:space="preserve">
     <value>Timeline name is of bad format. If this is a personal timeline, it means the username is of bad format and inner exception should be a UsernameBadFormatException.</value>

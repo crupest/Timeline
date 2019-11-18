@@ -88,7 +88,7 @@ namespace Timeline.Tests.Helpers
                 return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, null);
             }
 
-            var result = JsonConvert.DeserializeObject<T>(body);
+            var result = JsonConvert.DeserializeObject<T>(body); // TODO! catch and throw on bad format
             return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, result);
         }
     }

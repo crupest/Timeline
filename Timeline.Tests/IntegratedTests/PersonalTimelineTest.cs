@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
@@ -20,6 +21,64 @@ namespace Timeline.Tests.IntegratedTests
             : base(factory)
         {
 
+        }
+
+        [Fact]
+        public async Task Member_Should_Work()
+        {
+            const string getUrl = "users/user/timeline";
+            const string changeUrl = "users/user/timeline/op/member";
+            using var client = await Factory.CreateClientAsUser();
+
+            async Task AssertMembers(IList<string> members)
+            {
+                var res = await client.GetAsync(getUrl);
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<BaseTimelineInfo>()
+                    .Which.Members.Should().NotBeNull().And.BeEquivalentTo(members);
+            }
+
+            async Task AssertEmptyMembers()
+            {
+                var res = await client.GetAsync(getUrl);
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<BaseTimelineInfo>()
+                    .Which.Members.Should().NotBeNull().And.BeEmpty();
+            }
+
+            await AssertEmptyMembers();
+            {
+                var res = await client.PostAsJsonAsync(changeUrl,
+                    new TimelineMemberChangeRequest { Add = new List<string> { "admin", "usernotexist" } });
+                res.Should().HaveStatusCode(400)
+                    .And.HaveCommonBody()
+                    .Which.Code.Should().Be(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist);
+            }
+            {
+                var res = await client.PostAsJsonAsync(changeUrl,
+                    new TimelineMemberChangeRequest { Remove = new List<string> { "admin", "usernotexist" } });
+                res.Should().HaveStatusCode(400)
+                    .And.HaveCommonBody()
+                    .Which.Code.Should().Be(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist);
+            }
+            {
+                var res = await client.PostAsJsonAsync(changeUrl,
+                    new TimelineMemberChangeRequest { Add = new List<string> { "admin" }, Remove = new List<string> { "admin" } });
+                res.Should().HaveStatusCode(200);
+                await AssertEmptyMembers();
+            }
+            {
+                var res = await client.PostAsJsonAsync(changeUrl,
+                    new TimelineMemberChangeRequest { Add = new List<string> { "admin" } });
+                res.Should().HaveStatusCode(200);
+                await AssertMembers(new List<string> { "admin" });
+            }
+            {
+                var res = await client.PostAsJsonAsync(changeUrl,
+                    new TimelineMemberChangeRequest { Remove = new List<string> { "admin" } });
+                res.Should().HaveStatusCode(200);
+                await AssertEmptyMembers();
+            }
         }
 
         [Theory]
@@ -56,6 +115,82 @@ namespace Timeline.Tests.IntegratedTests
                 var res = await client.PostAsJsonAsync("users/admin/timeline/op/member",
                     new TimelineMemberChangeRequest { Add = new List<string> { "user" } });
                 res.Should().HaveStatusCode(opMemberAdmin);
+            }
+        }
+
+        [Fact]
+        public async Task Permission_GetPost()
+        {
+            const string userUrl = "users/user/timeline/posts";
+            const string adminUrl = "users/admin/timeline/posts";
+            { // default visibility is registered
+                {
+                    using var client = Factory.CreateDefaultClient();
+                    var res = await client.GetAsync(userUrl);
+                    res.Should().HaveStatusCode(403);
+                }
+
+                {
+                    using var client = await Factory.CreateClientAsUser();
+                    var res = await client.GetAsync(adminUrl);
+                    res.Should().HaveStatusCode(200);
+                }
+            }
+
+            { // change visibility to public
+                {
+                    using var client = await Factory.CreateClientAsUser();
+                    var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
+                        new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Public });
+                    res.Should().HaveStatusCode(200);
+                }
+                {
+                    using var client = Factory.CreateDefaultClient();
+                    var res = await client.GetAsync(userUrl);
+                    res.Should().HaveStatusCode(200);
+                }
+            }
+
+            { // change visibility to private
+                {
+                    using var client = await Factory.CreateClientAsAdmin();
+                    {
+                        var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
+                        new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Private });
+                        res.Should().HaveStatusCode(200);
+                    }
+                    {
+                        var res = await client.PostAsJsonAsync("users/admin/timeline/op/property",
+                            new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Private });
+                        res.Should().HaveStatusCode(200);
+                    }
+                }
+                {
+                    using var client = Factory.CreateDefaultClient();
+                    var res = await client.GetAsync(userUrl);
+                    res.Should().HaveStatusCode(403);
+                }
+                { // user can't read admin's
+                    using var client = await Factory.CreateClientAsUser();
+                    var res = await client.GetAsync(adminUrl);
+                    res.Should().HaveStatusCode(403);
+                }
+                { // admin can read user's
+                    using var client = await Factory.CreateClientAsAdmin();
+                    var res = await client.GetAsync(userUrl);
+                    res.Should().HaveStatusCode(200);
+                }
+                { // add member
+                    using var client = await Factory.CreateClientAsAdmin();
+                    var res = await client.PostAsJsonAsync("users/admin/timeline/op/member",
+                        new TimelineMemberChangeRequest { Add = new List<string> { "user" } });
+                    res.Should().HaveStatusCode(200);
+                }
+                { // now user can read admin's
+                    using var client = await Factory.CreateClientAsUser();
+                    var res = await client.GetAsync(adminUrl);
+                    res.Should().HaveStatusCode(200);
+                }
             }
         }
     }

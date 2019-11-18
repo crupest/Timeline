@@ -458,7 +458,7 @@ namespace Timeline.Services
                 if (list != null)
                 {
                     Dictionary<string, int> result = new Dictionary<string, int>();
-                    var count = 0;
+                    var count = list.Count;
                     for (var index = 0; index < count; index++)
                     {
                         var username = list[index];
