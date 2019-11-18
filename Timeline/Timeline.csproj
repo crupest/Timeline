@@ -1,19 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
-        <IsPackable>false</IsPackable>
         <UserSecretsId>1f6fb74d-4277-4bc0-aeea-b1fc5ffb0b43</UserSecretsId>
         <Authors>crupest</Authors>
 
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    <ItemGroup>
-      <Compile Remove="Resources\Filters\**" />
-      <Content Remove="Resources\Filters\**" />
-      <EmbeddedResource Remove="Resources\Filters\**" />
-      <None Remove="Resources\Filters\**" />
-    </ItemGroup>
 
     <ItemGroup>
         <Content Include="default-avatar.png">
@@ -30,8 +23,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="3.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0-rc1.final" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
@@ -40,144 +33,144 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\Authentication\AuthHandler.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>AuthHandler.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Common.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Common.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Controllers\Testing\TestingI18nController.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>TestingI18nController.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Controllers\TimelineController.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>TimelineController.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Controllers\TokenController.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>TokenController.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Controllers\UserAvatarController.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>UserAvatarController.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Controllers\UserController.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>UserController.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Filters.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Filters.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Models\Http\Common.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Common.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>UsernameValidator.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Models\Validation\Validator.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Validator.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Services\Exception.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Exception.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Services\UserAvatarService.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>UserAvatarService.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Services\UserDetailService.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>UserDetailService.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Services\UserService.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>UserService.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Resources\Authentication\AuthHandler.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>AuthHandler.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Common.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Common.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Controllers\Testing\TestingI18nController.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>TestingI18nController.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Controllers\TimelineController.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>TimelineController.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Controllers\TokenController.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>TokenController.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Controllers\UserAvatarController.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>UserAvatarController.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Controllers\UserController.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>UserController.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Filters.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Filters.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Models\Http\Common.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Common.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>UsernameValidator.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Models\Validation\Validator.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Validator.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Services\Exception.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Exception.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Services\UserAvatarService.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>UserAvatarService.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Services\UserDetailService.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>UserDetailService.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Services\UserService.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>UserService.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources\Authentication\AuthHandler.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>AuthHandler.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Common.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Common.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Controllers\Testing\TestingI18nController.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>TestingI18nController.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Controllers\TimelineController.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>TimelineController.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Controllers\TokenController.resx">
-        <SubType>Designer</SubType>
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>TokenController.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Controllers\UserAvatarController.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>UserAvatarController.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Controllers\UserController.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>UserController.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Filters.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Filters.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Models\Http\Common.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Common.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>UsernameValidator.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Validator.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Services\Exception.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Exception.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Services\UserAvatarService.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>UserAvatarService.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Services\UserDetailService.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>UserDetailService.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Services\UserService.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>UserService.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Authentication\AuthHandler.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>AuthHandler.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Common.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Common.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Controllers\Testing\TestingI18nController.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>TestingI18nController.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Controllers\TimelineController.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>TimelineController.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Controllers\TokenController.resx">
+            <SubType>Designer</SubType>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>TokenController.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Controllers\UserAvatarController.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>UserAvatarController.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Controllers\UserController.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>UserController.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Filters.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Filters.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Models\Http\Common.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Common.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>UsernameValidator.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Validator.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\Exception.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Exception.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\UserAvatarService.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>UserAvatarService.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\UserDetailService.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>UserDetailService.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\UserService.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>UserService.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 </Project>
