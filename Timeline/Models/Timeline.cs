@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Timeline.Entities;
 
 namespace Timeline.Models
 {

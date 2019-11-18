@@ -24,6 +24,55 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
+        public async Task TimelineGet_Should_Work()
+        {
+            using var client = Factory.CreateDefaultClient();
+            var res = await client.GetAsync("users/user/timeline");
+            var body = res.Should().HaveStatusCode(200)
+                .And.HaveJsonBody<BaseTimelineInfo>().Which;
+            body.Owner.Should().Be("user");
+            body.Visibility.Should().Be(TimelineVisibility.Register);
+            body.Description.Should().Be("");
+            body.Members.Should().NotBeNull().And.BeEmpty();
+        }
+
+        [Fact]
+        public async Task Description_Should_Work()
+        {
+            using var client = await Factory.CreateClientAsUser();
+
+            async Task AssertDescription(string description)
+            {
+                var res = await client.GetAsync("users/user/timeline");
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<BaseTimelineInfo>()
+                    .Which.Description.Should().Be(description);
+            }
+
+            const string mockDescription = "haha";
+
+            await AssertDescription("");
+            {
+                var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
+                    new TimelinePropertyChangeRequest { Description = mockDescription });
+                res.Should().HaveStatusCode(200);
+                await AssertDescription(mockDescription);
+            }
+            {
+                var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
+                    new TimelinePropertyChangeRequest { Description = null });
+                res.Should().HaveStatusCode(200);
+                await AssertDescription(mockDescription);
+            }
+            {
+                var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
+                    new TimelinePropertyChangeRequest { Description = "" });
+                res.Should().HaveStatusCode(200);
+                await AssertDescription("");
+            }
+        }
+
+        [Fact]
         public async Task Member_Should_Work()
         {
             const string getUrl = "users/user/timeline";

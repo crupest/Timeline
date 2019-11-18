@@ -717,7 +717,7 @@ namespace Timeline.Services
 
             return new BaseTimelineInfo
             {
-                Description = timelineEntity.Description,
+                Description = timelineEntity.Description ?? "",
                 Owner = username,
                 Visibility = timelineEntity.Visibility,
                 Members = memberUsernames.ToList()
