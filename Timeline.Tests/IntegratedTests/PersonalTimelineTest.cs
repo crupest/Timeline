@@ -442,6 +442,13 @@ namespace Timeline.Tests.IntegratedTests
                     res.Should().HaveStatusCode(200);
                 }
                 {
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                        new TimelinePostDeleteRequest { Id = 30000 });
+                    res.Should().HaveStatusCode(400)
+                        .And.HaveCommonBody()
+                        .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationDeleteNotExist);
+                }
+                {
                     var res = await client.GetAsync("users/user/timeline/posts");
                     res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo[]>()

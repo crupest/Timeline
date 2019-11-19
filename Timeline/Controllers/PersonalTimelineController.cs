@@ -107,14 +107,14 @@ namespace Timeline.Controllers
         [CatchTimelineNotExistException]
         public async Task<ActionResult> PostOperationDelete([FromRoute][Username] string username, [FromBody] TimelinePostDeleteRequest body)
         {
-            var postId = body.Id!.Value;
-            if (!IsAdmin() && !await _service.HasPostModifyPermission(username, postId, GetAuthUsername()!))
-            {
-                return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.Timeline.PostOperationDeleteForbid, MessagePostOperationCreateForbid));
-            }
             try
             {
+                var postId = body.Id!.Value;
+                if (!IsAdmin() && !await _service.HasPostModifyPermission(username, postId, GetAuthUsername()!))
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        new CommonResponse(ErrorCodes.Http.Timeline.PostOperationDeleteForbid, MessagePostOperationCreateForbid));
+                }
                 await _service.DeletePost(username, postId);
             }
             catch (TimelinePostNotExistException)
