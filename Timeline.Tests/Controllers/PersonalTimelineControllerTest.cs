@@ -15,7 +15,6 @@ using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Helpers.Authentication;
 using Xunit;
 
 namespace Timeline.Tests.Controllers

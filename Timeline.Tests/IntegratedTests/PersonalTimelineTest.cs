@@ -1,17 +1,12 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Helpers.Authentication;
-using Timeline.Tests.Mock.Data;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
@@ -27,7 +22,7 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task TimelineGet_Should_Work()
         {
-            using var client = Factory.CreateDefaultClient();
+            using var client = await CreateClientWithNoAuth();
             var res = await client.GetAsync("users/user/timeline");
             var body = res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<BaseTimelineInfo>().Which;
@@ -40,7 +35,7 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task Description_Should_Work()
         {
-            using var client = await Factory.CreateClientAsUser();
+            using var client = await CreateClientAsUser();
 
             async Task AssertDescription(string description)
             {
@@ -78,7 +73,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             const string getUrl = "users/user/timeline";
             const string changeUrl = "users/user/timeline/op/member";
-            using var client = await Factory.CreateClientAsUser();
+            using var client = await CreateClientAsUser();
 
             async Task AssertMembers(IList<string> members)
             {
@@ -137,7 +132,7 @@ namespace Timeline.Tests.IntegratedTests
         [InlineData(AuthType.Admin, 200, 200, 200, 200, 200)]
         public async Task Permission_Timeline(AuthType authType, int get, int opPropertyUser, int opPropertyAdmin, int opMemberUser, int opMemberAdmin)
         {
-            using var client = await Factory.CreateClientAs(authType);
+            using var client = await CreateClientAs(authType);
             {
                 var res = await client.GetAsync("users/user/timeline");
                 res.Should().HaveStatusCode(get);
@@ -175,13 +170,13 @@ namespace Timeline.Tests.IntegratedTests
             const string adminUrl = "users/admin/timeline/posts";
             { // default visibility is registered
                 {
-                    using var client = Factory.CreateDefaultClient();
+                    using var client = await CreateClientWithNoAuth();
                     var res = await client.GetAsync(userUrl);
                     res.Should().HaveStatusCode(403);
                 }
 
                 {
-                    using var client = await Factory.CreateClientAsUser();
+                    using var client = await CreateClientAsUser();
                     var res = await client.GetAsync(adminUrl);
                     res.Should().HaveStatusCode(200);
                 }
@@ -189,13 +184,13 @@ namespace Timeline.Tests.IntegratedTests
 
             { // change visibility to public
                 {
-                    using var client = await Factory.CreateClientAsUser();
+                    using var client = await CreateClientAsUser();
                     var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
                         new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Public });
                     res.Should().HaveStatusCode(200);
                 }
                 {
-                    using var client = Factory.CreateDefaultClient();
+                    using var client = await CreateClientWithNoAuth();
                     var res = await client.GetAsync(userUrl);
                     res.Should().HaveStatusCode(200);
                 }
@@ -203,7 +198,7 @@ namespace Timeline.Tests.IntegratedTests
 
             { // change visibility to private
                 {
-                    using var client = await Factory.CreateClientAsAdmin();
+                    using var client = await CreateClientAsAdmin();
                     {
                         var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
                         new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Private });
@@ -216,28 +211,28 @@ namespace Timeline.Tests.IntegratedTests
                     }
                 }
                 {
-                    using var client = Factory.CreateDefaultClient();
+                    using var client = await CreateClientWithNoAuth();
                     var res = await client.GetAsync(userUrl);
                     res.Should().HaveStatusCode(403);
                 }
                 { // user can't read admin's
-                    using var client = await Factory.CreateClientAsUser();
+                    using var client = await CreateClientAsUser();
                     var res = await client.GetAsync(adminUrl);
                     res.Should().HaveStatusCode(403);
                 }
                 { // admin can read user's
-                    using var client = await Factory.CreateClientAsAdmin();
+                    using var client = await CreateClientAsAdmin();
                     var res = await client.GetAsync(userUrl);
                     res.Should().HaveStatusCode(200);
                 }
                 { // add member
-                    using var client = await Factory.CreateClientAsAdmin();
+                    using var client = await CreateClientAsAdmin();
                     var res = await client.PostAsJsonAsync("users/admin/timeline/op/member",
                         new TimelineMemberChangeRequest { Add = new List<string> { "user" } });
                     res.Should().HaveStatusCode(200);
                 }
                 { // now user can read admin's
-                    using var client = await Factory.CreateClientAsUser();
+                    using var client = await CreateClientAsUser();
                     var res = await client.GetAsync(adminUrl);
                     res.Should().HaveStatusCode(200);
                 }
@@ -250,14 +245,14 @@ namespace Timeline.Tests.IntegratedTests
         {
             CreateExtraMockUsers(1);
 
-            using (var client = await Factory.CreateClientAsUser())
+            using (var client = await CreateClientAsUser())
             {
                 var res = await client.PostAsJsonAsync("users/user/timeline/op/member",
                     new TimelineMemberChangeRequest { Add = new List<string> { "user0" } });
                 res.Should().HaveStatusCode(200);
             }
 
-            using (var client = Factory.CreateDefaultClient())
+            using (var client = await CreateClientWithNoAuth())
             {
                 { // no auth should get 401
                     var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
@@ -266,7 +261,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
 
-            using (var client = await Factory.CreateClientAsUser())
+            using (var client = await CreateClientAsUser())
             {
                 { // post self's
                     var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
@@ -280,7 +275,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
 
-            using (var client = await Factory.CreateClientAsAdmin())
+            using (var client = await CreateClientAsAdmin())
             {
                 { // post as admin
                     var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
@@ -289,7 +284,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
 
-            using (var client = await Factory.CreateClientAs(ExtraMockUsers[0]))
+            using (var client = await CreateClientAs(ExtraMockUsers[0]))
             {
                 { // post as member
                     var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
@@ -306,7 +301,7 @@ namespace Timeline.Tests.IntegratedTests
 
             async Task<long> CreatePost(MockUser auth, string timeline)
             {
-                using var client = await Factory.CreateClientAs(auth);
+                using var client = await CreateClientAs(auth);
                 var res = await client.PostAsJsonAsync($"users/{timeline}/timeline/postop/create",
                     new TimelinePostCreateRequest { Content = "aaa" });
                 return res.Should().HaveStatusCode(200)
@@ -314,7 +309,7 @@ namespace Timeline.Tests.IntegratedTests
                     .Which.Id;
             }
 
-            using (var client = await Factory.CreateClientAsUser())
+            using (var client = await CreateClientAsUser())
             {
                 var res = await client.PostAsJsonAsync("users/user/timeline/op/member",
                     new TimelineMemberChangeRequest { Add = new List<string> { "user0", "user1" } });
@@ -322,7 +317,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             { // no auth should get 401
-                using var client = Factory.CreateDefaultClient();
+                using var client = await CreateClientWithNoAuth();
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = 12 });
                 res.Should().HaveStatusCode(401);
@@ -330,7 +325,7 @@ namespace Timeline.Tests.IntegratedTests
 
             { // self can delete self
                 var postId = await CreatePost(MockUser.User, "user");
-                using var client = await Factory.CreateClientAsUser();
+                using var client = await CreateClientAsUser();
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = postId });
                 res.Should().HaveStatusCode(200);
@@ -338,7 +333,7 @@ namespace Timeline.Tests.IntegratedTests
 
             { // admin can delete any
                 var postId = await CreatePost(MockUser.User, "user");
-                using var client = await Factory.CreateClientAsAdmin();
+                using var client = await CreateClientAsAdmin();
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = postId });
                 res.Should().HaveStatusCode(200);
@@ -346,7 +341,7 @@ namespace Timeline.Tests.IntegratedTests
 
             { // owner can delete other
                 var postId = await CreatePost(ExtraMockUsers[0], "user");
-                using var client = await Factory.CreateClientAsUser();
+                using var client = await CreateClientAsUser();
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = postId });
                 res.Should().HaveStatusCode(200);
@@ -354,7 +349,7 @@ namespace Timeline.Tests.IntegratedTests
 
             { // author can delete self
                 var postId = await CreatePost(ExtraMockUsers[0], "user");
-                using var client = await Factory.CreateClientAs(ExtraMockUsers[0]);
+                using var client = await CreateClientAs(ExtraMockUsers[0]);
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = postId });
                 res.Should().HaveStatusCode(200);
@@ -362,7 +357,7 @@ namespace Timeline.Tests.IntegratedTests
 
             { // otherwise is forbidden
                 var postId = await CreatePost(ExtraMockUsers[0], "user");
-                using var client = await Factory.CreateClientAs(ExtraMockUsers[1]);
+                using var client = await CreateClientAs(ExtraMockUsers[1]);
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = postId });
                 res.Should().HaveStatusCode(403);
@@ -373,7 +368,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Post_Op_Should_Work()
         {
             {
-                using var client = await Factory.CreateClientAsUser();
+                using var client = await CreateClientAsUser();
                 {
                     var res = await client.GetAsync("users/user/timeline/posts");
                     res.Should().HaveStatusCode(200)
@@ -459,6 +454,7 @@ namespace Timeline.Tests.IntegratedTests
                             Time = createRes2.Time
                         });
                 }
+                // TODO! Add post not exist tests.
             }
         }
     }

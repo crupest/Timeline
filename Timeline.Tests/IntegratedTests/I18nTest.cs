@@ -1,32 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Timeline.Tests.Helpers;
 using Xunit;
-using FluentAssertions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:Uri parameters should not be strings")]
-    public class I18nTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class I18nTest : IntegratedTestBase
     {
-        private readonly TestApplication _testApp;
         private readonly HttpClient _client;
 
         public I18nTest(WebApplicationFactory<Startup> factory)
+            : base(factory)
         {
-            _testApp = new TestApplication(factory);
-            _client = _testApp.Factory.CreateDefaultClient();
+            _client = Factory.CreateDefaultClient();
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {
             _client.Dispose();
-            _testApp.Dispose();
         }
 
         private const string DirectUrl = "testing/i18n/direct";
