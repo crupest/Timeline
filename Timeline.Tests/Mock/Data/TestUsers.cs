@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using Timeline.Entities;
 using Timeline.Models;
-using Timeline.Services;
 
 namespace Timeline.Tests.Mock.Data
 {
@@ -24,27 +21,5 @@ namespace Timeline.Tests.Mock.Data
         public static MockUser Admin { get; } = new MockUser("admin", "adminpassword", true);
 
         public static IReadOnlyList<UserInfo> UserInfoList { get; } = new List<UserInfo> { User.Info, Admin.Info };
-
-        // emmmmmmm. Never reuse the user instances because EF Core uses them, which will cause strange things.
-        public static IEnumerable<User> CreateMockEntities()
-        {
-            var passwordService = new PasswordService();
-            User Create(MockUser user)
-            {
-                return new User
-                {
-                    Name = user.Username,
-                    EncryptedPassword = passwordService.HashPassword(user.Password),
-                    RoleString = UserRoleConvert.ToString(user.Administrator),
-                    Avatar = null
-                };
-            }
-
-            return new List<User>
-            {
-                Create(User),
-                Create(Admin)
-            };
-        }
     }
 }

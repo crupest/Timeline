@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -22,9 +21,8 @@ namespace Timeline.Tests.Helpers.Authentication
         public static async Task<CreateTokenResponse> CreateUserTokenAsync(this HttpClient client, string username, string password, int? expireOffset = null)
         {
             var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, Expire = expireOffset });
-            response.Should().HaveStatusCode(200);
-            var result = JsonConvert.DeserializeObject<CreateTokenResponse>(await response.Content.ReadAsStringAsync());
-            return result;
+            return response.Should().HaveStatusCode(200)
+                .And.HaveJsonBody<CreateTokenResponse>().Which;
         }
 
         public static async Task<HttpClient> CreateClientWithCredential<T>(this WebApplicationFactory<T> factory, string username, string password) where T : class
@@ -35,14 +33,19 @@ namespace Timeline.Tests.Helpers.Authentication
             return client;
         }
 
+        public static Task<HttpClient> CreateClientAs<T>(this WebApplicationFactory<T> factory, MockUser user) where T : class
+        {
+            return CreateClientWithCredential(factory, user.Username, user.Password);
+        }
+
         public static Task<HttpClient> CreateClientAsUser<T>(this WebApplicationFactory<T> factory) where T : class
         {
-            return factory.CreateClientWithCredential(MockUser.User.Username, MockUser.User.Password);
+            return factory.CreateClientAs(MockUser.User);
         }
 
         public static Task<HttpClient> CreateClientAsAdmin<T>(this WebApplicationFactory<T> factory) where T : class
         {
-            return factory.CreateClientWithCredential(MockUser.Admin.Username, MockUser.Admin.Password);
+            return factory.CreateClientAs(MockUser.Admin);
         }
 
         public static Task<HttpClient> CreateClientAs<T>(this WebApplicationFactory<T> factory, AuthType authType) where T : class
@@ -55,5 +58,18 @@ namespace Timeline.Tests.Helpers.Authentication
                 _ => throw new InvalidOperationException("Unknown auth type.")
             };
         }
+
+        public static MockUser GetMockUser(this AuthType authType)
+        {
+            return authType switch
+            {
+                AuthType.None => null,
+                AuthType.User => MockUser.User,
+                AuthType.Admin => MockUser.Admin,
+                _ => throw new InvalidOperationException("Unknown auth type.")
+            };
+        }
+
+        public static string GetUsername(this AuthType authType) => authType.GetMockUser().Username;
     }
 }
