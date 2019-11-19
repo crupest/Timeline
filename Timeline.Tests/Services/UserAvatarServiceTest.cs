@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Mock.Data;
 using Xunit;
 
 namespace Timeline.Tests.Services

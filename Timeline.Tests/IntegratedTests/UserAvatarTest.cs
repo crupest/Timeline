@@ -15,27 +15,18 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Helpers.Authentication;
 using Xunit;
 using static Timeline.ErrorCodes.Http.Common;
 using static Timeline.ErrorCodes.Http.UserAvatar;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class UserAvatarTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class UserAvatarTest : IntegratedTestBase
     {
-        private readonly TestApplication _testApp;
-        private readonly WebApplicationFactory<Startup> _factory;
-
         public UserAvatarTest(WebApplicationFactory<Startup> factory)
+            : base(factory)
         {
-            _testApp = new TestApplication(factory);
-            _factory = _testApp.Factory;
-        }
 
-        public void Dispose()
-        {
-            _testApp.Dispose();
         }
 
         [Fact]
@@ -48,7 +39,7 @@ namespace Timeline.Tests.IntegratedTests
                 Type = PngFormat.Instance.DefaultMimeType
             };
 
-            using (var client = await _factory.CreateClientAsUser())
+            using (var client = await CreateClientAsUser())
             {
                 {
                     var res = await client.GetAsync("users/usernotexist/avatar");
@@ -57,7 +48,7 @@ namespace Timeline.Tests.IntegratedTests
                         .Which.Code.Should().Be(Get.UserNotExist);
                 }
 
-                var env = _factory.Server.Host.Services.GetRequiredService<IWebHostEnvironment>();
+                var env = Factory.Server.Host.Services.GetRequiredService<IWebHostEnvironment>();
                 var defaultAvatarData = await File.ReadAllBytesAsync(Path.Combine(env.ContentRootPath, "default-avatar.png"));
 
                 async Task GetReturnDefault(string username = "user")
@@ -239,7 +230,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             // Authorization check.
-            using (var client = await _factory.CreateClientAsAdmin())
+            using (var client = await CreateClientAsAdmin())
             {
                 {
                     var res = await client.PutByteArrayAsync("users/user/avatar", mockAvatar.Data, mockAvatar.Type);
@@ -266,7 +257,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             // bad username check
-            using (var client = await _factory.CreateClientAsAdmin())
+            using (var client = await CreateClientAsAdmin())
             {
                 {
                     var res = await client.GetAsync("users/u!ser/avatar");

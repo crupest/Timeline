@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Timeline.Entities;
-using Timeline.Tests.Mock.Data;
 
 namespace Timeline.Tests.Helpers
 {

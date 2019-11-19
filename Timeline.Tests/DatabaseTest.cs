@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using Timeline.Entities;
-using Timeline.Tests.Mock.Data;
+using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests
