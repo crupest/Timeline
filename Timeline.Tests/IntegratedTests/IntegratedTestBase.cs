@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Tests.Helpers;
+using Timeline.Tests.Mock.Data;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
@@ -23,5 +24,12 @@ namespace Timeline.Tests.IntegratedTests
         {
             TestApp.Dispose();
         }
+
+        protected void CreateExtraMockUsers(int count)
+        {
+            TestApp.Database.CreateExtraMockUsers(count);
+        }
+
+        protected IReadOnlyList<MockUser> ExtraMockUsers => TestApp.Database.ExtraMockUsers;
     }
 }

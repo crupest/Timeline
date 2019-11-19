@@ -15,7 +15,7 @@ namespace Timeline.Tests
         public DatabaseTest()
         {
             _database = new TestDatabase();
-            _context = _database.DatabaseContext;
+            _context = _database.Context;
         }
 
         public void Dispose()

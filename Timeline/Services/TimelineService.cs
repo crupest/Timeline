@@ -605,12 +605,12 @@ namespace Timeline.Services
 
             var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
-            var postEntity = await Database.Timelines.Where(p => p.Id == id).Select(p => new { p.OwnerId }).SingleOrDefaultAsync();
+            var postEntity = await Database.TimelinePosts.Where(p => p.Id == id).Select(p => new { p.AuthorId }).SingleOrDefaultAsync();
 
             if (postEntity == null)
                 throw new TimelinePostNotExistException(id);
 
-            return timelineEntity.OwnerId == userId || postEntity.OwnerId == userId;
+            return timelineEntity.OwnerId == userId || postEntity.AuthorId == userId;
         }
 
         public async Task<bool> IsMemberOf(string name, string username)

@@ -11,6 +11,7 @@ using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Timeline.Tests.Helpers.Authentication;
+using Timeline.Tests.Mock.Data;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
@@ -239,6 +240,224 @@ namespace Timeline.Tests.IntegratedTests
                     using var client = await Factory.CreateClientAsUser();
                     var res = await client.GetAsync(adminUrl);
                     res.Should().HaveStatusCode(200);
+                }
+            }
+        }
+
+
+        [Fact]
+        public async Task Permission_Post_Create()
+        {
+            CreateExtraMockUsers(1);
+
+            using (var client = await Factory.CreateClientAsUser())
+            {
+                var res = await client.PostAsJsonAsync("users/user/timeline/op/member",
+                    new TimelineMemberChangeRequest { Add = new List<string> { "user0" } });
+                res.Should().HaveStatusCode(200);
+            }
+
+            using (var client = Factory.CreateDefaultClient())
+            {
+                { // no auth should get 401
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = "aaa" });
+                    res.Should().HaveStatusCode(401);
+                }
+            }
+
+            using (var client = await Factory.CreateClientAsUser())
+            {
+                { // post self's
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = "aaa" });
+                    res.Should().HaveStatusCode(200);
+                }
+                { // post other not as a member should get 403
+                    var res = await client.PostAsJsonAsync("users/admin/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = "aaa" });
+                    res.Should().HaveStatusCode(403);
+                }
+            }
+
+            using (var client = await Factory.CreateClientAsAdmin())
+            {
+                { // post as admin
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = "aaa" });
+                    res.Should().HaveStatusCode(200);
+                }
+            }
+
+            using (var client = await Factory.CreateClientAs(ExtraMockUsers[0]))
+            {
+                { // post as member
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = "aaa" });
+                    res.Should().HaveStatusCode(200);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Permission_Post_Delete()
+        {
+            CreateExtraMockUsers(2);
+
+            async Task<long> CreatePost(MockUser auth, string timeline)
+            {
+                using var client = await Factory.CreateClientAs(auth);
+                var res = await client.PostAsJsonAsync($"users/{timeline}/timeline/postop/create",
+                    new TimelinePostCreateRequest { Content = "aaa" });
+                return res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostCreateResponse>()
+                    .Which.Id;
+            }
+
+            using (var client = await Factory.CreateClientAsUser())
+            {
+                var res = await client.PostAsJsonAsync("users/user/timeline/op/member",
+                    new TimelineMemberChangeRequest { Add = new List<string> { "user0", "user1" } });
+                res.Should().HaveStatusCode(200);
+            }
+
+            { // no auth should get 401
+                using var client = Factory.CreateDefaultClient();
+                var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                    new TimelinePostDeleteRequest { Id = 12 });
+                res.Should().HaveStatusCode(401);
+            }
+
+            { // self can delete self
+                var postId = await CreatePost(MockUser.User, "user");
+                using var client = await Factory.CreateClientAsUser();
+                var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                    new TimelinePostDeleteRequest { Id = postId });
+                res.Should().HaveStatusCode(200);
+            }
+
+            { // admin can delete any
+                var postId = await CreatePost(MockUser.User, "user");
+                using var client = await Factory.CreateClientAsAdmin();
+                var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                    new TimelinePostDeleteRequest { Id = postId });
+                res.Should().HaveStatusCode(200);
+            }
+
+            { // owner can delete other
+                var postId = await CreatePost(ExtraMockUsers[0], "user");
+                using var client = await Factory.CreateClientAsUser();
+                var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                    new TimelinePostDeleteRequest { Id = postId });
+                res.Should().HaveStatusCode(200);
+            }
+
+            { // author can delete self
+                var postId = await CreatePost(ExtraMockUsers[0], "user");
+                using var client = await Factory.CreateClientAs(ExtraMockUsers[0]);
+                var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                    new TimelinePostDeleteRequest { Id = postId });
+                res.Should().HaveStatusCode(200);
+            }
+
+            { // otherwise is forbidden
+                var postId = await CreatePost(ExtraMockUsers[0], "user");
+                using var client = await Factory.CreateClientAs(ExtraMockUsers[1]);
+                var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                    new TimelinePostDeleteRequest { Id = postId });
+                res.Should().HaveStatusCode(403);
+            }
+        }
+
+        [Fact]
+        public async Task Post_Op_Should_Work()
+        {
+            {
+                using var client = await Factory.CreateClientAsUser();
+                {
+                    var res = await client.GetAsync("users/user/timeline/posts");
+                    res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelinePostInfo[]>()
+                        .Which.Should().NotBeNull().And.BeEmpty();
+                }
+                {
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = null });
+                    res.Should().BeInvalidModel();
+                }
+                const string mockContent = "aaa";
+                TimelinePostCreateResponse createRes;
+                {
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = mockContent });
+                    var body = res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelinePostCreateResponse>()
+                        .Which;
+                    body.Should().NotBeNull();
+                    createRes = body;
+                }
+                {
+                    var res = await client.GetAsync("users/user/timeline/posts");
+                    res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelinePostInfo[]>()
+                        .Which.Should().NotBeNull().And.BeEquivalentTo(
+                        new TimelinePostInfo
+                        {
+                            Id = createRes.Id,
+                            Author = "user",
+                            Content = mockContent,
+                            Time = createRes.Time
+                        });
+                }
+                const string mockContent2 = "bbb";
+                var mockTime2 = DateTime.Now.AddDays(-1);
+                TimelinePostCreateResponse createRes2;
+                {
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                        new TimelinePostCreateRequest { Content = mockContent2, Time = mockTime2 });
+                    var body = res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelinePostCreateResponse>()
+                        .Which;
+                    body.Should().NotBeNull();
+                    createRes2 = body;
+                }
+                {
+                    var res = await client.GetAsync("users/user/timeline/posts");
+                    res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelinePostInfo[]>()
+                        .Which.Should().NotBeNull().And.BeEquivalentTo(
+                        new TimelinePostInfo
+                        {
+                            Id = createRes.Id,
+                            Author = "user",
+                            Content = mockContent,
+                            Time = createRes.Time
+                        },
+                        new TimelinePostInfo
+                        {
+                            Id = createRes2.Id,
+                            Author = "user",
+                            Content = mockContent2,
+                            Time = createRes2.Time
+                        });
+                }
+                {
+                    var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
+                        new TimelinePostDeleteRequest { Id = createRes.Id });
+                    res.Should().HaveStatusCode(200);
+                }
+                {
+                    var res = await client.GetAsync("users/user/timeline/posts");
+                    res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelinePostInfo[]>()
+                        .Which.Should().NotBeNull().And.BeEquivalentTo(
+                        new TimelinePostInfo
+                        {
+                            Id = createRes2.Id,
+                            Author = "user",
+                            Content = mockContent2,
+                            Time = createRes2.Time
+                        });
                 }
             }
         }
