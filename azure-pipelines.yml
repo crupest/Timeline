@@ -6,38 +6,38 @@ stages:
   displayName: Routine Build and Test
 
   jobs:
-    - job: build
-      displayName: Build Debug and Test
-      pool:
-        vmImage: 'ubuntu-18.04'
-      variables:
-        buildConfiguration: 'Debug'
-        ASPNETCORE_ENVIRONMENT: 'Development'
-      steps:
-      - task: UseDotNet@2
-        inputs:
-          packageType: sdk
-          version: 3.0.x
+  - job: build
+    displayName: Build Debug and Test
+    pool:
+      vmImage: 'ubuntu-18.04'
+    variables:
+      buildConfiguration: 'Debug'
+      ASPNETCORE_ENVIRONMENT: 'Development'
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: sdk
+        version: 3.0.x
 
-      - script: |
-          dotnet restore Timeline/Timeline.csproj --configfile nuget.config
-          dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
-        displayName: Dotnet Restore
+    - script: |
+        dotnet restore Timeline/Timeline.csproj --configfile nuget.config
+        dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
+      displayName: Dotnet Restore
 
-      - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
-        displayName: Dotnet Test
+    - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
+      displayName: Dotnet Test
 
-      - task: PublishTestResults@2
-        condition: succeededOrFailed()
-        inputs:
-          testRunner: VSTest
-          testResultsFiles: '**/*.trx'
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testRunner: VSTest
+        testResultsFiles: '**/*.trx'
 
-      - task: PublishCodeCoverageResults@1
-        condition: succeededOrFailed()
-        inputs:
-          codeCoverageTool: 'Cobertura'
-          summaryFileLocation: '**/TestResults/*/coverage.cobertura.xml'
+    - task: PublishCodeCoverageResults@1
+      condition: succeededOrFailed()
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '**/TestResults/*/coverage.cobertura.xml'
 
 - stage: deploy
   displayName: Build Release and Deploy
@@ -52,6 +52,11 @@ stages:
     pool:
       vmImage: 'ubuntu-18.04'
     steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: sdk
+        version: 3.0.x
+
     - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./Timeline/publish/
       displayName: Dotnet Publish
 
@@ -78,4 +83,3 @@ stages:
               sudo systemctl restart timeline.service
             displayName: 'Copy Files and Restart Service'
             failOnStderr: true
-
