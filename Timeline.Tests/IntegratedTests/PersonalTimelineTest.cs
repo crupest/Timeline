@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models;
@@ -461,7 +462,33 @@ namespace Timeline.Tests.IntegratedTests
                             Time = createRes2.Time
                         });
                 }
-                // TODO! Add post not exist tests.
+            }
+        }
+
+        [Fact]
+        public async Task GetPost_Should_Ordered()
+        {
+            using var client = await CreateClientAsUser();
+
+            async Task<long> CreatePost(DateTime time)
+            {
+                var res = await client.PostAsJsonAsync("users/user/timeline/postop/create",
+                    new TimelinePostCreateRequest { Content = "aaa", Time = time });
+                return res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostCreateResponse>()
+                    .Which.Id;
+            }
+
+            var now = DateTime.Now;
+            var id0 = await CreatePost(now.AddDays(1));
+            var id1 = await CreatePost(now.AddDays(-1));
+            var id2 = await CreatePost(now);
+
+            {
+                var res = await client.GetAsync("users/user/timeline/posts");
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo[]>()
+                    .Which.Select(p => p.Id).Should().Equal(id1, id2, id0);
             }
         }
     }
