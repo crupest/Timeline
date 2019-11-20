@@ -348,7 +348,7 @@ namespace Timeline.Services
                 throw new ArgumentNullException(nameof(name));
 
             var timelineId = await FindTimelineId(name);
-            var postEntities = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
+            var postEntities = await Database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
             var posts = new List<TimelinePostInfo>(await Task.WhenAll(postEntities.Select(async p => new TimelinePostInfo
             {
                 Id = p.Id,
