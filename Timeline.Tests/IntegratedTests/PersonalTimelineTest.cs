@@ -169,6 +169,12 @@ namespace Timeline.Tests.IntegratedTests
         {
             const string userUrl = "users/user/timeline/posts";
             const string adminUrl = "users/admin/timeline/posts";
+            {
+                using var client = await CreateClientAsUser();
+                var res = await client.PostAsync("users/user/timeline/op/property",
+                    new StringContent(@"{""visibility"":""abcdefg""}", System.Text.Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json));
+                res.Should().BeInvalidModel();
+            }
             { // default visibility is registered
                 {
                     using var client = await CreateClientWithNoAuth();
