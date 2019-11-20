@@ -1,37 +1,33 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Helpers.Authentication;
-using Timeline.Tests.Mock.Data;
 using Xunit;
 using static Timeline.ErrorCodes.Http.Token;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class TokenTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class TokenTest : IntegratedTestBase
     {
         private const string CreateTokenUrl = "token/create";
         private const string VerifyTokenUrl = "token/verify";
 
-        private readonly TestApplication _testApp;
-        private readonly WebApplicationFactory<Startup> _factory;
-
         public TokenTest(WebApplicationFactory<Startup> factory)
+            : base(factory)
         {
-            _testApp = new TestApplication(factory);
-            _factory = _testApp.Factory;
+
         }
 
-        public void Dispose()
+        private static async Task<CreateTokenResponse> CreateUserTokenAsync(HttpClient client, string username, string password, int? expireOffset = null)
         {
-            _testApp.Dispose();
+            var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, Expire = expireOffset });
+            return response.Should().HaveStatusCode(200)
+                .And.HaveJsonBody<CreateTokenResponse>().Which;
         }
 
         public static IEnumerable<object[]> CreateToken_InvalidModel_Data()
@@ -46,7 +42,7 @@ namespace Timeline.Tests.IntegratedTests
         [MemberData(nameof(CreateToken_InvalidModel_Data))]
         public async Task CreateToken_InvalidModel(string username, string password, int expire)
         {
-            using var client = _factory.CreateDefaultClient();
+            using var client = await CreateClientWithNoAuth();
             (await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest
             {
                 Username = username,
@@ -65,7 +61,7 @@ namespace Timeline.Tests.IntegratedTests
         [MemberData(nameof(CreateToken_UserCredential_Data))]
         public async void CreateToken_UserCredential(string username, string password)
         {
-            using var client = _factory.CreateDefaultClient();
+            using var client = await CreateClientWithNoAuth();
             var response = await client.PostAsJsonAsync(CreateTokenUrl,
                 new CreateTokenRequest { Username = username, Password = password });
             response.Should().HaveStatusCode(400)
@@ -76,7 +72,7 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task CreateToken_Success()
         {
-            using var client = _factory.CreateDefaultClient();
+            using var client = await CreateClientWithNoAuth();
             var response = await client.PostAsJsonAsync(CreateTokenUrl,
                 new CreateTokenRequest { Username = MockUser.User.Username, Password = MockUser.User.Password });
             var body = response.Should().HaveStatusCode(200)
@@ -88,7 +84,7 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task VerifyToken_InvalidModel()
         {
-            using var client = _factory.CreateDefaultClient();
+            using var client = await CreateClientWithNoAuth();
             (await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = null })).Should().BeInvalidModel();
         }
@@ -96,7 +92,7 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task VerifyToken_BadFormat()
         {
-            using var client = _factory.CreateDefaultClient();
+            using var client = await CreateClientWithNoAuth();
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = "bad token hahaha" });
             response.Should().HaveStatusCode(400)
@@ -107,10 +103,10 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task VerifyToken_OldVersion()
         {
-            using var client = _factory.CreateDefaultClient();
-            var token = (await client.CreateUserTokenAsync(MockUser.User.Username, MockUser.User.Password)).Token;
+            using var client = await CreateClientWithNoAuth();
+            var token = (await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password)).Token;
 
-            using (var scope = _factory.Server.Host.Services.CreateScope()) // UserService is scoped.
+            using (var scope = Factory.Server.Host.Services.CreateScope()) // UserService is scoped.
             {
                 // create a user for test
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
@@ -127,10 +123,10 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task VerifyToken_UserNotExist()
         {
-            using var client = _factory.CreateDefaultClient();
-            var token = (await client.CreateUserTokenAsync(MockUser.User.Username, MockUser.User.Password)).Token;
+            using var client = await CreateClientWithNoAuth();
+            var token = (await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password)).Token;
 
-            using (var scope = _factory.Server.Host.Services.CreateScope()) // UserService is scoped.
+            using (var scope = Factory.Server.Host.Services.CreateScope()) // UserService is scoped.
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                 await userService.DeleteUser(MockUser.User.Username);
@@ -146,7 +142,7 @@ namespace Timeline.Tests.IntegratedTests
         //[Fact]
         //public async Task VerifyToken_Expired()
         //{
-        //    using (var client = _factory.CreateDefaultClient())
+        //    using (var client = await CreateClientWithNoAuth())
         //    {
         //        // I can only control the token expired time but not current time
         //        // because verify logic is encapsuled in other library.
@@ -164,8 +160,8 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task VerifyToken_Success()
         {
-            using var client = _factory.CreateDefaultClient();
-            var createTokenResult = await client.CreateUserTokenAsync(MockUser.User.Username, MockUser.User.Password);
+            using var client = await CreateClientWithNoAuth();
+            var createTokenResult = await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password);
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = createTokenResult.Token });
             response.Should().HaveStatusCode(200)

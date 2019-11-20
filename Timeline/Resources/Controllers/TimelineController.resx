@@ -117,103 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AvatarFormatException" xml:space="preserve">
-    <value>Avartar is of bad format because {0}.</value>
+  <data name="ExceptionStringToVisibility" xml:space="preserve">
+    <value>An unknown timeline visibility value. Can't convert it.</value>
   </data>
-  <data name="AvatarFormatExceptionBadSize" xml:space="preserve">
-    <value>image is not a square, aka, width is not equal to height</value>
+  <data name="LogUnknownTimelineMemberOperationUserException" xml:space="preserve">
+    <value>An unknown TimelineMemberOperationUserException is thrown. Can't recognize its inner exception. It is rethrown.</value>
   </data>
-  <data name="AvatarFormatExceptionCantDecode" xml:space="preserve">
-    <value>failed to decode image, see inner exception</value>
+  <data name="MessageMemberUsernameBadFormat" xml:space="preserve">
+    <value>The {0}-st username to do operation {1} on is of bad format.</value>
   </data>
-  <data name="AvatarFormatExceptionUnknownError" xml:space="preserve">
-    <value>unknown error</value>
+  <data name="MessageMemberUserNotExist" xml:space="preserve">
+    <value>The {0}-st user to do operation {1} on does not exist.</value>
   </data>
-  <data name="AvatarFormatExceptionUnmatchedFormat" xml:space="preserve">
-    <value>image's actual mime type is not the specified one</value>
+  <data name="MessagePostListGetForbid" xml:space="preserve">
+    <value>You have no permission to read posts of the timeline.</value>
   </data>
-  <data name="BadPasswordException" xml:space="preserve">
-    <value>The password is wrong.</value>
+  <data name="MessagePostOperationCreateForbid" xml:space="preserve">
+    <value>You have no permission to create posts in the timeline.</value>
   </data>
-  <data name="HashedPasswordBadFromatException" xml:space="preserve">
-    <value>The hashes password is of bad format. It might not be created by server.</value>
+  <data name="MessagePostOperationDeleteForbid" xml:space="preserve">
+    <value>You have no permission to delete posts in the timeline.</value>
   </data>
-  <data name="HashedPasswordBadFromatExceptionNotBase64" xml:space="preserve">
-    <value>Not of valid base64 format. See inner exception.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotLength0" xml:space="preserve">
-    <value>Decoded hashed password is of length 0.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotOthers" xml:space="preserve">
-    <value>See inner exception.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotSaltTooShort" xml:space="preserve">
-    <value>Salt length &lt; 128 bits.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotSubkeyTooShort" xml:space="preserve">
-    <value>Subkey length &lt; 128 bits.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotUnknownMarker" xml:space="preserve">
-    <value>Unknown format marker.</value>
-  </data>
-  <data name="JwtBadVersionException" xml:space="preserve">
-    <value>The version of the jwt token is old.</value>
-  </data>
-  <data name="JwtVerifyException" xml:space="preserve">
-    <value>The token didn't pass verification because {0}, see inner exception for information.</value>
-  </data>
-  <data name="JwtVerifyExceptionExpired" xml:space="preserve">
-    <value>token is expired.</value>
-  </data>
-  <data name="JwtVerifyExceptionIdClaimBadFormat" xml:space="preserve">
-    <value>id claim is not a number.</value>
-  </data>
-  <data name="JwtVerifyExceptionNoIdClaim" xml:space="preserve">
-    <value>id claim does not exist.</value>
-  </data>
-  <data name="JwtVerifyExceptionNoVersionClaim" xml:space="preserve">
-    <value>version claim does not exist.</value>
-  </data>
-  <data name="JwtVerifyExceptionOldVersion" xml:space="preserve">
-    <value>version of token is old.</value>
-  </data>
-  <data name="JwtVerifyExceptionOthers" xml:space="preserve">
-    <value>uncommon error.</value>
-  </data>
-  <data name="JwtVerifyExceptionUnknown" xml:space="preserve">
-    <value>unknown error code.</value>
-  </data>
-  <data name="JwtVerifyExceptionVersionClaimBadFormat" xml:space="preserve">
-    <value>version claim is not a number.</value>
-  </data>
-  <data name="TimelineAlreadyExistException" xml:space="preserve">
-    <value>The timeline with that name already exists.</value>
-  </data>
-  <data name="TimelineMemberOperationException" xml:space="preserve">
-    <value>An exception happened when add or remove member on timeline.</value>
-  </data>
-  <data name="TimelineMemberOperationExceptionDetail" xml:space="preserve">
-    <value>An exception happened when do operation {0} on the {1} member on timeline.</value>
-  </data>
-  <data name="TimelineNameBadFormatException" xml:space="preserve">
-    <value>Timeline name is of bad format. If this is a personal timeline, it means the username is of bad format and inner exception should be a UsernameBadFormatException.</value>
-  </data>
-  <data name="TimelineNotExistException" xml:space="preserve">
-    <value>Timeline does not exist. If this is a personal timeline, it means the user does not exist and inner exception should be a UserNotExistException.</value>
-  </data>
-  <data name="TimelinePostNotExistException" xml:space="preserve">
-    <value>The timeline post does not exist. You can't do operation on it.</value>
-  </data>
-  <data name="TimelineUserNotMemberException" xml:space="preserve">
-    <value>The use is not a member of the timeline.</value>
-  </data>
-  <data name="UsernameBadFormatException" xml:space="preserve">
-    <value>The username is of bad format.</value>
-  </data>
-  <data name="UsernameConfictException" xml:space="preserve">
-    <value>The username already exists.</value>
-  </data>
-  <data name="UserNotExistException" xml:space="preserve">
-    <value>The user does not exist.</value>
+  <data name="MessagePostOperationDeleteNotExist" xml:space="preserve">
+    <value>The post to delete does not exist.</value>
   </data>
 </root>

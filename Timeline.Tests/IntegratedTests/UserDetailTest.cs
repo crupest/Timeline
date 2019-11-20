@@ -1,38 +1,27 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
-using System;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Helpers.Authentication;
-using Timeline.Tests.Mock.Data;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public class UserDetailTest : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public class UserDetailTest : IntegratedTestBase
     {
-        private readonly TestApplication _testApp;
-        private readonly WebApplicationFactory<Startup> _factory;
-
         public UserDetailTest(WebApplicationFactory<Startup> factory)
+            : base(factory)
         {
-            _testApp = new TestApplication(factory);
-            _factory = _testApp.Factory;
-        }
 
-        public void Dispose()
-        {
-            _testApp.Dispose();
         }
 
         [Fact]
         public async Task PermissionTest()
         {
             { // unauthorize
-                using var client = _factory.CreateDefaultClient();
+                using var client = await CreateClientWithNoAuth();
                 { // GET
                     var res = await client.GetAsync($"users/{MockUser.User.Username}/nickname");
                     res.Should().HaveStatusCode(HttpStatusCode.OK);
@@ -47,7 +36,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
             { // user
-                using var client = await _factory.CreateClientAsUser();
+                using var client = await CreateClientAsUser();
                 { // GET
                     var res = await client.GetAsync($"users/{MockUser.User.Username}/nickname");
                     res.Should().HaveStatusCode(HttpStatusCode.OK);
@@ -70,7 +59,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
             { // user
-                using var client = await _factory.CreateClientAsAdmin();
+                using var client = await CreateClientAsAdmin();
                 { // PUT other
                     var res = await client.PutStringAsync($"users/{MockUser.User.Username}/nickname", "aaa");
                     res.Should().HaveStatusCode(HttpStatusCode.OK);
@@ -88,7 +77,7 @@ namespace Timeline.Tests.IntegratedTests
             var url = $"users/{MockUser.User.Username}/nickname";
             var userNotExistUrl = "users/usernotexist/nickname";
             {
-                using var client = await _factory.CreateClientAsUser();
+                using var client = await CreateClientAsUser();
                 {
                     var res = await client.GetAsync(userNotExistUrl);
                     res.Should().HaveStatusCode(HttpStatusCode.NotFound)
@@ -134,7 +123,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
             {
-                using var client = await _factory.CreateClientAsAdmin();
+                using var client = await CreateClientAsAdmin();
                 {
                     var res = await client.PutStringAsync(userNotExistUrl, "aaa");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)

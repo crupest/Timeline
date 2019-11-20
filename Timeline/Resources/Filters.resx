@@ -138,6 +138,12 @@
   <data name="MessageSelfOrAdminForbid" xml:space="preserve">
     <value>You can't access the resource unless you are the owner or administrator.</value>
   </data>
+  <data name="MessageTimelineNotExist" xml:space="preserve">
+    <value>The requested timeline does not exist.</value>
+  </data>
+  <data name="MessageTimelineNotExistUser" xml:space="preserve">
+    <value>The requested personal timeline does not exist because the user does not exist.</value>
+  </data>
   <data name="MessageUserNotExist" xml:space="preserve">
     <value>The user does not exist.</value>
   </data>

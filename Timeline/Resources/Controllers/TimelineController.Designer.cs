@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources {
+namespace Timeline.Resources.Controllers {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Timeline.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Filters {
+    internal class TimelineController {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Filters() {
+        internal TimelineController() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Filters", typeof(Filters).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Controllers.TimelineController", typeof(TimelineController).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,92 +61,74 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, but there is no user. Try add AuthorizeAttribute..
+        ///   Looks up a localized string similar to An unknown timeline visibility value. Can&apos;t convert it..
         /// </summary>
-        internal static string LogSelfOrAdminNoUser {
+        internal static string ExceptionStringToVisibility {
             get {
-                return ResourceManager.GetString("LogSelfOrAdminNoUser", resourceCulture);
+                return ResourceManager.GetString("ExceptionStringToVisibility", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, but it does not have a model named username..
+        ///   Looks up a localized string similar to An unknown TimelineMemberOperationUserException is thrown. Can&apos;t recognize its inner exception. It is rethrown..
         /// </summary>
-        internal static string LogSelfOrAdminNoUsername {
+        internal static string LogUnknownTimelineMemberOperationUserException {
             get {
-                return ResourceManager.GetString("LogSelfOrAdminNoUsername", resourceCulture);
+                return ResourceManager.GetString("LogUnknownTimelineMemberOperationUserException", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You apply a SelfOrAdminAttribute on an action, found a model named username, but it is not string..
+        ///   Looks up a localized string similar to The {0}-st username to do operation {1} on is of bad format..
         /// </summary>
-        internal static string LogSelfOrAdminUsernameNotString {
+        internal static string MessageMemberUsernameBadFormat {
             get {
-                return ResourceManager.GetString("LogSelfOrAdminUsernameNotString", resourceCulture);
+                return ResourceManager.GetString("MessageMemberUsernameBadFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Header Content-Length is missing or of bad format..
+        ///   Looks up a localized string similar to The {0}-st user to do operation {1} on does not exist..
         /// </summary>
-        internal static string MessageHeaderContentLengthMissing {
+        internal static string MessageMemberUserNotExist {
             get {
-                return ResourceManager.GetString("MessageHeaderContentLengthMissing", resourceCulture);
+                return ResourceManager.GetString("MessageMemberUserNotExist", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Header Content-Length must not be 0..
+        ///   Looks up a localized string similar to You have no permission to read posts of the timeline..
         /// </summary>
-        internal static string MessageHeaderContentLengthZero {
+        internal static string MessagePostListGetForbid {
             get {
-                return ResourceManager.GetString("MessageHeaderContentLengthZero", resourceCulture);
+                return ResourceManager.GetString("MessagePostListGetForbid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Header Content-Type is required..
+        ///   Looks up a localized string similar to You have no permission to create posts in the timeline..
         /// </summary>
-        internal static string MessageHeaderContentTypeMissing {
+        internal static string MessagePostOperationCreateForbid {
             get {
-                return ResourceManager.GetString("MessageHeaderContentTypeMissing", resourceCulture);
+                return ResourceManager.GetString("MessagePostOperationCreateForbid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can&apos;t access the resource unless you are the owner or administrator..
+        ///   Looks up a localized string similar to You have no permission to delete posts in the timeline..
         /// </summary>
-        internal static string MessageSelfOrAdminForbid {
+        internal static string MessagePostOperationDeleteForbid {
             get {
-                return ResourceManager.GetString("MessageSelfOrAdminForbid", resourceCulture);
+                return ResourceManager.GetString("MessagePostOperationDeleteForbid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The requested timeline does not exist..
+        ///   Looks up a localized string similar to The post to delete does not exist..
         /// </summary>
-        internal static string MessageTimelineNotExist {
+        internal static string MessagePostOperationDeleteNotExist {
             get {
-                return ResourceManager.GetString("MessageTimelineNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The requested personal timeline does not exist because the user does not exist..
-        /// </summary>
-        internal static string MessageTimelineNotExistUser {
-            get {
-                return ResourceManager.GetString("MessageTimelineNotExistUser", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The user does not exist..
-        /// </summary>
-        internal static string MessageUserNotExist {
-            get {
-                return ResourceManager.GetString("MessageUserNotExist", resourceCulture);
+                return ResourceManager.GetString("MessagePostOperationDeleteNotExist", resourceCulture);
             }
         }
     }

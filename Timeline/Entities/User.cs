@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Timeline.Entities
@@ -9,6 +10,7 @@ namespace Timeline.Entities
         public const string User = "user";
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is an entity class.")]
     [Table("users")]
     public class User
     {
@@ -30,5 +32,11 @@ namespace Timeline.Entities
         public UserAvatar? Avatar { get; set; }
 
         public UserDetail? Detail { get; set; }
+
+        public List<TimelineEntity> Timelines { get; set; } = default!;
+
+        public List<TimelinePostEntity> TimelinePosts { get; set; } = default!;
+
+        public List<TimelineMemberEntity> TimelinesJoined { get; set; } = default!;
     }
 }

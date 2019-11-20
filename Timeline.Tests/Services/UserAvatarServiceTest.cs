@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Mock.Data;
 using Xunit;
 
 namespace Timeline.Tests.Services
@@ -139,7 +138,7 @@ namespace Timeline.Tests.Services
 
             _database = new TestDatabase();
 
-            _service = new UserAvatarService(NullLogger<UserAvatarService>.Instance, _database.DatabaseContext, _mockDefaultAvatarProvider.Object, _mockValidator.Object, _mockETagGenerator.Object, _mockClock.Object);
+            _service = new UserAvatarService(NullLogger<UserAvatarService>.Instance, _database.Context, _mockDefaultAvatarProvider.Object, _mockValidator.Object, _mockETagGenerator.Object, _mockClock.Object);
         }
 
         public void Dispose()
@@ -171,7 +170,7 @@ namespace Timeline.Tests.Services
             string username = MockUser.User.Username;
             var mockAvatarEntity = CreateMockAvatarEntity("aaa");
             {
-                var context = _database.DatabaseContext;
+                var context = _database.Context;
                 var user = await context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
                 user.Avatar = mockAvatarEntity;
                 await context.SaveChangesAsync();
@@ -205,7 +204,7 @@ namespace Timeline.Tests.Services
             string username = MockUser.User.Username;
             var mockAvatarEntity = CreateMockAvatarEntity("aaa");
             {
-                var context = _database.DatabaseContext;
+                var context = _database.Context;
                 var user = await context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
                 user.Avatar = mockAvatarEntity;
                 await context.SaveChangesAsync();
@@ -237,7 +236,7 @@ namespace Timeline.Tests.Services
         {
             string username = MockUser.User.Username;
 
-            var user = await _database.DatabaseContext.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
+            var user = await _database.Context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
 
             var avatar1 = CreateMockAvatar("aaa");
             var avatar2 = CreateMockAvatar("bbb");

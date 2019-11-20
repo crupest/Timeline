@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using Timeline.Entities;
-using Timeline.Tests.Mock.Data;
+using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests
@@ -15,7 +15,7 @@ namespace Timeline.Tests
         public DatabaseTest()
         {
             _database = new TestDatabase();
-            _context = _database.DatabaseContext;
+            _context = _database.Context;
         }
 
         public void Dispose()
