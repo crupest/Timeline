@@ -348,7 +348,7 @@ namespace Timeline.Services
                 throw new ArgumentNullException(nameof(name));
 
             var timelineId = await FindTimelineId(name);
-            var postEntities = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId).ToListAsync();
+            var postEntities = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
             var posts = new List<TimelinePostInfo>(await Task.WhenAll(postEntities.Select(async p => new TimelinePostInfo
             {
                 Id = p.Id,
@@ -418,7 +418,9 @@ namespace Timeline.Services
             if (post == null)
                 throw new TimelinePostNotExistException(id);
 
-            Database.TimelinePosts.Remove(post);
+            post.Content = null;
+            post.LastUpdated = Clock.GetCurrentTime();
+
             await Database.SaveChangesAsync();
         }
 
