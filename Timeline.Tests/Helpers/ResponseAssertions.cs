@@ -2,11 +2,13 @@
 using FluentAssertions.Execution;
 using FluentAssertions.Formatting;
 using FluentAssertions.Primitives;
-using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Timeline.Models.Converters;
 using Timeline.Models.Http;
 
 namespace Timeline.Tests.Helpers
@@ -88,8 +90,25 @@ namespace Timeline.Tests.Helpers
                 return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, null);
             }
 
-            var result = JsonConvert.DeserializeObject<T>(body); // TODO! catch and throw on bad format
-            return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, result);
+
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+                options.Converters.Add(new JsonStringEnumConverter());
+                options.Converters.Add(new JsonDateTimeConverter());
+
+                var result = JsonSerializer.Deserialize<T>(body, options);
+
+                return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, result);
+            }
+            catch (JsonException e)
+            {
+                a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string{reason}, but failed to deserialize it. Exception is {0}.", e);
+                return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, null);
+            }
         }
     }
 
