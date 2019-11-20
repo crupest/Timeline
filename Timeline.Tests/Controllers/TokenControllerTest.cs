@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using Timeline.Controllers;
 using Timeline.Models.Http;
 using Timeline.Services;
-using Timeline.Tests.Mock.Data;
-using Timeline.Tests.Mock.Services;
+using Timeline.Tests.Helpers;
 using Xunit;
 using static Timeline.ErrorCodes.Http.Token;
 

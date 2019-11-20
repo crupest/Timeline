@@ -15,8 +15,8 @@
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
@@ -30,9 +30,5 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Timeline\Timeline.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Properties\" />
     </ItemGroup>
 </Project>

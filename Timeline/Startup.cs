@@ -71,6 +71,8 @@ namespace Timeline
             services.AddUserAvatarService();
             services.AddScoped<IUserDetailService, UserDetailService>();
 
+            services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();
+
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
             services.AddDbContext<DatabaseContext>(options =>

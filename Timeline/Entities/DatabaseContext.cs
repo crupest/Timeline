@@ -20,5 +20,8 @@ namespace Timeline.Entities
         public DbSet<User> Users { get; set; } = default!;
         public DbSet<UserAvatar> UserAvatars { get; set; } = default!;
         public DbSet<UserDetail> UserDetails { get; set; } = default!;
+        public DbSet<TimelineEntity> Timelines { get; set; } = default!;
+        public DbSet<TimelinePostEntity> TimelinePosts { get; set; } = default!;
+        public DbSet<TimelineMemberEntity> TimelineMembers { get; set; } = default!;
     }
 }

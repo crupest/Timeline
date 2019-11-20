@@ -12,7 +12,6 @@ using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.Mock.Data;
 using Xunit;
 using static Timeline.ErrorCodes.Http.User;
 
