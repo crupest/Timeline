@@ -72,6 +72,8 @@ namespace Timeline.Models.Http
     {
         public class ResponseData
         {
+            public ResponseData() { }
+
             public ResponseData(bool create)
             {
                 Create = create;
@@ -106,6 +108,8 @@ namespace Timeline.Models.Http
     {
         public class ResponseData
         {
+            public ResponseData() { }
+
             public ResponseData(bool delete)
             {
                 Delete = delete;
