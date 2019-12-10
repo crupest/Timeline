@@ -17,7 +17,7 @@ namespace Timeline.Models.Converters
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.ToUniversalTime().ToString("s", CultureInfo.InvariantCulture));
+            writer.WriteStringValue(value.ToUniversalTime().ToString("s", CultureInfo.InvariantCulture) + "Z");
         }
     }
 }
