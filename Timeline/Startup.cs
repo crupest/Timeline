@@ -8,11 +8,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
 using Timeline.Entities;
 using Timeline.Formatters;
 using Timeline.Helpers;
+using Timeline.Models.Converters;
 using Timeline.Services;
 
 namespace Timeline
@@ -36,11 +38,15 @@ namespace Timeline
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
             })
-                .ConfigureApiBehaviorOptions(options =>
-                {
-                    options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
-                })
-                .AddNewtonsoftJson(); // TODO: Remove this.
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
+            })
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
+            });
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
             var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
