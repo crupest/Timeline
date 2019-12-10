@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <UserSecretsId>1f6fb74d-4277-4bc0-aeea-b1fc5ffb0b43</UserSecretsId>
         <Authors>crupest</Authors>
 
@@ -15,18 +15,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7">
+        <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="3.0.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.1">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="3.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.1" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-dev002868" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
