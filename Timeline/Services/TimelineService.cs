@@ -349,13 +349,17 @@ namespace Timeline.Services
 
             var timelineId = await FindTimelineId(name);
             var postEntities = await Database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
-            var posts = new List<TimelinePostInfo>(await Task.WhenAll(postEntities.Select(async p => new TimelinePostInfo
+            var posts = new List<TimelinePostInfo>();
+            foreach (var entity in postEntities)
             {
-                Id = p.Id,
-                Content = p.Content,
-                Author = (await Database.Users.Where(u => u.Id == p.AuthorId).Select(u => new { u.Name }).SingleAsync()).Name,
-                Time = p.Time
-            })));
+                posts.Add(new TimelinePostInfo
+                {
+                    Id = entity.Id,
+                    Content = entity.Content,
+                    Author = (await Database.Users.Where(u => u.Id == entity.AuthorId).Select(u => new { u.Name }).SingleAsync()).Name,
+                    Time = entity.Time
+                });
+            }
             return posts;
         }
 
