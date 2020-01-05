@@ -2,19 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timeline.Entities;
 
-namespace Timeline.Migrations
+namespace Timeline.Migrations.ProductionDatabase
 {
-    [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ProductionDatabaseContext))]
+    [Migration("20200105151839_RenameTimelineMember")]
+    partial class RenameTimelineMember
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.0.1")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Timeline.Entities.TimelineEntity", b =>
@@ -72,7 +74,7 @@ namespace Timeline.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TimelineMembers");
+                    b.ToTable("timeline_members");
                 });
 
             modelBuilder.Entity("Timeline.Entities.TimelinePostEntity", b =>

@@ -18,7 +18,7 @@ namespace Timeline.Tests.Helpers
                 builder.ConfigureServices(services =>
                 {
                     services.AddEntityFrameworkSqlite();
-                    services.AddDbContext<DatabaseContext>(options =>
+                    services.AddDbContext<DatabaseContext, DevelopmentDatabaseContext>(options =>
                     {
                         options.UseSqlite(Database.Connection);
                     });

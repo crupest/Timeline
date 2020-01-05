@@ -47,11 +47,11 @@ namespace Timeline.Tests.Helpers
             Connection = new SqliteConnection("Data Source=:memory:;");
             Connection.Open();
 
-            var options = new DbContextOptionsBuilder<DatabaseContext>()
+            var options = new DbContextOptionsBuilder<DevelopmentDatabaseContext>()
                 .UseSqlite(Connection)
                 .Options;
 
-            Context = new DatabaseContext(options);
+            Context = new DevelopmentDatabaseContext(options);
 
             InitDatabase(Context);
         }
