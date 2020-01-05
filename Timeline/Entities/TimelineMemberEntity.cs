@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Timeline.Entities
 {
+    [Table("timeline_members")]
     public class TimelineMemberEntity
     {
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

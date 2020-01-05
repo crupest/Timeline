@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json.Serialization;
@@ -55,15 +56,27 @@ namespace Timeline
             services.AddAuthorization();
 
 
-            var corsConfig = Configuration.GetSection("Cors").Get<string[]>();
-            services.AddCors(setup =>
+            if (Environment.IsDevelopment())
             {
-                setup.AddDefaultPolicy(new CorsPolicyBuilder()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .WithOrigins(corsConfig).Build()
-                );
-            });
+                services.AddCors(setup =>
+                {
+                    setup.AddDefaultPolicy(builder =>
+                    {
+                        builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                    });
+                });
+            }
+            else
+            {
+                var corsConfig = Configuration.GetSection("Cors").Get<string[]>();
+                services.AddCors(setup =>
+                {
+                    setup.AddDefaultPolicy(builder =>
+                    {
+                        builder.AllowAnyHeader().AllowAnyMethod().WithOrigins(corsConfig);
+                    });
+                });
+            }
 
             services.AddLocalization(options =>
             {
@@ -81,10 +94,24 @@ namespace Timeline
 
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
-            services.AddDbContext<DatabaseContext>(options =>
+            if (databaseConfig.UseDevelopment)
             {
-                options.UseMySql(databaseConfig.ConnectionString);
-            });
+                services.AddDbContext<DatabaseContext, DevelopmentDatabaseContext>(options =>
+                {
+                    if (databaseConfig.DevelopmentConnectionString == null)
+                        throw new InvalidOperationException("DatabaseConfig.DevelopmentConnectionString is not set. Please set it as a sqlite connection string.");
+                    options.UseSqlite(databaseConfig.DevelopmentConnectionString);
+                });
+            }
+            else
+            {
+                services.AddDbContext<DatabaseContext, ProductionDatabaseContext>(options =>
+                {
+                    if (databaseConfig.ConnectionString == null)
+                        throw new InvalidOperationException("DatabaseConfig.ConnectionString is not set. Please set it as a mysql connection string.");
+                    options.UseMySql(databaseConfig.ConnectionString);
+                });
+            }
 
             services.AddMemoryCache();
         }

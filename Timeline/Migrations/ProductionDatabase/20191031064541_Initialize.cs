@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Timeline.Migrations
+namespace Timeline.Migrations.ProductionDatabase
 {
     public partial class Initialize : Migration
     {

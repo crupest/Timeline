@@ -21,11 +21,12 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="3.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.1" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-dev002868" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
@@ -171,5 +172,9 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>UserService.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="DevelopmentMigrations\" />
     </ItemGroup>
 </Project>

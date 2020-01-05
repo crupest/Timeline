@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timeline.Entities;
 
-namespace Timeline.Migrations
+namespace Timeline.Migrations.ProductionDatabase
 {
-    [DbContext(typeof(DatabaseContext))]
+    [DbContext(typeof(ProductionDatabaseContext))]
     [Migration("20191031064541_Initialize")]
     partial class Initialize
     {
