@@ -6,11 +6,11 @@ namespace Timeline.Services
     [Serializable]
     public class BadPasswordException : Exception
     {
-        public BadPasswordException() : base(Resources.Services.Exception.UserNotExistException) { }
+        public BadPasswordException() : base(Resources.Services.Exception.BadPasswordException) { }
         public BadPasswordException(string message, Exception inner) : base(message, inner) { }
 
         public BadPasswordException(string badPassword)
-            : base(Log.Format(Resources.Services.Exception.UserNotExistException, ("Bad Password", badPassword)))
+            : base(Log.Format(Resources.Services.Exception.BadPasswordException, ("Bad Password", badPassword)))
         {
             Password = badPassword;
         }
