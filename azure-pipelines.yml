@@ -57,7 +57,7 @@ stages:
         packageType: sdk
         version: 3.1.x
 
-    - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./Timeline/publish/
+    - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./Timeline/publish/ -r linux-x64 --self-contained false
       displayName: Dotnet Publish
 
     - publish: Timeline/publish
