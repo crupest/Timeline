@@ -415,8 +415,6 @@ namespace Timeline.Services
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            var timelineId = FindTimelineId(name);
-
             var post = await Database.TimelinePosts.Where(p => p.Id == id).SingleOrDefaultAsync();
 
             if (post == null)
