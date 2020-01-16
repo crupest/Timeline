@@ -60,23 +60,26 @@ stages:
     - script: dotnet publish Timeline/Timeline.csproj --configuration $(buildConfiguration) --output ./Timeline/publish/
       displayName: Dotnet Publish
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: 'timeline'
-        targetPath: Timeline/publish
+    - publish: Timeline/publish
+      artifact: timeline
 
   - deployment: deploy
     displayName: Deploy to Server
-    pool:
-      name: 'Default'
-    environment: 'timeline-server'
+    environment: 
+      name: timeline-server
+      resourceType: VirtualMachine
+      tags: linux
     dependsOn: build
     strategy:
       runOnce:
+        preDeploy:
+          steps:
+          - download: none
+
+          - download: current
+            artifact: timeline
         deploy:
           steps:
-          - download: current
-            artifact: 'timeline'
           - script: |
               rm -rf /var/timeline/*
               cp -r $PIPELINE_WORKSPACE/timeline/. /var/timeline/
