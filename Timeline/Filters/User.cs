@@ -9,25 +9,6 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using static Timeline.Resources.Filters;
 
-namespace Timeline
-{
-    public static partial class ErrorCodes
-    {
-        public static partial class Http
-        {
-            public static partial class Filter // bxx = 1xx
-            {
-                public static class User // bbb = 101
-                {
-                    public const int NotExist = 11010101;
-
-                    public const int NotSelfOrAdminForbid = 11010201;
-                }
-            }
-        }
-    }
-}
-
 namespace Timeline.Filters
 {
     public class SelfOrAdminAttribute : ActionFilterAttribute
@@ -51,8 +32,7 @@ namespace Timeline.Filters
                 {
                     if (!user.IsAdministrator() && user.Identity.Name != username)
                     {
-                        context.Result = new ObjectResult(
-                            new CommonResponse(ErrorCodes.Http.Filter.User.NotSelfOrAdminForbid, MessageSelfOrAdminForbid))
+                        context.Result = new ObjectResult(ErrorResponse.Common.Forbid())
                         { StatusCode = StatusCodes.Status403Forbidden };
                     }
                 }
@@ -76,7 +56,7 @@ namespace Timeline.Filters
         {
             if (context.Exception is UserNotExistException)
             {
-                var body = new CommonResponse(ErrorCodes.Http.Filter.User.NotExist, MessageUserNotExist);
+                var body = ErrorResponse.UserCommon.NotExist();
 
                 if (context.HttpContext.Request.Method == "GET")
                     context.Result = new NotFoundObjectResult(body);

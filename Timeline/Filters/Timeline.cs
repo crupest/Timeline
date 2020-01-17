@@ -2,25 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Timeline.Models.Http;
 using Timeline.Services;
-using static Timeline.Resources.Filters;
-
-namespace Timeline
-{
-    public static partial class ErrorCodes
-    {
-        public static partial class Http
-        {
-            public static partial class Filter // bxx = 1xx
-            {
-                public static class Timeline // bbb = 102
-                {
-                    public const int UserNotExist = 11020101;
-                    public const int NameNotExist = 11020102;
-                }
-            }
-        }
-    }
-}
 
 namespace Timeline.Filters
 {
@@ -33,13 +14,11 @@ namespace Timeline.Filters
             {
                 if (e.InnerException is UserNotExistException)
                 {
-                    context.Result = new BadRequestObjectResult(
-                        new CommonResponse(ErrorCodes.Http.Filter.Timeline.UserNotExist, MessageTimelineNotExistUser));
+                    context.Result = new BadRequestObjectResult(ErrorResponse.UserCommon.NotExist());
                 }
                 else
                 {
-                    context.Result = new BadRequestObjectResult(
-                        new CommonResponse(ErrorCodes.Http.Filter.Timeline.NameNotExist, MessageTimelineNotExist));
+                    throw new System.NotImplementedException();
                 }
             }
         }

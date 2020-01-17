@@ -10,7 +10,7 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
-using static Timeline.ErrorCodes.Http.Token;
+using static Timeline.ErrorCodes.Token;
 
 namespace Timeline.Tests.Controllers
 {
@@ -98,7 +98,7 @@ namespace Timeline.Tests.Controllers
 
         public static IEnumerable<object[]> Verify_BadRequest_Data()
         {
-            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.Expired), Verify.Expired };
+            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.Expired), Verify.TimeExpired };
             yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.IdClaimBadFormat), Verify.BadFormat };
             yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.OldVersion), Verify.OldVersion };
             yield return new object[] { new UserNotExistException(), Verify.UserNotExist };

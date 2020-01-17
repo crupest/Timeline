@@ -117,23 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MessageContentTooBig" xml:space="preserve">
-    <value>Body is too big. It can't be bigger than {0}.</value>
-  </data>
-  <data name="MessageContentUnmatchedLengthBigger" xml:space="preserve">
-    <value>Actual body length is bigger than it in header.</value>
-  </data>
-  <data name="MessageContentUnmatchedLengthSmaller" xml:space="preserve">
-    <value>Actual body length is smaller than it in header.</value>
-  </data>
   <data name="MessageDeleteDelete" xml:space="preserve">
     <value>An existent item is deleted.</value>
   </data>
   <data name="MessageDeleteNotExist" xml:space="preserve">
     <value>The item does not exist, so nothing is changed.</value>
-  </data>
-  <data name="MessageHeaderIfNonMatchBad" xml:space="preserve">
-    <value>Header If-Non-Match is of bad format.</value>
   </data>
   <data name="MessagePutCreate" xml:space="preserve">
     <value>A new item is created.</value>

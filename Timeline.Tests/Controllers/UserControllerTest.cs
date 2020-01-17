@@ -13,7 +13,8 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
-using static Timeline.ErrorCodes.Http.User;
+using static Timeline.ErrorCodes.User;
+using static Timeline.ErrorCodes.UserCommon;
 
 namespace Timeline.Tests.Controllers
 {
@@ -61,7 +62,7 @@ namespace Timeline.Tests.Controllers
             var action = await _controller.Get(username);
             action.Result.Should().BeAssignableTo<NotFoundObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(Get.NotExist);
+                .Which.Code.Should().Be(UserNotExist);
         }
 
         [Theory]
@@ -114,7 +115,7 @@ namespace Timeline.Tests.Controllers
             }, username);
             action.Should().BeAssignableTo<NotFoundObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(Patch.NotExist);
+                .Which.Code.Should().Be(UserNotExist);
         }
 
         [Fact]
@@ -154,8 +155,8 @@ namespace Timeline.Tests.Controllers
         }
 
         [Theory]
-        [InlineData(typeof(UserNotExistException), Op.ChangeUsername.NotExist)]
-        [InlineData(typeof(UsernameConfictException), Op.ChangeUsername.AlreadyExist)]
+        [InlineData(typeof(UserNotExistException), UserNotExist)]
+        [InlineData(typeof(UsernameConfictException), ChangeUsername_Conflict)]
         public async Task Op_ChangeUsername_Failure(Type exceptionType, int code)
         {
             const string oldUsername = "aaa";
@@ -212,7 +213,7 @@ namespace Timeline.Tests.Controllers
             var action = await _controller.ChangePassword(new ChangePasswordRequest { OldPassword = oldPassword, NewPassword = newPassword });
             action.Should().BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(Op.ChangePassword.BadOldPassword);
+                .Which.Code.Should().Be(ChangePassword_BadOldPassword);
         }
     }
 }

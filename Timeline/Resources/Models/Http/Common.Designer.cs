@@ -61,33 +61,6 @@ namespace Timeline.Resources.Models.Http {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Body is too big. It can&apos;t be bigger than {0}..
-        /// </summary>
-        internal static string MessageContentTooBig {
-            get {
-                return ResourceManager.GetString("MessageContentTooBig", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Actual body length is bigger than it in header..
-        /// </summary>
-        internal static string MessageContentUnmatchedLengthBigger {
-            get {
-                return ResourceManager.GetString("MessageContentUnmatchedLengthBigger", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Actual body length is smaller than it in header..
-        /// </summary>
-        internal static string MessageContentUnmatchedLengthSmaller {
-            get {
-                return ResourceManager.GetString("MessageContentUnmatchedLengthSmaller", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to An existent item is deleted..
         /// </summary>
         internal static string MessageDeleteDelete {
@@ -102,15 +75,6 @@ namespace Timeline.Resources.Models.Http {
         internal static string MessageDeleteNotExist {
             get {
                 return ResourceManager.GetString("MessageDeleteNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Header If-Non-Match is of bad format..
-        /// </summary>
-        internal static string MessageHeaderIfNonMatchBad {
-            get {
-                return ResourceManager.GetString("MessageHeaderIfNonMatchBad", resourceCulture);
             }
         }
         

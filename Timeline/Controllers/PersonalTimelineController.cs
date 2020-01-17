@@ -12,24 +12,7 @@ using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using static Timeline.Resources.Controllers.TimelineController;
-
-namespace Timeline
-{
-    public static partial class ErrorCodes
-    {
-        public static partial class Http
-        {
-            public static class Timeline // ccc = 004
-            {
-                public const int PostListGetForbid = 10040101;
-                public const int PostOperationCreateForbid = 10040102;
-                public const int PostOperationDeleteForbid = 10040103;
-                public const int PostOperationDeleteNotExist = 10040201;
-                public const int ChangeMemberUserNotExist = 10040301;
-            }
-        }
-    }
-}
+using static Timeline.Resources.Messages;
 
 namespace Timeline.Controllers
 {
@@ -80,8 +63,7 @@ namespace Timeline.Controllers
         {
             if (!IsAdmin() && !await _service.HasReadPermission(username, GetAuthUsername()))
             {
-                return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.Timeline.PostListGetForbid, MessagePostListGetForbid));
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
             return await _service.GetPosts(username);
@@ -94,8 +76,7 @@ namespace Timeline.Controllers
         {
             if (!IsAdmin() && !await _service.IsMemberOf(username, GetAuthUsername()!))
             {
-                return StatusCode(StatusCodes.Status403Forbidden,
-                    new CommonResponse(ErrorCodes.Http.Timeline.PostOperationCreateForbid, MessagePostOperationCreateForbid));
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
             var res = await _service.CreatePost(username, User.Identity.Name!, body.Content, body.Time);
@@ -112,16 +93,13 @@ namespace Timeline.Controllers
                 var postId = body.Id!.Value;
                 if (!IsAdmin() && !await _service.HasPostModifyPermission(username, postId, GetAuthUsername()!))
                 {
-                    return StatusCode(StatusCodes.Status403Forbidden,
-                        new CommonResponse(ErrorCodes.Http.Timeline.PostOperationDeleteForbid, MessagePostOperationCreateForbid));
+                    return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
                 }
                 await _service.DeletePost(username, postId);
             }
             catch (TimelinePostNotExistException)
             {
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Timeline.PostOperationDeleteNotExist,
-                    MessagePostOperationDeleteNotExist));
+                return BadRequest(ErrorResponse.TimelineController.PostOperationDelete_NotExist());
             }
             return Ok();
         }
@@ -151,13 +129,13 @@ namespace Timeline.Controllers
             {
                 if (e.InnerException is UsernameBadFormatException)
                 {
-                    return BadRequest(CommonResponse.InvalidModel(
-                        string.Format(CultureInfo.CurrentCulture, MessageMemberUsernameBadFormat, e.Index, e.Operation)));
+                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(
+                        TimelineController_ChangeMember_UsernameBadFormat, e.Index, e.Operation));
                 }
                 else if (e.InnerException is UserNotExistException)
                 {
-                    return BadRequest(new CommonResponse(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist,
-                        string.Format(CultureInfo.CurrentCulture, MessageMemberUserNotExist, e.Index, e.Operation)));
+                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(
+                        TimelineController_ChangeMember_UserNotExist, e.Index, e.Operation));
                 }
 
                 _logger.LogError(e, LogUnknownTimelineMemberOperationUserException);
