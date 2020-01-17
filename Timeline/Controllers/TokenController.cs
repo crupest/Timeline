@@ -10,31 +10,6 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using static Timeline.Resources.Controllers.TokenController;
 
-namespace Timeline
-{
-    public static partial class ErrorCodes
-    {
-        public static partial class Http
-        {
-            public static class Token // bbb = 001
-            {
-                public static class Create // cc = 01
-                {
-                    public const int BadCredential = 10010101;
-                }
-
-                public static class Verify // cc = 02
-                {
-                    public const int BadFormat = 10010201;
-                    public const int UserNotExist = 10010202;
-                    public const int OldVersion = 10010203;
-                    public const int Expired = 10010204;
-                }
-            }
-        }
-    }
-}
-
 namespace Timeline.Controllers
 {
     [Route("token")]
@@ -87,16 +62,12 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 LogFailure(LogUserNotExist, e);
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Create.BadCredential,
-                    ErrorBadCredential));
+                return BadRequest(ErrorResponse.TokenController.Create_BadCredential());
             }
             catch (BadPasswordException e)
             {
                 LogFailure(LogBadPassword, e);
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Create.BadCredential,
-                     ErrorBadCredential));
+                return BadRequest(ErrorResponse.TokenController.Create_BadCredential());
             }
         }
 
@@ -128,31 +99,28 @@ namespace Timeline.Controllers
                 if (e.ErrorCode == JwtVerifyException.ErrorCodes.Expired)
                 {
                     var innerException = e.InnerException as SecurityTokenExpiredException;
-                    LogFailure(LogVerifyExpire, e, ("Expires", innerException?.Expires),
+                    LogFailure(LogVerifyExpire, e, ("Expires", innerException.Expires),
                         ("Current Time", _clock.GetCurrentTime()));
-                    return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.Expired, ErrorVerifyExpire));
+                    return BadRequest(ErrorResponse.TokenController.Verify_TimeExpired());
                 }
                 else if (e.ErrorCode == JwtVerifyException.ErrorCodes.OldVersion)
                 {
                     var innerException = e.InnerException as JwtBadVersionException;
                     LogFailure(LogVerifyOldVersion, e,
-                        ("Token Version", innerException?.TokenVersion), ("Required Version", innerException?.RequiredVersion));
-                    return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.OldVersion, ErrorVerifyOldVersion));
+                        ("Token Version", innerException.TokenVersion),
+                        ("Required Version", innerException?.RequiredVersion));
+                    return BadRequest(ErrorResponse.TokenController.Verify_OldVersion());
                 }
                 else
                 {
                     LogFailure(LogVerifyBadFormat, e);
-                    return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.BadFormat, ErrorVerifyBadFormat));
+                    return BadRequest(ErrorResponse.TokenController.Verify_BadFormat());
                 }
             }
             catch (UserNotExistException e)
             {
                 LogFailure(LogVerifyUserNotExist, e);
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Verify.UserNotExist, ErrorVerifyUserNotExist));
+                return BadRequest(ErrorResponse.TokenController.Verify_UserNotExist());
             }
         }
     }

@@ -33,15 +33,14 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Timeline.ErrorCodes\Timeline.ErrorCodes.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Compile Update="Resources\Authentication\AuthHandler.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>AuthHandler.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Common.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Common.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Controllers\Testing\TestingI18nController.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -72,6 +71,11 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Filters.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Messages.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Messages.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Models\Http\Common.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -115,10 +119,6 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>AuthHandler.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Common.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
         <EmbeddedResource Update="Resources\Controllers\Testing\TestingI18nController.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>TestingI18nController.Designer.cs</LastGenOutput>
@@ -143,6 +143,10 @@
         <EmbeddedResource Update="Resources\Filters.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Filters.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Messages.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Messages.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Http\Common.resx">
             <Generator>ResXFileCodeGenerator</Generator>

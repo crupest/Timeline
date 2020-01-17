@@ -117,23 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MessageContentTooBig" xml:space="preserve">
-    <value>请求体太大。它不能超过{0}.</value>
-  </data>
-  <data name="MessageContentUnmatchedLengthBigger" xml:space="preserve">
-    <value>实际的请求体长度比头中指示的大。</value>
-  </data>
-  <data name="MessageContentUnmatchedLengthSmaller" xml:space="preserve">
-    <value>实际的请求体长度比头中指示的小。</value>
-  </data>
   <data name="MessageDeleteDelete" xml:space="preserve">
     <value>删除了一个项目。</value>
   </data>
   <data name="MessageDeleteNotExist" xml:space="preserve">
     <value>要删除的项目不存在，什么都没有修改。</value>
-  </data>
-  <data name="MessageHeaderIfNonMatchBad" xml:space="preserve">
-    <value>请求头If-Non-Match格式不对。</value>
   </data>
   <data name="MessagePutCreate" xml:space="preserve">
     <value>创建了一个新项目。</value>

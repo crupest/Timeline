@@ -61,56 +61,11 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Old password is wrong..
+        ///   Looks up a localized string similar to Unknown PutResult..
         /// </summary>
-        internal static string ErrorChangePasswordBadPassword {
+        internal static string ExceptionUnknownPutResult {
             get {
-                return ResourceManager.GetString("ErrorChangePasswordBadPassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The new username {0} already exists..
-        /// </summary>
-        internal static string ErrorChangeUsernameAlreadyExist {
-            get {
-                return ResourceManager.GetString("ErrorChangeUsernameAlreadyExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The old username {0} does not exist..
-        /// </summary>
-        internal static string ErrorChangeUsernameNotExist {
-            get {
-                return ResourceManager.GetString("ErrorChangeUsernameNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The user does not exist..
-        /// </summary>
-        internal static string ErrorGetUserNotExist {
-            get {
-                return ResourceManager.GetString("ErrorGetUserNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Can&apos;t patch a user that does not exist..
-        /// </summary>
-        internal static string ErrorPatchUserNotExist {
-            get {
-                return ResourceManager.GetString("ErrorPatchUserNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Username is of bad format..
-        /// </summary>
-        internal static string ErrorPutBadUsername {
-            get {
-                return ResourceManager.GetString("ErrorPutBadUsername", resourceCulture);
+                return ResourceManager.GetString("ExceptionUnknownPutResult", resourceCulture);
             }
         }
         
@@ -124,20 +79,11 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A user has changed password..
-        /// </summary>
-        internal static string LogChangePasswordSuccess {
-            get {
-                return ResourceManager.GetString("LogChangePasswordSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Attempt to change a user&apos;s username to a existent one failed..
         /// </summary>
-        internal static string LogChangeUsernameAlreadyExist {
+        internal static string LogChangeUsernameConflict {
             get {
-                return ResourceManager.GetString("LogChangeUsernameAlreadyExist", resourceCulture);
+                return ResourceManager.GetString("LogChangeUsernameConflict", resourceCulture);
             }
         }
         
@@ -147,33 +93,6 @@ namespace Timeline.Resources.Controllers {
         internal static string LogChangeUsernameNotExist {
             get {
                 return ResourceManager.GetString("LogChangeUsernameNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A user has changed username..
-        /// </summary>
-        internal static string LogChangeUsernameSuccess {
-            get {
-                return ResourceManager.GetString("LogChangeUsernameSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A user has been deleted..
-        /// </summary>
-        internal static string LogDeleteDelete {
-            get {
-                return ResourceManager.GetString("LogDeleteDelete", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attempt to delete a user that does not exist..
-        /// </summary>
-        internal static string LogDeleteNotExist {
-            get {
-                return ResourceManager.GetString("LogDeleteNotExist", resourceCulture);
             }
         }
         
@@ -192,33 +111,6 @@ namespace Timeline.Resources.Controllers {
         internal static string LogPatchUserNotExist {
             get {
                 return ResourceManager.GetString("LogPatchUserNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attempt to create a user with bad username failed..
-        /// </summary>
-        internal static string LogPutBadUsername {
-            get {
-                return ResourceManager.GetString("LogPutBadUsername", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A user has been created..
-        /// </summary>
-        internal static string LogPutCreate {
-            get {
-                return ResourceManager.GetString("LogPutCreate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A user has been modified..
-        /// </summary>
-        internal static string LogPutModify {
-            get {
-                return ResourceManager.GetString("LogPutModify", resourceCulture);
             }
         }
     }

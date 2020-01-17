@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
+using System;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Helpers;
@@ -10,43 +10,6 @@ using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using static Timeline.Resources.Controllers.UserController;
-
-namespace Timeline
-{
-    public static partial class ErrorCodes
-    {
-        public static partial class Http
-        {
-            public static class User // bbb = 002
-            {
-                public static class Get // cc = 01
-                {
-                    public const int NotExist = 10020101; // dd = 01
-                }
-
-                public static class Patch // cc = 03
-                {
-                    public const int NotExist = 10020301; // dd = 01
-                }
-
-                public static class Op // cc = 1x
-                {
-                    public static class ChangeUsername // cc = 11
-                    {
-                        public const int NotExist = 10021101; // dd = 01
-                        public const int AlreadyExist = 10021102; // dd = 02
-                    }
-
-                    public static class ChangePassword // cc = 12
-                    {
-                        public const int BadOldPassword = 10021201; // dd = 01
-                    }
-                }
-
-            }
-        }
-    }
-}
 
 namespace Timeline.Controllers
 {
@@ -76,7 +39,7 @@ namespace Timeline.Controllers
             if (user == null)
             {
                 _logger.LogInformation(Log.Format(LogGetUserNotExist, ("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Http.User.Get.NotExist, ErrorGetUserNotExist));
+                return NotFound(ErrorResponse.UserCommon.NotExist());
             }
             return Ok(user);
         }
@@ -88,13 +51,11 @@ namespace Timeline.Controllers
             switch (result)
             {
                 case PutResult.Create:
-                    _logger.LogInformation(Log.Format(LogPutCreate, ("Username", username)));
                     return CreatedAtAction("Get", new { username }, CommonPutResponse.Create());
                 case PutResult.Modify:
-                    _logger.LogInformation(Log.Format(LogPutModify, ("Username", username)));
                     return Ok(CommonPutResponse.Modify());
                 default:
-                    throw new InvalidBranchException();
+                    throw new Exception(ExceptionUnknownPutResult);
             }
         }
 
@@ -109,7 +70,7 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Http.User.Patch.NotExist, ErrorPatchUserNotExist));
+                return NotFound(ErrorResponse.UserCommon.NotExist());
             }
         }
 
@@ -119,12 +80,10 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.DeleteUser(username);
-                _logger.LogInformation(Log.Format(LogDeleteDelete, ("Username", username)));
                 return Ok(CommonDeleteResponse.Delete());
             }
-            catch (UserNotExistException e)
+            catch (UserNotExistException)
             {
-                _logger.LogInformation(e, Log.Format(LogDeleteNotExist, ("Username", username)));
                 return Ok(CommonDeleteResponse.NotExist());
             }
         }
@@ -135,22 +94,19 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.ChangeUsername(request.OldUsername, request.NewUsername);
-                _logger.LogInformation(Log.Format(LogChangeUsernameSuccess,
-                    ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
                 return Ok();
             }
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogChangeUsernameNotExist,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.NotExist,
-                    string.Format(CultureInfo.CurrentCulture, ErrorChangeUsernameNotExist, request.OldUsername)));
+                return BadRequest(ErrorResponse.UserCommon.NotExist());
             }
             catch (UsernameConfictException e)
             {
-                _logger.LogInformation(e, Log.Format(LogChangeUsernameAlreadyExist,
+                _logger.LogInformation(e, Log.Format(LogChangeUsernameConflict,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.AlreadyExist, ErrorChangeUsernameAlreadyExist));
+                return BadRequest(ErrorResponse.UserController.ChangeUsername_Conflict());
             }
             // there is no need to catch bad format exception because it is already checked in model validation.
         }
@@ -161,15 +117,13 @@ namespace Timeline.Controllers
             try
             {
                 await _userService.ChangePassword(User.Identity.Name!, request.OldPassword, request.NewPassword);
-                _logger.LogInformation(Log.Format(LogChangePasswordSuccess, ("Username", User.Identity.Name)));
                 return Ok();
             }
             catch (BadPasswordException e)
             {
                 _logger.LogInformation(e, Log.Format(LogChangePasswordBadPassword,
                     ("Username", User.Identity.Name), ("Old Password", request.OldPassword)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangePassword.BadOldPassword,
-                    ErrorChangePasswordBadPassword));
+                return BadRequest(ErrorResponse.UserController.ChangePassword_BadOldPassword());
             }
             // User can't be non-existent or the token is bad. 
         }

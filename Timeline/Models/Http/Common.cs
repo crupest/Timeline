@@ -1,15 +1,9 @@
-using System.Globalization;
 using static Timeline.Resources.Models.Http.Common;
 
 namespace Timeline.Models.Http
 {
     public class CommonResponse
     {
-        internal static CommonResponse InvalidModel(string message)
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.InvalidModel, message);
-        }
-
         public CommonResponse()
         {
 
@@ -24,33 +18,6 @@ namespace Timeline.Models.Http
         public int Code { get; set; }
         public string? Message { get; set; }
     }
-
-    internal static class HeaderErrorResponse
-    {
-        internal static CommonResponse BadIfNonMatch()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Header.IfNonMatch.BadFormat, MessageHeaderIfNonMatchBad);
-        }
-    }
-
-    internal static class ContentErrorResponse
-    {
-        internal static CommonResponse TooBig(string maxLength)
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Content.TooBig,
-                string.Format(CultureInfo.CurrentCulture, MessageContentTooBig, maxLength));
-        }
-
-        internal static CommonResponse UnmatchedLength_Smaller()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Content.UnmatchedLength_Smaller, MessageContentUnmatchedLengthSmaller);
-        }
-        internal static CommonResponse UnmatchedLength_Bigger()
-        {
-            return new CommonResponse(ErrorCodes.Http.Common.Content.UnmatchedLength_Bigger, MessageContentUnmatchedLengthBigger);
-        }
-    }
-
 
     public class CommonDataResponse<T> : CommonResponse
     {

@@ -20,7 +20,7 @@ namespace Timeline.Helpers
                     messageBuilder.AppendLine(error.ErrorMessage);
                 }
 
-            return new BadRequestObjectResult(CommonResponse.InvalidModel(messageBuilder.ToString()));
+            return new BadRequestObjectResult(ErrorResponse.Common.CustomMessage_InvalidModel(messageBuilder.ToString()));
         }
     }
 }
