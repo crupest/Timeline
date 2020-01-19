@@ -98,14 +98,14 @@ namespace Timeline.Tests.IntegratedTests
                     new TimelineMemberChangeRequest { Add = new List<string> { "admin", "usernotexist" } });
                 res.Should().HaveStatusCode(400)
                     .And.HaveCommonBody()
-                    .Which.Code.Should().Be(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist);
+                    .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
             }
             {
                 var res = await client.PostAsJsonAsync(changeUrl,
                     new TimelineMemberChangeRequest { Remove = new List<string> { "admin", "usernotexist" } });
                 res.Should().HaveStatusCode(400)
                     .And.HaveCommonBody()
-                    .Which.Code.Should().Be(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist);
+                    .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
             }
             {
                 var res = await client.PostAsJsonAsync(changeUrl,
@@ -453,7 +453,7 @@ namespace Timeline.Tests.IntegratedTests
                         new TimelinePostDeleteRequest { Id = 30000 });
                     res.Should().HaveStatusCode(400)
                         .And.HaveCommonBody()
-                        .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationDeleteNotExist);
+                        .Which.Code.Should().Be(ErrorCodes.TimelineController.PostOperationDelete_NotExist);
                 }
                 {
                     var res = await client.GetAsync("users/user/timeline/posts");

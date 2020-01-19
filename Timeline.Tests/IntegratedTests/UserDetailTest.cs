@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
 
@@ -82,7 +83,7 @@ namespace Timeline.Tests.IntegratedTests
                     var res = await client.GetAsync(userNotExistUrl);
                     res.Should().HaveStatusCode(HttpStatusCode.NotFound)
                         .And.HaveCommonBody()
-                        .Which.Code.Should().Be(ErrorCodes.Http.Filter.User.NotExist);
+                        .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
 
                 }
                 {
@@ -128,13 +129,13 @@ namespace Timeline.Tests.IntegratedTests
                     var res = await client.PutStringAsync(userNotExistUrl, "aaa");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody()
-                        .Which.Code.Should().Be(ErrorCodes.Http.Filter.User.NotExist);
+                        .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
                 }
                 {
                     var res = await client.DeleteAsync(userNotExistUrl);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody()
-                        .Which.Code.Should().Be(ErrorCodes.Http.Filter.User.NotExist);
+                        .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
                 }
                 var nickname = "nnn";
                 {

@@ -7,7 +7,6 @@ using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
-using static Timeline.ErrorCodes.Http.User;
 
 namespace Timeline.Tests.IntegratedTests
 {
@@ -54,7 +53,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.GetAsync("users/usernotexist");
             res.Should().HaveStatusCode(404)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Get.NotExist);
+                .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
         }
 
         public static IEnumerable<object[]> Put_InvalidModel_Data()
@@ -118,7 +117,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
             res.Should().HaveStatusCode(404)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Patch.NotExist);
+                .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
         }
 
         [Fact]
@@ -198,7 +197,7 @@ namespace Timeline.Tests.IntegratedTests
                 new ChangeUsernameRequest { OldUsername = "usernotexist", NewUsername = "newUsername" });
             res.Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Op.ChangeUsername.NotExist);
+                .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
         }
 
         [Fact]
@@ -209,7 +208,7 @@ namespace Timeline.Tests.IntegratedTests
                 new ChangeUsernameRequest { OldUsername = MockUser.User.Username, NewUsername = MockUser.Admin.Username });
             res.Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Op.ChangeUsername.AlreadyExist);
+                .Which.Code.Should().Be(ErrorCodes.UserController.ChangeUsername_Conflict);
         }
 
         private async Task TestLogin(string username, string password)
@@ -256,7 +255,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.PostAsJsonAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
             res.Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Op.ChangePassword.BadOldPassword);
+                .Which.Code.Should().Be(ErrorCodes.UserController.ChangePassword_BadOldPassword);
         }
 
         [Fact]
