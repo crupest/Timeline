@@ -142,7 +142,7 @@ namespace Timeline.Tests.Controllers
                 .Which;
             result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             result.Value.Should().BeAssignableTo<CommonResponse>()
-            .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostListGetForbid);
+            .Which.Code.Should().Be(ErrorCodes.Common.Forbid);
             _service.VerifyAll();
         }
 
@@ -185,7 +185,7 @@ namespace Timeline.Tests.Controllers
             })).Result.Should().NotBeNull().And.BeAssignableTo<ObjectResult>().Which;
             result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             result.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationCreateForbid);
+                .Which.Code.Should().Be(ErrorCodes.Common.Forbid);
             _service.VerifyAll();
         }
 
@@ -249,7 +249,7 @@ namespace Timeline.Tests.Controllers
             })).Should().NotBeNull().And.BeAssignableTo<ObjectResult>().Which;
             result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
             result.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationDeleteForbid);
+                .Which.Code.Should().Be(ErrorCodes.Common.Forbid);
             _service.VerifyAll();
         }
 
@@ -266,7 +266,7 @@ namespace Timeline.Tests.Controllers
             })).Should().NotBeNull().And.BeAssignableTo<ObjectResult>().Which;
             result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
             result.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.PostOperationDeleteNotExist);
+                .Which.Code.Should().Be(ErrorCodes.TimelineController.PostOperationDelete_NotExist);
             _service.VerifyAll();
         }
 
@@ -347,7 +347,7 @@ namespace Timeline.Tests.Controllers
             });
             result.Should().NotBeNull().And.BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Common.InvalidModel);
+                .Which.Code.Should().Be(ErrorCodes.Common.InvalidModel);
             _service.VerifyAll();
         }
 
@@ -366,7 +366,7 @@ namespace Timeline.Tests.Controllers
             });
             result.Should().NotBeNull().And.BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(ErrorCodes.Http.Timeline.ChangeMemberUserNotExist);
+                .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
             _service.VerifyAll();
         }
 

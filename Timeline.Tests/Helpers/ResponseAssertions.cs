@@ -3,6 +3,7 @@ using FluentAssertions.Execution;
 using FluentAssertions.Formatting;
 using FluentAssertions.Primitives;
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -147,14 +148,21 @@ namespace Timeline.Tests.Helpers
             body.Data.Delete.Should().Be(delete);
         }
 
+        public static void HaveCommonResponseBody(this HttpResponseMessageAssertions assertions, int code, string message = null, params object[] messageArgs)
+        {
+            message = string.IsNullOrEmpty(message) ? "" : ", " + string.Format(CultureInfo.CurrentCulture, message, messageArgs);
+            var body = assertions.HaveJsonBody<CommonResponse>("Response body should be CommonResponse{0}", message).Which;
+            body.Code.Should().Be(code, "Response body code is not the specified one{0}", message);
+        }
+
         public static void BeInvalidModel(this HttpResponseMessageAssertions assertions, string message = null)
         {
             message = string.IsNullOrEmpty(message) ? "" : ", " + message;
             assertions.HaveStatusCode(400, "Invalid Model Error must have 400 status code{0}", message)
                 .And.HaveCommonBody("Invalid Model Error must have CommonResponse body{0}", message)
-                .Which.Code.Should().Be(ErrorCodes.Http.Common.InvalidModel,
+                .Which.Code.Should().Be(ErrorCodes.Common.InvalidModel,
                 "Invalid Model Error must have code {0} in body{1}",
-                ErrorCodes.Http.Common.InvalidModel, message);
+                ErrorCodes.Common.InvalidModel, message);
         }
     }
 }

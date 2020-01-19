@@ -10,7 +10,6 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
-using static Timeline.ErrorCodes.Token;
 
 namespace Timeline.Tests.Controllers
 {
@@ -67,7 +66,7 @@ namespace Timeline.Tests.Controllers
             });
             action.Result.Should().BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(Create.BadCredential);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Create_BadCredential);
         }
 
         [Fact]
@@ -82,7 +81,7 @@ namespace Timeline.Tests.Controllers
             });
             action.Result.Should().BeAssignableTo<BadRequestObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()
-                .Which.Code.Should().Be(Create.BadCredential);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Create_BadCredential);
         }
 
         [Fact]
@@ -98,10 +97,10 @@ namespace Timeline.Tests.Controllers
 
         public static IEnumerable<object[]> Verify_BadRequest_Data()
         {
-            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.Expired), Verify.TimeExpired };
-            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.IdClaimBadFormat), Verify.BadFormat };
-            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.OldVersion), Verify.OldVersion };
-            yield return new object[] { new UserNotExistException(), Verify.UserNotExist };
+            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.Expired), ErrorCodes.TokenController.Verify_TimeExpired };
+            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.IdClaimBadFormat), ErrorCodes.TokenController.Verify_BadFormat };
+            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.OldVersion), ErrorCodes.TokenController.Verify_OldVersion };
+            yield return new object[] { new UserNotExistException(), ErrorCodes.TokenController.Verify_UserNotExist };
         }
 
         [Theory]

@@ -66,7 +66,7 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogGetUserNotExist, ("Username", username)));
-                return NotFound(ErrorResponse.UserController.ChangePassword_BadOldPassword());
+                return NotFound(ErrorResponse.UserCommon.NotExist());
             }
         }
 
@@ -112,7 +112,7 @@ namespace Timeline.Controllers
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogPutUserNotExist, ("Username", username)));
-                return BadRequest(ErrorResponse.UserController.ChangePassword_BadOldPassword());
+                return BadRequest(ErrorResponse.UserCommon.NotExist());
             }
             catch (AvatarFormatException e)
             {

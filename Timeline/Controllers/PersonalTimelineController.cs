@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Filters;
@@ -134,7 +133,7 @@ namespace Timeline.Controllers
                 }
                 else if (e.InnerException is UserNotExistException)
                 {
-                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(
+                    return BadRequest(ErrorResponse.UserCommon.CustomMessage_NotExist(
                         TimelineController_ChangeMember_UserNotExist, e.Index, e.Operation));
                 }
 

@@ -99,7 +99,7 @@ namespace Timeline.Controllers
                 if (e.ErrorCode == JwtVerifyException.ErrorCodes.Expired)
                 {
                     var innerException = e.InnerException as SecurityTokenExpiredException;
-                    LogFailure(LogVerifyExpire, e, ("Expires", innerException.Expires),
+                    LogFailure(LogVerifyExpire, e, ("Expires", innerException?.Expires),
                         ("Current Time", _clock.GetCurrentTime()));
                     return BadRequest(ErrorResponse.TokenController.Verify_TimeExpired());
                 }
@@ -107,7 +107,7 @@ namespace Timeline.Controllers
                 {
                     var innerException = e.InnerException as JwtBadVersionException;
                     LogFailure(LogVerifyOldVersion, e,
-                        ("Token Version", innerException.TokenVersion),
+                        ("Token Version", innerException?.TokenVersion),
                         ("Required Version", innerException?.RequiredVersion));
                     return BadRequest(ErrorResponse.TokenController.Verify_OldVersion());
                 }

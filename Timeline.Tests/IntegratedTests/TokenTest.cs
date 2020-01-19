@@ -8,7 +8,6 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
-using static Timeline.ErrorCodes.Http.Token;
 
 namespace Timeline.Tests.IntegratedTests
 {
@@ -66,7 +65,7 @@ namespace Timeline.Tests.IntegratedTests
                 new CreateTokenRequest { Username = username, Password = password });
             response.Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Create.BadCredential);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Create_BadCredential);
         }
 
         [Fact]
@@ -97,7 +96,7 @@ namespace Timeline.Tests.IntegratedTests
                 new VerifyTokenRequest { Token = "bad token hahaha" });
             response.Should().HaveStatusCode(400)
                  .And.HaveCommonBody()
-                 .Which.Code.Should().Be(Verify.BadFormat);
+                 .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_BadFormat);
         }
 
         [Fact]
@@ -117,7 +116,7 @@ namespace Timeline.Tests.IntegratedTests
                 new VerifyTokenRequest { Token = token }))
                 .Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Verify.OldVersion);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_OldVersion);
         }
 
         [Fact]
@@ -136,7 +135,7 @@ namespace Timeline.Tests.IntegratedTests
                 new VerifyTokenRequest { Token = token }))
                 .Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Verify.UserNotExist);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_UserNotExist);
         }
 
         //[Fact]
