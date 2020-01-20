@@ -97,9 +97,9 @@ namespace Timeline.Tests.Controllers
 
         public static IEnumerable<object[]> Verify_BadRequest_Data()
         {
-            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.Expired), ErrorCodes.TokenController.Verify_TimeExpired };
-            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.IdClaimBadFormat), ErrorCodes.TokenController.Verify_BadFormat };
-            yield return new object[] { new JwtVerifyException(JwtVerifyException.ErrorCodes.OldVersion), ErrorCodes.TokenController.Verify_OldVersion };
+            yield return new object[] { new JwtUserTokenBadFormatException(JwtUserTokenBadFormatException.ErrorCodes.Expired), ErrorCodes.TokenController.Verify_TimeExpired };
+            yield return new object[] { new JwtUserTokenBadFormatException(JwtUserTokenBadFormatException.ErrorCodes.IdClaimBadFormat), ErrorCodes.TokenController.Verify_BadFormat };
+            yield return new object[] { new JwtUserTokenBadFormatException(JwtUserTokenBadFormatException.ErrorCodes.OldVersion), ErrorCodes.TokenController.Verify_OldVersion };
             yield return new object[] { new UserNotExistException(), ErrorCodes.TokenController.Verify_UserNotExist };
         }
 

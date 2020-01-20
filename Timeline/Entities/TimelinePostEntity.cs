@@ -20,7 +20,7 @@ namespace Timeline.Entities
         public long AuthorId { get; set; }
 
         [ForeignKey(nameof(AuthorId))]
-        public User Author { get; set; } = default!;
+        public UserEntity Author { get; set; } = default!;
 
         [Column("content")]
         public string? Content { get; set; }

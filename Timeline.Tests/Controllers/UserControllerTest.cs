@@ -46,7 +46,7 @@ namespace Timeline.Tests.Controllers
         public async Task Get_Success()
         {
             const string username = "aaa";
-            _mockUserService.Setup(s => s.GetUser(username)).ReturnsAsync(MockUser.User.Info);
+            _mockUserService.Setup(s => s.GetUserByUsername(username)).ReturnsAsync(MockUser.User.Info);
             var action = await _controller.Get(username);
             action.Result.Should().BeAssignableTo<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(MockUser.User.Info);
@@ -56,7 +56,7 @@ namespace Timeline.Tests.Controllers
         public async Task Get_NotFound()
         {
             const string username = "aaa";
-            _mockUserService.Setup(s => s.GetUser(username)).Returns(Task.FromResult<UserInfo>(null));
+            _mockUserService.Setup(s => s.GetUserByUsername(username)).Returns(Task.FromResult<User>(null));
             var action = await _controller.Get(username);
             action.Result.Should().BeAssignableTo<NotFoundObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()

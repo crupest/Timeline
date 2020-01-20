@@ -9,50 +9,60 @@ using Timeline.Configs;
 
 namespace Timeline.Services
 {
-    public class TokenInfo
+    public class UserTokenInfo
     {
         public long Id { get; set; }
         public long Version { get; set; }
+        public DateTime? ExpireAt { get; set; }
     }
 
-    public interface IJwtService
+    public interface IUserTokenService
     {
         /// <summary>
-        /// Create a JWT token for a given token info.
+        /// Create a token for a given token info.
         /// </summary>
         /// <param name="tokenInfo">The info to generate token.</param>
-        /// <param name="expires">The expire time. If null then use current time with offset in config.</param>
         /// <returns>Return the generated token.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="tokenInfo"/> is null.</exception>
-        string GenerateJwtToken(TokenInfo tokenInfo, DateTime? expires = null);
+        string GenerateToken(UserTokenInfo tokenInfo);
 
         /// <summary>
-        /// Verify a JWT token.
-        /// Return null is <paramref name="token"/> is null.
+        /// Verify a token and get the saved info.
         /// </summary>
-        /// <param name="token">The token string to verify.</param>
-        /// <returns>Return the saved info in token.</returns>
+        /// <param name="token">The token to verify.</param>
+        /// <returns>The saved info in token.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
-        /// <exception cref="JwtVerifyException">Thrown when the token is invalid.</exception>
-        TokenInfo VerifyJwtToken(string token);
-
+        /// <exception cref="UserTokenBadFormatException">Thrown when the token is of bad format.</exception>
+        /// <remarks>
+        /// If this method throw <see cref="UserTokenBadFormatException"/>, it usually means the token is not created by this service.
+        /// </remarks>
+        UserTokenInfo VerifyToken(string token);
     }
 
-    public class JwtService : IJwtService
+    public class JwtUserTokenService : IUserTokenService
     {
         private const string VersionClaimType = "timeline_version";
 
         private readonly IOptionsMonitor<JwtConfig> _jwtConfig;
-        private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
         private readonly IClock _clock;
 
-        public JwtService(IOptionsMonitor<JwtConfig> jwtConfig, IClock clock)
+        private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
+        private SymmetricSecurityKey _tokenSecurityKey;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
+        public JwtUserTokenService(IOptionsMonitor<JwtConfig> jwtConfig, IClock clock)
         {
             _jwtConfig = jwtConfig;
             _clock = clock;
+
+            _tokenSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.CurrentValue.SigningKey));
+            jwtConfig.OnChange(config =>
+            {
+                _tokenSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey));
+            });
         }
 
-        public string GenerateJwtToken(TokenInfo tokenInfo, DateTime? expires = null)
+        public string GenerateToken(UserTokenInfo tokenInfo)
         {
             if (tokenInfo == null)
                 throw new ArgumentNullException(nameof(tokenInfo));
@@ -71,7 +81,7 @@ namespace Timeline.Services
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey)), SecurityAlgorithms.HmacSha384),
                 IssuedAt = _clock.GetCurrentTime(),
-                Expires = expires.GetValueOrDefault(_clock.GetCurrentTime().AddSeconds(config.DefaultExpireOffset)),
+                Expires = tokenInfo.ExpireAt.GetValueOrDefault(_clock.GetCurrentTime().AddSeconds(config.DefaultExpireOffset)),
                 NotBefore = _clock.GetCurrentTime() // I must explicitly set this or it will use the current time by default and mock is not work in which case test will not pass.
             };
 
@@ -82,7 +92,7 @@ namespace Timeline.Services
         }
 
 
-        public TokenInfo VerifyJwtToken(string token)
+        public UserTokenInfo VerifyToken(string token)
         {
             if (token == null)
                 throw new ArgumentNullException(nameof(token));
@@ -95,37 +105,42 @@ namespace Timeline.Services
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
+                    ValidateLifetime = false,
                     ValidIssuer = config.Issuer,
                     ValidAudience = config.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey))
-                }, out _);
+                    IssuerSigningKey = _tokenSecurityKey
+                }, out var t);
 
                 var idClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (idClaim == null)
-                    throw new JwtVerifyException(JwtVerifyException.ErrorCodes.NoIdClaim);
+                    throw new JwtUserTokenBadFormatException(token, JwtUserTokenBadFormatException.ErrorKind.NoIdClaim);
                 if (!long.TryParse(idClaim, out var id))
-                    throw new JwtVerifyException(JwtVerifyException.ErrorCodes.IdClaimBadFormat);
+                    throw new JwtUserTokenBadFormatException(token, JwtUserTokenBadFormatException.ErrorKind.IdClaimBadFormat);
 
                 var versionClaim = principal.FindFirstValue(VersionClaimType);
                 if (versionClaim == null)
-                    throw new JwtVerifyException(JwtVerifyException.ErrorCodes.NoVersionClaim);
+                    throw new JwtUserTokenBadFormatException(token, JwtUserTokenBadFormatException.ErrorKind.NoVersionClaim);
                 if (!long.TryParse(versionClaim, out var version))
-                    throw new JwtVerifyException(JwtVerifyException.ErrorCodes.VersionClaimBadFormat);
+                    throw new JwtUserTokenBadFormatException(token, JwtUserTokenBadFormatException.ErrorKind.VersionClaimBadFormat);
 
-                return new TokenInfo
+                var decodedToken = (JwtSecurityToken)t;
+                var exp = decodedToken.Payload.Exp;
+                DateTime? expireAt = null;
+                if (exp.HasValue)
+                {
+                    expireAt = EpochTime.DateTime(exp.Value);
+                }
+
+                return new UserTokenInfo
                 {
                     Id = id,
-                    Version = version
+                    Version = version,
+                    ExpireAt = expireAt
                 };
             }
-            catch (SecurityTokenExpiredException e)
+            catch (Exception e) when (e is SecurityTokenException || e is ArgumentException)
             {
-                throw new JwtVerifyException(e, JwtVerifyException.ErrorCodes.Expired);
-            }
-            catch (Exception e)
-            {
-                throw new JwtVerifyException(e, JwtVerifyException.ErrorCodes.Others);
+                throw new JwtUserTokenBadFormatException(token, JwtUserTokenBadFormatException.ErrorKind.Other, e);
             }
         }
     }

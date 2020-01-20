@@ -1,23 +1,10 @@
-namespace Timeline.Models
+﻿namespace Timeline.Models
 {
-    public sealed class UserInfo
+    public class UserInfo
     {
-        public UserInfo()
-        {
-        }
-
-        public UserInfo(string username, bool administrator)
-        {
-            Username = username;
-            Administrator = administrator;
-        }
-
+        public long Id { get; set; }
+        public long Version { get; set; }
         public string Username { get; set; } = default!;
-        public bool Administrator { get; set; } = default!;
-
-        public override string ToString()
-        {
-            return $"Username: {Username} ; Administrator: {Administrator}";
-        }
+        public bool Administrator { get; set; }
     }
 }

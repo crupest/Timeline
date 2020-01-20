@@ -94,16 +94,16 @@ namespace Timeline.Controllers
                     User = result
                 });
             }
-            catch (JwtVerifyException e)
+            catch (JwtUserTokenBadFormatException e)
             {
-                if (e.ErrorCode == JwtVerifyException.ErrorCodes.Expired)
+                if (e.ErrorCode == JwtUserTokenBadFormatException.ErrorCodes.Expired)
                 {
                     var innerException = e.InnerException as SecurityTokenExpiredException;
                     LogFailure(LogVerifyExpire, e, ("Expires", innerException?.Expires),
                         ("Current Time", _clock.GetCurrentTime()));
                     return BadRequest(ErrorResponse.TokenController.Verify_TimeExpired());
                 }
-                else if (e.ErrorCode == JwtVerifyException.ErrorCodes.OldVersion)
+                else if (e.ErrorCode == JwtUserTokenBadFormatException.ErrorCodes.OldVersion)
                 {
                     var innerException = e.InnerException as JwtBadVersionException;
                     LogFailure(LogVerifyOldVersion, e,

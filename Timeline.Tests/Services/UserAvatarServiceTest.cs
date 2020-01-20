@@ -78,7 +78,7 @@ namespace Timeline.Tests.Services
 
     public class UserAvatarServiceTest : IDisposable
     {
-        private UserAvatar CreateMockAvatarEntity(string key) => new UserAvatar
+        private UserAvatarEntity CreateMockAvatarEntity(string key) => new UserAvatarEntity
         {
             Type = $"image/test{key}",
             Data = Encoding.ASCII.GetBytes($"mock{key}"),
@@ -102,7 +102,7 @@ namespace Timeline.Tests.Services
             Data = Encoding.ASCII.GetBytes($"mock{key}")
         };
 
-        private static Avatar ToAvatar(UserAvatar entity)
+        private static Avatar ToAvatar(UserAvatarEntity entity)
         {
             return new Avatar
             {
@@ -111,7 +111,7 @@ namespace Timeline.Tests.Services
             };
         }
 
-        private static AvatarInfo ToAvatarInfo(UserAvatar entity)
+        private static AvatarInfo ToAvatarInfo(UserAvatarEntity entity)
         {
             return new AvatarInfo
             {

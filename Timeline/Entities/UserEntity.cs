@@ -12,7 +12,7 @@ namespace Timeline.Entities
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is an entity class.")]
     [Table("users")]
-    public class User
+    public class UserEntity
     {
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
@@ -29,9 +29,9 @@ namespace Timeline.Entities
         [Column("version"), Required]
         public long Version { get; set; }
 
-        public UserAvatar? Avatar { get; set; }
+        public UserAvatarEntity? Avatar { get; set; }
 
-        public UserDetail? Detail { get; set; }
+        public UserDetailEntity? Detail { get; set; }
 
         public List<TimelineEntity> Timelines { get; set; } = default!;
 

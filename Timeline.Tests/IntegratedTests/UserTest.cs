@@ -24,7 +24,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsAdmin();
             var res = await client.GetAsync("users");
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo[]>()
+                .And.HaveJsonBody<User[]>()
                 .Which.Should().BeEquivalentTo(MockUser.UserInfoList);
         }
 
@@ -34,7 +34,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsAdmin();
             var res = await client.GetAsync("users/" + MockUser.User.Username);
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo>()
+                .And.HaveJsonBody<User>()
                 .Which.Should().BeEquivalentTo(MockUser.User.Info);
         }
 
@@ -77,7 +77,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             var res = await client.GetAsync("users/" + username);
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo>()
+                .And.HaveJsonBody<User>()
                 .Which.Administrator.Should().Be(administrator);
         }
 

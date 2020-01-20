@@ -275,7 +275,7 @@ namespace Timeline.Services
                 var create = avatarEntity == null;
                 if (create)
                 {
-                    avatarEntity = new UserAvatar();
+                    avatarEntity = new UserAvatarEntity();
                 }
                 avatarEntity!.Type = avatar.Type;
                 avatarEntity.Data = avatar.Data;

@@ -6,7 +6,7 @@ namespace Timeline.Entities
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is data base entity.")]
     [Table("user_avatars")]
-    public class UserAvatar
+    public class UserAvatarEntity
     {
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }

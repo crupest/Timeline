@@ -14,9 +14,9 @@ namespace Timeline.Tests.Helpers
         // currently password service is thread safe, so we share a static one.
         private static PasswordService PasswordService { get; } = new PasswordService();
 
-        private static User CreateEntityFromMock(MockUser user)
+        private static UserEntity CreateEntityFromMock(MockUser user)
         {
-            return new User
+            return new UserEntity
             {
                 Name = user.Username,
                 EncryptedPassword = PasswordService.HashPassword(user.Password),
@@ -25,7 +25,7 @@ namespace Timeline.Tests.Helpers
             };
         }
 
-        private static IEnumerable<User> CreateDefaultMockEntities()
+        private static IEnumerable<UserEntity> CreateDefaultMockEntities()
         {
             // emmmmmmm. Never reuse the user instances because EF Core uses them, which will cause strange things.
             yield return CreateEntityFromMock(MockUser.User);

@@ -77,7 +77,7 @@ namespace Timeline.Services
                 var create = userDetail == null;
                 if (create)
                 {
-                    userDetail = new UserDetail
+                    userDetail = new UserDetailEntity
                     {
                         UserId = userId
                     };
