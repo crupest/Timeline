@@ -27,15 +27,15 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("users"), AdminAuthorize]
-        public async Task<ActionResult<UserInfo[]>> List()
+        public async Task<ActionResult<User[]>> List()
         {
             return Ok(await _userService.ListUsers());
         }
 
         [HttpGet("users/{username}"), AdminAuthorize]
-        public async Task<ActionResult<UserInfo>> Get([FromRoute][Username] string username)
+        public async Task<ActionResult<User>> Get([FromRoute][Username] string username)
         {
-            var user = await _userService.GetUser(username);
+            var user = await _userService.GetUserByUsername(username);
             if (user == null)
             {
                 _logger.LogInformation(Log.Format(LogGetUserNotExist, ("Username", username)));

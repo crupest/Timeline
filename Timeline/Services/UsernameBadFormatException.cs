@@ -22,6 +22,6 @@ namespace Timeline.Services
         /// <summary>
         /// Username of bad format.
         /// </summary>
-        public string? Username { get; private set; }
+        public string Username { get; private set; } = "";
     }
 }

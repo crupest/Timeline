@@ -52,7 +52,7 @@ namespace Timeline.Tests.Services
             {
                 var context = _testDatabase.Context;
                 var userId = (await context.Users.Where(u => u.Name == MockUser.User.Username).Select(u => new { u.Id }).SingleAsync()).Id;
-                context.UserDetails.Add(new UserDetail
+                context.UserDetails.Add(new UserDetailEntity
                 {
                     Nickname = nickname,
                     UserId = userId

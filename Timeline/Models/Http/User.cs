@@ -3,6 +3,12 @@ using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
+    public class User
+    {
+        public string Username { get; set; } = default!;
+        public bool Administrator { get; set; }
+    }
+
     public class UserPutRequest
     {
         [Required]

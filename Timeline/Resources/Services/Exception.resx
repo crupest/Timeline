@@ -156,35 +156,26 @@
   <data name="HashedPasswordBadFromatExceptionNotUnknownMarker" xml:space="preserve">
     <value>Unknown format marker.</value>
   </data>
-  <data name="JwtBadVersionException" xml:space="preserve">
-    <value>The version of the jwt token is old.</value>
+  <data name="JwtUserTokenBadFormatException" xml:space="preserve">
+    <value>The token didn't pass verification because {0}.</value>
   </data>
-  <data name="JwtVerifyException" xml:space="preserve">
-    <value>The token didn't pass verification because {0}, see inner exception for information.</value>
+  <data name="JwtUserTokenBadFormatExceptionIdBadFormat" xml:space="preserve">
+    <value>id claim is not a number</value>
   </data>
-  <data name="JwtVerifyExceptionExpired" xml:space="preserve">
-    <value>token is expired.</value>
+  <data name="JwtUserTokenBadFormatExceptionIdMissing" xml:space="preserve">
+    <value>id claim does not exist</value>
   </data>
-  <data name="JwtVerifyExceptionIdClaimBadFormat" xml:space="preserve">
-    <value>id claim is not a number.</value>
+  <data name="JwtUserTokenBadFormatExceptionOthers" xml:space="preserve">
+    <value>other error, see inner exception for information</value>
   </data>
-  <data name="JwtVerifyExceptionNoIdClaim" xml:space="preserve">
-    <value>id claim does not exist.</value>
+  <data name="JwtUserTokenBadFormatExceptionUnknown" xml:space="preserve">
+    <value>unknown error</value>
   </data>
-  <data name="JwtVerifyExceptionNoVersionClaim" xml:space="preserve">
-    <value>version claim does not exist.</value>
-  </data>
-  <data name="JwtVerifyExceptionOldVersion" xml:space="preserve">
-    <value>version of token is old.</value>
-  </data>
-  <data name="JwtVerifyExceptionOthers" xml:space="preserve">
-    <value>uncommon error.</value>
-  </data>
-  <data name="JwtVerifyExceptionUnknown" xml:space="preserve">
-    <value>unknown error code.</value>
-  </data>
-  <data name="JwtVerifyExceptionVersionClaimBadFormat" xml:space="preserve">
+  <data name="JwtUserTokenBadFormatExceptionVersionBadFormat" xml:space="preserve">
     <value>version claim is not a number.</value>
+  </data>
+  <data name="JwtUserTokenBadFormatExceptionVersionMissing" xml:space="preserve">
+    <value>version claim does not exist.</value>
   </data>
   <data name="TimelineAlreadyExistException" xml:space="preserve">
     <value>The timeline with that name already exists.</value>
@@ -215,5 +206,14 @@
   </data>
   <data name="UserNotExistException" xml:space="preserve">
     <value>The user does not exist.</value>
+  </data>
+  <data name="UserTokenBadFormatException" xml:space="preserve">
+    <value>The token is of bad format, which means it may not be created by the server.</value>
+  </data>
+  <data name="UserTokenBadVersionException" xml:space="preserve">
+    <value>The token is of bad version.</value>
+  </data>
+  <data name="UserTokenTimeExpireException" xml:space="preserve">
+    <value>The token is expired because its expiration time has passed.</value>
   </data>
 </root>

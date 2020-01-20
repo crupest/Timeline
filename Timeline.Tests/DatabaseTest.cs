@@ -28,7 +28,7 @@ namespace Timeline.Tests
         {
             var user = _context.Users.First();
             _context.UserAvatars.Count().Should().Be(0);
-            _context.UserAvatars.Add(new UserAvatar
+            _context.UserAvatars.Add(new UserAvatarEntity
             {
                 Data = null,
                 Type = null,
@@ -48,7 +48,7 @@ namespace Timeline.Tests
         {
             var user = _context.Users.First();
             _context.UserDetails.Count().Should().Be(0);
-            _context.UserDetails.Add(new UserDetail
+            _context.UserDetails.Add(new UserDetailEntity
             {
                 Nickname = null,
                 UserId = user.Id

@@ -19,7 +19,7 @@ namespace Timeline.Services
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
         /// <exception cref="UsernameBadFormatException">Thrown if <paramref name="username"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown if user does not exist.</exception>
-        internal static async Task<long> CheckAndGetUser(DbSet<User> userDbSet, string? username)
+        internal static async Task<long> CheckAndGetUser(DbSet<UserEntity> userDbSet, string? username)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));

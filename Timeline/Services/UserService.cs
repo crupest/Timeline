@@ -11,47 +11,37 @@ using Timeline.Models.Validation;
 
 namespace Timeline.Services
 {
-    public class CreateTokenResult
-    {
-        public string Token { get; set; } = default!;
-        public UserInfo User { get; set; } = default!;
-    }
-
     public interface IUserService
     {
         /// <summary>
-        /// Try to anthenticate with the given username and password.
-        /// If success, create a token and return the user info.
+        /// Try to verify the given username and password.
         /// </summary>
-        /// <param name="username">The username of the user to anthenticate.</param>
-        /// <param name="password">The password of the user to anthenticate.</param>
-        /// <param name="expires">The expired time point. Null then use default. See <see cref="JwtService.GenerateJwtToken(TokenInfo, DateTime?)"/> for what is default.</param>
-        /// <returns>An <see cref="CreateTokenResult"/> containing the created token and user info.</returns>
+        /// <param name="username">The username of the user to verify.</param>
+        /// <param name="password">The password of the user to verify.</param>
+        /// <returns>The user info.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
         /// <exception cref="UsernameBadFormatException">Thrown when username is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
-        Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires = null);
+        Task<UserInfo> VerifyCredential(string username, string password);
 
         /// <summary>
-        /// Verify the given token.
-        /// If success, return the user info.
+        /// Try to get a user by id.
         /// </summary>
-        /// <param name="token">The token to verify.</param>
-        /// <returns>The user info specified by the token.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
-        /// <exception cref="JwtVerifyException">Thrown when the token is of bad format. Thrown by <see cref="JwtService.VerifyJwtToken(string)"/>.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user specified by the token does not exist. Usually it has been deleted after the token was issued.</exception>
-        Task<UserInfo> VerifyToken(string token);
+        /// <param name="id">The id of the user.</param>
+        /// <returns>The user info.</returns>
+        /// <exception cref="UserNotExistException">Thrown when the user with given id does not exist.</exception>
+        Task<UserInfo> GetUserById(long id);
 
         /// <summary>
         /// Get the user info of given username.
         /// </summary>
         /// <param name="username">Username of the user.</param>
-        /// <returns>The info of the user. Null if the user of given username does not exists.</returns>
+        /// <returns>The info of the user.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
         /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        Task<UserInfo> GetUser(string username);
+        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
+        Task<UserInfo> GetUserByUsername(string username);
 
         /// <summary>
         /// List all users.
@@ -120,39 +110,24 @@ namespace Timeline.Services
         Task ChangeUsername(string oldUsername, string newUsername);
     }
 
-    internal class UserCache
-    {
-        public string Username { get; set; } = default!;
-        public bool Administrator { get; set; }
-        public long Version { get; set; }
-
-        public UserInfo ToUserInfo()
-        {
-            return new UserInfo(Username, Administrator);
-        }
-    }
-
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
 
-        private readonly IMemoryCache _memoryCache;
         private readonly DatabaseContext _databaseContext;
 
-        private readonly IJwtService _jwtService;
+        private readonly IMemoryCache _memoryCache;
+
         private readonly IPasswordService _passwordService;
 
-        private readonly UsernameValidator _usernameValidator;
+        private readonly UsernameValidator _usernameValidator = new UsernameValidator();
 
-        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
+        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IPasswordService passwordService)
         {
             _logger = logger;
             _memoryCache = memoryCache;
             _databaseContext = databaseContext;
-            _jwtService = jwtService;
             _passwordService = passwordService;
-
-            _usernameValidator = new UsernameValidator();
         }
 
         private static string GenerateCacheKeyByUserId(long id) => $"user:{id}";
@@ -176,12 +151,13 @@ namespace Timeline.Services
             }
         }
 
-        public async Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires)
+        public async Task<UserInfo> CheckCredential(string username, string password)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
+
             CheckUsernameFormat(username);
 
             // We need password info, so always check the database.
@@ -231,12 +207,12 @@ namespace Timeline.Services
             }
 
             if (tokenInfo.Version != cache.Version)
-                throw new JwtVerifyException(new JwtBadVersionException(tokenInfo.Version, cache.Version), JwtVerifyException.ErrorCodes.OldVersion);
+                throw new JwtUserTokenBadFormatException(new JwtBadVersionException(tokenInfo.Version, cache.Version), JwtUserTokenBadFormatException.ErrorCodes.OldVersion);
 
             return cache.ToUserInfo();
         }
 
-        public async Task<UserInfo> GetUser(string username)
+        public async Task<UserInfo> GetUserByUsername(string username)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -267,7 +243,7 @@ namespace Timeline.Services
 
             if (user == null)
             {
-                var newUser = new User
+                var newUser = new UserEntity
                 {
                     Name = username,
                     EncryptedPassword = _passwordService.HashPassword(password),
