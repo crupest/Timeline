@@ -23,6 +23,10 @@ namespace Timeline.Entities
         [Column("last_modified"), Required]
         public DateTime LastModified { get; set; }
 
+        [Column("user"), Required]
         public long UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public UserEntity User { get; set; } = default!;
     }
 }

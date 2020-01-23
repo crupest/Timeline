@@ -139,19 +139,30 @@ namespace Timeline.Services
             _logger.LogInformation(Log.Format(Resources.Services.UserService.LogCacheRemove, ("Key", key)));
         }
 
-        private void CheckUsernameFormat(string username, string? additionalMessage = null)
+        private void CheckUsernameFormat(string username, string? message = null)
         {
-            var (result, message) = _usernameValidator.Validate(username);
+            var (result, validationMessage) = _usernameValidator.Validate(username);
             if (!result)
             {
-                if (additionalMessage == null)
-                    throw new UsernameBadFormatException(username, message);
+                if (message == null)
+                    throw new UsernameBadFormatException(username, validationMessage);
                 else
-                    throw new UsernameBadFormatException(username, additionalMessage + message);
+                    throw new UsernameBadFormatException(username, validationMessage, message);
             }
         }
 
-        public async Task<UserInfo> CheckCredential(string username, string password)
+        private static UserInfo CreateUserInfoFromEntity(UserEntity user)
+        {
+            return new UserInfo
+            {
+                Id = user.Id,
+                Username = user.Name,
+                Administrator = UserRoleConvert.ToBool(user.RoleString),
+                Version = user.Version
+            };
+        }
+
+        public async Task<UserInfo> VerifyCredential(string username, string password)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -169,30 +180,13 @@ namespace Timeline.Services
             if (!_passwordService.VerifyPassword(user.EncryptedPassword, password))
                 throw new BadPasswordException(password);
 
-            var token = _jwtService.GenerateJwtToken(new TokenInfo
-            {
-                Id = user.Id,
-                Version = user.Version
-            }, expires);
-
-            return new CreateTokenResult
-            {
-                Token = token,
-                User = UserConvert.CreateUserInfo(user)
-            };
+            return CreateUserInfoFromEntity(user);
         }
 
-        public async Task<UserInfo> VerifyToken(string token)
+        public async Task<UserInfo> GetUserById(long id)
         {
-            if (token == null)
-                throw new ArgumentNullException(nameof(token));
-
-            TokenInfo tokenInfo;
-            tokenInfo = _jwtService.VerifyJwtToken(token);
-
-            var id = tokenInfo.Id;
             var key = GenerateCacheKeyByUserId(id);
-            if (!_memoryCache.TryGetValue<UserCache>(key, out var cache))
+            if (!_memoryCache.TryGetValue<UserInfo>(key, out var cache))
             {
                 // no cache, check the database
                 var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
@@ -201,34 +195,35 @@ namespace Timeline.Services
                     throw new UserNotExistException(id);
 
                 // create cache
-                cache = UserConvert.CreateUserCache(user);
+                cache = CreateUserInfoFromEntity(user);
                 _memoryCache.CreateEntry(key).SetValue(cache);
                 _logger.LogInformation(Log.Format(Resources.Services.UserService.LogCacheCreate, ("Key", key)));
             }
 
-            if (tokenInfo.Version != cache.Version)
-                throw new JwtUserTokenBadFormatException(new JwtBadVersionException(tokenInfo.Version, cache.Version), JwtUserTokenBadFormatException.ErrorCodes.OldVersion);
-
-            return cache.ToUserInfo();
+            return cache;
         }
 
         public async Task<UserInfo> GetUserByUsername(string username)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
+
             CheckUsernameFormat(username);
 
-            return await _databaseContext.Users
+            var entity = await _databaseContext.Users
                 .Where(user => user.Name == username)
-                .Select(user => UserConvert.CreateUserInfo(user))
                 .SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new UserNotExistException(username);
+
+            return CreateUserInfoFromEntity(entity);
         }
 
         public async Task<UserInfo[]> ListUsers()
         {
-            return await _databaseContext.Users
-                .Select(user => UserConvert.CreateUserInfo(user))
-                .ToArrayAsync();
+            var entities = await _databaseContext.Users.ToArrayAsync();
+            return entities.Select(user => CreateUserInfoFromEntity(user)).ToArray();
         }
 
         public async Task<PutResult> PutUser(string username, string password, bool administrator)

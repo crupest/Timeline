@@ -12,6 +12,10 @@ namespace Timeline.Entities
         [Column("nickname"), MaxLength(26)]
         public string? Nickname { get; set; }
 
+        [Column("user")]
         public long UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public UserEntity User { get; set; } = default!;
     }
 }
