@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -30,13 +31,13 @@ namespace Timeline.Auth
     public class MyAuthenticationHandler : AuthenticationHandler<MyAuthenticationOptions>
     {
         private readonly ILogger<MyAuthenticationHandler> _logger;
-        private readonly IUserService _userService;
+        private readonly IUserTokenManager _userTokenManager;
 
-        public MyAuthenticationHandler(IOptionsMonitor<MyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserService userService)
+        public MyAuthenticationHandler(IOptionsMonitor<MyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserTokenManager userTokenManager)
             : base(options, logger, encoder, clock)
         {
             _logger = logger.CreateLogger<MyAuthenticationHandler>();
-            _userService = userService;
+            _userTokenManager = userTokenManager;
         }
 
         // return null if no token is found
@@ -78,9 +79,10 @@ namespace Timeline.Auth
 
             try
             {
-                var userInfo = await _userService.VerifyToken(token);
+                var userInfo = await _userTokenManager.VerifyToken(token);
 
                 var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
                 identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
                 identity.AddClaims(UserRoleConvert.ToArray(userInfo.Administrator).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
 

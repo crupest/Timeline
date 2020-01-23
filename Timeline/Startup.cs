@@ -84,7 +84,8 @@ namespace Timeline
             });
 
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IJwtService, UserTokenService>();
+            services.AddScoped<IUserTokenService, JwtUserTokenService>();
+            services.AddScoped<IUserTokenManager, UserTokenManager>();
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClock, Clock>();
             services.AddUserAvatarService();

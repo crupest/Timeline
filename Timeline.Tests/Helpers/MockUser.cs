@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Timeline.Models;
+using Timeline.Models.Http;
 
 namespace Timeline.Tests.Helpers
 {
@@ -7,11 +7,11 @@ namespace Timeline.Tests.Helpers
     {
         public MockUser(string username, string password, bool administrator)
         {
-            Info = new UserInfo(username, administrator);
+            Info = new User { Username = username, Administrator = administrator };
             Password = password;
         }
 
-        public UserInfo Info { get; set; }
+        public User Info { get; set; }
         public string Username => Info.Username;
         public string Password { get; set; }
         public bool Administrator => Info.Administrator;
@@ -19,6 +19,6 @@ namespace Timeline.Tests.Helpers
         public static MockUser User { get; } = new MockUser("user", "userpassword", false);
         public static MockUser Admin { get; } = new MockUser("admin", "adminpassword", true);
 
-        public static IReadOnlyList<UserInfo> UserInfoList { get; } = new List<UserInfo> { User.Info, Admin.Info };
+        public static IReadOnlyList<User> UserInfoList { get; } = new List<User> { User.Info, Admin.Info };
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -35,18 +36,28 @@ namespace Timeline.Tests.Controllers
         [Fact]
         public async Task GetList_Success()
         {
-            var array = MockUser.UserInfoList.ToArray();
-            _mockUserService.Setup(s => s.ListUsers()).ReturnsAsync(array);
+            var mockUserList = new UserInfo[] {
+                new UserInfo { Id = 1, Username = "aaa", Administrator = true, Version = 1 },
+                new UserInfo { Id = 2, Username = "bbb", Administrator = false, Version = 1 }
+            };
+            _mockUserService.Setup(s => s.ListUsers()).ReturnsAsync(mockUserList);
             var action = await _controller.List();
             action.Result.Should().BeAssignableTo<OkObjectResult>()
-                .Which.Value.Should().BeEquivalentTo(array);
+                .Which.Value.Should().BeEquivalentTo(
+                mockUserList.Select(u => new User { Username = u.Username, Administrator = u.Administrator }).ToArray());
         }
 
         [Fact]
         public async Task Get_Success()
         {
             const string username = "aaa";
-            _mockUserService.Setup(s => s.GetUserByUsername(username)).ReturnsAsync(MockUser.User.Info);
+            _mockUserService.Setup(s => s.GetUserByUsername(username)).ReturnsAsync(new UserInfo
+            {
+                Id = 1,
+                Username = MockUser.User.Username,
+                Administrator = MockUser.User.Administrator,
+                Version = 1
+            });
             var action = await _controller.Get(username);
             action.Result.Should().BeAssignableTo<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(MockUser.User.Info);
@@ -56,7 +67,7 @@ namespace Timeline.Tests.Controllers
         public async Task Get_NotFound()
         {
             const string username = "aaa";
-            _mockUserService.Setup(s => s.GetUserByUsername(username)).Returns(Task.FromResult<User>(null));
+            _mockUserService.Setup(s => s.GetUserByUsername(username)).ThrowsAsync(new UserNotExistException());
             var action = await _controller.Get(username);
             action.Result.Should().BeAssignableTo<NotFoundObjectResult>()
                 .Which.Value.Should().BeAssignableTo<CommonResponse>()

@@ -35,13 +35,16 @@ namespace Timeline.Controllers
         [HttpGet("users/{username}"), AdminAuthorize]
         public async Task<ActionResult<User>> Get([FromRoute][Username] string username)
         {
-            var user = await _userService.GetUserByUsername(username);
-            if (user == null)
+            try
             {
-                _logger.LogInformation(Log.Format(LogGetUserNotExist, ("Username", username)));
+                var user = await _userService.GetUserByUsername(username);
+                return Ok(user);
+            }
+            catch (UserNotExistException e)
+            {
+                _logger.LogInformation(e, Log.Format(LogGetUserNotExist, ("Username", username)));
                 return NotFound(ErrorResponse.UserCommon.NotExist());
             }
-            return Ok(user);
         }
 
         [HttpPut("users/{username}"), AdminAuthorize]
