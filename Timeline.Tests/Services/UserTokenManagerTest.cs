@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Timeline.Models;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
@@ -47,6 +48,37 @@ namespace Timeline.Tests.Services
             const string password = "ppp";
             _mockUserService.Setup(s => s.VerifyCredential(username, password)).ThrowsAsync((Exception)Activator.CreateInstance(exceptionType));
             await _service.Awaiting(s => s.CreateToken(username, password)).Should().ThrowAsync(exceptionType);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task CreateToken_Success(bool setExpireTime)
+        {
+            const string username = "uuu";
+            const string password = "ppp";
+            var mockExpireTime = setExpireTime ? (DateTime?)DateTime.Now : null;
+            var mockUserInfo = new UserInfo
+            {
+                Id = 1,
+                Username = username,
+                Administrator = false,
+                Version = 1
+            };
+            const string mockToken = "mocktokenaaaaaaa";
+
+            _mockUserService.Setup(s => s.VerifyCredential(username, password)).ReturnsAsync(mockUserInfo);
+            _mockUserTokenService.Setup(s => s.GenerateToken(
+                It.Is<UserTokenInfo>(userTokenInfo =>
+                userTokenInfo.Id == mockUserInfo.Id &&
+                userTokenInfo.Version == mockUserInfo.Version &&
+                userTokenInfo.ExpireAt == mockExpireTime))).Returns(mockToken);
+            (await _service.CreateToken(username, password, mockExpireTime))
+                .Should().BeEquivalentTo(new UserTokenCreateResult
+                {
+                    Token = mockToken,
+                    User = mockUserInfo
+                });
         }
     }
 }
