@@ -80,5 +80,86 @@ namespace Timeline.Tests.Services
                     User = mockUserInfo
                 });
         }
+
+        [Fact]
+        public void VerifyToken_NullArgument()
+        {
+            _service.Invoking(s => s.VerifyToken(null)).Should().ThrowAsync<ArgumentNullException>();
+        }
+
+        [Fact]
+        public async Task VerifyToken_BadFormat()
+        {
+            const string mockToken = "mocktokenaaaaaa";
+            _mockUserTokenService.Setup(s => s.VerifyToken(mockToken)).Throws(new UserTokenBadFormatException());
+
+            await _service.Awaiting(s => s.VerifyToken(mockToken)).Should().ThrowAsync<UserTokenBadFormatException>();
+        }
+
+        [Fact]
+        public async Task VerifyToken_TimeExpire()
+        {
+            const string mockToken = "mocktokenaaaaaa";
+            var mockTime = DateTime.Now;
+            _mockClock.MockCurrentTime = mockTime;
+            var mockTokenInfo = new UserTokenInfo
+            {
+                Id = 1,
+                Version = 1,
+                ExpireAt = mockTime.AddDays(-1)
+            };
+            _mockUserTokenService.Setup(s => s.VerifyToken(mockToken)).Returns(mockTokenInfo);
+
+            await _service.Awaiting(s => s.VerifyToken(mockToken)).Should().ThrowAsync<UserTokenTimeExpireException>();
+        }
+
+        [Fact]
+        public async Task VerifyToken_BadVersion()
+        {
+            const string mockToken = "mocktokenaaaaaa";
+            var mockTime = DateTime.Now;
+            _mockClock.MockCurrentTime = mockTime;
+            var mockTokenInfo = new UserTokenInfo
+            {
+                Id = 1,
+                Version = 1,
+                ExpireAt = mockTime.AddDays(1)
+            };
+            _mockUserTokenService.Setup(s => s.VerifyToken(mockToken)).Returns(mockTokenInfo);
+            _mockUserService.Setup(s => s.GetUserById(1)).ReturnsAsync(new UserInfo
+            {
+                Id = 1,
+                Username = "aaa",
+                Administrator = false,
+                Version = 2
+            });
+
+            await _service.Awaiting(s => s.VerifyToken(mockToken)).Should().ThrowAsync<UserTokenBadVersionException>();
+        }
+
+        [Fact]
+        public async Task VerifyToken_Success()
+        {
+            const string mockToken = "mocktokenaaaaaa";
+            var mockTime = DateTime.Now;
+            _mockClock.MockCurrentTime = mockTime;
+            var mockTokenInfo = new UserTokenInfo
+            {
+                Id = 1,
+                Version = 1,
+                ExpireAt = mockTime.AddDays(1)
+            };
+            var mockUserInfo = new UserInfo
+            {
+                Id = 1,
+                Username = "aaa",
+                Administrator = false,
+                Version = 1
+            };
+            _mockUserTokenService.Setup(s => s.VerifyToken(mockToken)).Returns(mockTokenInfo);
+            _mockUserService.Setup(s => s.GetUserById(1)).ReturnsAsync(mockUserInfo);
+
+            (await _service.VerifyToken(mockToken)).Should().BeEquivalentTo(mockUserInfo);
+        }
     }
 }
