@@ -20,9 +20,9 @@ namespace Timeline.Controllers
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
 
-        private static User CreateUserFromUserInfo(UserInfo userInfo)
+        private static Models.Http.User CreateUserFromUserInfo(Models.User userInfo)
         {
-            return new User
+            return new Models.Http.User
             {
                 Username = userInfo.Username,
                 Administrator = userInfo.Administrator

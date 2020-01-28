@@ -27,7 +27,7 @@ namespace Timeline.Services
             if (!result)
                 throw new UsernameBadFormatException(username, message);
 
-            var userId = await userDbSet.Where(u => u.Name == username).Select(u => u.Id).SingleOrDefaultAsync();
+            var userId = await userDbSet.Where(u => u.Username == username).Select(u => u.Id).SingleOrDefaultAsync();
             if (userId == 0)
                 throw new UserNotExistException(username);
             return userId;

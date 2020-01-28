@@ -17,21 +17,22 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Column("name"), MaxLength(26), Required]
-        public string Name { get; set; } = default!;
+        [Column("username"), MaxLength(26), Required]
+        public string Username { get; set; } = default!;
 
         [Column("password"), Required]
-        public string EncryptedPassword { get; set; } = default!;
+        public string Password { get; set; } = default!;
 
         [Column("roles"), Required]
-        public string RoleString { get; set; } = default!;
+        public string Roles { get; set; } = default!;
 
         [Column("version"), Required]
         public long Version { get; set; }
 
-        public UserAvatarEntity? Avatar { get; set; }
+        [Column("nickname"), MaxLength(40)]
+        public string? Nickname { get; set; }
 
-        public UserDetailEntity? Detail { get; set; }
+        public UserAvatarEntity? Avatar { get; set; }
 
         public List<TimelineEntity> Timelines { get; set; } = default!;
 

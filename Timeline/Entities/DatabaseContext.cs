@@ -14,7 +14,7 @@ namespace Timeline.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserEntity>().Property(e => e.Version).HasDefaultValue(0);
-            modelBuilder.Entity<UserEntity>().HasIndex(e => e.Name).IsUnique();
+            modelBuilder.Entity<UserEntity>().HasIndex(e => e.Username).IsUnique();
         }
 
         public DbSet<UserEntity> Users { get; set; } = default!;

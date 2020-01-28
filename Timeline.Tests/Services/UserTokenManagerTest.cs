@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Services;
@@ -58,7 +56,7 @@ namespace Timeline.Tests.Services
             const string username = "uuu";
             const string password = "ppp";
             var mockExpireTime = setExpireTime ? (DateTime?)DateTime.Now : null;
-            var mockUserInfo = new UserInfo
+            var mockUserInfo = new User
             {
                 Id = 1,
                 Username = username,
@@ -126,7 +124,7 @@ namespace Timeline.Tests.Services
                 ExpireAt = mockTime.AddDays(1)
             };
             _mockUserTokenService.Setup(s => s.VerifyToken(mockToken)).Returns(mockTokenInfo);
-            _mockUserService.Setup(s => s.GetUserById(1)).ReturnsAsync(new UserInfo
+            _mockUserService.Setup(s => s.GetUserById(1)).ReturnsAsync(new User
             {
                 Id = 1,
                 Username = "aaa",
@@ -149,7 +147,7 @@ namespace Timeline.Tests.Services
                 Version = 1,
                 ExpireAt = mockTime.AddDays(1)
             };
-            var mockUserInfo = new UserInfo
+            var mockUserInfo = new User
             {
                 Id = 1,
                 Username = "aaa",

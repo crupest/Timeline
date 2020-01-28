@@ -51,7 +51,7 @@ namespace Timeline.Tests.Services
             const string nickname = "aaaaaa";
             {
                 var context = _testDatabase.Context;
-                var userId = (await context.Users.Where(u => u.Name == MockUser.User.Username).Select(u => new { u.Id }).SingleAsync()).Id;
+                var userId = (await context.Users.Where(u => u.Username == MockUser.User.Username).Select(u => new { u.Id }).SingleAsync()).Id;
                 context.UserDetails.Add(new UserDetailEntity
                 {
                     Nickname = nickname,
@@ -83,7 +83,7 @@ namespace Timeline.Tests.Services
         public async Task SetNickname_ShouldWork()
         {
             var username = MockUser.User.Username;
-            var user = await _testDatabase.Context.Users.Where(u => u.Name == username).Include(u => u.Detail).SingleAsync();
+            var user = await _testDatabase.Context.Users.Where(u => u.Username == username).Include(u => u.Detail).SingleAsync();
 
             var nickname1 = "nickname1";
             var nickname2 = "nickname2";

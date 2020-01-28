@@ -79,6 +79,42 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password can&apos;t be empty..
+        /// </summary>
+        internal static string ExceptionPasswordEmpty {
+            get {
+                return ResourceManager.GetString("ExceptionPasswordEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password can&apos;t be null or empty..
+        /// </summary>
+        internal static string ExceptionPasswordNullOrEmpty {
+            get {
+                return ResourceManager.GetString("ExceptionPasswordNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username is of bad format, because {}..
+        /// </summary>
+        internal static string ExceptionUsernameBadFormat {
+            get {
+                return ResourceManager.GetString("ExceptionUsernameBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username can&apos;t be null or empty..
+        /// </summary>
+        internal static string ExceptionUsernameNullOrEmpty {
+            get {
+                return ResourceManager.GetString("ExceptionUsernameNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A cache entry is created..
         /// </summary>
         internal static string LogCacheCreate {
