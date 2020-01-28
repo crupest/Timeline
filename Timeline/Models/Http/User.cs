@@ -1,14 +1,10 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
-    public class User
-    {
-        public string Username { get; set; } = default!;
-        public bool Administrator { get; set; }
-    }
-
+    [Obsolete("Remove this.")]
     public class UserPutRequest
     {
         [Required]
@@ -17,6 +13,7 @@ namespace Timeline.Models.Http
         public bool? Administrator { get; set; }
     }
 
+    [Obsolete("Remove this.")]
     public class UserPatchRequest
     {
         public string? Password { get; set; }

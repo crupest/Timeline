@@ -356,7 +356,7 @@ namespace Timeline.Services
                 {
                     Id = entity.Id,
                     Content = entity.Content,
-                    Author = (await Database.Users.Where(u => u.Id == entity.AuthorId).Select(u => new { u.Name }).SingleAsync()).Name,
+                    Author = (await Database.Users.Where(u => u.Id == entity.AuthorId).Select(u => new { u.Username }).SingleAsync()).Name,
                     Time = entity.Time
                 });
             }
@@ -382,7 +382,7 @@ namespace Timeline.Services
 
             var timelineId = await FindTimelineId(name);
 
-            var authorEntity = Database.Users.Where(u => u.Name == author).Select(u => new { u.Id }).SingleOrDefault();
+            var authorEntity = Database.Users.Where(u => u.Username == author).Select(u => new { u.Id }).SingleOrDefault();
             if (authorEntity == null)
             {
                 throw new UserNotExistException(author);
@@ -508,7 +508,7 @@ namespace Timeline.Services
                 List<long> result = new List<long>();
                 foreach (var (username, index) in map)
                 {
-                    var user = await Database.Users.Where(u => u.Name == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+                    var user = await Database.Users.Where(u => u.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
                     if (user == null)
                     {
                         throw new TimelineMemberOperationUserException(index, operation, username,
@@ -550,7 +550,7 @@ namespace Timeline.Services
                     throw new UsernameBadFormatException(username);
                 }
 
-                var user = await Database.Users.Where(u => u.Name == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+                var user = await Database.Users.Where(u => u.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
 
                 if (user == null)
                 {
@@ -596,7 +596,7 @@ namespace Timeline.Services
                 }
             }
 
-            var user = await Database.Users.Where(u => u.Name == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+            var user = await Database.Users.Where(u => u.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
 
             if (user == null)
             {
@@ -632,7 +632,7 @@ namespace Timeline.Services
                 }
             }
 
-            var user = await Database.Users.Where(u => u.Name == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+            var user = await Database.Users.Where(u => u.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
 
             if (user == null)
             {
@@ -672,7 +672,7 @@ namespace Timeline.Services
                 }
             }
 
-            var userEntity = await Database.Users.Where(u => u.Name == name).Select(u => new { u.Id }).SingleOrDefaultAsync();
+            var userEntity = await Database.Users.Where(u => u.Username == name).Select(u => new { u.Id }).SingleOrDefaultAsync();
 
             if (userEntity == null)
             {
@@ -715,7 +715,7 @@ namespace Timeline.Services
 
             var timelineMemberEntities = await Database.TimelineMembers.Where(m => m.TimelineId == timelineId).Select(m => new { m.UserId }).ToListAsync();
 
-            var memberUsernameTasks = timelineMemberEntities.Select(m => Database.Users.Where(u => u.Id == m.UserId).Select(u => u.Name).SingleAsync()).ToArray();
+            var memberUsernameTasks = timelineMemberEntities.Select(m => Database.Users.Where(u => u.Id == m.UserId).Select(u => u.Username).SingleAsync()).ToArray();
 
             var memberUsernames = await Task.WhenAll(memberUsernameTasks);
 

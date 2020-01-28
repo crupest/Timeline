@@ -42,7 +42,7 @@ namespace Timeline.Tests.Controllers
             var mockCreateResult = new UserTokenCreateResult
             {
                 Token = "mocktokenaaaaa",
-                User = new UserInfo
+                User = new Models.User
                 {
                     Id = 1,
                     Username = MockUser.User.Username,
@@ -99,7 +99,7 @@ namespace Timeline.Tests.Controllers
         public async Task Verify_Ok()
         {
             const string token = "aaaaaaaaaaaaaa";
-            _mockUserService.Setup(s => s.VerifyToken(token)).ReturnsAsync(new UserInfo
+            _mockUserService.Setup(s => s.VerifyToken(token)).ReturnsAsync(new Models.User
             {
                 Id = 1,
                 Username = MockUser.User.Username,

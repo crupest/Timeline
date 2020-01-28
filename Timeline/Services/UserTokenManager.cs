@@ -8,7 +8,7 @@ namespace Timeline.Services
     public class UserTokenCreateResult
     {
         public string Token { get; set; } = default!;
-        public UserInfo User { get; set; } = default!;
+        public User User { get; set; } = default!;
     }
 
     public interface IUserTokenManager
@@ -36,7 +36,7 @@ namespace Timeline.Services
         /// <exception cref="UserTokenBadVersionException">Thrown when the token is of bad version.</exception>
         /// <exception cref="UserTokenBadFormatException">Thrown when the token is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user specified by the token does not exist. Usually the user had been deleted after the token was issued.</exception>
-        public Task<UserInfo> VerifyToken(string token);
+        public Task<User> VerifyToken(string token);
     }
 
     public class UserTokenManager : IUserTokenManager
@@ -68,7 +68,7 @@ namespace Timeline.Services
         }
 
 
-        public async Task<UserInfo> VerifyToken(string token)
+        public async Task<User> VerifyToken(string token)
         {
             if (token == null)
                 throw new ArgumentNullException(nameof(token));

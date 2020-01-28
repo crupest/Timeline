@@ -82,6 +82,11 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Common.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Models\Validation\PasswordValidator.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>PasswordValidator.resx</DependentUpon>
+        </Compile>
         <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -102,10 +107,20 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>UserAvatarService.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Services\UserCache.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>UserCache.resx</DependentUpon>
+        </Compile>
         <Compile Update="Resources\Services\UserDetailService.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>UserDetailService.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Services\UserManager.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>UserManager.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Services\UserService.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -152,6 +167,10 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Common.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Models\Validation\PasswordValidator.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>PasswordValidator.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>UsernameValidator.Designer.cs</LastGenOutput>
@@ -168,9 +187,17 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>UserAvatarService.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\UserCache.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>UserCache.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\UserDetailService.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>UserDetailService.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\UserManager.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>UserManager.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\UserService.resx">
             <Generator>ResXFileCodeGenerator</Generator>

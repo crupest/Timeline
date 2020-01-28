@@ -177,6 +177,9 @@
   <data name="JwtUserTokenBadFormatExceptionVersionMissing" xml:space="preserve">
     <value>version claim does not exist.</value>
   </data>
+  <data name="PasswordBadFormatException" xml:space="preserve">
+    <value>Password is of bad format.</value>
+  </data>
   <data name="TimelineAlreadyExistException" xml:space="preserve">
     <value>The timeline with that name already exists.</value>
   </data>
@@ -197,9 +200,6 @@
   </data>
   <data name="TimelineUserNotMemberException" xml:space="preserve">
     <value>The use is not a member of the timeline.</value>
-  </data>
-  <data name="UsernameBadFormatException" xml:space="preserve">
-    <value>The username is of bad format.</value>
   </data>
   <data name="UsernameConfictException" xml:space="preserve">
     <value>The username already exists.</value>

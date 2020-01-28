@@ -241,6 +241,15 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password is of bad format..
+        /// </summary>
+        internal static string PasswordBadFormatException {
+            get {
+                return ResourceManager.GetString("PasswordBadFormatException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The timeline with that name already exists..
         /// </summary>
         internal static string TimelineAlreadyExistException {
@@ -300,15 +309,6 @@ namespace Timeline.Resources.Services {
         internal static string TimelineUserNotMemberException {
             get {
                 return ResourceManager.GetString("TimelineUserNotMemberException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The username is of bad format..
-        /// </summary>
-        internal static string UsernameBadFormatException {
-            get {
-                return ResourceManager.GetString("UsernameBadFormatException", resourceCulture);
             }
         }
         

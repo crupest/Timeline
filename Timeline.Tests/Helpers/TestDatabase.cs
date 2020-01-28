@@ -18,9 +18,9 @@ namespace Timeline.Tests.Helpers
         {
             return new UserEntity
             {
-                Name = user.Username,
-                EncryptedPassword = PasswordService.HashPassword(user.Password),
-                RoleString = UserRoleConvert.ToString(user.Administrator),
+                Username = user.Username,
+                Password = PasswordService.HashPassword(user.Password),
+                Roles = UserRoleConvert.ToString(user.Administrator),
                 Avatar = null
             };
         }

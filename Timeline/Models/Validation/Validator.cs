@@ -20,24 +20,46 @@ namespace Timeline.Models.Validation
         (bool, string) Validate(object? value);
     }
 
+    public static class ValidatorExtensions
+    {
+        public static bool Validate(this IValidator validator, object? value, out string message)
+        {
+            if (validator == null)
+                throw new ArgumentNullException(nameof(validator));
+
+            var (r, m) = validator.Validate(value);
+            message = m;
+            return r;
+        }
+    }
+
     /// <summary>
     /// Convenient base class for validator.
     /// </summary>
     /// <typeparam name="T">The type of accepted value.</typeparam>
     /// <remarks>
     /// Subclass should override <see cref="DoValidate(T, out string)"/> to do the real validation.
-    /// This class will check the nullity and type of value. If value is null or not of type <typeparamref name="T"/>
-    /// it will return false and not call <see cref="DoValidate(T, out string)"/>.
+    /// This class will check the nullity and type of value.
+    /// If value is null, it will pass or fail depending on <see cref="PermitNull"/>.
+    /// If value is not null and not of type <typeparamref name="T"/>
+    /// it will fail and not call <see cref="DoValidate(T, out string)"/>.
+    /// 
+    /// <see cref="PermitNull"/> is true by default.
     /// 
     /// If you want some other behaviours, write the validator from scratch.
     /// </remarks>
     public abstract class Validator<T> : IValidator
     {
+        protected bool PermitNull { get; set; } = true;
+
         public (bool, string) Validate(object? value)
         {
             if (value == null)
             {
-                return (false, ValidatorMessageNull);
+                if (PermitNull)
+                    return (true, GetSuccessMessage());
+                else
+                    return (false, ValidatorMessageNull);
             }
 
             if (value is T v)

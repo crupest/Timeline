@@ -36,9 +36,9 @@ namespace Timeline.Tests.Controllers
         [Fact]
         public async Task GetList_Success()
         {
-            var mockUserList = new UserInfo[] {
-                new UserInfo { Id = 1, Username = "aaa", Administrator = true, Version = 1 },
-                new UserInfo { Id = 2, Username = "bbb", Administrator = false, Version = 1 }
+            var mockUserList = new Models.User[] {
+                new Models.User { Id = 1, Username = "aaa", Administrator = true, Version = 1 },
+                new Models.User { Id = 2, Username = "bbb", Administrator = false, Version = 1 }
             };
             _mockUserService.Setup(s => s.ListUsers()).ReturnsAsync(mockUserList);
             var action = await _controller.List();
@@ -51,7 +51,7 @@ namespace Timeline.Tests.Controllers
         public async Task Get_Success()
         {
             const string username = "aaa";
-            _mockUserService.Setup(s => s.GetUserByUsername(username)).ReturnsAsync(new UserInfo
+            _mockUserService.Setup(s => s.GetUserByUsername(username)).ReturnsAsync(new Models.User
             {
                 Id = 1,
                 Username = MockUser.User.Username,

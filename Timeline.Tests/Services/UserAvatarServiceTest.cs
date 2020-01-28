@@ -171,7 +171,7 @@ namespace Timeline.Tests.Services
             var mockAvatarEntity = CreateMockAvatarEntity("aaa");
             {
                 var context = _database.Context;
-                var user = await context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
+                var user = await context.Users.Where(u => u.Username == username).Include(u => u.Avatar).SingleAsync();
                 user.Avatar = mockAvatarEntity;
                 await context.SaveChangesAsync();
             }
@@ -205,7 +205,7 @@ namespace Timeline.Tests.Services
             var mockAvatarEntity = CreateMockAvatarEntity("aaa");
             {
                 var context = _database.Context;
-                var user = await context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
+                var user = await context.Users.Where(u => u.Username == username).Include(u => u.Avatar).SingleAsync();
                 user.Avatar = mockAvatarEntity;
                 await context.SaveChangesAsync();
             }
@@ -236,7 +236,7 @@ namespace Timeline.Tests.Services
         {
             string username = MockUser.User.Username;
 
-            var user = await _database.Context.Users.Where(u => u.Name == username).Include(u => u.Avatar).SingleAsync();
+            var user = await _database.Context.Users.Where(u => u.Username == username).Include(u => u.Avatar).SingleAsync();
 
             var avatar1 = CreateMockAvatar("aaa");
             var avatar2 = CreateMockAvatar("bbb");
