@@ -12,6 +12,7 @@ namespace Timeline.Models
 
 
         #region secret
+        public long? Id { get; set; }
         public string? Password { get; set; }
         public long? Version { get; set; }
         #endregion secret

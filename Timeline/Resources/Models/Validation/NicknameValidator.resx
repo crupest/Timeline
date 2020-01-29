@@ -117,13 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ValidatorMessageBadType" xml:space="preserve">
-    <value>值不是类型{0}的实例。</value>
-  </data>
-  <data name="ValidatorMessageNull" xml:space="preserve">
-    <value>值不能为null.</value>
-  </data>
-  <data name="ValidatorMessageSuccess" xml:space="preserve">
-    <value>验证成功。</value>
+  <data name="MessageTooLong" xml:space="preserve">
+    <value>Nickname is too long.</value>
   </data>
 </root>

@@ -120,26 +120,26 @@
   <data name="ExceptionNewUsernameBadFormat" xml:space="preserve">
     <value>New username is of bad format.</value>
   </data>
+  <data name="ExceptionNicknameBadFormat" xml:space="preserve">
+    <value>Nickname is of bad format, because {}.</value>
+  </data>
   <data name="ExceptionOldUsernameBadFormat" xml:space="preserve">
     <value>Old username is of bad format.</value>
   </data>
   <data name="ExceptionPasswordEmpty" xml:space="preserve">
     <value>Password can't be empty.</value>
   </data>
-  <data name="ExceptionPasswordNullOrEmpty" xml:space="preserve">
-    <value>Password can't be null or empty.</value>
+  <data name="ExceptionPasswordNull" xml:space="preserve">
+    <value>Password can't be null.</value>
   </data>
   <data name="ExceptionUsernameBadFormat" xml:space="preserve">
     <value>Username is of bad format, because {}.</value>
   </data>
-  <data name="ExceptionUsernameNullOrEmpty" xml:space="preserve">
-    <value>Username can't be null or empty.</value>
+  <data name="ExceptionUsernameConflict" xml:space="preserve">
+    <value>A user with given username already exists.</value>
   </data>
-  <data name="LogCacheCreate" xml:space="preserve">
-    <value>A cache entry is created.</value>
-  </data>
-  <data name="LogCacheRemove" xml:space="preserve">
-    <value>A cache entry is removed.</value>
+  <data name="ExceptionUsernameNull" xml:space="preserve">
+    <value>Username can't be null.</value>
   </data>
   <data name="LogDatabaseCreate" xml:space="preserve">
     <value>A new user entry is added to the database.</value>

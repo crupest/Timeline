@@ -82,9 +82,9 @@ namespace Timeline.Auth
                 var userInfo = await _userTokenManager.VerifyToken(token);
 
                 var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
-                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userInfo.Id!.Value.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
                 identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
-                identity.AddClaims(UserRoleConvert.ToArray(userInfo.Administrator).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
+                identity.AddClaims(UserRoleConvert.ToArray(userInfo.Administrator!.Value).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
                 principal.AddIdentity(identity);

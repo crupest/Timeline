@@ -70,6 +70,15 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nickname is of bad format, because {}..
+        /// </summary>
+        internal static string ExceptionNicknameBadFormat {
+            get {
+                return ResourceManager.GetString("ExceptionNicknameBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Old username is of bad format..
         /// </summary>
         internal static string ExceptionOldUsernameBadFormat {
@@ -88,11 +97,11 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Password can&apos;t be null or empty..
+        ///   Looks up a localized string similar to Password can&apos;t be null..
         /// </summary>
-        internal static string ExceptionPasswordNullOrEmpty {
+        internal static string ExceptionPasswordNull {
             get {
-                return ResourceManager.GetString("ExceptionPasswordNullOrEmpty", resourceCulture);
+                return ResourceManager.GetString("ExceptionPasswordNull", resourceCulture);
             }
         }
         
@@ -106,29 +115,20 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Username can&apos;t be null or empty..
+        ///   Looks up a localized string similar to A user with given username already exists..
         /// </summary>
-        internal static string ExceptionUsernameNullOrEmpty {
+        internal static string ExceptionUsernameConflict {
             get {
-                return ResourceManager.GetString("ExceptionUsernameNullOrEmpty", resourceCulture);
+                return ResourceManager.GetString("ExceptionUsernameConflict", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A cache entry is created..
+        ///   Looks up a localized string similar to Username can&apos;t be null..
         /// </summary>
-        internal static string LogCacheCreate {
+        internal static string ExceptionUsernameNull {
             get {
-                return ResourceManager.GetString("LogCacheCreate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A cache entry is removed..
-        /// </summary>
-        internal static string LogCacheRemove {
-            get {
-                return ResourceManager.GetString("LogCacheRemove", resourceCulture);
+                return ResourceManager.GetString("ExceptionUsernameNull", resourceCulture);
             }
         }
         
