@@ -129,6 +129,9 @@
   <data name="Common_Forbid" xml:space="preserve">
     <value>You have no permission to do the operation.</value>
   </data>
+  <data name="Common_Forbid_NotSelf" xml:space="preserve">
+    <value>You are not the resource owner.</value>
+  </data>
   <data name="Common_Header_ContentLength_Missing" xml:space="preserve">
     <value>Header Content-Length is missing or of bad format.</value>
   </data>
@@ -185,5 +188,14 @@
   </data>
   <data name="UserController_ChangeUsername_Conflict" xml:space="preserve">
     <value>The new username already exists.</value>
+  </data>
+  <data name="UserController_Patch_Forbid_Administrator" xml:space="preserve">
+    <value>You can't set permission unless you are administrator.</value>
+  </data>
+  <data name="UserController_Patch_Forbid_Password" xml:space="preserve">
+    <value>You can't set password unless you are administrator. If you want to change password, use /userop/changepassword .</value>
+  </data>
+  <data name="UserController_Patch_Forbid_Username" xml:space="preserve">
+    <value>You can't set username unless you are administrator.</value>
   </data>
 </root>

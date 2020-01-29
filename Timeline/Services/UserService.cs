@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
-using Timeline.Models;
 using Timeline.Models.Validation;
 using static Timeline.Resources.Services.UserService;
 

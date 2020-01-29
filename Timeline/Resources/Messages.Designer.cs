@@ -97,6 +97,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are not the resource owner..
+        /// </summary>
+        internal static string Common_Forbid_NotSelf {
+            get {
+                return ResourceManager.GetString("Common_Forbid_NotSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Header Content-Length is missing or of bad format..
         /// </summary>
         internal static string Common_Header_ContentLength_Missing {
@@ -264,6 +273,33 @@ namespace Timeline.Resources {
         internal static string UserController_ChangeUsername_Conflict {
             get {
                 return ResourceManager.GetString("UserController_ChangeUsername_Conflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t set permission unless you are administrator..
+        /// </summary>
+        internal static string UserController_Patch_Forbid_Administrator {
+            get {
+                return ResourceManager.GetString("UserController_Patch_Forbid_Administrator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t set password unless you are administrator. If you want to change password, use /userop/changepassword ..
+        /// </summary>
+        internal static string UserController_Patch_Forbid_Password {
+            get {
+                return ResourceManager.GetString("UserController_Patch_Forbid_Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t set username unless you are administrator..
+        /// </summary>
+        internal static string UserController_Patch_Forbid_Username {
+            get {
+                return ResourceManager.GetString("UserController_Patch_Forbid_Username", resourceCulture);
             }
         }
     }
