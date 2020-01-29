@@ -29,7 +29,7 @@ namespace Timeline.Controllers
         [HttpGet("users"), AdminAuthorize]
         public async Task<ActionResult<User[]>> List()
         {
-            return Ok(await _userService.ListUsers());
+            return Ok(await _userService.GetUsers());
         }
 
         [HttpGet("users/{username}"), AdminAuthorize]
@@ -105,7 +105,7 @@ namespace Timeline.Controllers
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
                 return BadRequest(ErrorResponse.UserCommon.NotExist());
             }
-            catch (UsernameConfictException e)
+            catch (ConfictException e)
             {
                 _logger.LogInformation(e, Log.Format(LogChangeUsernameConflict,
                     ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));

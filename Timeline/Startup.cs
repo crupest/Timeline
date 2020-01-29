@@ -1,14 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -89,7 +86,6 @@ namespace Timeline
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClock, Clock>();
             services.AddUserAvatarService();
-            services.AddScoped<IUserDetailService, UserDetailService>();
 
             services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();
 
@@ -113,8 +109,6 @@ namespace Timeline
                     options.UseMySql(databaseConfig.ConnectionString);
                 });
             }
-
-            services.AddMemoryCache();
         }
 
 
@@ -127,19 +121,6 @@ namespace Timeline
             });
 
             app.UseRouting();
-
-            var supportedCultures = new List<CultureInfo>
-            {
-                new CultureInfo("en"),
-                new CultureInfo("zh")
-            };
-
-            app.UseRequestLocalization(new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture("en"),
-                SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
-            });
 
             app.UseCors();
 

@@ -115,6 +115,15 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A present resource conflicts with the given resource..
+        /// </summary>
+        internal static string ConfictException {
+            get {
+                return ResourceManager.GetString("ConfictException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The hashes password is of bad format. It might not be created by server..
         /// </summary>
         internal static string HashedPasswordBadFromatException {
@@ -309,15 +318,6 @@ namespace Timeline.Resources.Services {
         internal static string TimelineUserNotMemberException {
             get {
                 return ResourceManager.GetString("TimelineUserNotMemberException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The username already exists..
-        /// </summary>
-        internal static string UsernameConfictException {
-            get {
-                return ResourceManager.GetString("UsernameConfictException", resourceCulture);
             }
         }
         

@@ -135,6 +135,9 @@
   <data name="BadPasswordException" xml:space="preserve">
     <value>The password is wrong.</value>
   </data>
+  <data name="ConfictException" xml:space="preserve">
+    <value>A present resource conflicts with the given resource.</value>
+  </data>
   <data name="HashedPasswordBadFromatException" xml:space="preserve">
     <value>The hashes password is of bad format. It might not be created by server.</value>
   </data>
@@ -200,9 +203,6 @@
   </data>
   <data name="TimelineUserNotMemberException" xml:space="preserve">
     <value>The use is not a member of the timeline.</value>
-  </data>
-  <data name="UsernameConfictException" xml:space="preserve">
-    <value>The username already exists.</value>
   </data>
   <data name="UserNotExistException" xml:space="preserve">
     <value>The user does not exist.</value>

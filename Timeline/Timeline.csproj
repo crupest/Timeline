@@ -82,10 +82,10 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Common.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Models\Validation\PasswordValidator.Designer.cs">
+        <Compile Update="Resources\Models\Validation\NicknameValidator.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
-          <DependentUpon>PasswordValidator.resx</DependentUpon>
+          <DependentUpon>NicknameValidator.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -116,11 +116,6 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>UserDetailService.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Services\UserManager.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>UserManager.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Services\UserService.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -167,9 +162,9 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Common.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Models\Validation\PasswordValidator.resx">
+        <EmbeddedResource Update="Resources\Models\Validation\NicknameValidator.resx">
           <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>PasswordValidator.Designer.cs</LastGenOutput>
+          <LastGenOutput>NicknameValidator.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
             <Generator>ResXFileCodeGenerator</Generator>
@@ -194,10 +189,6 @@
         <EmbeddedResource Update="Resources\Services\UserDetailService.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>UserDetailService.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\UserManager.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>UserManager.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\UserService.resx">
             <Generator>ResXFileCodeGenerator</Generator>

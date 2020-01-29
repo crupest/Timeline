@@ -40,7 +40,7 @@ namespace Timeline.Tests.Controllers
                 new Models.User { Id = 1, Username = "aaa", Administrator = true, Version = 1 },
                 new Models.User { Id = 2, Username = "bbb", Administrator = false, Version = 1 }
             };
-            _mockUserService.Setup(s => s.ListUsers()).ReturnsAsync(mockUserList);
+            _mockUserService.Setup(s => s.GetUsers()).ReturnsAsync(mockUserList);
             var action = await _controller.List();
             action.Result.Should().BeAssignableTo<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(
@@ -165,7 +165,7 @@ namespace Timeline.Tests.Controllers
 
         [Theory]
         [InlineData(typeof(UserNotExistException), ErrorCodes.UserCommon.NotExist)]
-        [InlineData(typeof(UsernameConfictException), ErrorCodes.UserController.ChangeUsername_Conflict)]
+        [InlineData(typeof(ConfictException), ErrorCodes.UserController.ChangeUsername_Conflict)]
         public async Task Op_ChangeUsername_Failure(Type exceptionType, int code)
         {
             const string oldUsername = "aaa";
