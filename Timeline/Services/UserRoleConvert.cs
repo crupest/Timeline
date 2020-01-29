@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Timeline.Entities;
 
-namespace Timeline.Models
+namespace Timeline.Services
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "No need.")]
     public static class UserRoleConvert
