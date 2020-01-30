@@ -22,12 +22,6 @@ namespace Timeline.Tests
         }
 
         [Fact]
-        public void Null()
-        {
-            FailAndMessage(null).Should().ContainEquivalentOf("null");
-        }
-
-        [Fact]
         public void NotString()
         {
             var (result, message) = _validator.Validate(123);
@@ -58,6 +52,7 @@ namespace Timeline.Tests
         }
 
         [Theory]
+        [InlineData(null)]
         [InlineData("abc")]
         [InlineData("-abc")]
         [InlineData("_abc")]
@@ -68,7 +63,6 @@ namespace Timeline.Tests
         [InlineData("a-b_c")]
         public void Success(string value)
         {
-
             var (result, _) = _validator.Validate(value);
             result.Should().BeTrue();
         }

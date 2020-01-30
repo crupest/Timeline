@@ -295,7 +295,7 @@ namespace Timeline.Services
             {
                 if (entity.Content != null) // otherwise it is deleted
                 {
-                    var author = Mapper.Map<UserInfo>(UserService.GetUserById(entity.AuthorId));
+                    var author = Mapper.Map<UserInfo>(await UserService.GetUserById(entity.AuthorId));
                     posts.Add(new TimelinePostInfo
                     {
                         Id = entity.Id,

@@ -17,10 +17,20 @@ namespace Timeline.Tests.Helpers
         public TestApplication(WebApplicationFactory<Startup> factory)
         {
             DatabaseConnection = new SqliteConnection("Data Source=:memory:;");
+            DatabaseConnection.Open();
+
+            var options = new DbContextOptionsBuilder<DevelopmentDatabaseContext>()
+                .UseSqlite(DatabaseConnection)
+                .Options;
+
+            using (var context = new DevelopmentDatabaseContext(options))
+            {
+                context.Database.EnsureCreated();
+            }
 
             Factory = factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureTestServices(services =>
+                builder.ConfigureServices(services =>
                 {
                     services.AddDbContext<DatabaseContext, DevelopmentDatabaseContext>(options =>
                     {

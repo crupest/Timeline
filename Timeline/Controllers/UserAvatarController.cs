@@ -78,7 +78,7 @@ namespace Timeline.Controllers
 
         [HttpPut("users/{username}/avatar")]
         [Authorize]
-        [RequireContentLength]
+        [RequireContentType, RequireContentLength]
         [Consumes("image/png", "image/jpeg", "image/gif", "image/webp")]
         public async Task<IActionResult> Put([FromRoute][Username] string username)
         {

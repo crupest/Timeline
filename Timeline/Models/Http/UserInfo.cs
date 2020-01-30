@@ -29,21 +29,30 @@ namespace Timeline.Models.Http
         public bool Administrator { get; set; }
     }
 
-    public class UserInfoSetAvatarUrlAction : IMappingAction<object, IUserInfo>
+    public class UserInfoAvatarUrlValueResolver : IValueResolver<User, IUserInfo, string>
     {
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
 
-        public UserInfoSetAvatarUrlAction(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
+        public UserInfoAvatarUrlValueResolver()
+        {
+        }
+
+        public UserInfoAvatarUrlValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
         {
             _actionContextAccessor = actionContextAccessor;
             _urlHelperFactory = urlHelperFactory;
         }
 
-        public void Process(object source, IUserInfo destination, ResolutionContext context)
+        public string Resolve(User source, IUserInfo destination, string destMember, ResolutionContext context)
         {
+            if (_actionContextAccessor == null)
+            {
+                return $"/users/{destination.Username}/avatar";
+            }
+
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
-            destination.AvatarUrl = urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController), new { destination.Username });
+            return urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController), new { destination.Username });
         }
     }
 
@@ -51,8 +60,8 @@ namespace Timeline.Models.Http
     {
         public UserInfoAutoMapperProfile()
         {
-            CreateMap<User, UserInfo>().AfterMap<UserInfoSetAvatarUrlAction>();
-            CreateMap<User, UserInfoForAdmin>().AfterMap<UserInfoSetAvatarUrlAction>();
+            CreateMap<User, UserInfo>().ForMember(u => u.AvatarUrl, opt => opt.MapFrom<UserInfoAvatarUrlValueResolver>());
+            CreateMap<User, UserInfoForAdmin>().ForMember(u => u.AvatarUrl, opt => opt.MapFrom<UserInfoAvatarUrlValueResolver>());
         }
     }
 }
