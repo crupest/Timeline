@@ -348,6 +348,9 @@ namespace Timeline.Services
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
+            // Currently we don't use the result. But we need to check the timeline.
+            var _ = await FindTimelineId(name);
+
             var post = await Database.TimelinePosts.Where(p => p.Id == id).SingleOrDefaultAsync();
 
             if (post == null)

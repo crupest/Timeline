@@ -75,7 +75,7 @@ namespace Timeline.Tests.IntegratedTests
                 await GetReturnDefault("admin");
 
                 {
-                    var request = new HttpRequestMessage()
+                    using var request = new HttpRequestMessage()
                     {
                         RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
                         Method = HttpMethod.Get,
@@ -87,7 +87,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var request = new HttpRequestMessage()
+                    using var request = new HttpRequestMessage()
                     {
                         RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
                         Method = HttpMethod.Get,
@@ -98,7 +98,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var request = new HttpRequestMessage()
+                    using var request = new HttpRequestMessage()
                     {
                         RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
                         Method = HttpMethod.Get,
@@ -109,7 +109,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    using var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
@@ -117,7 +117,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    using var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 1;
                     var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
@@ -125,7 +125,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    using var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 0;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
@@ -139,7 +139,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    using var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 1000 * 1000 * 11;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
@@ -148,7 +148,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    using var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 2;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
@@ -157,7 +157,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var content = new ByteArrayContent(new[] { (byte)0x00, (byte)0x01 });
+                    using var content = new ByteArrayContent(new[] { (byte)0x00, (byte)0x01 });
                     content.Headers.ContentLength = 1;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
