@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -5,7 +6,6 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Timeline.Helpers;
-using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
 using static Timeline.Resources.Controllers.TokenController;
@@ -20,20 +20,14 @@ namespace Timeline.Controllers
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
 
-        private static Models.Http.User CreateUserFromUserInfo(Models.User userInfo)
-        {
-            return new Models.Http.User
-            {
-                Username = userInfo.Username,
-                Administrator = userInfo.Administrator
-            };
-        }
+        private readonly IMapper _mapper;
 
-        public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock)
+        public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
         {
             _userTokenManager = userTokenManager;
             _logger = logger;
             _clock = clock;
+            _mapper = mapper;
         }
 
         [HttpPost("create")]
@@ -65,7 +59,7 @@ namespace Timeline.Controllers
                 return Ok(new CreateTokenResponse
                 {
                     Token = result.Token,
-                    User = CreateUserFromUserInfo(result.User)
+                    User = _mapper.Map<UserInfoForAdmin>(result.User)
                 });
             }
             catch (UserNotExistException e)
@@ -100,7 +94,7 @@ namespace Timeline.Controllers
                     ("Username", result.Username), ("Token", request.Token)));
                 return Ok(new VerifyTokenResponse
                 {
-                    User = CreateUserFromUserInfo(result)
+                    User = _mapper.Map<UserInfoForAdmin>(result)
                 });
             }
             catch (UserTokenTimeExpireException e)

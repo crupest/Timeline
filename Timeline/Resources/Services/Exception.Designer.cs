@@ -117,9 +117,9 @@ namespace Timeline.Resources.Services {
         /// <summary>
         ///   Looks up a localized string similar to A present resource conflicts with the given resource..
         /// </summary>
-        internal static string ConfictException {
+        internal static string ConflictException {
             get {
-                return ResourceManager.GetString("ConfictException", resourceCulture);
+                return ResourceManager.GetString("ConflictException", resourceCulture);
             }
         }
         
@@ -259,42 +259,6 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The timeline with that name already exists..
-        /// </summary>
-        internal static string TimelineAlreadyExistException {
-            get {
-                return ResourceManager.GetString("TimelineAlreadyExistException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception happened when add or remove member on timeline..
-        /// </summary>
-        internal static string TimelineMemberOperationException {
-            get {
-                return ResourceManager.GetString("TimelineMemberOperationException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception happened when do operation {0} on the {1} member on timeline..
-        /// </summary>
-        internal static string TimelineMemberOperationExceptionDetail {
-            get {
-                return ResourceManager.GetString("TimelineMemberOperationExceptionDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Timeline name is of bad format. If this is a personal timeline, it means the username is of bad format and inner exception should be a UsernameBadFormatException..
-        /// </summary>
-        internal static string TimelineNameBadFormatException {
-            get {
-                return ResourceManager.GetString("TimelineNameBadFormatException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Timeline does not exist. If this is a personal timeline, it means the user does not exist and inner exception should be a UserNotExistException..
         /// </summary>
         internal static string TimelineNotExistException {
@@ -309,15 +273,6 @@ namespace Timeline.Resources.Services {
         internal static string TimelinePostNotExistException {
             get {
                 return ResourceManager.GetString("TimelinePostNotExistException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The use is not a member of the timeline..
-        /// </summary>
-        internal static string TimelineUserNotMemberException {
-            get {
-                return ResourceManager.GetString("TimelineUserNotMemberException", resourceCulture);
             }
         }
         

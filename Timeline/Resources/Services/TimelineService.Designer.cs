@@ -22,14 +22,14 @@ namespace Timeline.Resources.Services {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class UserCache {
+    internal class TimelineService {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal UserCache() {
+        internal TimelineService() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Services {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Services.UserCache", typeof(UserCache).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Services.TimelineService", typeof(TimelineService).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,38 +61,20 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Found user info from cache. Entry: {0} ..
+        ///   Looks up a localized string similar to The number {0} username is invalid..
         /// </summary>
-        internal static string LogGetCacheExist {
+        internal static string ExceptionChangeMemberUsernameBadFormat {
             get {
-                return ResourceManager.GetString("LogGetCacheExist", resourceCulture);
+                return ResourceManager.GetString("ExceptionChangeMemberUsernameBadFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User info not exist in cache. Id: {0} ..
+        ///   Looks up a localized string similar to The owner username of personal timeline is of bad format..
         /// </summary>
-        internal static string LogGetCacheNotExist {
+        internal static string ExceptionFindTimelineUsernameBadFormat {
             get {
-                return ResourceManager.GetString("LogGetCacheNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to User info remove in cache. Id: {0} ..
-        /// </summary>
-        internal static string LogRemoveCache {
-            get {
-                return ResourceManager.GetString("LogRemoveCache", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to User info set in cache. Entry: {0} ..
-        /// </summary>
-        internal static string LogSetCache {
-            get {
-                return ResourceManager.GetString("LogSetCache", resourceCulture);
+                return ResourceManager.GetString("ExceptionFindTimelineUsernameBadFormat", resourceCulture);
             }
         }
     }

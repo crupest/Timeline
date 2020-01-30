@@ -7,7 +7,6 @@ namespace Timeline.Filters
 {
     public class CatchTimelineNotExistExceptionAttribute : ExceptionFilterAttribute
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public override void OnException(ExceptionContext context)
         {
             if (context.Exception is TimelineNotExistException e)

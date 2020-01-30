@@ -169,6 +169,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user to set as member does not exist..
+        /// </summary>
+        internal static string TimelineController_MemberPut_NotExist {
+            get {
+                return ResourceManager.GetString("TimelineController_MemberPut_NotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The post to delete does not exist..
         /// </summary>
         internal static string TimelineController_PostOperationDelete_NotExist {
@@ -268,15 +277,6 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The new username already exists..
-        /// </summary>
-        internal static string UserController_ChangeUsername_Conflict {
-            get {
-                return ResourceManager.GetString("UserController_ChangeUsername_Conflict", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to You can&apos;t set permission unless you are administrator..
         /// </summary>
         internal static string UserController_Patch_Forbid_Administrator {
@@ -300,6 +300,15 @@ namespace Timeline.Resources {
         internal static string UserController_Patch_Forbid_Username {
             get {
                 return ResourceManager.GetString("UserController_Patch_Forbid_Username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A user with given username already exists..
+        /// </summary>
+        internal static string UserController_UsernameConflict {
+            get {
+                return ResourceManager.GetString("UserController_UsernameConflict", resourceCulture);
             }
         }
     }

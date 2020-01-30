@@ -29,7 +29,6 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "HttpMessageRequest should be disposed ???")]
         public async Task Test()
         {
             Avatar mockAvatar = new Avatar
@@ -61,7 +60,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 EntityTagHeaderValue eTag;
                 {
-                    var res = await client.GetAsync($"users/user/avatar");
+                    var res = await client.GetAsync($"users/user1/avatar");
                     res.Should().HaveStatusCode(200);
                     res.Content.Headers.ContentType.MediaType.Should().Be("image/png");
                     var body = await res.Content.ReadAsByteArrayAsync();
@@ -78,7 +77,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var request = new HttpRequestMessage()
                     {
-                        RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
+                        RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
                         Method = HttpMethod.Get,
                     };
                     request.Headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
@@ -90,7 +89,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var request = new HttpRequestMessage()
                     {
-                        RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
+                        RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
                         Method = HttpMethod.Get,
                     };
                     request.Headers.TryAddWithoutValidation("If-None-Match", "\"aaa\"");
@@ -101,7 +100,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var request = new HttpRequestMessage()
                     {
-                        RequestUri = new Uri(client.BaseAddress, "users/user/avatar"),
+                        RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
                         Method = HttpMethod.Get,
                     };
                     request.Headers.Add("If-None-Match", eTag.ToString());
@@ -112,7 +111,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                    var res = await client.PutAsync("users/user/avatar", content);
+                    var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Header.ContentLength_Missing); ;
                 }
@@ -120,7 +119,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 1;
-                    var res = await client.PutAsync("users/user/avatar", content);
+                    var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Header.ContentType_Missing);
                 }
@@ -129,13 +128,13 @@ namespace Timeline.Tests.IntegratedTests
                     var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 0;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                    var res = await client.PutAsync("users/user/avatar", content);
+                    var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Header.ContentLength_Zero);
                 }
 
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", new[] { (byte)0x00 }, "image/notaccept");
+                    var res = await client.PutByteArrayAsync("users/user1/avatar", new[] { (byte)0x00 }, "image/notaccept");
                     res.Should().HaveStatusCode(HttpStatusCode.UnsupportedMediaType);
                 }
 
@@ -143,7 +142,7 @@ namespace Timeline.Tests.IntegratedTests
                     var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 1000 * 1000 * 11;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                    var res = await client.PutAsync("users/user/avatar", content);
+                    var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Content.TooBig);
                 }
@@ -152,7 +151,7 @@ namespace Timeline.Tests.IntegratedTests
                     var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 2;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                    var res = await client.PutAsync("users/user/avatar", content);
+                    var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Content.UnmatchedLength_Smaller);
                 }
@@ -161,34 +160,34 @@ namespace Timeline.Tests.IntegratedTests
                     var content = new ByteArrayContent(new[] { (byte)0x00, (byte)0x01 });
                     content.Headers.ContentLength = 1;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                    var res = await client.PutAsync("users/user/avatar", content);
+                    var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Content.UnmatchedLength_Bigger);
                 }
 
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", new[] { (byte)0x00 }, "image/png");
+                    var res = await client.PutByteArrayAsync("users/user1/avatar", new[] { (byte)0x00 }, "image/png");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.UserAvatar.BadFormat_CantDecode);
                 }
 
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", mockAvatar.Data, "image/jpeg");
+                    var res = await client.PutByteArrayAsync("users/user1/avatar", mockAvatar.Data, "image/jpeg");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.UserAvatar.BadFormat_UnmatchedFormat);
                 }
 
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", ImageHelper.CreatePngWithSize(100, 200), "image/png");
+                    var res = await client.PutByteArrayAsync("users/user1/avatar", ImageHelper.CreatePngWithSize(100, 200), "image/png");
                     res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
                         .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.UserAvatar.BadFormat_BadSize);
                 }
 
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", mockAvatar.Data, mockAvatar.Type);
+                    var res = await client.PutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.Type);
                     res.Should().HaveStatusCode(HttpStatusCode.OK);
 
-                    var res2 = await client.GetAsync("users/user/avatar");
+                    var res2 = await client.GetAsync("users/user1/avatar");
                     res2.Should().HaveStatusCode(200);
                     res2.Content.Headers.ContentType.MediaType.Should().Be(mockAvatar.Type);
                     var body = await res2.Content.ReadAsByteArrayAsync();
@@ -204,7 +203,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 foreach ((var mimeType, var format) in formats)
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", ImageHelper.CreateImageWithSize(100, 100, format), mimeType);
+                    var res = await client.PutByteArrayAsync("users/user1/avatar", ImageHelper.CreateImageWithSize(100, 100, format), mimeType);
                     res.Should().HaveStatusCode(HttpStatusCode.OK);
                 }
 
@@ -222,22 +221,22 @@ namespace Timeline.Tests.IntegratedTests
 
                 for (int i = 0; i < 2; i++) // double delete should work.
                 {
-                    var res = await client.DeleteAsync("users/user/avatar");
+                    var res = await client.DeleteAsync("users/user1/avatar");
                     res.Should().HaveStatusCode(200);
                     await GetReturnDefault();
                 }
             }
 
             // Authorization check.
-            using (var client = await CreateClientAsAdmin())
+            using (var client = await CreateClientAsAdministrator())
             {
                 {
-                    var res = await client.PutByteArrayAsync("users/user/avatar", mockAvatar.Data, mockAvatar.Type);
+                    var res = await client.PutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.Type);
                     res.Should().HaveStatusCode(HttpStatusCode.OK);
                 }
 
                 {
-                    var res = await client.DeleteAsync("users/user/avatar");
+                    var res = await client.DeleteAsync("users/user1/avatar");
                     res.Should().HaveStatusCode(HttpStatusCode.OK);
                 }
 
@@ -256,7 +255,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             // bad username check
-            using (var client = await CreateClientAsAdmin())
+            using (var client = await CreateClientAsAdministrator())
             {
                 {
                     var res = await client.GetAsync("users/u!ser/avatar");

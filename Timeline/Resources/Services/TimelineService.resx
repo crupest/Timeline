@@ -117,16 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="LogGetCacheExist" xml:space="preserve">
-    <value>Found user info from cache. Entry: {0} .</value>
+  <data name="ExceptionChangeMemberUsernameBadFormat" xml:space="preserve">
+    <value>The number {0} username is invalid.</value>
   </data>
-  <data name="LogGetCacheNotExist" xml:space="preserve">
-    <value>User info not exist in cache. Id: {0} .</value>
-  </data>
-  <data name="LogRemoveCache" xml:space="preserve">
-    <value>User info remove in cache. Id: {0} .</value>
-  </data>
-  <data name="LogSetCache" xml:space="preserve">
-    <value>User info set in cache. Entry: {0} .</value>
+  <data name="ExceptionFindTimelineUsernameBadFormat" xml:space="preserve">
+    <value>The owner username of personal timeline is of bad format.</value>
   </data>
 </root>

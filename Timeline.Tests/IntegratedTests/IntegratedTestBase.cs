@@ -1,36 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
+using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public enum AuthType
-    {
-        None,
-        User,
-        Admin
-    }
-
-    public static class AuthTypeExtensions
-    {
-        public static MockUser GetMockUser(this AuthType authType)
-        {
-            return authType switch
-            {
-                AuthType.None => null,
-                AuthType.User => MockUser.User,
-                AuthType.Admin => MockUser.Admin,
-                _ => throw new InvalidOperationException("Unknown auth type.")
-            };
-        }
-
-        public static string GetUsername(this AuthType authType) => authType.GetMockUser().Username;
-    }
 
     public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
@@ -38,14 +19,62 @@ namespace Timeline.Tests.IntegratedTests
 
         protected WebApplicationFactory<Startup> Factory => TestApp.Factory;
 
-        public IntegratedTestBase(WebApplicationFactory<Startup> factory)
+        public IntegratedTestBase(WebApplicationFactory<Startup> factory) : this(factory, 1)
         {
+
+        }
+
+        public IntegratedTestBase(WebApplicationFactory<Startup> factory, int userCount)
+        {
+            if (userCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(userCount), userCount, "User count can't be negative.");
+
             TestApp = new TestApplication(factory);
+
+            using (var scope = Factory.Services.CreateScope())
+            {
+                var users = new List<User>()
+                {
+                    new User
+                    {
+                        Username = "admin",
+                        Password = "adminpw",
+                        Administrator = true,
+                        Nickname = "administrator"
+                    }
+                };
+
+                for (int i = 1; i <= userCount; i++)
+                {
+                    users.Add(new User
+                    {
+                        Username = $"user{i}",
+                        Password = $"user{i}pw",
+                        Administrator = false,
+                        Nickname = $"imuser{i}"
+                    });
+                }
+
+                var userInfoList = new List<UserInfo>();
+                var userInfoForAdminList = new List<UserInfoForAdmin>();
+
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
+                foreach (var user in users)
+                {
+                    userService.CreateUser(user);
+                    userInfoList.Add(mapper.Map<UserInfo>(user));
+                    userInfoForAdminList.Add(mapper.Map<UserInfoForAdmin>(user));
+                }
+
+                UserInfoList = userInfoList;
+                UserInfoForAdminList = userInfoForAdminList;
+            }
         }
 
         protected virtual void OnDispose()
         {
-
         }
 
         public void Dispose()
@@ -54,14 +83,11 @@ namespace Timeline.Tests.IntegratedTests
             TestApp.Dispose();
         }
 
-        protected void CreateExtraMockUsers(int count)
-        {
-            TestApp.Database.CreateExtraMockUsers(count);
-        }
+        public IReadOnlyList<UserInfo> UserInfoList { get; }
 
-        protected IReadOnlyList<MockUser> ExtraMockUsers => TestApp.Database.ExtraMockUsers;
+        public IReadOnlyList<UserInfoForAdmin> UserInfoForAdminList { get; }
 
-        public Task<HttpClient> CreateClientWithNoAuth()
+        public Task<HttpClient> CreateDefaultClient()
         {
             return Task.FromResult(Factory.CreateDefaultClient());
         }
@@ -77,18 +103,25 @@ namespace Timeline.Tests.IntegratedTests
             return client;
         }
 
-        public Task<HttpClient> CreateClientAs(MockUser user)
+        public Task<HttpClient> CreateClientAs(int userNumber)
         {
-            if (user == null)
-                return CreateClientWithNoAuth();
-            return CreateClientWithCredential(user.Username, user.Password);
+            if (userNumber < 0)
+                throw new ArgumentOutOfRangeException(nameof(userNumber), "User number can't be negative.");
+
+            if (userNumber == 0)
+                return CreateClientWithCredential("admin", "adminpw");
+            else
+                return CreateClientWithCredential($"user{userNumber}", $"user{userNumber}pw");
         }
 
-        public Task<HttpClient> CreateClientAs(AuthType authType) => CreateClientAs(authType.GetMockUser());
+        public Task<HttpClient> CreateClientAsAdministrator()
+        {
+            return CreateClientAs(0);
+        }
 
-
-        public Task<HttpClient> CreateClientAsUser() => CreateClientAs(MockUser.User);
-        public Task<HttpClient> CreateClientAsAdmin() => CreateClientAs(MockUser.Admin);
-
+        public Task<HttpClient> CreateClientAsUser()
+        {
+            return CreateClientAs(1);
+        }
     }
 }

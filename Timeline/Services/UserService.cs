@@ -44,6 +44,16 @@ namespace Timeline.Services
         Task<User> GetUserByUsername(string username);
 
         /// <summary>
+        /// Get the user id of given username.
+        /// </summary>
+        /// <param name="username">Username of the user.</param>
+        /// <returns>The id of the user.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
+        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
+        Task<long> GetUserIdByUsername(string username);
+
+        /// <summary>
         /// List all users.
         /// </summary>
         /// <returns>The user info of users.</returns>
@@ -57,7 +67,7 @@ namespace Timeline.Services
         /// <returns>The id of the new user.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="info"/>is null.</exception>
         /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="info"/> is bad.</exception>
-        /// <exception cref="ConfictException">Thrown when a user with given username already exists.</exception>
+        /// <exception cref="ConflictException">Thrown when a user with given username already exists.</exception>
         /// <remarks>
         /// <see cref="User.Username"/> must not be null and must be a valid username.
         /// <see cref="User.Password"/> must not be null or empty.
@@ -78,13 +88,12 @@ namespace Timeline.Services
         /// Only <see cref="User.Username"/>, <see cref="User.Administrator"/>, <see cref="User.Password"/> and <see cref="User.Nickname"/> will be used.
         /// If null, then not change.
         /// Other fields are ignored.
-        /// After modified, even if nothing is changed, version will increase.
+        /// Version will increase if password is changed.
         /// 
         /// <see cref="User.Username"/> must be a valid username if set.
         /// <see cref="User.Password"/> can't be empty if set.
         /// <see cref="User.Nickname"/> must be a valid nickname if set.
         /// 
-        /// Note: Whether <see cref="User.Version"/> is set or not, version will increase and not set to the specified value if there is one.
         /// </remarks>
         /// <seealso cref="ModifyUser(string, User)"/>
         Task ModifyUser(long id, User? info);
@@ -97,6 +106,7 @@ namespace Timeline.Services
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format or some fields in <paramref name="info"/> is bad.</exception>
         /// <exception cref="UserNotExistException">Thrown when user with given id does not exist.</exception>
+        /// <exception cref="ConflictException">Thrown when user with the newusername already exist.</exception>
         /// <remarks>
         /// Only <see cref="User.Administrator"/>, <see cref="User.Password"/> and <see cref="User.Nickname"/> will be used.
         /// If null, then not change.
@@ -184,7 +194,7 @@ namespace Timeline.Services
 
         private static void ThrowUsernameConflict()
         {
-            throw new ConfictException(ExceptionUsernameConflict);
+            throw new ConflictException(ExceptionUsernameConflict);
         }
 
         private static User CreateUserFromEntity(UserEntity entity)
@@ -243,6 +253,21 @@ namespace Timeline.Services
                 throw new UserNotExistException(username);
 
             return CreateUserFromEntity(entity);
+        }
+
+        public async Task<long> GetUserIdByUsername(string username)
+        {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+
+            CheckUsernameFormat(username, nameof(username));
+
+            var entity = await _databaseContext.Users.Where(user => user.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new UserNotExistException(username);
+
+            return entity.Id;
         }
 
         public async Task<User[]> GetUsers()
@@ -325,6 +350,7 @@ namespace Timeline.Services
                 if (password != null)
                 {
                     entity.Password = _passwordService.HashPassword(password);
+                    entity.Version += 1;
                 }
 
                 var administrator = info.Administrator;
@@ -339,8 +365,6 @@ namespace Timeline.Services
                     entity.Nickname = nickname;
                 }
             }
-
-            entity.Version += 1;
         }
 
 

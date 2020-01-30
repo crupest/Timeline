@@ -4,44 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Auth;
 using Timeline.Filters;
-using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
-using static Timeline.Resources.Controllers.TimelineController;
-using static Timeline.Resources.Messages;
 
 namespace Timeline.Controllers
 {
     [ApiController]
+    [CatchTimelineNotExistException]
     public class PersonalTimelineController : Controller
     {
         private readonly ILogger<PersonalTimelineController> _logger;
 
         private readonly IPersonalTimelineService _service;
-
-        private bool IsAdmin()
-        {
-            if (User != null)
-            {
-                return User.IsAdministrator();
-            }
-            return false;
-        }
-
-        private string? GetAuthUsername()
-        {
-            if (User == null)
-            {
-                return null;
-            }
-            else
-            {
-                return User.Identity.Name;
-            }
-        }
 
         public PersonalTimelineController(ILogger<PersonalTimelineController> logger, IPersonalTimelineService service)
         {
@@ -50,17 +26,15 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("users/{username}/timeline")]
-        [CatchTimelineNotExistException]
         public async Task<ActionResult<BaseTimelineInfo>> TimelineGet([FromRoute][Username] string username)
         {
             return await _service.GetTimeline(username);
         }
 
         [HttpGet("users/{username}/timeline/posts")]
-        [CatchTimelineNotExistException]
         public async Task<ActionResult<IList<TimelinePostInfo>>> PostListGet([FromRoute][Username] string username)
         {
-            if (!IsAdmin() && !await _service.HasReadPermission(username, GetAuthUsername()))
+            if (!this.IsAdministrator() && !await _service.HasReadPermission(username, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -68,77 +42,88 @@ namespace Timeline.Controllers
             return await _service.GetPosts(username);
         }
 
-        [HttpPost("users/{username}/timeline/postop/create")]
+        [HttpPost("users/{username}/timeline/posts")]
         [Authorize]
-        [CatchTimelineNotExistException]
-        public async Task<ActionResult<TimelinePostCreateResponse>> PostOperationCreate([FromRoute][Username] string username, [FromBody] TimelinePostCreateRequest body)
+        public async Task<ActionResult<TimelinePostInfo>> PostPost([FromRoute][Username] string username, [FromBody] TimelinePostCreateRequest body)
         {
-            if (!IsAdmin() && !await _service.IsMemberOf(username, GetAuthUsername()!))
+            var id = this.GetUserId();
+            if (!this.IsAdministrator() && !await _service.IsMemberOf(username, id))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var res = await _service.CreatePost(username, User.Identity.Name!, body.Content, body.Time);
+            var res = await _service.CreatePost(username, id, body.Content, body.Time);
             return res;
         }
 
-        [HttpPost("users/{username}/timeline/postop/delete")]
+        [HttpDelete("users/{username}/timeline/posts/{id}")]
         [Authorize]
-        [CatchTimelineNotExistException]
-        public async Task<ActionResult> PostOperationDelete([FromRoute][Username] string username, [FromBody] TimelinePostDeleteRequest body)
+        public async Task<ActionResult> PostDelete([FromRoute][Username] string username, [FromRoute] long id)
         {
             try
             {
-                var postId = body.Id!.Value;
-                if (!IsAdmin() && !await _service.HasPostModifyPermission(username, postId, GetAuthUsername()!))
+                if (!this.IsAdministrator() && !await _service.HasPostModifyPermission(username, id, this.GetUserId()))
                 {
                     return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
                 }
-                await _service.DeletePost(username, postId);
+                await _service.DeletePost(username, id);
+                return Ok(CommonDeleteResponse.Delete());
             }
             catch (TimelinePostNotExistException)
             {
-                return BadRequest(ErrorResponse.TimelineController.PostOperationDelete_NotExist());
+                return Ok(CommonDeleteResponse.NotExist());
             }
-            return Ok();
         }
 
-        [HttpPost("users/{username}/timeline/op/property")]
+        [HttpPatch("users/{username}/timeline")]
         [Authorize]
-        [SelfOrAdmin]
-        [CatchTimelineNotExistException]
-        public async Task<ActionResult> TimelineChangeProperty([FromRoute][Username] string username, [FromBody] TimelinePropertyChangeRequest body)
+        public async Task<ActionResult> TimelinePatch([FromRoute][Username] string username, [FromBody] TimelinePatchRequest body)
         {
+            if (!this.IsAdministrator() && !(User.Identity.Name == username))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
             await _service.ChangeProperty(username, body);
             return Ok();
         }
 
-        [HttpPost("users/{username}/timeline/op/member")]
+        [HttpPut("users/{username}/timeline/members/{member}")]
         [Authorize]
-        [SelfOrAdmin]
-        [CatchTimelineNotExistException]
-        public async Task<ActionResult> TimelineChangeMember([FromRoute][Username] string username, [FromBody] TimelineMemberChangeRequest body)
+        public async Task<ActionResult> TimelineMemberPut([FromRoute][Username] string username, [FromRoute][Username] string member)
         {
+            if (!this.IsAdministrator() && !(User.Identity.Name == username))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
+
             try
             {
-                await _service.ChangeMember(username, body.Add, body.Remove);
+                await _service.ChangeMember(username, new List<string> { member }, null);
                 return Ok();
             }
-            catch (TimelineMemberOperationUserException e)
+            catch (UserNotExistException)
             {
-                if (e.InnerException is UsernameBadFormatException)
-                {
-                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(
-                        TimelineController_ChangeMember_UsernameBadFormat, e.Index, e.Operation));
-                }
-                else if (e.InnerException is UserNotExistException)
-                {
-                    return BadRequest(ErrorResponse.UserCommon.CustomMessage_NotExist(
-                        TimelineController_ChangeMember_UserNotExist, e.Index, e.Operation));
-                }
+                return BadRequest(ErrorResponse.TimelineController.MemberPut_NotExist());
+            }
+        }
 
-                _logger.LogError(e, LogUnknownTimelineMemberOperationUserException);
-                throw;
+        [HttpDelete("users/{username}/timeline/members/{member}")]
+        [Authorize]
+        public async Task<ActionResult> TimelineMemberDelete([FromRoute][Username] string username, [FromRoute][Username] string member)
+        {
+            if (!this.IsAdministrator() && !(User.Identity.Name == username))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
+
+            try
+            {
+                await _service.ChangeMember(username, null, new List<string> { member });
+                return Ok(CommonDeleteResponse.Delete());
+            }
+            catch (UserNotExistException)
+            {
+                return Ok(CommonDeleteResponse.NotExist());
             }
         }
     }

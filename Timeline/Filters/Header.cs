@@ -6,7 +6,6 @@ namespace Timeline.Filters
 {
     public class RequireContentTypeAttribute : ActionFilterAttribute
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (context.HttpContext.Request.ContentType == null)
@@ -31,7 +30,6 @@ namespace Timeline.Filters
 
         public bool RequireNonZero { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (context.HttpContext.Request.ContentLength == null)

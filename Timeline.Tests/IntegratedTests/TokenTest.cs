@@ -53,7 +53,7 @@ namespace Timeline.Tests.IntegratedTests
         public static IEnumerable<object[]> CreateToken_UserCredential_Data()
         {
             yield return new[] { "usernotexist", "p" };
-            yield return new[] { MockUser.User.Username, "???" };
+            yield return new[] { MockUser.Ordinary.Username, "???" };
         }
 
         [Theory]
@@ -73,11 +73,11 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientWithNoAuth();
             var response = await client.PostAsJsonAsync(CreateTokenUrl,
-                new CreateTokenRequest { Username = MockUser.User.Username, Password = MockUser.User.Password });
+                new CreateTokenRequest { Username = MockUser.Ordinary.Username, Password = MockUser.Ordinary.Password });
             var body = response.Should().HaveStatusCode(200)
                .And.HaveJsonBody<CreateTokenResponse>().Which;
             body.Token.Should().NotBeNullOrWhiteSpace();
-            body.User.Should().BeEquivalentTo(MockUser.User.Info);
+            body.User.Should().BeEquivalentTo(MockUser.Ordinary.Info);
         }
 
         [Fact]
@@ -103,13 +103,13 @@ namespace Timeline.Tests.IntegratedTests
         public async Task VerifyToken_OldVersion()
         {
             using var client = await CreateClientWithNoAuth();
-            var token = (await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password)).Token;
+            var token = (await CreateUserTokenAsync(client, MockUser.Ordinary.Username, MockUser.Ordinary.Password)).Token;
 
             using (var scope = Factory.Server.Host.Services.CreateScope()) // UserService is scoped.
             {
                 // create a user for test
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                await userService.PatchUser(MockUser.User.Username, null, null);
+                await userService.PatchUser(MockUser.Ordinary.Username, null, null);
             }
 
             (await client.PostAsJsonAsync(VerifyTokenUrl,
@@ -123,12 +123,12 @@ namespace Timeline.Tests.IntegratedTests
         public async Task VerifyToken_UserNotExist()
         {
             using var client = await CreateClientWithNoAuth();
-            var token = (await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password)).Token;
+            var token = (await CreateUserTokenAsync(client, MockUser.Ordinary.Username, MockUser.Ordinary.Password)).Token;
 
             using (var scope = Factory.Server.Host.Services.CreateScope()) // UserService is scoped.
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                await userService.DeleteUser(MockUser.User.Username);
+                await userService.DeleteUser(MockUser.Ordinary.Username);
             }
 
             (await client.PostAsJsonAsync(VerifyTokenUrl,
@@ -160,12 +160,12 @@ namespace Timeline.Tests.IntegratedTests
         public async Task VerifyToken_Success()
         {
             using var client = await CreateClientWithNoAuth();
-            var createTokenResult = await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password);
+            var createTokenResult = await CreateUserTokenAsync(client, MockUser.Ordinary.Username, MockUser.Ordinary.Password);
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = createTokenResult.Token });
             response.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<VerifyTokenResponse>()
-                .Which.User.Should().BeEquivalentTo(MockUser.User.Info);
+                .Which.User.Should().BeEquivalentTo(MockUser.Ordinary.Info);
         }
     }
 }

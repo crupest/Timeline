@@ -21,11 +21,13 @@ namespace Timeline.Controllers
     {
         private readonly ILogger<UserAvatarController> _logger;
 
+        private readonly IUserService _userService;
         private readonly IUserAvatarService _service;
 
-        public UserAvatarController(ILogger<UserAvatarController> logger, IUserAvatarService service)
+        public UserAvatarController(ILogger<UserAvatarController> logger, IUserService userService, IUserAvatarService service)
         {
             _logger = logger;
+            _userService = userService;
             _service = service;
         }
 
@@ -33,46 +35,50 @@ namespace Timeline.Controllers
         [ResponseCache(NoStore = false, Location = ResponseCacheLocation.None, Duration = 0)]
         public async Task<IActionResult> Get([FromRoute][Username] string username)
         {
-            const string IfNonMatchHeaderKey = "If-None-Match";
-
+            long id;
             try
             {
-                var eTagValue = $"\"{await _service.GetAvatarETag(username)}\"";
-                var eTag = new EntityTagHeaderValue(eTagValue);
-
-                if (Request.Headers.TryGetValue(IfNonMatchHeaderKey, out var value))
-                {
-                    if (!EntityTagHeaderValue.TryParseStrictList(value, out var eTagList))
-                    {
-                        _logger.LogInformation(Log.Format(LogGetBadIfNoneMatch,
-                            ("Username", username), ("If-None-Match", value)));
-                        return BadRequest(ErrorResponse.Common.Header.IfNonMatch_BadFormat());
-                    }
-
-                    if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
-                    {
-                        Response.Headers.Add("ETag", eTagValue);
-                        _logger.LogInformation(Log.Format(LogGetReturnNotModify, ("Username", username)));
-                        return StatusCode(StatusCodes.Status304NotModified);
-                    }
-                }
-
-                var avatarInfo = await _service.GetAvatar(username);
-                var avatar = avatarInfo.Avatar;
-
-                _logger.LogInformation(Log.Format(LogGetReturnData, ("Username", username)));
-                return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
+                id = await _userService.GetUserIdByUsername(username);
             }
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogGetUserNotExist, ("Username", username)));
                 return NotFound(ErrorResponse.UserCommon.NotExist());
             }
+
+            const string IfNonMatchHeaderKey = "If-None-Match";
+
+            var eTagValue = $"\"{await _service.GetAvatarETag(id)}\"";
+            var eTag = new EntityTagHeaderValue(eTagValue);
+
+            if (Request.Headers.TryGetValue(IfNonMatchHeaderKey, out var value))
+            {
+                if (!EntityTagHeaderValue.TryParseStrictList(value, out var eTagList))
+                {
+                    _logger.LogInformation(Log.Format(LogGetBadIfNoneMatch,
+                        ("Username", username), ("If-None-Match", value)));
+                    return BadRequest(ErrorResponse.Common.Header.IfNonMatch_BadFormat());
+                }
+
+                if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
+                {
+                    Response.Headers.Add("ETag", eTagValue);
+                    _logger.LogInformation(Log.Format(LogGetReturnNotModify, ("Username", username)));
+                    return StatusCode(StatusCodes.Status304NotModified);
+                }
+            }
+
+            var avatarInfo = await _service.GetAvatar(id);
+            var avatar = avatarInfo.Avatar;
+
+            _logger.LogInformation(Log.Format(LogGetReturnData, ("Username", username)));
+            return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
+
         }
 
         [HttpPut("users/{username}/avatar")]
         [Authorize]
-        [RequireContentType, RequireContentLength]
+        [RequireContentLength]
         [Consumes("image/png", "image/jpeg", "image/gif", "image/webp")]
         public async Task<IActionResult> Put([FromRoute][Username] string username)
         {
@@ -87,6 +93,17 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
+            long id;
+            try
+            {
+                id = await _userService.GetUserIdByUsername(username);
+            }
+            catch (UserNotExistException e)
+            {
+                _logger.LogInformation(e, Log.Format(LogPutUserNotExist, ("Username", username)));
+                return BadRequest(ErrorResponse.UserCommon.NotExist());
+            }
+
             try
             {
                 var data = new byte[contentLength];
@@ -99,7 +116,7 @@ namespace Timeline.Controllers
                 if (await Request.Body.ReadAsync(extraByte) != 0)
                     return BadRequest(ErrorResponse.Common.Content.UnmatchedLength_Bigger());
 
-                await _service.SetAvatar(username, new Avatar
+                await _service.SetAvatar(id, new Avatar
                 {
                     Data = data,
                     Type = Request.ContentType
@@ -108,11 +125,6 @@ namespace Timeline.Controllers
                 _logger.LogInformation(Log.Format(LogPutSuccess,
                     ("Username", username), ("Mime Type", Request.ContentType)));
                 return Ok();
-            }
-            catch (UserNotExistException e)
-            {
-                _logger.LogInformation(e, Log.Format(LogPutUserNotExist, ("Username", username)));
-                return BadRequest(ErrorResponse.UserCommon.NotExist());
             }
             catch (AvatarFormatException e)
             {
@@ -139,16 +151,19 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
+            long id;
             try
             {
-                await _service.SetAvatar(username, null);
-                return Ok();
+                id = await _userService.GetUserIdByUsername(username);
             }
             catch (UserNotExistException e)
             {
                 _logger.LogInformation(e, Log.Format(LogDeleteNotExist, ("Username", username)));
                 return BadRequest(ErrorResponse.UserCommon.NotExist());
             }
+
+            await _service.SetAvatar(id, null);
+            return Ok();
         }
     }
 }
