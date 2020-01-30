@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
@@ -15,7 +14,7 @@ namespace Timeline.Tests.IntegratedTests
     public class PersonalTimelineTest : IntegratedTestBase
     {
         public PersonalTimelineTest(WebApplicationFactory<Startup> factory)
-            : base(factory)
+            : base(factory, 3)
         {
 
         }
@@ -23,11 +22,11 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task TimelineGet_Should_Work()
         {
-            using var client = await CreateClientWithNoAuth();
-            var res = await client.GetAsync("users/user/timeline");
+            using var client = await CreateDefaultClient();
+            var res = await client.GetAsync("users/user1/timeline");
             var body = res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<BaseTimelineInfo>().Which;
-            body.Owner.Should().Be("user");
+            body.Owner.Should().BeEquivalentTo(UserInfoList[1]);
             body.Visibility.Should().Be(TimelineVisibility.Register);
             body.Description.Should().Be("");
             body.Members.Should().NotBeNull().And.BeEmpty();
@@ -40,7 +39,7 @@ namespace Timeline.Tests.IntegratedTests
 
             async Task AssertDescription(string description)
             {
-                var res = await client.GetAsync("users/user/timeline");
+                var res = await client.GetAsync("users/user1/timeline");
                 var body = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<BaseTimelineInfo>()
                     .Which.Description.Should().Be(description);
@@ -50,20 +49,20 @@ namespace Timeline.Tests.IntegratedTests
 
             await AssertDescription("");
             {
-                var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
-                    new TimelinePropertyChangeRequest { Description = mockDescription });
+                var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                    new TimelinePatchRequest { Description = mockDescription });
                 res.Should().HaveStatusCode(200);
                 await AssertDescription(mockDescription);
             }
             {
-                var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
-                    new TimelinePropertyChangeRequest { Description = null });
+                var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                    new TimelinePatchRequest { Description = null });
                 res.Should().HaveStatusCode(200);
                 await AssertDescription(mockDescription);
             }
             {
-                var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
-                    new TimelinePropertyChangeRequest { Description = "" });
+                var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                    new TimelinePatchRequest { Description = "" });
                 res.Should().HaveStatusCode(200);
                 await AssertDescription("");
             }
@@ -141,13 +140,13 @@ namespace Timeline.Tests.IntegratedTests
 
             {
                 var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
-                    new TimelinePropertyChangeRequest { Description = "hahaha" });
+                    new TimelinePatchRequest { Description = "hahaha" });
                 res.Should().HaveStatusCode(opPropertyUser);
             }
 
             {
                 var res = await client.PostAsJsonAsync("users/admin/timeline/op/property",
-                    new TimelinePropertyChangeRequest { Description = "hahaha" });
+                    new TimelinePatchRequest { Description = "hahaha" });
                 res.Should().HaveStatusCode(opPropertyAdmin);
             }
 
@@ -193,7 +192,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     using var client = await CreateClientAsUser();
                     var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
-                        new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Public });
+                        new TimelinePatchRequest { Visibility = TimelineVisibility.Public });
                     res.Should().HaveStatusCode(200);
                 }
                 {
@@ -208,12 +207,12 @@ namespace Timeline.Tests.IntegratedTests
                     using var client = await CreateClientAsAdmin();
                     {
                         var res = await client.PostAsJsonAsync("users/user/timeline/op/property",
-                        new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Private });
+                        new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
                         res.Should().HaveStatusCode(200);
                     }
                     {
                         var res = await client.PostAsJsonAsync("users/admin/timeline/op/property",
-                            new TimelinePropertyChangeRequest { Visibility = TimelineVisibility.Private });
+                            new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
                         res.Should().HaveStatusCode(200);
                     }
                 }
@@ -331,7 +330,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             { // self can delete self
-                var postId = await CreatePost(MockUser.User, "user");
+                var postId = await CreatePost(MockUser.Ordinary, "user");
                 using var client = await CreateClientAsUser();
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = postId });
@@ -339,7 +338,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             { // admin can delete any
-                var postId = await CreatePost(MockUser.User, "user");
+                var postId = await CreatePost(MockUser.Ordinary, "user");
                 using var client = await CreateClientAsAdmin();
                 var res = await client.PostAsJsonAsync("users/user/timeline/postop/delete",
                     new TimelinePostDeleteRequest { Id = postId });

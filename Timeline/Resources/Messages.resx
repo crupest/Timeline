@@ -153,6 +153,9 @@
   <data name="TimelineController_ChangeMember_UserNotExist" xml:space="preserve">
     <value>The {0}-st user to do operation {1} on does not exist.</value>
   </data>
+  <data name="TimelineController_MemberPut_NotExist" xml:space="preserve">
+    <value>The user to set as member does not exist.</value>
+  </data>
   <data name="TimelineController_PostOperationDelete_NotExist" xml:space="preserve">
     <value>The post to delete does not exist.</value>
   </data>
@@ -186,9 +189,6 @@
   <data name="UserController_ChangePassword_BadOldPassword" xml:space="preserve">
     <value>Old password is wrong.</value>
   </data>
-  <data name="UserController_ChangeUsername_Conflict" xml:space="preserve">
-    <value>The new username already exists.</value>
-  </data>
   <data name="UserController_Patch_Forbid_Administrator" xml:space="preserve">
     <value>You can't set permission unless you are administrator.</value>
   </data>
@@ -197,5 +197,8 @@
   </data>
   <data name="UserController_Patch_Forbid_Username" xml:space="preserve">
     <value>You can't set username unless you are administrator.</value>
+  </data>
+  <data name="UserController_UsernameConflict" xml:space="preserve">
+    <value>A user with given username already exists.</value>
   </data>
 </root>

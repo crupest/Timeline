@@ -49,7 +49,6 @@ namespace Timeline.Services
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
         private SymmetricSecurityKey _tokenSecurityKey;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
         public JwtUserTokenService(IOptionsMonitor<JwtConfig> jwtConfig, IClock clock)
         {
             _jwtConfig = jwtConfig;

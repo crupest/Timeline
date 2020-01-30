@@ -26,5 +26,20 @@ namespace Timeline.Controllers
 
             throw new InvalidOperationException("Failed to get user id because NameIdentifier claim is not a number.");
         }
+
+        public static long? GetOptionalUserId(this ControllerBase controller)
+        {
+            if (controller.User == null)
+                return null;
+
+            var claim = controller.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+                throw new InvalidOperationException("Failed to get user id because User has no NameIdentifier claim.");
+
+            if (long.TryParse(claim.Value, out var value))
+                return value;
+
+            throw new InvalidOperationException("Failed to get user id because NameIdentifier claim is not a number.");
+        }
     }
 }

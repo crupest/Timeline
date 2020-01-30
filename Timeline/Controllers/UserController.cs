@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,30 +18,40 @@ namespace Timeline.Controllers
     [ApiController]
     public class UserController : Controller
     {
-
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService)
+        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _mapper = mapper;
+        }
+
+        private IUserInfo ConvertToUserInfo(User user, bool administrator)
+        {
+            if (administrator)
+                return _mapper.Map<UserInfoForAdmin>(user);
+            else
+                return _mapper.Map<UserInfo>(user);
         }
 
         [HttpGet("users")]
-        public async Task<ActionResult<User[]>> List()
+        public async Task<ActionResult<IUserInfo[]>> List()
         {
             var users = await _userService.GetUsers();
-            return Ok(users.Select(u => u.EraseSecretAndFinalFill(Url, this.IsAdministrator())).ToArray());
+            var administrator = this.IsAdministrator();
+            return Ok(users.Select(u => ConvertToUserInfo(u, administrator)).ToArray());
         }
 
         [HttpGet("users/{username}")]
-        public async Task<ActionResult<User>> Get([FromRoute][Username] string username)
+        public async Task<ActionResult<IUserInfo>> Get([FromRoute][Username] string username)
         {
             try
             {
                 var user = await _userService.GetUserByUsername(username);
-                return Ok(user.EraseSecretAndFinalFill(Url, this.IsAdministrator()));
+                return Ok(ConvertToUserInfo(user, this.IsAdministrator()));
             }
             catch (UserNotExistException e)
             {
@@ -52,28 +63,21 @@ namespace Timeline.Controllers
         [HttpPatch("users/{username}"), Authorize]
         public async Task<ActionResult> Patch([FromBody] UserPatchRequest body, [FromRoute][Username] string username)
         {
-            static User Convert(UserPatchRequest body)
-            {
-                return new User
-                {
-                    Username = body.Username,
-                    Password = body.Password,
-                    Administrator = body.Administrator,
-                    Nickname = body.Nickname
-                };
-            }
-
             if (this.IsAdministrator())
             {
                 try
                 {
-                    await _userService.ModifyUser(username, Convert(body));
+                    await _userService.ModifyUser(username, _mapper.Map<User>(body));
                     return Ok();
                 }
                 catch (UserNotExistException e)
                 {
                     _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
                     return NotFound(ErrorResponse.UserCommon.NotExist());
+                }
+                catch (ConflictException)
+                {
+                    return BadRequest(ErrorResponse.UserController.UsernameConflict());
                 }
             }
             else
@@ -94,7 +98,7 @@ namespace Timeline.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden,
                         ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Administrator));
 
-                await _userService.ModifyUser(this.GetUserId(), Convert(body));
+                await _userService.ModifyUser(this.GetUserId(), _mapper.Map<User>(body));
                 return Ok();
             }
         }
@@ -113,10 +117,18 @@ namespace Timeline.Controllers
             }
         }
 
-        [HttpPost("userop/create"), AdminAuthorize]
-        public async Task<ActionResult> CreateUser([FromBody] User body)
+        [HttpPost("userop/createuser"), AdminAuthorize]
+        public async Task<ActionResult> CreateUser([FromBody] CreateUserRequest body)
         {
-
+            try
+            {
+                await _userService.CreateUser(_mapper.Map<User>(body));
+                return Ok();
+            }
+            catch (ConflictException)
+            {
+                return BadRequest(ErrorResponse.UserController.UsernameConflict());
+            }
         }
 
         [HttpPost("userop/changepassword"), Authorize]
@@ -133,7 +145,7 @@ namespace Timeline.Controllers
                     ("Username", User.Identity.Name), ("Old Password", request.OldPassword)));
                 return BadRequest(ErrorResponse.UserController.ChangePassword_BadOldPassword());
             }
-            // User can't be non-existent or the token is bad. 
+            // User can't be non-existent or the token is bad.
         }
     }
 }

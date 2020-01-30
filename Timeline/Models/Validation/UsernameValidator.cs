@@ -8,7 +8,6 @@ namespace Timeline.Models.Validation
     {
         public const int MaxLength = 26;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Already checked in base class.")]
         protected override (bool, string) DoValidate(string value)
         {
             if (value.Length == 0)

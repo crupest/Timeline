@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -8,19 +10,21 @@ namespace Timeline.Tests.Helpers
 {
     public class TestApplication : IDisposable
     {
-        public TestDatabase Database { get; } = new TestDatabase();
+        public SqliteConnection DatabaseConnection { get; }
+
         public WebApplicationFactory<Startup> Factory { get; }
 
         public TestApplication(WebApplicationFactory<Startup> factory)
         {
+            DatabaseConnection = new SqliteConnection("Data Source=:memory:;");
+
             Factory = factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureServices(services =>
+                builder.ConfigureTestServices(services =>
                 {
-                    services.AddEntityFrameworkSqlite();
                     services.AddDbContext<DatabaseContext, DevelopmentDatabaseContext>(options =>
                     {
-                        options.UseSqlite(Database.Connection);
+                        options.UseSqlite(DatabaseConnection);
                     });
                 });
             });
@@ -28,7 +32,8 @@ namespace Timeline.Tests.Helpers
 
         public void Dispose()
         {
-            Database.Dispose();
+            DatabaseConnection.Close();
+            DatabaseConnection.Dispose();
         }
     }
 }

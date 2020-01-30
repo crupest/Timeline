@@ -135,7 +135,7 @@
   <data name="BadPasswordException" xml:space="preserve">
     <value>The password is wrong.</value>
   </data>
-  <data name="ConfictException" xml:space="preserve">
+  <data name="ConflictException" xml:space="preserve">
     <value>A present resource conflicts with the given resource.</value>
   </data>
   <data name="HashedPasswordBadFromatException" xml:space="preserve">
@@ -183,26 +183,11 @@
   <data name="PasswordBadFormatException" xml:space="preserve">
     <value>Password is of bad format.</value>
   </data>
-  <data name="TimelineAlreadyExistException" xml:space="preserve">
-    <value>The timeline with that name already exists.</value>
-  </data>
-  <data name="TimelineMemberOperationException" xml:space="preserve">
-    <value>An exception happened when add or remove member on timeline.</value>
-  </data>
-  <data name="TimelineMemberOperationExceptionDetail" xml:space="preserve">
-    <value>An exception happened when do operation {0} on the {1} member on timeline.</value>
-  </data>
-  <data name="TimelineNameBadFormatException" xml:space="preserve">
-    <value>Timeline name is of bad format. If this is a personal timeline, it means the username is of bad format and inner exception should be a UsernameBadFormatException.</value>
-  </data>
   <data name="TimelineNotExistException" xml:space="preserve">
     <value>Timeline does not exist. If this is a personal timeline, it means the user does not exist and inner exception should be a UserNotExistException.</value>
   </data>
   <data name="TimelinePostNotExistException" xml:space="preserve">
     <value>The timeline post does not exist. You can't do operation on it.</value>
-  </data>
-  <data name="TimelineUserNotMemberException" xml:space="preserve">
-    <value>The use is not a member of the timeline.</value>
   </data>
   <data name="UserNotExistException" xml:space="preserve">
     <value>The user does not exist.</value>

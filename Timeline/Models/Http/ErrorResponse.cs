@@ -184,14 +184,14 @@ namespace Timeline.Models.Http
         public static class UserController
         {
 
-            public static CommonResponse ChangeUsername_Conflict(params object?[] formatArgs)
+            public static CommonResponse UsernameConflict(params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.UserController.ChangeUsername_Conflict, string.Format(UserController_ChangeUsername_Conflict, formatArgs));
+                return new CommonResponse(ErrorCodes.UserController.UsernameConflict, string.Format(UserController_UsernameConflict, formatArgs));
             }
 
-            public static CommonResponse CustomMessage_ChangeUsername_Conflict(string message, params object?[] formatArgs)
+            public static CommonResponse CustomMessage_UsernameConflict(string message, params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.UserController.ChangeUsername_Conflict, string.Format(message, formatArgs));
+                return new CommonResponse(ErrorCodes.UserController.UsernameConflict, string.Format(message, formatArgs));
             }
 
             public static CommonResponse ChangePassword_BadOldPassword(params object?[] formatArgs)
@@ -244,14 +244,14 @@ namespace Timeline.Models.Http
         public static class TimelineController
         {
 
-            public static CommonResponse PostOperationDelete_NotExist(params object?[] formatArgs)
+            public static CommonResponse MemberPut_NotExist(params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.TimelineController.PostOperationDelete_NotExist, string.Format(TimelineController_PostOperationDelete_NotExist, formatArgs));
+                return new CommonResponse(ErrorCodes.TimelineController.MemberPut_NotExist, string.Format(TimelineController_MemberPut_NotExist, formatArgs));
             }
 
-            public static CommonResponse CustomMessage_PostOperationDelete_NotExist(string message, params object?[] formatArgs)
+            public static CommonResponse CustomMessage_MemberPut_NotExist(string message, params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.TimelineController.PostOperationDelete_NotExist, string.Format(message, formatArgs));
+                return new CommonResponse(ErrorCodes.TimelineController.MemberPut_NotExist, string.Format(message, formatArgs));
             }
 
         }

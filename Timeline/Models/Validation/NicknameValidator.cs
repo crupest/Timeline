@@ -5,7 +5,6 @@ namespace Timeline.Models.Validation
 {
     public class NicknameValidator : Validator<string>
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Already checked in base.")]
         protected override (bool, string) DoValidate(string value)
         {
             if (value.Length > 10)

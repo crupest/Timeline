@@ -15,6 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="9.0.0" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,14 +28,14 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.0" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-dev002868" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Timeline.ErrorCodes\Timeline.ErrorCodes.csproj" />
+        <ProjectReference Include="..\Timeline.ErrorCodes\Timeline.ErrorCodes.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -41,11 +43,6 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>AuthHandler.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Controllers\Testing\TestingI18nController.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>TestingI18nController.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Controllers\TimelineController.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -73,9 +70,9 @@
             <DependentUpon>Filters.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Messages.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Messages.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Messages.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Models\Http\Common.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -83,9 +80,9 @@
             <DependentUpon>Common.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Models\Validation\NicknameValidator.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>NicknameValidator.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>NicknameValidator.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -102,20 +99,15 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Exception.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Services\TimelineService.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>TimelineService.resx</DependentUpon>
+        </Compile>
         <Compile Update="Resources\Services\UserAvatarService.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>UserAvatarService.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Services\UserCache.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>UserCache.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Services\UserDetailService.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>UserDetailService.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Services\UserService.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -128,10 +120,6 @@
         <EmbeddedResource Update="Resources\Authentication\AuthHandler.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>AuthHandler.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Controllers\Testing\TestingI18nController.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>TestingI18nController.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Controllers\TimelineController.resx">
             <Generator>ResXFileCodeGenerator</Generator>
@@ -155,16 +143,16 @@
             <LastGenOutput>Filters.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Messages.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Messages.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Http\Common.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Common.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Validation\NicknameValidator.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>NicknameValidator.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>NicknameValidator.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
             <Generator>ResXFileCodeGenerator</Generator>
@@ -178,17 +166,13 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Exception.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\TimelineService.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>TimelineService.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\UserAvatarService.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>UserAvatarService.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\UserCache.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>UserCache.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\UserDetailService.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>UserDetailService.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\UserService.resx">
             <Generator>ResXFileCodeGenerator</Generator>

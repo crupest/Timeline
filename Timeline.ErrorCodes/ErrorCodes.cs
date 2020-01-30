@@ -45,7 +45,7 @@
 
         public static class UserController
         {
-            public const int ChangeUsername_Conflict = 1_102_01_01;
+            public const int UsernameConflict = 1_102_01_01;
             public const int ChangePassword_BadOldPassword = 1_102_02_01;
         }
 
@@ -58,7 +58,7 @@
 
         public static class TimelineController
         {
-            public const int PostOperationDelete_NotExist = 1_104_01_01;
+            public const int MemberPut_NotExist = 1_104_01_01;
         }
     }
 }

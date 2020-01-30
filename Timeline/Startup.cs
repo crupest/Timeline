@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -47,7 +48,6 @@ namespace Timeline
             });
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
-            var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
             services.AddAuthentication(AuthenticationConstants.Scheme)
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
@@ -75,16 +75,14 @@ namespace Timeline
                 });
             }
 
-            services.AddLocalization(options =>
-            {
-                options.ResourcesPath = "Resources";
-            });
+            services.AddAutoMapper(GetType().Assembly);
 
+            services.AddTransient<IClock, Clock>();
+
+            services.AddTransient<IPasswordService, PasswordService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserTokenService, JwtUserTokenService>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
-            services.AddTransient<IPasswordService, PasswordService>();
-            services.AddTransient<IClock, Clock>();
             services.AddUserAvatarService();
 
             services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();

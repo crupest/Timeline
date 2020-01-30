@@ -1,9 +1,9 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
@@ -19,102 +19,144 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task Get_List_Success()
+        public async Task GetList_NoAuth()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.GetAsync("users");
+            using var client = await CreateDefaultClient();
+            var res = await client.GetAsync("/users");
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<User[]>()
-                .Which.Should().BeEquivalentTo(MockUser.UserInfoList);
+                .And.HaveJsonBody<UserInfo[]>()
+                .Which.Should().BeEquivalentTo(UserInfoList);
         }
 
         [Fact]
-        public async Task Get_Single_Success()
+        public async Task GetList_User()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.GetAsync("users/" + MockUser.User.Username);
+            using var client = await CreateClientAsUser();
+            var res = await client.GetAsync("/users");
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<User>()
-                .Which.Should().BeEquivalentTo(MockUser.User.Info);
+                .And.HaveJsonBody<UserInfo[]>()
+                .Which.Should().BeEquivalentTo(UserInfoList);
+        }
+
+        [Fact]
+        public async Task GetList_Admin()
+        {
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.GetAsync("/users");
+            res.Should().HaveStatusCode(200)
+                .And.HaveJsonBody<UserInfo[]>()
+                .Which.Should().BeEquivalentTo(UserInfoForAdminList);
+        }
+
+        [Fact]
+        public async Task Get_NoAuth()
+        {
+            using var client = await CreateDefaultClient();
+            var res = await client.GetAsync($"/users/admin");
+            res.Should().HaveStatusCode(200)
+                .And.HaveJsonBody<UserInfo>()
+                .Which.Should().BeEquivalentTo(UserInfoList[0]);
+        }
+
+        [Fact]
+        public async Task Get_User()
+        {
+            using var client = await CreateClientAsUser();
+            var res = await client.GetAsync($"/users/admin");
+            res.Should().HaveStatusCode(200)
+                .And.HaveJsonBody<UserInfo>()
+                .Which.Should().BeEquivalentTo(UserInfoList[0]);
+        }
+
+        [Fact]
+        public async Task Get_Admin()
+        {
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.GetAsync($"/users/user1");
+            res.Should().HaveStatusCode(200)
+                .And.HaveJsonBody<UserInfo>()
+                .Which.Should().BeEquivalentTo(UserInfoForAdminList[1]);
         }
 
         [Fact]
         public async Task Get_InvalidModel()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.GetAsync("users/aaa!a");
+            using var client = await CreateClientAsUser();
+            var res = await client.GetAsync("/users/aaa!a");
             res.Should().BeInvalidModel();
         }
 
         [Fact]
-        public async Task Get_Users_404()
+        public async Task Get_404()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.GetAsync("users/usernotexist");
+            using var client = await CreateClientAsUser();
+            var res = await client.GetAsync("/users/usernotexist");
             res.Should().HaveStatusCode(404)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
-        }
-
-        public static IEnumerable<object[]> Put_InvalidModel_Data()
-        {
-            yield return new object[] { "aaa", null, false };
-            yield return new object[] { "aaa", "p", null };
-            yield return new object[] { "aa!a", "p", false };
-        }
-
-        [Theory]
-        [MemberData(nameof(Put_InvalidModel_Data))]
-        public async Task Put_InvalidModel(string username, string password, bool? administrator)
-        {
-            using var client = await CreateClientAsAdmin();
-            (await client.PutAsJsonAsync("users/" + username,
-                new UserPutRequest { Password = password, Administrator = administrator }))
-                .Should().BeInvalidModel();
-        }
-
-        private async Task CheckAdministrator(HttpClient client, string username, bool administrator)
-        {
-            var res = await client.GetAsync("users/" + username);
-            res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<User>()
-                .Which.Administrator.Should().Be(administrator);
+                .And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
         }
 
         [Fact]
-        public async Task Put_Modiefied()
+        public async Task Patch_User()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.PutAsJsonAsync("users/" + MockUser.User.Username, new UserPutRequest
+            using var client = await CreateClientAsUser();
             {
-                Password = "password",
-                Administrator = false
-            });
-            res.Should().BePut(false);
-            await CheckAdministrator(client, MockUser.User.Username, false);
+                var res = await client.PatchAsJsonAsync("/users/user1",
+                    new UserPatchRequest { Nickname = "aaa" });
+                res.Should().HaveStatusCode(200);
+            }
+
+            {
+                var res = await client.GetAsync("/users/user1");
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<UserInfo>()
+                    .Which.Nickname.Should().Be("aaa");
+            }
         }
 
         [Fact]
-        public async Task Put_Created()
+        public async Task Patch_Admin()
         {
-            using var client = await CreateClientAsAdmin();
-            const string username = "puttest";
-            const string url = "users/" + username;
+            using var client = await CreateClientAsAdministrator();
+            using var userClient = await CreateClientAsUser();
 
-            var res = await client.PutAsJsonAsync(url, new UserPutRequest
             {
-                Password = "password",
-                Administrator = false
-            });
-            res.Should().BePut(true);
-            await CheckAdministrator(client, username, false);
+                var res = await client.PatchAsJsonAsync("/users/user1",
+                    new UserPatchRequest
+                    {
+                        Username = "newuser",
+                        Password = "newpw",
+                        Administrator = true,
+                        Nickname = "aaa"
+                    });
+                res.Should().HaveStatusCode(200);
+            }
+
+            {
+                var res = await client.GetAsync("/users/newuser");
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<UserInfoForAdmin>()
+                    .Which;
+                body.Administrator.Should().Be(true);
+                body.Nickname.Should().Be("aaa");
+            }
+
+            {
+                // Token should expire.
+                var res = await userClient.GetAsync("/users");
+                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+            }
+
+            {
+                // Check password.
+                (await CreateClientWithCredential("newuser", "newpw")).Dispose();
+            }
         }
 
         [Fact]
         public async Task Patch_NotExist()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.PatchAsJsonAsync("/users/usernotexist", new UserPatchRequest { });
             res.Should().HaveStatusCode(404)
                 .And.HaveCommonBody()
                 .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
@@ -123,114 +165,239 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task Patch_InvalidModel()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.PatchAsJsonAsync("users/aaa!a", new UserPatchRequest { });
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.PatchAsJsonAsync("/users/aaa!a", new UserPatchRequest { });
+            res.Should().BeInvalidModel();
+        }
+
+        public static IEnumerable<object[]> Patch_InvalidModel_Body_Data()
+        {
+            yield return new[] { new UserPatchRequest { Username = "aaa!a" } };
+            yield return new[] { new UserPatchRequest { Password = "" } };
+            yield return new[] { new UserPatchRequest { Nickname = new string('a', 50) } };
+        }
+
+        [Theory]
+        [MemberData(nameof(Patch_InvalidModel_Body_Data))]
+        public async Task Patch_InvalidModel_Body(UserPatchRequest body)
+        {
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.PatchAsJsonAsync("/users/user1", body);
             res.Should().BeInvalidModel();
         }
 
         [Fact]
-        public async Task Patch_Success()
+        public async Task Patch_UsernameConflict()
         {
-            using var client = await CreateClientAsAdmin();
-            {
-                var res = await client.PatchAsJsonAsync("users/" + MockUser.User.Username,
-                    new UserPatchRequest { Administrator = false });
-                res.Should().HaveStatusCode(200);
-                await CheckAdministrator(client, MockUser.User.Username, false);
-            }
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.PatchAsJsonAsync("/users/user1", new UserPatchRequest { Username = "admin" });
+            res.Should().HaveStatusCode(400)
+                .And.HaveCommonBody(ErrorCodes.UserController.UsernameConflict);
         }
 
         [Fact]
-        public async Task Delete_InvalidModel()
+        public async Task Patch_NoAuth_Unauthorized()
         {
-            using var client = await CreateClientAsAdmin();
-            var url = "users/aaa!a";
-            var res = await client.DeleteAsync(url);
-            res.Should().BeInvalidModel();
+            using var client = await CreateClientAsUser();
+            var res = await client.PatchAsJsonAsync("/users/user1", new UserPatchRequest { Nickname = "aaa" });
+            res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async Task Patch_User_Forbid()
+        {
+            using var client = await CreateClientAsUser();
+            var res = await client.PatchAsJsonAsync("/users/admin", new UserPatchRequest { Nickname = "aaa" });
+            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task Patch_Username_Forbid()
+        {
+            using var client = await CreateClientAsUser();
+            var res = await client.PatchAsJsonAsync("/users/user1", new UserPatchRequest { Username = "aaa" });
+            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task Patch_Password_Forbid()
+        {
+            using var client = await CreateClientAsUser();
+            var res = await client.PatchAsJsonAsync("/users/user1", new UserPatchRequest { Password = "aaa" });
+            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task Patch_Administrator_Forbid()
+        {
+            using var client = await CreateClientAsUser();
+            var res = await client.PatchAsJsonAsync("/users/user1", new UserPatchRequest { Administrator = true });
+            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task Delete_Deleted()
         {
-            using var client = await CreateClientAsAdmin();
-            var url = "users/" + MockUser.User.Username;
-            var res = await client.DeleteAsync(url);
-            res.Should().BeDelete(true);
+            using var client = await CreateClientAsAdministrator();
+            {
+                var res = await client.DeleteAsync("/users/user1");
+                res.Should().BeDelete(true);
+            }
 
-            var res2 = await client.GetAsync(url);
-            res2.Should().HaveStatusCode(404);
+            {
+                var res = await client.GetAsync("/users/user1");
+                res.Should().HaveStatusCode(404);
+            }
         }
 
         [Fact]
         public async Task Delete_NotExist()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.DeleteAsync("users/usernotexist");
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.DeleteAsync("/users/usernotexist");
             res.Should().BeDelete(false);
         }
 
-        private const string changeUsernameUrl = "userop/changeusername";
-
-        public static IEnumerable<object[]> Op_ChangeUsername_InvalidModel_Data()
+        [Fact]
+        public async Task Delete_InvalidModel()
         {
-            yield return new[] { null, "uuu" };
-            yield return new[] { "uuu", null };
-            yield return new[] { "a!a", "uuu" };
-            yield return new[] { "uuu", "a!a" };
+            using var client = await CreateClientAsAdministrator();
+            var res = await client.DeleteAsync("/users/aaa!a");
+            res.Should().BeInvalidModel();
+        }
+
+        [Fact]
+        public async Task Delete_NoAuth_Unauthorized()
+        {
+            using var client = await CreateDefaultClient();
+            var res = await client.DeleteAsync("/users/aaa!a");
+            res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async Task Delete_User_Forbid()
+        {
+            using var client = await CreateClientAsUser();
+            var res = await client.DeleteAsync("/users/aaa!a");
+            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+        }
+
+        private const string createUserUrl = "/userop/createuser";
+
+        [Fact]
+        public async Task Op_CreateUser()
+        {
+            using var client = await CreateClientAsAdministrator();
+            {
+                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
+                {
+                    Username = "aaa",
+                    Password = "bbb",
+                    Administrator = true,
+                    Nickname = "ccc"
+                });
+                res.Should().HaveStatusCode(200);
+            }
+            {
+                var res = await client.GetAsync("users/aaa");
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<UserInfoForAdmin>().Which;
+                body.Username.Should().Be("aaa");
+                body.Nickname.Should().Be("ccc");
+                body.Administrator.Should().BeTrue();
+            }
+            {
+                // Test password.
+                (await CreateClientWithCredential("aaa", "bbb")).Dispose();
+            }
+        }
+
+        public static IEnumerable<object[]> Op_CreateUser_InvalidModel_Data()
+        {
+            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "bbb" } };
+            yield return new[] { new CreateUserRequest { Username = "aaa", Administrator = true } };
+            yield return new[] { new CreateUserRequest { Password = "bbb", Administrator = true } };
+            yield return new[] { new CreateUserRequest { Username = "a!a", Password = "bbb", Administrator = true } };
+            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "", Administrator = true } };
+            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "bbb", Administrator = true, Nickname = new string('a', 40) } };
         }
 
         [Theory]
-        [MemberData(nameof(Op_ChangeUsername_InvalidModel_Data))]
-        public async Task Op_ChangeUsername_InvalidModel(string oldUsername, string newUsername)
+        [MemberData(nameof(Op_CreateUser_InvalidModel_Data))]
+        public async Task Op_CreateUser_InvalidModel(CreateUserRequest body)
         {
-            using var client = await CreateClientAsAdmin();
-            (await client.PostAsJsonAsync(changeUsernameUrl,
-                new ChangeUsernameRequest { OldUsername = oldUsername, NewUsername = newUsername }))
-                .Should().BeInvalidModel();
+            using var client = await CreateClientAsAdministrator();
+            {
+                var res = await client.PostAsJsonAsync(createUserUrl, body);
+                res.Should().BeInvalidModel();
+            }
         }
 
         [Fact]
-        public async Task Op_ChangeUsername_UserNotExist()
+        public async Task Op_CreateUser_UsernameConflict()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.PostAsJsonAsync(changeUsernameUrl,
-                new ChangeUsernameRequest { OldUsername = "usernotexist", NewUsername = "newUsername" });
-            res.Should().HaveStatusCode(400)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
+            using var client = await CreateClientAsAdministrator();
+            {
+                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
+                {
+                    Username = "user1",
+                    Password = "bbb",
+                    Administrator = false
+                });
+                res.Should().HaveStatusCode(400)
+                    .And.HaveCommonBody(ErrorCodes.UserController.UsernameConflict);
+            }
         }
 
         [Fact]
-        public async Task Op_ChangeUsername_UserAlreadyExist()
+        public async Task Op_CreateUser_NoAuth_Unauthorized()
         {
-            using var client = await CreateClientAsAdmin();
-            var res = await client.PostAsJsonAsync(changeUsernameUrl,
-                new ChangeUsernameRequest { OldUsername = MockUser.User.Username, NewUsername = MockUser.Admin.Username });
-            res.Should().HaveStatusCode(400)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.UserController.ChangeUsername_Conflict);
-        }
-
-        private async Task TestLogin(string username, string password)
-        {
-            using var client = await CreateClientWithNoAuth();
-            var response = await client.PostAsJsonAsync("token/create", new CreateTokenRequest { Username = username, Password = password });
-            response.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<CreateTokenResponse>();
+            using var client = await CreateDefaultClient();
+            {
+                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
+                {
+                    Username = "aaa",
+                    Password = "bbb",
+                    Administrator = false
+                });
+                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+            }
         }
 
         [Fact]
-        public async Task Op_ChangeUsername_Success()
+        public async Task Op_CreateUser_User_Forbid()
         {
-            using var client = await CreateClientAsAdmin();
-            const string newUsername = "hahaha";
-            var res = await client.PostAsJsonAsync(changeUsernameUrl,
-                new ChangeUsernameRequest { OldUsername = MockUser.User.Username, NewUsername = newUsername });
-            res.Should().HaveStatusCode(200);
-            await TestLogin(newUsername, MockUser.User.Password);
+            using var client = await CreateClientAsUser();
+            {
+                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
+                {
+                    Username = "aaa",
+                    Password = "bbb",
+                    Administrator = false
+                });
+                res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+            }
         }
 
-        private const string changePasswordUrl = "userop/changepassword";
+        private const string changePasswordUrl = "/userop/changepassword";
+
+        [Fact]
+        public async Task Op_ChangePassword()
+        {
+            using var client = await CreateClientAsUser();
+            {
+                var res = await client.PostAsJsonAsync(changePasswordUrl,
+                    new ChangePasswordRequest { OldPassword = "user1pw", NewPassword = "newpw" });
+                res.Should().HaveStatusCode(200);
+            }
+            {
+                var res = await client.PatchAsJsonAsync("/users/user1", new UserPatchRequest { });
+                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+            }
+            {
+                (await CreateClientWithCredential("user1", "newpw")).Dispose();
+            }
+        }
 
         public static IEnumerable<object[]> Op_ChangePassword_InvalidModel_Data()
         {
@@ -243,9 +410,9 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_ChangePassword_InvalidModel(string oldPassword, string newPassword)
         {
             using var client = await CreateClientAsUser();
-            (await client.PostAsJsonAsync(changePasswordUrl,
-                new ChangePasswordRequest { OldPassword = oldPassword, NewPassword = newPassword }))
-                .Should().BeInvalidModel();
+            var res = await client.PostAsJsonAsync(changePasswordUrl,
+                new ChangePasswordRequest { OldPassword = oldPassword, NewPassword = newPassword });
+            res.Should().BeInvalidModel();
         }
 
         [Fact]
@@ -254,19 +421,15 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
             var res = await client.PostAsJsonAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
             res.Should().HaveStatusCode(400)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.UserController.ChangePassword_BadOldPassword);
+                .And.HaveCommonBody(ErrorCodes.UserController.ChangePassword_BadOldPassword);
         }
 
         [Fact]
-        public async Task Op_ChangePassword_Success()
+        public async Task Op_ChangePassword_NoAuth_Unauthorized()
         {
-            using var client = await CreateClientAsUser();
-            const string newPassword = "new";
-            var res = await client.PostAsJsonAsync(changePasswordUrl,
-                new ChangePasswordRequest { OldPassword = MockUser.User.Password, NewPassword = newPassword });
-            res.Should().HaveStatusCode(200);
-            await TestLogin(MockUser.User.Username, newPassword);
+            using var client = await CreateDefaultClient();
+            var res = await client.PostAsJsonAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
+            res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
         }
     }
 }

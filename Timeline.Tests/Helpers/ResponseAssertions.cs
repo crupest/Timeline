@@ -125,6 +125,13 @@ namespace Timeline.Tests.Helpers
             return assertions.HaveJsonBody<CommonResponse>(because, becauseArgs);
         }
 
+        public static void HaveCommonBody(this HttpResponseMessageAssertions assertions, int code, string message = null, params object[] messageArgs)
+        {
+            message = string.IsNullOrEmpty(message) ? "" : ", " + string.Format(CultureInfo.CurrentCulture, message, messageArgs);
+            var body = assertions.HaveCommonBody("Response body should be CommonResponse{0}", message).Which;
+            body.Code.Should().Be(code, "Response body code is not the specified one{0}", message);
+        }
+
         public static AndWhichConstraint<HttpResponseMessageAssertions, CommonDataResponse<TData>> HaveCommonDataBody<TData>(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
             return assertions.HaveJsonBody<CommonDataResponse<TData>>(because, becauseArgs);
@@ -146,13 +153,6 @@ namespace Timeline.Tests.Helpers
                 .Which;
             body.Code.Should().Be(0);
             body.Data.Delete.Should().Be(delete);
-        }
-
-        public static void HaveCommonResponseBody(this HttpResponseMessageAssertions assertions, int code, string message = null, params object[] messageArgs)
-        {
-            message = string.IsNullOrEmpty(message) ? "" : ", " + string.Format(CultureInfo.CurrentCulture, message, messageArgs);
-            var body = assertions.HaveJsonBody<CommonResponse>("Response body should be CommonResponse{0}", message).Which;
-            body.Code.Should().Be(code, "Response body code is not the specified one{0}", message);
         }
 
         public static void BeInvalidModel(this HttpResponseMessageAssertions assertions, string message = null)

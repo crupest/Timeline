@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
-using Timeline.Models.Validation;
 
 namespace Timeline.Services
 {
@@ -61,36 +60,27 @@ namespace Timeline.Services
     public interface IUserAvatarService
     {
         /// <summary>
-        /// Get the etag of a user's avatar.
+        /// Get the etag of a user's avatar. Warning: This method does not check the user existence.
         /// </summary>
-        /// <param name="username">The username of the user to get avatar etag of.</param>
+        /// <param name="id">The id of the user to get avatar etag of.</param>
         /// <returns>The etag.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown if the <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
-        Task<string> GetAvatarETag(string username);
+        Task<string> GetAvatarETag(long id);
 
         /// <summary>
-        /// Get avatar of a user. If the user has no avatar set, a default one is returned.
+        /// Get avatar of a user. If the user has no avatar set, a default one is returned. Warning: This method does not check the user existence.
         /// </summary>
-        /// <param name="username">The username of the user to get avatar of.</param>
+        /// <param name="id">The id of the user to get avatar of.</param>
         /// <returns>The avatar info.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown if the <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
-        Task<AvatarInfo> GetAvatar(string username);
+        Task<AvatarInfo> GetAvatar(long id);
 
         /// <summary>
-        /// Set avatar for a user.
+        /// Set avatar for a user. Warning: This method does not check the user existence.
         /// </summary>
-        /// <param name="username">The username of the user to set avatar for.</param>
+        /// <param name="id">The id of the user to set avatar for.</param>
         /// <param name="avatar">The avatar. Can be null to delete the saved avatar.</param>
-        /// <exception cref="ArgumentNullException">Throw if <paramref name="username"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if any field in <paramref name="avatar"/> is null when <paramref name="avatar"/> is not null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown if the <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown if the user does not exist.</exception>
         /// <exception cref="AvatarFormatException">Thrown if avatar is of bad format.</exception>
-        Task SetAvatar(string username, Avatar? avatar);
+        Task SetAvatar(long id, Avatar? avatar);
     }
 
     // TODO! : Make this configurable.
@@ -104,7 +94,6 @@ namespace Timeline.Services
         private DateTime _cacheLastModified;
         private string _cacheETag = default!;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "DI.")]
         public DefaultUserAvatarProvider(IWebHostEnvironment environment, IETagGenerator eTagGenerator)
         {
             _avatarPath = Path.Combine(environment.ContentRootPath, "default-avatar.png");
@@ -195,22 +184,18 @@ namespace Timeline.Services
             _clock = clock;
         }
 
-        public async Task<string> GetAvatarETag(string username)
+        public async Task<string> GetAvatarETag(long id)
         {
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
-
-            var eTag = (await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.ETag }).SingleOrDefaultAsync())?.ETag;
+            var eTag = (await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.ETag }).SingleOrDefaultAsync())?.ETag;
             if (eTag == null)
                 return await _defaultUserAvatarProvider.GetDefaultAvatarETag();
             else
                 return eTag;
         }
 
-        public async Task<AvatarInfo> GetAvatar(string username)
+        public async Task<AvatarInfo> GetAvatar(long id)
         {
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
-
-            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.Type, a.Data, a.LastModified }).SingleOrDefaultAsync();
+            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.Type, a.Data, a.LastModified }).SingleOrDefaultAsync();
 
             if (avatarEntity != null)
             {
@@ -240,7 +225,7 @@ namespace Timeline.Services
             return defaultAvatar;
         }
 
-        public async Task SetAvatar(string username, Avatar? avatar)
+        public async Task SetAvatar(long id, Avatar? avatar)
         {
             if (avatar != null)
             {
@@ -250,8 +235,7 @@ namespace Timeline.Services
                     throw new ArgumentException(Resources.Services.UserAvatarService.ExceptionAvatarTypeNullOrEmpty, nameof(avatar));
             }
 
-            var userId = await DatabaseExtensions.CheckAndGetUser(_database.Users, username);
-            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
+            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == id).SingleOrDefaultAsync();
 
             if (avatar == null)
             {
@@ -281,7 +265,7 @@ namespace Timeline.Services
                 avatarEntity.Data = avatar.Data;
                 avatarEntity.ETag = await _eTagGenerator.Generate(avatar.Data);
                 avatarEntity.LastModified = _clock.GetCurrentTime();
-                avatarEntity.UserId = userId;
+                avatarEntity.UserId = id;
                 if (create)
                 {
                     _database.UserAvatars.Add(avatarEntity);
