@@ -106,8 +106,7 @@ namespace Timeline.Tests.IntegratedTests
         public Task<HttpClient> CreateClientAs(int userNumber)
         {
             if (userNumber < 0)
-                throw new ArgumentOutOfRangeException(nameof(userNumber), "User number can't be negative.");
-
+                return CreateDefaultClient();
             if (userNumber == 0)
                 return CreateClientWithCredential("admin", "adminpw");
             else
