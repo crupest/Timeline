@@ -42,7 +42,13 @@ namespace Timeline.Controllers
         {
             var users = await _userService.GetUsers();
             var administrator = this.IsAdministrator();
-            return Ok(users.Select(u => ConvertToUserInfo(u, administrator)).ToArray());
+            // Note: the (object) explicit conversion. If not convert,
+            // then result is a IUserInfo array and JsonSerializer will
+            // treat all element as IUserInfo and deserialize only properties
+            // in IUserInfo. So we convert it to object to make an object
+            // array so that JsonSerializer use the runtime type.
+            var result = users.Select(u => (object)ConvertToUserInfo(u, administrator)).ToArray();
+            return Ok(result);
         }
 
         [HttpGet("users/{username}")]
@@ -106,15 +112,11 @@ namespace Timeline.Controllers
         [HttpDelete("users/{username}"), AdminAuthorize]
         public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute][Username] string username)
         {
-            try
-            {
-                await _userService.DeleteUser(username);
+            var delete = await _userService.DeleteUser(username);
+            if (delete)
                 return Ok(CommonDeleteResponse.Delete());
-            }
-            catch (UserNotExistException)
-            {
+            else
                 return Ok(CommonDeleteResponse.NotExist());
-            }
         }
 
         [HttpPost("userop/createuser"), AdminAuthorize]

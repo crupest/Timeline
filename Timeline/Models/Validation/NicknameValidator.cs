@@ -7,7 +7,7 @@ namespace Timeline.Models.Validation
     {
         protected override (bool, string) DoValidate(string value)
         {
-            if (value.Length > 10)
+            if (value.Length > 25)
                 return (false, MessageTooLong);
 
             return (true, GetSuccessMessage());

@@ -49,7 +49,7 @@ namespace Timeline.Tests.IntegratedTests
                 var env = Factory.Server.Host.Services.GetRequiredService<IWebHostEnvironment>();
                 var defaultAvatarData = await File.ReadAllBytesAsync(Path.Combine(env.ContentRootPath, "default-avatar.png"));
 
-                async Task GetReturnDefault(string username = "user")
+                async Task GetReturnDefault(string username = "user1")
                 {
                     var res = await client.GetAsync($"users/{username}/avatar");
                     res.Should().HaveStatusCode(200);

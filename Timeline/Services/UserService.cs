@@ -300,12 +300,14 @@ namespace Timeline.Services
 
             var administrator = info.Administrator ?? false;
             var password = info.Password;
+            var nickname = info.Nickname;
 
             var newEntity = new UserEntity
             {
                 Username = username,
                 Password = _passwordService.HashPassword(password),
                 Roles = UserRoleConvert.ToString(administrator),
+                Nickname = nickname,
                 Version = 1
             };
             _databaseContext.Users.Add(newEntity);

@@ -29,7 +29,7 @@ namespace Timeline.Entities
         [Column("version"), Required]
         public long Version { get; set; }
 
-        [Column("nickname"), MaxLength(40)]
+        [Column("nickname"), MaxLength(100)]
         public string? Nickname { get; set; }
 
         public UserAvatarEntity? Avatar { get; set; }

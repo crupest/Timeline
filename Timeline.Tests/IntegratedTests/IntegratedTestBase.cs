@@ -63,7 +63,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 foreach (var user in users)
                 {
-                    userService.CreateUser(user);
+                    userService.CreateUser(user).Wait();
                     userInfoList.Add(mapper.Map<UserInfo>(user));
                     userInfoForAdminList.Add(mapper.Map<UserInfoForAdmin>(user));
                 }

@@ -34,7 +34,7 @@ namespace Timeline.Controllers
 
             var claim = controller.User.FindFirst(ClaimTypes.NameIdentifier);
             if (claim == null)
-                throw new InvalidOperationException("Failed to get user id because User has no NameIdentifier claim.");
+                return null;
 
             if (long.TryParse(claim.Value, out var value))
                 return value;

@@ -44,7 +44,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsAdministrator();
             var res = await client.GetAsync("/users");
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo[]>()
+                .And.HaveJsonBody<UserInfoForAdmin[]>()
                 .Which.Should().BeEquivalentTo(UserInfoForAdminList);
         }
 
@@ -74,7 +74,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsAdministrator();
             var res = await client.GetAsync($"/users/user1");
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo>()
+                .And.HaveJsonBody<UserInfoForAdmin>()
                 .Which.Should().BeEquivalentTo(UserInfoForAdminList[1]);
         }
 
@@ -142,7 +142,7 @@ namespace Timeline.Tests.IntegratedTests
 
             {
                 // Token should expire.
-                var res = await userClient.GetAsync("/users");
+                var res = await userClient.GetAsync("/testing/auth/Authorize");
                 res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
             }
 
@@ -198,7 +198,7 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task Patch_NoAuth_Unauthorized()
         {
-            using var client = await CreateClientAsUser();
+            using var client = await CreateDefaultClient();
             var res = await client.PatchAsJsonAsync("/users/user1", new UserPatchRequest { Nickname = "aaa" });
             res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
         }
