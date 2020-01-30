@@ -33,6 +33,74 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
+        public async Task InvalidModel_BadUsername()
+        {
+            using var client = await CreateClientAsAdministrator();
+            {
+                var res = await client.GetAsync("users/user!!!/timeline");
+                res.Should().BeInvalidModel();
+            }
+            {
+                var res = await client.PatchAsJsonAsync("users/user!!!/timeline", new TimelinePatchRequest { });
+                res.Should().BeInvalidModel();
+            }
+            {
+                var res = await client.PutAsync("users/user!!!/timeline/members/user1", null);
+                res.Should().BeInvalidModel();
+            }
+            {
+                var res = await client.DeleteAsync("users/user!!!/timeline/members/user1");
+                res.Should().BeInvalidModel();
+            }
+            {
+                var res = await client.GetAsync("users/user!!!/timeline/posts");
+                res.Should().BeInvalidModel();
+            }
+            {
+                var res = await client.PostAsJsonAsync("users/user!!!/timeline/posts", new TimelinePostCreateRequest { Content = "aaa" });
+                res.Should().BeInvalidModel();
+            }
+            {
+                var res = await client.DeleteAsync("users/user!!!/timeline/posts/123");
+                res.Should().BeInvalidModel();
+            }
+        }
+
+        [Fact]
+        public async Task NotFound()
+        {
+            using var client = await CreateClientAsAdministrator();
+            {
+                var res = await client.GetAsync("users/usernotexist/timeline");
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            }
+            {
+                var res = await client.PatchAsJsonAsync("users/usernotexist/timeline", new TimelinePatchRequest { });
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            }
+            {
+                var res = await client.PutAsync("users/usernotexist/timeline/members/user1", null);
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            }
+            {
+                var res = await client.DeleteAsync("users/usernotexist/timeline/members/user1");
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            }
+            {
+                var res = await client.GetAsync("users/usernotexist/timeline/posts");
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            }
+            {
+                var res = await client.PostAsJsonAsync("users/usernotexist/timeline/posts", new TimelinePostCreateRequest { Content = "aaa" });
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            }
+            {
+                var res = await client.DeleteAsync("users/usernotexist/timeline/posts/123");
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            }
+        }
+
+        [Fact]
         public async Task Description_Should_Work()
         {
             using var client = await CreateClientAsUser();
@@ -163,9 +231,10 @@ namespace Timeline.Tests.IntegratedTests
             const string userUrl = "users/user1/timeline/posts";
             const string adminUrl = "users/admin/timeline/posts";
             {
+
                 using var client = await CreateClientAsUser();
-                var res = await client.PatchAsync("users/user1/timeline",
-                    new StringContent(@"{""visibility"":""abcdefg""}", System.Text.Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json));
+                using var content = new StringContent(@"{""visibility"":""abcdefg""}", System.Text.Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
+                var res = await client.PatchAsync("users/user1/timeline", content);
                 res.Should().BeInvalidModel();
             }
             { // default visibility is registered

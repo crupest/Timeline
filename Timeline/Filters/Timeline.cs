@@ -13,7 +13,7 @@ namespace Timeline.Filters
             {
                 if (e.InnerException is UserNotExistException)
                 {
-                    context.Result = new BadRequestObjectResult(ErrorResponse.UserCommon.NotExist());
+                    context.Result = new NotFoundObjectResult(ErrorResponse.UserCommon.NotExist());
                 }
                 else
                 {

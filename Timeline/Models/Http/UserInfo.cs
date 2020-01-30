@@ -31,11 +31,13 @@ namespace Timeline.Models.Http
 
     public class UserInfoAvatarUrlValueResolver : IValueResolver<User, IUserInfo, string>
     {
-        private readonly IActionContextAccessor _actionContextAccessor;
-        private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly IActionContextAccessor? _actionContextAccessor;
+        private readonly IUrlHelperFactory? _urlHelperFactory;
 
         public UserInfoAvatarUrlValueResolver()
         {
+            _actionContextAccessor = null;
+            _urlHelperFactory = null;
         }
 
         public UserInfoAvatarUrlValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
@@ -51,7 +53,7 @@ namespace Timeline.Models.Http
                 return $"/users/{destination.Username}/avatar";
             }
 
-            var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
+            var urlHelper = _urlHelperFactory!.GetUrlHelper(_actionContextAccessor.ActionContext);
             return urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController), new { destination.Username });
         }
     }
