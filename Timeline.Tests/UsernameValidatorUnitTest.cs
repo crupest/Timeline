@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Timeline.Tests
 {
-    [UseCulture("en")]
     public class UsernameValidatorUnitTest : IClassFixture<UsernameValidator>
     {
         private readonly UsernameValidator _validator;
