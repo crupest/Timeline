@@ -6,7 +6,6 @@ namespace Timeline.Helpers
 {
     public static class InvalidModelResponseFactory
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public static IActionResult Factory(ActionContext context)
         {
             var modelState = context.ModelState;
@@ -20,7 +19,7 @@ namespace Timeline.Helpers
                     messageBuilder.AppendLine(error.ErrorMessage);
                 }
 
-            return new BadRequestObjectResult(CommonResponse.InvalidModel(messageBuilder.ToString()));
+            return new BadRequestObjectResult(ErrorResponse.Common.CustomMessage_InvalidModel(messageBuilder.ToString()));
         }
     }
 }

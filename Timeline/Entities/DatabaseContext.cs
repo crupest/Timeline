@@ -10,16 +10,14 @@ namespace Timeline.Entities
 
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().Property(e => e.Version).HasDefaultValue(0);
-            modelBuilder.Entity<User>().HasIndex(e => e.Name).IsUnique();
+            modelBuilder.Entity<UserEntity>().Property(e => e.Version).HasDefaultValue(0);
+            modelBuilder.Entity<UserEntity>().HasIndex(e => e.Username).IsUnique();
         }
 
-        public DbSet<User> Users { get; set; } = default!;
-        public DbSet<UserAvatar> UserAvatars { get; set; } = default!;
-        public DbSet<UserDetail> UserDetails { get; set; } = default!;
+        public DbSet<UserEntity> Users { get; set; } = default!;
+        public DbSet<UserAvatarEntity> UserAvatars { get; set; } = default!;
         public DbSet<TimelineEntity> Timelines { get; set; } = default!;
         public DbSet<TimelinePostEntity> TimelinePosts { get; set; } = default!;
         public DbSet<TimelineMemberEntity> TimelineMembers { get; set; } = default!;

@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Timeline.Tests
 {
-    [UseCulture("en")]
     public class UsernameValidatorUnitTest : IClassFixture<UsernameValidator>
     {
         private readonly UsernameValidator _validator;
@@ -20,12 +19,6 @@ namespace Timeline.Tests
             var (result, message) = _validator.Validate(username);
             result.Should().BeFalse();
             return message;
-        }
-
-        [Fact]
-        public void Null()
-        {
-            FailAndMessage(null).Should().ContainEquivalentOf("null");
         }
 
         [Fact]
@@ -59,6 +52,7 @@ namespace Timeline.Tests
         }
 
         [Theory]
+        [InlineData(null)]
         [InlineData("abc")]
         [InlineData("-abc")]
         [InlineData("_abc")]
@@ -69,7 +63,6 @@ namespace Timeline.Tests
         [InlineData("a-b_c")]
         public void Success(string value)
         {
-
             var (result, _) = _validator.Validate(value);
             result.Should().BeTrue();
         }

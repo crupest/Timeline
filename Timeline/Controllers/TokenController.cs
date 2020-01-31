@@ -1,7 +1,7 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -10,46 +10,24 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using static Timeline.Resources.Controllers.TokenController;
 
-namespace Timeline
-{
-    public static partial class ErrorCodes
-    {
-        public static partial class Http
-        {
-            public static class Token // bbb = 001
-            {
-                public static class Create // cc = 01
-                {
-                    public const int BadCredential = 10010101;
-                }
-
-                public static class Verify // cc = 02
-                {
-                    public const int BadFormat = 10010201;
-                    public const int UserNotExist = 10010202;
-                    public const int OldVersion = 10010203;
-                    public const int Expired = 10010204;
-                }
-            }
-        }
-    }
-}
-
 namespace Timeline.Controllers
 {
     [Route("token")]
     [ApiController]
     public class TokenController : Controller
     {
-        private readonly IUserService _userService;
+        private readonly IUserTokenManager _userTokenManager;
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
 
-        public TokenController(IUserService userService, ILogger<TokenController> logger, IClock clock)
+        private readonly IMapper _mapper;
+
+        public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
         {
-            _userService = userService;
+            _userTokenManager = userTokenManager;
             _logger = logger;
             _clock = clock;
+            _mapper = mapper;
         }
 
         [HttpPost("create")]
@@ -72,7 +50,7 @@ namespace Timeline.Controllers
                 if (request.Expire != null)
                     expireTime = _clock.GetCurrentTime().AddDays(request.Expire.Value);
 
-                var result = await _userService.CreateToken(request.Username, request.Password, expireTime);
+                var result = await _userTokenManager.CreateToken(request.Username, request.Password, expireTime);
 
                 _logger.LogInformation(Log.Format(LogCreateSuccess,
                     ("Username", request.Username),
@@ -81,22 +59,18 @@ namespace Timeline.Controllers
                 return Ok(new CreateTokenResponse
                 {
                     Token = result.Token,
-                    User = result.User
+                    User = _mapper.Map<UserInfo>(result.User)
                 });
             }
             catch (UserNotExistException e)
             {
                 LogFailure(LogUserNotExist, e);
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Create.BadCredential,
-                    ErrorBadCredential));
+                return BadRequest(ErrorResponse.TokenController.Create_BadCredential());
             }
             catch (BadPasswordException e)
             {
                 LogFailure(LogBadPassword, e);
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Create.BadCredential,
-                     ErrorBadCredential));
+                return BadRequest(ErrorResponse.TokenController.Create_BadCredential());
             }
         }
 
@@ -115,44 +89,34 @@ namespace Timeline.Controllers
 
             try
             {
-                var result = await _userService.VerifyToken(request.Token);
+                var result = await _userTokenManager.VerifyToken(request.Token);
                 _logger.LogInformation(Log.Format(LogVerifySuccess,
                     ("Username", result.Username), ("Token", request.Token)));
                 return Ok(new VerifyTokenResponse
                 {
-                    User = result
+                    User = _mapper.Map<UserInfo>(result)
                 });
             }
-            catch (JwtVerifyException e)
+            catch (UserTokenTimeExpireException e)
             {
-                if (e.ErrorCode == JwtVerifyException.ErrorCodes.Expired)
-                {
-                    var innerException = e.InnerException as SecurityTokenExpiredException;
-                    LogFailure(LogVerifyExpire, e, ("Expires", innerException?.Expires),
-                        ("Current Time", _clock.GetCurrentTime()));
-                    return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.Expired, ErrorVerifyExpire));
-                }
-                else if (e.ErrorCode == JwtVerifyException.ErrorCodes.OldVersion)
-                {
-                    var innerException = e.InnerException as JwtBadVersionException;
-                    LogFailure(LogVerifyOldVersion, e,
-                        ("Token Version", innerException?.TokenVersion), ("Required Version", innerException?.RequiredVersion));
-                    return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.OldVersion, ErrorVerifyOldVersion));
-                }
-                else
-                {
-                    LogFailure(LogVerifyBadFormat, e);
-                    return BadRequest(new CommonResponse(
-                        ErrorCodes.Http.Token.Verify.BadFormat, ErrorVerifyBadFormat));
-                }
+                LogFailure(LogVerifyExpire, e, ("Expire Time", e.ExpireTime), ("Verify Time", e.VerifyTime));
+                return BadRequest(ErrorResponse.TokenController.Verify_TimeExpired());
+            }
+            catch (UserTokenBadVersionException e)
+            {
+                LogFailure(LogVerifyOldVersion, e, ("Token Version", e.TokenVersion), ("Required Version", e.RequiredVersion));
+                return BadRequest(ErrorResponse.TokenController.Verify_OldVersion());
+
+            }
+            catch (UserTokenBadFormatException e)
+            {
+                LogFailure(LogVerifyBadFormat, e);
+                return BadRequest(ErrorResponse.TokenController.Verify_BadFormat());
             }
             catch (UserNotExistException e)
             {
                 LogFailure(LogVerifyUserNotExist, e);
-                return BadRequest(new CommonResponse(
-                    ErrorCodes.Http.Token.Verify.UserNotExist, ErrorVerifyUserNotExist));
+                return BadRequest(ErrorResponse.TokenController.Verify_UserNotExist());
             }
         }
     }

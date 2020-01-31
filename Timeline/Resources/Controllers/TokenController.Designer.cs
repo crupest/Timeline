@@ -61,51 +61,6 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Username or password is invalid..
-        /// </summary>
-        internal static string ErrorBadCredential {
-            get {
-                return ResourceManager.GetString("ErrorBadCredential", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The token is of bad format. It might not be created by the server..
-        /// </summary>
-        internal static string ErrorVerifyBadFormat {
-            get {
-                return ResourceManager.GetString("ErrorVerifyBadFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The token is expired..
-        /// </summary>
-        internal static string ErrorVerifyExpire {
-            get {
-                return ResourceManager.GetString("ErrorVerifyExpire", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Token has an old version. User might have update some info..
-        /// </summary>
-        internal static string ErrorVerifyOldVersion {
-            get {
-                return ResourceManager.GetString("ErrorVerifyOldVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to User does not exist. Administrator might have deleted this user..
-        /// </summary>
-        internal static string ErrorVerifyUserNotExist {
-            get {
-                return ResourceManager.GetString("ErrorVerifyUserNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The password is wrong..
         /// </summary>
         internal static string LogBadPassword {

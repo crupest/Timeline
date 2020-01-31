@@ -1,158 +1,124 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Helpers;
-using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using static Timeline.Resources.Controllers.UserController;
-
-namespace Timeline
-{
-    public static partial class ErrorCodes
-    {
-        public static partial class Http
-        {
-            public static class User // bbb = 002
-            {
-                public static class Get // cc = 01
-                {
-                    public const int NotExist = 10020101; // dd = 01
-                }
-
-                public static class Patch // cc = 03
-                {
-                    public const int NotExist = 10020301; // dd = 01
-                }
-
-                public static class Op // cc = 1x
-                {
-                    public static class ChangeUsername // cc = 11
-                    {
-                        public const int NotExist = 10021101; // dd = 01
-                        public const int AlreadyExist = 10021102; // dd = 02
-                    }
-
-                    public static class ChangePassword // cc = 12
-                    {
-                        public const int BadOldPassword = 10021201; // dd = 01
-                    }
-                }
-
-            }
-        }
-    }
-}
+using static Timeline.Resources.Messages;
 
 namespace Timeline.Controllers
 {
     [ApiController]
     public class UserController : Controller
     {
-
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService)
+        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _mapper = mapper;
         }
 
-        [HttpGet("users"), AdminAuthorize]
+        private UserInfo ConvertToUserInfo(User user) => _mapper.Map<UserInfo>(user);
+
+        [HttpGet("users")]
         public async Task<ActionResult<UserInfo[]>> List()
         {
-            return Ok(await _userService.ListUsers());
+            var users = await _userService.GetUsers();
+            var result = users.Select(u => ConvertToUserInfo(u)).ToArray();
+            return Ok(result);
         }
 
-        [HttpGet("users/{username}"), AdminAuthorize]
+        [HttpGet("users/{username}")]
         public async Task<ActionResult<UserInfo>> Get([FromRoute][Username] string username)
-        {
-            var user = await _userService.GetUser(username);
-            if (user == null)
-            {
-                _logger.LogInformation(Log.Format(LogGetUserNotExist, ("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Http.User.Get.NotExist, ErrorGetUserNotExist));
-            }
-            return Ok(user);
-        }
-
-        [HttpPut("users/{username}"), AdminAuthorize]
-        public async Task<ActionResult<CommonPutResponse>> Put([FromBody] UserPutRequest request, [FromRoute][Username] string username)
-        {
-            var result = await _userService.PutUser(username, request.Password, request.Administrator!.Value);
-            switch (result)
-            {
-                case PutResult.Create:
-                    _logger.LogInformation(Log.Format(LogPutCreate, ("Username", username)));
-                    return CreatedAtAction("Get", new { username }, CommonPutResponse.Create());
-                case PutResult.Modify:
-                    _logger.LogInformation(Log.Format(LogPutModify, ("Username", username)));
-                    return Ok(CommonPutResponse.Modify());
-                default:
-                    throw new InvalidBranchException();
-            }
-        }
-
-        [HttpPatch("users/{username}"), AdminAuthorize]
-        public async Task<ActionResult> Patch([FromBody] UserPatchRequest request, [FromRoute][Username] string username)
         {
             try
             {
-                await _userService.PatchUser(username, request.Password, request.Administrator);
-                return Ok();
+                var user = await _userService.GetUserByUsername(username);
+                return Ok(ConvertToUserInfo(user));
             }
             catch (UserNotExistException e)
             {
-                _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
-                return NotFound(new CommonResponse(ErrorCodes.Http.User.Patch.NotExist, ErrorPatchUserNotExist));
+                _logger.LogInformation(e, Log.Format(LogGetUserNotExist, ("Username", username)));
+                return NotFound(ErrorResponse.UserCommon.NotExist());
+            }
+        }
+
+        [HttpPatch("users/{username}"), Authorize]
+        public async Task<ActionResult<UserInfo>> Patch([FromBody] UserPatchRequest body, [FromRoute][Username] string username)
+        {
+            if (this.IsAdministrator())
+            {
+                try
+                {
+                    var user = await _userService.ModifyUser(username, _mapper.Map<User>(body));
+                    return Ok(ConvertToUserInfo(user));
+                }
+                catch (UserNotExistException e)
+                {
+                    _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
+                    return NotFound(ErrorResponse.UserCommon.NotExist());
+                }
+                catch (ConflictException)
+                {
+                    return BadRequest(ErrorResponse.UserController.UsernameConflict());
+                }
+            }
+            else
+            {
+                if (User.Identity.Name != username)
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        ErrorResponse.Common.CustomMessage_Forbid(Common_Forbid_NotSelf));
+
+                if (body.Username != null)
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Username));
+
+                if (body.Password != null)
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Password));
+
+                if (body.Administrator != null)
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Administrator));
+
+                var user = await _userService.ModifyUser(this.GetUserId(), _mapper.Map<User>(body));
+                return Ok(ConvertToUserInfo(user));
             }
         }
 
         [HttpDelete("users/{username}"), AdminAuthorize]
         public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute][Username] string username)
         {
-            try
-            {
-                await _userService.DeleteUser(username);
-                _logger.LogInformation(Log.Format(LogDeleteDelete, ("Username", username)));
+            var delete = await _userService.DeleteUser(username);
+            if (delete)
                 return Ok(CommonDeleteResponse.Delete());
-            }
-            catch (UserNotExistException e)
-            {
-                _logger.LogInformation(e, Log.Format(LogDeleteNotExist, ("Username", username)));
+            else
                 return Ok(CommonDeleteResponse.NotExist());
-            }
         }
 
-        [HttpPost("userop/changeusername"), AdminAuthorize]
-        public async Task<ActionResult> ChangeUsername([FromBody] ChangeUsernameRequest request)
+        [HttpPost("userop/createuser"), AdminAuthorize]
+        public async Task<ActionResult<UserInfo>> CreateUser([FromBody] CreateUserRequest body)
         {
             try
             {
-                await _userService.ChangeUsername(request.OldUsername, request.NewUsername);
-                _logger.LogInformation(Log.Format(LogChangeUsernameSuccess,
-                    ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
-                return Ok();
+                var user = await _userService.CreateUser(_mapper.Map<User>(body));
+                return Ok(ConvertToUserInfo(user));
             }
-            catch (UserNotExistException e)
+            catch (ConflictException)
             {
-                _logger.LogInformation(e, Log.Format(LogChangeUsernameNotExist,
-                    ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.NotExist,
-                    string.Format(CultureInfo.CurrentCulture, ErrorChangeUsernameNotExist, request.OldUsername)));
+                return BadRequest(ErrorResponse.UserController.UsernameConflict());
             }
-            catch (UsernameConfictException e)
-            {
-                _logger.LogInformation(e, Log.Format(LogChangeUsernameAlreadyExist,
-                    ("Old Username", request.OldUsername), ("New Username", request.NewUsername)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangeUsername.AlreadyExist, ErrorChangeUsernameAlreadyExist));
-            }
-            // there is no need to catch bad format exception because it is already checked in model validation.
         }
 
         [HttpPost("userop/changepassword"), Authorize]
@@ -160,18 +126,16 @@ namespace Timeline.Controllers
         {
             try
             {
-                await _userService.ChangePassword(User.Identity.Name!, request.OldPassword, request.NewPassword);
-                _logger.LogInformation(Log.Format(LogChangePasswordSuccess, ("Username", User.Identity.Name)));
+                await _userService.ChangePassword(this.GetUserId(), request.OldPassword, request.NewPassword);
                 return Ok();
             }
             catch (BadPasswordException e)
             {
                 _logger.LogInformation(e, Log.Format(LogChangePasswordBadPassword,
                     ("Username", User.Identity.Name), ("Old Password", request.OldPassword)));
-                return BadRequest(new CommonResponse(ErrorCodes.Http.User.Op.ChangePassword.BadOldPassword,
-                    ErrorChangePasswordBadPassword));
+                return BadRequest(ErrorResponse.UserController.ChangePassword_BadOldPassword());
             }
-            // User can't be non-existent or the token is bad. 
+            // User can't be non-existent or the token is bad.
         }
     }
 }
