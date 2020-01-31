@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 using System;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
@@ -108,7 +110,8 @@ namespace Timeline
                 {
                     if (databaseConfig.ConnectionString == null)
                         throw new InvalidOperationException("DatabaseConfig.ConnectionString is not set. Please set it as a mysql connection string.");
-                    options.UseMySql(databaseConfig.ConnectionString);
+                    options.UseMySql(databaseConfig.ConnectionString,
+                        mySqlOptions => mySqlOptions.ServerVersion(new ServerVersion(new Version(5, 7), ServerType.MySql)));
                 });
             }
         }
