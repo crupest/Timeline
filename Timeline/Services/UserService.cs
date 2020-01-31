@@ -82,6 +82,7 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="id">The id of the user.</param>
         /// <param name="info">The new info. May be null.</param>
+        /// <returns>The new user info.</returns>
         /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="info"/> is bad.</exception>
         /// <exception cref="UserNotExistException">Thrown when user with given id does not exist.</exception>
         /// <remarks>
@@ -96,13 +97,14 @@ namespace Timeline.Services
         /// 
         /// </remarks>
         /// <seealso cref="ModifyUser(string, User)"/>
-        Task ModifyUser(long id, User? info);
+        Task<User> ModifyUser(long id, User? info);
 
         /// <summary>
         /// Modify a user's info.
         /// </summary>
         /// <param name="username">The username of the user.</param>
         /// <param name="info">The new info. May be null.</param>
+        /// <returns>The new user info.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format or some fields in <paramref name="info"/> is bad.</exception>
         /// <exception cref="UserNotExistException">Thrown when user with given id does not exist.</exception>
@@ -120,7 +122,7 @@ namespace Timeline.Services
         /// Note: Whether <see cref="User.Version"/> is set or not, version will increase and not set to the specified value if there is one.
         /// </remarks>
         /// <seealso cref="ModifyUser(long, User)"/>
-        Task ModifyUser(string username, User? info);
+        Task<User> ModifyUser(string username, User? info);
 
         /// <summary>
         /// Delete a user of given id.
@@ -370,7 +372,7 @@ namespace Timeline.Services
         }
 
 
-        public async Task ModifyUser(long id, User? info)
+        public async Task<User> ModifyUser(long id, User? info)
         {
             ValidateModifyUserInfo(info);
 
@@ -382,9 +384,11 @@ namespace Timeline.Services
 
             await _databaseContext.SaveChangesAsync();
             _logger.LogInformation(LogDatabaseUpdate, ("Id", id));
+
+            return CreateUserFromEntity(entity);
         }
 
-        public async Task ModifyUser(string username, User? info)
+        public async Task<User> ModifyUser(string username, User? info)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -400,6 +404,8 @@ namespace Timeline.Services
 
             await _databaseContext.SaveChangesAsync();
             _logger.LogInformation(LogDatabaseUpdate, ("Username", username));
+
+            return CreateUserFromEntity(entity);
         }
 
         public async Task<bool> DeleteUser(long id)

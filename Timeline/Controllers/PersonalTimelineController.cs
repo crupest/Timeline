@@ -77,14 +77,15 @@ namespace Timeline.Controllers
 
         [HttpPatch("users/{username}/timeline")]
         [Authorize]
-        public async Task<ActionResult> TimelinePatch([FromRoute][Username] string username, [FromBody] TimelinePatchRequest body)
+        public async Task<ActionResult<BaseTimelineInfo>> TimelinePatch([FromRoute][Username] string username, [FromBody] TimelinePatchRequest body)
         {
             if (!this.IsAdministrator() && !(User.Identity.Name == username))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
             await _service.ChangeProperty(username, body);
-            return Ok();
+            var timeline = await _service.GetTimeline(username);
+            return Ok(timeline);
         }
 
         [HttpPut("users/{username}/timeline/members/{member}")]

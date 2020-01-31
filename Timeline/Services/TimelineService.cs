@@ -81,21 +81,6 @@ namespace Timeline.Services
         Task DeletePost(string name, long id);
 
         /// <summary>
-        /// Set the properties of a timeline. 
-        /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="newProperties">The new properties. Null member means not to change.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="newProperties"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
-        Task ChangeProperty(string name, TimelinePatchRequest newProperties);
-
-        /// <summary>
         /// Remove members to a timeline.
         /// </summary>
         /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
@@ -235,6 +220,23 @@ namespace Timeline.Services
         /// Thrown when the user does not exist. Inner exception MUST be <see cref="UserNotExistException"/>.
         /// </exception>
         Task<BaseTimelineInfo> GetTimeline(string username);
+
+        /// <summary>
+        /// Set the properties of a timeline. 
+        /// </summary>
+        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="newProperties">The new properties. Null member means not to change.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="username"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="username"/> is of bad format.
+        /// </exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when the user does not exist. Inner exception MUST be <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task ChangeProperty(string name, TimelinePatchRequest newProperties);
+
     }
 
     public abstract class BaseTimelineService : IBaseTimelineService

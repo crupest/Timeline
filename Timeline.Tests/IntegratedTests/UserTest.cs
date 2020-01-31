@@ -102,7 +102,9 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.PatchAsJsonAsync("/users/user1",
                     new UserPatchRequest { Nickname = "aaa" });
-                res.Should().HaveStatusCode(200);
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<UserInfo>()
+                    .Which.Nickname.Should().Be("aaa");
             }
 
             {
@@ -128,7 +130,11 @@ namespace Timeline.Tests.IntegratedTests
                         Administrator = true,
                         Nickname = "aaa"
                     });
-                res.Should().HaveStatusCode(200);
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<UserInfo>()
+                    .Which;
+                body.Administrator.Should().Be(true);
+                body.Nickname.Should().Be("aaa");
             }
 
             {
