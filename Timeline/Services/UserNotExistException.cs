@@ -31,11 +31,11 @@ namespace Timeline.Services
         /// <summary>
         /// The username of the user that does not exist.
         /// </summary>
-        public string? Username { get; set; }
+        public string Username { get; set; } = "";
 
         /// <summary>
         /// The id of the user that does not exist.
         /// </summary>
-        public long? Id { get; set; }
+        public long Id { get; set; }
     }
 }

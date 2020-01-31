@@ -14,7 +14,7 @@ namespace Timeline.Migrations.ProductionDatabase
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Timeline.Entities.TimelineEntity", b =>
@@ -111,44 +111,7 @@ namespace Timeline.Migrations.ProductionDatabase
                     b.ToTable("timeline_posts");
                 });
 
-            modelBuilder.Entity("Timeline.Entities.User", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("EncryptedPassword")
-                        .IsRequired()
-                        .HasColumnName("password")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnName("name")
-                        .HasColumnType("varchar(26) CHARACTER SET utf8mb4")
-                        .HasMaxLength(26);
-
-                    b.Property<string>("RoleString")
-                        .IsRequired()
-                        .HasColumnName("roles")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<long>("Version")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("version")
-                        .HasColumnType("bigint")
-                        .HasDefaultValue(0L);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("users");
-                });
-
-            modelBuilder.Entity("Timeline.Entities.UserAvatar", b =>
+            modelBuilder.Entity("Timeline.Entities.UserAvatarEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -173,6 +136,7 @@ namespace Timeline.Migrations.ProductionDatabase
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<long>("UserId")
+                        .HasColumnName("user")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -183,7 +147,7 @@ namespace Timeline.Migrations.ProductionDatabase
                     b.ToTable("user_avatars");
                 });
 
-            modelBuilder.Entity("Timeline.Entities.UserDetail", b =>
+            modelBuilder.Entity("Timeline.Entities.UserEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -192,23 +156,42 @@ namespace Timeline.Migrations.ProductionDatabase
 
                     b.Property<string>("Nickname")
                         .HasColumnName("nickname")
+                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnName("password")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("Roles")
+                        .IsRequired()
+                        .HasColumnName("roles")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnName("username")
                         .HasColumnType("varchar(26) CHARACTER SET utf8mb4")
                         .HasMaxLength(26);
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<long>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("version")
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("user_details");
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("Timeline.Entities.TimelineEntity", b =>
                 {
-                    b.HasOne("Timeline.Entities.User", "Owner")
+                    b.HasOne("Timeline.Entities.UserEntity", "Owner")
                         .WithMany("Timelines")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -223,7 +206,7 @@ namespace Timeline.Migrations.ProductionDatabase
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Timeline.Entities.User", "User")
+                    b.HasOne("Timeline.Entities.UserEntity", "User")
                         .WithMany("TimelinesJoined")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -232,7 +215,7 @@ namespace Timeline.Migrations.ProductionDatabase
 
             modelBuilder.Entity("Timeline.Entities.TimelinePostEntity", b =>
                 {
-                    b.HasOne("Timeline.Entities.User", "Author")
+                    b.HasOne("Timeline.Entities.UserEntity", "Author")
                         .WithMany("TimelinePosts")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -245,20 +228,11 @@ namespace Timeline.Migrations.ProductionDatabase
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Timeline.Entities.UserAvatar", b =>
+            modelBuilder.Entity("Timeline.Entities.UserAvatarEntity", b =>
                 {
-                    b.HasOne("Timeline.Entities.User", null)
+                    b.HasOne("Timeline.Entities.UserEntity", "User")
                         .WithOne("Avatar")
-                        .HasForeignKey("Timeline.Entities.UserAvatar", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Timeline.Entities.UserDetail", b =>
-                {
-                    b.HasOne("Timeline.Entities.User", null)
-                        .WithOne("Detail")
-                        .HasForeignKey("Timeline.Entities.UserDetail", "UserId")
+                        .HasForeignKey("Timeline.Entities.UserAvatarEntity", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -15,7 +15,6 @@ namespace Timeline.Formatters
             SupportedEncodings.Add(Encoding.UTF8);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding effectiveEncoding)
         {
             var request = context.HttpContext.Request;

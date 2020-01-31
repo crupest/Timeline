@@ -126,25 +126,4 @@
   <data name="LogSelfOrAdminUsernameNotString" xml:space="preserve">
     <value>You apply a SelfOrAdminAttribute on an action, found a model named username, but it is not string.</value>
   </data>
-  <data name="MessageHeaderContentLengthMissing" xml:space="preserve">
-    <value>Header Content-Length is missing or of bad format.</value>
-  </data>
-  <data name="MessageHeaderContentLengthZero" xml:space="preserve">
-    <value>Header Content-Length must not be 0.</value>
-  </data>
-  <data name="MessageHeaderContentTypeMissing" xml:space="preserve">
-    <value>Header Content-Type is required.</value>
-  </data>
-  <data name="MessageSelfOrAdminForbid" xml:space="preserve">
-    <value>You can't access the resource unless you are the owner or administrator.</value>
-  </data>
-  <data name="MessageTimelineNotExist" xml:space="preserve">
-    <value>The requested timeline does not exist.</value>
-  </data>
-  <data name="MessageTimelineNotExistUser" xml:space="preserve">
-    <value>The requested personal timeline does not exist because the user does not exist.</value>
-  </data>
-  <data name="MessageUserNotExist" xml:space="preserve">
-    <value>The user does not exist.</value>
-  </data>
 </root>

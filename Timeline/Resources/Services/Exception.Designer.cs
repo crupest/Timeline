@@ -115,6 +115,15 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A present resource conflicts with the given resource..
+        /// </summary>
+        internal static string ConflictException {
+            get {
+                return ResourceManager.GetString("ConflictException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The hashes password is of bad format. It might not be created by server..
         /// </summary>
         internal static string HashedPasswordBadFromatException {
@@ -178,128 +187,74 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The version of the jwt token is old..
+        ///   Looks up a localized string similar to The token didn&apos;t pass verification because {0}..
         /// </summary>
-        internal static string JwtBadVersionException {
+        internal static string JwtUserTokenBadFormatException {
             get {
-                return ResourceManager.GetString("JwtBadVersionException", resourceCulture);
+                return ResourceManager.GetString("JwtUserTokenBadFormatException", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The token didn&apos;t pass verification because {0}, see inner exception for information..
+        ///   Looks up a localized string similar to id claim is not a number.
         /// </summary>
-        internal static string JwtVerifyException {
+        internal static string JwtUserTokenBadFormatExceptionIdBadFormat {
             get {
-                return ResourceManager.GetString("JwtVerifyException", resourceCulture);
+                return ResourceManager.GetString("JwtUserTokenBadFormatExceptionIdBadFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to token is expired..
+        ///   Looks up a localized string similar to id claim does not exist.
         /// </summary>
-        internal static string JwtVerifyExceptionExpired {
+        internal static string JwtUserTokenBadFormatExceptionIdMissing {
             get {
-                return ResourceManager.GetString("JwtVerifyExceptionExpired", resourceCulture);
+                return ResourceManager.GetString("JwtUserTokenBadFormatExceptionIdMissing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to id claim is not a number..
+        ///   Looks up a localized string similar to other error, see inner exception for information.
         /// </summary>
-        internal static string JwtVerifyExceptionIdClaimBadFormat {
+        internal static string JwtUserTokenBadFormatExceptionOthers {
             get {
-                return ResourceManager.GetString("JwtVerifyExceptionIdClaimBadFormat", resourceCulture);
+                return ResourceManager.GetString("JwtUserTokenBadFormatExceptionOthers", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to id claim does not exist..
+        ///   Looks up a localized string similar to unknown error.
         /// </summary>
-        internal static string JwtVerifyExceptionNoIdClaim {
+        internal static string JwtUserTokenBadFormatExceptionUnknown {
             get {
-                return ResourceManager.GetString("JwtVerifyExceptionNoIdClaim", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to version claim does not exist..
-        /// </summary>
-        internal static string JwtVerifyExceptionNoVersionClaim {
-            get {
-                return ResourceManager.GetString("JwtVerifyExceptionNoVersionClaim", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to version of token is old..
-        /// </summary>
-        internal static string JwtVerifyExceptionOldVersion {
-            get {
-                return ResourceManager.GetString("JwtVerifyExceptionOldVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to uncommon error..
-        /// </summary>
-        internal static string JwtVerifyExceptionOthers {
-            get {
-                return ResourceManager.GetString("JwtVerifyExceptionOthers", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to unknown error code..
-        /// </summary>
-        internal static string JwtVerifyExceptionUnknown {
-            get {
-                return ResourceManager.GetString("JwtVerifyExceptionUnknown", resourceCulture);
+                return ResourceManager.GetString("JwtUserTokenBadFormatExceptionUnknown", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to version claim is not a number..
         /// </summary>
-        internal static string JwtVerifyExceptionVersionClaimBadFormat {
+        internal static string JwtUserTokenBadFormatExceptionVersionBadFormat {
             get {
-                return ResourceManager.GetString("JwtVerifyExceptionVersionClaimBadFormat", resourceCulture);
+                return ResourceManager.GetString("JwtUserTokenBadFormatExceptionVersionBadFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The timeline with that name already exists..
+        ///   Looks up a localized string similar to version claim does not exist..
         /// </summary>
-        internal static string TimelineAlreadyExistException {
+        internal static string JwtUserTokenBadFormatExceptionVersionMissing {
             get {
-                return ResourceManager.GetString("TimelineAlreadyExistException", resourceCulture);
+                return ResourceManager.GetString("JwtUserTokenBadFormatExceptionVersionMissing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An exception happened when add or remove member on timeline..
+        ///   Looks up a localized string similar to Password is of bad format..
         /// </summary>
-        internal static string TimelineMemberOperationException {
+        internal static string PasswordBadFormatException {
             get {
-                return ResourceManager.GetString("TimelineMemberOperationException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception happened when do operation {0} on the {1} member on timeline..
-        /// </summary>
-        internal static string TimelineMemberOperationExceptionDetail {
-            get {
-                return ResourceManager.GetString("TimelineMemberOperationExceptionDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Timeline name is of bad format. If this is a personal timeline, it means the username is of bad format and inner exception should be a UsernameBadFormatException..
-        /// </summary>
-        internal static string TimelineNameBadFormatException {
-            get {
-                return ResourceManager.GetString("TimelineNameBadFormatException", resourceCulture);
+                return ResourceManager.GetString("PasswordBadFormatException", resourceCulture);
             }
         }
         
@@ -322,38 +277,38 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The use is not a member of the timeline..
-        /// </summary>
-        internal static string TimelineUserNotMemberException {
-            get {
-                return ResourceManager.GetString("TimelineUserNotMemberException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The username is of bad format..
-        /// </summary>
-        internal static string UsernameBadFormatException {
-            get {
-                return ResourceManager.GetString("UsernameBadFormatException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The username already exists..
-        /// </summary>
-        internal static string UsernameConfictException {
-            get {
-                return ResourceManager.GetString("UsernameConfictException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The user does not exist..
         /// </summary>
         internal static string UserNotExistException {
             get {
                 return ResourceManager.GetString("UserNotExistException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is of bad format, which means it may not be created by the server..
+        /// </summary>
+        internal static string UserTokenBadFormatException {
+            get {
+                return ResourceManager.GetString("UserTokenBadFormatException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is of bad version..
+        /// </summary>
+        internal static string UserTokenBadVersionException {
+            get {
+                return ResourceManager.GetString("UserTokenBadVersionException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is expired because its expiration time has passed..
+        /// </summary>
+        internal static string UserTokenTimeExpireException {
+            get {
+                return ResourceManager.GetString("UserTokenTimeExpireException", resourceCulture);
             }
         }
     }

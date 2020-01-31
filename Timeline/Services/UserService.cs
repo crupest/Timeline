@@ -1,396 +1,462 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
-using Timeline.Models;
 using Timeline.Models.Validation;
+using static Timeline.Resources.Services.UserService;
 
 namespace Timeline.Services
 {
-    public class CreateTokenResult
-    {
-        public string Token { get; set; } = default!;
-        public UserInfo User { get; set; } = default!;
-    }
-
     public interface IUserService
     {
         /// <summary>
-        /// Try to anthenticate with the given username and password.
-        /// If success, create a token and return the user info.
+        /// Try to verify the given username and password.
         /// </summary>
-        /// <param name="username">The username of the user to anthenticate.</param>
-        /// <param name="password">The password of the user to anthenticate.</param>
-        /// <param name="expires">The expired time point. Null then use default. See <see cref="JwtService.GenerateJwtToken(TokenInfo, DateTime?)"/> for what is default.</param>
-        /// <returns>An <see cref="CreateTokenResult"/> containing the created token and user info.</returns>
+        /// <param name="username">The username of the user to verify.</param>
+        /// <param name="password">The password of the user to verify.</param>
+        /// <returns>The user info and auth info.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown when username is of bad format.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format or <paramref name="password"/> is empty.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
-        Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires = null);
+        Task<User> VerifyCredential(string username, string password);
 
         /// <summary>
-        /// Verify the given token.
-        /// If success, return the user info.
+        /// Try to get a user by id.
         /// </summary>
-        /// <param name="token">The token to verify.</param>
-        /// <returns>The user info specified by the token.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
-        /// <exception cref="JwtVerifyException">Thrown when the token is of bad format. Thrown by <see cref="JwtService.VerifyJwtToken(string)"/>.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user specified by the token does not exist. Usually it has been deleted after the token was issued.</exception>
-        Task<UserInfo> VerifyToken(string token);
+        /// <param name="id">The id of the user.</param>
+        /// <returns>The user info.</returns>
+        /// <exception cref="UserNotExistException">Thrown when the user with given id does not exist.</exception>
+        Task<User> GetUserById(long id);
 
         /// <summary>
         /// Get the user info of given username.
         /// </summary>
         /// <param name="username">Username of the user.</param>
-        /// <returns>The info of the user. Null if the user of given username does not exists.</returns>
+        /// <returns>The info of the user.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        Task<UserInfo> GetUser(string username);
+        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
+        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
+        Task<User> GetUserByUsername(string username);
+
+        /// <summary>
+        /// Get the user id of given username.
+        /// </summary>
+        /// <param name="username">Username of the user.</param>
+        /// <returns>The id of the user.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
+        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
+        Task<long> GetUserIdByUsername(string username);
 
         /// <summary>
         /// List all users.
         /// </summary>
         /// <returns>The user info of users.</returns>
-        Task<UserInfo[]> ListUsers();
+        Task<User[]> GetUsers();
 
         /// <summary>
-        /// Create or modify a user with given username.
-        /// Username must be match with [a-zA-z0-9-_].
+        /// Create a user with given info.
         /// </summary>
-        /// <param name="username">Username of user.</param>
-        /// <param name="password">Password of user.</param>
-        /// <param name="administrator">Whether the user is administrator.</param>
-        /// <returns>
-        /// Return <see cref="PutResult.Create"/> if a new user is created.
-        /// Return <see cref="PutResult.Modify"/> if a existing user is modified.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        Task<PutResult> PutUser(string username, string password, bool administrator);
+        /// <param name="info">The info of new user.</param>
+        /// <param name="password">The password, can't be null or empty.</param>
+        /// <returns>The the new user.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="info"/>is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="info"/> is bad.</exception>
+        /// <exception cref="ConflictException">Thrown when a user with given username already exists.</exception>
+        /// <remarks>
+        /// <see cref="User.Username"/> must not be null and must be a valid username.
+        /// <see cref="User.Password"/> must not be null or empty.
+        /// <see cref="User.Administrator"/> is false by default (null).
+        /// <see cref="User.Nickname"/> must be a valid nickname if set. It is empty by default.
+        /// Other fields are ignored.
+        /// </remarks>
+        Task<User> CreateUser(User info);
 
         /// <summary>
-        /// Partially modify a user of given username.
+        /// Modify a user's info.
+        /// </summary>
+        /// <param name="id">The id of the user.</param>
+        /// <param name="info">The new info. May be null.</param>
+        /// <returns>The new user info.</returns>
+        /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="info"/> is bad.</exception>
+        /// <exception cref="UserNotExistException">Thrown when user with given id does not exist.</exception>
+        /// <remarks>
+        /// Only <see cref="User.Username"/>, <see cref="User.Administrator"/>, <see cref="User.Password"/> and <see cref="User.Nickname"/> will be used.
+        /// If null, then not change.
+        /// Other fields are ignored.
+        /// Version will increase if password is changed.
         /// 
-        /// Note that whether actually modified or not, Version of the user will always increase.
+        /// <see cref="User.Username"/> must be a valid username if set.
+        /// <see cref="User.Password"/> can't be empty if set.
+        /// <see cref="User.Nickname"/> must be a valid nickname if set.
+        /// 
+        /// </remarks>
+        /// <seealso cref="ModifyUser(string, User)"/>
+        Task<User> ModifyUser(long id, User? info);
+
+        /// <summary>
+        /// Modify a user's info.
         /// </summary>
-        /// <param name="username">Username of the user to modify. Can't be null.</param>
-        /// <param name="password">New password. Null if not modify.</param>
-        /// <param name="administrator">Whether the user is administrator. Null if not modify.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
-        Task PatchUser(string username, string? password, bool? administrator);
+        /// <param name="username">The username of the user.</param>
+        /// <param name="info">The new info. May be null.</param>
+        /// <returns>The new user info.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format or some fields in <paramref name="info"/> is bad.</exception>
+        /// <exception cref="UserNotExistException">Thrown when user with given id does not exist.</exception>
+        /// <exception cref="ConflictException">Thrown when user with the newusername already exist.</exception>
+        /// <remarks>
+        /// Only <see cref="User.Administrator"/>, <see cref="User.Password"/> and <see cref="User.Nickname"/> will be used.
+        /// If null, then not change.
+        /// Other fields are ignored.
+        /// After modified, even if nothing is changed, version will increase.
+        /// 
+        /// <see cref="User.Username"/> must be a valid username if set.
+        /// <see cref="User.Password"/> can't be empty if set.
+        /// <see cref="User.Nickname"/> must be a valid nickname if set.
+        /// 
+        /// Note: Whether <see cref="User.Version"/> is set or not, version will increase and not set to the specified value if there is one.
+        /// </remarks>
+        /// <seealso cref="ModifyUser(long, User)"/>
+        Task<User> ModifyUser(string username, User? info);
+
+        /// <summary>
+        /// Delete a user of given id.
+        /// </summary>
+        /// <param name="id">Id of the user to delete.</param>
+        /// <returns>True if user is deleted, false if user not exist.</returns>
+        Task<bool> DeleteUser(long id);
 
         /// <summary>
         /// Delete a user of given username.
         /// </summary>
-        /// <param name="username">Username of thet user to delete. Can't be null.</param>
+        /// <param name="username">Username of the user to delete. Can't be null.</param>
+        /// <returns>True if user is deleted, false if user not exist.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
-        Task DeleteUser(string username);
+        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
+        Task<bool> DeleteUser(string username);
 
         /// <summary>
         /// Try to change a user's password with old password.
         /// </summary>
-        /// <param name="username">The name of user to change password of.</param>
-        /// <param name="oldPassword">The user's old password.</param>
-        /// <param name="newPassword">The user's new password.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> or <paramref name="oldPassword"/> or <paramref name="newPassword"/> is null.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown when <paramref name="username"/> is of bad format.</exception>
+        /// <param name="id">The id of user to change password of.</param>
+        /// <param name="oldPassword">Old password.</param>
+        /// <param name="newPassword">New password.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="oldPassword"/> or <paramref name="newPassword"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="oldPassword"/> or <paramref name="newPassword"/> is empty.</exception>
         /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown if the old password is wrong.</exception>
-        Task ChangePassword(string username, string oldPassword, string newPassword);
-
-        /// <summary>
-        /// Change a user's username.
-        /// </summary>
-        /// <param name="oldUsername">The user's old username.</param>
-        /// <param name="newUsername">The new username.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="oldUsername"/> or <paramref name="newUsername"/> is null.</exception>
-        /// <exception cref="UserNotExistException">Thrown if the user with old username does not exist.</exception>
-        /// <exception cref="UsernameBadFormatException">Thrown if the <paramref name="oldUsername"/> or <paramref name="newUsername"/> is of bad format.</exception>
-        /// <exception cref="UsernameConfictException">Thrown if user with the new username already exists.</exception>
-        Task ChangeUsername(string oldUsername, string newUsername);
-    }
-
-    internal class UserCache
-    {
-        public string Username { get; set; } = default!;
-        public bool Administrator { get; set; }
-        public long Version { get; set; }
-
-        public UserInfo ToUserInfo()
-        {
-            return new UserInfo(Username, Administrator);
-        }
+        Task ChangePassword(long id, string oldPassword, string newPassword);
     }
 
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
 
-        private readonly IMemoryCache _memoryCache;
         private readonly DatabaseContext _databaseContext;
 
-        private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
 
-        private readonly UsernameValidator _usernameValidator;
-
-        public UserService(ILogger<UserService> logger, IMemoryCache memoryCache, DatabaseContext databaseContext, IJwtService jwtService, IPasswordService passwordService)
+        private readonly UsernameValidator _usernameValidator = new UsernameValidator();
+        private readonly NicknameValidator _nicknameValidator = new NicknameValidator();
+        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService)
         {
             _logger = logger;
-            _memoryCache = memoryCache;
             _databaseContext = databaseContext;
-            _jwtService = jwtService;
             _passwordService = passwordService;
-
-            _usernameValidator = new UsernameValidator();
         }
 
-        private static string GenerateCacheKeyByUserId(long id) => $"user:{id}";
-
-        private void RemoveCache(long id)
+        private void CheckUsernameFormat(string username, string? paramName)
         {
-            var key = GenerateCacheKeyByUserId(id);
-            _memoryCache.Remove(key);
-            _logger.LogInformation(Log.Format(Resources.Services.UserService.LogCacheRemove, ("Key", key)));
-        }
-
-        private void CheckUsernameFormat(string username, string? additionalMessage = null)
-        {
-            var (result, message) = _usernameValidator.Validate(username);
-            if (!result)
+            if (!_usernameValidator.Validate(username, out var message))
             {
-                if (additionalMessage == null)
-                    throw new UsernameBadFormatException(username, message);
-                else
-                    throw new UsernameBadFormatException(username, additionalMessage + message);
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionUsernameBadFormat, message), paramName);
             }
         }
 
-        public async Task<CreateTokenResult> CreateToken(string username, string password, DateTime? expires)
+        private static void CheckPasswordFormat(string password, string? paramName)
         {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-            if (password == null)
-                throw new ArgumentNullException(nameof(password));
-            CheckUsernameFormat(username);
-
-            // We need password info, so always check the database.
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
-
-            if (user == null)
-                throw new UserNotExistException(username);
-
-            if (!_passwordService.VerifyPassword(user.EncryptedPassword, password))
-                throw new BadPasswordException(password);
-
-            var token = _jwtService.GenerateJwtToken(new TokenInfo
+            if (password.Length == 0)
             {
-                Id = user.Id,
-                Version = user.Version
-            }, expires);
+                throw new ArgumentException(ExceptionPasswordEmpty, paramName);
+            }
+        }
 
-            return new CreateTokenResult
+        private void CheckNicknameFormat(string nickname, string? paramName)
+        {
+            if (!_nicknameValidator.Validate(nickname, out var message))
             {
-                Token = token,
-                User = UserConvert.CreateUserInfo(user)
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionNicknameBadFormat, message), paramName);
+            }
+        }
+
+        private static void ThrowUsernameConflict()
+        {
+            throw new ConflictException(ExceptionUsernameConflict);
+        }
+
+        private static User CreateUserFromEntity(UserEntity entity)
+        {
+            return new User
+            {
+                Username = entity.Username,
+                Administrator = UserRoleConvert.ToBool(entity.Roles),
+                Nickname = string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
+                Id = entity.Id,
+                Version = entity.Version
             };
         }
 
-        public async Task<UserInfo> VerifyToken(string token)
-        {
-            if (token == null)
-                throw new ArgumentNullException(nameof(token));
-
-            TokenInfo tokenInfo;
-            tokenInfo = _jwtService.VerifyJwtToken(token);
-
-            var id = tokenInfo.Id;
-            var key = GenerateCacheKeyByUserId(id);
-            if (!_memoryCache.TryGetValue<UserCache>(key, out var cache))
-            {
-                // no cache, check the database
-                var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
-
-                if (user == null)
-                    throw new UserNotExistException(id);
-
-                // create cache
-                cache = UserConvert.CreateUserCache(user);
-                _memoryCache.CreateEntry(key).SetValue(cache);
-                _logger.LogInformation(Log.Format(Resources.Services.UserService.LogCacheCreate, ("Key", key)));
-            }
-
-            if (tokenInfo.Version != cache.Version)
-                throw new JwtVerifyException(new JwtBadVersionException(tokenInfo.Version, cache.Version), JwtVerifyException.ErrorCodes.OldVersion);
-
-            return cache.ToUserInfo();
-        }
-
-        public async Task<UserInfo> GetUser(string username)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-            CheckUsernameFormat(username);
-
-            return await _databaseContext.Users
-                .Where(user => user.Name == username)
-                .Select(user => UserConvert.CreateUserInfo(user))
-                .SingleOrDefaultAsync();
-        }
-
-        public async Task<UserInfo[]> ListUsers()
-        {
-            return await _databaseContext.Users
-                .Select(user => UserConvert.CreateUserInfo(user))
-                .ToArrayAsync();
-        }
-
-        public async Task<PutResult> PutUser(string username, string password, bool administrator)
+        public async Task<User> VerifyCredential(string username, string password)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
-            CheckUsernameFormat(username);
 
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+            CheckUsernameFormat(username, nameof(username));
+            CheckPasswordFormat(password, nameof(password));
+
+            var entity = await _databaseContext.Users.Where(u => u.Username == username).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new UserNotExistException(username);
+
+            if (!_passwordService.VerifyPassword(entity.Password, password))
+                throw new BadPasswordException(password);
+
+            return CreateUserFromEntity(entity);
+        }
+
+        public async Task<User> GetUserById(long id)
+        {
+            var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
             if (user == null)
+                throw new UserNotExistException(id);
+
+            return CreateUserFromEntity(user);
+        }
+
+        public async Task<User> GetUserByUsername(string username)
+        {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+
+            CheckUsernameFormat(username, nameof(username));
+
+            var entity = await _databaseContext.Users.Where(user => user.Username == username).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new UserNotExistException(username);
+
+            return CreateUserFromEntity(entity);
+        }
+
+        public async Task<long> GetUserIdByUsername(string username)
+        {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+
+            CheckUsernameFormat(username, nameof(username));
+
+            var entity = await _databaseContext.Users.Where(user => user.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new UserNotExistException(username);
+
+            return entity.Id;
+        }
+
+        public async Task<User[]> GetUsers()
+        {
+            var entities = await _databaseContext.Users.ToArrayAsync();
+            return entities.Select(user => CreateUserFromEntity(user)).ToArray();
+        }
+
+        public async Task<User> CreateUser(User info)
+        {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
+            if (info.Username == null)
+                throw new ArgumentException(ExceptionUsernameNull, nameof(info));
+            CheckUsernameFormat(info.Username, nameof(info));
+
+            if (info.Password == null)
+                throw new ArgumentException(ExceptionPasswordNull, nameof(info));
+            CheckPasswordFormat(info.Password, nameof(info));
+
+            if (info.Nickname != null)
+                CheckNicknameFormat(info.Nickname, nameof(info));
+
+            var username = info.Username;
+
+            var conflict = await _databaseContext.Users.AnyAsync(u => u.Username == username);
+            if (conflict)
+                ThrowUsernameConflict();
+
+            var administrator = info.Administrator ?? false;
+            var password = info.Password;
+            var nickname = info.Nickname;
+
+            var newEntity = new UserEntity
             {
-                var newUser = new User
+                Username = username,
+                Password = _passwordService.HashPassword(password),
+                Roles = UserRoleConvert.ToString(administrator),
+                Nickname = nickname,
+                Version = 1
+            };
+            _databaseContext.Users.Add(newEntity);
+            await _databaseContext.SaveChangesAsync();
+
+            _logger.LogInformation(Log.Format(LogDatabaseCreate,
+                ("Id", newEntity.Id), ("Username", username), ("Administrator", administrator)));
+
+            return CreateUserFromEntity(newEntity);
+        }
+
+        private void ValidateModifyUserInfo(User? info)
+        {
+            if (info != null)
+            {
+                if (info.Username != null)
+                    CheckUsernameFormat(info.Username, nameof(info));
+
+                if (info.Password != null)
+                    CheckPasswordFormat(info.Password, nameof(info));
+
+                if (info.Nickname != null)
+                    CheckNicknameFormat(info.Nickname, nameof(info));
+            }
+        }
+
+        private async Task UpdateUserEntity(UserEntity entity, User? info)
+        {
+            if (info != null)
+            {
+                var username = info.Username;
+                if (username != null)
                 {
-                    Name = username,
-                    EncryptedPassword = _passwordService.HashPassword(password),
-                    RoleString = UserRoleConvert.ToString(administrator),
-                    Avatar = null
-                };
-                await _databaseContext.AddAsync(newUser);
-                await _databaseContext.SaveChangesAsync();
-                _logger.LogInformation(Log.Format(Resources.Services.UserService.LogDatabaseCreate,
-                    ("Id", newUser.Id), ("Username", username), ("Administrator", administrator)));
-                return PutResult.Create;
+                    var conflict = await _databaseContext.Users.AnyAsync(u => u.Username == username);
+                    if (conflict)
+                        ThrowUsernameConflict();
+
+                    entity.Username = username;
+                }
+
+                var password = info.Password;
+                if (password != null)
+                {
+                    entity.Password = _passwordService.HashPassword(password);
+                    entity.Version += 1;
+                }
+
+                var administrator = info.Administrator;
+                if (administrator.HasValue)
+                {
+                    entity.Roles = UserRoleConvert.ToString(administrator.Value);
+                }
+
+                var nickname = info.Nickname;
+                if (nickname != null)
+                {
+                    entity.Nickname = nickname;
+                }
             }
-
-            user.EncryptedPassword = _passwordService.HashPassword(password);
-            user.RoleString = UserRoleConvert.ToString(administrator);
-            user.Version += 1;
-            await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Log.Format(Resources.Services.UserService.LogDatabaseUpdate,
-                ("Id", user.Id), ("Username", username), ("Administrator", administrator)));
-
-            //clear cache
-            RemoveCache(user.Id);
-
-            return PutResult.Modify;
         }
 
-        public async Task PatchUser(string username, string? password, bool? administrator)
+
+        public async Task<User> ModifyUser(long id, User? info)
+        {
+            ValidateModifyUserInfo(info);
+
+            var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+            if (entity == null)
+                throw new UserNotExistException(id);
+
+            await UpdateUserEntity(entity, info);
+
+            await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation(LogDatabaseUpdate, ("Id", id));
+
+            return CreateUserFromEntity(entity);
+        }
+
+        public async Task<User> ModifyUser(string username, User? info)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
-            CheckUsernameFormat(username);
+            CheckUsernameFormat(username, nameof(username));
 
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
-            if (user == null)
+            ValidateModifyUserInfo(info);
+
+            var entity = await _databaseContext.Users.Where(u => u.Username == username).SingleOrDefaultAsync();
+            if (entity == null)
                 throw new UserNotExistException(username);
 
-            if (password != null)
-            {
-                user.EncryptedPassword = _passwordService.HashPassword(password);
-            }
+            await UpdateUserEntity(entity, info);
 
-            if (administrator != null)
-            {
-                user.RoleString = UserRoleConvert.ToString(administrator.Value);
-            }
-
-            user.Version += 1;
             await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Resources.Services.UserService.LogDatabaseUpdate, ("Id", user.Id));
+            _logger.LogInformation(LogDatabaseUpdate, ("Username", username));
 
-            //clear cache
-            RemoveCache(user.Id);
+            return CreateUserFromEntity(entity);
         }
 
-        public async Task DeleteUser(string username)
+        public async Task<bool> DeleteUser(long id)
         {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-            CheckUsernameFormat(username);
-
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
+            var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
             if (user == null)
-                throw new UserNotExistException(username);
+                return false;
 
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Log.Format(Resources.Services.UserService.LogDatabaseRemove,
-                ("Id", user.Id)));
-
-            //clear cache
-            RemoveCache(user.Id);
+            _logger.LogInformation(Log.Format(LogDatabaseRemove, ("Id", id), ("Username", user.Username)));
+            return true;
         }
 
-        public async Task ChangePassword(string username, string oldPassword, string newPassword)
+        public async Task<bool> DeleteUser(string username)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
+            CheckUsernameFormat(username, nameof(username));
+
+            var user = await _databaseContext.Users.Where(u => u.Username == username).SingleOrDefaultAsync();
+            if (user == null)
+                return false;
+
+            _databaseContext.Users.Remove(user);
+            await _databaseContext.SaveChangesAsync();
+            _logger.LogInformation(Log.Format(LogDatabaseRemove, ("Id", user.Id), ("Username", username)));
+            return true;
+        }
+
+        public async Task ChangePassword(long id, string oldPassword, string newPassword)
+        {
             if (oldPassword == null)
                 throw new ArgumentNullException(nameof(oldPassword));
             if (newPassword == null)
                 throw new ArgumentNullException(nameof(newPassword));
-            CheckUsernameFormat(username);
+            CheckPasswordFormat(oldPassword, nameof(oldPassword));
+            CheckPasswordFormat(newPassword, nameof(newPassword));
 
-            var user = await _databaseContext.Users.Where(u => u.Name == username).SingleOrDefaultAsync();
-            if (user == null)
-                throw new UserNotExistException(username);
+            var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
-            var verifyResult = _passwordService.VerifyPassword(user.EncryptedPassword, oldPassword);
-            if (!verifyResult)
+            if (entity == null)
+                throw new UserNotExistException(id);
+
+            if (!_passwordService.VerifyPassword(entity.Password, oldPassword))
                 throw new BadPasswordException(oldPassword);
 
-            user.EncryptedPassword = _passwordService.HashPassword(newPassword);
-            user.Version += 1;
+            entity.Password = _passwordService.HashPassword(newPassword);
+            entity.Version += 1;
             await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Log.Format(Resources.Services.UserService.LogDatabaseUpdate,
-                ("Id", user.Id), ("Operation", "Change password")));
-            //clear cache
-            RemoveCache(user.Id);
-        }
-
-        public async Task ChangeUsername(string oldUsername, string newUsername)
-        {
-            if (oldUsername == null)
-                throw new ArgumentNullException(nameof(oldUsername));
-            if (newUsername == null)
-                throw new ArgumentNullException(nameof(newUsername));
-            CheckUsernameFormat(oldUsername, Resources.Services.UserService.ExceptionOldUsernameBadFormat);
-            CheckUsernameFormat(newUsername, Resources.Services.UserService.ExceptionNewUsernameBadFormat);
-
-            var user = await _databaseContext.Users.Where(u => u.Name == oldUsername).SingleOrDefaultAsync();
-            if (user == null)
-                throw new UserNotExistException(oldUsername);
-
-            var conflictUser = await _databaseContext.Users.Where(u => u.Name == newUsername).SingleOrDefaultAsync();
-            if (conflictUser != null)
-                throw new UsernameConfictException(newUsername);
-
-            user.Name = newUsername;
-            user.Version += 1;
-            await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Log.Format(Resources.Services.UserService.LogDatabaseUpdate,
-                ("Id", user.Id), ("Old Username", oldUsername), ("New Username", newUsername)));
-            RemoveCache(user.Id);
+            _logger.LogInformation(Log.Format(LogDatabaseUpdate, ("Id", id), ("Operation", "Change password")));
         }
     }
 }

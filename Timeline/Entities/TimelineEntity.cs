@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Timeline.Models;
+using Timeline.Models.Http;
 
 namespace Timeline.Entities
 {
@@ -26,7 +26,7 @@ namespace Timeline.Entities
         public long OwnerId { get; set; }
 
         [ForeignKey(nameof(OwnerId))]
-        public User Owner { get; set; } = default!;
+        public UserEntity Owner { get; set; } = default!;
 
         [Column("visibility")]
         public TimelineVisibility Visibility { get; set; }

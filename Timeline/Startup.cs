@@ -1,14 +1,16 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -50,7 +52,6 @@ namespace Timeline
             });
 
             services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
-            var jwtConfig = Configuration.GetSection(nameof(JwtConfig)).Get<JwtConfig>();
             services.AddAuthentication(AuthenticationConstants.Scheme)
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
@@ -78,19 +79,19 @@ namespace Timeline
                 });
             }
 
-            services.AddLocalization(options =>
-            {
-                options.ResourcesPath = "Resources";
-            });
+            services.AddAutoMapper(GetType().Assembly);
 
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IJwtService, JwtService>();
-            services.AddTransient<IPasswordService, PasswordService>();
             services.AddTransient<IClock, Clock>();
+
+            services.AddTransient<IPasswordService, PasswordService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserTokenService, JwtUserTokenService>();
+            services.AddScoped<IUserTokenManager, UserTokenManager>();
             services.AddUserAvatarService();
-            services.AddScoped<IUserDetailService, UserDetailService>();
 
             services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();
+
+            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
@@ -109,11 +110,10 @@ namespace Timeline
                 {
                     if (databaseConfig.ConnectionString == null)
                         throw new InvalidOperationException("DatabaseConfig.ConnectionString is not set. Please set it as a mysql connection string.");
-                    options.UseMySql(databaseConfig.ConnectionString);
+                    options.UseMySql(databaseConfig.ConnectionString,
+                        mySqlOptions => mySqlOptions.ServerVersion(new ServerVersion(new Version(5, 7), ServerType.MySql)));
                 });
             }
-
-            services.AddMemoryCache();
         }
 
 
@@ -126,19 +126,6 @@ namespace Timeline
             });
 
             app.UseRouting();
-
-            var supportedCultures = new List<CultureInfo>
-            {
-                new CultureInfo("en"),
-                new CultureInfo("zh")
-            };
-
-            app.UseRequestLocalization(new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture("en"),
-                SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
-            });
 
             app.UseCors();
 

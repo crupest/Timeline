@@ -8,7 +8,6 @@ using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
-using static Timeline.ErrorCodes.Http.Token;
 
 namespace Timeline.Tests.IntegratedTests
 {
@@ -42,7 +41,7 @@ namespace Timeline.Tests.IntegratedTests
         [MemberData(nameof(CreateToken_InvalidModel_Data))]
         public async Task CreateToken_InvalidModel(string username, string password, int expire)
         {
-            using var client = await CreateClientWithNoAuth();
+            using var client = await CreateDefaultClient();
             (await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest
             {
                 Username = username,
@@ -54,37 +53,37 @@ namespace Timeline.Tests.IntegratedTests
         public static IEnumerable<object[]> CreateToken_UserCredential_Data()
         {
             yield return new[] { "usernotexist", "p" };
-            yield return new[] { MockUser.User.Username, "???" };
+            yield return new[] { "user1", "???" };
         }
 
         [Theory]
         [MemberData(nameof(CreateToken_UserCredential_Data))]
         public async void CreateToken_UserCredential(string username, string password)
         {
-            using var client = await CreateClientWithNoAuth();
+            using var client = await CreateDefaultClient();
             var response = await client.PostAsJsonAsync(CreateTokenUrl,
                 new CreateTokenRequest { Username = username, Password = password });
             response.Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Create.BadCredential);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Create_BadCredential);
         }
 
         [Fact]
         public async Task CreateToken_Success()
         {
-            using var client = await CreateClientWithNoAuth();
+            using var client = await CreateDefaultClient();
             var response = await client.PostAsJsonAsync(CreateTokenUrl,
-                new CreateTokenRequest { Username = MockUser.User.Username, Password = MockUser.User.Password });
+                new CreateTokenRequest { Username = "user1", Password = "user1pw" });
             var body = response.Should().HaveStatusCode(200)
                .And.HaveJsonBody<CreateTokenResponse>().Which;
             body.Token.Should().NotBeNullOrWhiteSpace();
-            body.User.Should().BeEquivalentTo(MockUser.User.Info);
+            body.User.Should().BeEquivalentTo(UserInfos[1]);
         }
 
         [Fact]
         public async Task VerifyToken_InvalidModel()
         {
-            using var client = await CreateClientWithNoAuth();
+            using var client = await CreateDefaultClient();
             (await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = null })).Should().BeInvalidModel();
         }
@@ -92,51 +91,51 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task VerifyToken_BadFormat()
         {
-            using var client = await CreateClientWithNoAuth();
+            using var client = await CreateDefaultClient();
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = "bad token hahaha" });
             response.Should().HaveStatusCode(400)
                  .And.HaveCommonBody()
-                 .Which.Code.Should().Be(Verify.BadFormat);
+                 .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_BadFormat);
         }
 
         [Fact]
         public async Task VerifyToken_OldVersion()
         {
-            using var client = await CreateClientWithNoAuth();
-            var token = (await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password)).Token;
+            using var client = await CreateDefaultClient();
+            var token = (await CreateUserTokenAsync(client, "user1", "user1pw")).Token;
 
-            using (var scope = Factory.Server.Host.Services.CreateScope()) // UserService is scoped.
+            using (var scope = Factory.Services.CreateScope()) // UserService is scoped.
             {
                 // create a user for test
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                await userService.PatchUser(MockUser.User.Username, null, null);
+                await userService.ModifyUser("user1", new User { Password = "user1pw" });
             }
 
             (await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = token }))
                 .Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Verify.OldVersion);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_OldVersion);
         }
 
         [Fact]
         public async Task VerifyToken_UserNotExist()
         {
-            using var client = await CreateClientWithNoAuth();
-            var token = (await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password)).Token;
+            using var client = await CreateDefaultClient();
+            var token = (await CreateUserTokenAsync(client, "user1", "user1pw")).Token;
 
             using (var scope = Factory.Server.Host.Services.CreateScope()) // UserService is scoped.
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                await userService.DeleteUser(MockUser.User.Username);
+                await userService.DeleteUser("user1");
             }
 
             (await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = token }))
                 .Should().HaveStatusCode(400)
                 .And.HaveCommonBody()
-                .Which.Code.Should().Be(Verify.UserNotExist);
+                .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_UserNotExist);
         }
 
         //[Fact]
@@ -160,13 +159,13 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task VerifyToken_Success()
         {
-            using var client = await CreateClientWithNoAuth();
-            var createTokenResult = await CreateUserTokenAsync(client, MockUser.User.Username, MockUser.User.Password);
+            using var client = await CreateDefaultClient();
+            var createTokenResult = await CreateUserTokenAsync(client, "user1", "user1pw");
             var response = await client.PostAsJsonAsync(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = createTokenResult.Token });
             response.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<VerifyTokenResponse>()
-                .Which.User.Should().BeEquivalentTo(MockUser.User.Info);
+                .Which.User.Should().BeEquivalentTo(UserInfos[1]);
         }
     }
 }

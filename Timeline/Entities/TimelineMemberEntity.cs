@@ -13,7 +13,7 @@ namespace Timeline.Entities
         public long UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public User User { get; set; } = default!;
+        public UserEntity User { get; set; } = default!;
 
         [Column("timeline")]
         public long TimelineId { get; set; }
