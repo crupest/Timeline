@@ -48,11 +48,12 @@ namespace Timeline.Models.Http
             }
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
-            return new UserInfoLinks
+            var result = new UserInfoLinks
             {
-                Avatar = urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController), new { destination.Username }),
-                Timeline = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController), new { destination.Username })
+                Avatar = urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController)[0..^nameof(Controller).Length], new { destination.Username }),
+                Timeline = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { destination.Username })
             };
+            return result;
         }
     }
 
