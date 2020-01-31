@@ -25,7 +25,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.GetAsync("/users");
             res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<UserInfo[]>()
-                .Which.Should().BeEquivalentTo(UserInfoList);
+                .Which.Should().BeEquivalentTo(UserInfos);
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.GetAsync("/users");
             res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<UserInfo[]>()
-                .Which.Should().BeEquivalentTo(UserInfoList);
+                .Which.Should().BeEquivalentTo(UserInfos);
         }
 
         [Fact]
@@ -44,8 +44,8 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsAdministrator();
             var res = await client.GetAsync("/users");
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfoForAdmin[]>()
-                .Which.Should().BeEquivalentTo(UserInfoForAdminList);
+                .And.HaveJsonBody<UserInfo[]>()
+                .Which.Should().BeEquivalentTo(UserInfos);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.GetAsync($"/users/admin");
             res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<UserInfo>()
-                .Which.Should().BeEquivalentTo(UserInfoList[0]);
+                .Which.Should().BeEquivalentTo(UserInfos[0]);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.GetAsync($"/users/admin");
             res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<UserInfo>()
-                .Which.Should().BeEquivalentTo(UserInfoList[0]);
+                .Which.Should().BeEquivalentTo(UserInfos[0]);
         }
 
         [Fact]
@@ -74,8 +74,8 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsAdministrator();
             var res = await client.GetAsync($"/users/user1");
             res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfoForAdmin>()
-                .Which.Should().BeEquivalentTo(UserInfoForAdminList[1]);
+                .And.HaveJsonBody<UserInfo>()
+                .Which.Should().BeEquivalentTo(UserInfos[1]);
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.GetAsync("/users/newuser");
                 var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfoForAdmin>()
+                    .And.HaveJsonBody<UserInfo>()
                     .Which;
                 body.Administrator.Should().Be(true);
                 body.Nickname.Should().Be("aaa");
@@ -301,7 +301,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.GetAsync("users/aaa");
                 var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfoForAdmin>().Which;
+                    .And.HaveJsonBody<UserInfo>().Which;
                 body.Username.Should().Be("aaa");
                 body.Nickname.Should().Be("ccc");
                 body.Administrator.Should().BeTrue();

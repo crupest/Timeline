@@ -59,7 +59,7 @@ namespace Timeline.Controllers
                 return Ok(new CreateTokenResponse
                 {
                     Token = result.Token,
-                    User = _mapper.Map<UserInfoForAdmin>(result.User)
+                    User = _mapper.Map<UserInfo>(result.User)
                 });
             }
             catch (UserNotExistException e)
@@ -94,7 +94,7 @@ namespace Timeline.Controllers
                     ("Username", result.Username), ("Token", request.Token)));
                 return Ok(new VerifyTokenResponse
                 {
-                    User = _mapper.Map<UserInfoForAdmin>(result)
+                    User = _mapper.Map<UserInfo>(result)
                 });
             }
             catch (UserTokenTimeExpireException e)

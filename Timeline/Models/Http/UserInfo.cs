@@ -7,54 +7,52 @@ using Timeline.Services;
 
 namespace Timeline.Models.Http
 {
-    public interface IUserInfo
-    {
-        string Username { get; set; }
-        string Nickname { get; set; }
-        string AvatarUrl { get; set; }
-    }
-
-    public class UserInfo : IUserInfo
+    public class UserInfo
     {
         public string Username { get; set; } = default!;
         public string Nickname { get; set; } = default!;
-        public string AvatarUrl { get; set; } = default!;
+        public bool? Administrator { get; set; } = default!;
+#pragma warning disable CA1707 
+        public UserInfoLinks? _links { get; set; }
+#pragma warning restore CA1707
     }
 
-    public class UserInfoForAdmin : IUserInfo
+    public class UserInfoLinks
     {
-        public string Username { get; set; } = default!;
-        public string Nickname { get; set; } = default!;
-        public string AvatarUrl { get; set; } = default!;
-        public bool Administrator { get; set; }
+        public string Avatar { get; set; } = default!;
+        public string Timeline { get; set; } = default!;
     }
 
-    public class UserInfoAvatarUrlValueResolver : IValueResolver<User, IUserInfo, string>
+    public class UserInfoLinksValueResolver : IValueResolver<User, UserInfo, UserInfoLinks?>
     {
         private readonly IActionContextAccessor? _actionContextAccessor;
         private readonly IUrlHelperFactory? _urlHelperFactory;
 
-        public UserInfoAvatarUrlValueResolver()
+        public UserInfoLinksValueResolver()
         {
             _actionContextAccessor = null;
             _urlHelperFactory = null;
         }
 
-        public UserInfoAvatarUrlValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
+        public UserInfoLinksValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
         {
             _actionContextAccessor = actionContextAccessor;
             _urlHelperFactory = urlHelperFactory;
         }
 
-        public string Resolve(User source, IUserInfo destination, string destMember, ResolutionContext context)
+        public UserInfoLinks? Resolve(User source, UserInfo destination, UserInfoLinks? destMember, ResolutionContext context)
         {
-            if (_actionContextAccessor == null)
+            if (_actionContextAccessor == null || _urlHelperFactory == null)
             {
-                return $"/users/{destination.Username}/avatar";
+                return null;
             }
 
-            var urlHelper = _urlHelperFactory!.GetUrlHelper(_actionContextAccessor.ActionContext);
-            return urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController), new { destination.Username });
+            var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
+            return new UserInfoLinks
+            {
+                Avatar = urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController), new { destination.Username }),
+                Timeline = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController), new { destination.Username })
+            };
         }
     }
 
@@ -62,8 +60,7 @@ namespace Timeline.Models.Http
     {
         public UserInfoAutoMapperProfile()
         {
-            CreateMap<User, UserInfo>().ForMember(u => u.AvatarUrl, opt => opt.MapFrom<UserInfoAvatarUrlValueResolver>());
-            CreateMap<User, UserInfoForAdmin>().ForMember(u => u.AvatarUrl, opt => opt.MapFrom<UserInfoAvatarUrlValueResolver>());
+            CreateMap<User, UserInfo>().ForMember(u => u._links, opt => opt.MapFrom<UserInfoLinksValueResolver>());
         }
     }
 }

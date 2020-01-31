@@ -15,6 +15,12 @@ namespace Timeline.Tests.IntegratedTests
 
     public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
+        static IntegratedTestBase()
+        {
+            FluentAssertions.AssertionOptions.AssertEquivalencyUsing(options =>
+                options.Excluding(m => m.RuntimeType == typeof(UserInfo) && m.SelectedMemberPath == "_links"));
+        }
+
         protected TestApplication TestApp { get; }
 
         protected WebApplicationFactory<Startup> Factory => TestApp.Factory;
@@ -56,7 +62,6 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 var userInfoList = new List<UserInfo>();
-                var userInfoForAdminList = new List<UserInfoForAdmin>();
 
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
@@ -65,11 +70,9 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     userService.CreateUser(user).Wait();
                     userInfoList.Add(mapper.Map<UserInfo>(user));
-                    userInfoForAdminList.Add(mapper.Map<UserInfoForAdmin>(user));
                 }
 
-                UserInfoList = userInfoList;
-                UserInfoForAdminList = userInfoForAdminList;
+                UserInfos = userInfoList;
             }
         }
 
@@ -83,9 +86,7 @@ namespace Timeline.Tests.IntegratedTests
             TestApp.Dispose();
         }
 
-        public IReadOnlyList<UserInfo> UserInfoList { get; }
-
-        public IReadOnlyList<UserInfoForAdmin> UserInfoForAdminList { get; }
+        public IReadOnlyList<UserInfo> UserInfos { get; }
 
         public Task<HttpClient> CreateDefaultClient()
         {
