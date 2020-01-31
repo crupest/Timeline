@@ -2,9 +2,11 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Text.Json.Serialization;
@@ -86,6 +88,8 @@ namespace Timeline
             services.AddUserAvatarService();
 
             services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();
+
+            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
 
