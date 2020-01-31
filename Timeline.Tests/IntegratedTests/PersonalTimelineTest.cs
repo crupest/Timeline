@@ -119,19 +119,22 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.PatchAsJsonAsync("users/user1/timeline",
                     new TimelinePatchRequest { Description = mockDescription });
-                res.Should().HaveStatusCode(200);
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<BaseTimelineInfo>().Which.Description.Should().Be(mockDescription);
                 await AssertDescription(mockDescription);
             }
             {
                 var res = await client.PatchAsJsonAsync("users/user1/timeline",
                     new TimelinePatchRequest { Description = null });
-                res.Should().HaveStatusCode(200);
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<BaseTimelineInfo>().Which.Description.Should().Be(mockDescription);
                 await AssertDescription(mockDescription);
             }
             {
                 var res = await client.PatchAsJsonAsync("users/user1/timeline",
                     new TimelinePatchRequest { Description = "" });
-                res.Should().HaveStatusCode(200);
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<BaseTimelineInfo>().Which.Description.Should().Be("");
                 await AssertDescription("");
             }
         }

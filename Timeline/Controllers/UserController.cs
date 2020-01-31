@@ -55,14 +55,14 @@ namespace Timeline.Controllers
         }
 
         [HttpPatch("users/{username}"), Authorize]
-        public async Task<ActionResult> Patch([FromBody] UserPatchRequest body, [FromRoute][Username] string username)
+        public async Task<ActionResult<UserInfo>> Patch([FromBody] UserPatchRequest body, [FromRoute][Username] string username)
         {
             if (this.IsAdministrator())
             {
                 try
                 {
-                    await _userService.ModifyUser(username, _mapper.Map<User>(body));
-                    return Ok();
+                    var user = await _userService.ModifyUser(username, _mapper.Map<User>(body));
+                    return Ok(ConvertToUserInfo(user));
                 }
                 catch (UserNotExistException e)
                 {
@@ -92,8 +92,8 @@ namespace Timeline.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden,
                         ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Administrator));
 
-                await _userService.ModifyUser(this.GetUserId(), _mapper.Map<User>(body));
-                return Ok();
+                var user = await _userService.ModifyUser(this.GetUserId(), _mapper.Map<User>(body));
+                return Ok(ConvertToUserInfo(user));
             }
         }
 
