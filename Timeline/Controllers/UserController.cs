@@ -29,35 +29,23 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
-        private IUserInfo ConvertToUserInfo(User user, bool administrator)
-        {
-            if (administrator)
-                return _mapper.Map<UserInfoForAdmin>(user);
-            else
-                return _mapper.Map<UserInfo>(user);
-        }
+        private UserInfo ConvertToUserInfo(User user) => _mapper.Map<UserInfo>(user);
 
         [HttpGet("users")]
-        public async Task<ActionResult<IUserInfo[]>> List()
+        public async Task<ActionResult<UserInfo[]>> List()
         {
             var users = await _userService.GetUsers();
-            var administrator = this.IsAdministrator();
-            // Note: the (object) explicit conversion. If not convert,
-            // then result is a IUserInfo array and JsonSerializer will
-            // treat all element as IUserInfo and deserialize only properties
-            // in IUserInfo. So we convert it to object to make an object
-            // array so that JsonSerializer use the runtime type.
-            var result = users.Select(u => (object)ConvertToUserInfo(u, administrator)).ToArray();
+            var result = users.Select(u => ConvertToUserInfo(u)).ToArray();
             return Ok(result);
         }
 
         [HttpGet("users/{username}")]
-        public async Task<ActionResult<IUserInfo>> Get([FromRoute][Username] string username)
+        public async Task<ActionResult<UserInfo>> Get([FromRoute][Username] string username)
         {
             try
             {
                 var user = await _userService.GetUserByUsername(username);
-                return Ok(ConvertToUserInfo(user, this.IsAdministrator()));
+                return Ok(ConvertToUserInfo(user));
             }
             catch (UserNotExistException e)
             {

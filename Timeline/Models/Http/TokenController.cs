@@ -16,7 +16,7 @@ namespace Timeline.Models.Http
     public class CreateTokenResponse
     {
         public string Token { get; set; } = default!;
-        public UserInfoForAdmin User { get; set; } = default!;
+        public UserInfo User { get; set; } = default!;
     }
 
     public class VerifyTokenRequest
@@ -27,6 +27,6 @@ namespace Timeline.Models.Http
 
     public class VerifyTokenResponse
     {
-        public UserInfoForAdmin User { get; set; } = default!;
+        public UserInfo User { get; set; } = default!;
     }
 }

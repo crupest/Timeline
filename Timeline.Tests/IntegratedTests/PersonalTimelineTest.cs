@@ -26,7 +26,7 @@ namespace Timeline.Tests.IntegratedTests
             var res = await client.GetAsync("users/user1/timeline");
             var body = res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<BaseTimelineInfo>().Which;
-            body.Owner.Should().BeEquivalentTo(UserInfoList[1]);
+            body.Owner.Should().BeEquivalentTo(UserInfos[1]);
             body.Visibility.Should().Be(TimelineVisibility.Register);
             body.Description.Should().Be("");
             body.Members.Should().NotBeNull().And.BeEmpty();
@@ -169,7 +169,7 @@ namespace Timeline.Tests.IntegratedTests
                 var res = await client.PutAsync("/users/user1/timeline/members/user2", null);
                 res.Should().HaveStatusCode(200);
             }
-            await AssertMembers(new List<UserInfo> { UserInfoList[2] });
+            await AssertMembers(new List<UserInfo> { UserInfos[2] });
             {
                 var res = await client.DeleteAsync("/users/user1/timeline/members/user2");
                 res.Should().BeDelete(true);
@@ -452,7 +452,7 @@ namespace Timeline.Tests.IntegratedTests
                         .Which;
                     body.Should().NotBeNull();
                     body.Content.Should().Be(mockContent);
-                    body.Author.Should().BeEquivalentTo(UserInfoList[1]);
+                    body.Author.Should().BeEquivalentTo(UserInfos[1]);
                     createRes = body;
                 }
                 {
@@ -472,7 +472,7 @@ namespace Timeline.Tests.IntegratedTests
                         .Which;
                     body.Should().NotBeNull();
                     body.Content.Should().Be(mockContent2);
-                    body.Author.Should().BeEquivalentTo(UserInfoList[1]);
+                    body.Author.Should().BeEquivalentTo(UserInfos[1]);
                     body.Time.Should().BeCloseTo(mockTime2, 1000);
                     createRes2 = body;
                 }

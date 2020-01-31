@@ -77,7 +77,7 @@ namespace Timeline.Tests.IntegratedTests
             var body = response.Should().HaveStatusCode(200)
                .And.HaveJsonBody<CreateTokenResponse>().Which;
             body.Token.Should().NotBeNullOrWhiteSpace();
-            body.User.Should().BeEquivalentTo(UserInfoForAdminList[1]);
+            body.User.Should().BeEquivalentTo(UserInfos[1]);
         }
 
         [Fact]
@@ -165,7 +165,7 @@ namespace Timeline.Tests.IntegratedTests
                 new VerifyTokenRequest { Token = createTokenResult.Token });
             response.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<VerifyTokenResponse>()
-                .Which.User.Should().BeEquivalentTo(UserInfoForAdminList[1]);
+                .Which.User.Should().BeEquivalentTo(UserInfos[1]);
         }
     }
 }
