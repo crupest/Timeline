@@ -124,13 +124,6 @@ ALTER TABLE users_backup
 
 CREATE UNIQUE INDEX IX_users_name ON users (name);
             ");
-
-            migrationBuilder.RenameColumn(name: "user", table: "user_avatars", newName: "UserId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_user_avatars_user",
-                table: "user_avatars",
-                newName: "IX_user_avatars_UserId");
         }
     }
 }
