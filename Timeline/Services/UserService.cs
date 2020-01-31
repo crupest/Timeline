@@ -64,7 +64,7 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="info">The info of new user.</param>
         /// <param name="password">The password, can't be null or empty.</param>
-        /// <returns>The id of the new user.</returns>
+        /// <returns>The the new user.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="info"/>is null.</exception>
         /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="info"/> is bad.</exception>
         /// <exception cref="ConflictException">Thrown when a user with given username already exists.</exception>
@@ -75,7 +75,7 @@ namespace Timeline.Services
         /// <see cref="User.Nickname"/> must be a valid nickname if set. It is empty by default.
         /// Other fields are ignored.
         /// </remarks>
-        Task<long> CreateUser(User info);
+        Task<User> CreateUser(User info);
 
         /// <summary>
         /// Modify a user's info.
@@ -276,7 +276,7 @@ namespace Timeline.Services
             return entities.Select(user => CreateUserFromEntity(user)).ToArray();
         }
 
-        public async Task<long> CreateUser(User info)
+        public async Task<User> CreateUser(User info)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
@@ -316,7 +316,7 @@ namespace Timeline.Services
             _logger.LogInformation(Log.Format(LogDatabaseCreate,
                 ("Id", newEntity.Id), ("Username", username), ("Administrator", administrator)));
 
-            return newEntity.Id;
+            return CreateUserFromEntity(newEntity);
         }
 
         private void ValidateModifyUserInfo(User? info)

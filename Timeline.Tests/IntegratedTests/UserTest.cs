@@ -296,7 +296,11 @@ namespace Timeline.Tests.IntegratedTests
                     Administrator = true,
                     Nickname = "ccc"
                 });
-                res.Should().HaveStatusCode(200);
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<UserInfo>().Which;
+                body.Username.Should().Be("aaa");
+                body.Nickname.Should().Be("ccc");
+                body.Administrator.Should().BeTrue();
             }
             {
                 var res = await client.GetAsync("users/aaa");

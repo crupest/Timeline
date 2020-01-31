@@ -25,14 +25,8 @@ namespace Timeline.Models.Http
 
     public class UserInfoLinksValueResolver : IValueResolver<User, UserInfo, UserInfoLinks?>
     {
-        private readonly IActionContextAccessor? _actionContextAccessor;
-        private readonly IUrlHelperFactory? _urlHelperFactory;
-
-        public UserInfoLinksValueResolver()
-        {
-            _actionContextAccessor = null;
-            _urlHelperFactory = null;
-        }
+        private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly IUrlHelperFactory _urlHelperFactory;
 
         public UserInfoLinksValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
         {
@@ -42,10 +36,8 @@ namespace Timeline.Models.Http
 
         public UserInfoLinks? Resolve(User source, UserInfo destination, UserInfoLinks? destMember, ResolutionContext context)
         {
-            if (_actionContextAccessor == null || _urlHelperFactory == null)
-            {
+            if (_actionContextAccessor.ActionContext == null)
                 return null;
-            }
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
             var result = new UserInfoLinks

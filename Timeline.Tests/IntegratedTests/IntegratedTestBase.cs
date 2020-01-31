@@ -12,13 +12,12 @@ using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-
     public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
         static IntegratedTestBase()
         {
             FluentAssertions.AssertionOptions.AssertEquivalencyUsing(options =>
-                options.Excluding(m => m.RuntimeType == typeof(UserInfo) && m.SelectedMemberPath == "_links"));
+                options.Excluding(m => m.RuntimeType == typeof(UserInfoLinks)));
         }
 
         protected TestApplication TestApp { get; }
