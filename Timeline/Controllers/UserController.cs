@@ -108,12 +108,12 @@ namespace Timeline.Controllers
         }
 
         [HttpPost("userop/createuser"), AdminAuthorize]
-        public async Task<ActionResult> CreateUser([FromBody] CreateUserRequest body)
+        public async Task<ActionResult<UserInfo>> CreateUser([FromBody] CreateUserRequest body)
         {
             try
             {
-                await _userService.CreateUser(_mapper.Map<User>(body));
-                return Ok();
+                var user = await _userService.CreateUser(_mapper.Map<User>(body));
+                return Ok(ConvertToUserInfo(user));
             }
             catch (ConflictException)
             {
