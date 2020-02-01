@@ -26,9 +26,9 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("users/{username}/timeline")]
-        public async Task<ActionResult<BaseTimelineInfo>> TimelineGet([FromRoute][Username] string username)
+        public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][Username] string username)
         {
-            return await _service.GetTimeline(username);
+            return (await _service.GetTimeline(username)).FillLinks(Url);
         }
 
         [HttpGet("users/{username}/timeline/posts")]
@@ -77,14 +77,14 @@ namespace Timeline.Controllers
 
         [HttpPatch("users/{username}/timeline")]
         [Authorize]
-        public async Task<ActionResult<BaseTimelineInfo>> TimelinePatch([FromRoute][Username] string username, [FromBody] TimelinePatchRequest body)
+        public async Task<ActionResult<TimelineInfo>> TimelinePatch([FromRoute][Username] string username, [FromBody] TimelinePatchRequest body)
         {
             if (!this.IsAdministrator() && !(User.Identity.Name == username))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
             await _service.ChangeProperty(username, body);
-            var timeline = await _service.GetTimeline(username);
+            var timeline = (await _service.GetTimeline(username)).FillLinks(Url);
             return Ok(timeline);
         }
 
