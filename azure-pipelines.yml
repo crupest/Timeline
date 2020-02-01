@@ -63,23 +63,26 @@ stages:
     - publish: Timeline/publish
       artifact: timeline
 
-  - deployment: deploy
+  - job: deploy
     displayName: Deploy to Server
-    environment: 
-      name: timeline-server
-      resourceType: VirtualMachine
-      tags: linux
+    pool:
+      vmImage: 'ubuntu-18.04'
+    variables:
+    - group: sshkey
     dependsOn: build
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: timeline
+    
+    steps:
+    - download: current
+      artifact: timeline
 
-          - script: |
-              rm -rf /var/timeline/*
-              cp -r $PIPELINE_WORKSPACE/timeline/. /var/timeline/
-              sudo systemctl restart timeline.service
-            displayName: 'Copy Files and Restart Service'
-            failOnStderr: true
+    - task: InstallSSHKey@0
+      inputs:
+        knownHostsEntry: $(knownHostsEntry)
+        sshPublicKey: $(sshPublicKey)
+        sshKeySecureFile: c4553c6f-a7f5-4778-b07c-763e71dd867a
+
+    - script: |
+        ssh timeline@crupest.xyz 'rm -rf /var/timeline/*'
+        scp -r $PIPELINE_WORKSPACE/timeline/* timeline@crupest.xyz:/var/timeline/
+        ssh timeline@crupest.xyz 'sudo systemctl restart timeline.service'
+      displayName: 'Copy Files and Restart Service'
