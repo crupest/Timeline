@@ -213,11 +213,12 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="name">The name of the timeline.</param>
         /// <param name="owner">The id of owner of the timeline.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="owner"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when timeline name is invalid. Currently it means it is an empty string.</exception>
+        /// <returns>The info of the new timeline.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="ConflictException">Thrown when the timeline already exists.</exception>
         /// <exception cref="UserNotExistException">Thrown when the owner user does not exist.</exception>
-        Task CreateTimeline(string name, long owner);
+        Task<TimelineInfo> CreateTimeline(string name, long owner);
     }
 
     public interface IPersonalTimelineService : IBaseTimelineService
@@ -244,6 +245,17 @@ namespace Timeline.Services
         protected IUserService UserService { get; }
 
         protected IMapper Mapper { get; }
+
+        protected TimelineEntity CreateNewEntity(string? name, long owner)
+        {
+            return new TimelineEntity
+            {
+                Name = name,
+                OwnerId = owner,
+                Visibility = TimelineVisibility.Register,
+                CreateTime = Clock.GetCurrentTime()
+            };
+        }
 
         /// <summary>
         /// Find the timeline id by the name.
@@ -537,6 +549,72 @@ namespace Timeline.Services
         }
     }
 
+    public class TimelineService : BaseTimelineService, ITimelineService
+    {
+        private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
+
+        private void ValidateTimelineName(string name, string paramName)
+        {
+            if (!_timelineNameValidator.Validate(name, out var message))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionTimelineNameBadFormat, message), paramName);
+            }
+        }
+
+        public TimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IUserService userService, IMapper mapper, IClock clock)
+            : base(loggerFactory, database, userService, mapper, clock)
+        {
+
+        }
+
+        protected override async Task<long> FindTimelineId(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            ValidateTimelineName(name, nameof(name));
+
+            var timelineEntity = await Database.Timelines.Where(t => t.Name == name).Select(t => new { t.Id }).SingleOrDefaultAsync();
+
+            if (timelineEntity == null)
+            {
+                throw new TimelineNotExistException(name);
+            }
+            else
+            {
+                return timelineEntity.Id;
+            }
+        }
+
+        public async Task<TimelineInfo> CreateTimeline(string name, long owner)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            ValidateTimelineName(name, nameof(name));
+
+            var user = await UserService.GetUserById(owner);
+
+            var conflict = await Database.Timelines.AnyAsync(t => t.Name == name);
+
+            if (conflict)
+                throw new ConflictException(ExceptionTimelineNameConflict);
+
+            var newEntity = CreateNewEntity(name, owner);
+            Database.Timelines.Add(newEntity);
+            await Database.SaveChangesAsync();
+
+            return new TimelineInfo
+            {
+                Name = name,
+                Description = "",
+                Owner = Mapper.Map<UserInfo>(user),
+                Visibility = newEntity.Visibility,
+                Members = new List<UserInfo>()
+            };
+        }
+    }
+
     public class PersonalTimelineService : BaseTimelineService, IPersonalTimelineService
     {
         public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IUserService userService, IMapper mapper, IClock clock)
@@ -547,6 +625,9 @@ namespace Timeline.Services
 
         protected override async Task<long> FindTimelineId(string name)
         {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
             long userId;
             try
             {
@@ -569,14 +650,7 @@ namespace Timeline.Services
             }
             else
             {
-                var newTimelineEntity = new TimelineEntity
-                {
-                    Name = null,
-                    Description = null,
-                    OwnerId = userId,
-                    Visibility = TimelineVisibility.Register,
-                    CreateTime = Clock.GetCurrentTime(),
-                };
+                var newTimelineEntity = CreateNewEntity(null, userId);
                 Database.Timelines.Add(newTimelineEntity);
                 await Database.SaveChangesAsync();
 
