@@ -1,4 +1,5 @@
-﻿using static Timeline.Resources.Messages;
+﻿
+using static Timeline.Resources.Messages;
 
 namespace Timeline.Models.Http
 {
