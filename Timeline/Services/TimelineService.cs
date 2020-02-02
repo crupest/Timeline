@@ -139,6 +139,26 @@ namespace Timeline.Services
         Task ChangeMember(string name, IList<string>? add, IList<string>? remove);
 
         /// <summary>
+        /// Check whether a user can manage(change timeline info, member, ...) a timeline.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="id"></param>
+        /// <returns>True if the user can manage the timeline, otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline does not exist.
+        /// For normal timeline, it means the name does not exist.
+        /// For personal timeline, it means the user of that username does not exist
+        /// and the inner exception should be a <see cref="UserNotExistException"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method does not check whether visitor is administrator.
+        /// Return false if user with user id does not exist.
+        /// </remarks>
+        Task<bool> HasManagePermission(string name, long userId);
+
+        /// <summary>
         /// Verify whether a visitor has the permission to read a timeline.
         /// </summary>
         /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
@@ -488,6 +508,17 @@ namespace Timeline.Services
             }
 
             await Database.SaveChangesAsync();
+        }
+
+        public async Task<bool> HasManagePermission(string name, long userId)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            var timelineId = await FindTimelineId(name);
+            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
+
+            return userId == timelineEntity.OwnerId;
         }
 
         public async Task<bool> HasReadPermission(string name, long? visitorId)

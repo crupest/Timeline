@@ -28,7 +28,7 @@ namespace Timeline.Controllers
         [HttpGet("users/{username}/timeline")]
         public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][Username] string username)
         {
-            return (await _service.GetTimeline(username)).FillLinks(Url);
+            return (await _service.GetTimeline(username)).FillLinksForPersonalTimeline(Url);
         }
 
         [HttpGet("users/{username}/timeline/posts")]
@@ -79,12 +79,12 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<ActionResult<TimelineInfo>> TimelinePatch([FromRoute][Username] string username, [FromBody] TimelinePatchRequest body)
         {
-            if (!this.IsAdministrator() && !(User.Identity.Name == username))
+            if (!this.IsAdministrator() && !(await _service.HasManagePermission(username, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
             await _service.ChangeProperty(username, body);
-            var timeline = (await _service.GetTimeline(username)).FillLinks(Url);
+            var timeline = (await _service.GetTimeline(username)).FillLinksForPersonalTimeline(Url);
             return Ok(timeline);
         }
 
@@ -92,7 +92,7 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<ActionResult> TimelineMemberPut([FromRoute][Username] string username, [FromRoute][Username] string member)
         {
-            if (!this.IsAdministrator() && !(User.Identity.Name == username))
+            if (!this.IsAdministrator() && !(await _service.HasManagePermission(username, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -112,7 +112,7 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<ActionResult> TimelineMemberDelete([FromRoute][Username] string username, [FromRoute][Username] string member)
         {
-            if (!this.IsAdministrator() && !(User.Identity.Name == username))
+            if (!this.IsAdministrator() && !(await _service.HasManagePermission(username, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
