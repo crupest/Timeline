@@ -77,5 +77,23 @@ namespace Timeline.Resources.Services {
                 return ResourceManager.GetString("ExceptionFindTimelineUsernameBadFormat", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The timeline name is of bad format because {0}..
+        /// </summary>
+        internal static string ExceptionTimelineNameBadFormat {
+            get {
+                return ResourceManager.GetString("ExceptionTimelineNameBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The timeline with given name already exists..
+        /// </summary>
+        internal static string ExceptionTimelineNameConflict {
+            get {
+                return ResourceManager.GetString("ExceptionTimelineNameConflict", resourceCulture);
+            }
+        }
     }
 }
