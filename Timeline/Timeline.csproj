@@ -89,10 +89,10 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>NicknameValidator.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Models\Validation\UsernameValidator.Designer.cs">
+        <Compile Update="Resources\Models\Validation\NameValidator.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>UsernameValidator.resx</DependentUpon>
+            <DependentUpon>NameValidator.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Models\Validation\Validator.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -163,9 +163,9 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>NicknameValidator.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Models\Validation\UsernameValidator.resx">
+        <EmbeddedResource Update="Resources\Models\Validation\NameValidator.resx">
             <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>UsernameValidator.Designer.cs</LastGenOutput>
+            <LastGenOutput>NameValidator.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
             <Generator>ResXFileCodeGenerator</Generator>

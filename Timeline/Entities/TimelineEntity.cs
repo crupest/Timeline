@@ -6,7 +6,8 @@ using Timeline.Models.Http;
 
 namespace Timeline.Entities
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is entity object.")]
+#pragma warning disable CA2227 // Collection properties should be read only
+    // TODO: Create index for this table.
     [Table("timelines")]
     public class TimelineEntity
     {
@@ -38,4 +39,5 @@ namespace Timeline.Entities
 
         public List<TimelinePostEntity> Posts { get; set; } = default!;
     }
+#pragma warning restore CA2227 // Collection properties should be read only
 }

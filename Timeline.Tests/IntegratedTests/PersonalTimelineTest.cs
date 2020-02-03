@@ -25,7 +25,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             var res = await client.GetAsync("users/user1/timeline");
             var body = res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<BaseTimelineInfo>().Which;
+                .And.HaveJsonBody<TimelineInfo>().Which;
             body.Owner.Should().BeEquivalentTo(UserInfos[1]);
             body.Visibility.Should().Be(TimelineVisibility.Register);
             body.Description.Should().Be("");
@@ -109,7 +109,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.GetAsync("users/user1/timeline");
                 var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<BaseTimelineInfo>()
+                    .And.HaveJsonBody<TimelineInfo>()
                     .Which.Description.Should().Be(description);
             }
 
@@ -120,21 +120,21 @@ namespace Timeline.Tests.IntegratedTests
                 var res = await client.PatchAsJsonAsync("users/user1/timeline",
                     new TimelinePatchRequest { Description = mockDescription });
                 res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<BaseTimelineInfo>().Which.Description.Should().Be(mockDescription);
+                    .And.HaveJsonBody<TimelineInfo>().Which.Description.Should().Be(mockDescription);
                 await AssertDescription(mockDescription);
             }
             {
                 var res = await client.PatchAsJsonAsync("users/user1/timeline",
                     new TimelinePatchRequest { Description = null });
                 res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<BaseTimelineInfo>().Which.Description.Should().Be(mockDescription);
+                    .And.HaveJsonBody<TimelineInfo>().Which.Description.Should().Be(mockDescription);
                 await AssertDescription(mockDescription);
             }
             {
                 var res = await client.PatchAsJsonAsync("users/user1/timeline",
                     new TimelinePatchRequest { Description = "" });
                 res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<BaseTimelineInfo>().Which.Description.Should().Be("");
+                    .And.HaveJsonBody<TimelineInfo>().Which.Description.Should().Be("");
                 await AssertDescription("");
             }
         }
@@ -149,7 +149,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.GetAsync(getUrl);
                 res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<BaseTimelineInfo>()
+                    .And.HaveJsonBody<TimelineInfo>()
                     .Which.Members.Should().NotBeNull().And.BeEquivalentTo(members);
             }
 
@@ -157,7 +157,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.GetAsync(getUrl);
                 res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<BaseTimelineInfo>()
+                    .And.HaveJsonBody<TimelineInfo>()
                     .Which.Members.Should().NotBeNull().And.BeEmpty();
             }
 
@@ -165,7 +165,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.PutAsync("/users/user1/timeline/members/usernotexist", null);
                 res.Should().HaveStatusCode(400)
-                    .And.HaveCommonBody(ErrorCodes.TimelineController.MemberPut_NotExist);
+                    .And.HaveCommonBody(ErrorCodes.TimelineCommon.MemberPut_NotExist);
             }
             await AssertEmptyMembers();
             {

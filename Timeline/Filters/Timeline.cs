@@ -17,7 +17,7 @@ namespace Timeline.Filters
                 }
                 else
                 {
-                    throw new System.NotImplementedException();
+                    context.Result = new NotFoundObjectResult(ErrorResponse.TimelineCommon.NotExist());
                 }
             }
         }

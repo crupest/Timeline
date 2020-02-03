@@ -147,17 +147,14 @@
   <data name="Common_InvalidModel" xml:space="preserve">
     <value>Model is of bad format.</value>
   </data>
-  <data name="TimelineController_ChangeMember_UsernameBadFormat" xml:space="preserve">
-    <value>The {0}-st username to do operation {1} on is of bad format.</value>
-  </data>
-  <data name="TimelineController_ChangeMember_UserNotExist" xml:space="preserve">
-    <value>The {0}-st user to do operation {1} on does not exist.</value>
-  </data>
-  <data name="TimelineController_MemberPut_NotExist" xml:space="preserve">
+  <data name="TimelineCommon_MemberPut_NotExist" xml:space="preserve">
     <value>The user to set as member does not exist.</value>
   </data>
-  <data name="TimelineController_PostOperationDelete_NotExist" xml:space="preserve">
-    <value>The post to delete does not exist.</value>
+  <data name="TimelineCommon_NameConflict" xml:space="preserve">
+    <value>A timeline with given name already exists.</value>
+  </data>
+  <data name="TimelineCommon_NotExist" xml:space="preserve">
+    <value>The timeline with given name does not exist.</value>
   </data>
   <data name="TokenController_Create_BadCredential" xml:space="preserve">
     <value>Username or password is invalid.</value>

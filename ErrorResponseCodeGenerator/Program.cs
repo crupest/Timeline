@@ -57,6 +57,12 @@ $
 ".Replace("$", code);
 
             Console.WriteLine(code);
+
+            TextCopy.Clipboard.SetText(code);
+            var oldColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Code has copied to clipboard!");
+            Console.ForegroundColor = oldColor;
         }
     }
 }

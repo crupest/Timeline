@@ -123,4 +123,10 @@
   <data name="ExceptionFindTimelineUsernameBadFormat" xml:space="preserve">
     <value>The owner username of personal timeline is of bad format.</value>
   </data>
+  <data name="ExceptionTimelineNameBadFormat" xml:space="preserve">
+    <value>The timeline name is of bad format because {0}.</value>
+  </data>
+  <data name="ExceptionTimelineNameConflict" xml:space="preserve">
+    <value>The timeline with given name already exists.</value>
+  </data>
 </root>
