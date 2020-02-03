@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Timeline.Filters;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
@@ -11,6 +12,7 @@ using Timeline.Services;
 namespace Timeline.Controllers
 {
     [ApiController]
+    [CatchTimelineNotExistException]
     public class TimelineController : Controller
     {
         private readonly ILogger<TimelineController> _logger;
@@ -26,7 +28,8 @@ namespace Timeline.Controllers
         [HttpGet("timelines/{name}")]
         public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][TimelineName] string name)
         {
-            return (await _service.GetTimeline(name)).FillLinksForNormalTimeline(Url);
+            var result = (await _service.GetTimeline(name)).FillLinksForNormalTimeline(Url);
+            return Ok(result);
         }
 
         [HttpGet("timelines/{name}/posts")]
@@ -128,13 +131,13 @@ namespace Timeline.Controllers
 
         [HttpPost("timelines")]
         [Authorize]
-        public async Task<ActionResult<TimelineInfo>> TimelineCreate([FromRoute] TimelineCreateRequest body)
+        public async Task<ActionResult<TimelineInfo>> TimelineCreate([FromBody] TimelineCreateRequest body)
         {
             var userId = this.GetUserId();
 
             try
             {
-                var timelineInfo = await _service.CreateTimeline(body.Name, userId);
+                var timelineInfo = (await _service.CreateTimeline(body.Name, userId)).FillLinksForNormalTimeline(Url);
                 return Ok(timelineInfo);
             }
             catch (ConflictException)
