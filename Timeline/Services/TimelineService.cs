@@ -322,6 +322,7 @@ namespace Timeline.Services
 
             return new TimelineInfo
             {
+                Name = timelineEntity.Name,
                 Description = timelineEntity.Description ?? "",
                 Owner = owner,
                 Visibility = timelineEntity.Visibility,
