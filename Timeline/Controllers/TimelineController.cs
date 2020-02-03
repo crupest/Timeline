@@ -102,7 +102,7 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException)
             {
-                return BadRequest(ErrorResponse.TimelineController.MemberPut_NotExist());
+                return BadRequest(ErrorResponse.TimelineCommon.MemberPut_NotExist());
             }
         }
 
@@ -126,6 +126,21 @@ namespace Timeline.Controllers
             }
         }
 
-        // TODO: Create API .
+        [HttpPost("timelines")]
+        [Authorize]
+        public async Task<ActionResult<TimelineInfo>> TimelineCreate([FromRoute] TimelineCreateRequest body)
+        {
+            var userId = this.GetUserId();
+
+            try
+            {
+                var timelineInfo = await _service.CreateTimeline(body.Name, userId);
+                return Ok(timelineInfo);
+            }
+            catch (ConflictException)
+            {
+                return BadRequest(ErrorResponse.TimelineCommon.NameConflict());
+            }
+        }
     }
 }
