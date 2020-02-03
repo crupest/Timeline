@@ -104,7 +104,7 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException)
             {
-                return BadRequest(ErrorResponse.TimelineController.MemberPut_NotExist());
+                return BadRequest(ErrorResponse.TimelineCommon.MemberPut_NotExist());
             }
         }
 

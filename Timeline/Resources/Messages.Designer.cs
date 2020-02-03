@@ -151,38 +151,29 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The {0}-st username to do operation {1} on is of bad format..
-        /// </summary>
-        internal static string TimelineController_ChangeMember_UsernameBadFormat {
-            get {
-                return ResourceManager.GetString("TimelineController_ChangeMember_UsernameBadFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The {0}-st user to do operation {1} on does not exist..
-        /// </summary>
-        internal static string TimelineController_ChangeMember_UserNotExist {
-            get {
-                return ResourceManager.GetString("TimelineController_ChangeMember_UserNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The user to set as member does not exist..
         /// </summary>
-        internal static string TimelineController_MemberPut_NotExist {
+        internal static string TimelineCommon_MemberPut_NotExist {
             get {
-                return ResourceManager.GetString("TimelineController_MemberPut_NotExist", resourceCulture);
+                return ResourceManager.GetString("TimelineCommon_MemberPut_NotExist", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The post to delete does not exist..
+        ///   Looks up a localized string similar to A timeline with given name already exists..
         /// </summary>
-        internal static string TimelineController_PostOperationDelete_NotExist {
+        internal static string TimelineCommon_NameConflict {
             get {
-                return ResourceManager.GetString("TimelineController_PostOperationDelete_NotExist", resourceCulture);
+                return ResourceManager.GetString("TimelineCommon_NameConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The timeline with given name does not exist..
+        /// </summary>
+        internal static string TimelineCommon_NotExist {
+            get {
+                return ResourceManager.GetString("TimelineCommon_NotExist", resourceCulture);
             }
         }
         

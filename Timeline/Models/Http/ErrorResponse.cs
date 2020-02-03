@@ -242,17 +242,37 @@ namespace Timeline.Models.Http
 
         }
 
-        public static class TimelineController
+        public static class TimelineCommon
         {
+
+            public static CommonResponse NameConflict(params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineCommon.NameConflict, string.Format(TimelineCommon_NameConflict, formatArgs));
+            }
+
+            public static CommonResponse CustomMessage_NameConflict(string message, params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineCommon.NameConflict, string.Format(message, formatArgs));
+            }
+
+            public static CommonResponse NotExist(params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineCommon.NotExist, string.Format(TimelineCommon_NotExist, formatArgs));
+            }
+
+            public static CommonResponse CustomMessage_NotExist(string message, params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineCommon.NotExist, string.Format(message, formatArgs));
+            }
 
             public static CommonResponse MemberPut_NotExist(params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.TimelineController.MemberPut_NotExist, string.Format(TimelineController_MemberPut_NotExist, formatArgs));
+                return new CommonResponse(ErrorCodes.TimelineCommon.MemberPut_NotExist, string.Format(TimelineCommon_MemberPut_NotExist, formatArgs));
             }
 
             public static CommonResponse CustomMessage_MemberPut_NotExist(string message, params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.TimelineController.MemberPut_NotExist, string.Format(message, formatArgs));
+                return new CommonResponse(ErrorCodes.TimelineCommon.MemberPut_NotExist, string.Format(message, formatArgs));
             }
 
         }

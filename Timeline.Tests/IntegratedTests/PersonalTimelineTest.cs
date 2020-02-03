@@ -165,7 +165,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var res = await client.PutAsync("/users/user1/timeline/members/usernotexist", null);
                 res.Should().HaveStatusCode(400)
-                    .And.HaveCommonBody(ErrorCodes.TimelineController.MemberPut_NotExist);
+                    .And.HaveCommonBody(ErrorCodes.TimelineCommon.MemberPut_NotExist);
             }
             await AssertEmptyMembers();
             {
