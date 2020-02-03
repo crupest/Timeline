@@ -2,16 +2,16 @@
 
 namespace Timeline.Models.Validation
 {
-    public class UsernameValidator : NameValidator
+    public class TimelineNameValidator : NameValidator
     {
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
         AllowMultiple = false)]
-    public class UsernameAttribute : ValidateWithAttribute
+    public class TimelineNameAttribute : ValidateWithAttribute
     {
-        public UsernameAttribute()
-            : base(typeof(UsernameValidator))
+        public TimelineNameAttribute()
+            : base(typeof(TimelineNameValidator))
         {
 
         }

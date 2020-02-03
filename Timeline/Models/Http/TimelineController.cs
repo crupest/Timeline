@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
@@ -9,6 +10,13 @@ namespace Timeline.Models.Http
         public string Content { get; set; } = default!;
 
         public DateTime? Time { get; set; }
+    }
+
+    public class TimelineCreateRequest
+    {
+        [Required]
+        [TimelineName]
+        public string Name { get; set; } = default!;
     }
 
     public class TimelinePatchRequest
