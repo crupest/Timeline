@@ -62,6 +62,11 @@
             public const int NotExist = 1_104_02_01;
             public const int MemberPut_NotExist = 1_104_03_01;
         }
+
+        public static class TimelineController
+        {
+            public const int QueryRelateNotExist = 1_105_01_01;
+        }
     }
 }
 

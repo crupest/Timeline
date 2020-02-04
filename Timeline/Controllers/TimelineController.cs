@@ -17,18 +17,41 @@ namespace Timeline.Controllers
     {
         private readonly ILogger<TimelineController> _logger;
 
+        private readonly IUserService _userService;
         private readonly ITimelineService _service;
 
-        public TimelineController(ILogger<TimelineController> logger, ITimelineService service)
+        public TimelineController(ILogger<TimelineController> logger, IUserService userService, ITimelineService service)
         {
             _logger = logger;
+            _userService = userService;
             _service = service;
+        }
+
+        [HttpGet("timelines")]
+        public async Task<ActionResult<List<TimelineInfo>>> TimelineList([FromQuery][Username] string? relate)
+        {
+            long? relatedUserId = null;
+            if (relate != null)
+            {
+                try
+                {
+                    relatedUserId = await _userService.GetUserIdByUsername(relate);
+                }
+                catch (UserNotExistException)
+                {
+                    return BadRequest(ErrorResponse.TimelineController.QueryRelateNotExist());
+                }
+            }
+
+            var result = await _service.GetTimelines(relatedUserId);
+            result.ForEach(t => t.FillLinks(Url));
+            return Ok(result);
         }
 
         [HttpGet("timelines/{name}")]
         public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][TimelineName] string name)
         {
-            var result = (await _service.GetTimeline(name)).FillLinksForNormalTimeline(Url);
+            var result = (await _service.GetTimeline(name)).FillLinks(Url);
             return Ok(result);
         }
 
@@ -85,7 +108,7 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
             await _service.ChangeProperty(name, body);
-            var timeline = (await _service.GetTimeline(name)).FillLinksForNormalTimeline(Url);
+            var timeline = (await _service.GetTimeline(name)).FillLinks(Url);
             return Ok(timeline);
         }
 
@@ -137,7 +160,7 @@ namespace Timeline.Controllers
 
             try
             {
-                var timelineInfo = (await _service.CreateTimeline(body.Name, userId)).FillLinksForNormalTimeline(Url);
+                var timelineInfo = (await _service.CreateTimeline(body.Name, userId)).FillLinks(Url);
                 return Ok(timelineInfo);
             }
             catch (ConflictException)

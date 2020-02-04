@@ -178,6 +178,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user specified by query param &quot;relate&quot; does not exist..
+        /// </summary>
+        internal static string TimelineController_QueryRelateNotExist {
+            get {
+                return ResourceManager.GetString("TimelineController_QueryRelateNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Username or password is invalid..
         /// </summary>
         internal static string TokenController_Create_BadCredential {

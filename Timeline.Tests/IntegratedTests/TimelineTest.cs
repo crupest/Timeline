@@ -36,6 +36,83 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
+        public async Task TimelineList()
+        {
+            await CreateTestTimelines();
+
+            TimelineInfo user1Timeline;
+
+            var client = await CreateDefaultClient();
+
+            {
+                var res = await client.GetAsync("/users/user1/timeline");
+                user1Timeline = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>().Which;
+            }
+
+            {
+                var testResult = new List<TimelineInfo>();
+                testResult.Add(user1Timeline);
+                testResult.AddRange(_testTimelines);
+
+                var res = await client.GetAsync("/timelines");
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<List<TimelineInfo>>()
+                    .Which.Should().BeEquivalentTo(testResult);
+            }
+        }
+
+        [Fact]
+        public async Task TimelineList_WithRelate()
+        {
+            await CreateTestTimelines();
+
+            var testResult = new List<TimelineInfo>();
+
+            {
+                var client = await CreateClientAsUser();
+
+                {
+                    var res = await client.PutAsync("/users/user1/timeline/members/user2", null);
+                    res.Should().HaveStatusCode(200);
+                }
+
+                {
+                    var res = await client.PutAsync("/timelines/t1/members/user2", null);
+                    res.Should().HaveStatusCode(200);
+                }
+
+                {
+                    var res = await client.GetAsync("/users/user1/timeline");
+                    testResult.Add(res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelineInfo>().Which);
+                }
+
+                {
+                    var res = await client.GetAsync("/timelines/t1");
+                    testResult.Add(res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelineInfo>().Which);
+                }
+
+                {
+                    var res = await client.GetAsync("/users/user2/timeline");
+                    testResult.Add(res.Should().HaveStatusCode(200)
+                        .And.HaveJsonBody<TimelineInfo>().Which);
+                }
+            }
+
+            testResult.Add(_testTimelines[2]);
+
+            {
+                var client = await CreateClientAs(2);
+                var res = await client.GetAsync("/timelines?relate=user2");
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<List<TimelineInfo>>()
+                    .Which.Should().BeEquivalentTo(testResult);
+            }
+        }
+
+        [Fact]
         public async Task TimelineCreate_Should_Work()
         {
             {
