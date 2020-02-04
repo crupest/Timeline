@@ -47,6 +47,7 @@ namespace Timeline.Models.Http
 
     public class TimelineInfoLinks
     {
+        public string Self { get; set; } = default!;
         public string Posts { get; set; } = default!;
     }
 
@@ -61,6 +62,7 @@ namespace Timeline.Models.Http
 
             info._links = new TimelineInfoLinks
             {
+                Self = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { info.Owner.Username }),
                 Posts = urlHelper.ActionLink(nameof(PersonalTimelineController.PostListGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { info.Owner.Username })
             };
 
@@ -76,6 +78,7 @@ namespace Timeline.Models.Http
 
             info._links = new TimelineInfoLinks
             {
+                Self = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { info.Name }),
                 Posts = urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { info.Name })
             };
 

@@ -19,6 +19,7 @@ namespace Timeline.Models.Http
 
     public class UserInfoLinks
     {
+        public string Self { get; set; } = default!;
         public string Avatar { get; set; } = default!;
         public string Timeline { get; set; } = default!;
     }
@@ -42,6 +43,7 @@ namespace Timeline.Models.Http
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
             var result = new UserInfoLinks
             {
+                Self = urlHelper.ActionLink(nameof(UserController.Get), nameof(UserController)[0..^nameof(Controller).Length], new { destination.Username }),
                 Avatar = urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController)[0..^nameof(Controller).Length], new { destination.Username }),
                 Timeline = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { destination.Username })
             };
