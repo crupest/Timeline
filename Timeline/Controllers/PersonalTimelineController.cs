@@ -28,7 +28,7 @@ namespace Timeline.Controllers
         [HttpGet("users/{username}/timeline")]
         public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][Username] string username)
         {
-            return (await _service.GetTimeline(username)).FillLinksForPersonalTimeline(Url);
+            return (await _service.GetTimeline(username)).FillLinks(Url);
         }
 
         [HttpGet("users/{username}/timeline/posts")]
@@ -84,7 +84,7 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
             await _service.ChangeProperty(username, body);
-            var timeline = (await _service.GetTimeline(username)).FillLinksForPersonalTimeline(Url);
+            var timeline = (await _service.GetTimeline(username)).FillLinks(Url);
             return Ok(timeline);
         }
 

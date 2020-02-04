@@ -156,6 +156,9 @@
   <data name="TimelineCommon_NotExist" xml:space="preserve">
     <value>The timeline with given name does not exist.</value>
   </data>
+  <data name="TimelineController_QueryRelateNotExist" xml:space="preserve">
+    <value>The user specified by query param "relate" does not exist.</value>
+  </data>
   <data name="TokenController_Create_BadCredential" xml:space="preserve">
     <value>Username or password is invalid.</value>
   </data>

@@ -277,6 +277,21 @@ namespace Timeline.Models.Http
 
         }
 
+        public static class TimelineController
+        {
+
+            public static CommonResponse QueryRelateNotExist(params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, string.Format(TimelineController_QueryRelateNotExist, formatArgs));
+            }
+
+            public static CommonResponse CustomMessage_QueryRelateNotExist(string message, params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, string.Format(message, formatArgs));
+            }
+
+        }
+
     }
 
 }

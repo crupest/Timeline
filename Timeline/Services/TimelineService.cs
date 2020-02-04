@@ -229,6 +229,16 @@ namespace Timeline.Services
     public interface ITimelineService : IBaseTimelineService
     {
         /// <summary>
+        /// Get all timelines including personal timelines.
+        /// </summary>
+        /// <param name="relatedUserId">Filter timelines related (own or is a member) to specific user.</param>
+        /// <returns>The list of timelines.</returns>
+        /// <remarks>
+        /// If user with related user id does not exist, empty list will be returned.
+        /// </remarks>
+        Task<List<TimelineInfo>> GetTimelines(long? relatedUserId = null);
+
+        /// <summary>
         /// Create a timeline.
         /// </summary>
         /// <param name="name">The name of the timeline.</param>
@@ -616,6 +626,44 @@ namespace Timeline.Services
             {
                 return timelineEntity.Id;
             }
+        }
+
+        public async Task<List<TimelineInfo>> GetTimelines(long? relatedUserId = null)
+        {
+            List<TimelineEntity> entities;
+
+            if (relatedUserId == null)
+            {
+                entities = await Database.Timelines.Include(t => t.Members).ToListAsync();
+            }
+            else
+            {
+                var timelineAsMemberIds = await Database.TimelineMembers.Where(m => m.UserId == relatedUserId).Select(m => m.TimelineId).ToListAsync();
+                entities = await Database.Timelines.Where(t => t.OwnerId == relatedUserId || timelineAsMemberIds.Contains(t.Id)).Include(t => t.Members).ToListAsync();
+            }
+
+            var result = new List<TimelineInfo>();
+
+            foreach (var entity in entities)
+            {
+                var timeline = new TimelineInfo
+                {
+                    Name = entity.Name,
+                    Description = entity.Description ?? "",
+                    Owner = Mapper.Map<UserInfo>(await UserService.GetUserById(entity.OwnerId)),
+                    Visibility = entity.Visibility,
+                    Members = new List<UserInfo>()
+                };
+
+                foreach (var m in entity.Members)
+                {
+                    timeline.Members.Add(Mapper.Map<UserInfo>(await UserService.GetUserById(m.UserId)));
+                }
+
+                result.Add(timeline);
+            }
+
+            return result;
         }
 
         public async Task<TimelineInfo> CreateTimeline(string name, long owner)

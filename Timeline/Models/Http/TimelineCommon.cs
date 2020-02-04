@@ -53,34 +53,29 @@ namespace Timeline.Models.Http
 
     public static class TimelineInfoExtensions
     {
-        public static TimelineInfo FillLinksForPersonalTimeline(this TimelineInfo info, IUrlHelper urlHelper)
+        public static TimelineInfo FillLinks(this TimelineInfo info, IUrlHelper urlHelper)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
             if (urlHelper == null)
                 throw new ArgumentNullException(nameof(urlHelper));
 
-            info._links = new TimelineInfoLinks
+            if (string.IsNullOrEmpty(info.Name))
             {
-                Self = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { info.Owner.Username }),
-                Posts = urlHelper.ActionLink(nameof(PersonalTimelineController.PostListGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { info.Owner.Username })
-            };
-
-            return info;
-        }
-
-        public static TimelineInfo FillLinksForNormalTimeline(this TimelineInfo info, IUrlHelper urlHelper)
-        {
-            if (info == null)
-                throw new ArgumentNullException(nameof(info));
-            if (urlHelper == null)
-                throw new ArgumentNullException(nameof(urlHelper));
-
-            info._links = new TimelineInfoLinks
+                info._links = new TimelineInfoLinks
+                {
+                    Self = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { info.Owner.Username }),
+                    Posts = urlHelper.ActionLink(nameof(PersonalTimelineController.PostListGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { info.Owner.Username })
+                };
+            }
+            else
             {
-                Self = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { info.Name }),
-                Posts = urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { info.Name })
-            };
+                info._links = new TimelineInfoLinks
+                {
+                    Self = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { info.Name }),
+                    Posts = urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { info.Name })
+                };
+            }
 
             return info;
         }
