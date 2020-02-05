@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Timeline.Filters;
 using Timeline.Models.Http;
@@ -28,14 +29,21 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("timelines")]
-        public async Task<ActionResult<List<TimelineInfo>>> TimelineList([FromQuery][Username] string? relate)
+        public async Task<ActionResult<List<TimelineInfo>>> TimelineList([FromQuery][Username] string? relate, [FromQuery][RegularExpression("(own)|(join)")] string? relateType)
         {
-            long? relatedUserId = null;
+            TimelineUserRelationship? relationship = null;
             if (relate != null)
             {
                 try
                 {
-                    relatedUserId = await _userService.GetUserIdByUsername(relate);
+                    var relatedUserId = await _userService.GetUserIdByUsername(relate);
+
+                    relationship = new TimelineUserRelationship(relateType switch
+                    {
+                        "own" => TimelineUserRelationshipType.Own,
+                        "join" => TimelineUserRelationshipType.Join,
+                        _ => TimelineUserRelationshipType.Default
+                    }, relatedUserId);
                 }
                 catch (UserNotExistException)
                 {
@@ -43,7 +51,7 @@ namespace Timeline.Controllers
                 }
             }
 
-            var result = await _service.GetTimelines(relatedUserId);
+            var result = await _service.GetTimelines(relationship);
             result.ForEach(t => t.FillLinks(Url));
             return Ok(result);
         }

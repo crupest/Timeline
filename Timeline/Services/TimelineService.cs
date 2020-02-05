@@ -13,6 +13,25 @@ using static Timeline.Resources.Services.TimelineService;
 
 namespace Timeline.Services
 {
+    public enum TimelineUserRelationshipType
+    {
+        Own = 0b1,
+        Join = 0b10,
+        Default = Own | Join
+    }
+
+    public class TimelineUserRelationship
+    {
+        public TimelineUserRelationship(TimelineUserRelationshipType type, long userId)
+        {
+            Type = type;
+            UserId = userId;
+        }
+
+        public TimelineUserRelationshipType Type { get; set; }
+        public long UserId { get; set; }
+    }
+
     /// <summary>
     /// This define the common interface of both personal timeline
     /// and normal timeline.
@@ -231,12 +250,12 @@ namespace Timeline.Services
         /// <summary>
         /// Get all timelines including personal timelines.
         /// </summary>
-        /// <param name="relatedUserId">Filter timelines related (own or is a member) to specific user.</param>
+        /// <param name="relate">Filter timelines related (own or is a member) to specific user.</param>
         /// <returns>The list of timelines.</returns>
         /// <remarks>
         /// If user with related user id does not exist, empty list will be returned.
         /// </remarks>
-        Task<List<TimelineInfo>> GetTimelines(long? relatedUserId = null);
+        Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null);
 
         /// <summary>
         /// Create a timeline.
@@ -628,18 +647,27 @@ namespace Timeline.Services
             }
         }
 
-        public async Task<List<TimelineInfo>> GetTimelines(long? relatedUserId = null)
+        public async Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null)
         {
             List<TimelineEntity> entities;
 
-            if (relatedUserId == null)
+            if (relate == null)
             {
                 entities = await Database.Timelines.Include(t => t.Members).ToListAsync();
             }
             else
             {
-                var timelineAsMemberIds = await Database.TimelineMembers.Where(m => m.UserId == relatedUserId).Select(m => m.TimelineId).ToListAsync();
-                entities = await Database.Timelines.Where(t => t.OwnerId == relatedUserId || timelineAsMemberIds.Contains(t.Id)).Include(t => t.Members).ToListAsync();
+                entities = new List<TimelineEntity>();
+
+                if ((relate.Type & TimelineUserRelationshipType.Own) != 0)
+                {
+                    entities.AddRange(await Database.Timelines.Where(t => t.OwnerId == relate.UserId && t.Name != null).Include(t => t.Members).ToListAsync());
+                }
+
+                if ((relate.Type & TimelineUserRelationshipType.Join) != 0)
+                {
+                    entities.AddRange(await Database.TimelineMembers.Where(m => m.UserId == relate.UserId).Include(m => m.Timeline).ThenInclude(t => t.Members).Select(m => m.Timeline).ToListAsync());
+                }
             }
 
             var result = new List<TimelineInfo>();
