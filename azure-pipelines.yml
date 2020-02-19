@@ -1,6 +1,6 @@
 trigger:
-- master
-
+  - master
+  
 stages:
 - stage: build
   displayName: Routine Build and Test
@@ -23,7 +23,6 @@ stages:
         dotnet restore Timeline/Timeline.csproj --configfile nuget.config
         dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
       displayName: Dotnet Restore
-
     - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
       displayName: Dotnet Test
 
@@ -63,26 +62,22 @@ stages:
     - publish: Timeline/publish
       artifact: timeline
 
-  - job: deploy
+  - deployment: deploy
     displayName: Deploy to Server
-    pool:
-      vmImage: 'ubuntu-18.04'
-    variables:
-    - group: sshkey
+    environment: 
+      name: timeline-server
+      resourceType: VirtualMachine
+      tags: linux
     dependsOn: build
-    
-    steps:
-    - download: current
-      artifact: timeline
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: timeline
 
-    - task: InstallSSHKey@0
-      inputs:
-        knownHostsEntry: $(knownHostsEntry)
-        sshPublicKey: $(sshPublicKey)
-        sshKeySecureFile: c4553c6f-a7f5-4778-b07c-763e71dd867a
-
-    - script: |
-        ssh timeline@crupest.xyz 'rm -rf /var/timeline/*'
-        scp -r $PIPELINE_WORKSPACE/timeline/* timeline@crupest.xyz:/var/timeline/
-        ssh timeline@crupest.xyz 'sudo systemctl restart timeline.service'
-      displayName: 'Copy Files and Restart Service'
+          - script: |
+              rm -rf /var/timeline/*
+              cp -r $PIPELINE_WORKSPACE/timeline/. /var/timeline/
+              sudo systemctl restart timeline.service
+            displayName: 'Copy Files and Restart Service'
