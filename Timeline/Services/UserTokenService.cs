@@ -43,13 +43,13 @@ namespace Timeline.Services
     {
         private const string VersionClaimType = "timeline_version";
 
-        private readonly IOptionsMonitor<JwtConfig> _jwtConfig;
+        private readonly IOptionsMonitor<JwtConfiguration> _jwtConfig;
         private readonly IClock _clock;
 
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
         private SymmetricSecurityKey _tokenSecurityKey;
 
-        public JwtUserTokenService(IOptionsMonitor<JwtConfig> jwtConfig, IClock clock)
+        public JwtUserTokenService(IOptionsMonitor<JwtConfiguration> jwtConfig, IClock clock)
         {
             _jwtConfig = jwtConfig;
             _clock = clock;
