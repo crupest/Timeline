@@ -6,45 +6,44 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timeline.Entities;
 
-namespace Timeline.Migrations.ProductionDatabase
+namespace Timeline.Migrations
 {
-    [DbContext(typeof(ProductionDatabaseContext))]
-    [Migration("20200105151839_RenameTimelineMember")]
-    partial class RenameTimelineMember
+    [DbContext(typeof(DatabaseContext))]
+    [Migration("20200105150407_Initialize")]
+    partial class Initialize
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("ProductVersion", "3.1.0");
 
             modelBuilder.Entity("Timeline.Entities.TimelineEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreateTime")
                         .HasColumnName("create_time")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .HasColumnName("description")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasColumnName("name")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("OwnerId")
                         .HasColumnName("owner")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Visibility")
                         .HasColumnName("visibility")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -58,15 +57,15 @@ namespace Timeline.Migrations.ProductionDatabase
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("TimelineId")
                         .HasColumnName("timeline")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("UserId")
                         .HasColumnName("user")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -82,27 +81,27 @@ namespace Timeline.Migrations.ProductionDatabase
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("AuthorId")
                         .HasColumnName("author")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
                         .HasColumnName("content")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnName("last_updated")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Time")
                         .HasColumnName("time")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("TimelineId")
                         .HasColumnName("timeline")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -118,28 +117,28 @@ namespace Timeline.Migrations.ProductionDatabase
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("EncryptedPassword")
                         .IsRequired()
                         .HasColumnName("password")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnName("name")
-                        .HasColumnType("varchar(26) CHARACTER SET utf8mb4")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(26);
 
                     b.Property<string>("RoleString")
                         .IsRequired()
                         .HasColumnName("roles")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("Version")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("version")
-                        .HasColumnType("bigint")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(0L);
 
                     b.HasKey("Id");
@@ -155,27 +154,27 @@ namespace Timeline.Migrations.ProductionDatabase
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("Data")
                         .HasColumnName("data")
-                        .HasColumnType("longblob");
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("ETag")
                         .HasColumnName("etag")
-                        .HasColumnType("varchar(30) CHARACTER SET utf8mb4")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(30);
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnName("last_modified")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
                         .HasColumnName("type")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -190,15 +189,15 @@ namespace Timeline.Migrations.ProductionDatabase
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Nickname")
                         .HasColumnName("nickname")
-                        .HasColumnType("varchar(26) CHARACTER SET utf8mb4")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(26);
 
                     b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

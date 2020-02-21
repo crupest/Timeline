@@ -8,8 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Pomelo.EntityFrameworkCore.MySql.Storage;
 using System;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
@@ -37,6 +35,12 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var workDir = Configuration.GetValue<string?>("WorkDir");
+            if (workDir == null)
+            {
+                throw new InvalidOperationException("Please set a work directory first.");
+            }
+
             services.AddControllers(setup =>
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
@@ -51,7 +55,7 @@ namespace Timeline
                 options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
             });
 
-            services.Configure<JwtConfig>(Configuration.GetSection(nameof(JwtConfig)));
+            services.Configure<JwtConfiguration>(Configuration.GetSection("Jwt"));
             services.AddAuthentication(AuthenticationConstants.Scheme)
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
@@ -79,6 +83,8 @@ namespace Timeline
                 });
             }
 
+            services.AddScoped<IPathProvider, PathProvider>();
+
             services.AddAutoMapper(GetType().Assembly);
 
             services.AddTransient<IClock, Clock>();
@@ -94,27 +100,11 @@ namespace Timeline
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-            var databaseConfig = Configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>();
-
-            if (databaseConfig.UseDevelopment)
+            services.AddDbContext<DatabaseContext>((services, options )=>
             {
-                services.AddDbContext<DatabaseContext, DevelopmentDatabaseContext>(options =>
-                {
-                    if (databaseConfig.DevelopmentConnectionString == null)
-                        throw new InvalidOperationException("DatabaseConfig.DevelopmentConnectionString is not set. Please set it as a sqlite connection string.");
-                    options.UseSqlite(databaseConfig.DevelopmentConnectionString);
-                });
-            }
-            else
-            {
-                services.AddDbContext<DatabaseContext, ProductionDatabaseContext>(options =>
-                {
-                    if (databaseConfig.ConnectionString == null)
-                        throw new InvalidOperationException("DatabaseConfig.ConnectionString is not set. Please set it as a mysql connection string.");
-                    options.UseMySql(databaseConfig.ConnectionString,
-                        mySqlOptions => mySqlOptions.ServerVersion(new ServerVersion(new Version(5, 7), ServerType.MySql)));
-                });
-            }
+                var pathProvider = services.GetRequiredService<IPathProvider>();
+                options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
+            });
         }
 
 
