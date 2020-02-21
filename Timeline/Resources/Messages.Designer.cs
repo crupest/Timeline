@@ -187,6 +187,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an unkown visibility in the query parameter &apos;visibility&apos;. .
+        /// </summary>
+        internal static string TimelineController_QueryVisibilityUnknown {
+            get {
+                return ResourceManager.GetString("TimelineController_QueryVisibilityUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Username or password is invalid..
         /// </summary>
         internal static string TokenController_Create_BadCredential {
