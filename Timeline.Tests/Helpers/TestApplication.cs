@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Timeline.Entities;
+using Timeline.Migrations;
 
 namespace Timeline.Tests.Helpers
 {
@@ -33,6 +34,11 @@ namespace Timeline.Tests.Helpers
             using (var context = new DatabaseContext(options))
             {
                 context.Database.EnsureCreated();
+                context.JwtToken.Add(new JwtTokenEntity
+                {
+                    Key = JwtTokenGenerateHelper.GenerateKey()
+                });
+                context.SaveChanges();
             }
 
             Factory = factory.WithWebHostBuilder(builder =>

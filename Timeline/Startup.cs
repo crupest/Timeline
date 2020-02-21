@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.IO;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -84,6 +83,8 @@ namespace Timeline
                 });
             }
 
+            services.AddScoped<IPathProvider, PathProvider>();
+
             services.AddAutoMapper(GetType().Assembly);
 
             services.AddTransient<IClock, Clock>();
@@ -99,10 +100,10 @@ namespace Timeline
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-            var dbConnectionString = $"Data Source={Path.Combine(workDir, "timeline.db")}";
-            services.AddDbContext<DatabaseContext>(options =>
+            services.AddDbContext<DatabaseContext>((services, options )=>
             {
-                options.UseSqlite(dbConnectionString);
+                var pathProvider = services.GetRequiredService<IPathProvider>();
+                options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
             });
         }
 

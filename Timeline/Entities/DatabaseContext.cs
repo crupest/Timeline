@@ -4,10 +4,9 @@ namespace Timeline.Entities
 {
     public class DatabaseContext : DbContext
     {
-        public DatabaseContext(DbContextOptions options)
+        public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -21,5 +20,6 @@ namespace Timeline.Entities
         public DbSet<TimelineEntity> Timelines { get; set; } = default!;
         public DbSet<TimelinePostEntity> TimelinePosts { get; set; } = default!;
         public DbSet<TimelineMemberEntity> TimelineMembers { get; set; } = default!;
+        public DbSet<JwtTokenEntity> JwtToken { get; set; } = default!;
     }
 }

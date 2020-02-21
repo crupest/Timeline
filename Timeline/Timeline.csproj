@@ -117,6 +117,11 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>UserService.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Services\UserTokenService.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>UserTokenService.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -184,6 +189,10 @@
         <EmbeddedResource Update="Resources\Services\UserService.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>UserService.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\UserTokenService.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>UserTokenService.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
 </Project>

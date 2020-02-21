@@ -3,9 +3,10 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using Timeline.Configs;
+using Timeline.Entities;
 
 namespace Timeline.Services
 {
@@ -49,16 +50,19 @@ namespace Timeline.Services
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
         private SymmetricSecurityKey _tokenSecurityKey;
 
-        public JwtUserTokenService(IOptionsMonitor<JwtConfiguration> jwtConfig, IClock clock)
+        public JwtUserTokenService(IOptionsMonitor<JwtConfiguration> jwtConfig, IClock clock, DatabaseContext database)
         {
             _jwtConfig = jwtConfig;
             _clock = clock;
 
-            _tokenSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.CurrentValue.SigningKey));
-            jwtConfig.OnChange(config =>
+            var key = database.JwtToken.Select(t => t.Key).SingleOrDefault();
+
+            if (key == null)
             {
-                _tokenSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey));
-            });
+                throw new InvalidOperationException(Resources.Services.UserTokenService.JwtKeyNotExist);
+            }
+
+            _tokenSecurityKey = new SymmetricSecurityKey(key);
         }
 
         public string GenerateToken(UserTokenInfo tokenInfo)
@@ -77,8 +81,7 @@ namespace Timeline.Services
                 Subject = identity,
                 Issuer = config.Issuer,
                 Audience = config.Audience,
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.SigningKey)), SecurityAlgorithms.HmacSha384),
+                SigningCredentials = new SigningCredentials(_tokenSecurityKey, SecurityAlgorithms.HmacSha384),
                 IssuedAt = _clock.GetCurrentTime(),
                 Expires = tokenInfo.ExpireAt.GetValueOrDefault(_clock.GetCurrentTime().AddSeconds(config.DefaultExpireOffset)),
                 NotBefore = _clock.GetCurrentTime() // I must explicitly set this or it will use the current time by default and mock is not work in which case test will not pass.

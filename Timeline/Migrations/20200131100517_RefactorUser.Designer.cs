@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timeline.Entities;
 
-namespace Timeline.Migrations.DevelopmentDatabase
+namespace Timeline.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     [Migration("20200131100517_RefactorUser")]
