@@ -6,17 +6,34 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timeline.Entities;
 
-namespace Timeline.Migrations.DevelopmentDatabase
+namespace Timeline.Migrations
 {
-    [DbContext(typeof(DevelopmentDatabaseContext))]
-    [Migration("20200131100517_RefactorUser")]
-    partial class RefactorUser
+    [DbContext(typeof(DatabaseContext))]
+    [Migration("20200221064341_AddJwtToken")]
+    partial class AddJwtToken
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1");
+                .HasAnnotation("ProductVersion", "3.1.2");
+
+            modelBuilder.Entity("Timeline.Entities.JwtTokenEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Token")
+                        .IsRequired()
+                        .HasColumnName("token")
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("jwt_token");
+                });
 
             modelBuilder.Entity("Timeline.Entities.TimelineEntity", b =>
                 {
