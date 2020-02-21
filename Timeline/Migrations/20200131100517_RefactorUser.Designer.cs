@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timeline.Entities;
 
 namespace Timeline.Migrations.DevelopmentDatabase
 {
-    [DbContext(typeof(DevelopmentDatabaseContext))]
-    partial class DevelopmentDatabaseContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DatabaseContext))]
+    [Migration("20200131100517_RefactorUser")]
+    partial class RefactorUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

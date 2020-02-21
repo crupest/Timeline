@@ -1,6 +1,6 @@
-namespace Timeline.Configs
+﻿namespace Timeline.Configs
 {
-    public class JwtConfig
+    public class JwtConfiguration
     {
         public string Issuer { get; set; } = default!;
         public string Audience { get; set; } = default!;
