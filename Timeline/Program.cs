@@ -13,10 +13,6 @@ namespace Timeline
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args)
-            .ConfigureAppConfiguration((context, config) =>
-            {
-                config.AddEnvironmentVariables("TIMELINE_");
-            })
             .Build().Run();
         }
 
