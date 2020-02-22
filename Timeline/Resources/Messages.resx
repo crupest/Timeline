@@ -159,6 +159,9 @@
   <data name="TimelineController_QueryRelateNotExist" xml:space="preserve">
     <value>The user specified by query param "relate" does not exist.</value>
   </data>
+  <data name="TimelineController_QueryVisibilityUnknown" xml:space="preserve">
+    <value>'{0}' is an unkown visibility in the query parameter 'visibility'. </value>
+  </data>
   <data name="TokenController_Create_BadCredential" xml:space="preserve">
     <value>Username or password is invalid.</value>
   </data>
