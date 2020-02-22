@@ -251,11 +251,12 @@ namespace Timeline.Services
         /// Get all timelines including personal timelines.
         /// </summary>
         /// <param name="relate">Filter timelines related (own or is a member) to specific user.</param>
+        /// <param name="visibility">Filter timelines with given visibility. If null or empty, all visibilities are returned. Duplicate value are ignored.</param>
         /// <returns>The list of timelines.</returns>
         /// <remarks>
         /// If user with related user id does not exist, empty list will be returned.
         /// </remarks>
-        Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null);
+        Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null);
 
         /// <summary>
         /// Create a timeline.
@@ -647,13 +648,24 @@ namespace Timeline.Services
             }
         }
 
-        public async Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null)
+        public async Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
         {
             List<TimelineEntity> entities;
 
+            IQueryable<TimelineEntity> ApplyTimelineVisibilityFilter(IQueryable<TimelineEntity> query)
+            {
+                if (visibility != null && visibility.Count != 0)
+                {
+                    return query.Where(t => visibility.Contains(t.Visibility));
+                }
+                return query;
+            }
+
+            bool allVisibilities = visibility == null || visibility.Count == 0;
+
             if (relate == null)
             {
-                entities = await Database.Timelines.Include(t => t.Members).ToListAsync();
+                entities = await ApplyTimelineVisibilityFilter(Database.Timelines).Include(t => t.Members).ToListAsync();
             }
             else
             {
@@ -661,12 +673,12 @@ namespace Timeline.Services
 
                 if ((relate.Type & TimelineUserRelationshipType.Own) != 0)
                 {
-                    entities.AddRange(await Database.Timelines.Where(t => t.OwnerId == relate.UserId && t.Name != null).Include(t => t.Members).ToListAsync());
+                    entities.AddRange(await ApplyTimelineVisibilityFilter(Database.Timelines.Where(t => t.OwnerId == relate.UserId)).Include(t => t.Members).ToListAsync());
                 }
 
                 if ((relate.Type & TimelineUserRelationshipType.Join) != 0)
                 {
-                    entities.AddRange(await Database.TimelineMembers.Where(m => m.UserId == relate.UserId).Include(m => m.Timeline).ThenInclude(t => t.Members).Select(m => m.Timeline).ToListAsync());
+                    entities.AddRange(await ApplyTimelineVisibilityFilter(Database.TimelineMembers.Where(m => m.UserId == relate.UserId).Include(m => m.Timeline).ThenInclude(t => t.Members).Select(m => m.Timeline)).ToListAsync());
                 }
             }
 

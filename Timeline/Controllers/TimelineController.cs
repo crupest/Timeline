@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -29,8 +30,37 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("timelines")]
-        public async Task<ActionResult<List<TimelineInfo>>> TimelineList([FromQuery][Username] string? relate, [FromQuery][RegularExpression("(own)|(join)")] string? relateType)
+        public async Task<ActionResult<List<TimelineInfo>>> TimelineList([FromQuery][Username] string? relate, [FromQuery][RegularExpression("(own)|(join)")] string? relateType, [FromQuery] string? visibility)
         {
+            List<TimelineVisibility>? visibilityFilter = null;
+            if (visibility != null)
+            {
+                visibilityFilter = new List<TimelineVisibility>();
+                var items = visibility.Split('|');
+                foreach (var item in items)
+                {
+                    if (item.Equals(nameof(TimelineVisibility.Private), StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!visibilityFilter.Contains(TimelineVisibility.Private))
+                            visibilityFilter.Add(TimelineVisibility.Private);
+                    }
+                    else if (item.Equals(nameof(TimelineVisibility.Register), StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!visibilityFilter.Contains(TimelineVisibility.Register))
+                            visibilityFilter.Add(TimelineVisibility.Register);
+                    }
+                    else if (item.Equals(nameof(TimelineVisibility.Public), StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!visibilityFilter.Contains(TimelineVisibility.Public))
+                            visibilityFilter.Add(TimelineVisibility.Public);
+                    }
+                    else
+                    {
+                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_QueryVisibilityUnknown, item));
+                    }
+                }
+            }
+
             TimelineUserRelationship? relationship = null;
             if (relate != null)
             {
@@ -51,7 +81,7 @@ namespace Timeline.Controllers
                 }
             }
 
-            var result = await _service.GetTimelines(relationship);
+            var result = await _service.GetTimelines(relationship, visibilityFilter);
             result.ForEach(t => t.FillLinks(Url));
             return Ok(result);
         }
