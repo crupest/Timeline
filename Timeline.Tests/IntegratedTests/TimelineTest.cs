@@ -316,6 +316,62 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
+        public async Task TimelineDelete_Should_Work()
+        {
+            await CreateTestTimelines();
+
+            {
+                using var client = await CreateDefaultClient();
+                var res = await client.DeleteAsync("timelines/t1");
+                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+            }
+
+            {
+                using var client = await CreateClientAs(2);
+                var res = await client.DeleteAsync("timelines/t1");
+                res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+            }
+
+            {
+                using var client = await CreateClientAsAdministrator();
+
+                {
+                    var res = await client.DeleteAsync("timelines/!!!");
+                    res.Should().BeInvalidModel();
+                }
+
+                {
+                    var res = await client.DeleteAsync("timelines/t2");
+                    res.Should().BeDelete(true);
+                }
+
+                {
+                    var res = await client.DeleteAsync("timelines/t2");
+                    res.Should().BeDelete(false);
+                }
+            }
+
+            {
+                using var client = await CreateClientAs(1);
+
+                {
+                    var res = await client.DeleteAsync("timelines/!!!");
+                    res.Should().BeInvalidModel();
+                }
+
+                {
+                    var res = await client.DeleteAsync("timelines/t1");
+                    res.Should().BeDelete(true);
+                }
+
+                {
+                    var res = await client.DeleteAsync("timelines/t1");
+                    res.Should().HaveStatusCode(HttpStatusCode.NotFound);
+                }
+            }
+        }
+
+        [Fact]
         public async Task InvalidModel_BadName()
         {
             using var client = await CreateClientAsAdministrator();

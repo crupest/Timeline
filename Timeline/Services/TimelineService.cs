@@ -269,6 +269,15 @@ namespace Timeline.Services
         /// <exception cref="ConflictException">Thrown when the timeline already exists.</exception>
         /// <exception cref="UserNotExistException">Thrown when the owner user does not exist.</exception>
         Task<TimelineInfo> CreateTimeline(string name, long owner);
+
+        /// <summary>
+        /// Delete a timeline.
+        /// </summary>
+        /// <param name="name">The name of the timeline.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
+        /// <exception cref="TimelineNotExistException">Thrown when the timeline does not exist.</exception>
+        Task DeleteTimeline(string name);
     }
 
     public interface IPersonalTimelineService : IBaseTimelineService
@@ -732,6 +741,22 @@ namespace Timeline.Services
                 Visibility = newEntity.Visibility,
                 Members = new List<UserInfo>()
             };
+        }
+
+        public async Task DeleteTimeline(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            ValidateTimelineName(name, nameof(name));
+
+            var entity = await Database.Timelines.Where(t => t.Name == name).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new TimelineNotExistException(name);
+
+            Database.Timelines.Remove(entity);
+            await Database.SaveChangesAsync();
         }
     }
 
