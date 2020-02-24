@@ -206,5 +206,25 @@ namespace Timeline.Controllers
                 return BadRequest(ErrorResponse.TimelineCommon.NameConflict());
             }
         }
+
+        [HttpDelete("timelines/{name}")]
+        [Authorize]
+        public async Task<ActionResult<TimelineInfo>> TimelineDelete([FromRoute][TimelineName] string name)
+        {
+            if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
+
+            try
+            {
+                await _service.DeleteTimeline(name);
+                return Ok(CommonDeleteResponse.Delete());
+            }
+            catch (TimelineNotExistException)
+            {
+                return Ok(CommonDeleteResponse.NotExist());
+            }
+        }
     }
 }
