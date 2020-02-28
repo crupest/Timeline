@@ -17,7 +17,7 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Column("username"), MaxLength(26), Required]
+        [Column("username"), Required]
         public string Username { get; set; } = default!;
 
         [Column("password"), Required]
@@ -29,7 +29,7 @@ namespace Timeline.Entities
         [Column("version"), Required]
         public long Version { get; set; }
 
-        [Column("nickname"), MaxLength(100)]
+        [Column("nickname")]
         public string? Nickname { get; set; }
 
         public UserAvatarEntity? Avatar { get; set; }
