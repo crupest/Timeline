@@ -10,6 +10,9 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [Column("local_id")]
+        public long LocalId { get; set; }
+
         [Column("timeline")]
         public long TimelineId { get; set; }
 
