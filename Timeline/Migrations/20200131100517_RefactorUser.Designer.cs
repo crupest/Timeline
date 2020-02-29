@@ -125,8 +125,7 @@ namespace Timeline.Migrations
 
                     b.Property<string>("ETag")
                         .HasColumnName("etag")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(30);
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnName("last_modified")
@@ -157,8 +156,7 @@ namespace Timeline.Migrations
 
                     b.Property<string>("Nickname")
                         .HasColumnName("nickname")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(100);
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -173,8 +171,7 @@ namespace Timeline.Migrations
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnName("username")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(26);
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("Version")
                         .ValueGeneratedOnAdd()
