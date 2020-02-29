@@ -14,7 +14,7 @@ namespace Timeline.Models.Validation
                 return (false, MessageEmptyString);
             }
 
-            if (value.Length > 26)
+            if (value.Length > MaxLength)
             {
                 return (false, MessageTooLong);
             }

@@ -12,7 +12,6 @@ namespace Timeline.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "nickname",
                 table: "users",
-                maxLength: 100,
                 nullable: true);
 
             migrationBuilder.Sql(@"
