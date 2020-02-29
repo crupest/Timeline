@@ -309,6 +309,7 @@ namespace Timeline.Services
         {
             return new TimelineEntity
             {
+                CurrentPostLocalId = 0,
                 Name = name,
                 OwnerId = owner,
                 Visibility = TimelineVisibility.Register,
@@ -386,7 +387,7 @@ namespace Timeline.Services
                     var author = Mapper.Map<UserInfo>(await UserService.GetUserById(entity.AuthorId));
                     posts.Add(new TimelinePostInfo
                     {
-                        Id = entity.Id,
+                        Id = entity.LocalId,
                         Content = entity.Content,
                         Author = author,
                         Time = entity.Time,
@@ -405,13 +406,18 @@ namespace Timeline.Services
                 throw new ArgumentNullException(nameof(content));
 
             var timelineId = await FindTimelineId(name);
+            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+
             var author = Mapper.Map<UserInfo>(await UserService.GetUserById(authorId));
 
             var currentTime = Clock.GetCurrentTime();
             var finalTime = time ?? currentTime;
 
+            timelineEntity.CurrentPostLocalId += 1;
+
             var postEntity = new TimelinePostEntity
             {
+                LocalId = timelineEntity.CurrentPostLocalId,
                 Content = content,
                 AuthorId = authorId,
                 TimelineId = timelineId,
@@ -423,7 +429,7 @@ namespace Timeline.Services
 
             return new TimelinePostInfo
             {
-                Id = postEntity.Id,
+                Id = postEntity.LocalId,
                 Content = content,
                 Author = author,
                 Time = finalTime,
@@ -436,10 +442,9 @@ namespace Timeline.Services
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            // Currently we don't use the result. But we need to check the timeline.
-            var _ = await FindTimelineId(name);
+            var timelineId = await FindTimelineId(name);
 
-            var post = await Database.TimelinePosts.Where(p => p.Id == id).SingleOrDefaultAsync();
+            var post = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == id).SingleOrDefaultAsync();
 
             if (post == null)
                 throw new TimelinePostNotExistException(id);

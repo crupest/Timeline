@@ -23,9 +23,9 @@ namespace Timeline.Migrations
                         .HasColumnName("id")
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("Token")
+                    b.Property<byte[]>("Key")
                         .IsRequired()
-                        .HasColumnName("token")
+                        .HasColumnName("key")
                         .HasColumnType("BLOB");
 
                     b.HasKey("Id");
@@ -43,6 +43,10 @@ namespace Timeline.Migrations
                     b.Property<DateTime>("CreateTime")
                         .HasColumnName("create_time")
                         .HasColumnType("TEXT");
+
+                    b.Property<long>("CurrentPostLocalId")
+                        .HasColumnName("current_post_local_id")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
                         .HasColumnName("description")
@@ -109,6 +113,10 @@ namespace Timeline.Migrations
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnName("last_updated")
                         .HasColumnType("TEXT");
+
+                    b.Property<long>("LocalId")
+                        .HasColumnName("local_id")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Time")
                         .HasColumnName("time")

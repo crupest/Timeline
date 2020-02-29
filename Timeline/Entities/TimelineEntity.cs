@@ -35,6 +35,9 @@ namespace Timeline.Entities
         [Column("create_time")]
         public DateTime CreateTime { get; set; }
 
+        [Column("current_post_local_id")]
+        public long CurrentPostLocalId { get; set; }
+
         public List<TimelineMemberEntity> Members { get; set; } = default!;
 
         public List<TimelinePostEntity> Posts { get; set; } = default!;
