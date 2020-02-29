@@ -17,7 +17,7 @@ namespace Timeline.Entities
         [Column("type")]
         public string? Type { get; set; }
 
-        [Column("etag"), MaxLength(30)]
+        [Column("etag")]
         public string? ETag { get; set; }
 
         [Column("last_modified"), Required]

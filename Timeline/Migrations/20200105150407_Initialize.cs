@@ -13,7 +13,7 @@ namespace Timeline.Migrations
                 {
                     id = table.Column<long>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    name = table.Column<string>(maxLength: 26, nullable: false),
+                    name = table.Column<string>(nullable: false),
                     password = table.Column<string>(nullable: false),
                     roles = table.Column<string>(nullable: false),
                     version = table.Column<long>(nullable: false, defaultValue: 0L)
@@ -55,7 +55,7 @@ namespace Timeline.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     data = table.Column<byte[]>(nullable: true),
                     type = table.Column<string>(nullable: true),
-                    etag = table.Column<string>(maxLength: 30, nullable: true),
+                    etag = table.Column<string>(nullable: true),
                     last_modified = table.Column<DateTime>(nullable: false),
                     UserId = table.Column<long>(nullable: false)
                 },
@@ -76,7 +76,7 @@ namespace Timeline.Migrations
                 {
                     id = table.Column<long>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    nickname = table.Column<string>(maxLength: 26, nullable: true),
+                    nickname = table.Column<string>(nullable: true),
                     UserId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
