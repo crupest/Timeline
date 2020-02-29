@@ -39,6 +39,7 @@ namespace Timeline.Tests
         [InlineData("!")]
         [InlineData("!abc")]
         [InlineData("ab c")]
+        [InlineData("ab c！")] // This is a chinese ! .
         public void BadCharactor(string value)
         {
             FailAndMessage(value).Should().ContainEquivalentOf("invalid")
@@ -61,6 +62,7 @@ namespace Timeline.Tests
         [InlineData("a-bc")]
         [InlineData("a-b-c")]
         [InlineData("a-b_c")]
+        [InlineData("a-你好_c")]
         public void Success(string value)
         {
             var (result, _) = _validator.Validate(value);
