@@ -164,7 +164,7 @@ namespace Timeline.Services
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
         private readonly IUserAvatarValidator _avatarValidator;
 
-        private readonly IETagGenerator _eTagGenerator;
+        private readonly IDataManager _dataManager;
 
         private readonly IClock _clock;
 
@@ -173,20 +173,20 @@ namespace Timeline.Services
             DatabaseContext database,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
             IUserAvatarValidator avatarValidator,
-            IETagGenerator eTagGenerator,
+            IDataManager dataManager,
             IClock clock)
         {
             _logger = logger;
             _database = database;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
             _avatarValidator = avatarValidator;
-            _eTagGenerator = eTagGenerator;
+            _dataManager = dataManager;
             _clock = clock;
         }
 
         public async Task<string> GetAvatarETag(long id)
         {
-            var eTag = (await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.ETag }).SingleOrDefaultAsync())?.ETag;
+            var eTag = (await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.DataTag }).SingleOrDefaultAsync())?.DataTag;
             if (eTag == null)
                 return await _defaultUserAvatarProvider.GetDefaultAvatarETag();
             else
@@ -195,25 +195,27 @@ namespace Timeline.Services
 
         public async Task<AvatarInfo> GetAvatar(long id)
         {
-            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.Type, a.Data, a.LastModified }).SingleOrDefaultAsync();
+            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.Type, a.DataTag, a.LastModified }).SingleOrDefaultAsync();
 
             if (avatarEntity != null)
             {
-                if (!LanguageHelper.AreSame(avatarEntity.Data == null, avatarEntity.Type == null))
+                if (!LanguageHelper.AreSame(avatarEntity.DataTag == null, avatarEntity.Type == null))
                 {
                     var message = Resources.Services.UserAvatarService.ExceptionDatabaseCorruptedDataAndTypeNotSame;
                     _logger.LogCritical(message);
                     throw new DatabaseCorruptedException(message);
                 }
 
-                if (avatarEntity.Data != null)
+
+                if (avatarEntity.DataTag != null)
                 {
+                    var data = await _dataManager.GetEntry(avatarEntity.DataTag);
                     return new AvatarInfo
                     {
                         Avatar = new Avatar
                         {
                             Type = avatarEntity.Type!,
-                            Data = avatarEntity.Data
+                            Data = data
                         },
                         LastModified = avatarEntity.LastModified
                     };
@@ -239,15 +241,15 @@ namespace Timeline.Services
 
             if (avatar == null)
             {
-                if (avatarEntity == null || avatarEntity.Data == null)
+                if (avatarEntity == null || avatarEntity.DataTag == null)
                 {
                     return;
                 }
                 else
                 {
-                    avatarEntity.Data = null;
+                    await _dataManager.FreeEntry(avatarEntity.DataTag);
+                    avatarEntity.DataTag = null;
                     avatarEntity.Type = null;
-                    avatarEntity.ETag = null;
                     avatarEntity.LastModified = _clock.GetCurrentTime();
                     await _database.SaveChangesAsync();
                     _logger.LogInformation(Resources.Services.UserAvatarService.LogUpdateEntity);
@@ -256,24 +258,26 @@ namespace Timeline.Services
             else
             {
                 await _avatarValidator.Validate(avatar);
+                var oldTag = avatarEntity?.DataTag;
                 var create = avatarEntity == null;
-                if (create)
+                if (avatarEntity == null)
                 {
                     avatarEntity = new UserAvatarEntity();
-                }
-                avatarEntity!.Type = avatar.Type;
-                avatarEntity.Data = avatar.Data;
-                avatarEntity.ETag = await _eTagGenerator.Generate(avatar.Data);
-                avatarEntity.LastModified = _clock.GetCurrentTime();
-                avatarEntity.UserId = id;
-                if (create)
-                {
                     _database.UserAvatars.Add(avatarEntity);
                 }
+                var tag = await _dataManager.RetainEntry(avatar.Data);
+                avatarEntity.DataTag = tag;
+                avatarEntity.Type = avatar.Type;
+                avatarEntity.LastModified = _clock.GetCurrentTime();
+                avatarEntity.UserId = id;
                 await _database.SaveChangesAsync();
                 _logger.LogInformation(create ?
                     Resources.Services.UserAvatarService.LogCreateEntity
                     : Resources.Services.UserAvatarService.LogUpdateEntity);
+                if (oldTag != null)
+                {
+                    await _dataManager.FreeEntry(oldTag);
+                }
             }
         }
     }
@@ -282,7 +286,6 @@ namespace Timeline.Services
     {
         public static void AddUserAvatarService(this IServiceCollection services)
         {
-            services.TryAddTransient<IETagGenerator, ETagGenerator>();
             services.AddScoped<IUserAvatarService, UserAvatarService>();
             services.AddSingleton<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
             services.AddTransient<IUserAvatarValidator, UserAvatarValidator>();
