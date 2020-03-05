@@ -115,7 +115,7 @@ namespace Timeline.Services
             var entity = await _database.Data.Where(d => d.Tag == tag).Select(d => new { d.Data }).SingleOrDefaultAsync();
 
             if (entity == null)
-                throw new InvalidOperationException("Entry with given tag does not exist.");
+                throw new InvalidOperationException(Resources.Services.DataManager.ExceptionEntryNotExist);
 
             return entity.Data;
         }

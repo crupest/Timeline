@@ -97,6 +97,11 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Validator.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Services\DataManager.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>DataManager.resx</DependentUpon>
+        </Compile>
         <Compile Update="Resources\Services\Exception.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -173,6 +178,10 @@
         <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Validator.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Services\DataManager.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>DataManager.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\Exception.resx">
             <Generator>ResXFileCodeGenerator</Generator>

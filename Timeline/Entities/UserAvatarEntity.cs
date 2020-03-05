@@ -11,14 +11,11 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Column("data")]
-        public byte[]? Data { get; set; }
+        [Column("data_tag")]
+        public string? DataTag { get; set; }
 
         [Column("type")]
         public string? Type { get; set; }
-
-        [Column("etag")]
-        public string? ETag { get; set; }
 
         [Column("last_modified"), Required]
         public DateTime LastModified { get; set; }
