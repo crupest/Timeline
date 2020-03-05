@@ -1,37 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Timeline.Entities;
 
 namespace Timeline.Services
 {
-    public class DataEntry
-    {
-#pragma warning disable CA1819 // Properties should not return arrays
-        public byte[] Data { get; set; } = default!;
-#pragma warning restore CA1819 // Properties should not return arrays
-        public DataInfo Info { get; set; } = default!;
-    }
-
-    public class DataInfo
-    {
-        public DateTime Time { get; set; }
-        public string Type { get; set; } = default!;
-    }
-
     /// <summary>
-    /// A data manager controling data.
+    /// A data manager controlling data.
     /// </summary>
     /// <remarks>
-    /// All data to be saved will be checked identity.
     /// Identical data will be saved as one copy and return the same tag.
-    /// Every data has a ref count. When data is saved, ref count increase.
-    /// When data is removed, ref count decease. If ref count is decreased
+    /// Every data has a ref count. When data is retained, ref count increase.
+    /// When data is freed, ref count decease. If ref count is decreased
     /// to 0, the data entry will be destroyed and no longer occupy space.
-    /// 
-    /// Type is just an attached attribute for convenience and not participate
-    /// in identity verification. This should be only used to save blobs but not
-    /// strings. It will be rare for identity blob with different type, I think.
     /// </remarks>
     public interface IDataManager
     {
@@ -40,11 +22,9 @@ namespace Timeline.Services
         /// increases its ref count and returns a tag to the entry.
         /// </summary>
         /// <param name="data">The data. Can't be null.</param>
-        /// <param name="type">The type of the data. Can't be null.</param>
         /// <returns>The tag of the created entry.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> or <paramref name="type"/> is null.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when a saved copy of data already exists but type is different.</exception>
-        public Task<string> RetainEntry(byte[] data, string type);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
+        public Task<string> RetainEntry(byte[] data);
 
         /// <summary>
         /// Decrease the the ref count of the entry.
@@ -61,19 +41,83 @@ namespace Timeline.Services
         /// Retrieve the entry with given tag.
         /// </summary>
         /// <param name="tag">The tag of the entry.</param>
-        /// <returns>The entry.</returns>
+        /// <returns>The data of the entry.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="tag"/> is null.</exception>
         /// <exception cref="InvalidOperationException">Thrown when entry with given tag does not exist.</exception>
-        public Task<DataEntry> GetEntry(string tag);
-
-        /// <summary>
-        /// Retrieve info of the entry with given tag.
-        /// </summary>
-        /// <param name="tag">The tag of the entry.</param>
-        /// <returns>The entry info.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="tag"/> is null.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when entry with given tag does not exist.</exception>
-        public Task<DataInfo> GetEntryInfo(string tag);
+        public Task<byte[]> GetEntry(string tag);
     }
 
+    public class DataManager : IDataManager
+    {
+        private readonly DatabaseContext _database;
+        private readonly IETagGenerator _eTagGenerator;
+
+        public DataManager(DatabaseContext database, IETagGenerator eTagGenerator)
+        {
+            _database = database;
+            _eTagGenerator = eTagGenerator;
+        }
+
+        public async Task<string> RetainEntry(byte[] data)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            var tag = await _eTagGenerator.Generate(data);
+
+            var entity = await _database.Data.Where(d => d.Tag == tag).SingleOrDefaultAsync();
+
+            if (entity == null)
+            {
+                entity = new DataEntity
+                {
+                    Tag = tag,
+                    Data = data,
+                    Ref = 1
+                };
+                _database.Data.Add(entity);
+                await _database.SaveChangesAsync();
+            }
+            else
+            {
+                entity.Ref += 1;
+                await _database.SaveChangesAsync();
+            }
+            return tag;
+        }
+
+        public async Task FreeEntry(string tag)
+        {
+            if (tag == null)
+                throw new ArgumentNullException(nameof(tag));
+
+            var entity = await _database.Data.Where(d => d.Tag == tag).SingleOrDefaultAsync();
+
+            if (entity != null)
+            {
+                if (entity.Ref == 1)
+                {
+                    _database.Data.Remove(entity);
+                }
+                else
+                {
+                    entity.Ref -= 1;
+                }
+                await _database.SaveChangesAsync();
+            }
+        }
+
+        public async Task<byte[]> GetEntry(string tag)
+        {
+            if (tag == null)
+                throw new ArgumentNullException(nameof(tag));
+
+            var entity = await _database.Data.Where(d => d.Tag == tag).Select(d => new { d.Data }).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new InvalidOperationException("Entry with given tag does not exist.");
+
+            return entity.Data;
+        }
+    }
 }
