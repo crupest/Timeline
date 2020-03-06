@@ -7,6 +7,10 @@
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="Migrations\20200306101428_AddDataTable.cs" />
+      <Compile Remove="Migrations\20200306101428_AddDataTable.Designer.cs" />
+    </ItemGroup>
 
     <ItemGroup>
         <Content Include="default-avatar.png">

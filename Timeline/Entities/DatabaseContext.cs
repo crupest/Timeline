@@ -13,6 +13,7 @@ namespace Timeline.Entities
         {
             modelBuilder.Entity<UserEntity>().Property(e => e.Version).HasDefaultValue(0);
             modelBuilder.Entity<UserEntity>().HasIndex(e => e.Username).IsUnique();
+            modelBuilder.Entity<DataEntity>().HasIndex(e => e.Tag).IsUnique();
         }
 
         public DbSet<UserEntity> Users { get; set; } = default!;
