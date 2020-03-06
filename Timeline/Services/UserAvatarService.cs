@@ -53,7 +53,7 @@ namespace Timeline.Services
         /// Validate a avatar's format and size info.
         /// </summary>
         /// <param name="avatar">The avatar to validate.</param>
-        /// <exception cref="AvatarFormatException">Thrown when validation failed.</exception>
+        /// <exception cref="ImageException">Thrown when validation failed.</exception>
         Task Validate(Avatar avatar);
     }
 
@@ -79,7 +79,7 @@ namespace Timeline.Services
         /// <param name="id">The id of the user to set avatar for.</param>
         /// <param name="avatar">The avatar. Can be null to delete the saved avatar.</param>
         /// <exception cref="ArgumentException">Thrown if any field in <paramref name="avatar"/> is null when <paramref name="avatar"/> is not null.</exception>
-        /// <exception cref="AvatarFormatException">Thrown if avatar is of bad format.</exception>
+        /// <exception cref="ImageException">Thrown if avatar is of bad format.</exception>
         Task SetAvatar(long id, Avatar? avatar);
     }
 
@@ -134,23 +134,13 @@ namespace Timeline.Services
 
     public class UserAvatarValidator : IUserAvatarValidator
     {
+        private readonly ImageValidator _innerValidator = new ImageValidator(true);
+
         public Task Validate(Avatar avatar)
         {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    using var image = Image.Load(avatar.Data, out IImageFormat format);
-                    if (!format.MimeTypes.Contains(avatar.Type))
-                        throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.UnmatchedFormat);
-                    if (image.Width != image.Height)
-                        throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.BadSize);
-                }
-                catch (UnknownImageFormatException e)
-                {
-                    throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.CantDecode, e);
-                }
-            });
+            if (avatar == null)
+                throw new ArgumentNullException(nameof(avatar));
+            return _innerValidator.Validate(avatar.Data, avatar.Type);
         }
     }
 

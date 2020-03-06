@@ -90,14 +90,14 @@ namespace Timeline.Services
         Task<List<TimelinePostInfo>> GetPosts(string name);
 
         /// <summary>
-        /// Create a new post in timeline.
+        /// Create a new text post in timeline.
         /// </summary>
         /// <param name="name">Username or the timeline name. See remarks of <ssee cref="IBaseTimelineService"/>.</param>
         /// <param name="authorId">The author's id.</param>
-        /// <param name="content">The content.</param>
+        /// <param name="text">The content text.</param>
         /// <param name="time">The time of the post. If null, then use current time.</param>
         /// <returns>The info of the created post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="content"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="text"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
         /// <exception cref="TimelineNotExistException">
         /// Thrown when timeline does not exist.
@@ -106,7 +106,27 @@ namespace Timeline.Services
         /// and the inner exception should be a <see cref="UserNotExistException"/>.
         /// </exception>
         /// <exception cref="UserNotExistException">Thrown if user with <paramref name="authorId"/> does not exist.</exception>
-        Task<TimelinePostInfo> CreatePost(string name, long authorId, string content, DateTime? time);
+        Task<TimelinePostInfo> CreateTextPost(string name, long authorId, string text, DateTime? time);
+
+        /// <summary>
+        /// Create a new image post in timeline.
+        /// </summary>
+        /// <param name="name">Username or the timeline name. See remarks of <ssee cref="IBaseTimelineService"/>.</param>
+        /// <param name="authorId">The author's id.</param>
+        /// <param name="data">The image data.</param>
+        /// <param name="time">The time of the post. If null, then use current time.</param>
+        /// <returns>The info of the created post.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="text"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline does not exist.
+        /// For normal timeline, it means the name does not exist.
+        /// For personal timeline, it means the user of that username does not exist
+        /// and the inner exception should be a <see cref="UserNotExistException"/>.
+        /// </exception>
+        /// <exception cref="UserNotExistException">Thrown if user with <paramref name="authorId"/> does not exist.</exception>
+        /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
+        Task<TimelinePostInfo> CreateImagePost(string name, long authorId, byte[] data, DateTime? time);
 
         /// <summary>
         /// Delete a post
@@ -398,12 +418,12 @@ namespace Timeline.Services
             return posts;
         }
 
-        public async Task<TimelinePostInfo> CreatePost(string name, long authorId, string content, DateTime? time)
+        public async Task<TimelinePostInfo> CreateTextPost(string name, long authorId, string text, DateTime? time)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
 
             var timelineId = await FindTimelineId(name);
             var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
@@ -418,7 +438,8 @@ namespace Timeline.Services
             var postEntity = new TimelinePostEntity
             {
                 LocalId = timelineEntity.CurrentPostLocalId,
-                Content = content,
+                ContentType = TimelinePostContentTypes.Text,
+                Content = text,
                 AuthorId = authorId,
                 TimelineId = timelineId,
                 Time = finalTime,
@@ -430,7 +451,7 @@ namespace Timeline.Services
             return new TimelinePostInfo
             {
                 Id = postEntity.LocalId,
-                Content = content,
+                Content = text,
                 Author = author,
                 Time = finalTime,
                 LastUpdated = currentTime

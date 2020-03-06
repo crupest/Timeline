@@ -25,6 +25,9 @@ namespace Timeline.Entities
         [ForeignKey(nameof(AuthorId))]
         public UserEntity Author { get; set; } = default!;
 
+        [Column("content_type"), Required]
+        public string ContentType { get; set; } = default!;
+
         [Column("content")]
         public string? Content { get; set; }
 
