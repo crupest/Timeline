@@ -93,6 +93,10 @@ namespace Timeline
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserTokenService, JwtUserTokenService>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
+
+            services.AddScoped<IETagGenerator, ETagGenerator>();
+            services.AddScoped<IDataManager, DataManager>();
+
             services.AddUserAvatarService();
 
             services.AddScoped<ITimelineService, TimelineService>();

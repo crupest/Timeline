@@ -76,13 +76,12 @@ namespace Timeline.Services
                     Ref = 1
                 };
                 _database.Data.Add(entity);
-                await _database.SaveChangesAsync();
             }
             else
             {
                 entity.Ref += 1;
-                await _database.SaveChangesAsync();
             }
+            await _database.SaveChangesAsync();
             return tag;
         }
 
