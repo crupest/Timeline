@@ -258,6 +258,7 @@ namespace Timeline.Services
             else
             {
                 await _avatarValidator.Validate(avatar);
+                var tag = await _dataManager.RetainEntry(avatar.Data);
                 var oldTag = avatarEntity?.DataTag;
                 var create = avatarEntity == null;
                 if (avatarEntity == null)
@@ -265,7 +266,6 @@ namespace Timeline.Services
                     avatarEntity = new UserAvatarEntity();
                     _database.UserAvatars.Add(avatarEntity);
                 }
-                var tag = await _dataManager.RetainEntry(avatar.Data);
                 avatarEntity.DataTag = tag;
                 avatarEntity.Type = avatar.Type;
                 avatarEntity.LastModified = _clock.GetCurrentTime();
@@ -287,7 +287,7 @@ namespace Timeline.Services
         public static void AddUserAvatarService(this IServiceCollection services)
         {
             services.AddScoped<IUserAvatarService, UserAvatarService>();
-            services.AddSingleton<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
+            services.AddScoped<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
             services.AddTransient<IUserAvatarValidator, UserAvatarValidator>();
         }
     }
