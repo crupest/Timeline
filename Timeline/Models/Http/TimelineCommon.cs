@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Timeline.Controllers;
 
 namespace Timeline.Models.Http
@@ -21,10 +22,42 @@ namespace Timeline.Models.Http
         Private
     }
 
+    public static class TimelinePostContentTypes
+    {
+        public const string Text = "text";
+        public const string Image = "image";
+    }
+
+    public interface ITimelinePostContent
+    {
+        public string Type { get; }
+    }
+
+    public class TextTimelinePostContent : ITimelinePostContent
+    {
+        public TextTimelinePostContent() { }
+        public TextTimelinePostContent(string text) { Text = text; }
+
+        public string Type { get; } = TimelinePostContentTypes.Text;
+        public string Text { get; set; } = "";
+    }
+
+    public class ImageTimelinePostContent : ITimelinePostContent
+    {
+        public ImageTimelinePostContent() { }
+        public ImageTimelinePostContent(string dataTag) { DataTag = dataTag; }
+
+        public string Type { get; } = TimelinePostContentTypes.Image;
+        [JsonIgnore]
+        public string DataTag { get; set; } = "";
+        public string? Url { get; set; } = null;
+    }
+
     public class TimelinePostInfo
     {
         public long Id { get; set; }
-        public string Content { get; set; } = default!;
+        // use object to make json serializer use the runtime type
+        public object Content { get; set; } = default!;
         public DateTime Time { get; set; }
         public UserInfo Author { get; set; } = default!;
         public DateTime LastUpdated { get; set; } = default!;
