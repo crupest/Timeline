@@ -97,6 +97,8 @@ namespace Timeline
             services.AddScoped<IETagGenerator, ETagGenerator>();
             services.AddScoped<IDataManager, DataManager>();
 
+            services.AddScoped<IImageValidator, ImageValidator>();
+
             services.AddUserAvatarService();
 
             services.AddScoped<ITimelineService, TimelineService>();
