@@ -32,6 +32,14 @@ namespace Timeline.Services
         public long UserId { get; set; }
     }
 
+    public class DataWithType
+    {
+#pragma warning disable CA1819 // Properties should not return arrays
+        public byte[] Data { get; set; } = default!;
+#pragma warning restore CA1819 // Properties should not return arrays
+        public string Type { get; set; } = default!;
+    }
+
     /// <summary>
     /// This define the common interface of both personal timeline
     /// and normal timeline.
@@ -88,6 +96,21 @@ namespace Timeline.Services
         /// and the inner exception should be a <see cref="UserNotExistException"/>.
         /// </exception>
         Task<List<TimelinePostInfo>> GetPosts(string name);
+
+        /// <summary>
+        /// Get the data of a post.
+        /// </summary>
+        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="postId">The id of the post.</param>
+        /// <returns>The data and its type.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when post has no data. See remarks.</exception>
+        /// <remarks>
+        /// Use this method to retrieve the image of image post.
+        /// </remarks>
+        Task<DataWithType> GetPostData(string name, long postId);
 
         /// <summary>
         /// Create a new text post in timeline.
@@ -307,10 +330,12 @@ namespace Timeline.Services
 
     public abstract class BaseTimelineService : IBaseTimelineService
     {
-        protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IUserService userService, IMapper mapper, IClock clock)
+        protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IMapper mapper, IClock clock)
         {
             Clock = clock;
             Database = database;
+            ImageValidator = imageValidator;
+            DataManager = dataManager;
             UserService = userService;
             Mapper = mapper;
         }
@@ -321,6 +346,8 @@ namespace Timeline.Services
 
         protected DatabaseContext Database { get; }
 
+        protected IImageValidator ImageValidator { get; }
+        protected IDataManager DataManager { get; }
         protected IUserService UserService { get; }
 
         protected IMapper Mapper { get; }
@@ -451,7 +478,54 @@ namespace Timeline.Services
             return new TimelinePostInfo
             {
                 Id = postEntity.LocalId,
-                Content = text,
+                Content = new TextTimelinePostContent(text),
+                Author = author,
+                Time = finalTime,
+                LastUpdated = currentTime
+            };
+        }
+
+        public async Task<TimelinePostInfo> CreateImagePost(string name, long authorId, byte[] data, DateTime? time)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
+            var timelineId = await FindTimelineId(name);
+            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+
+            var author = Mapper.Map<UserInfo>(await UserService.GetUserById(authorId));
+
+            var imageFormat = await ImageValidator.Validate(data);
+
+            var imageFormatText = imageFormat.DefaultMimeType;
+
+            var tag = await DataManager.RetainEntry(data);
+
+            var currentTime = Clock.GetCurrentTime();
+            var finalTime = time ?? currentTime;
+
+            timelineEntity.CurrentPostLocalId += 1;
+
+            var postEntity = new TimelinePostEntity
+            {
+                LocalId = timelineEntity.CurrentPostLocalId,
+                ContentType = TimelinePostContentTypes.Image,
+                Content = tag,
+                ExtraContent = imageFormatText,
+                AuthorId = authorId,
+                TimelineId = timelineId,
+                Time = finalTime,
+                LastUpdated = currentTime
+            };
+            Database.TimelinePosts.Add(postEntity);
+            await Database.SaveChangesAsync();
+
+            return new TimelinePostInfo
+            {
+                Id = postEntity.LocalId,
+                Content = new ImageTimelinePostContent(tag),
                 Author = author,
                 Time = finalTime,
                 LastUpdated = currentTime
@@ -658,8 +732,8 @@ namespace Timeline.Services
             }
         }
 
-        public TimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IUserService userService, IMapper mapper, IClock clock)
-            : base(loggerFactory, database, userService, mapper, clock)
+        public TimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IMapper mapper, IClock clock)
+            : base(loggerFactory, database, imageValidator, dataManager, userService, mapper, clock)
         {
 
         }
@@ -788,8 +862,8 @@ namespace Timeline.Services
 
     public class PersonalTimelineService : BaseTimelineService, IPersonalTimelineService
     {
-        public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IUserService userService, IMapper mapper, IClock clock)
-            : base(loggerFactory, database, userService, mapper, clock)
+        public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IMapper mapper, IClock clock)
+            : base(loggerFactory, database, imageValidator, dataManager, userService, mapper, clock)
         {
 
         }

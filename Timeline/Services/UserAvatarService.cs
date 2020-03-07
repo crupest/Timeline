@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 using System;
 using System.IO;
 using System.Linq;
@@ -45,16 +42,6 @@ namespace Timeline.Services
         /// Get the default avatar.
         /// </summary>
         Task<AvatarInfo> GetDefaultAvatar();
-    }
-
-    public interface IUserAvatarValidator
-    {
-        /// <summary>
-        /// Validate a avatar's format and size info.
-        /// </summary>
-        /// <param name="avatar">The avatar to validate.</param>
-        /// <exception cref="ImageException">Thrown when validation failed.</exception>
-        Task Validate(Avatar avatar);
     }
 
     public interface IUserAvatarService
@@ -132,18 +119,6 @@ namespace Timeline.Services
         }
     }
 
-    public class UserAvatarValidator : IUserAvatarValidator
-    {
-        private readonly ImageValidator _innerValidator = new ImageValidator(true);
-
-        public Task Validate(Avatar avatar)
-        {
-            if (avatar == null)
-                throw new ArgumentNullException(nameof(avatar));
-            return _innerValidator.Validate(avatar.Data, avatar.Type);
-        }
-    }
-
     public class UserAvatarService : IUserAvatarService
     {
 
@@ -152,7 +127,8 @@ namespace Timeline.Services
         private readonly DatabaseContext _database;
 
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
-        private readonly IUserAvatarValidator _avatarValidator;
+
+        private readonly IImageValidator _imageValidator;
 
         private readonly IDataManager _dataManager;
 
@@ -162,14 +138,14 @@ namespace Timeline.Services
             ILogger<UserAvatarService> logger,
             DatabaseContext database,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
-            IUserAvatarValidator avatarValidator,
+            IImageValidator imageValidator,
             IDataManager dataManager,
             IClock clock)
         {
             _logger = logger;
             _database = database;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
-            _avatarValidator = avatarValidator;
+            _imageValidator = imageValidator;
             _dataManager = dataManager;
             _clock = clock;
         }
@@ -247,7 +223,7 @@ namespace Timeline.Services
             }
             else
             {
-                await _avatarValidator.Validate(avatar);
+                await _imageValidator.Validate(avatar.Data, avatar.Type, true);
                 var tag = await _dataManager.RetainEntry(avatar.Data);
                 var oldTag = avatarEntity?.DataTag;
                 var create = avatarEntity == null;
@@ -278,7 +254,6 @@ namespace Timeline.Services
         {
             services.AddScoped<IUserAvatarService, UserAvatarService>();
             services.AddScoped<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
-            services.AddTransient<IUserAvatarValidator, UserAvatarValidator>();
         }
     }
 }
