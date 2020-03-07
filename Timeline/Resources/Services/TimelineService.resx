@@ -120,6 +120,9 @@
   <data name="ExceptionChangeMemberUsernameBadFormat" xml:space="preserve">
     <value>The number {0} username is invalid.</value>
   </data>
+  <data name="ExceptionDatabaseUnknownContentType" xml:space="preserve">
+    <value>Unknown post content type "{0}" is saved in database.</value>
+  </data>
   <data name="ExceptionFindTimelineUsernameBadFormat" xml:space="preserve">
     <value>The owner username of personal timeline is of bad format.</value>
   </data>

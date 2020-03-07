@@ -70,6 +70,15 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown post content type &quot;{0}&quot; is saved in database..
+        /// </summary>
+        internal static string ExceptionDatabaseUnknownContentType {
+            get {
+                return ResourceManager.GetString("ExceptionDatabaseUnknownContentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The owner username of personal timeline is of bad format..
         /// </summary>
         internal static string ExceptionFindTimelineUsernameBadFormat {
