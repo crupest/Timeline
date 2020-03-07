@@ -432,10 +432,20 @@ namespace Timeline.Services
                 if (entity.Content != null) // otherwise it is deleted
                 {
                     var author = Mapper.Map<UserInfo>(await UserService.GetUserById(entity.AuthorId));
+
+                    var type = entity.ContentType;
+
+                    ITimelinePostContent content = type switch
+                    {
+                        TimelinePostContentTypes.Text => new TextTimelinePostContent(entity.Content),
+                        TimelinePostContentTypes.Image => new ImageTimelinePostContent(entity.Content),
+                        _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
+                    };
+
                     posts.Add(new TimelinePostInfo
                     {
                         Id = entity.LocalId,
-                        Content = entity.Content,
+                        Content = content,
                         Author = author,
                         Time = entity.Time,
                         LastUpdated = entity.LastUpdated
@@ -544,10 +554,22 @@ namespace Timeline.Services
             if (post == null)
                 throw new TimelinePostNotExistException(id);
 
+            string? dataTag = null;
+
+            if (post.ContentType == TimelinePostContentTypes.Image)
+            {
+                dataTag = post.Content;
+            }
+
             post.Content = null;
             post.LastUpdated = Clock.GetCurrentTime();
 
             await Database.SaveChangesAsync();
+
+            if (dataTag != null)
+            {
+                await DataManager.FreeEntry(dataTag);
+            }
         }
 
         public async Task ChangeProperty(string name, TimelinePatchRequest newProperties)
