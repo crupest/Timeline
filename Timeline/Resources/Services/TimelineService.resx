@@ -126,10 +126,19 @@
   <data name="ExceptionFindTimelineUsernameBadFormat" xml:space="preserve">
     <value>The owner username of personal timeline is of bad format.</value>
   </data>
+  <data name="ExceptionGetDataDataEntryNotExist" xml:space="preserve">
+    <value>The data entry of the tag of the image post does not exist.</value>
+  </data>
+  <data name="ExceptionGetDataNonImagePost" xml:space="preserve">
+    <value>Can't get data of a non-image post.</value>
+  </data>
   <data name="ExceptionTimelineNameBadFormat" xml:space="preserve">
     <value>The timeline name is of bad format because {0}.</value>
   </data>
   <data name="ExceptionTimelineNameConflict" xml:space="preserve">
     <value>The timeline with given name already exists.</value>
+  </data>
+  <data name="LogGetDataNoFormat" xml:space="preserve">
+    <value>Image format type of the post does not exist in column "extra_content". Normally this couldn't be possible because it should be saved when post was created. However, we now re-detect the format and save it.</value>
   </data>
 </root>

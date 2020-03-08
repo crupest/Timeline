@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -105,7 +106,7 @@ namespace Timeline.Services
         /// <returns>The data and its type.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist.</exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
         /// <exception cref="InvalidOperationException">Thrown when post has no data. See remarks.</exception>
         /// <remarks>
         /// Use this method to retrieve the image of image post.
@@ -332,6 +333,7 @@ namespace Timeline.Services
     {
         protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IMapper mapper, IClock clock)
         {
+            _logger = loggerFactory.CreateLogger<BaseTimelineService>();
             Clock = clock;
             Database = database;
             ImageValidator = imageValidator;
@@ -339,6 +341,8 @@ namespace Timeline.Services
             UserService = userService;
             Mapper = mapper;
         }
+
+        private ILogger<BaseTimelineService> _logger;
 
         protected IClock Clock { get; }
 
@@ -422,7 +426,6 @@ namespace Timeline.Services
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-
             var timelineId = await FindTimelineId(name);
             var postEntities = await Database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
 
@@ -453,6 +456,50 @@ namespace Timeline.Services
                 }
             }
             return posts;
+        }
+        public async Task<DataWithType> GetPostData(string name, long postId)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            var timelineId = await FindTimelineId(name);
+            var postEntity = await Database.TimelinePosts.Where(p => p.LocalId == postId).SingleOrDefaultAsync();
+
+            if (postEntity == null)
+                throw new TimelinePostNotExistException(name, postId);
+
+            if (postEntity.Content == null)
+                throw new TimelinePostNotExistException(name, postId, true);
+
+            if (postEntity.ContentType != TimelinePostContentTypes.Image)
+                throw new InvalidOperationException(ExceptionGetDataNonImagePost);
+
+            var tag = postEntity.Content;
+
+            byte[] data;
+
+            try
+            {
+                data = await DataManager.GetEntry(tag);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new DatabaseCorruptedException(ExceptionGetDataDataEntryNotExist, e);
+            }
+
+            if (postEntity.ExtraContent == null)
+            {
+                _logger.LogWarning(LogGetDataNoFormat);
+                var format = Image.DetectFormat(data);
+                postEntity.ExtraContent = format.DefaultMimeType;
+                await Database.SaveChangesAsync();
+            }
+
+            return new DataWithType
+            {
+                Data = data,
+                Type = postEntity.ExtraContent
+            };
         }
 
         public async Task<TimelinePostInfo> CreateTextPost(string name, long authorId, string text, DateTime? time)
@@ -552,7 +599,7 @@ namespace Timeline.Services
             var post = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == id).SingleOrDefaultAsync();
 
             if (post == null)
-                throw new TimelinePostNotExistException(id);
+                throw new TimelinePostNotExistException(name, id);
 
             string? dataTag = null;
 
@@ -721,7 +768,7 @@ namespace Timeline.Services
             var postEntity = await Database.TimelinePosts.Where(p => p.Id == id).Select(p => new { p.AuthorId }).SingleOrDefaultAsync();
 
             if (postEntity == null)
-                throw new TimelinePostNotExistException(id);
+                throw new TimelinePostNotExistException(name, id);
 
             return timelineEntity.OwnerId == modifierId || postEntity.AuthorId == modifierId;
         }

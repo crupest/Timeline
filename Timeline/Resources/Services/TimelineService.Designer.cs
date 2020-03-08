@@ -88,6 +88,24 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The data entry of the tag of the image post does not exist..
+        /// </summary>
+        internal static string ExceptionGetDataDataEntryNotExist {
+            get {
+                return ResourceManager.GetString("ExceptionGetDataDataEntryNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t get data of a non-image post..
+        /// </summary>
+        internal static string ExceptionGetDataNonImagePost {
+            get {
+                return ResourceManager.GetString("ExceptionGetDataNonImagePost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The timeline name is of bad format because {0}..
         /// </summary>
         internal static string ExceptionTimelineNameBadFormat {
@@ -102,6 +120,15 @@ namespace Timeline.Resources.Services {
         internal static string ExceptionTimelineNameConflict {
             get {
                 return ResourceManager.GetString("ExceptionTimelineNameConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image format type of the post does not exist in column &quot;extra_content&quot;. Normally this couldn&apos;t be possible because it should be saved when post was created. However, we now re-detect the format and save it..
+        /// </summary>
+        internal static string LogGetDataNoFormat {
+            get {
+                return ResourceManager.GetString("LogGetDataNoFormat", resourceCulture);
             }
         }
     }
