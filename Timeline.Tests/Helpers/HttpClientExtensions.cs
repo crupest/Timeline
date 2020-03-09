@@ -6,7 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Timeline.Tests.Helpers
+namespace TimelineApp.Tests.Helpers
 {
     public static class HttpClientExtensions
     {

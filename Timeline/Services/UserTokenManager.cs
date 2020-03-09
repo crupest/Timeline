@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using TimelineApp.Models;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     public class UserTokenCreateResult
     {

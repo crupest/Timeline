@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Timeline.ErrorCodes\Timeline.ErrorCodes.csproj" />
+    <ProjectReference Include="..\Timeline.ErrorCodes\TimelineApp.ErrorCodes.csproj" />
   </ItemGroup>
 
 </Project>

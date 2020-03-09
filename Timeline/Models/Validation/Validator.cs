@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Localization;
 using System;
 using System.ComponentModel.DataAnnotations;
-using Timeline.Helpers;
-using static Timeline.Resources.Models.Validation.Validator;
+using TimelineApp.Helpers;
+using static TimelineApp.Resources.Models.Validation.Validator;
 
-namespace Timeline.Models.Validation
+namespace TimelineApp.Models.Validation
 {
     /// <summary>
     /// A validator to validate value.

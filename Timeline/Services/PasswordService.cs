@@ -3,7 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     /// <summary>
     /// Hashed password is of bad format.

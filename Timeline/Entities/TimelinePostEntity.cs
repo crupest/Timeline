@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Timeline.Entities
+namespace TimelineApp.Entities
 {
     [Table("timeline_posts")]
     public class TimelinePostEntity

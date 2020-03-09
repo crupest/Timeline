@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     public interface IPathProvider
     {

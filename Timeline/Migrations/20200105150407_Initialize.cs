@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Timeline.Migrations
+namespace TimelineApp.Migrations
 {
     public partial class Initialize : Migration
     {

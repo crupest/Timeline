@@ -6,15 +6,15 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Timeline.Auth;
-using Timeline.Filters;
-using Timeline.Helpers;
-using Timeline.Models.Http;
-using Timeline.Models.Validation;
-using Timeline.Services;
-using static Timeline.Resources.Controllers.UserAvatarController;
+using TimelineApp.Auth;
+using TimelineApp.Filters;
+using TimelineApp.Helpers;
+using TimelineApp.Models.Http;
+using TimelineApp.Models.Validation;
+using TimelineApp.Services;
+using static TimelineApp.Resources.Controllers.UserAvatarController;
 
-namespace Timeline.Controllers
+namespace TimelineApp.Controllers
 {
     [ApiController]
     public class UserAvatarController : Controller

@@ -2,13 +2,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline", "Timeline\Timeline.csproj", "{A34D323C-5233-4754-B14F-4819CE9C27CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimelineApp", "Timeline\TimelineApp.csproj", "{A34D323C-5233-4754-B14F-4819CE9C27CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline.Tests", "Timeline.Tests\Timeline.Tests.csproj", "{3D76D578-37BC-43C2-97BF-9C6DD3825F10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimelineApp.Tests", "Timeline.Tests\TimelineApp.Tests.csproj", "{3D76D578-37BC-43C2-97BF-9C6DD3825F10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErrorResponseCodeGenerator", "ErrorResponseCodeGenerator\ErrorResponseCodeGenerator.csproj", "{F325F802-75DE-4527-A299-F668281B0E4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ErrorResponseCodeGenerator", "ErrorResponseCodeGenerator\ErrorResponseCodeGenerator.csproj", "{F325F802-75DE-4527-A299-F668281B0E4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timeline.ErrorCodes", "Timeline.ErrorCodes\Timeline.ErrorCodes.csproj", "{1044E3B0-1010-47CA-956E-B6E8FE87055B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimelineApp.ErrorCodes", "Timeline.ErrorCodes\TimelineApp.ErrorCodes.csproj", "{1044E3B0-1010-47CA-956E-B6E8FE87055B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

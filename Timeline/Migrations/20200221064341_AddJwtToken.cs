@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Timeline.Migrations
+namespace TimelineApp.Migrations
 {
     public static class JwtTokenGenerateHelper
     {

@@ -5,7 +5,7 @@ using FluentAssertions.Primitives;
 using System;
 using System.Reflection;
 
-namespace Timeline.Tests.Helpers
+namespace TimelineApp.Tests.Helpers
 {
     public class ParameterInfoValueFormatter : IValueFormatter
     {

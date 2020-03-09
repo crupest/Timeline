@@ -13,12 +13,12 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Timeline.Models.Http;
-using Timeline.Services;
-using Timeline.Tests.Helpers;
+using TimelineApp.Models.Http;
+using TimelineApp.Services;
+using TimelineApp.Tests.Helpers;
 using Xunit;
 
-namespace Timeline.Tests.IntegratedTests
+namespace TimelineApp.Tests.IntegratedTests
 {
     public class UserAvatarTest : IntegratedTestBase
     {

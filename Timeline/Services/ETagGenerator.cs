@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     public interface IETagGenerator
     {

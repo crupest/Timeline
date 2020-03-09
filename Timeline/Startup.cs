@@ -10,15 +10,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Text.Json.Serialization;
-using Timeline.Auth;
-using Timeline.Configs;
-using Timeline.Entities;
-using Timeline.Formatters;
-using Timeline.Helpers;
-using Timeline.Models.Converters;
-using Timeline.Services;
+using TimelineApp.Auth;
+using TimelineApp.Configs;
+using TimelineApp.Entities;
+using TimelineApp.Formatters;
+using TimelineApp.Helpers;
+using TimelineApp.Models.Converters;
+using TimelineApp.Services;
 
-namespace Timeline
+namespace TimelineApp
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class Startup
@@ -101,7 +101,7 @@ namespace Timeline
 
             services.AddUserAvatarService();
 
-            services.AddScoped<ITimelineService, TimelineService>();
+            services.AddScoped<ITimelineService, TimelineManager>();
             services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();

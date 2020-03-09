@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     [Serializable]
     public class ImageException : Exception

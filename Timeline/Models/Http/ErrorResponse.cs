@@ -1,7 +1,7 @@
 ﻿
-using static Timeline.Resources.Messages;
+using static TimelineApp.Resources.Messages;
 
-namespace Timeline.Models.Http
+namespace TimelineApp.Models.Http
 {
 
     public static class ErrorResponse

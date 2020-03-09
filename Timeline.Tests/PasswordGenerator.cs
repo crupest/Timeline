@@ -1,9 +1,9 @@
 ﻿using System;
-using Timeline.Services;
+using TimelineApp.Services;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Timeline.Tests
+namespace TimelineApp.Tests
 {
     public class PasswordGenerator
     {
