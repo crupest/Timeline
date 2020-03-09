@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
-using Timeline.Auth;
-using static Timeline.Resources.Controllers.ControllerAuthExtensions;
+using TimelineApp.Auth;
+using static TimelineApp.Resources.Controllers.ControllerAuthExtensions;
 
-namespace Timeline.Controllers
+namespace TimelineApp.Controllers
 {
     public static class ControllerAuthExtensions
     {

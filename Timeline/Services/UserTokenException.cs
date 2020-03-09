@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
 
     [Serializable]

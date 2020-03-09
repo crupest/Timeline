@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
 
-namespace Timeline.Tests.Helpers
+namespace TimelineApp.Tests.Helpers
 {
     public static class ReflectionHelper
     {

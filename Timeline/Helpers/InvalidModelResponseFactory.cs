@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
-using Timeline.Models.Http;
+using TimelineApp.Models.Http;
 
-namespace Timeline.Helpers
+namespace TimelineApp.Helpers
 {
     public static class InvalidModelResponseFactory
     {

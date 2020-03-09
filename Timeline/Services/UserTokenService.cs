@@ -5,10 +5,10 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Timeline.Configs;
-using Timeline.Entities;
+using TimelineApp.Configs;
+using TimelineApp.Entities;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     public class UserTokenInfo
     {

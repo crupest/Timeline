@@ -8,10 +8,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Timeline.Services;
-using static Timeline.Resources.Authentication.AuthHandler;
+using TimelineApp.Services;
+using static TimelineApp.Resources.Authentication.AuthHandler;
 
-namespace Timeline.Auth
+namespace TimelineApp.Auth
 {
     public static class AuthenticationConstants
     {

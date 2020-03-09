@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
 using System;
@@ -7,12 +6,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Timeline.Entities;
-using Timeline.Models.Http;
-using Timeline.Models.Validation;
-using static Timeline.Resources.Services.TimelineService;
+using TimelineApp.Entities;
+using TimelineApp.Models;
+using TimelineApp.Models.Validation;
+using static TimelineApp.Resources.Services.TimelineService;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     public enum TimelineUserRelationshipType
     {
@@ -42,70 +41,63 @@ namespace Timeline.Services
     }
 
     /// <summary>
-    /// This define the common interface of both personal timeline
-    /// and normal timeline.
+    /// This define the common interface of both personal timeline and normal timeline.
     /// </summary>
     /// <remarks>
-    /// The "name" parameter in method means name of timeline in
-    /// <see cref="ITimelineService"/> while username of the owner
-    /// of the personal timeline in <see cref="IPersonalTimelineService"/>.
+    /// The "name" parameter in each method has different meaning.
+    /// <see cref="IOrdinaryTimelineService"/> => name of the ordinary timeline
+    /// <see cref="IPersonalTimelineService"/> => username of the owner of the personal timeline
+    /// <see cref="ITimelineService"/> => username if begin with '@' otherwise timeline name
+    ///
+    /// <see cref="ArgumentException"/> is thrown when name is illegal.
+    /// For ordinary timeline, it means the name is not a valid timeline name.
+    /// For personal timeline, it means the name is not a valid username.
+    /// 
+    /// <see cref="TimelineNotExistException"> is thrown when timeline does not exist.
+    /// For ordinary timeline, it means the timeline of the name does not exist.
+    /// For personal timeline, it means the user with the username does not exist and the inner exception should be a <see cref="UserNotExistException"/>.
     /// </remarks>
     public interface IBaseTimelineService
     {
         /// <summary>
         /// Get the timeline info.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <returns>The timeline info.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
-        Task<TimelineInfo> GetTimeline(string name);
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        Task<Timeline> GetTimeline(string name);
 
         /// <summary>
         /// Set the properties of a timeline. 
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="newProperties">The new properties. Null member means not to change.</param>
-        /// <returns>The timeline info.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
-        Task ChangeProperty(string name, TimelinePatchRequest newProperties);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="newProperties"/> is null.</exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        Task ChangeProperty(string name, TimelineChangePropertyRequest newProperties);
 
         /// <summary>
         /// Get all the posts in the timeline.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <returns>A list of all posts.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
-        Task<List<TimelinePostInfo>> GetPosts(string name);
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        Task<List<TimelinePost>> GetPosts(string name);
 
         /// <summary>
         /// Get the data of a post.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="postId">The id of the post.</param>
         /// <returns>The data and its type.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
         /// <exception cref="InvalidOperationException">Thrown when post has no data. See remarks.</exception>
         /// <remarks>
@@ -116,55 +108,40 @@ namespace Timeline.Services
         /// <summary>
         /// Create a new text post in timeline.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <ssee cref="IBaseTimelineService"/>.</param>
-        /// <param name="authorId">The author's id.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="authorId">The author's user id.</param>
         /// <param name="text">The content text.</param>
         /// <param name="time">The time of the post. If null, then use current time.</param>
         /// <returns>The info of the created post.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="text"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="UserNotExistException">Thrown if user with <paramref name="authorId"/> does not exist.</exception>
-        Task<TimelinePostInfo> CreateTextPost(string name, long authorId, string text, DateTime? time);
+        Task<TimelinePost> CreateTextPost(string name, long authorId, string text, DateTime? time);
 
         /// <summary>
         /// Create a new image post in timeline.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <ssee cref="IBaseTimelineService"/>.</param>
-        /// <param name="authorId">The author's id.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="authorId">The author's user id.</param>
         /// <param name="data">The image data.</param>
         /// <param name="time">The time of the post. If null, then use current time.</param>
         /// <returns>The info of the created post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="text"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="data"/> is null.</exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="UserNotExistException">Thrown if user with <paramref name="authorId"/> does not exist.</exception>
         /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
-        Task<TimelinePostInfo> CreateImagePost(string name, long authorId, byte[] data, DateTime? time);
+        Task<TimelinePost> CreateImagePost(string name, long authorId, byte[] data, DateTime? time);
 
         /// <summary>
-        /// Delete a post
+        /// Delete a post.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="id">The id of the post to delete.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="username"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="TimelinePostNotExistException">
         /// Thrown when the post with given id does not exist or is deleted already.
         /// </exception>
@@ -177,18 +154,13 @@ namespace Timeline.Services
         /// <summary>
         /// Remove members to a timeline.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="add">A list of usernames of members to add. May be null.</param>
         /// <param name="remove">A list of usernames of members to remove. May be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="ArgumentException">Thrown when names in <paramref name="add"/> or <paramref name="remove"/> is not a valid username.</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
         /// <exception cref="UserNotExistException">
         /// Thrown when one of the user to change does not exist.
         /// </exception>
@@ -204,17 +176,12 @@ namespace Timeline.Services
         /// <summary>
         /// Check whether a user can manage(change timeline info, member, ...) a timeline.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="id"></param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="userId">The user id.</param>
         /// <returns>True if the user can manage the timeline, otherwise false.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <remarks>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with user id does not exist.
@@ -224,17 +191,12 @@ namespace Timeline.Services
         /// <summary>
         /// Verify whether a visitor has the permission to read a timeline.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="visitorId">The id of the user to check on. Null means visitor without account.</param>
         /// <returns>True if can read, false if can't read.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <remarks>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with visitor id does not exist.
@@ -244,17 +206,12 @@ namespace Timeline.Services
         /// <summary>
         /// Verify whether a user has the permission to modify a post.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="modifierId">The id of the user to check on.</param>
         /// <returns>True if can modify, false if can't modify.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="TimelinePostNotExistException">
         /// Thrown when the post with given id does not exist or is deleted already.
         /// </exception>
@@ -268,17 +225,12 @@ namespace Timeline.Services
         /// <summary>
         /// Verify whether a user is member of a timeline.
         /// </summary>
-        /// <param name="name">Username or the timeline name. See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="userId">The id of user to check on.</param>
         /// <returns>True if it is a member, false if not.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <remarks>
         /// Timeline owner is also considered as a member.
         /// Return false when user with user id does not exist.
@@ -300,7 +252,7 @@ namespace Timeline.Services
         /// <remarks>
         /// If user with related user id does not exist, empty list will be returned.
         /// </remarks>
-        Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null);
+        Task<List<Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null);
 
         /// <summary>
         /// Create a timeline.
@@ -312,7 +264,7 @@ namespace Timeline.Services
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="ConflictException">Thrown when the timeline already exists.</exception>
         /// <exception cref="UserNotExistException">Thrown when the owner user does not exist.</exception>
-        Task<TimelineInfo> CreateTimeline(string name, long owner);
+        Task<Timeline> CreateTimeline(string name, long owner);
 
         /// <summary>
         /// Delete a timeline.
@@ -324,25 +276,29 @@ namespace Timeline.Services
         Task DeleteTimeline(string name);
     }
 
+    public interface IOrdinaryTimelineService : IBaseTimelineService
+    {
+
+    }
+
     public interface IPersonalTimelineService : IBaseTimelineService
     {
 
     }
 
-    public abstract class BaseTimelineService : IBaseTimelineService
+    public abstract class BaseTimelineManager : IBaseTimelineService
     {
-        protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IMapper mapper, IClock clock)
+        protected BaseTimelineManager(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
         {
-            _logger = loggerFactory.CreateLogger<BaseTimelineService>();
+            _logger = loggerFactory.CreateLogger<BaseTimelineManager>();
             Clock = clock;
             Database = database;
             ImageValidator = imageValidator;
             DataManager = dataManager;
             UserService = userService;
-            Mapper = mapper;
         }
 
-        private ILogger<BaseTimelineService> _logger;
+        private ILogger<BaseTimelineManager> _logger;
 
         protected IClock Clock { get; }
 
@@ -353,20 +309,6 @@ namespace Timeline.Services
         protected IImageValidator ImageValidator { get; }
         protected IDataManager DataManager { get; }
         protected IUserService UserService { get; }
-
-        protected IMapper Mapper { get; }
-
-        protected TimelineEntity CreateNewEntity(string? name, long owner)
-        {
-            return new TimelineEntity
-            {
-                CurrentPostLocalId = 0,
-                Name = name,
-                OwnerId = owner,
-                Visibility = TimelineVisibility.Register,
-                CreateTime = Clock.GetCurrentTime()
-            };
-        }
 
         /// <summary>
         /// Find the timeline id by the name.
@@ -392,7 +334,7 @@ namespace Timeline.Services
         /// </remarks>
         protected abstract Task<long> FindTimelineId(string name);
 
-        public async Task<TimelineInfo> GetTimeline(string name)
+        public async Task<Timeline> GetTimeline(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -403,17 +345,17 @@ namespace Timeline.Services
 
             var timelineMemberEntities = await Database.TimelineMembers.Where(m => m.TimelineId == timelineId).Select(m => new { m.UserId }).ToListAsync();
 
-            var owner = Mapper.Map<UserInfo>(await UserService.GetUserById(timelineEntity.OwnerId));
+            var owner = await UserService.GetUserById(timelineEntity.OwnerId);
 
-            var members = new List<UserInfo>();
+            var members = new List<User>();
             foreach (var memberEntity in timelineMemberEntities)
             {
-                members.Add(Mapper.Map<UserInfo>(await UserService.GetUserById(memberEntity.UserId)));
+                members.Add(await UserService.GetUserById(memberEntity.UserId));
             }
 
-            return new TimelineInfo
+            return new Timeline
             {
-                Name = timelineEntity.Name,
+                Name = timelineEntity.Name ?? ("@" + owner.Username),
                 Description = timelineEntity.Description ?? "",
                 Owner = owner,
                 Visibility = timelineEntity.Visibility,
@@ -421,7 +363,7 @@ namespace Timeline.Services
             };
         }
 
-        public async Task<List<TimelinePostInfo>> GetPosts(string name)
+        public async Task<List<TimelinePost>> GetPosts(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -429,12 +371,12 @@ namespace Timeline.Services
             var timelineId = await FindTimelineId(name);
             var postEntities = await Database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
 
-            var posts = new List<TimelinePostInfo>();
+            var posts = new List<TimelinePost>();
             foreach (var entity in postEntities)
             {
                 if (entity.Content != null) // otherwise it is deleted
                 {
-                    var author = Mapper.Map<UserInfo>(await UserService.GetUserById(entity.AuthorId));
+                    var author = await UserService.GetUserById(entity.AuthorId);
 
                     var type = entity.ContentType;
 
@@ -445,7 +387,7 @@ namespace Timeline.Services
                         _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
                     };
 
-                    posts.Add(new TimelinePostInfo
+                    posts.Add(new TimelinePost
                     {
                         Id = entity.LocalId,
                         Content = content,
@@ -502,7 +444,7 @@ namespace Timeline.Services
             };
         }
 
-        public async Task<TimelinePostInfo> CreateTextPost(string name, long authorId, string text, DateTime? time)
+        public async Task<TimelinePost> CreateTextPost(string name, long authorId, string text, DateTime? time)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -512,7 +454,7 @@ namespace Timeline.Services
             var timelineId = await FindTimelineId(name);
             var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
-            var author = Mapper.Map<UserInfo>(await UserService.GetUserById(authorId));
+            var author = await UserService.GetUserById(authorId);
 
             var currentTime = Clock.GetCurrentTime();
             var finalTime = time ?? currentTime;
@@ -532,7 +474,7 @@ namespace Timeline.Services
             Database.TimelinePosts.Add(postEntity);
             await Database.SaveChangesAsync();
 
-            return new TimelinePostInfo
+            return new TimelinePost
             {
                 Id = postEntity.LocalId,
                 Content = new TextTimelinePostContent(text),
@@ -542,7 +484,7 @@ namespace Timeline.Services
             };
         }
 
-        public async Task<TimelinePostInfo> CreateImagePost(string name, long authorId, byte[] data, DateTime? time)
+        public async Task<TimelinePost> CreateImagePost(string name, long authorId, byte[] data, DateTime? time)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -552,7 +494,7 @@ namespace Timeline.Services
             var timelineId = await FindTimelineId(name);
             var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
-            var author = Mapper.Map<UserInfo>(await UserService.GetUserById(authorId));
+            var author = await UserService.GetUserById(authorId);
 
             var imageFormat = await ImageValidator.Validate(data);
 
@@ -579,7 +521,7 @@ namespace Timeline.Services
             Database.TimelinePosts.Add(postEntity);
             await Database.SaveChangesAsync();
 
-            return new TimelinePostInfo
+            return new TimelinePost
             {
                 Id = postEntity.LocalId,
                 Content = new ImageTimelinePostContent(tag),
@@ -619,7 +561,7 @@ namespace Timeline.Services
             }
         }
 
-        public async Task ChangeProperty(string name, TimelinePatchRequest newProperties)
+        public async Task ChangeProperty(string name, TimelineChangePropertyRequest newProperties)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -789,7 +731,7 @@ namespace Timeline.Services
         }
     }
 
-    public class TimelineService : BaseTimelineService, ITimelineService
+    public class OrdinaryTimelineService : BaseTimelineManager, IOrdinaryTimelineService
     {
         private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
 
@@ -801,8 +743,8 @@ namespace Timeline.Services
             }
         }
 
-        public TimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IMapper mapper, IClock clock)
-            : base(loggerFactory, database, imageValidator, dataManager, userService, mapper, clock)
+        public OrdinaryTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
+            : base(loggerFactory, database, imageValidator, dataManager, userService, clock)
         {
 
         }
@@ -825,114 +767,12 @@ namespace Timeline.Services
                 return timelineEntity.Id;
             }
         }
-
-        public async Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
-        {
-            List<TimelineEntity> entities;
-
-            IQueryable<TimelineEntity> ApplyTimelineVisibilityFilter(IQueryable<TimelineEntity> query)
-            {
-                if (visibility != null && visibility.Count != 0)
-                {
-                    return query.Where(t => visibility.Contains(t.Visibility));
-                }
-                return query;
-            }
-
-            bool allVisibilities = visibility == null || visibility.Count == 0;
-
-            if (relate == null)
-            {
-                entities = await ApplyTimelineVisibilityFilter(Database.Timelines).Include(t => t.Members).ToListAsync();
-            }
-            else
-            {
-                entities = new List<TimelineEntity>();
-
-                if ((relate.Type & TimelineUserRelationshipType.Own) != 0)
-                {
-                    entities.AddRange(await ApplyTimelineVisibilityFilter(Database.Timelines.Where(t => t.OwnerId == relate.UserId)).Include(t => t.Members).ToListAsync());
-                }
-
-                if ((relate.Type & TimelineUserRelationshipType.Join) != 0)
-                {
-                    entities.AddRange(await ApplyTimelineVisibilityFilter(Database.TimelineMembers.Where(m => m.UserId == relate.UserId).Include(m => m.Timeline).ThenInclude(t => t.Members).Select(m => m.Timeline)).ToListAsync());
-                }
-            }
-
-            var result = new List<TimelineInfo>();
-
-            foreach (var entity in entities)
-            {
-                var timeline = new TimelineInfo
-                {
-                    Name = entity.Name,
-                    Description = entity.Description ?? "",
-                    Owner = Mapper.Map<UserInfo>(await UserService.GetUserById(entity.OwnerId)),
-                    Visibility = entity.Visibility,
-                    Members = new List<UserInfo>()
-                };
-
-                foreach (var m in entity.Members)
-                {
-                    timeline.Members.Add(Mapper.Map<UserInfo>(await UserService.GetUserById(m.UserId)));
-                }
-
-                result.Add(timeline);
-            }
-
-            return result;
-        }
-
-        public async Task<TimelineInfo> CreateTimeline(string name, long owner)
-        {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-
-            ValidateTimelineName(name, nameof(name));
-
-            var user = await UserService.GetUserById(owner);
-
-            var conflict = await Database.Timelines.AnyAsync(t => t.Name == name);
-
-            if (conflict)
-                throw new ConflictException(ExceptionTimelineNameConflict);
-
-            var newEntity = CreateNewEntity(name, owner);
-            Database.Timelines.Add(newEntity);
-            await Database.SaveChangesAsync();
-
-            return new TimelineInfo
-            {
-                Name = name,
-                Description = "",
-                Owner = Mapper.Map<UserInfo>(user),
-                Visibility = newEntity.Visibility,
-                Members = new List<UserInfo>()
-            };
-        }
-
-        public async Task DeleteTimeline(string name)
-        {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-
-            ValidateTimelineName(name, nameof(name));
-
-            var entity = await Database.Timelines.Where(t => t.Name == name).SingleOrDefaultAsync();
-
-            if (entity == null)
-                throw new TimelineNotExistException(name);
-
-            Database.Timelines.Remove(entity);
-            await Database.SaveChangesAsync();
-        }
     }
 
-    public class PersonalTimelineService : BaseTimelineService, IPersonalTimelineService
+    public class PersonalTimelineService : BaseTimelineManager, IPersonalTimelineService
     {
-        public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IMapper mapper, IClock clock)
-            : base(loggerFactory, database, imageValidator, dataManager, userService, mapper, clock)
+        public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
+            : base(loggerFactory, database, imageValidator, dataManager, userService, clock)
         {
 
         }
@@ -964,12 +804,250 @@ namespace Timeline.Services
             }
             else
             {
-                var newTimelineEntity = CreateNewEntity(null, userId);
+                var newTimelineEntity = new TimelineEntity
+                {
+                    CurrentPostLocalId = 0,
+                    Name = null,
+                    OwnerId = userId,
+                    Visibility = TimelineVisibility.Register,
+                    CreateTime = Clock.GetCurrentTime()
+                };
                 Database.Timelines.Add(newTimelineEntity);
                 await Database.SaveChangesAsync();
 
                 return newTimelineEntity.Id;
             }
+        }
+    }
+
+    public class TimelineService : ITimelineService
+    {
+        private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
+
+        private readonly DatabaseContext _database;
+
+        private readonly IUserService _userService;
+        private readonly IClock _clock;
+
+        private readonly IOrdinaryTimelineService _ordinaryTimelineService;
+        private readonly IPersonalTimelineService _personalTimelineService;
+
+        public TimelineService(DatabaseContext database, IUserService userService, IClock clock, IOrdinaryTimelineService ordinaryTimelineService, IPersonalTimelineService personalTimelineService)
+        {
+            _database = database;
+            _userService = userService;
+            _clock = clock;
+            _ordinaryTimelineService = ordinaryTimelineService;
+            _personalTimelineService = personalTimelineService;
+        }
+
+        private void ValidateTimelineName(string name, string paramName)
+        {
+            if (!_timelineNameValidator.Validate(name, out var message))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionTimelineNameBadFormat, message), paramName);
+            }
+        }
+
+        public async Task<List<Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
+        {
+            List<TimelineEntity> entities;
+
+            IQueryable<TimelineEntity> ApplyTimelineVisibilityFilter(IQueryable<TimelineEntity> query)
+            {
+                if (visibility != null && visibility.Count != 0)
+                {
+                    return query.Where(t => visibility.Contains(t.Visibility));
+                }
+                return query;
+            }
+
+            bool allVisibilities = visibility == null || visibility.Count == 0;
+
+            if (relate == null)
+            {
+                entities = await ApplyTimelineVisibilityFilter(_database.Timelines).Include(t => t.Members).ToListAsync();
+            }
+            else
+            {
+                entities = new List<TimelineEntity>();
+
+                if ((relate.Type & TimelineUserRelationshipType.Own) != 0)
+                {
+                    entities.AddRange(await ApplyTimelineVisibilityFilter(_database.Timelines.Where(t => t.OwnerId == relate.UserId)).Include(t => t.Members).ToListAsync());
+                }
+
+                if ((relate.Type & TimelineUserRelationshipType.Join) != 0)
+                {
+                    entities.AddRange(await ApplyTimelineVisibilityFilter(_database.TimelineMembers.Where(m => m.UserId == relate.UserId).Include(m => m.Timeline).ThenInclude(t => t.Members).Select(m => m.Timeline)).ToListAsync());
+                }
+            }
+
+            var result = new List<Timeline>();
+
+            foreach (var entity in entities)
+            {
+                var owner = await _userService.GetUserById(entity.OwnerId);
+                var timeline = new Timeline
+                {
+                    Name = entity.Name ?? ("@" + owner.Username),
+                    Description = entity.Description ?? "",
+                    Owner = owner,
+                    Visibility = entity.Visibility,
+                    Members = new List<User>()
+                };
+
+                foreach (var m in entity.Members)
+                {
+                    timeline.Members.Add(await _userService.GetUserById(m.UserId));
+                }
+
+                result.Add(timeline);
+            }
+
+            return result;
+        }
+
+        public async Task<Timeline> CreateTimeline(string name, long owner)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            ValidateTimelineName(name, nameof(name));
+
+            var user = await _userService.GetUserById(owner);
+
+            var conflict = await _database.Timelines.AnyAsync(t => t.Name == name);
+
+            if (conflict)
+                throw new ConflictException(ExceptionTimelineNameConflict);
+
+            var newEntity = new TimelineEntity
+            {
+                CurrentPostLocalId = 0,
+                Name = name,
+                OwnerId = owner,
+                Visibility = TimelineVisibility.Register,
+                CreateTime = _clock.GetCurrentTime()
+            };
+
+            _database.Timelines.Add(newEntity);
+            await _database.SaveChangesAsync();
+
+            return new Timeline
+            {
+                Name = name,
+                Description = "",
+                Owner = user,
+                Visibility = newEntity.Visibility,
+                Members = new List<User>()
+            };
+        }
+
+        public async Task DeleteTimeline(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            ValidateTimelineName(name, nameof(name));
+
+            var entity = await _database.Timelines.Where(t => t.Name == name).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new TimelineNotExistException(name);
+
+            _database.Timelines.Remove(entity);
+            await _database.SaveChangesAsync();
+        }
+
+
+        private IBaseTimelineService BranchName(string name, out string realName)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            if (name.StartsWith('@'))
+            {
+                realName = name.Substring(1);
+                return _personalTimelineService;
+            }
+            else
+            {
+                realName = name;
+                return _ordinaryTimelineService;
+            }
+        }
+
+        public Task<Timeline> GetTimeline(string name)
+        {
+            var s = BranchName(name, out var realName);
+            return s.GetTimeline(realName);
+        }
+
+        public Task ChangeProperty(string name, TimelineChangePropertyRequest newProperties)
+        {
+            var s = BranchName(name, out var realName);
+            return s.ChangeProperty(realName, newProperties);
+        }
+
+        public Task<List<TimelinePost>> GetPosts(string name)
+        {
+            var s = BranchName(name, out var realName);
+            return s.GetPosts(realName);
+        }
+
+        public Task<DataWithType> GetPostData(string name, long postId)
+        {
+            var s = BranchName(name, out var realName);
+            return s.GetPostData(realName, postId);
+        }
+
+        public Task<TimelinePost> CreateTextPost(string name, long authorId, string text, DateTime? time)
+        {
+            var s = BranchName(name, out var realName);
+            return s.CreateTextPost(realName, authorId, text, time);
+        }
+
+        public Task<TimelinePost> CreateImagePost(string name, long authorId, byte[] data, DateTime? time)
+        {
+            var s = BranchName(name, out var realName);
+            return s.CreateImagePost(realName, authorId, data, time);
+        }
+
+        public Task DeletePost(string name, long id)
+        {
+            var s = BranchName(name, out var realName);
+            return s.DeletePost(realName, id);
+        }
+
+        public Task ChangeMember(string name, IList<string>? add, IList<string>? remove)
+        {
+            var s = BranchName(name, out var realName);
+            return s.ChangeMember(realName, add, remove);
+        }
+
+        public Task<bool> HasManagePermission(string name, long userId)
+        {
+            var s = BranchName(name, out var realName);
+            return s.HasManagePermission(realName, userId);
+        }
+
+        public Task<bool> HasReadPermission(string name, long? visitorId)
+        {
+            var s = BranchName(name, out var realName);
+            return s.HasReadPermission(realName, visitorId);
+        }
+
+        public Task<bool> HasPostModifyPermission(string name, long id, long modifierId)
+        {
+            var s = BranchName(name, out var realName);
+            return s.HasPostModifyPermission(realName, id, modifierId);
+        }
+
+        public Task<bool> IsMemberOf(string name, long userId)
+        {
+            var s = BranchName(name, out var realName);
+            return s.IsMemberOf(realName, userId);
         }
     }
 }

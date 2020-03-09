@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources.Models.Http {
+namespace TimelineApp.Resources.Models.Http {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Models.Http {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Http.Common", typeof(Common).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TimelineApp.Resources.Models.Http.Common", typeof(Common).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

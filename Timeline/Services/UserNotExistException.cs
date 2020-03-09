@@ -1,7 +1,7 @@
 ﻿using System;
-using Timeline.Helpers;
+using TimelineApp.Helpers;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     /// <summary>
     /// The user requested does not exist.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Timeline.Models.Validation
+namespace TimelineApp.Models.Validation
 {
     public class UsernameValidator : NameValidator
     {

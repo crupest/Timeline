@@ -1,4 +1,4 @@
-﻿namespace Timeline.Models.Http
+﻿namespace TimelineApp.Models.Http
 {
     /// <summary>
     /// All error code constants.

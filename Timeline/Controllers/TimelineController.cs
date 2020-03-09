@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -6,12 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Timeline.Filters;
-using Timeline.Models.Http;
-using Timeline.Models.Validation;
-using Timeline.Services;
+using TimelineApp.Filters;
+using TimelineApp.Models;
+using TimelineApp.Models.Http;
+using TimelineApp.Models.Validation;
+using TimelineApp.Services;
 
-namespace Timeline.Controllers
+namespace TimelineApp.Controllers
 {
     [ApiController]
     [CatchTimelineNotExistException]
@@ -22,11 +24,14 @@ namespace Timeline.Controllers
         private readonly IUserService _userService;
         private readonly ITimelineService _service;
 
-        public TimelineController(ILogger<TimelineController> logger, IUserService userService, ITimelineService service)
+        private readonly IMapper _mapper;
+
+        public TimelineController(ILogger<TimelineController> logger, IUserService userService, ITimelineService service, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
             _service = service;
+            _mapper = mapper;
         }
 
         [HttpGet("timelines")]
@@ -81,27 +86,31 @@ namespace Timeline.Controllers
                 }
             }
 
-            var result = await _service.GetTimelines(relationship, visibilityFilter);
-            result.ForEach(t => t.FillLinks(Url));
-            return Ok(result);
+            var timelines = await _service.GetTimelines(relationship, visibilityFilter);
+            var result = _mapper.Map<List<TimelineInfo>>(timelines);
+            return result;
         }
 
         [HttpGet("timelines/{name}")]
         public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][TimelineName] string name)
         {
-            var result = (await _service.GetTimeline(name)).FillLinks(Url);
-            return Ok(result);
+            var timeline = await _service.GetTimeline(name);
+            var result = _mapper.Map<TimelineInfo>(timeline);
+            return result;
         }
 
         [HttpGet("timelines/{name}/posts")]
-        public async Task<ActionResult<IList<TimelinePostInfo>>> PostListGet([FromRoute][TimelineName] string name)
+        public async Task<ActionResult<List<TimelinePostInfo>>> PostListGet([FromRoute][TimelineName] string name)
         {
             if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            return await _service.GetPosts(name);
+            var posts = await _service.GetPosts(name);
+            var result = _mapper.Map<List<TimelinePostInfo>>(posts);
+
+            return result;
         }
 
         [HttpPost("timelines/{name}/posts")]
@@ -120,7 +129,7 @@ namespace Timeline.Controllers
 
         [HttpDelete("timelines/{name}/posts/{id}")]
         [Authorize]
-        public async Task<ActionResult> PostDelete([FromRoute][TimelineName] string name, [FromRoute] long id)
+        public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][TimelineName] string name, [FromRoute] long id)
         {
             try
             {
@@ -129,11 +138,11 @@ namespace Timeline.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
                 }
                 await _service.DeletePost(name, id);
-                return Ok(CommonDeleteResponse.Delete());
+                return CommonDeleteResponse.Delete();
             }
             catch (TimelinePostNotExistException)
             {
-                return Ok(CommonDeleteResponse.NotExist());
+                return CommonDeleteResponse.NotExist();
             }
         }
 

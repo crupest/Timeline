@@ -1,7 +1,7 @@
 ﻿using System.Security.Principal;
-using Timeline.Entities;
+using TimelineApp.Entities;
 
-namespace Timeline.Auth
+namespace TimelineApp.Auth
 {
     internal static class PrincipalExtensions
     {

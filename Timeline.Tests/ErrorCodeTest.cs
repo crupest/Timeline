@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Timeline.Models.Http;
+using TimelineApp.Models.Http;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Timeline.Tests
+namespace TimelineApp.Tests
 {
     public class ErrorCodeTest
     {

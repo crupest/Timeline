@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Timeline.Models.Http;
+using TimelineApp.Models.Http;
 
-namespace Timeline.Filters
+namespace TimelineApp.Filters
 {
     public class RequireContentTypeAttribute : ActionFilterAttribute
     {

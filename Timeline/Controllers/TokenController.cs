@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using Timeline.Helpers;
-using Timeline.Models.Http;
-using Timeline.Services;
-using static Timeline.Resources.Controllers.TokenController;
+using TimelineApp.Helpers;
+using TimelineApp.Models.Http;
+using TimelineApp.Services;
+using static TimelineApp.Resources.Controllers.TokenController;
 
-namespace Timeline.Controllers
+namespace TimelineApp.Controllers
 {
     [Route("token")]
     [ApiController]

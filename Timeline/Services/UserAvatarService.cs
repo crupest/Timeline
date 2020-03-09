@@ -6,10 +6,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Timeline.Entities;
-using Timeline.Helpers;
+using TimelineApp.Entities;
+using TimelineApp.Helpers;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     public class Avatar
     {

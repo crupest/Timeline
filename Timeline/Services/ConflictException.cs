@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     /// <summary>
     /// Thrown when a resource already exists and conflicts with the given resource.

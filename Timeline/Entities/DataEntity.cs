@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Timeline.Entities
+namespace TimelineApp.Entities
 {
     [Table("data")]
     public class DataEntity

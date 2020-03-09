@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     /// <summary>
     /// Convenient for unit test.

@@ -1,9 +1,9 @@
 using AutoMapper;
 using System.ComponentModel.DataAnnotations;
-using Timeline.Models.Validation;
-using Timeline.Services;
+using TimelineApp.Models.Validation;
+using TimelineApp.Services;
 
-namespace Timeline.Models.Http
+namespace TimelineApp.Models.Http
 {
     public class UserPatchRequest
     {

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using static Timeline.Resources.Models.Validation.NameValidator;
+using static TimelineApp.Resources.Models.Validation.NameValidator;
 
-namespace Timeline.Models.Validation
+namespace TimelineApp.Models.Validation
 {
     public class NameValidator : Validator<string>
     {

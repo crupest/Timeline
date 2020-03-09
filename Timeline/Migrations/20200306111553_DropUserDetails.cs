@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Timeline.Migrations
+namespace TimelineApp.Migrations
 {
     public partial class DropUserDetails : Migration
     {

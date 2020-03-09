@@ -1,6 +1,6 @@
-using static Timeline.Resources.Models.Http.Common;
+using static TimelineApp.Resources.Models.Http.Common;
 
-namespace Timeline.Models.Http
+namespace TimelineApp.Models.Http
 {
     public class CommonResponse
     {

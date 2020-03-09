@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Timeline.Helpers
+namespace TimelineApp.Helpers
 {
     public static class LanguageHelper
     {

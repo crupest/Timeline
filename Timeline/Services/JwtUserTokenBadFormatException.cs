@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using static Timeline.Resources.Services.Exception;
+using static TimelineApp.Resources.Services.Exception;
 
-namespace Timeline.Services
+namespace TimelineApp.Services
 {
     [Serializable]
     public class JwtUserTokenBadFormatException : UserTokenBadFormatException

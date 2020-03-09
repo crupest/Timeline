@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Timeline.Entities;
+using TimelineApp.Entities;
 
-namespace Timeline.Migrations
+namespace TimelineApp.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     [Migration("20200221064341_AddJwtToken")]

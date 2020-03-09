@@ -45,7 +45,7 @@ namespace ErrorResponseCodeGenerator
 ";
             }
 
-            RecursiveAddErrorCode(typeof(Timeline.Models.Http.ErrorCodes), true);
+            RecursiveAddErrorCode(typeof(TimelineApp.Models.Http.ErrorCodes), true);
 
             code = @"
 using static Timeline.Resources.Messages;
