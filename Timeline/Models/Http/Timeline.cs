@@ -64,7 +64,7 @@ namespace TimelineApp.Models.Http
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
 
-            return  new TimelineInfoLinks
+            return new TimelineInfoLinks
             {
                 Self = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { source.Name }),
                 Posts = urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { source.Name })
@@ -114,6 +114,9 @@ namespace TimelineApp.Models.Http
         public TimelineInfoAutoMapperProfile()
         {
             CreateMap<Timeline, TimelineInfo>().ForMember(u => u._links, opt => opt.MapFrom<TimelineInfoLinksValueResolver>());
+            CreateMap<TimelinePost, TimelinePostInfo>();
+            CreateMap<ITimelinePostContent, TimelinePostContentInfo>().ConvertUsing<TimelinePostConverter>();
+            CreateMap<TimelinePatchRequest, TimelineChangePropertyRequest>();
         }
     }
 }
