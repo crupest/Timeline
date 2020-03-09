@@ -154,9 +154,10 @@ namespace TimelineApp.Controllers
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
-            await _service.ChangeProperty(name, body);
-            var timeline = (await _service.GetTimeline(name)).FillLinks(Url);
-            return Ok(timeline);
+            await _service.ChangeProperty(name, _mapper.Map<TimelineChangePropertyRequest>(body));
+            var timeline = await _service.GetTimeline(name);
+            var result = _mapper.Map<TimelineInfo>(timeline);
+            return result;
         }
 
         [HttpPut("timelines/{name}/members/{member}")]
@@ -207,8 +208,9 @@ namespace TimelineApp.Controllers
 
             try
             {
-                var timelineInfo = (await _service.CreateTimeline(body.Name, userId)).FillLinks(Url);
-                return Ok(timelineInfo);
+                var timeline = await _service.CreateTimeline(body.Name, userId);
+                var result = _mapper.Map<TimelineInfo>(timeline);
+                return result;
             }
             catch (ConflictException)
             {
@@ -218,7 +220,7 @@ namespace TimelineApp.Controllers
 
         [HttpDelete("timelines/{name}")]
         [Authorize]
-        public async Task<ActionResult<TimelineInfo>> TimelineDelete([FromRoute][TimelineName] string name)
+        public async Task<ActionResult<CommonDeleteResponse>> TimelineDelete([FromRoute][TimelineName] string name)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
             {
@@ -228,11 +230,11 @@ namespace TimelineApp.Controllers
             try
             {
                 await _service.DeleteTimeline(name);
-                return Ok(CommonDeleteResponse.Delete());
+                return CommonDeleteResponse.Delete();
             }
             catch (TimelineNotExistException)
             {
-                return Ok(CommonDeleteResponse.NotExist());
+                return CommonDeleteResponse.NotExist();
             }
         }
     }
