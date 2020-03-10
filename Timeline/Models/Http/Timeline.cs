@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System;
 using System.Collections.Generic;
-using TimelineApp.Controllers;
+using Timeline.Controllers;
 
-namespace TimelineApp.Models.Http
+namespace Timeline.Models.Http
 {
     public class TimelinePostContentInfo
     {

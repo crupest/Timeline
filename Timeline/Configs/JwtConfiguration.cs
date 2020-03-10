@@ -1,4 +1,4 @@
-﻿namespace TimelineApp.Configs
+﻿namespace Timeline.Configs
 {
     public class JwtConfiguration
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TimelineApp.Resources.Models.Validation {
+namespace Timeline.Resources.Models.Validation {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TimelineApp.Resources.Models.Validation {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TimelineApp.Resources.Models.Validation.Validator", typeof(Validator).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Validation.Validator", typeof(Validator).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TimelineApp.Entities;
-using TimelineApp.Migrations;
+using Timeline.Entities;
+using Timeline.Migrations;
 
-namespace TimelineApp.Tests.Helpers
+namespace Timeline.Tests.Helpers
 {
     public class TestApplication : IDisposable
     {

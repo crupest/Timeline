@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Localization;
 using System.Reflection;
 
-namespace TimelineApp.Helpers
+namespace Timeline.Helpers
 {
     internal static class StringLocalizerFactoryExtensions
     {

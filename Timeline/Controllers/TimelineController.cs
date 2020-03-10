@@ -7,13 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using TimelineApp.Filters;
-using TimelineApp.Models;
-using TimelineApp.Models.Http;
-using TimelineApp.Models.Validation;
-using TimelineApp.Services;
+using Timeline.Filters;
+using Timeline.Models;
+using Timeline.Models.Http;
+using Timeline.Models.Validation;
+using Timeline.Services;
 
-namespace TimelineApp.Controllers
+namespace Timeline.Controllers
 {
     [ApiController]
     [CatchTimelineNotExistException]

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace TimelineApp.Entities
+namespace Timeline.Entities
 {
     public class DatabaseContext : DbContext
     {

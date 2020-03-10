@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimelineApp.Auth;
+using Timeline.Auth;
 
-namespace TimelineApp.Controllers.Testing
+namespace Timeline.Controllers.Testing
 {
     [Route("testing/auth")]
     [ApiController]

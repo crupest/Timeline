@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TimelineApp.Models.Http;
+using Timeline.Models.Http;
 
-namespace TimelineApp.Entities
+namespace Timeline.Entities
 {
 #pragma warning disable CA2227 // Collection properties should be read only
     // TODO: Create index for this table.

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TimelineApp.Models.Http
+namespace Timeline.Models.Http
 {
     public class CreateTokenRequest
     {

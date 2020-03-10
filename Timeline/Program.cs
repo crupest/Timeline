@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Resources;
-using TimelineApp.Entities;
+using Timeline.Entities;
 
 [assembly: NeutralResourcesLanguage("en")]
 
-namespace TimelineApp
+namespace Timeline
 {
     public static class Program
     {

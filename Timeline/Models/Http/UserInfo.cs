@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System;
-using TimelineApp.Controllers;
+using Timeline.Controllers;
 
-namespace TimelineApp.Models.Http
+namespace Timeline.Models.Http
 {
     public class UserInfo
     {

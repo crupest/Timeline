@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TimelineApp.Models.Http;
-using TimelineApp.Services;
+using Timeline.Models.Http;
+using Timeline.Services;
 
-namespace TimelineApp.Filters
+namespace Timeline.Filters
 {
     public class CatchTimelineNotExistExceptionAttribute : ExceptionFilterAttribute
     {

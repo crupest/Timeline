@@ -1,7 +1,7 @@
 ﻿using System;
-using static TimelineApp.Resources.Models.Validation.NicknameValidator;
+using static Timeline.Resources.Models.Validation.NicknameValidator;
 
-namespace TimelineApp.Models.Validation
+namespace Timeline.Models.Validation
 {
     public class NicknameValidator : Validator<string>
     {

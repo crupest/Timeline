@@ -5,7 +5,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TimelineApp.Formatters
+namespace Timeline.Formatters
 {
     public class StringInputFormatter : TextInputFormatter
     {

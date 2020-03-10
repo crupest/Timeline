@@ -4,13 +4,13 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using TimelineApp.Entities;
-using TimelineApp.Helpers;
-using TimelineApp.Models;
-using TimelineApp.Models.Validation;
-using static TimelineApp.Resources.Services.UserService;
+using Timeline.Entities;
+using Timeline.Helpers;
+using Timeline.Models;
+using Timeline.Models.Validation;
+using static Timeline.Resources.Services.UserService;
 
-namespace TimelineApp.Services
+namespace Timeline.Services
 {
     public interface IUserService
     {

@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using TimelineApp.Models.Validation;
-using TimelineApp.Tests.Helpers;
+using Timeline.Models.Validation;
+using Timeline.Tests.Helpers;
 using Xunit;
 
-namespace TimelineApp.Tests
+namespace Timeline.Tests
 {
     public class UsernameValidatorUnitTest : IClassFixture<UsernameValidator>
     {

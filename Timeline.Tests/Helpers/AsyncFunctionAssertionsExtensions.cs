@@ -4,7 +4,7 @@ using FluentAssertions.Specialized;
 using System;
 using System.Threading.Tasks;
 
-namespace TimelineApp.Tests.Helpers
+namespace Timeline.Tests.Helpers
 {
     public static class AsyncFunctionAssertionsExtensions
     {
