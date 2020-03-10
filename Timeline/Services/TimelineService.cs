@@ -32,12 +32,14 @@ namespace Timeline.Services
         public long UserId { get; set; }
     }
 
-    public class DataWithType
+    public class PostData
     {
 #pragma warning disable CA1819 // Properties should not return arrays
         public byte[] Data { get; set; } = default!;
 #pragma warning restore CA1819 // Properties should not return arrays
         public string Type { get; set; } = default!;
+        public string ETag { get; set; } = default!;
+        public DateTime LastModified { get; set; } = default!;
     }
 
     /// <summary>
@@ -103,7 +105,7 @@ namespace Timeline.Services
         /// <remarks>
         /// Use this method to retrieve the image of image post.
         /// </remarks>
-        Task<DataWithType> GetPostData(string name, long postId);
+        Task<PostData> GetPostData(string name, long postId);
 
         /// <summary>
         /// Create a new text post in timeline.
@@ -334,6 +336,8 @@ namespace Timeline.Services
         /// </remarks>
         protected abstract Task<long> FindTimelineId(string name);
 
+        protected abstract string GenerateName(string name);
+
         public async Task<Models.Timeline> GetTimeline(string name)
         {
             if (name == null)
@@ -355,7 +359,7 @@ namespace Timeline.Services
 
             return new Models.Timeline
             {
-                Name = timelineEntity.Name ?? ("@" + owner.Username),
+                Name = GenerateName(name),
                 Description = timelineEntity.Description ?? "",
                 Owner = owner,
                 Visibility = timelineEntity.Visibility,
@@ -387,19 +391,19 @@ namespace Timeline.Services
                         _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
                     };
 
-                    posts.Add(new TimelinePost
-                    {
-                        Id = entity.LocalId,
-                        Content = content,
-                        Author = author,
-                        Time = entity.Time,
-                        LastUpdated = entity.LastUpdated
-                    });
+                    posts.Add(new TimelinePost(
+                        id: entity.LocalId,
+                        content: content,
+                        time: entity.Time,
+                        author: author,
+                        lastUpdated: entity.LastUpdated,
+                        timelineName: GenerateName(name)
+                    ));
                 }
             }
             return posts;
         }
-        public async Task<DataWithType> GetPostData(string name, long postId)
+        public async Task<PostData> GetPostData(string name, long postId)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -437,10 +441,12 @@ namespace Timeline.Services
                 await Database.SaveChangesAsync();
             }
 
-            return new DataWithType
+            return new PostData
             {
                 Data = data,
-                Type = postEntity.ExtraContent
+                Type = postEntity.ExtraContent,
+                ETag = tag,
+                LastModified = postEntity.LastUpdated
             };
         }
 
@@ -474,14 +480,15 @@ namespace Timeline.Services
             Database.TimelinePosts.Add(postEntity);
             await Database.SaveChangesAsync();
 
-            return new TimelinePost
-            {
-                Id = postEntity.LocalId,
-                Content = new TextTimelinePostContent(text),
-                Author = author,
-                Time = finalTime,
-                LastUpdated = currentTime
-            };
+
+            return new TimelinePost(
+                id: postEntity.LocalId,
+                content: new TextTimelinePostContent(text),
+                time: finalTime,
+                author: author,
+                lastUpdated: currentTime,
+                timelineName: GenerateName(name)
+            );
         }
 
         public async Task<TimelinePost> CreateImagePost(string name, long authorId, byte[] data, DateTime? time)
@@ -521,14 +528,14 @@ namespace Timeline.Services
             Database.TimelinePosts.Add(postEntity);
             await Database.SaveChangesAsync();
 
-            return new TimelinePost
-            {
-                Id = postEntity.LocalId,
-                Content = new ImageTimelinePostContent(tag),
-                Author = author,
-                Time = finalTime,
-                LastUpdated = currentTime
-            };
+            return new TimelinePost(
+                id: postEntity.LocalId,
+                content: new ImageTimelinePostContent(tag),
+                time: finalTime,
+                author: author,
+                lastUpdated: currentTime,
+                timelineName: GenerateName(name)
+            );
         }
 
         public async Task DeletePost(string name, long id)
@@ -767,6 +774,11 @@ namespace Timeline.Services
                 return timelineEntity.Id;
             }
         }
+
+        protected override string GenerateName(string name)
+        {
+            return name;
+        }
     }
 
     public class PersonalTimelineService : BaseTimelineManager, IPersonalTimelineService
@@ -817,6 +829,11 @@ namespace Timeline.Services
 
                 return newTimelineEntity.Id;
             }
+        }
+
+        protected override string GenerateName(string name)
+        {
+            return "@" + name;
         }
     }
 
@@ -996,7 +1013,7 @@ namespace Timeline.Services
             return s.GetPosts(realName);
         }
 
-        public Task<DataWithType> GetPostData(string name, long postId)
+        public Task<PostData> GetPostData(string name, long postId)
         {
             var s = BranchName(name, out var realName);
             return s.GetPostData(realName, postId);

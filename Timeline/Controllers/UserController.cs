@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Helpers;
+using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;

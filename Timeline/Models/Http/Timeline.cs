@@ -72,25 +72,27 @@ namespace Timeline.Models.Http
         }
     }
 
-    public class TimelinePostConverter : ITypeConverter<ITimelinePostContent, TimelinePostContentInfo>
+    public class TimelinePostContentResolver : IValueResolver<TimelinePost, TimelinePostInfo, TimelinePostContentInfo>
     {
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
 
-        public TimelinePostConverter(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
+        public TimelinePostContentResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
         {
             _actionContextAccessor = actionContextAccessor;
             _urlHelperFactory = urlHelperFactory;
         }
 
-        public TimelinePostContentInfo Convert(ITimelinePostContent source, TimelinePostContentInfo destination, ResolutionContext context)
+        public TimelinePostContentInfo Resolve(TimelinePost source, TimelinePostInfo destination, TimelinePostContentInfo destMember, ResolutionContext context)
         {
             if (_actionContextAccessor.ActionContext == null)
                 throw new InvalidOperationException("No action context, can't fill urls.");
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
-            if (source is TextTimelinePostContent textContent)
+            var sourceContent = source.Content;
+
+            if (sourceContent is TextTimelinePostContent textContent)
             {
                 return new TimelinePostContentInfo
                 {
@@ -98,13 +100,20 @@ namespace Timeline.Models.Http
                     Text = textContent.Text
                 };
             }
-            else if (source is ImageTimelinePostContent imageContent)
+            else if (sourceContent is ImageTimelinePostContent imageContent)
             {
                 return new TimelinePostContentInfo
                 {
                     Type = TimelinePostContentTypes.Image,
-                    Url = urlHelper.ActionLink(action: "PostDataGet", nameof(TimelineController)[0..^nameof(Controller).Length], new { source.Name })
+                    Url = urlHelper.ActionLink(
+                        action: nameof(TimelineController.PostDataGet),
+                        controller: nameof(TimelineController)[0..^nameof(Controller).Length],
+                        values: new { Name = source.TimelineName, Id = source.Id })
                 };
+            }
+            else
+            {
+                throw new InvalidOperationException("Unknown content type.");
             }
         }
     }
@@ -114,8 +123,7 @@ namespace Timeline.Models.Http
         public TimelineInfoAutoMapperProfile()
         {
             CreateMap<Timeline, TimelineInfo>().ForMember(u => u._links, opt => opt.MapFrom<TimelineInfoLinksValueResolver>());
-            CreateMap<TimelinePost, TimelinePostInfo>();
-            CreateMap<ITimelinePostContent, TimelinePostContentInfo>().ConvertUsing<TimelinePostConverter>();
+            CreateMap<TimelinePost, TimelinePostInfo>().ForMember(p => p.Content, opt => opt.MapFrom<TimelinePostContentResolver>());
             CreateMap<TimelinePatchRequest, TimelineChangePropertyRequest>();
         }
     }

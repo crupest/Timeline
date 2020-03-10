@@ -6,12 +6,38 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
+    public static class TimelineHelper
+    {
+        public static TimelinePostContentInfo TextPostContent(string text)
+        {
+            return new TimelinePostContentInfo
+            {
+                Type = "text",
+                Text = text
+            };
+        }
+
+        public static TimelinePostCreateRequest TextPostCreateRequest(string text, DateTime? time = null)
+        {
+            return new TimelinePostCreateRequest
+            {
+                Content = new TimelinePostCreateRequestContent
+                {
+                    Type = "text",
+                    Text = text
+                },
+                Time = time
+            };
+        }
+    }
+
     public class TimelineTest : IntegratedTestBase
     {
         public TimelineTest(WebApplicationFactory<Startup> factory)
@@ -45,7 +71,7 @@ namespace Timeline.Tests.IntegratedTests
             var client = await CreateDefaultClient();
 
             {
-                var res = await client.GetAsync("/users/user1/timeline");
+                var res = await client.GetAsync("/timelines/@user1");
                 user1Timeline = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>().Which;
             }
@@ -80,7 +106,7 @@ namespace Timeline.Tests.IntegratedTests
                 var client = await CreateClientAsUser();
 
                 {
-                    var res = await client.PutAsync("/users/user1/timeline/members/user3", null);
+                    var res = await client.PutAsync("/timelines/@user1/members/user3", null);
                     res.Should().HaveStatusCode(200);
                 }
 
@@ -90,7 +116,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync("/users/user1/timeline", new TimelinePatchRequest { Visibility = TimelineVisibility.Public });
+                    var res = await client.PatchAsJsonAsync("/timelines/@user1", new TimelinePatchRequest { Visibility = TimelineVisibility.Public });
                     res.Should().HaveStatusCode(200);
                 }
 
@@ -100,7 +126,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/users/user1/timeline");
+                    var res = await client.GetAsync("/timelines/@user1");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -123,7 +149,7 @@ namespace Timeline.Tests.IntegratedTests
                 var client = await CreateClientAs(2);
 
                 {
-                    var res = await client.PutAsync("/users/user2/timeline/members/user3", null);
+                    var res = await client.PutAsync("/timelines/@user2/members/user3", null);
                     res.Should().HaveStatusCode(200);
                 }
 
@@ -133,7 +159,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync("/users/user2/timeline", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
+                    var res = await client.PatchAsJsonAsync("/timelines/@user2", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
                     res.Should().HaveStatusCode(200);
                 }
 
@@ -143,7 +169,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/users/user2/timeline");
+                    var res = await client.GetAsync("/timelines/@user2");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -165,7 +191,7 @@ namespace Timeline.Tests.IntegratedTests
                 var client = await CreateClientAs(3);
 
                 {
-                    var res = await client.PatchAsJsonAsync("/users/user3/timeline", new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
+                    var res = await client.PatchAsJsonAsync("/timelines/@user3", new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
                     res.Should().HaveStatusCode(200);
                 }
 
@@ -175,7 +201,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/users/user3/timeline");
+                    var res = await client.GetAsync("/timelines/@user3");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -396,7 +422,7 @@ namespace Timeline.Tests.IntegratedTests
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.PostAsJsonAsync("timelines/aaa!!!/posts", new TimelinePostCreateRequest { Content = "aaa" });
+                var res = await client.PostAsJsonAsync("timelines/aaa!!!/posts", TimelineHelper.TextPostCreateRequest("aaa"));
                 res.Should().BeInvalidModel();
             }
             {
@@ -430,7 +456,7 @@ namespace Timeline.Tests.IntegratedTests
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineCommon.NotExist);
             }
             {
-                var res = await client.PostAsJsonAsync("timelines/notexist/posts", new TimelinePostCreateRequest { Content = "aaa" });
+                var res = await client.PostAsJsonAsync("timelines/notexist/posts", TimelineHelper.TextPostCreateRequest("aaa"));
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineCommon.NotExist);
             }
             {
@@ -673,7 +699,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 { // no auth should get 401
                     var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(401);
                 }
             }
@@ -682,12 +708,12 @@ namespace Timeline.Tests.IntegratedTests
             {
                 { // post self's
                     var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(200);
                 }
                 { // post other not as a member should get 403
                     var res = await client.PostAsJsonAsync("timelines/t0/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(403);
                 }
             }
@@ -696,7 +722,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 { // post as admin
                     var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(200);
                 }
             }
@@ -705,7 +731,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 { // post as member
                     var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(200);
                 }
             }
@@ -720,7 +746,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 using var client = await CreateClientAs(userNumber);
                 var res = await client.PostAsJsonAsync($"timelines/t1/posts",
-                    new TimelinePostCreateRequest { Content = "aaa" });
+                    TimelineHelper.TextPostCreateRequest("aaa"));
                 return res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelinePostInfo>()
                     .Which.Id;
@@ -795,19 +821,19 @@ namespace Timeline.Tests.IntegratedTests
                 }
                 {
                     var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                        new TimelinePostCreateRequest { Content = null });
+                        TimelineHelper.TextPostCreateRequest(null));
                     res.Should().BeInvalidModel();
                 }
                 const string mockContent = "aaa";
                 TimelinePostInfo createRes;
                 {
                     var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                        new TimelinePostCreateRequest { Content = mockContent });
+                        TimelineHelper.TextPostCreateRequest(mockContent));
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo>()
                         .Which;
                     body.Should().NotBeNull();
-                    body.Content.Should().Be(mockContent);
+                    body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent));
                     body.Author.Should().BeEquivalentTo(UserInfos[1]);
                     createRes = body;
                 }
@@ -822,12 +848,12 @@ namespace Timeline.Tests.IntegratedTests
                 TimelinePostInfo createRes2;
                 {
                     var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                        new TimelinePostCreateRequest { Content = mockContent2, Time = mockTime2 });
+                        TimelineHelper.TextPostCreateRequest(mockContent2, mockTime2));
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo>()
                         .Which;
                     body.Should().NotBeNull();
-                    body.Content.Should().Be(mockContent2);
+                    body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent2));
                     body.Author.Should().BeEquivalentTo(UserInfos[1]);
                     body.Time.Should().BeCloseTo(mockTime2, 1000);
                     createRes2 = body;
@@ -865,7 +891,7 @@ namespace Timeline.Tests.IntegratedTests
             async Task<long> CreatePost(DateTime time)
             {
                 var res = await client.PostAsJsonAsync("timelines/t1/posts",
-                    new TimelinePostCreateRequest { Content = "aaa", Time = time });
+                    TimelineHelper.TextPostCreateRequest("aaa", time));
                 return res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelinePostInfo>()
                     .Which.Id;

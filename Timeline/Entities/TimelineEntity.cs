@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Timeline.Models.Http;
+using Timeline.Models;
 
 namespace Timeline.Entities
 {

@@ -48,11 +48,22 @@ namespace Timeline.Models
 
     public class TimelinePost
     {
+        public TimelinePost(long id, ITimelinePostContent content, DateTime time, User author, DateTime lastUpdated, string timelineName)
+        {
+            Id = id;
+            Content = content;
+            Time = time;
+            Author = author;
+            LastUpdated = lastUpdated;
+            TimelineName = timelineName;
+        }
+
         public long Id { get; set; }
-        public ITimelinePostContent Content { get; set; } = default!;
+        public ITimelinePostContent Content { get; set; }
         public DateTime Time { get; set; }
-        public User Author { get; set; } = default!;
-        public DateTime LastUpdated { get; set; } = default!;
+        public User Author { get; set; }
+        public DateTime LastUpdated { get; set; }
+        public string TimelineName { get; set; }
     }
 
 #pragma warning disable CA1724 // Type names should not match namespaces

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -111,6 +112,19 @@ namespace Timeline.Controllers
             var result = _mapper.Map<List<TimelinePostInfo>>(posts);
 
             return result;
+        }
+
+        // TODO: Make cache available.
+        [HttpGet("timelines/{name}/posts/{id}/data")]
+        public async Task<ActionResult<List<TimelinePostInfo>>> PostDataGet([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
+        {
+            if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
+
+            var data = await _service.GetPostData(name, id);
+            return File(data.Data, data.Type, data.LastModified, new EntityTagHeaderValue(data.ETag));
         }
 
         [HttpPost("timelines/{name}/posts")]
