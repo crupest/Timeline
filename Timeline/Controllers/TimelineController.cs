@@ -92,7 +92,7 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("timelines/{name}")]
-        public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][TimelineName] string name)
+        public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][GeneralTimelineName] string name)
         {
             var timeline = await _service.GetTimeline(name);
             var result = _mapper.Map<TimelineInfo>(timeline);
@@ -100,7 +100,7 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("timelines/{name}/posts")]
-        public async Task<ActionResult<List<TimelinePostInfo>>> PostListGet([FromRoute][TimelineName] string name)
+        public async Task<ActionResult<List<TimelinePostInfo>>> PostListGet([FromRoute][GeneralTimelineName] string name)
         {
             if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
             {
@@ -115,7 +115,7 @@ namespace Timeline.Controllers
 
         [HttpPost("timelines/{name}/posts")]
         [Authorize]
-        public async Task<ActionResult<TimelinePostInfo>> PostPost([FromRoute][TimelineName] string name, [FromBody] TimelinePostCreateRequest body)
+        public async Task<ActionResult<TimelinePostInfo>> PostPost([FromRoute][GeneralTimelineName] string name, [FromBody] TimelinePostCreateRequest body)
         {
             var id = this.GetUserId();
             if (!this.IsAdministrator() && !await _service.IsMemberOf(name, id))
@@ -129,7 +129,7 @@ namespace Timeline.Controllers
 
         [HttpDelete("timelines/{name}/posts/{id}")]
         [Authorize]
-        public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][TimelineName] string name, [FromRoute] long id)
+        public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace Timeline.Controllers
 
         [HttpPatch("timelines/{name}")]
         [Authorize]
-        public async Task<ActionResult<TimelineInfo>> TimelinePatch([FromRoute][TimelineName] string name, [FromBody] TimelinePatchRequest body)
+        public async Task<ActionResult<TimelineInfo>> TimelinePatch([FromRoute][GeneralTimelineName] string name, [FromBody] TimelinePatchRequest body)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
             {
@@ -162,7 +162,7 @@ namespace Timeline.Controllers
 
         [HttpPut("timelines/{name}/members/{member}")]
         [Authorize]
-        public async Task<ActionResult> TimelineMemberPut([FromRoute][TimelineName] string name, [FromRoute][Username] string member)
+        public async Task<ActionResult> TimelineMemberPut([FromRoute][GeneralTimelineName] string name, [FromRoute][Username] string member)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
             {
@@ -182,7 +182,7 @@ namespace Timeline.Controllers
 
         [HttpDelete("timelines/{name}/members/{member}")]
         [Authorize]
-        public async Task<ActionResult> TimelineMemberDelete([FromRoute][TimelineName] string name, [FromRoute][Username] string member)
+        public async Task<ActionResult> TimelineMemberDelete([FromRoute][GeneralTimelineName] string name, [FromRoute][Username] string member)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
             {

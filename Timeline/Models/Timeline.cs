@@ -55,7 +55,9 @@ namespace Timeline.Models
         public DateTime LastUpdated { get; set; } = default!;
     }
 
+#pragma warning disable CA1724 // Type names should not match namespaces
     public class Timeline
+#pragma warning restore CA1724 // Type names should not match namespaces
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
