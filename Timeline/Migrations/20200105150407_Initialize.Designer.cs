@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TimelineApp.Entities;
+using Timeline.Entities;
 
-namespace TimelineApp.Migrations
+namespace Timeline.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     [Migration("20200105150407_Initialize")]

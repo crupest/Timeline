@@ -5,15 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
-using TimelineApp.Auth;
-using TimelineApp.Helpers;
-using TimelineApp.Models.Http;
-using TimelineApp.Models.Validation;
-using TimelineApp.Services;
-using static TimelineApp.Resources.Controllers.UserController;
-using static TimelineApp.Resources.Messages;
+using Timeline.Auth;
+using Timeline.Helpers;
+using Timeline.Models.Http;
+using Timeline.Models.Validation;
+using Timeline.Services;
+using static Timeline.Resources.Controllers.UserController;
+using static Timeline.Resources.Messages;
 
-namespace TimelineApp.Controllers
+namespace Timeline.Controllers
 {
     [ApiController]
     public class UserController : Controller

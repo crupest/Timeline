@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TimelineApp.Models.Converters
+namespace Timeline.Models.Converters
 {
     public class JsonDateTimeConverter : JsonConverter<DateTime>
     {

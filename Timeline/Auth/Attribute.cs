@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
-using TimelineApp.Entities;
+using Timeline.Entities;
 
-namespace TimelineApp.Auth
+namespace Timeline.Auth
 {
     public class AdminAuthorizeAttribute : AuthorizeAttribute
     {

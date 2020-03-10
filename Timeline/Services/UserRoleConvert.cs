@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TimelineApp.Entities;
+using Timeline.Entities;
 
-namespace TimelineApp.Services
+namespace Timeline.Services
 {
     public static class UserRoleConvert
     {

@@ -2,9 +2,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TimelineApp.Entities;
+using Timeline.Entities;
 
-namespace TimelineApp.Services
+namespace Timeline.Services
 {
     /// <summary>
     /// A data manager controlling data.

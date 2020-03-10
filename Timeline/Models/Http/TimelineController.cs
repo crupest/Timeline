@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using TimelineApp.Models.Validation;
+using Timeline.Models.Validation;
 
-namespace TimelineApp.Models.Http
+namespace Timeline.Models.Http
 {
     public class TimelinePostCreateRequestContent
     {

@@ -3,7 +3,7 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using System.IO;
 
-namespace TimelineApp.Tests.Helpers
+namespace Timeline.Tests.Helpers
 {
     public static class ImageHelper
     {

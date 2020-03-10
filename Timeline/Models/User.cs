@@ -1,4 +1,4 @@
-﻿namespace TimelineApp.Models
+﻿namespace Timeline.Models
 {
     public class User
     {

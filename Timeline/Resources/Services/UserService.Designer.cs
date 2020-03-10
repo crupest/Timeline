@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TimelineApp.Resources.Services {
+namespace Timeline.Resources.Services {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TimelineApp.Resources.Services {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TimelineApp.Resources.Services.UserService", typeof(UserService).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Services.UserService", typeof(UserService).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

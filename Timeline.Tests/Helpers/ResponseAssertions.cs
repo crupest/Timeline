@@ -9,10 +9,10 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using TimelineApp.Models.Converters;
-using TimelineApp.Models.Http;
+using Timeline.Models.Converters;
+using Timeline.Models.Http;
 
-namespace TimelineApp.Tests.Helpers
+namespace Timeline.Tests.Helpers
 {
     public class HttpResponseMessageValueFormatter : IValueFormatter
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TimelineApp.Resources.Controllers {
+namespace Timeline.Resources.Controllers {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TimelineApp.Resources.Controllers {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TimelineApp.Resources.Controllers.UserAvatarController", typeof(UserAvatarController).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Controllers.UserAvatarController", typeof(UserAvatarController).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

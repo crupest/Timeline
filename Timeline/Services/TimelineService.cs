@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using TimelineApp.Entities;
-using TimelineApp.Models;
-using TimelineApp.Models.Validation;
-using static TimelineApp.Resources.Services.TimelineService;
+using Timeline.Entities;
+using Timeline.Models;
+using Timeline.Models.Validation;
+using static Timeline.Resources.Services.TimelineService;
 
-namespace TimelineApp.Services
+namespace Timeline.Services
 {
     public enum TimelineUserRelationshipType
     {
@@ -67,7 +67,7 @@ namespace TimelineApp.Services
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
         /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        Task<Timeline> GetTimeline(string name);
+        Task<Models.Timeline> GetTimeline(string name);
 
         /// <summary>
         /// Set the properties of a timeline. 
@@ -252,7 +252,7 @@ namespace TimelineApp.Services
         /// <remarks>
         /// If user with related user id does not exist, empty list will be returned.
         /// </remarks>
-        Task<List<Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null);
+        Task<List<Models.Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null);
 
         /// <summary>
         /// Create a timeline.
@@ -264,7 +264,7 @@ namespace TimelineApp.Services
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="ConflictException">Thrown when the timeline already exists.</exception>
         /// <exception cref="UserNotExistException">Thrown when the owner user does not exist.</exception>
-        Task<Timeline> CreateTimeline(string name, long owner);
+        Task<Models.Timeline> CreateTimeline(string name, long owner);
 
         /// <summary>
         /// Delete a timeline.
@@ -334,7 +334,7 @@ namespace TimelineApp.Services
         /// </remarks>
         protected abstract Task<long> FindTimelineId(string name);
 
-        public async Task<Timeline> GetTimeline(string name)
+        public async Task<Models.Timeline> GetTimeline(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -353,7 +353,7 @@ namespace TimelineApp.Services
                 members.Add(await UserService.GetUserById(memberEntity.UserId));
             }
 
-            return new Timeline
+            return new Models.Timeline
             {
                 Name = timelineEntity.Name ?? ("@" + owner.Username),
                 Description = timelineEntity.Description ?? "",
@@ -849,7 +849,7 @@ namespace TimelineApp.Services
             }
         }
 
-        public async Task<List<Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
+        public async Task<List<Models.Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
         {
             List<TimelineEntity> entities;
 
@@ -883,12 +883,12 @@ namespace TimelineApp.Services
                 }
             }
 
-            var result = new List<Timeline>();
+            var result = new List<Models.Timeline>();
 
             foreach (var entity in entities)
             {
                 var owner = await _userService.GetUserById(entity.OwnerId);
-                var timeline = new Timeline
+                var timeline = new Models.Timeline
                 {
                     Name = entity.Name ?? ("@" + owner.Username),
                     Description = entity.Description ?? "",
@@ -908,7 +908,7 @@ namespace TimelineApp.Services
             return result;
         }
 
-        public async Task<Timeline> CreateTimeline(string name, long owner)
+        public async Task<Models.Timeline> CreateTimeline(string name, long owner)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -934,7 +934,7 @@ namespace TimelineApp.Services
             _database.Timelines.Add(newEntity);
             await _database.SaveChangesAsync();
 
-            return new Timeline
+            return new Models.Timeline
             {
                 Name = name,
                 Description = "",
@@ -978,7 +978,7 @@ namespace TimelineApp.Services
             }
         }
 
-        public Task<Timeline> GetTimeline(string name)
+        public Task<Models.Timeline> GetTimeline(string name)
         {
             var s = BranchName(name, out var realName);
             return s.GetTimeline(realName);

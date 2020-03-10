@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TimelineApp.Services
+namespace Timeline.Services
 {
     [Serializable]
     public class TimelineNotExistException : Exception

@@ -28,6 +28,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Timeline\TimelineApp.csproj" />
+      <ProjectReference Include="..\Timeline\Timeline.csproj" />
     </ItemGroup>
 </Project>

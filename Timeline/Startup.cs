@@ -10,15 +10,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Text.Json.Serialization;
-using TimelineApp.Auth;
-using TimelineApp.Configs;
-using TimelineApp.Entities;
-using TimelineApp.Formatters;
-using TimelineApp.Helpers;
-using TimelineApp.Models.Converters;
-using TimelineApp.Services;
+using Timeline.Auth;
+using Timeline.Configs;
+using Timeline.Entities;
+using Timeline.Formatters;
+using Timeline.Helpers;
+using Timeline.Models.Converters;
+using Timeline.Services;
 
-namespace TimelineApp
+namespace Timeline
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class Startup

@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TimelineApp.Filters;
-using TimelineApp.Models.Http;
-using TimelineApp.Models.Validation;
-using TimelineApp.Services;
+using Timeline.Filters;
+using Timeline.Models.Http;
+using Timeline.Models.Validation;
+using Timeline.Services;
 
-namespace TimelineApp.Controllers
+namespace Timeline.Controllers
 {
     [ApiController]
     [CatchTimelineNotExistException]

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace TimelineApp.Migrations
+namespace Timeline.Migrations
 {
     public partial class AddPostLocalId : Migration
     {

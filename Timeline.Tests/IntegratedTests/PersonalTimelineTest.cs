@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using TimelineApp.Models.Http;
-using TimelineApp.Tests.Helpers;
+using Timeline.Models.Http;
+using Timeline.Tests.Helpers;
 using Xunit;
 
-namespace TimelineApp.Tests.IntegratedTests
+namespace Timeline.Tests.IntegratedTests
 {
     public class PersonalTimelineTest : IntegratedTestBase
     {

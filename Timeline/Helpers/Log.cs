@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TimelineApp.Helpers
+namespace Timeline.Helpers
 {
     public static class Log
     {

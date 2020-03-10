@@ -2,10 +2,10 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Threading.Tasks;
-using TimelineApp.Tests.Helpers;
+using Timeline.Tests.Helpers;
 using Xunit;
 
-namespace TimelineApp.Tests.IntegratedTests
+namespace Timeline.Tests.IntegratedTests
 {
     public class AuthorizationTest : IntegratedTestBase
     {
