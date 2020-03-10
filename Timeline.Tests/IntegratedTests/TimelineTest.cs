@@ -909,5 +909,50 @@ namespace Timeline.Tests.IntegratedTests
                     .Which.Select(p => p.Id).Should().Equal(id1, id2, id0);
             }
         }
+
+        [Fact]
+        public async Task CreatePost_InvalidModel()
+        {
+            await CreateTestTimelines();
+
+            using var client = await CreateClientAsUser();
+
+            {
+                var res = await client.PostAsJsonAsync("timelines/t1/posts", new TimelinePostCreateRequest { Content = null });
+                res.Should().BeInvalidModel();
+            }
+
+            {
+                var res = await client.PostAsJsonAsync("timelines/t1/posts", new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = null } });
+                res.Should().BeInvalidModel();
+            }
+
+            {
+                var res = await client.PostAsJsonAsync("timelines/t1/posts", new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "hahaha" } });
+                res.Should().BeInvalidModel();
+            }
+
+            {
+                var res = await client.PostAsJsonAsync("timelines/t1/posts", new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "text", Text = null } });
+                res.Should().BeInvalidModel();
+            }
+
+            {
+                var res = await client.PostAsJsonAsync("timelines/t1/posts", new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = null } });
+                res.Should().BeInvalidModel();
+            }
+
+            {
+                // image not base64
+                var res = await client.PostAsJsonAsync("timelines/t1/posts", new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = "!!!" } });
+                res.Should().BeInvalidModel();
+            }
+
+            {
+                // image base64 not image
+                var res = await client.PostAsJsonAsync("timelines/t1/posts", new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = Convert.ToBase64String(new byte[] { 0x01, 0x02, 0x03 }) } });
+                res.Should().BeInvalidModel();
+            }
+        }
     }
 }
