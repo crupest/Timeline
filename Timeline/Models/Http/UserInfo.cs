@@ -45,7 +45,7 @@ namespace Timeline.Models.Http
             {
                 Self = urlHelper.ActionLink(nameof(UserController.Get), nameof(UserController)[0..^nameof(Controller).Length], new { destination.Username }),
                 Avatar = urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController)[0..^nameof(Controller).Length], new { destination.Username }),
-                Timeline = urlHelper.ActionLink(nameof(PersonalTimelineController.TimelineGet), nameof(PersonalTimelineController)[0..^nameof(Controller).Length], new { destination.Username })
+                Timeline = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { Name = "@" + destination.Username })
             };
             return result;
         }

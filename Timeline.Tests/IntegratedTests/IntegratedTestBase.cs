@@ -1,10 +1,13 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Timeline.Models;
+using Timeline.Models.Converters;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
@@ -14,12 +17,6 @@ namespace Timeline.Tests.IntegratedTests
 {
     public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
-        static IntegratedTestBase()
-        {
-            FluentAssertions.AssertionOptions.AssertEquivalencyUsing(options =>
-                options.Excluding(m => m.RuntimeType == typeof(UserInfoLinks)));
-        }
-
         protected TestApplication TestApp { get; }
 
         protected WebApplicationFactory<Startup> Factory => TestApp.Factory;
@@ -63,12 +60,22 @@ namespace Timeline.Tests.IntegratedTests
                 var userInfoList = new List<UserInfo>();
 
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-
                 foreach (var user in users)
                 {
                     userService.CreateUser(user).Wait();
-                    userInfoList.Add(mapper.Map<UserInfo>(user));
+                }
+
+                using var client = CreateDefaultClient().Result;
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+                options.Converters.Add(new JsonStringEnumConverter());
+                options.Converters.Add(new JsonDateTimeConverter());
+                foreach (var user in users)
+                {
+                    var s = client.GetStringAsync($"/users/{user.Username}").Result;
+                    userInfoList.Add(JsonSerializer.Deserialize<UserInfo>(s, options));
                 }
 
                 UserInfos = userInfoList;

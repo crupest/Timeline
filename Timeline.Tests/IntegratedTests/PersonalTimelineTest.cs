@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
@@ -23,7 +24,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task TimelineGet_Should_Work()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.GetAsync("users/user1/timeline");
+            var res = await client.GetAsync("timelines/@user1");
             var body = res.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<TimelineInfo>().Which;
             body.Owner.Should().BeEquivalentTo(UserInfos[1]);
@@ -37,31 +38,31 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
             {
-                var res = await client.GetAsync("users/user!!!/timeline");
+                var res = await client.GetAsync("timelines/@user!!!");
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.PatchAsJsonAsync("users/user!!!/timeline", new TimelinePatchRequest { });
+                var res = await client.PatchAsJsonAsync("timelines/@user!!!", new TimelinePatchRequest { });
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.PutAsync("users/user!!!/timeline/members/user1", null);
+                var res = await client.PutAsync("timelines/@user!!!/members/user1", null);
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.DeleteAsync("users/user!!!/timeline/members/user1");
+                var res = await client.DeleteAsync("timelines/@user!!!/members/user1");
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.GetAsync("users/user!!!/timeline/posts");
+                var res = await client.GetAsync("timelines/@user!!!/posts");
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.PostAsJsonAsync("users/user!!!/timeline/posts", new TimelinePostCreateRequest { Content = "aaa" });
+                var res = await client.PostAsJsonAsync("timelines/@user!!!/posts", TimelineHelper.TextPostCreateRequest("aaa"));
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.DeleteAsync("users/user!!!/timeline/posts/123");
+                var res = await client.DeleteAsync("timelines/@user!!!/posts/123");
                 res.Should().BeInvalidModel();
             }
         }
@@ -71,31 +72,31 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
             {
-                var res = await client.GetAsync("users/usernotexist/timeline");
+                var res = await client.GetAsync("timelines/@usernotexist");
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
             }
             {
-                var res = await client.PatchAsJsonAsync("users/usernotexist/timeline", new TimelinePatchRequest { });
+                var res = await client.PatchAsJsonAsync("timelines/@usernotexist", new TimelinePatchRequest { });
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
             }
             {
-                var res = await client.PutAsync("users/usernotexist/timeline/members/user1", null);
+                var res = await client.PutAsync("timelines/@usernotexist/members/user1", null);
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
             }
             {
-                var res = await client.DeleteAsync("users/usernotexist/timeline/members/user1");
+                var res = await client.DeleteAsync("timelines/@usernotexist/members/user1");
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
             }
             {
-                var res = await client.GetAsync("users/usernotexist/timeline/posts");
+                var res = await client.GetAsync("timelines/@usernotexist/posts");
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
             }
             {
-                var res = await client.PostAsJsonAsync("users/usernotexist/timeline/posts", new TimelinePostCreateRequest { Content = "aaa" });
+                var res = await client.PostAsJsonAsync("timelines/@usernotexist/posts", TimelineHelper.TextPostCreateRequest("aaa"));
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
             }
             {
-                var res = await client.DeleteAsync("users/usernotexist/timeline/posts/123");
+                var res = await client.DeleteAsync("timelines/@usernotexist/posts/123");
                 res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
             }
         }
@@ -107,7 +108,7 @@ namespace Timeline.Tests.IntegratedTests
 
             async Task AssertDescription(string description)
             {
-                var res = await client.GetAsync("users/user1/timeline");
+                var res = await client.GetAsync("timelines/@user1");
                 var body = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>()
                     .Which.Description.Should().Be(description);
@@ -117,21 +118,21 @@ namespace Timeline.Tests.IntegratedTests
 
             await AssertDescription("");
             {
-                var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                var res = await client.PatchAsJsonAsync("timelines/@user1",
                     new TimelinePatchRequest { Description = mockDescription });
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>().Which.Description.Should().Be(mockDescription);
                 await AssertDescription(mockDescription);
             }
             {
-                var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                var res = await client.PatchAsJsonAsync("timelines/@user1",
                     new TimelinePatchRequest { Description = null });
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>().Which.Description.Should().Be(mockDescription);
                 await AssertDescription(mockDescription);
             }
             {
-                var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                var res = await client.PatchAsJsonAsync("timelines/@user1",
                     new TimelinePatchRequest { Description = "" });
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>().Which.Description.Should().Be("");
@@ -142,7 +143,7 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task Member_Should_Work()
         {
-            const string getUrl = "users/user1/timeline";
+            const string getUrl = "timelines/@user1";
             using var client = await CreateClientAsUser();
 
             async Task AssertMembers(IList<UserInfo> members)
@@ -163,23 +164,23 @@ namespace Timeline.Tests.IntegratedTests
 
             await AssertEmptyMembers();
             {
-                var res = await client.PutAsync("/users/user1/timeline/members/usernotexist", null);
+                var res = await client.PutAsync("/timelines/@user1/members/usernotexist", null);
                 res.Should().HaveStatusCode(400)
                     .And.HaveCommonBody(ErrorCodes.TimelineCommon.MemberPut_NotExist);
             }
             await AssertEmptyMembers();
             {
-                var res = await client.PutAsync("/users/user1/timeline/members/user2", null);
+                var res = await client.PutAsync("/timelines/@user1/members/user2", null);
                 res.Should().HaveStatusCode(200);
             }
             await AssertMembers(new List<UserInfo> { UserInfos[2] });
             {
-                var res = await client.DeleteAsync("/users/user1/timeline/members/user2");
+                var res = await client.DeleteAsync("/timelines/@user1/members/user2");
                 res.Should().BeDelete(true);
             }
             await AssertEmptyMembers();
             {
-                var res = await client.DeleteAsync("/users/user1/timeline/members/users2");
+                var res = await client.DeleteAsync("/timelines/@user1/members/users2");
                 res.Should().BeDelete(false);
             }
             await AssertEmptyMembers();
@@ -193,37 +194,37 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAs(userNumber);
             {
-                var res = await client.GetAsync("users/user1/timeline");
+                var res = await client.GetAsync("timelines/@user1");
                 res.Should().HaveStatusCode(get);
             }
 
             {
-                var res = await client.PatchAsJsonAsync("users/user1/timeline", new TimelinePatchRequest { Description = "hahaha" });
+                var res = await client.PatchAsJsonAsync("timelines/@user1", new TimelinePatchRequest { Description = "hahaha" });
                 res.Should().HaveStatusCode(opPatchUser);
             }
 
             {
-                var res = await client.PatchAsJsonAsync("users/admin/timeline", new TimelinePatchRequest { Description = "hahaha" });
+                var res = await client.PatchAsJsonAsync("timelines/@admin", new TimelinePatchRequest { Description = "hahaha" });
                 res.Should().HaveStatusCode(opPatchAdmin);
             }
 
             {
-                var res = await client.PutAsync("users/user1/timeline/members/user2", null);
+                var res = await client.PutAsync("timelines/@user1/members/user2", null);
                 res.Should().HaveStatusCode(opMemberUser);
             }
 
             {
-                var res = await client.DeleteAsync("users/user1/timeline/members/user2");
+                var res = await client.DeleteAsync("timelines/@user1/members/user2");
                 res.Should().HaveStatusCode(opMemberUser);
             }
 
             {
-                var res = await client.PutAsync("users/admin/timeline/members/user2", null);
+                var res = await client.PutAsync("timelines/@admin/members/user2", null);
                 res.Should().HaveStatusCode(opMemberAdmin);
             }
 
             {
-                var res = await client.DeleteAsync("users/admin/timeline/members/user2");
+                var res = await client.DeleteAsync("timelines/@admin/members/user2");
                 res.Should().HaveStatusCode(opMemberAdmin);
             }
         }
@@ -231,13 +232,13 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task Visibility_Test()
         {
-            const string userUrl = "users/user1/timeline/posts";
-            const string adminUrl = "users/admin/timeline/posts";
+            const string userUrl = "timelines/@user1/posts";
+            const string adminUrl = "timelines/@admin/posts";
             {
 
                 using var client = await CreateClientAsUser();
                 using var content = new StringContent(@"{""visibility"":""abcdefg""}", System.Text.Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
-                var res = await client.PatchAsync("users/user1/timeline", content);
+                var res = await client.PatchAsync("timelines/@user1", content);
                 res.Should().BeInvalidModel();
             }
             { // default visibility is registered
@@ -257,7 +258,7 @@ namespace Timeline.Tests.IntegratedTests
             { // change visibility to public
                 {
                     using var client = await CreateClientAsUser();
-                    var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                    var res = await client.PatchAsJsonAsync("timelines/@user1",
                         new TimelinePatchRequest { Visibility = TimelineVisibility.Public });
                     res.Should().HaveStatusCode(200);
                 }
@@ -272,12 +273,12 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     using var client = await CreateClientAsAdministrator();
                     {
-                        var res = await client.PatchAsJsonAsync("users/user1/timeline",
+                        var res = await client.PatchAsJsonAsync("timelines/@user1",
                         new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
                         res.Should().HaveStatusCode(200);
                     }
                     {
-                        var res = await client.PatchAsJsonAsync("users/admin/timeline",
+                        var res = await client.PatchAsJsonAsync("timelines/@admin",
                             new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
                         res.Should().HaveStatusCode(200);
                     }
@@ -299,7 +300,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
                 { // add member
                     using var client = await CreateClientAsAdministrator();
-                    var res = await client.PutAsync("/users/admin/timeline/members/user1", null);
+                    var res = await client.PutAsync("/timelines/@admin/members/user1", null);
                     res.Should().HaveStatusCode(200);
                 }
                 { // now user can read admin's
@@ -316,15 +317,15 @@ namespace Timeline.Tests.IntegratedTests
         {
             using (var client = await CreateClientAsUser())
             {
-                var res = await client.PutAsync("users/user1/timeline/members/user2", null);
+                var res = await client.PutAsync("timelines/@user1/members/user2", null);
                 res.Should().HaveStatusCode(200);
             }
 
             using (var client = await CreateDefaultClient())
             {
                 { // no auth should get 401
-                    var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                    var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(401);
                 }
             }
@@ -332,13 +333,13 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await CreateClientAsUser())
             {
                 { // post self's
-                    var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                    var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(200);
                 }
                 { // post other not as a member should get 403
-                    var res = await client.PostAsJsonAsync("users/admin/timeline/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                    var res = await client.PostAsJsonAsync("timelines/@admin/posts",
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(403);
                 }
             }
@@ -346,8 +347,8 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await CreateClientAsAdministrator())
             {
                 { // post as admin
-                    var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                    var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(200);
                 }
             }
@@ -355,8 +356,8 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await CreateClientAs(2))
             {
                 { // post as member
-                    var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                        new TimelinePostCreateRequest { Content = "aaa" });
+                    var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                        TimelineHelper.TextPostCreateRequest("aaa"));
                     res.Should().HaveStatusCode(200);
                 }
             }
@@ -368,8 +369,8 @@ namespace Timeline.Tests.IntegratedTests
             async Task<long> CreatePost(int userNumber)
             {
                 using var client = await CreateClientAs(userNumber);
-                var res = await client.PostAsJsonAsync($"users/user1/timeline/posts",
-                    new TimelinePostCreateRequest { Content = "aaa" });
+                var res = await client.PostAsJsonAsync($"timelines/@user1/posts",
+                    TimelineHelper.TextPostCreateRequest("aaa"));
                 return res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelinePostInfo>()
                     .Which.Id;
@@ -378,53 +379,53 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await CreateClientAsUser())
             {
                 {
-                    var res = await client.PutAsync("users/user1/timeline/members/user2", null);
+                    var res = await client.PutAsync("timelines/@user1/members/user2", null);
                     res.Should().HaveStatusCode(200);
                 }
                 {
-                    var res = await client.PutAsync("users/user1/timeline/members/user3", null);
+                    var res = await client.PutAsync("timelines/@user1/members/user3", null);
                     res.Should().HaveStatusCode(200);
                 }
             }
 
             { // no auth should get 401
                 using var client = await CreateDefaultClient();
-                var res = await client.DeleteAsync("users/user1/timeline/posts/12");
+                var res = await client.DeleteAsync("timelines/@user1/posts/12");
                 res.Should().HaveStatusCode(401);
             }
 
             { // self can delete self
                 var postId = await CreatePost(1);
                 using var client = await CreateClientAsUser();
-                var res = await client.DeleteAsync($"users/user1/timeline/posts/{postId}");
+                var res = await client.DeleteAsync($"timelines/@user1/posts/{postId}");
                 res.Should().HaveStatusCode(200);
             }
 
             { // admin can delete any
                 var postId = await CreatePost(1);
                 using var client = await CreateClientAsAdministrator();
-                var res = await client.DeleteAsync($"users/user1/timeline/posts/{postId}");
+                var res = await client.DeleteAsync($"timelines/@user1/posts/{postId}");
                 res.Should().HaveStatusCode(200);
             }
 
             { // owner can delete other
                 var postId = await CreatePost(2);
                 using var client = await CreateClientAsUser();
-                var res = await client.DeleteAsync($"users/user1/timeline/posts/{postId}");
+                var res = await client.DeleteAsync($"timelines/@user1/posts/{postId}");
                 res.Should().HaveStatusCode(200);
             }
 
             { // author can delete self
                 var postId = await CreatePost(2);
                 using var client = await CreateClientAs(2);
-                var res = await client.DeleteAsync($"users/user1/timeline/posts/{postId}");
+                var res = await client.DeleteAsync($"timelines/@user1/posts/{postId}");
                 res.Should().HaveStatusCode(200);
             }
 
             { // otherwise is forbidden
                 var postId = await CreatePost(2);
                 using var client = await CreateClientAs(3);
-                var res = await client.DeleteAsync($"users/user1/timeline/posts/{postId}");
+                var res = await client.DeleteAsync($"timelines/@user1/posts/{postId}");
                 res.Should().HaveStatusCode(403);
             }
         }
@@ -435,31 +436,31 @@ namespace Timeline.Tests.IntegratedTests
             {
                 using var client = await CreateClientAsUser();
                 {
-                    var res = await client.GetAsync("users/user1/timeline/posts");
+                    var res = await client.GetAsync("timelines/@user1/posts");
                     res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo[]>()
                         .Which.Should().NotBeNull().And.BeEmpty();
                 }
                 {
-                    var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                        new TimelinePostCreateRequest { Content = null });
+                    var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                        TimelineHelper.TextPostCreateRequest(null));
                     res.Should().BeInvalidModel();
                 }
                 const string mockContent = "aaa";
                 TimelinePostInfo createRes;
                 {
-                    var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                        new TimelinePostCreateRequest { Content = mockContent });
+                    var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                        TimelineHelper.TextPostCreateRequest(mockContent));
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo>()
                         .Which;
                     body.Should().NotBeNull();
-                    body.Content.Should().Be(mockContent);
+                    body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent));
                     body.Author.Should().BeEquivalentTo(UserInfos[1]);
                     createRes = body;
                 }
                 {
-                    var res = await client.GetAsync("users/user1/timeline/posts");
+                    var res = await client.GetAsync("timelines/@user1/posts");
                     res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo[]>()
                         .Which.Should().NotBeNull().And.BeEquivalentTo(createRes);
@@ -468,33 +469,33 @@ namespace Timeline.Tests.IntegratedTests
                 var mockTime2 = DateTime.Now.AddDays(-1);
                 TimelinePostInfo createRes2;
                 {
-                    var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                        new TimelinePostCreateRequest { Content = mockContent2, Time = mockTime2 });
+                    var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                        TimelineHelper.TextPostCreateRequest(mockContent2, mockTime2));
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo>()
                         .Which;
                     body.Should().NotBeNull();
-                    body.Content.Should().Be(mockContent2);
+                    body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent2));
                     body.Author.Should().BeEquivalentTo(UserInfos[1]);
                     body.Time.Should().BeCloseTo(mockTime2, 1000);
                     createRes2 = body;
                 }
                 {
-                    var res = await client.GetAsync("users/user1/timeline/posts");
+                    var res = await client.GetAsync("timelines/@user1/posts");
                     res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo[]>()
                         .Which.Should().NotBeNull().And.BeEquivalentTo(createRes, createRes2);
                 }
                 {
-                    var res = await client.DeleteAsync($"users/user1/timeline/posts/{createRes.Id}");
+                    var res = await client.DeleteAsync($"timelines/@user1/posts/{createRes.Id}");
                     res.Should().BeDelete(true);
                 }
                 {
-                    var res = await client.DeleteAsync("users/user1/timeline/posts/30000");
+                    var res = await client.DeleteAsync("timelines/@user1/posts/30000");
                     res.Should().BeDelete(false);
                 }
                 {
-                    var res = await client.GetAsync("users/user1/timeline/posts");
+                    var res = await client.GetAsync("timelines/@user1/posts");
                     res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelinePostInfo[]>()
                         .Which.Should().NotBeNull().And.BeEquivalentTo(createRes2);
@@ -509,8 +510,8 @@ namespace Timeline.Tests.IntegratedTests
 
             async Task<long> CreatePost(DateTime time)
             {
-                var res = await client.PostAsJsonAsync("users/user1/timeline/posts",
-                    new TimelinePostCreateRequest { Content = "aaa", Time = time });
+                var res = await client.PostAsJsonAsync("timelines/@user1/posts",
+                    TimelineHelper.TextPostCreateRequest("aaa", time));
                 return res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelinePostInfo>()
                     .Which.Id;
@@ -522,7 +523,7 @@ namespace Timeline.Tests.IntegratedTests
             var id2 = await CreatePost(now);
 
             {
-                var res = await client.GetAsync("users/user1/timeline/posts");
+                var res = await client.GetAsync("timelines/@user1/posts");
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelinePostInfo[]>()
                     .Which.Select(p => p.Id).Should().Equal(id1, id2, id0);
