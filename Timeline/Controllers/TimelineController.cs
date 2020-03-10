@@ -123,8 +123,52 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var res = await _service.CreatePost(name, id, body.Content, body.Time);
-            return res;
+            var content = body.Content;
+
+            TimelinePost post;
+
+            if (content.Type == TimelinePostContentTypes.Text)
+            {
+                var text = content.Text;
+                if (text == null)
+                {
+                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
+                }
+                post = await _service.CreateTextPost(name, id, text, body.Time);
+            }
+            else if (content.Type == TimelinePostContentTypes.Image)
+            {
+                var base64Data = content.Data;
+                if (base64Data == null)
+                {
+                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataRequired));
+                }
+                byte[] data;
+                try
+                {
+                    data = Convert.FromBase64String(base64Data);
+                }
+                catch (FormatException)
+                {
+                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotBase64));
+                }
+
+                try
+                {
+                    post = await _service.CreateImagePost(name, id, data, body.Time);
+                }
+                catch (ImageException)
+                {
+                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotImage));
+                }
+            }
+            else
+            {
+                return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ContentUnknownType));
+            }
+
+            var result = _mapper.Map<TimelinePostInfo>(post);
+            return result;
         }
 
         [HttpDelete("timelines/{name}/posts/{id}")]

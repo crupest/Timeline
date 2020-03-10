@@ -178,6 +178,42 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown type of post content..
+        /// </summary>
+        internal static string TimelineController_ContentUnknownType {
+            get {
+                return ResourceManager.GetString("TimelineController_ContentUnknownType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data field is not a valid base64 string in image content..
+        /// </summary>
+        internal static string TimelineController_ImageContentDataNotBase64 {
+            get {
+                return ResourceManager.GetString("TimelineController_ImageContentDataNotBase64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data field is not a valid image after base64 decoding in image content..
+        /// </summary>
+        internal static string TimelineController_ImageContentDataNotImage {
+            get {
+                return ResourceManager.GetString("TimelineController_ImageContentDataNotImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data field is required for image content..
+        /// </summary>
+        internal static string TimelineController_ImageContentDataRequired {
+            get {
+                return ResourceManager.GetString("TimelineController_ImageContentDataRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user specified by query param &quot;relate&quot; does not exist..
         /// </summary>
         internal static string TimelineController_QueryRelateNotExist {
@@ -192,6 +228,15 @@ namespace Timeline.Resources {
         internal static string TimelineController_QueryVisibilityUnknown {
             get {
                 return ResourceManager.GetString("TimelineController_QueryVisibilityUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text field is required for text content..
+        /// </summary>
+        internal static string TimelineController_TextContentTextRequired {
+            get {
+                return ResourceManager.GetString("TimelineController_TextContentTextRequired", resourceCulture);
             }
         }
         

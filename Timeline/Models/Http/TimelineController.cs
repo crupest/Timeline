@@ -14,6 +14,7 @@ namespace Timeline.Models.Http
 
     public class TimelinePostCreateRequest
     {
+        [Required]
         public TimelinePostCreateRequestContent Content { get; set; } = default!;
 
         public DateTime? Time { get; set; }
