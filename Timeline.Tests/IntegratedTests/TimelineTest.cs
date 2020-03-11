@@ -43,7 +43,11 @@ namespace Timeline.Tests.IntegratedTests
         public TimelineTest(WebApplicationFactory<Startup> factory)
             : base(factory, 3)
         {
-            CreateTestTimelines().Wait();
+        }
+
+        protected override async Task OnInitializeAsync()
+        {
+            await CreateTestTimelines();
         }
 
         private List<TimelineInfo> _testTimelines;
