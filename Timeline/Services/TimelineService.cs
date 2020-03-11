@@ -210,19 +210,18 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
         /// <param name="modifierId">The id of the user to check on.</param>
+        /// <param name="throwOnPostNotExist">True if you want it to throw <see cref="TimelinePostNotExistException"/>. Default false.</param>
         /// <returns>True if can modify, false if can't modify.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
         /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
         /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelinePostNotExistException">
-        /// Thrown when the post with given id does not exist or is deleted already.
-        /// </exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when the post with given id does not exist or is deleted already and <paramref name="throwOnPostNotExist"/> is true.</exception>
         /// <remarks>
         /// This method does not check whether the user is administrator.
         /// It only checks whether he is the author of the post or the owner of the timeline.
         /// Return false when user with modifier id does not exist.
         /// </remarks>
-        Task<bool> HasPostModifyPermission(string name, long id, long modifierId);
+        Task<bool> HasPostModifyPermission(string name, long id, long modifierId, bool throwOnPostNotExist = false);
 
         /// <summary>
         /// Verify whether a user is member of a timeline.
@@ -705,7 +704,7 @@ namespace Timeline.Services
             }
         }
 
-        public async Task<bool> HasPostModifyPermission(string name, long id, long modifierId)
+        public async Task<bool> HasPostModifyPermission(string name, long id, long modifierId, bool throwOnPostNotExist = false)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -716,10 +715,12 @@ namespace Timeline.Services
 
             var postEntity = await Database.TimelinePosts.Where(p => p.Id == id).Select(p => new { p.AuthorId }).SingleOrDefaultAsync();
 
-            if (postEntity == null)
-                throw new TimelinePostNotExistException(name, id);
+            if (postEntity == null && throwOnPostNotExist)
+            {
+                throw new TimelinePostNotExistException(name, id, false);
+            }
 
-            return timelineEntity.OwnerId == modifierId || postEntity.AuthorId == modifierId;
+            return timelineEntity.OwnerId == modifierId || postEntity == null || postEntity.AuthorId == modifierId;
         }
 
         public async Task<bool> IsMemberOf(string name, long userId)
@@ -1055,10 +1056,10 @@ namespace Timeline.Services
             return s.HasReadPermission(realName, visitorId);
         }
 
-        public Task<bool> HasPostModifyPermission(string name, long id, long modifierId)
+        public Task<bool> HasPostModifyPermission(string name, long id, long modifierId, bool throwOnPostNotExist = false)
         {
             var s = BranchName(name, out var realName);
-            return s.HasPostModifyPermission(realName, id, modifierId);
+            return s.HasPostModifyPermission(realName, id, modifierId, throwOnPostNotExist);
         }
 
         public Task<bool> IsMemberOf(string name, long userId)

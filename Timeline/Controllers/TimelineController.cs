@@ -189,12 +189,12 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
         {
+            if (!this.IsAdministrator() && !await _service.HasPostModifyPermission(name, id, this.GetUserId()))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
             try
             {
-                if (!this.IsAdministrator() && !await _service.HasPostModifyPermission(name, id, this.GetUserId()))
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
-                }
                 await _service.DeletePost(name, id);
                 return CommonDeleteResponse.Delete();
             }
