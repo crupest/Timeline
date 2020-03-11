@@ -285,6 +285,16 @@ namespace Timeline.Models.Http
                 return new CommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, string.Format(message, formatArgs));
             }
 
+            public static CommonResponse PostNotExist(params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineController.PostNotExist, string.Format(TimelineController_PostNotExist, formatArgs));
+            }
+
+            public static CommonResponse CustomMessage_PostNotExist(string message, params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.TimelineController.PostNotExist, string.Format(message, formatArgs));
+            }
+
             public static CommonResponse PostNoData(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.TimelineController.PostNoData, string.Format(TimelineController_PostNoData, formatArgs));

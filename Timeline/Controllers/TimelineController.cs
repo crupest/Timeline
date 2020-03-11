@@ -123,8 +123,19 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var data = await _service.GetPostData(name, id);
-            return File(data.Data, data.Type, data.LastModified, new EntityTagHeaderValue(data.ETag));
+            try
+            {
+                var data = await _service.GetPostData(name, id);
+                return File(data.Data, data.Type, data.LastModified, new EntityTagHeaderValue(data.ETag));
+            }
+            catch (TimelinePostNotExistException)
+            {
+                return NotFound(ErrorResponse.TimelineController.PostNotExist());
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest(ErrorResponse.TimelineController.PostNoData());
+            }
         }
 
         [HttpPost("timelines/{name}/posts")]
