@@ -234,7 +234,7 @@ namespace Timeline.Controllers
             }
             catch (UserNotExistException)
             {
-                return BadRequest(ErrorResponse.TimelineCommon.MemberPut_NotExist());
+                return BadRequest(ErrorResponse.TimelineController.MemberPut_NotExist());
             }
         }
 
@@ -272,7 +272,7 @@ namespace Timeline.Controllers
             }
             catch (ConflictException)
             {
-                return BadRequest(ErrorResponse.TimelineCommon.NameConflict());
+                return BadRequest(ErrorResponse.TimelineController.NameConflict());
             }
         }
 

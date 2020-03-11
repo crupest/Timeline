@@ -56,16 +56,13 @@
             public const int BadFormat_BadSize = 1_103_00_03;
         }
 
-        public static class TimelineCommon
+        public static class TimelineController
         {
             public const int NameConflict = 1_104_01_01;
             public const int NotExist = 1_104_02_01;
             public const int MemberPut_NotExist = 1_104_03_01;
-        }
-
-        public static class TimelineController
-        {
-            public const int QueryRelateNotExist = 1_105_01_01;
+            public const int QueryRelateNotExist = 1_104_04_01;
+            public const int PostNoData = 1_104_05_01;
         }
     }
 }

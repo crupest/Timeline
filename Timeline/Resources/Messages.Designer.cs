@@ -151,33 +151,6 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user to set as member does not exist..
-        /// </summary>
-        internal static string TimelineCommon_MemberPut_NotExist {
-            get {
-                return ResourceManager.GetString("TimelineCommon_MemberPut_NotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A timeline with given name already exists..
-        /// </summary>
-        internal static string TimelineCommon_NameConflict {
-            get {
-                return ResourceManager.GetString("TimelineCommon_NameConflict", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The timeline with given name does not exist..
-        /// </summary>
-        internal static string TimelineCommon_NotExist {
-            get {
-                return ResourceManager.GetString("TimelineCommon_NotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Unknown type of post content..
         /// </summary>
         internal static string TimelineController_ContentUnknownType {
@@ -210,6 +183,42 @@ namespace Timeline.Resources {
         internal static string TimelineController_ImageContentDataRequired {
             get {
                 return ResourceManager.GetString("TimelineController_ImageContentDataRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user to set as member does not exist..
+        /// </summary>
+        internal static string TimelineController_MemberPut_NotExist {
+            get {
+                return ResourceManager.GetString("TimelineController_MemberPut_NotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timeline with given name already exists..
+        /// </summary>
+        internal static string TimelineController_NameConflict {
+            get {
+                return ResourceManager.GetString("TimelineController_NameConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The timeline with given name does not exist..
+        /// </summary>
+        internal static string TimelineController_NotExist {
+            get {
+                return ResourceManager.GetString("TimelineController_NotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The post of that type has no data..
+        /// </summary>
+        internal static string TimelineController_PostNoData {
+            get {
+                return ResourceManager.GetString("TimelineController_PostNoData", resourceCulture);
             }
         }
         

@@ -287,11 +287,11 @@ namespace Timeline.Services
 
     }
 
-    public abstract class BaseTimelineManager : IBaseTimelineService
+    public abstract class BaseTimelineService : IBaseTimelineService
     {
-        protected BaseTimelineManager(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
+        protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
         {
-            _logger = loggerFactory.CreateLogger<BaseTimelineManager>();
+            _logger = loggerFactory.CreateLogger<BaseTimelineService>();
             Clock = clock;
             Database = database;
             ImageValidator = imageValidator;
@@ -299,7 +299,7 @@ namespace Timeline.Services
             UserService = userService;
         }
 
-        private ILogger<BaseTimelineManager> _logger;
+        private ILogger<BaseTimelineService> _logger;
 
         protected IClock Clock { get; }
 
@@ -546,7 +546,7 @@ namespace Timeline.Services
 
             var post = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == id).SingleOrDefaultAsync();
 
-            if (post == null)
+            if (post == null || post.Content == null)
                 throw new TimelinePostNotExistException(name, id);
 
             string? dataTag = null;
@@ -739,7 +739,7 @@ namespace Timeline.Services
         }
     }
 
-    public class OrdinaryTimelineService : BaseTimelineManager, IOrdinaryTimelineService
+    public class OrdinaryTimelineService : BaseTimelineService, IOrdinaryTimelineService
     {
         private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
 
@@ -782,7 +782,7 @@ namespace Timeline.Services
         }
     }
 
-    public class PersonalTimelineService : BaseTimelineManager, IPersonalTimelineService
+    public class PersonalTimelineService : BaseTimelineService, IPersonalTimelineService
     {
         public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
             : base(loggerFactory, database, imageValidator, dataManager, userService, clock)
