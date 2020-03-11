@@ -98,16 +98,36 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task Personal_TimelineGet_Should_Work()
+        public async Task TimelineGet_Should_Work()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.GetAsync("timelines/@user1");
-            var body = res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<TimelineInfo>().Which;
-            body.Owner.Should().BeEquivalentTo(UserInfos[1]);
-            body.Visibility.Should().Be(TimelineVisibility.Register);
-            body.Description.Should().Be("");
-            body.Members.Should().NotBeNull().And.BeEmpty();
+            {
+                var res = await client.GetAsync("timelines/@user1");
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>().Which;
+                body.Owner.Should().BeEquivalentTo(UserInfos[1]);
+                body.Visibility.Should().Be(TimelineVisibility.Register);
+                body.Description.Should().Be("");
+                body.Members.Should().NotBeNull().And.BeEmpty();
+                var links = body._links;
+                links.Should().NotBeNull();
+                links.Self.Should().EndWith("/timelines/@user1");
+                links.Posts.Should().EndWith("/timelines/@user1/posts");
+            }
+
+            {
+                var res = await client.GetAsync("timelines/t1");
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>().Which;
+                body.Owner.Should().BeEquivalentTo(UserInfos[1]);
+                body.Visibility.Should().Be(TimelineVisibility.Register);
+                body.Description.Should().Be("");
+                body.Members.Should().NotBeNull().And.BeEmpty();
+                var links = body._links;
+                links.Should().NotBeNull();
+                links.Self.Should().EndWith("/timelines/t1");
+                links.Posts.Should().EndWith("/timelines/t1/posts");
+            }
         }
 
         [Fact]
