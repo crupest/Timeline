@@ -171,6 +171,9 @@
   <data name="TimelineController_PostNoData" xml:space="preserve">
     <value>The post of that type has no data.</value>
   </data>
+  <data name="TimelineController_PostNotExist" xml:space="preserve">
+    <value>The post to operate on does not exist.</value>
+  </data>
   <data name="TimelineController_QueryRelateNotExist" xml:space="preserve">
     <value>The user specified by query param "relate" does not exist.</value>
   </data>

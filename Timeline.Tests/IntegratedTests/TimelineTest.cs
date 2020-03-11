@@ -77,6 +77,22 @@ namespace Timeline.Tests.IntegratedTests
             yield return new[] { new Func<int, string, string>(GenerateOrdinaryTimelineUrl) };
         }
 
+        private static string GeneratePersonalTimelineUrlByName(string name, string subpath = null)
+        {
+            return $"timelines/@{name}{(subpath == null ? "" : ("/" + subpath))}";
+        }
+
+        private static string GenerateOrdinaryTimelineUrlByName(string name, string subpath = null)
+        {
+            return $"timelines/{name}{(subpath == null ? "" : ("/" + subpath))}";
+        }
+
+        public static IEnumerable<object[]> TimelineUrlByNameGeneratorData()
+        {
+            yield return new[] { new Func<string, string, string>(GeneratePersonalTimelineUrlByName) };
+            yield return new[] { new Func<string, string, string>(GenerateOrdinaryTimelineUrlByName) };
+        }
+
         [Fact]
         public async Task Personal_TimelineGet_Should_Work()
         {
@@ -420,140 +436,83 @@ namespace Timeline.Tests.IntegratedTests
             }
         }
 
-        [Fact]
-        public async Task Ordinary_InvalidModel_BadName()
+        [Theory]
+        [MemberData(nameof(TimelineUrlByNameGeneratorData))]
+        public async Task InvalidModel_BadName(Func<string, string, string> generator)
         {
             using var client = await CreateClientAsAdministrator();
             {
-                var res = await client.GetAsync("timelines/aaa!!!");
+                var res = await client.GetAsync(generator("aaa!!!", null));
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.PatchAsJsonAsync("timelines/aaa!!!", new TimelinePatchRequest { });
+                var res = await client.PatchAsJsonAsync(generator("aaa!!!", null), new TimelinePatchRequest { });
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.PutAsync("timelines/aaa!!!/members/user1", null);
+                var res = await client.PutAsync(generator("aaa!!!", "members/user1"), null);
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.DeleteAsync("timelines/aaa!!!/members/user1");
+                var res = await client.DeleteAsync(generator("aaa!!!/members", "user1"));
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.GetAsync("timelines/aaa!!!/posts");
+                var res = await client.GetAsync(generator("aaa!!!", "posts"));
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.PostAsJsonAsync("timelines/aaa!!!/posts", TimelineHelper.TextPostCreateRequest("aaa"));
+                var res = await client.PostAsJsonAsync(generator("aaa!!!", "posts"), TimelineHelper.TextPostCreateRequest("aaa"));
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.DeleteAsync("timelines/aaa!!!/posts/123");
+                var res = await client.DeleteAsync(generator("aaa!!!", "posts/123"));
+                res.Should().BeInvalidModel();
+            }
+            {
+                var res = await client.GetAsync(generator("aaa!!!", "posts/123/data"));
                 res.Should().BeInvalidModel();
             }
         }
 
-        [Fact]
-        public async Task Personal_InvalidModel_BadUsername()
+        [Theory]
+        [MemberData(nameof(TimelineUrlByNameGeneratorData))]
+        public async Task Ordinary_NotFound(Func<string, string, string> generator)
         {
+            var errorCode = generator == GenerateOrdinaryTimelineUrlByName ? ErrorCodes.TimelineController.NotExist : ErrorCodes.UserCommon.NotExist;
+
             using var client = await CreateClientAsAdministrator();
             {
-                var res = await client.GetAsync("timelines/@user!!!");
-                res.Should().BeInvalidModel();
+                var res = await client.GetAsync(generator("notexist", null));
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
             {
-                var res = await client.PatchAsJsonAsync("timelines/@user!!!", new TimelinePatchRequest { });
-                res.Should().BeInvalidModel();
+                var res = await client.PatchAsJsonAsync(generator("notexist", null), new TimelinePatchRequest { });
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
             {
-                var res = await client.PutAsync("timelines/@user!!!/members/user1", null);
-                res.Should().BeInvalidModel();
+                var res = await client.PutAsync(generator("notexist", "members/user1"), null);
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
             {
-                var res = await client.DeleteAsync("timelines/@user!!!/members/user1");
-                res.Should().BeInvalidModel();
+                var res = await client.DeleteAsync(generator("notexist", "members/user1"));
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
             {
-                var res = await client.GetAsync("timelines/@user!!!/posts");
-                res.Should().BeInvalidModel();
+                var res = await client.GetAsync(generator("notexist", "posts"));
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
             {
-                var res = await client.PostAsJsonAsync("timelines/@user!!!/posts", TimelineHelper.TextPostCreateRequest("aaa"));
-                res.Should().BeInvalidModel();
+                var res = await client.PostAsJsonAsync(generator("notexist", "posts"), TimelineHelper.TextPostCreateRequest("aaa"));
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
             {
-                var res = await client.DeleteAsync("timelines/@user!!!/posts/123");
-                res.Should().BeInvalidModel();
-            }
-        }
-
-        [Fact]
-        public async Task Ordinary_NotFound()
-        {
-            using var client = await CreateClientAsAdministrator();
-            {
-                var res = await client.GetAsync("timelines/notexist");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineController.NotExist);
+                var res = await client.DeleteAsync(generator("notexist", "posts/123"));
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
             {
-                var res = await client.PatchAsJsonAsync("timelines/notexist", new TimelinePatchRequest { });
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineController.NotExist);
-            }
-            {
-                var res = await client.PutAsync("timelines/notexist/members/user1", null);
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineController.NotExist);
-            }
-            {
-                var res = await client.DeleteAsync("timelines/notexist/members/user1");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineController.NotExist);
-            }
-            {
-                var res = await client.GetAsync("timelines/notexist/posts");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineController.NotExist);
-            }
-            {
-                var res = await client.PostAsJsonAsync("timelines/notexist/posts", TimelineHelper.TextPostCreateRequest("aaa"));
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineController.NotExist);
-            }
-            {
-                var res = await client.DeleteAsync("timelines/notexist/posts/123");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.TimelineController.NotExist);
-            }
-        }
-
-
-        [Fact]
-        public async Task PersonalNotFound()
-        {
-            using var client = await CreateClientAsAdministrator();
-            {
-                var res = await client.GetAsync("timelines/@usernotexist");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
-            }
-            {
-                var res = await client.PatchAsJsonAsync("timelines/@usernotexist", new TimelinePatchRequest { });
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
-            }
-            {
-                var res = await client.PutAsync("timelines/@usernotexist/members/user1", null);
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
-            }
-            {
-                var res = await client.DeleteAsync("timelines/@usernotexist/members/user1");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
-            }
-            {
-                var res = await client.GetAsync("timelines/@usernotexist/posts");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
-            }
-            {
-                var res = await client.PostAsJsonAsync("timelines/@usernotexist/posts", TimelineHelper.TextPostCreateRequest("aaa"));
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
-            }
-            {
-                var res = await client.DeleteAsync("timelines/@usernotexist/posts/123");
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+                var res = await client.GetAsync(generator("notexist", "posts/123/data"));
+                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
             }
         }
 

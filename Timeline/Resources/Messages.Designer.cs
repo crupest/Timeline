@@ -223,6 +223,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The post to operate on does not exist..
+        /// </summary>
+        internal static string TimelineController_PostNotExist {
+            get {
+                return ResourceManager.GetString("TimelineController_PostNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user specified by query param &quot;relate&quot; does not exist..
         /// </summary>
         internal static string TimelineController_QueryRelateNotExist {
