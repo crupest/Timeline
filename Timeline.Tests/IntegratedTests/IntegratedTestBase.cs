@@ -15,11 +15,15 @@ using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IAsyncLifetime
     {
         protected TestApplication TestApp { get; }
 
         protected WebApplicationFactory<Startup> Factory => TestApp.Factory;
+
+        public IReadOnlyList<UserInfo> UserInfos { get; private set; }
+
+        private readonly int _userCount;
 
         public IntegratedTestBase(WebApplicationFactory<Startup> factory) : this(factory, 1)
         {
@@ -31,7 +35,29 @@ namespace Timeline.Tests.IntegratedTests
             if (userCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(userCount), userCount, "User count can't be negative.");
 
+            _userCount = userCount;
+
             TestApp = new TestApplication(factory);
+        }
+
+        protected virtual Task OnInitializeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual Task OnDisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual void OnDispose()
+        {
+
+        }
+
+        public async Task InitializeAsync()
+        {
+            await TestApp.InitializeAsync();
 
             using (var scope = Factory.Services.CreateScope())
             {
@@ -46,7 +72,7 @@ namespace Timeline.Tests.IntegratedTests
                     }
                 };
 
-                for (int i = 1; i <= userCount; i++)
+                for (int i = 1; i <= _userCount; i++)
                 {
                     users.Add(new User
                     {
@@ -62,10 +88,10 @@ namespace Timeline.Tests.IntegratedTests
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                 foreach (var user in users)
                 {
-                    userService.CreateUser(user).Wait();
+                    await userService.CreateUser(user);
                 }
 
-                using var client = CreateDefaultClient().Result;
+                using var client = await CreateDefaultClient();
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -74,25 +100,22 @@ namespace Timeline.Tests.IntegratedTests
                 options.Converters.Add(new JsonDateTimeConverter());
                 foreach (var user in users)
                 {
-                    var s = client.GetStringAsync($"/users/{user.Username}").Result;
+                    var s = await client.GetStringAsync($"/users/{user.Username}");
                     userInfoList.Add(JsonSerializer.Deserialize<UserInfo>(s, options));
                 }
 
                 UserInfos = userInfoList;
             }
+
+            await OnInitializeAsync();
         }
 
-        protected virtual void OnDispose()
+        public async Task DisposeAsync()
         {
-        }
-
-        public void Dispose()
-        {
+            await OnDisposeAsync();
             OnDispose();
-            TestApp.Dispose();
+            await TestApp.DisposeAsync();
         }
-
-        public IReadOnlyList<UserInfo> UserInfos { get; }
 
         public Task<HttpClient> CreateDefaultClient()
         {
