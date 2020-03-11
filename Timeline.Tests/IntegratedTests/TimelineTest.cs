@@ -869,6 +869,10 @@ namespace Timeline.Tests.IntegratedTests
                     res.Should().BeDelete(true);
                 }
                 {
+                    var res = await client.DeleteAsync($"timelines/t1/posts/{createRes.Id}");
+                    res.Should().BeDelete(false);
+                }
+                {
                     var res = await client.DeleteAsync("timelines/t1/posts/30000");
                     res.Should().BeDelete(false);
                 }
