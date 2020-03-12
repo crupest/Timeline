@@ -126,14 +126,14 @@ namespace Timeline.Controllers
                     ("Username", username), ("Mime Type", Request.ContentType)));
                 return Ok();
             }
-            catch (AvatarFormatException e)
+            catch (ImageException e)
             {
                 _logger.LogInformation(e, Log.Format(LogPutUserBadFormat, ("Username", username)));
                 return BadRequest(e.Error switch
                 {
-                    AvatarFormatException.ErrorReason.CantDecode => ErrorResponse.UserAvatar.BadFormat_CantDecode(),
-                    AvatarFormatException.ErrorReason.UnmatchedFormat => ErrorResponse.UserAvatar.BadFormat_UnmatchedFormat(),
-                    AvatarFormatException.ErrorReason.BadSize => ErrorResponse.UserAvatar.BadFormat_BadSize(),
+                    ImageException.ErrorReason.CantDecode => ErrorResponse.UserAvatar.BadFormat_CantDecode(),
+                    ImageException.ErrorReason.UnmatchedFormat => ErrorResponse.UserAvatar.BadFormat_UnmatchedFormat(),
+                    ImageException.ErrorReason.NotSquare => ErrorResponse.UserAvatar.BadFormat_BadSize(),
                     _ =>
                         throw new Exception(ExceptionUnknownAvatarFormatError)
                 });

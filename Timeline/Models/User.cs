@@ -1,4 +1,4 @@
-﻿namespace Timeline.Services
+﻿namespace Timeline.Models
 {
     public class User
     {

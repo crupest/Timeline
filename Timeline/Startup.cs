@@ -47,6 +47,7 @@ namespace Timeline
             })
             .AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.IgnoreNullValues = true;
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
             })
@@ -97,9 +98,12 @@ namespace Timeline
             services.AddScoped<IETagGenerator, ETagGenerator>();
             services.AddScoped<IDataManager, DataManager>();
 
+            services.AddScoped<IImageValidator, ImageValidator>();
+
             services.AddUserAvatarService();
 
             services.AddScoped<ITimelineService, TimelineService>();
+            services.AddScoped<IOrdinaryTimelineService, OrdinaryTimelineService>();
             services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();

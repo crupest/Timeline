@@ -1,10 +1,13 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Timeline.Models;
+using Timeline.Models.Converters;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
@@ -12,17 +15,15 @@ using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
+    public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IAsyncLifetime
     {
-        static IntegratedTestBase()
-        {
-            FluentAssertions.AssertionOptions.AssertEquivalencyUsing(options =>
-                options.Excluding(m => m.RuntimeType == typeof(UserInfoLinks)));
-        }
-
         protected TestApplication TestApp { get; }
 
         protected WebApplicationFactory<Startup> Factory => TestApp.Factory;
+
+        public IReadOnlyList<UserInfo> UserInfos { get; private set; }
+
+        private readonly int _userCount;
 
         public IntegratedTestBase(WebApplicationFactory<Startup> factory) : this(factory, 1)
         {
@@ -34,7 +35,29 @@ namespace Timeline.Tests.IntegratedTests
             if (userCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(userCount), userCount, "User count can't be negative.");
 
+            _userCount = userCount;
+
             TestApp = new TestApplication(factory);
+        }
+
+        protected virtual Task OnInitializeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual Task OnDisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual void OnDispose()
+        {
+
+        }
+
+        public async Task InitializeAsync()
+        {
+            await TestApp.InitializeAsync();
 
             using (var scope = Factory.Services.CreateScope())
             {
@@ -49,7 +72,7 @@ namespace Timeline.Tests.IntegratedTests
                     }
                 };
 
-                for (int i = 1; i <= userCount; i++)
+                for (int i = 1; i <= _userCount; i++)
                 {
                     users.Add(new User
                     {
@@ -63,29 +86,36 @@ namespace Timeline.Tests.IntegratedTests
                 var userInfoList = new List<UserInfo>();
 
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-
                 foreach (var user in users)
                 {
-                    userService.CreateUser(user).Wait();
-                    userInfoList.Add(mapper.Map<UserInfo>(user));
+                    await userService.CreateUser(user);
+                }
+
+                using var client = await CreateDefaultClient();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+                options.Converters.Add(new JsonStringEnumConverter());
+                options.Converters.Add(new JsonDateTimeConverter());
+                foreach (var user in users)
+                {
+                    var s = await client.GetStringAsync($"/users/{user.Username}");
+                    userInfoList.Add(JsonSerializer.Deserialize<UserInfo>(s, options));
                 }
 
                 UserInfos = userInfoList;
             }
+
+            await OnInitializeAsync();
         }
 
-        protected virtual void OnDispose()
+        public async Task DisposeAsync()
         {
-        }
-
-        public void Dispose()
-        {
+            await OnDisposeAsync();
             OnDispose();
-            TestApp.Dispose();
+            await TestApp.DisposeAsync();
         }
-
-        public IReadOnlyList<UserInfo> UserInfos { get; }
 
         public Task<HttpClient> CreateDefaultClient()
         {

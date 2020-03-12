@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;

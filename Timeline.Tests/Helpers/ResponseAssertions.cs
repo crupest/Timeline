@@ -33,7 +33,9 @@ namespace Timeline.Tests.Helpers
 
             try
             {
-                var body = res.Content.ReadAsStringAsync().Result;
+                var task = res.Content.ReadAsStringAsync();
+                task.Wait();
+                var body = task.Result;
                 if (body.Length > 40)
                 {
                     body = body[0..40] + " ...";
@@ -83,7 +85,9 @@ namespace Timeline.Tests.Helpers
             string body;
             try
             {
-                body = Subject.Content.ReadAsStringAsync().Result;
+                var task = Subject.Content.ReadAsStringAsync();
+                task.Wait();
+                body = task.Result;
             }
             catch (AggregateException e)
             {
