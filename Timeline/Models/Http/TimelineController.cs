@@ -4,10 +4,18 @@ using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
+    public class TimelinePostCreateRequestContent
+    {
+        [Required]
+        public string Type { get; set; } = default!;
+        public string? Text { get; set; }
+        public string? Data { get; set; }
+    }
+
     public class TimelinePostCreateRequest
     {
-        [Required(AllowEmptyStrings = true)]
-        public string Content { get; set; } = default!;
+        [Required]
+        public TimelinePostCreateRequestContent Content { get; set; } = default!;
 
         public DateTime? Time { get; set; }
     }

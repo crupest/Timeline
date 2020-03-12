@@ -12,12 +12,17 @@ namespace Timeline.Services
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        public TimelinePostNotExistException(long id) : base(Resources.Services.Exception.TimelinePostNotExistException) { Id = id; }
+        public TimelinePostNotExistException(string timelineName, long id, bool isDelete = false) : base(Resources.Services.Exception.TimelinePostNotExistException) { TimelineName = timelineName; Id = id; IsDelete = isDelete; }
 
-        public TimelinePostNotExistException(long id, string message) : base(message) { Id = id; }
+        public TimelinePostNotExistException(string timelineName, long id, bool isDelete, string message) : base(message) { TimelineName = timelineName; Id = id; IsDelete = isDelete; }
 
-        public TimelinePostNotExistException(long id, string message, Exception inner) : base(message, inner) { Id = id; }
+        public TimelinePostNotExistException(string timelineName, long id, bool isDelete, string message, Exception inner) : base(message, inner) { TimelineName = timelineName; Id = id; IsDelete = isDelete; }
 
+        public string TimelineName { get; set; } = "";
         public long Id { get; set; }
+        /// <summary>
+        /// True if the post is deleted. False if the post does not exist at all.
+        /// </summary>
+        public bool IsDelete { get; set; } = false;
     }
 }

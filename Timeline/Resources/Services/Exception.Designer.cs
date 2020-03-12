@@ -61,51 +61,6 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Avartar is of bad format because {0}..
-        /// </summary>
-        internal static string AvatarFormatException {
-            get {
-                return ResourceManager.GetString("AvatarFormatException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to image is not a square, aka, width is not equal to height.
-        /// </summary>
-        internal static string AvatarFormatExceptionBadSize {
-            get {
-                return ResourceManager.GetString("AvatarFormatExceptionBadSize", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to failed to decode image, see inner exception.
-        /// </summary>
-        internal static string AvatarFormatExceptionCantDecode {
-            get {
-                return ResourceManager.GetString("AvatarFormatExceptionCantDecode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to unknown error.
-        /// </summary>
-        internal static string AvatarFormatExceptionUnknownError {
-            get {
-                return ResourceManager.GetString("AvatarFormatExceptionUnknownError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to image&apos;s actual mime type is not the specified one.
-        /// </summary>
-        internal static string AvatarFormatExceptionUnmatchedFormat {
-            get {
-                return ResourceManager.GetString("AvatarFormatExceptionUnmatchedFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The password is wrong..
         /// </summary>
         internal static string BadPasswordException {
@@ -183,6 +138,51 @@ namespace Timeline.Resources.Services {
         internal static string HashedPasswordBadFromatExceptionNotUnknownMarker {
             get {
                 return ResourceManager.GetString("HashedPasswordBadFromatExceptionNotUnknownMarker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image is in valid because {0}..
+        /// </summary>
+        internal static string ImageException {
+            get {
+                return ResourceManager.GetString("ImageException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to image is not a square, aka, width is not equal to height.
+        /// </summary>
+        internal static string ImageExceptionBadSize {
+            get {
+                return ResourceManager.GetString("ImageExceptionBadSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to failed to decode image, see inner exception.
+        /// </summary>
+        internal static string ImageExceptionCantDecode {
+            get {
+                return ResourceManager.GetString("ImageExceptionCantDecode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to unknown error.
+        /// </summary>
+        internal static string ImageExceptionUnknownError {
+            get {
+                return ResourceManager.GetString("ImageExceptionUnknownError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to image&apos;s actual mime type is not the specified one.
+        /// </summary>
+        internal static string ImageExceptionUnmatchedFormat {
+            get {
+                return ResourceManager.GetString("ImageExceptionUnmatchedFormat", resourceCulture);
             }
         }
         

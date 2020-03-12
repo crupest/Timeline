@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 using System;
 using System.IO;
 using System.Linq;
@@ -47,16 +44,6 @@ namespace Timeline.Services
         Task<AvatarInfo> GetDefaultAvatar();
     }
 
-    public interface IUserAvatarValidator
-    {
-        /// <summary>
-        /// Validate a avatar's format and size info.
-        /// </summary>
-        /// <param name="avatar">The avatar to validate.</param>
-        /// <exception cref="AvatarFormatException">Thrown when validation failed.</exception>
-        Task Validate(Avatar avatar);
-    }
-
     public interface IUserAvatarService
     {
         /// <summary>
@@ -79,7 +66,7 @@ namespace Timeline.Services
         /// <param name="id">The id of the user to set avatar for.</param>
         /// <param name="avatar">The avatar. Can be null to delete the saved avatar.</param>
         /// <exception cref="ArgumentException">Thrown if any field in <paramref name="avatar"/> is null when <paramref name="avatar"/> is not null.</exception>
-        /// <exception cref="AvatarFormatException">Thrown if avatar is of bad format.</exception>
+        /// <exception cref="ImageException">Thrown if avatar is of bad format.</exception>
         Task SetAvatar(long id, Avatar? avatar);
     }
 
@@ -132,28 +119,6 @@ namespace Timeline.Services
         }
     }
 
-    public class UserAvatarValidator : IUserAvatarValidator
-    {
-        public Task Validate(Avatar avatar)
-        {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    using var image = Image.Load(avatar.Data, out IImageFormat format);
-                    if (!format.MimeTypes.Contains(avatar.Type))
-                        throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.UnmatchedFormat);
-                    if (image.Width != image.Height)
-                        throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.BadSize);
-                }
-                catch (UnknownImageFormatException e)
-                {
-                    throw new AvatarFormatException(avatar, AvatarFormatException.ErrorReason.CantDecode, e);
-                }
-            });
-        }
-    }
-
     public class UserAvatarService : IUserAvatarService
     {
 
@@ -162,7 +127,8 @@ namespace Timeline.Services
         private readonly DatabaseContext _database;
 
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
-        private readonly IUserAvatarValidator _avatarValidator;
+
+        private readonly IImageValidator _imageValidator;
 
         private readonly IDataManager _dataManager;
 
@@ -172,14 +138,14 @@ namespace Timeline.Services
             ILogger<UserAvatarService> logger,
             DatabaseContext database,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
-            IUserAvatarValidator avatarValidator,
+            IImageValidator imageValidator,
             IDataManager dataManager,
             IClock clock)
         {
             _logger = logger;
             _database = database;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
-            _avatarValidator = avatarValidator;
+            _imageValidator = imageValidator;
             _dataManager = dataManager;
             _clock = clock;
         }
@@ -257,7 +223,7 @@ namespace Timeline.Services
             }
             else
             {
-                await _avatarValidator.Validate(avatar);
+                await _imageValidator.Validate(avatar.Data, avatar.Type, true);
                 var tag = await _dataManager.RetainEntry(avatar.Data);
                 var oldTag = avatarEntity?.DataTag;
                 var create = avatarEntity == null;
@@ -288,7 +254,6 @@ namespace Timeline.Services
         {
             services.AddScoped<IUserAvatarService, UserAvatarService>();
             services.AddScoped<IDefaultUserAvatarProvider, DefaultUserAvatarProvider>();
-            services.AddTransient<IUserAvatarValidator, UserAvatarValidator>();
         }
     }
 }

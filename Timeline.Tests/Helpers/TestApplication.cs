@@ -3,29 +3,35 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Migrations;
+using Xunit;
 
 namespace Timeline.Tests.Helpers
 {
-    public class TestApplication : IDisposable
+    public class TestApplication : IAsyncLifetime
     {
-        public SqliteConnection DatabaseConnection { get; }
+        public SqliteConnection DatabaseConnection { get; private set; }
 
-        public WebApplicationFactory<Startup> Factory { get; }
+        public WebApplicationFactory<Startup> Factory { get; private set; }
 
-        public string WorkDir { get; }
+        public string WorkDir { get; private set; }
 
         public TestApplication(WebApplicationFactory<Startup> factory)
+        {
+            Factory = factory;
+        }
+
+        public async Task InitializeAsync()
         {
             WorkDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(WorkDir);
 
             DatabaseConnection = new SqliteConnection("Data Source=:memory:;");
-            DatabaseConnection.Open();
+            await DatabaseConnection.OpenAsync();
 
             var options = new DbContextOptionsBuilder<DatabaseContext>()
                 .UseSqlite(DatabaseConnection)
@@ -33,15 +39,15 @@ namespace Timeline.Tests.Helpers
 
             using (var context = new DatabaseContext(options))
             {
-                context.Database.EnsureCreated();
+                await context.Database.EnsureCreatedAsync();
                 context.JwtToken.Add(new JwtTokenEntity
                 {
                     Key = JwtTokenGenerateHelper.GenerateKey()
                 });
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
 
-            Factory = factory.WithWebHostBuilder(builder =>
+            Factory = Factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureAppConfiguration((context, config) =>
                 {
@@ -60,11 +66,10 @@ namespace Timeline.Tests.Helpers
             });
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
-            DatabaseConnection.Close();
-            DatabaseConnection.Dispose();
-
+            await DatabaseConnection.CloseAsync();
+            await DatabaseConnection.DisposeAsync();
             Directory.Delete(WorkDir, true);
         }
     }

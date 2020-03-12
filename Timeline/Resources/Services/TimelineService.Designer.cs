@@ -70,11 +70,38 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown post content type &quot;{0}&quot; is saved in database..
+        /// </summary>
+        internal static string ExceptionDatabaseUnknownContentType {
+            get {
+                return ResourceManager.GetString("ExceptionDatabaseUnknownContentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The owner username of personal timeline is of bad format..
         /// </summary>
         internal static string ExceptionFindTimelineUsernameBadFormat {
             get {
                 return ResourceManager.GetString("ExceptionFindTimelineUsernameBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data entry of the tag of the image post does not exist..
+        /// </summary>
+        internal static string ExceptionGetDataDataEntryNotExist {
+            get {
+                return ResourceManager.GetString("ExceptionGetDataDataEntryNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t get data of a non-image post..
+        /// </summary>
+        internal static string ExceptionGetDataNonImagePost {
+            get {
+                return ResourceManager.GetString("ExceptionGetDataNonImagePost", resourceCulture);
             }
         }
         
@@ -93,6 +120,15 @@ namespace Timeline.Resources.Services {
         internal static string ExceptionTimelineNameConflict {
             get {
                 return ResourceManager.GetString("ExceptionTimelineNameConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image format type of the post does not exist in column &quot;extra_content&quot;. Normally this couldn&apos;t be possible because it should be saved when post was created. However, we now re-detect the format and save it..
+        /// </summary>
+        internal static string LogGetDataNoFormat {
+            get {
+                return ResourceManager.GetString("LogGetDataNoFormat", resourceCulture);
             }
         }
     }

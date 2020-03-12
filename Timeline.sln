@@ -6,9 +6,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline", "Timeline\Timeli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline.Tests", "Timeline.Tests\Timeline.Tests.csproj", "{3D76D578-37BC-43C2-97BF-9C6DD3825F10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErrorResponseCodeGenerator", "ErrorResponseCodeGenerator\ErrorResponseCodeGenerator.csproj", "{F325F802-75DE-4527-A299-F668281B0E4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ErrorResponseCodeGenerator", "ErrorResponseCodeGenerator\ErrorResponseCodeGenerator.csproj", "{F325F802-75DE-4527-A299-F668281B0E4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timeline.ErrorCodes", "Timeline.ErrorCodes\Timeline.ErrorCodes.csproj", "{1044E3B0-1010-47CA-956E-B6E8FE87055B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline.ErrorCodes", "Timeline.ErrorCodes\Timeline.ErrorCodes.csproj", "{1044E3B0-1010-47CA-956E-B6E8FE87055B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

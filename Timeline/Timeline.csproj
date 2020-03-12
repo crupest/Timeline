@@ -7,10 +7,6 @@
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    <ItemGroup>
-      <Compile Remove="Migrations\20200306101428_AddDataTable.cs" />
-      <Compile Remove="Migrations\20200306101428_AddDataTable.Designer.cs" />
-    </ItemGroup>
 
     <ItemGroup>
         <Content Include="default-avatar.png">
@@ -32,12 +28,12 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-dev002868" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-unstable0934" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Timeline.ErrorCodes\Timeline.ErrorCodes.csproj" />
+      <ProjectReference Include="..\Timeline.ErrorCodes\Timeline.ErrorCodes.csproj" />
     </ItemGroup>
 
     <ItemGroup>
