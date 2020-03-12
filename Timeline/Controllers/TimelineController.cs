@@ -126,7 +126,7 @@ namespace Timeline.Controllers
             try
             {
                 var data = await _service.GetPostData(name, id);
-                return File(data.Data, data.Type, data.LastModified, new EntityTagHeaderValue(data.ETag));
+                return File(data.Data, data.Type, data.LastModified, new EntityTagHeaderValue($"\"{data.ETag}\""));
             }
             catch (TimelinePostNotExistException)
             {

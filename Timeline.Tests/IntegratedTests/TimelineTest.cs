@@ -1,11 +1,16 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
@@ -882,7 +887,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Post_Op_Should_Work(Func<int, string, string> generator)
+        public async Task TextPost_ShouldWork(Func<int, string, string> generator)
         {
             {
                 using var client = await CreateClientAsUser();
@@ -1027,6 +1032,115 @@ namespace Timeline.Tests.IntegratedTests
                 // image base64 not image
                 var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = Convert.ToBase64String(new byte[] { 0x01, 0x02, 0x03 }) } });
                 res.Should().BeInvalidModel();
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task ImagePost_ShouldWork(Func<int, string, string> generator)
+        {
+            var imageData = ImageHelper.CreatePngWithSize(100, 200);
+
+            long postId;
+            string postImageUrl;
+
+            void AssertPostContent(TimelinePostContentInfo content)
+            {
+                content.Type.Should().Be(TimelinePostContentTypes.Image);
+                content.Url.Should().EndWith(generator(1, $"posts/{postId}/data"));
+                content.Text.Should().Be(null);
+            }
+
+            using var client = await CreateClientAsUser();
+
+            {
+                var res = await client.PostAsJsonAsync(generator(1, "posts"),
+                    new TimelinePostCreateRequest
+                    {
+                        Content = new TimelinePostCreateRequestContent
+                        {
+                            Type = TimelinePostContentTypes.Image,
+                            Data = Convert.ToBase64String(imageData)
+                        }
+                    });
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo>().Which;
+                postId = body.Id;
+                postImageUrl = body.Content.Url;
+                AssertPostContent(body.Content);
+            }
+
+            {
+                var res = await client.GetAsync(generator(1, "posts"));
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo[]>().Which;
+                body.Should().HaveCount(1);
+                var post = body[0];
+                post.Id.Should().Be(postId);
+                AssertPostContent(post.Content);
+            }
+
+            {
+                var res = await client.GetAsync(generator(1, $"posts/{postId}/data"));
+                res.Content.Headers.ContentType.MediaType.Should().Be("image/png");
+                var data = await res.Content.ReadAsByteArrayAsync();
+                var image = Image.Load(data, out var format);
+                image.Width.Should().Be(100);
+                image.Height.Should().Be(200);
+                format.Name.Should().Be(PngFormat.Instance.Name);
+            }
+
+            {
+                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
+                res.Should().BeDelete(true);
+            }
+
+            {
+                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
+                res.Should().BeDelete(false);
+            }
+
+            {
+                var res = await client.GetAsync(generator(1, "posts"));
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo[]>()
+                    .Which.Should().BeEmpty();
+            }
+
+            {
+                using var scope = TestApp.Factory.Services.CreateScope();
+                var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                var count = await database.Data.CountAsync();
+                count.Should().Be(0);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task ImagePost_400(Func<int, string, string> generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            {
+                var res = await client.GetAsync(generator(1, "posts/11234/data"));
+                res.Should().HaveStatusCode(404)
+                    .And.HaveCommonBody(ErrorCodes.TimelineController.PostNotExist);
+            }
+
+            long postId;
+            {
+                var res = await client.PostAsJsonAsync(generator(1, "posts"),
+                    TimelineHelper.TextPostCreateRequest("aaa"));
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo>()
+                    .Which;
+                postId = body.Id;
+            }
+
+            {
+                var res = await client.GetAsync(generator(1, $"posts/{postId}/data"));
+                res.Should().HaveStatusCode(400)
+                    .And.HaveCommonBody(ErrorCodes.TimelineController.PostNoData);
             }
         }
     }
