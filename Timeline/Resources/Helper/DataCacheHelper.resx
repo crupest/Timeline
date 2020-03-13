@@ -117,31 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ExceptionUnknownAvatarFormatError" xml:space="preserve">
-    <value>Unknown AvatarDataException.ErrorReason value.</value>
+  <data name="LogBadIfNoneMatch" xml:space="preserve">
+    <value>Header If-None-Match is of bad format.</value>
   </data>
-  <data name="LogDeleteForbid" xml:space="preserve">
-    <value>Attempt to delete a avatar of other user as a non-admin failed.</value>
+  <data name="LogResultData" xml:space="preserve">
+    <value>Cache is invalid and data is returned.</value>
   </data>
-  <data name="LogDeleteNotExist" xml:space="preserve">
-    <value>Attempt to delete a avatar of a non-existent user failed.</value>
-  </data>
-  <data name="LogDeleteSuccess" xml:space="preserve">
-    <value>Succeed to delete a avatar of a user.</value>
-  </data>
-  <data name="LogGetUserNotExist" xml:space="preserve">
-    <value>Attempt to get a avatar of a non-existent user failed.</value>
-  </data>
-  <data name="LogPutForbid" xml:space="preserve">
-    <value>Attempt to put a avatar of other user as a non-admin failed.</value>
-  </data>
-  <data name="LogPutSuccess" xml:space="preserve">
-    <value>Succeed to put a avatar of a user.</value>
-  </data>
-  <data name="LogPutUserBadFormat" xml:space="preserve">
-    <value>Attempt to put a avatar of a bad format failed.</value>
-  </data>
-  <data name="LogPutUserNotExist" xml:space="preserve">
-    <value>Attempt to put a avatar of a non-existent user failed.</value>
+  <data name="LogResultNotModified" xml:space="preserve">
+    <value>Cache is valid and 304 Not Modified is returned.</value>
   </data>
 </root>
