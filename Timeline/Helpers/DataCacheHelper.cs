@@ -66,10 +66,24 @@ namespace Timeline.Helpers
 
     public static class DataCacheHelper
     {
-        public static async Task<ActionResult> GenerateActionResult(Controller controller, ICacheableDataProvider provider)
+        public static async Task<ActionResult> GenerateActionResult(Controller controller, ICacheableDataProvider provider, TimeSpan? maxAge = null)
         {
+            const string CacheControlHeaderKey = "Cache-Control";
             const string IfNonMatchHeaderKey = "If-None-Match";
             const string ETagHeaderKey = "ETag";
+
+            string GenerateCacheControlHeaderValue()
+            {
+                var cacheControlHeader = new CacheControlHeaderValue()
+                {
+                    NoCache = true,
+                    NoStore = false,
+                    MaxAge = maxAge ?? TimeSpan.FromDays(14),
+                    Private = true,
+                    MustRevalidate = true
+                };
+                return cacheControlHeader.ToString();
+            }
 
             var loggerFactory = controller.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
             var logger = loggerFactory.CreateLogger(typeof(DataCacheHelper));
@@ -89,20 +103,23 @@ namespace Timeline.Helpers
 
                 if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
                 {
-                    controller.Response.Headers.Add(ETagHeaderKey, eTagValue);
                     logger.LogInformation(LogResultNotModified);
+                    controller.Response.Headers.Add(ETagHeaderKey, eTagValue);
+                    controller.Response.Headers.Add(CacheControlHeaderKey, GenerateCacheControlHeaderValue());
+
                     return controller.StatusCode(StatusCodes.Status304NotModified);
                 }
             }
 
             var data = await provider.GetData();
             logger.LogInformation(LogResultData);
+            controller.Response.Headers.Add(CacheControlHeaderKey, GenerateCacheControlHeaderValue());
             return controller.File(data.Data, data.Type, data.LastModified, eTag);
         }
 
-        public static Task<ActionResult> GenerateActionResult(Controller controller, Func<Task<string>> getDataETagDelegate, Func<Task<ICacheableData>> getDataDelegate)
+        public static Task<ActionResult> GenerateActionResult(Controller controller, Func<Task<string>> getDataETagDelegate, Func<Task<ICacheableData>> getDataDelegate, TimeSpan? maxAge = null)
         {
-            return GenerateActionResult(controller, new DelegateCacheableDataProvider(getDataETagDelegate, getDataDelegate));
+            return GenerateActionResult(controller, new DelegateCacheableDataProvider(getDataETagDelegate, getDataDelegate), maxAge);
         }
     }
 }

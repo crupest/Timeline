@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Timeline.Filters;
+using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
@@ -114,7 +115,6 @@ namespace Timeline.Controllers
             return result;
         }
 
-        // TODO: Make cache available.
         [HttpGet("timelines/{name}/posts/{id}/data")]
         public async Task<ActionResult<List<TimelinePostInfo>>> PostDataGet([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
         {
@@ -125,8 +125,11 @@ namespace Timeline.Controllers
 
             try
             {
-                var data = await _service.GetPostData(name, id);
-                return File(data.Data, data.Type, data.LastModified, new EntityTagHeaderValue($"\"{data.ETag}\""));
+                return await DataCacheHelper.GenerateActionResult(this, () => _service.GetPostDataETag(name, id), async () =>
+                {
+                    var data = await _service.GetPostData(name, id);
+                    return data;
+                });
             }
             catch (TimelinePostNotExistException)
             {
