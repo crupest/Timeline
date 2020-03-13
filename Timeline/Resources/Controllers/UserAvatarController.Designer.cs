@@ -97,33 +97,6 @@ namespace Timeline.Resources.Controllers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempt to get a avatar with If-None-Match in bad format..
-        /// </summary>
-        internal static string LogGetBadIfNoneMatch {
-            get {
-                return ResourceManager.GetString("LogGetBadIfNoneMatch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Returned full data for a get avatar attempt..
-        /// </summary>
-        internal static string LogGetReturnData {
-            get {
-                return ResourceManager.GetString("LogGetReturnData", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Returned NotModify for a get avatar attempt..
-        /// </summary>
-        internal static string LogGetReturnNotModify {
-            get {
-                return ResourceManager.GetString("LogGetReturnNotModify", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Attempt to get a avatar of a non-existent user failed..
         /// </summary>
         internal static string LogGetUserNotExist {

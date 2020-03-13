@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Validation;
 using static Timeline.Resources.Services.TimelineService;
@@ -32,14 +33,14 @@ namespace Timeline.Services
         public long UserId { get; set; }
     }
 
-    public class PostData
+    public class PostData : ICacheableData
     {
 #pragma warning disable CA1819 // Properties should not return arrays
         public byte[] Data { get; set; } = default!;
 #pragma warning restore CA1819 // Properties should not return arrays
         public string Type { get; set; } = default!;
         public string ETag { get; set; } = default!;
-        public DateTime LastModified { get; set; } = default!;
+        public DateTime? LastModified { get; set; }
     }
 
     /// <summary>
@@ -92,6 +93,20 @@ namespace Timeline.Services
         Task<List<TimelinePost>> GetPosts(string name);
 
         /// <summary>
+        /// Get the etag of data of a post.
+        /// </summary>
+        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="postId">The id of the post.</param>
+        /// <returns>The etag of the data.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when post has no data. See remarks.</exception>
+        /// <seealso cref="GetPostData(string, long)"/>
+        Task<string> GetPostDataETag(string name, long postId);
+
+        /// <summary>
         /// Get the data of a post.
         /// </summary>
         /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
@@ -105,6 +120,7 @@ namespace Timeline.Services
         /// <remarks>
         /// Use this method to retrieve the image of image post.
         /// </remarks>
+        /// <seealso cref="GetPostDataETag(string, long)"/>
         Task<PostData> GetPostData(string name, long postId);
 
         /// <summary>
@@ -402,6 +418,29 @@ namespace Timeline.Services
             }
             return posts;
         }
+
+        public async Task<string> GetPostDataETag(string name, long postId)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            var timelineId = await FindTimelineId(name);
+            var postEntity = await Database.TimelinePosts.Where(p => p.LocalId == postId).SingleOrDefaultAsync();
+
+            if (postEntity == null)
+                throw new TimelinePostNotExistException(name, postId);
+
+            if (postEntity.Content == null)
+                throw new TimelinePostNotExistException(name, postId, true);
+
+            if (postEntity.ContentType != TimelinePostContentTypes.Image)
+                throw new InvalidOperationException(ExceptionGetDataNonImagePost);
+
+            var tag = postEntity.Content;
+
+            return tag;
+        }
+
         public async Task<PostData> GetPostData(string name, long postId)
         {
             if (name == null)
@@ -1012,6 +1051,12 @@ namespace Timeline.Services
         {
             var s = BranchName(name, out var realName);
             return s.GetPosts(realName);
+        }
+
+        public Task<string> GetPostDataETag(string name, long postId)
+        {
+            var s = BranchName(name, out var realName);
+            return s.GetPostDataETag(realName, postId);
         }
 
         public Task<PostData> GetPostData(string name, long postId)

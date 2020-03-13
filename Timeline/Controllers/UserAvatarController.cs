@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Filters;
@@ -32,7 +30,6 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("users/{username}/avatar")]
-        [ResponseCache(NoStore = false, Location = ResponseCacheLocation.None, Duration = 0)]
         public async Task<IActionResult> Get([FromRoute][Username] string username)
         {
             long id;
@@ -46,34 +43,11 @@ namespace Timeline.Controllers
                 return NotFound(ErrorResponse.UserCommon.NotExist());
             }
 
-            const string IfNonMatchHeaderKey = "If-None-Match";
-
-            var eTagValue = $"\"{await _service.GetAvatarETag(id)}\"";
-            var eTag = new EntityTagHeaderValue(eTagValue);
-
-            if (Request.Headers.TryGetValue(IfNonMatchHeaderKey, out var value))
+            return await DataCacheHelper.GenerateActionResult(this, () => _service.GetAvatarETag(id), async () =>
             {
-                if (!EntityTagHeaderValue.TryParseStrictList(value, out var eTagList))
-                {
-                    _logger.LogInformation(Log.Format(LogGetBadIfNoneMatch,
-                        ("Username", username), ("If-None-Match", value)));
-                    return BadRequest(ErrorResponse.Common.Header.IfNonMatch_BadFormat());
-                }
-
-                if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
-                {
-                    Response.Headers.Add("ETag", eTagValue);
-                    _logger.LogInformation(Log.Format(LogGetReturnNotModify, ("Username", username)));
-                    return StatusCode(StatusCodes.Status304NotModified);
-                }
-            }
-
-            var avatarInfo = await _service.GetAvatar(id);
-            var avatar = avatarInfo.Avatar;
-
-            _logger.LogInformation(Log.Format(LogGetReturnData, ("Username", username)));
-            return File(avatar.Data, avatar.Type, new DateTimeOffset(avatarInfo.LastModified), eTag);
-
+                var avatar = await _service.GetAvatar(id);
+                return avatar.ToCacheableData();
+            });
         }
 
         [HttpPut("users/{username}/avatar")]

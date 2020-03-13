@@ -1,7 +1,6 @@
 using AutoMapper;
 using System.ComponentModel.DataAnnotations;
 using Timeline.Models.Validation;
-using Timeline.Services;
 
 namespace Timeline.Models.Http
 {

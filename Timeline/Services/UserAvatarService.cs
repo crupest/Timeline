@@ -22,6 +22,11 @@ namespace Timeline.Services
     {
         public Avatar Avatar { get; set; } = default!;
         public DateTime LastModified { get; set; }
+
+        public CacheableData ToCacheableData()
+        {
+            return new CacheableData(Avatar.Type, Avatar.Data, LastModified);
+        }
     }
 
     /// <summary>
