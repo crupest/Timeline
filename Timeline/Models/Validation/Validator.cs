@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Timeline.Helpers;
 using static Timeline.Resources.Models.Validation.Validator;
 
 namespace Timeline.Models.Validation

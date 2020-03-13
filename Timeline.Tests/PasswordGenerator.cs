@@ -1,5 +1,4 @@
-﻿using System;
-using Timeline.Services;
+﻿using Timeline.Services;
 using Xunit;
 using Xunit.Abstractions;
 
