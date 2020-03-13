@@ -72,6 +72,11 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Filters.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Helper\DataCacheHelper.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>DataCacheHelper.resx</DependentUpon>
+        </Compile>
         <Compile Update="Resources\Messages.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -158,6 +163,10 @@
         <EmbeddedResource Update="Resources\Filters.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Filters.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Helper\DataCacheHelper.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>DataCacheHelper.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Messages.resx">
             <Generator>ResXFileCodeGenerator</Generator>
