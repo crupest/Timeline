@@ -108,7 +108,7 @@ namespace Timeline
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-            services.AddDbContext<DatabaseContext>((services, options )=>
+            services.AddDbContext<DatabaseContext>((services, options) =>
             {
                 var pathProvider = services.GetRequiredService<IPathProvider>();
                 options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
