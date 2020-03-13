@@ -1091,6 +1091,10 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
+                await CacheTestHelper.TestCache(client, generator(1, $"posts/{postId}/data"));
+            }
+
+            {
                 var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
                 res.Should().BeDelete(true);
             }

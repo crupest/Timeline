@@ -32,7 +32,6 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("users/{username}/avatar")]
-        [ResponseCache(NoStore = false, Location = ResponseCacheLocation.None, Duration = 0)]
         public async Task<IActionResult> Get([FromRoute][Username] string username)
         {
             long id;

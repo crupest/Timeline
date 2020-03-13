@@ -6,7 +6,6 @@ using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -58,55 +57,17 @@ namespace Timeline.Tests.IntegratedTests
                     body.Should().Equal(defaultAvatarData);
                 }
 
-                EntityTagHeaderValue eTag;
                 {
-                    var res = await client.GetAsync($"users/user1/avatar");
+                    var res = await client.GetAsync("users/user1/avatar");
                     res.Should().HaveStatusCode(200);
                     res.Content.Headers.ContentType.MediaType.Should().Be("image/png");
                     var body = await res.Content.ReadAsByteArrayAsync();
                     body.Should().Equal(defaultAvatarData);
-                    var cacheControl = res.Headers.CacheControl;
-                    cacheControl.NoCache.Should().BeTrue();
-                    cacheControl.NoStore.Should().BeFalse();
-                    cacheControl.MaxAge.Should().NotBeNull().And.Be(TimeSpan.Zero);
-                    eTag = res.Headers.ETag;
                 }
+
+                await CacheTestHelper.TestCache(client, "users/user1/avatar");
 
                 await GetReturnDefault("admin");
-
-                {
-                    using var request = new HttpRequestMessage()
-                    {
-                        RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
-                        Method = HttpMethod.Get,
-                    };
-                    request.Headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
-                    var res = await client.SendAsync(request);
-                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Header.IfNonMatch_BadFormat);
-                }
-
-                {
-                    using var request = new HttpRequestMessage()
-                    {
-                        RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
-                        Method = HttpMethod.Get,
-                    };
-                    request.Headers.TryAddWithoutValidation("If-None-Match", "\"aaa\"");
-                    var res = await client.SendAsync(request);
-                    res.Should().HaveStatusCode(HttpStatusCode.OK);
-                }
-
-                {
-                    using var request = new HttpRequestMessage()
-                    {
-                        RequestUri = new Uri(client.BaseAddress, "users/user1/avatar"),
-                        Method = HttpMethod.Get,
-                    };
-                    request.Headers.Add("If-None-Match", eTag.ToString());
-                    var res = await client.SendAsync(request);
-                    res.Should().HaveStatusCode(HttpStatusCode.NotModified);
-                }
 
                 {
                     using var content = new ByteArrayContent(new[] { (byte)0x00 });
