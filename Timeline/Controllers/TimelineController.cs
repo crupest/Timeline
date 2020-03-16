@@ -134,7 +134,7 @@ namespace Timeline.Controllers
             {
                 return NotFound(ErrorResponse.TimelineController.PostNotExist());
             }
-            catch (InvalidOperationException)
+            catch (BadPostTypeException)
             {
                 return BadRequest(ErrorResponse.TimelineController.PostNoData());
             }
