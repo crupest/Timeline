@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ using Timeline.Entities;
 using Timeline.Formatters;
 using Timeline.Helpers;
 using Timeline.Models.Converters;
+using Timeline.Routes;
 using Timeline.Services;
 
 namespace Timeline
@@ -44,6 +46,7 @@ namespace Timeline
             services.AddControllers(setup =>
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
+                setup.UseApiRoutePrefix("api");
             })
             .AddJsonOptions(options =>
             {
@@ -60,29 +63,6 @@ namespace Timeline
             services.AddAuthentication(AuthenticationConstants.Scheme)
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
-
-
-            if (Environment.IsDevelopment())
-            {
-                services.AddCors(setup =>
-                {
-                    setup.AddDefaultPolicy(builder =>
-                    {
-                        builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
-                    });
-                });
-            }
-            else
-            {
-                var corsConfig = Configuration.GetSection("Cors").Get<string[]>();
-                services.AddCors(setup =>
-                {
-                    setup.AddDefaultPolicy(builder =>
-                    {
-                        builder.AllowAnyHeader().AllowAnyMethod().WithOrigins(corsConfig);
-                    });
-                });
-            }
 
             services.AddScoped<IPathProvider, PathProvider>();
 
@@ -113,6 +93,11 @@ namespace Timeline
                 var pathProvider = services.GetRequiredService<IPathProvider>();
                 options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
             });
+
+            services.AddSpaStaticFiles(config =>
+            {
+                config.RootPath = "ClientApp/dist";
+            });
         }
 
 
@@ -126,7 +111,7 @@ namespace Timeline
 
             app.UseRouting();
 
-            app.UseCors();
+            app.UseSpaStaticFiles();
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -134,6 +119,18 @@ namespace Timeline
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (Environment.IsDevelopment())
+                {
+                    // TODO! I'll waiting for aspnetcore to support custom package manager and port.
+                    // It is already in master branch code but not published.
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                }
             });
         }
     }

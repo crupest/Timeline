@@ -119,12 +119,15 @@ namespace Timeline.Tests.IntegratedTests
 
         public Task<HttpClient> CreateDefaultClient()
         {
-            return Task.FromResult(Factory.CreateDefaultClient());
+            var client = Factory.CreateDefaultClient();
+            client.BaseAddress = new Uri(client.BaseAddress, "api");
+            return Task.FromResult(client);
         }
 
         public async Task<HttpClient> CreateClientWithCredential(string username, string password)
         {
             var client = Factory.CreateDefaultClient();
+            client.BaseAddress = new Uri(client.BaseAddress, "api");
             var response = await client.PostAsJsonAsync("/token/create",
                 new CreateTokenRequest { Username = username, Password = password });
             var token = response.Should().HaveStatusCode(200)
