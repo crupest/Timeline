@@ -37,7 +37,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-unstable0934" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-rc0001" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.6.0" />
     </ItemGroup>
 
