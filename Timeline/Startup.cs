@@ -127,9 +127,7 @@ namespace Timeline
 
                 if (Environment.IsDevelopment())
                 {
-                    // TODO! I'll waiting for aspnetcore to support custom package manager and port.
-                    // It is already in master branch code but not published.
-                    spa.UseReactDevelopmentServer(npmScript: "start");
+                    SpaServices.SpaDevelopmentServerMiddlewareExtensions.UseSpaDevelopmentServer(spa, packageManager: "yarn", npmScript: "start", port: 3000);
                 }
             });
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System.Linq;
 
@@ -29,7 +30,7 @@ namespace Timeline.Routes
 
         public void Apply(ApplicationModel application)
         {
-            foreach (var selector in application.Controllers.Where(c => c.RouteValues.TryGetValue("area", out var value) && value == "api").SelectMany(c => c.Selectors))
+            foreach (var selector in application.Controllers.Where(c => c.Filters.Any(f => f is IApiBehaviorMetadata)).SelectMany(c => c.Selectors))
             {
                 if (selector.AttributeRouteModel != null)
                 {

@@ -72,12 +72,12 @@ namespace Timeline.Tests.IntegratedTests
 
         private static string GeneratePersonalTimelineUrl(int id, string subpath = null)
         {
-            return $"timelines/@{(id == 0 ? "admin" : ("user" + id))}{(subpath == null ? "" : ("/" + subpath))}";
+            return $"timelines/@{(id == 0 ? "admin" : ("user" + id))}/{(subpath ?? "")}";
         }
 
         private static string GenerateOrdinaryTimelineUrl(int id, string subpath = null)
         {
-            return $"timelines/t{id}{(subpath == null ? "" : ("/" + subpath))}";
+            return $"timelines/t{id}/{(subpath ?? "")}";
         }
 
         public static IEnumerable<object[]> TimelineUrlGeneratorData()
@@ -88,12 +88,12 @@ namespace Timeline.Tests.IntegratedTests
 
         private static string GeneratePersonalTimelineUrlByName(string name, string subpath = null)
         {
-            return $"timelines/@{name}{(subpath == null ? "" : ("/" + subpath))}";
+            return $"timelines/@{name}/{(subpath ?? "")}";
         }
 
         private static string GenerateOrdinaryTimelineUrlByName(string name, string subpath = null)
         {
-            return $"timelines/{name}{(subpath == null ? "" : ("/" + subpath))}";
+            return $"timelines/{name}/{(subpath ?? "")}";
         }
 
         public static IEnumerable<object[]> TimelineUrlByNameGeneratorData()
@@ -116,8 +116,8 @@ namespace Timeline.Tests.IntegratedTests
                 body.Members.Should().NotBeNull().And.BeEmpty();
                 var links = body._links;
                 links.Should().NotBeNull();
-                links.Self.Should().EndWith("/timelines/@user1");
-                links.Posts.Should().EndWith("/timelines/@user1/posts");
+                links.Self.Should().EndWith("timelines/@user1");
+                links.Posts.Should().EndWith("timelines/@user1/posts");
             }
 
             {
@@ -130,8 +130,8 @@ namespace Timeline.Tests.IntegratedTests
                 body.Members.Should().NotBeNull().And.BeEmpty();
                 var links = body._links;
                 links.Should().NotBeNull();
-                links.Self.Should().EndWith("/timelines/t1");
-                links.Posts.Should().EndWith("/timelines/t1/posts");
+                links.Self.Should().EndWith("timelines/t1");
+                links.Posts.Should().EndWith("timelines/t1/posts");
             }
         }
 
@@ -143,7 +143,7 @@ namespace Timeline.Tests.IntegratedTests
             var client = await CreateDefaultClient();
 
             {
-                var res = await client.GetAsync("/timelines/@user1");
+                var res = await client.GetAsync("timelines/@user1");
                 user1Timeline = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>().Which;
             }
@@ -153,7 +153,7 @@ namespace Timeline.Tests.IntegratedTests
                 testResult.Add(user1Timeline);
                 testResult.AddRange(_testTimelines);
 
-                var res = await client.GetAsync("/timelines");
+                var res = await client.GetAsync("timelines");
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<List<TimelineInfo>>()
                     .Which.Should().BeEquivalentTo(testResult);
@@ -176,27 +176,27 @@ namespace Timeline.Tests.IntegratedTests
                 var client = await CreateClientAsUser();
 
                 {
-                    var res = await client.PutAsync("/timelines/@user1/members/user3", null);
+                    var res = await client.PutAsync("timelines/@user1/members/user3", null);
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.PutAsync("/timelines/t1/members/user3", null);
+                    var res = await client.PutAsync("timelines/t1/members/user3", null);
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync("/timelines/@user1", new TimelinePatchRequest { Visibility = TimelineVisibility.Public });
+                    var res = await client.PatchAsJsonAsync("timelines/@user1", new TimelinePatchRequest { Visibility = TimelineVisibility.Public });
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync("/timelines/t1", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
+                    var res = await client.PatchAsJsonAsync("timelines/t1", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines/@user1");
+                    var res = await client.GetAsync("timelines/@user1");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -206,7 +206,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines/t1");
+                    var res = await client.GetAsync("timelines/t1");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -219,27 +219,27 @@ namespace Timeline.Tests.IntegratedTests
                 var client = await CreateClientAs(2);
 
                 {
-                    var res = await client.PutAsync("/timelines/@user2/members/user3", null);
+                    var res = await client.PutAsync("timelines/@user2/members/user3", null);
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.PutAsync("/timelines/t2/members/user3", null);
+                    var res = await client.PutAsync("timelines/t2/members/user3", null);
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync("/timelines/@user2", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
+                    var res = await client.PatchAsJsonAsync("timelines/@user2", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync("/timelines/t2", new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
+                    var res = await client.PatchAsJsonAsync("timelines/t2", new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines/@user2");
+                    var res = await client.GetAsync("timelines/@user2");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -248,7 +248,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines/t2");
+                    var res = await client.GetAsync("timelines/t2");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -261,17 +261,17 @@ namespace Timeline.Tests.IntegratedTests
                 var client = await CreateClientAs(3);
 
                 {
-                    var res = await client.PatchAsJsonAsync("/timelines/@user3", new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
+                    var res = await client.PatchAsJsonAsync("timelines/@user3", new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.PatchAsJsonAsync("/timelines/t3", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
+                    var res = await client.PatchAsJsonAsync("timelines/t3", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
                     res.Should().HaveStatusCode(200);
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines/@user3");
+                    var res = await client.GetAsync("timelines/@user3");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -280,7 +280,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines/t3");
+                    var res = await client.GetAsync("timelines/t3");
                     var timeline = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<TimelineInfo>().Which;
                     testResultRelate.Add(timeline);
@@ -292,7 +292,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var client = await CreateClientAs(3);
                 {
-                    var res = await client.GetAsync("/timelines?relate=user3");
+                    var res = await client.GetAsync("timelines?relate=user3");
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<List<TimelineInfo>>()
                         .Which;
@@ -300,7 +300,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines?relate=user3&relateType=own");
+                    var res = await client.GetAsync("timelines?relate=user3&relateType=own");
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<List<TimelineInfo>>()
                         .Which;
@@ -308,7 +308,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines?relate=user3&visibility=public");
+                    var res = await client.GetAsync("timelines?relate=user3&visibility=public");
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<List<TimelineInfo>>()
                         .Which;
@@ -316,7 +316,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines?relate=user3&visibility=register");
+                    var res = await client.GetAsync("timelines?relate=user3&visibility=register");
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<List<TimelineInfo>>()
                         .Which;
@@ -324,7 +324,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines?relate=user3&relateType=join&visibility=private");
+                    var res = await client.GetAsync("timelines?relate=user3&relateType=join&visibility=private");
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<List<TimelineInfo>>()
                         .Which;
@@ -332,7 +332,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    var res = await client.GetAsync("/timelines?relate=user3&relateType=own&visibility=private");
+                    var res = await client.GetAsync("timelines?relate=user3&relateType=own&visibility=private");
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<List<TimelineInfo>>()
                         .Which;
@@ -343,7 +343,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var client = await CreateDefaultClient();
                 {
-                    var res = await client.GetAsync("/timelines?visibility=public");
+                    var res = await client.GetAsync("timelines?visibility=public");
                     var body = res.Should().HaveStatusCode(200)
                         .And.HaveJsonBody<List<TimelineInfo>>()
                         .Which;
@@ -358,17 +358,17 @@ namespace Timeline.Tests.IntegratedTests
             var client = await CreateClientAsUser();
 
             {
-                var res = await client.GetAsync("/timelines?relate=us!!");
+                var res = await client.GetAsync("timelines?relate=us!!");
                 res.Should().BeInvalidModel();
             }
 
             {
-                var res = await client.GetAsync("/timelines?relateType=aaa");
+                var res = await client.GetAsync("timelines?relateType=aaa");
                 res.Should().BeInvalidModel();
             }
 
             {
-                var res = await client.GetAsync("/timelines?visibility=aaa");
+                var res = await client.GetAsync("timelines?visibility=aaa");
                 res.Should().BeInvalidModel();
             }
         }
@@ -483,7 +483,7 @@ namespace Timeline.Tests.IntegratedTests
                 res.Should().BeInvalidModel();
             }
             {
-                var res = await client.DeleteAsync(generator("aaa!!!/members", "user1"));
+                var res = await client.DeleteAsync(generator("aaa!!!", "members/user1"));
                 res.Should().BeInvalidModel();
             }
             {
