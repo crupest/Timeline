@@ -1,12 +1,15 @@
 # Welcome to Timeline!
 
 [![Build Status](https://dev.azure.com/crupest-web/Timeline/_apis/build/status/crupest.Timeline?branchName=master)](https://dev.azure.com/crupest-web/Timeline/_build/latest?definitionId=7&branchName=master)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=crupest/Timeline)](https://dependabot.com)
 
-This is the first web app back-end of [me](https://github.com/crupest).
+This is the first web app of [me](https://github.com/crupest).
 
-It is written in C# and built with [Asp.Net Core](https://github.com/aspnet/AspNetCore).
+Its back-end is written in C# and built with [ASP.Net Core](https://github.com/dotnet/aspnetcore).
 
-The final product is hosting on my [Tencent Cloud](https://cloud.tencent.com/) Cloud Virtual Machine on https://api.crupest.xyz.
+Its front-end is written in Typescript and React.
+
+The final product is hosting on my [Tencent Cloud](https://cloud.tencent.com/) Cloud Virtual Machine on https://crupest.xyz.
 
 Feel free to comment by opening an issue.
 
