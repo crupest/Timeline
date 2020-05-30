@@ -27,7 +27,6 @@
   },
   "scripts": {
     "start": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack-dev-server --config ./webpack.config.dev.ts",
-    "start-prod": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack --config ./webpack.config.prod.dev.ts && http-server dist -p 3000",
     "build": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack --config ./webpack.config.prod.ts",
     "lint": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx"
   },
