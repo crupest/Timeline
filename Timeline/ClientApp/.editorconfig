@@ -1,0 +1,13 @@
+root = true
+
+[*.ts]
+tab_width = 2
+
+[*.tsx]
+tab_width = 2
+
+[*.css]
+tab_width = 2
+
+[*.scss]
+tab_width = 2

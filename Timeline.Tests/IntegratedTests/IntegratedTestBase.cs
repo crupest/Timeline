@@ -100,7 +100,7 @@ namespace Timeline.Tests.IntegratedTests
                 options.Converters.Add(new JsonDateTimeConverter());
                 foreach (var user in users)
                 {
-                    var s = await client.GetStringAsync($"/users/{user.Username}");
+                    var s = await client.GetStringAsync($"users/{user.Username}");
                     userInfoList.Add(JsonSerializer.Deserialize<UserInfo>(s, options));
                 }
 
@@ -119,13 +119,16 @@ namespace Timeline.Tests.IntegratedTests
 
         public Task<HttpClient> CreateDefaultClient()
         {
-            return Task.FromResult(Factory.CreateDefaultClient());
+            var client = Factory.CreateDefaultClient();
+            client.BaseAddress = new Uri(client.BaseAddress, "api/");
+            return Task.FromResult(client);
         }
 
         public async Task<HttpClient> CreateClientWithCredential(string username, string password)
         {
             var client = Factory.CreateDefaultClient();
-            var response = await client.PostAsJsonAsync("/token/create",
+            client.BaseAddress = new Uri(client.BaseAddress, "api/");
+            var response = await client.PostAsJsonAsync("token/create",
                 new CreateTokenRequest { Username = username, Password = password });
             var token = response.Should().HaveStatusCode(200)
                 .And.HaveJsonBody<CreateTokenResponse>().Which.Token;
