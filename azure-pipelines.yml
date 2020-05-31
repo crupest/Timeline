@@ -84,7 +84,7 @@ stages:
       displayName: Build And Push Docker Image
       inputs:
         command: buildAndPush
-        repository: timeline
+        repository: crupest/timeline
         tags: latest
         buildContext: Timeline
         containerRegistry: crupest-docker-hub
