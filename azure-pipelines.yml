@@ -80,22 +80,11 @@ stages:
     - publish: Timeline/publish
       artifact: timeline
 
-  - deployment: deploy
-    displayName: Deploy to Server
-    environment: 
-      name: timeline-server
-      resourceType: VirtualMachine
-      tags: linux
-    dependsOn: build
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: timeline
-
-          - script: |
-              rm -rf /var/timeline/*
-              cp -r $PIPELINE_WORKSPACE/timeline/. /var/timeline/
-              sudo systemctl restart timeline.service
-            displayName: 'Copy Files and Restart Service'
+    - task: Docker@2
+      displayName: Build And Push Docker Image
+      inputs:
+        command: buildAndPush
+        repository: timeline
+        tags: latest
+        buildContext: Timeline
+        containerRegistry: crupest-docker-hub

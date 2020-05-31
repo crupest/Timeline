@@ -36,12 +36,6 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var workDir = Configuration.GetValue<string?>("WorkDir");
-            if (workDir == null)
-            {
-                throw new InvalidOperationException("Please set a work directory first.");
-            }
-
             services.AddControllers(setup =>
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
