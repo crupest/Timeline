@@ -21,7 +21,7 @@ namespace Timeline.Services
         public PathProvider(IConfiguration configuration)
         {
             _configuration = configuration;
-            _workingDirectory = configuration.GetValue<string>("WorkDir");
+            _workingDirectory = configuration.GetValue<string?>("WorkDir") ?? "/timeline";
         }
 
         public string GetWorkingDirectory()
