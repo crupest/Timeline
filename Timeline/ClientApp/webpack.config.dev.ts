@@ -2,6 +2,7 @@ import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import PnpWebpackPlugin from 'pnp-webpack-plugin';
 
 import { commonRules, htmlCommonConfig } from './webpack.common';
 
@@ -17,16 +18,20 @@ const config: webpack.Configuration = {
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: {
-          plugins: ['react-hot-loader/babel']
-        }
-      }
-    ]
+          plugins: ['react-hot-loader/babel'],
+        },
+      },
+    ],
   },
   resolve: {
     alias: {
-      'react-dom': '@hot-loader/react-dom'
+      'react-dom': '@hot-loader/react-dom',
     },
-    extensions: ['*', '.js', '.jsx', '.ts', '.tsx']
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+    plugins: [PnpWebpackPlugin],
+  },
+  resolveLoader: {
+    plugins: [PnpWebpackPlugin.moduleLoader(module)],
   },
   optimization: {
     runtimeChunk: 'single',
@@ -36,16 +41,16 @@ const config: webpack.Configuration = {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    }
+          chunks: 'all',
+        },
+      },
+    },
   },
   output: {
     path: path.resolve(__dirname, 'dist/'),
     filename: '[name].[hash].js',
     chunkFilename: '[name].[hash].js',
-    publicPath: '/'
+    publicPath: '/',
   },
   devServer: {
     contentBase: path.join(__dirname, 'public/'),
@@ -53,16 +58,16 @@ const config: webpack.Configuration = {
     port: 3000,
     publicPath: 'http://localhost:3000/',
     historyApiFallback: true,
-    hotOnly: true
+    hotOnly: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
       ...htmlCommonConfig,
-      devServer: 'http://localhost:3000'
+      devServer: 'http://localhost:3000',
     }),
     new ForkTsCheckerWebpackPlugin(),
-    new webpack.HotModuleReplacementPlugin()
-  ]
+    new webpack.HotModuleReplacementPlugin(),
+  ],
 };
 
 export default config;
