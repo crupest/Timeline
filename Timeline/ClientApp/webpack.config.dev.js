@@ -1,12 +1,12 @@
-import path from 'path';
-import webpack from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import PnpWebpackPlugin from 'pnp-webpack-plugin';
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const PnpWebpackPlugin = require('pnp-webpack-plugin');
 
-import { commonRules, htmlCommonConfig } from './webpack.common';
+const { commonRules, htmlCommonConfig } = require('./webpack.common');
 
-const config: webpack.Configuration = {
+const config = {
   entry: ['react-hot-loader/patch', './src/index.tsx'],
   mode: 'development',
   devtool: 'eval-source-map',
@@ -70,4 +70,4 @@ const config: webpack.Configuration = {
   ],
 };
 
-export default config;
+module.exports = config;

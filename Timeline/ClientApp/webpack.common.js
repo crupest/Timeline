@@ -1,9 +1,7 @@
-import webpack from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import autoprefixer from 'autoprefixer';
-import htmlWebpackTemplate from 'html-webpack-template';
+const autoprefixer = require('autoprefixer');
+const htmlWebpackTemplate = require('html-webpack-template');
 
-export const commonRules: webpack.RuleSetRule[] = [
+const commonRules = [
   {
     test: /\.css$/,
     use: ['style-loader', 'css-loader'],
@@ -37,7 +35,7 @@ export const commonRules: webpack.RuleSetRule[] = [
   },
 ];
 
-export const htmlCommonConfig: HtmlWebpackPlugin.Options = {
+const htmlCommonConfig = {
   inject: false,
   template: htmlWebpackTemplate,
 
@@ -54,4 +52,9 @@ export const htmlCommonConfig: HtmlWebpackPlugin.Options = {
   <meta name="theme-color" content="#ffffff">
   `,
   title: 'Timeline',
+};
+
+module.exports = {
+  commonRules,
+  htmlCommonConfig,
 };

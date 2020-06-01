@@ -1,14 +1,13 @@
-import path from 'path';
-import webpack from 'webpack';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import CopyPlugin from 'copy-webpack-plugin';
-import PnpWebpackPlugin from 'pnp-webpack-plugin';
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const PnpWebpackPlugin = require('pnp-webpack-plugin');
 
-import { commonRules, htmlCommonConfig } from './webpack.common';
+const { commonRules, htmlCommonConfig } = require('./webpack.common');
 
-const config: webpack.Configuration = {
+const config = {
   entry: ['./src/index.tsx'],
   mode: 'production',
   devtool: 'source-map',
@@ -52,13 +51,15 @@ const config: webpack.Configuration = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin(htmlCommonConfig),
     new ForkTsCheckerWebpackPlugin(),
-    new CopyPlugin([
-      {
-        from: path.resolve(__dirname, 'public/'),
-        to: path.resolve(__dirname, 'dist/'),
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'public/'),
+          to: path.resolve(__dirname, 'dist/'),
+        },
+      ],
+    }),
   ],
 };
 
-export default config;
+module.exports = config;
