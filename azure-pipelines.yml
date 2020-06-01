@@ -55,3 +55,25 @@ stages:
       inputs:
         codeCoverageTool: 'Cobertura'
         summaryFileLocation: '**/TestResults/*/coverage.cobertura.xml'
+
+- stage: deploy
+  displayName: Build Release and Deploy
+  dependsOn: build
+  condition: eq(variables['Build.SourceBranchName'], 'master')
+  variables:
+    buildConfiguration: 'Release'
+
+  jobs:
+  - job: build
+    displayName: Build Release Artifact
+    pool:
+      vmImage: 'ubuntu-18.04'
+    steps:
+    - task: Docker@2
+      displayName: Build And Push Docker Image
+      inputs:
+        command: buildAndPush
+        repository: crupest/timeline
+        tags: latest
+        buildContext: .
+        containerRegistry: crupest-docker-hub
