@@ -1,0 +1,7 @@
+.git
+
+*/bin
+*/obj
+Timeline/publish
+Timeline/ClientApp/dist
+Timeline/ClientApp/node_modules
