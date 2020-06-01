@@ -2,8 +2,11 @@
 
 # dependencies
 /node_modules
-/.pnp
-.pnp.js
+
+.yarn/*
+!.yarn/cache
+!.yarn/releases
+!.yarn/plugins
 
 # testing
 /coverage
@@ -24,4 +27,4 @@ yarn-error.log*
 
 .vscode
 
-dist
+/dist

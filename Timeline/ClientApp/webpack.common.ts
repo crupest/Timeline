@@ -1,11 +1,12 @@
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import autoprefixer from 'autoprefixer';
+import htmlWebpackTemplate from 'html-webpack-template';
 
 export const commonRules: webpack.RuleSetRule[] = [
   {
     test: /\.css$/,
-    use: ['style-loader', 'css-loader']
+    use: ['style-loader', 'css-loader'],
   },
   {
     test: /\.(scss)$/,
@@ -15,13 +16,13 @@ export const commonRules: webpack.RuleSetRule[] = [
       {
         loader: 'postcss-loader',
         options: {
-          plugins: function() {
+          plugins: function () {
             return [autoprefixer];
-          }
-        }
+          },
+        },
       },
-      'sass-loader'
-    ]
+      'sass-loader',
+    ],
   },
   {
     test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot)$/i,
@@ -29,19 +30,16 @@ export const commonRules: webpack.RuleSetRule[] = [
       {
         loader: 'url-loader',
         options: {
-          limit: 8192
-        }
+          limit: 8192,
+        },
       },
-      {
-        loader: 'image-webpack-loader'
-      }
-    ]
-  }
+    ],
+  },
 ];
 
 export const htmlCommonConfig: HtmlWebpackPlugin.Options = {
   inject: false,
-  template: require('html-webpack-template'),
+  template: htmlWebpackTemplate,
 
   appMountId: 'app',
   mobile: true,
@@ -55,5 +53,5 @@ export const htmlCommonConfig: HtmlWebpackPlugin.Options = {
   <meta name="msapplication-TileColor" content="#2d89ef">
   <meta name="theme-color" content="#ffffff">
   `,
-  title: 'Timeline'
+  title: 'Timeline',
 };

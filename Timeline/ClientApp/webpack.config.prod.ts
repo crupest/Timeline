@@ -4,6 +4,7 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
+import PnpWebpackPlugin from 'pnp-webpack-plugin';
 
 import { commonRules, htmlCommonConfig } from './webpack.common';
 
@@ -17,12 +18,16 @@ const config: webpack.Configuration = {
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
-      }
-    ]
+        loader: 'babel-loader',
+      },
+    ],
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx', '.ts', '.tsx']
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+    plugins: [PnpWebpackPlugin],
+  },
+  resolveLoader: {
+    plugins: [PnpWebpackPlugin.moduleLoader(module)],
   },
   optimization: {
     runtimeChunk: 'single',
@@ -32,16 +37,16 @@ const config: webpack.Configuration = {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    }
+          chunks: 'all',
+        },
+      },
+    },
   },
   output: {
     path: path.resolve(__dirname, 'dist/'),
     filename: '[name].[hash].js',
     chunkFilename: '[name].[hash].js',
-    publicPath: '/'
+    publicPath: '/',
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -50,10 +55,10 @@ const config: webpack.Configuration = {
     new CopyPlugin([
       {
         from: path.resolve(__dirname, 'public/'),
-        to: path.resolve(__dirname, 'dist/')
-      }
-    ])
-  ]
+        to: path.resolve(__dirname, 'dist/'),
+      },
+    ]),
+  ],
 };
 
 export default config;
