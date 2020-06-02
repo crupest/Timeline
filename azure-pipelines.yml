@@ -37,11 +37,7 @@ stages:
         packageType: sdk
         version: 3.1.x
 
-    - script: |
-        dotnet restore Timeline/Timeline.csproj --configfile nuget.config
-        dotnet restore Timeline.Tests/Timeline.Tests.csproj --configfile nuget.config
-      displayName: Dotnet Restore
-    - script: dotnet test Timeline.Tests/Timeline.Tests.csproj --configuration $(buildConfiguration) --no-restore --logger trx --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
+    - script: dotnet test --configuration $(buildConfiguration) --logger trx --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
       displayName: Dotnet Test
 
     - task: PublishTestResults@2
