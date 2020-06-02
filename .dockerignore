@@ -3,5 +3,10 @@
 */bin
 */obj
 Timeline/publish
+
 Timeline/ClientApp/dist
 Timeline/ClientApp/node_modules
+Timeline/ClientApp/.yarn/*
+!Timeline/ClientApp/.yarn/releases
+!Timeline/ClientApp/.yarn/plugins
+Timeline/ClientApp/.pnp.*
