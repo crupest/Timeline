@@ -58,10 +58,6 @@ const frontendCredits: {
     name: 'pepjs',
     url: 'https://github.com/jquery/PEP',
   },
-  {
-    name: 'cross-env',
-    url: 'https://github.com/kentcdodds/cross-env',
-  },
 ];
 
 const backendCredits: {
@@ -118,13 +114,6 @@ const About: React.FC = () => {
                 rel="noopener noreferrer"
               >
                 <i className="fab fa-github about-link-icon text-body" />
-              </a>
-              <a
-                href="https://blog.crupest.xyz"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fas fa-blog about-link-icon text-body" />
               </a>
             </p>
           </div>
