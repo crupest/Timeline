@@ -114,7 +114,10 @@ namespace Timeline
 
             app.UseRouting();
 
-            app.UseSpaStaticFiles();
+            app.UseSpaStaticFiles(new StaticFileOptions
+            {
+                ServeUnknownFileTypes = true
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();
