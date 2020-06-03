@@ -11,7 +11,7 @@ import {
   Modal,
   Row,
   Col,
-  Button
+  Button,
 } from 'reactstrap';
 
 export interface TimelineMemberCallbacks {
@@ -25,7 +25,7 @@ export interface TimelineMemberProps {
   edit: TimelineMemberCallbacks | null | undefined;
 }
 
-const TimelineMember: React.FC<TimelineMemberProps> = props => {
+const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
   const { t } = useTranslation();
 
   const [userSearchText, setUserSearchText] = useState<string>('');
@@ -87,7 +87,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = props => {
             <>
               <SearchInput
                 value={userSearchText}
-                onChange={v => {
+                onChange={(v) => {
                   setUserSearchText(v);
                 }}
                 loading={userSearchState.type === 'loading'}
@@ -95,27 +95,27 @@ const TimelineMember: React.FC<TimelineMemberProps> = props => {
                   if (userSearchText === '') {
                     setUserSearchState({
                       type: 'error',
-                      data: 'login.emptyUsername'
+                      data: 'login.emptyUsername',
                     });
                     return;
                   }
 
                   setUserSearchState({ type: 'loading' });
                   edit.onCheckUser(userSearchText).then(
-                    u => {
+                    (u) => {
                       if (u == null) {
                         setUserSearchState({
                           type: 'error',
-                          data: 'timeline.userNotExist'
+                          data: 'timeline.userNotExist',
                         });
                       } else {
                         setUserSearchState({ type: 'user', data: u });
                       }
                     },
-                    e => {
+                    (e) => {
                       setUserSearchState({
                         type: 'error',
-                        data: e.toString()
+                        data: `${e as string}`,
                       });
                     }
                   );
@@ -125,7 +125,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = props => {
                 if (userSearchState.type === 'user') {
                   const u = userSearchState.data;
                   const addable =
-                    members.findIndex(m => m.username === u.username) === -1;
+                    members.findIndex((m) => m.username === u.username) === -1;
                   return (
                     <>
                       {!addable ? (
@@ -150,7 +150,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = props => {
                             className="align-self-center"
                             disabled={!addable}
                             onClick={() => {
-                              edit.onAddUser(u).then(_ => {
+                              void edit.onAddUser(u).then((_) => {
                                 setUserSearchText('');
                                 setUserSearchState({ type: 'init' });
                               });
@@ -185,7 +185,9 @@ export interface TimelineMemberDialogProps extends TimelineMemberProps {
   onClose: () => void;
 }
 
-export const TimelineMemberDialog: React.FC<TimelineMemberDialogProps> = props => {
+export const TimelineMemberDialog: React.FC<TimelineMemberDialogProps> = (
+  props
+) => {
   return (
     <Modal isOpen={props.open} toggle={props.onClose}>
       <TimelineMember {...props} />

@@ -44,7 +44,7 @@ export default function TimelinePageTemplateUI<TTimeline, TEditItems>(
   const onPostEditHeightChange = React.useCallback((height: number): void => {
     const { current: bottomSpaceDiv } = bottomSpaceRef;
     if (bottomSpaceDiv != null) {
-      bottomSpaceDiv.style.height = height + 'px';
+      bottomSpaceDiv.style.height = `${height}px`;
     }
     if (height === 0) {
       const alertHost = getAlertHost();
@@ -54,7 +54,7 @@ export default function TimelinePageTemplateUI<TTimeline, TEditItems>(
     } else {
       const alertHost = getAlertHost();
       if (alertHost != null) {
-        alertHost.style.marginBottom = height + 'px';
+        alertHost.style.marginBottom = `${height}px`;
       }
     }
   }, []);

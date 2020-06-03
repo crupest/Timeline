@@ -6,12 +6,13 @@ import { Container, Row, Col, Input } from 'reactstrap';
 
 import { apiBaseUrl } from '../config';
 
-import { useUser, userLogout } from '../data/user';
+import { useUser, userLogout, useUserLoggedIn } from '../data/user';
 
 import AppBar from '../common/AppBar';
 import OperationDialog, {
   OperationInputErrorInfo,
 } from '../common/OperationDialog';
+import { CommonErrorResponse } from '../data/common';
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -30,7 +31,7 @@ async function changePassword(
       newPassword,
     });
   } catch (e) {
-    const error = e as AxiosError;
+    const error = e as AxiosError<CommonErrorResponse>;
     if (
       error.response &&
       error.response.status === 400 &&
@@ -44,7 +45,7 @@ async function changePassword(
 }
 
 const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
-  const user = useUser()!;
+  const user = useUserLoggedIn();
   const history = useHistory();
   const { t } = useTranslation();
 
@@ -176,7 +177,7 @@ const Settings: React.FC = (_) => {
               type="select"
               value={language}
               onChange={(e) => {
-                i18n.changeLanguage(e.target.value);
+                void i18n.changeLanguage(e.target.value);
               }}
             >
               <option value="zh">中文</option>

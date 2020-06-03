@@ -3,7 +3,7 @@ import { useHistory } from 'react-router';
 import axios from 'axios';
 
 import { apiBaseUrl } from '../config';
-import { useUser } from '../data/user';
+import { useUserLoggedIn } from '../data/user';
 import { validateTimelineName } from '../data/timeline';
 
 import OperationDialog from '../common/OperationDialog';
@@ -13,9 +13,9 @@ interface TimelineCreateDialogProps {
   close: () => void;
 }
 
-const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = props => {
+const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
   const history = useHistory();
-  const user = useUser()!;
+  const user = useUserLoggedIn();
 
   let nameSaved: string;
 
@@ -30,7 +30,7 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = props => {
           type: 'text',
           label: 'home.createDialog.name',
           helperText: 'home.createDialog.nameFormat',
-          validator: name => {
+          validator: (name) => {
             if (name.length === 0) {
               return 'home.createDialog.noEmpty';
             } else if (name.length > 26) {
@@ -40,19 +40,19 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = props => {
             } else {
               return null;
             }
-          }
-        }
+          },
+        },
       ]}
       onProcess={([name]) => {
         nameSaved = name as string;
         return axios.post(`${apiBaseUrl}/timelines?token=${user.token}`, {
-          name
+          name,
         });
       }}
       onSuccessAndClose={() => {
         history.push(`timelines/${nameSaved}`);
       }}
-      failurePrompt={e => (e as object).toString()}
+      failurePrompt={(e) => `${e as string}`}
     />
   );
 };

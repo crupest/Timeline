@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { apiBaseUrl } from '../config';
+import { extractErrorCode } from './common';
 import { pushAlert } from '../common/alert-service';
 import { i18nPromise } from '../i18n';
+import { UiLogicError } from '../common';
 
 export interface UserAuthInfo {
   username: string;
@@ -63,30 +65,30 @@ const verifyTokenUrl = apiBaseUrl + kVerifyTokenUrl;
 function verifyToken(token: string): Promise<User> {
   return axios
     .post<VerifyTokenResponse>(verifyTokenUrl, {
-      token: token
+      token: token,
     } as VerifyTokenRequest)
-    .then(res => res.data.user);
+    .then((res) => res.data.user);
 }
 
 const TOKEN_STORAGE_KEY = 'token';
 
 export function checkUserLoginState(): Promise<UserWithToken | null> {
   if (getCurrentUser() !== undefined)
-    throw new Error("Already checked user. Can't check twice.");
+    throw new UiLogicError("Already checked user. Can't check twice.");
 
   const savedToken = window.localStorage.getItem(TOKEN_STORAGE_KEY);
   if (savedToken) {
     return verifyToken(savedToken)
       .then(
-        u => {
+        (u) => {
           const user: UserWithToken = {
             ...u,
-            token: savedToken
+            token: savedToken,
           };
-          i18nPromise.then(t => {
+          void i18nPromise.then((t) => {
             pushAlert({
               type: 'success',
-              message: t('user.welcomeBack')
+              message: t('user.welcomeBack'),
             });
           });
           return user;
@@ -94,17 +96,17 @@ export function checkUserLoginState(): Promise<UserWithToken | null> {
         (e: AxiosError) => {
           if (e.response != null) {
             window.localStorage.removeItem(TOKEN_STORAGE_KEY);
-            i18nPromise.then(t => {
+            void i18nPromise.then((t) => {
               pushAlert({
                 type: 'danger',
-                message: t('user.verifyTokenFailed')
+                message: t('user.verifyTokenFailed'),
               });
             });
           } else {
-            i18nPromise.then(t => {
+            void i18nPromise.then((t) => {
               pushAlert({
                 type: 'danger',
-                message: t('user.verifyTokenFailedNetwork')
+                message: t('user.verifyTokenFailedNetwork'),
               });
             });
           }
@@ -112,7 +114,7 @@ export function checkUserLoginState(): Promise<UserWithToken | null> {
           return null;
         }
       )
-      .then(u => {
+      .then((u) => {
         userSubject.next(u);
         return u;
       });
@@ -132,18 +134,17 @@ export function userLogin(
   rememberMe: boolean
 ): Promise<UserWithToken> {
   if (getCurrentUser()) {
-    throw new Error('Already login.');
+    throw new UiLogicError('Already login.');
   }
   return axios
     .post<CreateTokenResponse>(createTokenUrl, { ...credentials, expire: 30 })
-    .catch(e => {
-      const error = e as AxiosError;
-      if (error.response?.data?.code === 11010101) {
+    .catch((e: AxiosError) => {
+      if (extractErrorCode(e) === 11010101) {
         throw new BadCredentialError(e);
       }
       throw e;
     })
-    .then(res => {
+    .then((res) => {
       const body = res.data;
       const token = body.token;
       if (rememberMe) {
@@ -151,7 +152,7 @@ export function userLogin(
       }
       const user = {
         ...body.user,
-        token
+        token,
       };
       userSubject.next(user);
       return user;
@@ -160,10 +161,10 @@ export function userLogin(
 
 export function userLogout(): void {
   if (getCurrentUser() === undefined) {
-    throw new Error('Please check user first.');
+    throw new UiLogicError('Please check user first.');
   }
   if (getCurrentUser() === null) {
-    throw new Error('No login.');
+    throw new UiLogicError('No login.');
   }
   window.localStorage.removeItem(TOKEN_STORAGE_KEY);
   userSubject.next(null);
@@ -174,7 +175,7 @@ export function useOptionalUser(): UserWithToken | null | undefined {
     userSubject.value
   );
   useEffect(() => {
-    const sub = user$.subscribe(u => setUser(u));
+    const sub = user$.subscribe((u) => setUser(u));
     return () => {
       sub.unsubscribe();
     };
@@ -186,16 +187,16 @@ export function useUser(): UserWithToken | null {
   const [user, setUser] = useState<UserWithToken | null>(() => {
     const initUser = userSubject.value;
     if (initUser === undefined) {
-      throw new Error(
+      throw new UiLogicError(
         "This is a logic error in user module. Current user can't be undefined in useUser."
       );
     }
     return initUser;
   });
   useEffect(() => {
-    const sub = user$.subscribe(u => {
+    const sub = user$.subscribe((u) => {
       if (u === undefined) {
-        throw new Error(
+        throw new UiLogicError(
           "This is a logic error in user module. User emitted can't be undefined later."
         );
       }
@@ -208,8 +209,16 @@ export function useUser(): UserWithToken | null {
   return user;
 }
 
+export function useUserLoggedIn(): UserWithToken {
+  const user = useUser();
+  if (user == null) {
+    throw new UiLogicError('You assert user has logged in but actually not.');
+  }
+  return user;
+}
+
 export function fetchUser(username: string): Promise<User> {
   return axios
     .get<User>(`${apiBaseUrl}/users/${username}`)
-    .then(res => res.data);
+    .then((res) => res.data);
 }

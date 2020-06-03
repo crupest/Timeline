@@ -4,7 +4,7 @@ import { useHistory } from 'react-router';
 import { Trans } from 'react-i18next';
 
 import { apiBaseUrl } from '../config';
-import { useUser } from '../data/user';
+import { useUserLoggedIn } from '../data/user';
 import OperationDialog from '../common/OperationDialog';
 
 interface TimelineDeleteDialog {
@@ -13,8 +13,8 @@ interface TimelineDeleteDialog {
   close: () => void;
 }
 
-const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = props => {
-  const user = useUser()!;
+const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
+  const user = useUserLoggedIn();
   const history = useHistory();
 
   const { name } = props;
@@ -35,14 +35,14 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = props => {
       inputScheme={[
         {
           type: 'text',
-          validator: value => {
+          validator: (value) => {
             if (value !== name) {
               return 'timeline.deleteDialog.notMatch';
             } else {
               return null;
             }
-          }
-        }
+          },
+        },
       ]}
       onProcess={() => {
         return axios.delete(

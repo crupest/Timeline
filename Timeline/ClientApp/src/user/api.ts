@@ -60,7 +60,7 @@ export function useOptionalVersionedAvatarUrl(
         ? undefined
         : updateQueryString(
             'v',
-            avatarVersion == null ? null : avatarVersion + '',
+            avatarVersion == null ? null : avatarVersion.toString(),
             url
           ),
     [avatarVersion, url]
@@ -72,7 +72,8 @@ export function useAvatarUrlWithGivenVersion(
   url: string
 ): string {
   return React.useMemo(
-    () => updateQueryString('v', version == null ? null : version + '', url),
+    () =>
+      updateQueryString('v', version == null ? null : version.toString(), url),
     [version, url]
   );
 }

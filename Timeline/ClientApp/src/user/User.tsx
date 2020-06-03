@@ -10,6 +10,7 @@ import ChangeNicknameDialog from './ChangeNicknameDialog';
 import ChangeAvatarDialog from './ChangeAvatarDialog';
 import TimelinePageTemplate from '../timeline/TimelinePageTemplate';
 import { PersonalTimelineManageItem } from './UserInfoCard';
+import { UiLogicError } from '../common';
 
 const User: React.FC = (_) => {
   const { username } = useParams<{ username: string }>();
@@ -26,12 +27,16 @@ const User: React.FC = (_) => {
   };
 
   if (dialog === 'nickname') {
+    if (user == null) {
+      throw new UiLogicError('Change nickname without login.');
+    }
+
     dialogElement = (
       <ChangeNicknameDialog
         open
         close={closeDialogHandler}
         onProcess={(newNickname) => {
-          const p = changeNickname(user!.token, username, newNickname);
+          const p = changeNickname(user.token, username, newNickname);
           return p.then((_) => {
             setDataKey(dataKey + 1);
           });
@@ -39,11 +44,15 @@ const User: React.FC = (_) => {
       />
     );
   } else if (dialog === 'avatar') {
+    if (user == null) {
+      throw new UiLogicError('Change avatar without login.');
+    }
+
     dialogElement = (
       <ChangeAvatarDialog
         open
         close={closeDialogHandler}
-        process={(file) => changeAvatar(user!.token, username, file, file.type)}
+        process={(file) => changeAvatar(user.token, username, file, file.type)}
       />
     );
   }

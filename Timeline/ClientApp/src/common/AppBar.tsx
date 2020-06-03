@@ -10,7 +10,7 @@ import { useOptionalVersionedAvatarUrl } from '../user/api';
 
 import TimelineLogo from './TimelineLogo';
 
-const AppBar: React.FC<{}> = (_) => {
+const AppBar: React.FC = (_) => {
   const history = useHistory();
   const user = useUser();
   const avatarUrl = useOptionalVersionedAvatarUrl(user?._links?.avatar);

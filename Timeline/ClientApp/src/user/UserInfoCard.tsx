@@ -39,6 +39,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
     props.timeline.owner._links.avatar
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
 
   const notifyHeight = React.useCallback((): void => {
@@ -58,17 +59,6 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
   const toggleManageDropdown = React.useCallback(
     (): void => setManageDropdownOpen((old) => !old),
     []
-  );
-  const onManageProperty = React.useCallback(
-    (): void => onManage!('property'),
-    [onManage]
-  );
-  const onManageAvatar = React.useCallback((): void => onManage!('avatar'), [
-    onManage,
-  ]);
-  const onManageNickname = React.useCallback(
-    (): void => onManage!('nickname'),
-    [onManage]
   );
 
   return (
@@ -93,19 +83,19 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
         {t(timelineVisibilityTooltipTranslationMap[props.timeline.visibility])}
       </small>
       <div className="text-right mt-2">
-        {props.onManage != null ? (
+        {onManage != null ? (
           <Dropdown isOpen={manageDropdownOpen} toggle={toggleManageDropdown}>
             <DropdownToggle outline color="primary">
               {t('timeline.manage')}
             </DropdownToggle>
             <DropdownMenu>
-              <DropdownItem onClick={onManageNickname}>
+              <DropdownItem onClick={() => onManage('nickname')}>
                 {t('timeline.manageItem.nickname')}
               </DropdownItem>
-              <DropdownItem onClick={onManageAvatar}>
+              <DropdownItem onClick={() => onManage('avatar')}>
                 {t('timeline.manageItem.avatar')}
               </DropdownItem>
-              <DropdownItem onClick={onManageProperty}>
+              <DropdownItem onClick={() => onManage('property')}>
                 {t('timeline.manageItem.property')}
               </DropdownItem>
               <DropdownItem onClick={props.onMember}>

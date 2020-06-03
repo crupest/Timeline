@@ -32,7 +32,7 @@ const App: React.FC = () => {
   const user = useOptionalUser();
 
   React.useEffect(() => {
-    checkUserLoginState();
+    void checkUserLoginState();
   }, []);
 
   let body;
