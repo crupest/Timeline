@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETCoreApp,Version=v3.1": {
+      "TextCopy": {
+        "type": "Direct",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "+vXX7g+z32PTAfejngj0KT8d5MRlEvPQgPkFh60W6P0aoMiLHuyYl1MYr2OF/80l1pFQI0rjC/tD1bA4thTIyA=="
+      },
+      "timeline.errorcodes": {
+        "type": "Project"
+      }
+    }
+  }
+}
