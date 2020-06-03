@@ -119,6 +119,11 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Common.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Models\Http\Exception.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Exception.resx</DependentUpon>
+        </Compile>
         <Compile Update="Resources\Models\Validation\NicknameValidator.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -207,6 +212,10 @@
         <EmbeddedResource Update="Resources\Models\Http\Common.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Common.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Models\Http\Exception.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Exception.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Validation\NicknameValidator.resx">
             <Generator>ResXFileCodeGenerator</Generator>

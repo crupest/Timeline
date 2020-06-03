@@ -58,11 +58,8 @@ namespace Timeline.Models.Http
 
         public TimelineInfoLinks Resolve(Timeline source, TimelineInfo destination, TimelineInfoLinks destMember, ResolutionContext context)
         {
-            if (_actionContextAccessor.ActionContext == null)
-                throw new InvalidOperationException("No action context, can't fill urls.");
-
-            var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
-
+            var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
+            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
             return new TimelineInfoLinks
             {
@@ -85,10 +82,8 @@ namespace Timeline.Models.Http
 
         public TimelinePostContentInfo Resolve(TimelinePost source, TimelinePostInfo destination, TimelinePostContentInfo destMember, ResolutionContext context)
         {
-            if (_actionContextAccessor.ActionContext == null)
-                throw new InvalidOperationException("No action context, can't fill urls.");
-
-            var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
+            var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
+            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
             var sourceContent = source.Content;
 
@@ -113,7 +108,7 @@ namespace Timeline.Models.Http
             }
             else
             {
-                throw new InvalidOperationException("Unknown content type.");
+                throw new InvalidOperationException(Resources.Models.Http.Exception.UnknownPostContentType);
             }
         }
     }

@@ -110,7 +110,7 @@ namespace Timeline.Services
             return Convert.ToBase64String(HashPasswordV3(password, _rng));
         }
 
-        private byte[] HashPasswordV3(string password, RandomNumberGenerator rng)
+        private static byte[] HashPasswordV3(string password, RandomNumberGenerator rng)
         {
             return HashPasswordV3(password, rng,
                 prf: KeyDerivationPrf.HMACSHA256,
@@ -166,7 +166,7 @@ namespace Timeline.Services
             };
         }
 
-        private bool VerifyHashedPasswordV3(byte[] hashedPassword, string password, string hashedPasswordString)
+        private static bool VerifyHashedPasswordV3(byte[] hashedPassword, string password, string hashedPasswordString)
         {
             try
             {
