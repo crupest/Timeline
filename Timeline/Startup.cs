@@ -24,10 +24,14 @@ namespace Timeline
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class Startup
     {
+        private readonly bool disableFrontEnd;
+
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Environment = environment;
             Configuration = configuration;
+
+            disableFrontEnd = Configuration.GetValue<bool?>(ApplicationConfiguration.DisableFrontEndKey) ?? false;
         }
 
         public IWebHostEnvironment Environment { get; }
@@ -87,10 +91,13 @@ namespace Timeline
                 options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
             });
 
-            services.AddSpaStaticFiles(config =>
+            if (!disableFrontEnd)
             {
-                config.RootPath = "ClientApp/dist";
-            });
+                services.AddSpaStaticFiles(config =>
+                {
+                    config.RootPath = "ClientApp/dist";
+                });
+            }
         }
 
 
@@ -114,10 +121,13 @@ namespace Timeline
 
             app.UseRouting();
 
-            app.UseSpaStaticFiles(new StaticFileOptions
+            if (!disableFrontEnd)
             {
-                ServeUnknownFileTypes = true
-            });
+                app.UseSpaStaticFiles(new StaticFileOptions
+                {
+                    ServeUnknownFileTypes = true
+                });
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -127,15 +137,18 @@ namespace Timeline
                 endpoints.MapControllers();
             });
 
-            app.UseSpa(spa =>
+            if (!disableFrontEnd)
             {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (Environment.IsDevelopment())
+                app.UseSpa(spa =>
                 {
-                    SpaServices.SpaDevelopmentServerMiddlewareExtensions.UseSpaDevelopmentServer(spa, packageManager: "yarn", npmScript: "start", port: 3000);
-                }
-            });
+                    spa.Options.SourcePath = "ClientApp";
+
+                    if (Environment.IsDevelopment())
+                    {
+                        SpaServices.SpaDevelopmentServerMiddlewareExtensions.UseSpaDevelopmentServer(spa, packageManager: "yarn", npmScript: "install-and-start", port: 3000);
+                    }
+                });
+            }
         }
     }
 }

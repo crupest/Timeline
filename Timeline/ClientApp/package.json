@@ -29,6 +29,7 @@
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.config.dev.js",
     "build": "webpack --config ./webpack.config.prod.js",
+    "install-and-start": "yarn && webpack-dev-server --config ./webpack.config.dev.js",
     "lint": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx"
   },
   "browserslist": {

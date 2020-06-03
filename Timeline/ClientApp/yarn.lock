@@ -1569,6 +1569,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webpack-env@npm:^1.15.2":
+  version: 1.15.2
+  resolution: "@types/webpack-env@npm:1.15.2"
+  checksum: 3/571fa57efdf276b4feaf6d1fafd6b4d25a5e6f146eb517ad6c9f64ccca0146a8ed759f05428fe224ace5040983334d87259da4758fa1c18f44063243eaa9da85
+  languageName: node
+  linkType: hard
+
 "@types/webpack-sources@npm:*":
   version: 0.1.6
   resolution: "@types/webpack-sources@npm:0.1.6"
@@ -9623,6 +9630,7 @@ fsevents@~2.1.2:
     "@types/react-router": ^5.1.7
     "@types/react-router-dom": ^5.1.5
     "@types/reactstrap": ^8.4.2
+    "@types/webpack-env": ^1.15.2
     "@types/xregexp": ^4.3.0
     "@typescript-eslint/eslint-plugin": ^3.0.2
     "@typescript-eslint/parser": ^3.0.2
