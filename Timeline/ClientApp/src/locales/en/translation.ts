@@ -153,8 +153,7 @@ const translation: TranslationResource = {
       title: 'Site Information',
       content:
         'The name of this site is <1>Timeline</1>, which is a Web App with <3>timeline</3> as its core concept. Its frontend and backend are both developed by <5>me</5>, and open source on GitHub. It is relatively easy to deploy it on your own server, which is also one of my goals. Welcome to comment anything in GitHub repository.',
-      frontendRepo: 'Frontend GitHub Repo',
-      backendRepo: 'Backend GitHub Repo',
+      repo: 'GitHub Repo',
     },
     credits: {
       title: 'Credits',

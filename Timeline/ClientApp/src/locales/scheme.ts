@@ -142,8 +142,7 @@ export default interface TranslationResource {
     site: {
       title: string;
       content: string;
-      frontendRepo: string;
-      backendRepo: string;
+      repo: string;
     };
     credits: {
       title: string;
