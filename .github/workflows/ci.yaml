@@ -56,9 +56,18 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ASPNETCORE_ENVIRONMENT: "Development"
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Restore Cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Use .Net Core 3.1.x
         uses: actions/setup-dotnet@v1
