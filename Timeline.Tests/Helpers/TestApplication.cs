@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Timeline.Configs;
 using Timeline.Entities;
 using Timeline.Migrations;
 using Xunit;
@@ -53,6 +54,7 @@ namespace Timeline.Tests.Helpers
                 {
                     config.AddInMemoryCollection(new Dictionary<string, string>
                     {
+                        [ApplicationConfiguration.DisableFrontEndKey] = "true",
                         ["WorkDir"] = WorkDir
                     });
                 });
