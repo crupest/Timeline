@@ -37,10 +37,9 @@ namespace Timeline.Models.Http
 
         public UserInfoLinks Resolve(User source, UserInfo destination, UserInfoLinks destMember, ResolutionContext context)
         {
-            if (_actionContextAccessor.ActionContext == null)
-                throw new InvalidOperationException("No action context, can't fill urls.");
+            var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
+            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
-            var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
             var result = new UserInfoLinks
             {
                 Self = urlHelper.ActionLink(nameof(UserController.Get), nameof(UserController)[0..^nameof(Controller).Length], new { destination.Username }),
