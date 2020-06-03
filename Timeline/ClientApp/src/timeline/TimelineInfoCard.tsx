@@ -28,6 +28,7 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
 
   const { t } = useTranslation();
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
 
   const notifyHeight = React.useCallback((): void => {
@@ -48,13 +49,6 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
     (): void => setManageDropdownOpen((old) => !old),
     []
   );
-  const onManageProperty = React.useCallback(
-    (): void => onManage!('property'),
-    [onManage]
-  );
-  const onManageDelete = React.useCallback((): void => onManage!('delete'), [
-    onManage,
-  ]);
 
   return (
     <div
@@ -81,20 +75,23 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
         {t(timelineVisibilityTooltipTranslationMap[props.timeline.visibility])}
       </small>
       <div className="text-right mt-2">
-        {props.onManage != null ? (
+        {onManage != null ? (
           <Dropdown isOpen={manageDropdownOpen} toggle={toggleManageDropdown}>
             <DropdownToggle outline color="primary">
               {t('timeline.manage')}
             </DropdownToggle>
             <DropdownMenu>
-              <DropdownItem onClick={onManageProperty}>
+              <DropdownItem onClick={() => onManage('property')}>
                 {t('timeline.manageItem.property')}
               </DropdownItem>
               <DropdownItem onClick={props.onMember}>
                 {t('timeline.manageItem.member')}
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem className="text-danger" onClick={onManageDelete}>
+              <DropdownItem
+                className="text-danger"
+                onClick={() => onManage('delete')}
+              >
                 {t('timeline.manageItem.delete')}
               </DropdownItem>
             </DropdownMenu>

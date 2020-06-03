@@ -19,6 +19,7 @@ import { TimelineMemberDialog } from './TimelineMember';
 import TimelinePropertyChangeDialog from './TimelinePropertyChangeDialog';
 import { TimelinePageTemplateUIProps } from './TimelinePageTemplateUI';
 import { TimelinePostSendCallback } from './TimelinePostEdit';
+import { UiLogicError } from '../common';
 
 export interface TimelinePageTemplateProps<
   TManageItem,
@@ -88,7 +89,7 @@ export default function TimelinePageTemplate<
               },
               (error) => {
                 if (subscribe) {
-                  setError(error.toString());
+                  setError(`${error as string}`);
                 }
               }
             );
@@ -129,13 +130,19 @@ export default function TimelinePageTemplate<
   let dialogElement: React.ReactElement | undefined;
 
   if (dialog === 'property') {
+    if (timeline == null) {
+      throw new UiLogicError(
+        'Timeline is null but attempt to open change property dialog.'
+      );
+    }
+
     dialogElement = (
       <TimelinePropertyChangeDialog
         open
         close={closeDialog}
         oldInfo={{
-          visibility: timeline!.visibility,
-          description: timeline!.description,
+          visibility: timeline.visibility,
+          description: timeline.description,
         }}
         onProcess={(req) => {
           return service.changeProperty(name, req).then((newTimeline) => {
@@ -145,13 +152,19 @@ export default function TimelinePageTemplate<
       />
     );
   } else if (dialog === 'member') {
+    if (timeline == null) {
+      throw new UiLogicError(
+        'Timeline is null but attempt to open change property dialog.'
+      );
+    }
+
     dialogElement = (
       <TimelineMemberDialog
         open
         onClose={closeDialog}
-        members={[timeline!.owner, ...timeline!.members]}
+        members={[timeline.owner, ...timeline.members]}
         edit={
-          service.hasManagePermission(user, timeline!)
+          service.hasManagePermission(user, timeline)
             ? {
                 onCheckUser: (u) => {
                   return fetchUser(u).catch((e) => {
@@ -168,18 +181,18 @@ export default function TimelinePageTemplate<
                 onAddUser: (u) => {
                   return service.addMember(name, u.username).then((_) => {
                     setTimeline({
-                      ...timeline!,
-                      members: concat(timeline!.members, u),
+                      ...timeline,
+                      members: concat(timeline.members, u),
                     });
                   });
                 },
                 onRemoveUser: (u) => {
-                  service.removeMember(name, u).then((_) => {
+                  void service.removeMember(name, u).then((_) => {
                     setTimeline({
-                      ...timeline!,
+                      ...timeline,
                       members: without(
-                        timeline!.members,
-                        timeline!.members.find((m) => m.username === u)
+                        timeline.members,
+                        timeline.members.find((m) => m.username === u)
                       ),
                     });
                   });

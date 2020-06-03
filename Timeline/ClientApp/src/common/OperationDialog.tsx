@@ -1,4 +1,4 @@
-import React, { useState, InputHTMLAttributes } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Spinner,
@@ -12,10 +12,12 @@ import {
   Button,
   Modal,
   ModalHeader,
-  FormText
+  FormText,
 } from 'reactstrap';
 
-const DefaultProcessPrompt: React.FC = _ => {
+import { UiLogicError } from '../common';
+
+const DefaultProcessPrompt: React.FC = (_) => {
   return (
     <Container className="justify-content-center align-items-center">
       <Spinner />
@@ -27,7 +29,7 @@ interface DefaultErrorPromptProps {
   error?: string;
 }
 
-const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = props => {
+const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = (props) => {
   const { t } = useTranslation();
 
   let result = <p className="text-danger">{t('operationDialog.error')}</p>;
@@ -111,7 +113,7 @@ interface OperationDialogProps {
   onSuccessAndClose?: () => void;
 }
 
-const OperationDialog: React.FC<OperationDialogProps> = props => {
+const OperationDialog: React.FC<OperationDialogProps> = (props) => {
   const inputScheme = props.inputScheme ?? [];
 
   const { t } = useTranslation();
@@ -119,13 +121,13 @@ const OperationDialog: React.FC<OperationDialogProps> = props => {
   type Step = 'input' | 'process' | OperationResult;
   const [step, setStep] = useState<Step>('input');
   const [values, setValues] = useState<(boolean | string)[]>(
-    inputScheme.map(i => {
+    inputScheme.map((i) => {
       if (i.type === 'bool') {
         return i.initValue ?? false;
       } else if (i.type === 'text' || i.type === 'select') {
         return i.initValue ?? '';
       } else {
-        throw new Error('Unknown input scheme.');
+        throw new UiLogicError('Unknown input scheme.');
       }
     })
   );
@@ -149,16 +151,16 @@ const OperationDialog: React.FC<OperationDialogProps> = props => {
   const onConfirm = (): void => {
     setStep('process');
     props.onProcess(values).then(
-      d => {
+      (d: unknown) => {
         setStep({
           type: 'success',
-          data: d
+          data: d,
         });
       },
-      e => {
+      (e: unknown) => {
         setStep({
           type: 'failure',
-          data: e
+          data: e,
         });
       }
     );
@@ -205,8 +207,7 @@ const OperationDialog: React.FC<OperationDialogProps> = props => {
         const newInputError: OperationInputErrorInfo = { ...oldError };
         for (const [index, error] of Object.entries(newError)) {
           if (error !== undefined) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (newInputError as any)[index] = error;
+            newInputError[+index] = error as OperationInputOptionalError;
           }
         }
         return newInputError;
@@ -236,7 +237,7 @@ const OperationDialog: React.FC<OperationDialogProps> = props => {
           {inputPrompt}
           {inputScheme.map((item, index) => {
             const value = values[index];
-            const error: string | undefined = (e =>
+            const error: string | undefined = ((e) =>
               typeof e === 'string' ? t(e) : undefined)(inputError?.[index]);
 
             if (item.type === 'text') {
@@ -246,7 +247,7 @@ const OperationDialog: React.FC<OperationDialogProps> = props => {
                   <Input
                     type={item.password === true ? 'password' : 'text'}
                     value={value as string}
-                    onChange={e => {
+                    onChange={(e) => {
                       const v = e.target.value;
                       const newValues = updateValue(index, v);
                       setInputError(
@@ -270,7 +271,7 @@ const OperationDialog: React.FC<OperationDialogProps> = props => {
                   <Input
                     type="checkbox"
                     value={value as string}
-                    onChange={e => {
+                    onChange={(e) => {
                       updateValue(
                         index,
                         (e.target as HTMLInputElement).checked
@@ -287,7 +288,7 @@ const OperationDialog: React.FC<OperationDialogProps> = props => {
                   <Input
                     type="select"
                     value={value as string}
-                    onChange={event => {
+                    onChange={(event) => {
                       updateValue(index, event.target.value);
                     }}
                   >

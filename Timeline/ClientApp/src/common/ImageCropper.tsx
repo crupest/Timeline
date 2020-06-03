@@ -1,6 +1,8 @@
 import * as React from 'react';
 import clsx from 'clsx';
 
+import { UiLogicError } from '../common';
+
 export interface Clip {
   left: number;
   top: number;
@@ -58,11 +60,11 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
   const c = normalizeClip(clip);
 
-  const imgElement = React.useRef<HTMLImageElement | null>(null);
+  const imgElementRef = React.useRef<HTMLImageElement | null>(null);
 
   const onImageRef = React.useCallback(
     (e: HTMLImageElement | null) => {
-      imgElement.current = e;
+      imgElementRef.current = e;
       if (imageElementCallback != null && e == null) {
         imageElementCallback(null);
       }
@@ -123,9 +125,13 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
       const movement = { x: e.clientX - oldState.x, y: e.clientY - oldState.y };
 
+      const { current: imgElement } = imgElementRef;
+
+      if (imgElement == null) throw new UiLogicError('Image element is null.');
+
       const moveRatio = {
-        x: movement.x / imgElement.current!.width,
-        y: movement.y / imgElement.current!.height,
+        x: movement.x / imgElement.width,
+        y: movement.y / imgElement.height,
       };
 
       const newRatio = {
@@ -158,9 +164,13 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
       const ratio = imageInfo == null ? 1 : imageInfo.ratio;
 
+      const { current: imgElement } = imgElementRef;
+
+      if (imgElement == null) throw new UiLogicError('Image element is null.');
+
       const moveRatio = {
-        x: movement.x / imgElement.current!.width,
-        y: movement.x / imgElement.current!.width / ratio,
+        x: movement.x / imgElement.width,
+        y: movement.x / imgElement.width / ratio,
       };
 
       const newRatio = {
@@ -189,6 +199,8 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
     [imageInfo, oldState, onChange]
   );
 
+  const toPercentage = (n: number): string => `${n}%`;
+
   // fuck!!! I just can't find a better way to implement this in pure css
   const containerStyle: React.CSSProperties = (() => {
     if (imageInfo == null) {
@@ -196,14 +208,14 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
     } else {
       if (imageInfo.ratio > 1) {
         return {
-          width: 100 / imageInfo.ratio + '%',
+          width: toPercentage(100 / imageInfo.ratio),
           paddingTop: '100%',
           height: 0,
         };
       } else {
         return {
           width: '100%',
-          paddingTop: 100 * imageInfo.ratio + '%',
+          paddingTop: toPercentage(100 * imageInfo.ratio),
           height: 0,
         };
       }
@@ -221,10 +233,10 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
           className="image-cropper-mask"
           touch-action="none"
           style={{
-            left: c.left * 100 + '%',
-            top: c.top * 100 + '%',
-            width: c.width * 100 + '%',
-            height: c.height * 100 + '%',
+            left: toPercentage(c.left * 100),
+            top: toPercentage(c.top * 100),
+            width: toPercentage(c.width * 100),
+            height: toPercentage(c.height * 100),
           }}
           onPointerMove={onPointerMove}
           onPointerDown={onPointerDown}
@@ -235,8 +247,8 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
         className="image-cropper-handler"
         touch-action="none"
         style={{
-          left: 'calc(' + (c.left + c.width) * 100 + '% - 15px)',
-          top: 'calc(' + (c.top + c.height) * 100 + '% - 15px)',
+          left: `calc(${(c.left + c.width) * 100}% - 15px)`,
+          top: `calc(${(c.top + c.height) * 100}% - 15px)`,
         }}
         onPointerMove={onHandlerPointerMove}
         onPointerDown={onPointerDown}

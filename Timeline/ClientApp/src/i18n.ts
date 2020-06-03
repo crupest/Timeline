@@ -6,8 +6,7 @@ const backend: BackendModule = {
   type: 'backend',
   async read(language, namespace, callback) {
     function error(message: string): void {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      callback(new Error(message), false as any);
+      callback(new Error(message), false);
     }
 
     function success(result: ResourceKey): void {
@@ -37,7 +36,7 @@ const backend: BackendModule = {
     }
   },
   init() {}, // eslint-disable-line @typescript-eslint/no-empty-function
-  create() {} // eslint-disable-line @typescript-eslint/no-empty-function
+  create() {}, // eslint-disable-line @typescript-eslint/no-empty-function
 };
 
 export const i18nPromise = i18n
@@ -51,8 +50,8 @@ export const i18nPromise = i18n
     debug: process.env.NODE_ENV === 'development',
 
     interpolation: {
-      escapeValue: false // not needed for react!!
-    }
+      escapeValue: false, // not needed for react!!
+    },
 
     // react i18next special options (optional)
     // override if needed - omit if ok with defaults
@@ -72,7 +71,7 @@ if (module.hot) {
   module.hot.accept(
     ['./locales/en/translation', './locales/zh/translation'],
     () => {
-      i18n.reloadResources();
+      void i18n.reloadResources();
     }
   );
 }

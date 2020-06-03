@@ -38,7 +38,7 @@ const Home: React.FC = (_) => {
     if (user == null) {
       setOwnTimelines(undefined);
       setJoinTimelines(undefined);
-      axios
+      void axios
         .get<TimelineInfo[]>(`${apiBaseUrl}/timelines?visibility=public`)
         .then((res) => {
           if (subscribe) {
@@ -47,7 +47,7 @@ const Home: React.FC = (_) => {
         });
     } else {
       setPublicTimelines(undefined);
-      axios
+      void axios
         .get<TimelineInfo[]>(
           `${apiBaseUrl}/timelines?relate=${user.username}&relateType=own`
         )
@@ -56,7 +56,7 @@ const Home: React.FC = (_) => {
             setOwnTimelines(res.data);
           }
         });
-      axios
+      void axios
         .get<TimelineInfo[]>(
           `${apiBaseUrl}/timelines?relate=${user.username}&relateType=join`
         )

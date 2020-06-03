@@ -18,7 +18,7 @@ import { User, UserWithToken } from '../data/user';
 import { apiBaseUrl } from '../config';
 
 async function fetchUserList(_token: string): Promise<User[]> {
-  const res = await axios.get(`${apiBaseUrl}/users`);
+  const res = await axios.get<User[]>(`${apiBaseUrl}/users`);
   return res.data;
 }
 
@@ -295,7 +295,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
     | {
         type: 'create';
       }
-    | { type: 'delete'; username: string }
+    | { type: TDelete; username: string }
     | {
         type: TChangeUsername;
         username: string;
@@ -317,7 +317,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
 
   useEffect(() => {
     let subscribe = true;
-    fetchUserList(props.user.token).then((us) => {
+    void fetchUserList(props.user.token).then((us) => {
       if (subscribe) {
         setUsers(us);
       }
@@ -337,7 +337,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
             close={() => setDialog(null)}
             process={async (user) => {
               const u = await createUser(user, token);
-              setUsers((oldUsers) => [...oldUsers!, u]);
+              setUsers((oldUsers) => [...(oldUsers ?? []), u]);
             }}
           />
         );
@@ -351,7 +351,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
             process={async () => {
               await deleteUser(dialog.username, token);
               setUsers((oldUsers) =>
-                oldUsers!.filter((u) => u.username !== dialog.username)
+                (oldUsers ?? []).filter((u) => u.username !== dialog.username)
               );
             }}
           />
@@ -366,10 +366,11 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
             process={async (newUsername) => {
               await changeUsername(dialog.username, newUsername, token);
               setUsers((oldUsers) => {
-                const users = oldUsers!.slice();
-                users.find(
+                const users = (oldUsers ?? []).slice();
+                const findedUser = users.find(
                   (u) => u.username === dialog.username
-                )!.username = newUsername;
+                );
+                if (findedUser) findedUser.username = newUsername;
                 return users;
               });
             }}
@@ -399,10 +400,11 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
             process={async () => {
               await changePermission(dialog.username, newPermission, token);
               setUsers((oldUsers) => {
-                const users = oldUsers!.slice();
-                users.find(
+                const users = (oldUsers ?? []).slice();
+                const findedUser = users.find(
                   (u) => u.username === dialog.username
-                )!.administrator = newPermission;
+                );
+                if (findedUser) findedUser.administrator = newPermission;
                 return users;
               });
             }}
@@ -419,15 +421,18 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           key={user.username}
           user={user}
           onContextMenu={(item) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const dialogInfo: any = {
-              type: item,
-              username: user.username,
-            };
-            if (item === 'changepermission') {
-              dialogInfo.newPermission = !user.administrator;
-            }
-            setDialog(dialogInfo);
+            setDialog(
+              item === kChangePermission
+                ? {
+                    type: kChangePermission,
+                    username: user.username,
+                    newPermission: !user.administrator,
+                  }
+                : {
+                    type: item,
+                    username: user.username,
+                  }
+            );
           }}
         />
       );

@@ -11,6 +11,7 @@ import {
 import { AxiosError } from 'axios';
 
 import ImageCropper, { Clip, applyClipToImage } from '../common/ImageCropper';
+import { UiLogicError } from '../common';
 
 export interface ChangeAvatarDialogProps {
   open: boolean;
@@ -107,11 +108,11 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       clip.width === 0 ||
       file == null
     ) {
-      throw new Error('Invalid state.');
+      throw new UiLogicError();
     }
 
     setState('processcrop');
-    applyClipToImage(cropImgElement, clip, file.type).then((b) => {
+    void applyClipToImage(cropImgElement, clip, file.type).then((b) => {
       setResultBlob(b);
     });
   }, [cropImgElement, clip, file]);
@@ -130,7 +131,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
 
   const upload = React.useCallback(() => {
     if (resultBlob == null) {
-      throw new Error('Invalid state.');
+      throw new UiLogicError();
     }
 
     setState('uploading');
@@ -147,7 +148,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
 
   const createPreviewRow = (): React.ReactElement => {
     if (resultUrl == null) {
-      throw new Error('Invalid state.');
+      throw new UiLogicError();
     }
     return (
       <Row className="justify-content-center">
@@ -182,7 +183,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           );
         } else if (state === 'crop') {
           if (fileUrl == null) {
-            throw new Error('Invalid state.');
+            throw new UiLogicError();
           }
           return (
             <>

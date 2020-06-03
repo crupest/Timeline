@@ -4,6 +4,7 @@ import XRegExp from 'xregexp';
 import { base64 } from './base64';
 import { apiBaseUrl } from '../config';
 import { User, UserAuthInfo, getCurrentUser, UserWithToken } from './user';
+import { UiLogicError } from '../common';
 
 export const kTimelineVisibilities = ['Public', 'Register', 'Private'] as const;
 
@@ -159,7 +160,7 @@ export class TimelineServiceTemplate<
   private checkUser(): UserWithToken {
     const user = getCurrentUser();
     if (user == null) {
-      throw new Error('You must login to perform the operation.');
+      throw new UiLogicError('You must login to perform the operation.');
     }
     return user;
   }
@@ -204,7 +205,7 @@ export class TimelineServiceTemplate<
       RawCreatePostRequestContent
     >((resolve) => {
       if (request.content.type === 'image') {
-        base64(request.content.data).then((d) =>
+        void base64(request.content.data).then((d) =>
           resolve({
             ...request.content,
             data: d,

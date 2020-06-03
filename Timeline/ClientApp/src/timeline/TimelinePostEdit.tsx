@@ -1,12 +1,13 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Container, Button, Spinner, Row, Col } from 'reactstrap';
+import { Button, Spinner, Row, Col } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 
 import { pushAlert } from '../common/alert-service';
 import { CreatePostRequest } from '../data/timeline';
 
 import FileInput from '../common/FileInput';
+import { UiLogicError } from '../common';
 
 interface TimelinePostEditImageProps {
   onSelect: (blob: Blob | null) => void;
@@ -96,11 +97,12 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   const canSend = kind === 'text' || (kind === 'image' && imageBlob != null);
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const containerRef = React.useRef<HTMLDivElement>(null!);
+
   React.useEffect(() => {
     if (props.onHeightChange) {
-      props.onHeightChange(
-        document.getElementById('timeline-post-edit-area')!.clientHeight
-      );
+      props.onHeightChange(containerRef.current.clientHeight);
     }
     return () => {
       if (props.onHeightChange) {
@@ -117,20 +119,31 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   const onSend = React.useCallback(() => {
     setState('process');
 
-    const req: CreatePostRequest =
-      kind === 'text'
-        ? {
+    const req: CreatePostRequest = (() => {
+      switch (kind) {
+        case 'text':
+          return {
             content: {
               type: 'text',
               text: text,
             },
+          } as CreatePostRequest;
+        case 'image':
+          if (imageBlob == null) {
+            throw new UiLogicError(
+              'Content type is image but image blob is null.'
+            );
           }
-        : {
+          return {
             content: {
               type: 'image',
-              data: imageBlob!,
+              data: imageBlob,
             },
-          };
+          } as CreatePostRequest;
+        default:
+          throw new UiLogicError('Unknown content type.');
+      }
+    })();
 
     onPost(req).then(
       (_) => {
@@ -155,11 +168,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   }, []);
 
   return (
-    <Container
-      id="timeline-post-edit-area"
-      fluid
-      className="fixed-bottom bg-light"
-    >
+    <div ref={containerRef} className="container-fluid fixed-bottom bg-light">
       <Row>
         <Col className="px-0">
           {kind === 'text' ? (
@@ -198,7 +207,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
           })()}
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 };
 

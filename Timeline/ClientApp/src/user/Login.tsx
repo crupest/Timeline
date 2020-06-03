@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { AxiosError } from 'axios';
 
 import AppBar from '../common/AppBar';
 
@@ -68,7 +69,7 @@ const Login: React.FC = (_) => {
           history.goBack();
         }
       },
-      (e) => {
+      (e: AxiosError | Error) => {
         setProcess(false);
         setError(e.message);
       }
