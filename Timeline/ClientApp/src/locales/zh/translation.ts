@@ -150,8 +150,7 @@ const translation: TranslationResource = {
       title: '网站信息',
       content:
         '这个网站的名字叫 <1>Timeline</1>，是一个以<3>时间线</3>为核心概念的 Web App . 它的前端和后端都是由<5>我</5>开发，并且在 GitHub 上开源。大家可以相对轻松的把它们部署在自己的服务器上，这也是我的目标之一。欢迎大家前往 GitHub 仓库提出任何意见。',
-      frontendRepo: '前端 GitHub 仓库',
-      backendRepo: '后端 GitHub 仓库',
+      repo: 'GitHub 仓库',
     },
     credits: {
       title: '鸣谢',

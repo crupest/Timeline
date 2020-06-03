@@ -66,7 +66,7 @@ const backendCredits: {
   icon?: string;
 }[] = [
   {
-    name: 'ASP.Net Core',
+    name: 'ASP.NET Core',
     url: 'https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core',
   },
   { name: 'sqlite', url: 'https://sqlite.org' },
@@ -128,20 +128,11 @@ const About: React.FC = () => {
           </p>
           <p>
             <a
-              href="https://github.com/crupest/Timeline-React"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('about.site.frontendRepo')}
-            </a>
-          </p>
-          <p>
-            <a
               href="https://github.com/crupest/Timeline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t('about.site.backendRepo')}
+              {t('about.site.repo')}
             </a>
           </p>
         </div>
