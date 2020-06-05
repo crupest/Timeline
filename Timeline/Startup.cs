@@ -21,7 +21,6 @@ using Timeline.Services;
 
 namespace Timeline
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class Startup
     {
         private readonly bool disableFrontEnd;
@@ -91,7 +90,7 @@ namespace Timeline
                 options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
             });
 
-            if (!disableFrontEnd)
+            if (!disableFrontEnd && !Environment.IsDevelopment())
             {
                 services.AddSpaStaticFiles(config =>
                 {
@@ -121,7 +120,7 @@ namespace Timeline
 
             app.UseRouting();
 
-            if (!disableFrontEnd)
+            if (!disableFrontEnd && !Environment.IsDevelopment())
             {
                 app.UseSpaStaticFiles(new StaticFileOptions
                 {
@@ -145,7 +144,14 @@ namespace Timeline
 
                     if (Environment.IsDevelopment())
                     {
-                        SpaServices.SpaDevelopmentServerMiddlewareExtensions.UseSpaDevelopmentServer(spa, packageManager: "yarn", npmScript: "install-and-start", port: 3000);
+                        if (Configuration.GetValue<bool?>(ApplicationConfiguration.FrontEndProxyOnlyKey) ?? false)
+                        {
+                            spa.UseProxyToSpaDevelopmentServer(new UriBuilder("http", "localhost", 3000).Uri);
+                        }
+                        else
+                        {
+                            SpaServices.SpaDevelopmentServerMiddlewareExtensions.UseSpaDevelopmentServer(spa, packageManager: "yarn", npmScript: "install-and-start", port: 3000);
+                        }
                     }
                 });
             }
