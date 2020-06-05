@@ -75,6 +75,12 @@ export default interface TranslationResource {
       inputPrompt: string;
       notMatch: string;
     };
+    post: {
+      deleteDialog: {
+        title: string;
+        prompt: string;
+      };
+    };
   };
   user: {
     username: string;

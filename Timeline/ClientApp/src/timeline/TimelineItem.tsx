@@ -1,18 +1,58 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { Row, Col } from 'reactstrap';
+import {
+  Row,
+  Col,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+} from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { TimelinePostInfo } from '../data/timeline';
 import { useAvatarUrlWithGivenVersion } from '../user/api';
 
+const TimelinePostDeleteConfirmDialog: React.FC<{
+  toggle: () => void;
+  onConfirm: () => void;
+}> = ({ toggle, onConfirm }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Modal toggle={toggle} isOpen centered>
+      <ModalHeader className="text-danger">
+        {t('timeline.post.deleteDialog.title')}
+      </ModalHeader>
+      <ModalBody>{t('timeline.post.deleteDialog.prompt')}</ModalBody>
+      <ModalFooter>
+        <Button color="secondary" onClick={toggle}>
+          {t('operationDialog.cancel')}
+        </Button>
+        <Button
+          color="danger"
+          onClick={() => {
+            onConfirm();
+            toggle();
+          }}
+        >
+          {t('operationDialog.confirm')}
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
+};
+
 export interface TimelineItemProps {
   post: TimelinePostInfo;
-  showDeleteButton?: boolean;
   current?: boolean;
-  toggleMore?: () => void;
-  onDelete?: () => void;
+  more?: {
+    isOpen: boolean;
+    toggle: () => void;
+    onDelete: () => void;
+  };
   onClick?: () => void;
   avatarVersion?: number;
 }
@@ -22,25 +62,18 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
 
   const current = props.current === true;
 
-  const { toggleMore: toggleDelete } = props;
+  const { more } = props;
 
   const avatarUrl = useAvatarUrlWithGivenVersion(
     props.avatarVersion,
     props.post.author._links.avatar
   );
 
-  const onOpenMore = React.useMemo<
-    React.MouseEventHandler<HTMLElement> | undefined
-  >(() => {
-    if (toggleDelete == null) {
-      return undefined;
-    } else {
-      return (e) => {
-        toggleDelete();
-        e.stopPropagation();
-      };
-    }
-  }, [toggleDelete]);
+  const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
+  const toggleDeleteDialog = React.useCallback(
+    () => setDeleteDialog((old) => !old),
+    []
+  );
 
   return (
     <Row
@@ -67,11 +100,14 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
               </small>
             </Row>
           </div>
-          {props.toggleMore != null ? (
+          {more != null ? (
             <div className="col-auto px-2 d-flex justify-content-center align-items-center">
               <i
                 className="fas fa-chevron-circle-down text-info icon-button"
-                onClick={onOpenMore}
+                onClick={(e) => {
+                  more.toggle();
+                  e.stopPropagation();
+                }}
               />
             </div>
           ) : null}
@@ -95,17 +131,31 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           })()}
         </p>
       </Col>
-      {props.showDeleteButton ? (
-        <div
-          className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
-          onClick={props.toggleMore}
-        >
-          <i
-            className="fas fa-trash text-danger large-icon"
-            onClick={props.onDelete}
-          />
-        </div>
-      ) : undefined}
+      {more != null && more.isOpen ? (
+        <>
+          <div
+            className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
+            onClick={more.toggle}
+          >
+            <i
+              className="fas fa-trash text-danger large-icon"
+              onClick={(e) => {
+                toggleDeleteDialog();
+                e.stopPropagation();
+              }}
+            />
+          </div>
+          {deleteDialog ? (
+            <TimelinePostDeleteConfirmDialog
+              toggle={() => {
+                toggleDeleteDialog();
+                more.toggle();
+              }}
+              onConfirm={more.onDelete}
+            />
+          ) : null}
+        </>
+      ) : null}
     </Row>
   );
 };
