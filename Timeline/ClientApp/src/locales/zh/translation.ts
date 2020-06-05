@@ -79,6 +79,12 @@ const translation: TranslationResource = {
         '这是一个危险的操作。如果您确认要删除时间线<1>{{name}}</1>，请在下面输入它的名字并点击确认。',
       notMatch: '名字不匹配',
     },
+    post: {
+      deleteDialog: {
+        title: '确认删除',
+        prompt: '确定删除这个消息？这个操作不可撤销。',
+      },
+    },
   },
   user: {
     username: '用户名',

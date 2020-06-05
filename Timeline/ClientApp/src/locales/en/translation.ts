@@ -81,6 +81,13 @@ const translation: TranslationResource = {
         'This is a dangerous action. If you are sure to delete timeline<1>{{name}}</1>, please input its name below and click confirm button.',
       notMatch: 'Name does not match.',
     },
+    post: {
+      deleteDialog: {
+        title: 'Confirm Delete',
+        prompt:
+          'Are you sure to delete the post? This operation is not recoverable.',
+      },
+    },
   },
   user: {
     username: 'username',

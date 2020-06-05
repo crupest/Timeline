@@ -65,14 +65,22 @@ const Timeline: React.FC<TimelineProps> = (props) => {
                 ? avatarVersion
                 : undefined;
 
+            const toggleMore = onToggleDelete[i];
+
             return (
               <TimelineItem
                 post={post}
                 key={post.id}
                 current={length - 1 === i}
-                showDeleteButton={indexShowDeleteButton === i}
-                toggleMore={onToggleDelete[i]}
-                onDelete={onItemDelete[i]}
+                more={
+                  toggleMore
+                    ? {
+                        isOpen: indexShowDeleteButton === i,
+                        toggle: toggleMore,
+                        onDelete: onItemDelete[i],
+                      }
+                    : undefined
+                }
                 onClick={onItemClick}
                 avatarVersion={av}
               />
