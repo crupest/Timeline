@@ -4,6 +4,7 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_FRONTENDPROXYONLY": "true",
         "ASPNETCORE_WORKDIR": "D:\\timeline-development"
       }
     },
