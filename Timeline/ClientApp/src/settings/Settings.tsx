@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import axios, { AxiosError } from 'axios';
-import { Container, Row, Col, Input } from 'reactstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Input,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+} from 'reactstrap';
 
 import { apiBaseUrl } from '../config';
 
@@ -116,12 +126,38 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
   );
 };
 
+const ConfirmLogoutDialog: React.FC<{
+  toggle: () => void;
+  onConfirm: () => void;
+}> = ({ toggle, onConfirm }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Modal isOpen centered>
+      <ModalHeader className="text-danger">
+        {t('settings.dialogConfirmLogout.title')}
+      </ModalHeader>
+      <ModalBody>{t('settings.dialogConfirmLogout.prompt')}</ModalBody>
+      <ModalFooter>
+        <Button color="secondary" onClick={toggle}>
+          {t('operationDialog.cancel')}
+        </Button>
+        <Button color="danger" onClick={onConfirm}>
+          {t('operationDialog.confirm')}
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
+};
+
 const Settings: React.FC = (_) => {
   const { i18n, t } = useTranslation();
   const user = useUser();
   const history = useHistory();
 
-  const [dialog, setDialog] = useState<null | 'changepassword'>(null);
+  const [dialog, setDialog] = useState<null | 'changepassword' | 'logout'>(
+    null
+  );
 
   const language = i18n.language.slice(0, 2);
 
@@ -157,8 +193,7 @@ const Settings: React.FC = (_) => {
                 <h5
                   className="text-danger"
                   onClick={() => {
-                    userLogout();
-                    history.push('/');
+                    setDialog('logout');
                   }}
                 >
                   {t('settings.logout')}
@@ -185,14 +220,31 @@ const Settings: React.FC = (_) => {
             </Input>
           </Col>
         </Row>
-        {dialog === 'changepassword' ? (
-          <ChangePasswordDialog
-            open
-            close={() => {
-              setDialog(null);
-            }}
-          />
-        ) : null}
+        {(() => {
+          switch (dialog) {
+            case 'changepassword':
+              return (
+                <ChangePasswordDialog
+                  open
+                  close={() => {
+                    setDialog(null);
+                  }}
+                />
+              );
+            case 'logout':
+              return (
+                <ConfirmLogoutDialog
+                  toggle={() => setDialog(null)}
+                  onConfirm={() => {
+                    userLogout();
+                    history.push('/');
+                  }}
+                />
+              );
+            default:
+              return null;
+          }
+        })()}
       </Container>
     </>
   );

@@ -135,6 +135,10 @@ export default interface TranslationResource {
       errorEmptyNewPassword: string;
       errorRetypeNotMatch: string;
     };
+    dialogConfirmLogout: {
+      title: string;
+      prompt: string;
+    };
   };
   about: {
     author: {

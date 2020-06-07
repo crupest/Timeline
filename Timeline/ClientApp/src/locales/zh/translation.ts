@@ -142,6 +142,10 @@ const translation: TranslationResource = {
       errorEmptyNewPassword: '新密码不能为空',
       errorRetypeNotMatch: '两次输入的密码不一致',
     },
+    dialogConfirmLogout: {
+      title: '确定注销',
+      prompt: '您确定注销此账号？这将删除所有已经缓存在浏览器的数据。',
+    },
   },
   about: {
     author: {
