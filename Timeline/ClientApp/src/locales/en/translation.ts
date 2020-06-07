@@ -146,6 +146,11 @@ const translation: TranslationResource = {
       errorEmptyNewPassword: "New password can't be empty.",
       errorRetypeNotMatch: 'Password retyped does not match.',
     },
+    dialogConfirmLogout: {
+      title: 'Confirm Logout',
+      prompt:
+        'Are you sure to log out? All cached data in the browser will be deleted.',
+    },
   },
   about: {
     author: {
