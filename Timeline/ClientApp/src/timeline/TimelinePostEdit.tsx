@@ -83,6 +83,7 @@ export interface TimelinePostEditProps {
   className?: string;
   onPost: TimelinePostSendCallback;
   onHeightChange?: (height: number) => void;
+  timelineName: string;
 }
 
 const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
@@ -94,6 +95,12 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   const [kind, setKind] = React.useState<'text' | 'image'>('text');
   const [text, setText] = React.useState<string>('');
   const [imageBlob, setImageBlob] = React.useState<Blob | null>(null);
+
+  const draftLocalStorageKey = `timeline.${props.timelineName}.postDraft`;
+
+  React.useEffect(() => {
+    setText(window.localStorage.getItem(draftLocalStorageKey) ?? '');
+  }, [draftLocalStorageKey]);
 
   const canSend = kind === 'text' || (kind === 'image' && imageBlob != null);
 
@@ -149,6 +156,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       (_) => {
         if (kind === 'text') {
           setText('');
+          window.localStorage.removeItem(draftLocalStorageKey);
         }
         setState('input');
         setKind('text');
@@ -161,7 +169,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         setState('input');
       }
     );
-  }, [onPost, kind, text, imageBlob, t]);
+  }, [onPost, kind, text, imageBlob, t, draftLocalStorageKey]);
 
   const onImageSelect = React.useCallback((blob: Blob | null) => {
     setImageBlob(blob);
@@ -177,7 +185,9 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
               value={text}
               disabled={state === 'process'}
               onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                setText(event.currentTarget.value);
+                const value = event.currentTarget.value;
+                setText(value);
+                window.localStorage.setItem(draftLocalStorageKey, value);
               }}
             />
           ) : (
