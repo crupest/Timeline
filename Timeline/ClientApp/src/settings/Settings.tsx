@@ -128,11 +128,11 @@ const Settings: React.FC = (_) => {
   return (
     <>
       <AppBar />
-      <Container fluid style={{ marginTop: '56px' }}>
+      <Container fluid className="mt-appbar">
         {user ? (
           <>
-            <Row className="border-bottom p-3">
-              <Col className="col-12">
+            <Row className="border-bottom p-3 cursor-pointer">
+              <Col xs="12">
                 <h5
                   onClick={() => {
                     history.push(`/users/${user.username}`);
@@ -142,8 +142,8 @@ const Settings: React.FC = (_) => {
                 </h5>
               </Col>
             </Row>
-            <Row className="border-bottom p-3">
-              <Col className="col-12">
+            <Row className="border-bottom p-3 cursor-pointer">
+              <Col xs="12">
                 <h5
                   className="text-danger"
                   onClick={() => setDialog('changepassword')}
@@ -152,8 +152,8 @@ const Settings: React.FC = (_) => {
                 </h5>
               </Col>
             </Row>
-            <Row className="border-bottom p-3">
-              <Col className="col-12">
+            <Row className="border-bottom p-3 cursor-pointer">
+              <Col xs="12">
                 <h5
                   className="text-danger"
                   onClick={() => {
@@ -168,11 +168,11 @@ const Settings: React.FC = (_) => {
           </>
         ) : null}
         <Row className="align-items-center border-bottom p-3">
-          <Col className="col-12 col-sm">
+          <Col xs="12" sm="auto">
             <h5>{t('settings.languagePrimary')}</h5>
             <p>{t('settings.languageSecondary')}</p>
           </Col>
-          <Col className="col-auto ml-auto">
+          <Col xs="auto" className="ml-auto">
             <Input
               type="select"
               value={language}
