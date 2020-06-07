@@ -20,7 +20,10 @@ export interface TimelineCardComponentProps<TTimeline, TManageItems> {
   onHeight?: (height: number) => void;
 }
 
-export interface TimelinePageTemplateUIProps<TTimeline, TManageItems> {
+export interface TimelinePageTemplateUIProps<
+  TTimeline extends { name: string },
+  TManageItems
+> {
   avatarKey?: string | number;
   timeline?: TTimeline;
   posts?: TimelinePostInfoEx[] | 'forbid';
@@ -34,7 +37,10 @@ export interface TimelinePageTemplateUIProps<TTimeline, TManageItems> {
   error?: string;
 }
 
-export default function TimelinePageTemplateUI<TTimeline, TEditItems>(
+export default function TimelinePageTemplateUI<
+  TTimeline extends { name: string },
+  TEditItems
+>(
   props: TimelinePageTemplateUIProps<TTimeline, TEditItems>
 ): React.ReactElement | null {
   const { t } = useTranslation();
@@ -96,6 +102,7 @@ export default function TimelinePageTemplateUI<TTimeline, TEditItems>(
                 <TimelinePostEdit
                   onPost={props.onPost}
                   onHeightChange={onPostEditHeightChange}
+                  timelineName={props.timeline.name}
                 />
               </>
             );
