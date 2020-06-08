@@ -2,16 +2,12 @@ import React from 'react';
 
 export interface CollapseButtonProps {
   collapse: boolean;
-  toggle: (visibility: boolean) => void;
+  onClick: () => void;
   className?: string;
 }
 
 const CollapseButton: React.FC<CollapseButtonProps> = (props) => {
-  const { toggle, collapse, className } = props;
-
-  const onClick = React.useCallback(() => {
-    toggle(!collapse);
-  }, [toggle, collapse]);
+  const { onClick, collapse, className } = props;
 
   return (
     <svg
