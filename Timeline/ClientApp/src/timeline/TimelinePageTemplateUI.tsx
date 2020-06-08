@@ -43,6 +43,8 @@ export default function TimelinePageTemplateUI<
 >(
   props: TimelinePageTemplateUIProps<TTimeline, TEditItems>
 ): React.ReactElement | null {
+  const { timeline } = props;
+
   const { t } = useTranslation();
 
   const bottomSpaceRef = React.useRef<HTMLDivElement | null>(null);
@@ -71,19 +73,29 @@ export default function TimelinePageTemplateUI<
     setCardHeight(height);
   }, []);
 
+  const genCardCollapseLocalStorageKey = (timelineName: string): string =>
+    `timeline.${timelineName}.cardCollapse`;
+
+  const cardCollapseLocalStorageKey =
+    timeline != null ? genCardCollapseLocalStorageKey(timeline.name) : null;
+
   const [infoCardCollapse, setInfoCardCollapse] = React.useState<boolean>(
     false
   );
-  const toggleInfoCardCollapse = React.useCallback((collapse) => {
-    setInfoCardCollapse(collapse);
-  }, []);
+  React.useEffect(() => {
+    if (cardCollapseLocalStorageKey != null) {
+      const savedCollapse =
+        window.localStorage.getItem(cardCollapseLocalStorageKey) === 'true';
+      setInfoCardCollapse(savedCollapse);
+    }
+  }, [cardCollapseLocalStorageKey]);
 
   let body: React.ReactElement;
 
   if (props.error != null) {
     body = <p className="text-danger">{t(props.error)}</p>;
   } else {
-    if (props.timeline != null) {
+    if (timeline != null) {
       let timelineBody: React.ReactElement;
       if (props.posts != null) {
         if (props.posts === 'forbid') {
@@ -102,7 +114,7 @@ export default function TimelinePageTemplateUI<
                 <TimelinePostEdit
                   onPost={props.onPost}
                   onHeightChange={onPostEditHeightChange}
-                  timelineName={props.timeline.name}
+                  timelineName={timeline.name}
                 />
               </>
             );
@@ -121,11 +133,18 @@ export default function TimelinePageTemplateUI<
           >
             <CollapseButton
               collapse={infoCardCollapse}
-              toggle={toggleInfoCardCollapse}
+              onClick={() => {
+                const newState = !infoCardCollapse;
+                setInfoCardCollapse(newState);
+                window.localStorage.setItem(
+                  genCardCollapseLocalStorageKey(timeline.name),
+                  newState.toString()
+                );
+              }}
               className="float-right m-1 info-card-collapse-button"
             />
             <CardComponent
-              timeline={props.timeline}
+              timeline={timeline}
               onManage={props.onManage}
               onMember={props.onMember}
               onHeight={onCardHeightChange}
