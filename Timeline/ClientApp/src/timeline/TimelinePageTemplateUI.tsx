@@ -1,7 +1,7 @@
 import React from 'react';
 import { Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
-import { Subject } from 'rxjs';
+import { Subject, fromEvent } from 'rxjs';
 
 import { getAlertHost } from '../common/alert-service';
 
@@ -74,17 +74,23 @@ export default function TimelinePageTemplateUI<
   }, [resizeSubject]);
 
   React.useEffect(() => {
-    let jumpToBottom = true;
-    const timerTag = window.setTimeout(() => {
-      jumpToBottom = false;
-    }, 1000);
-    const subscription = resizeSubject.subscribe(() => {
-      if (jumpToBottom)
-        window.scrollTo(0, document.body.getBoundingClientRect().height);
-    });
+    let scrollToBottom = true;
+    const disableScrollToBottom = (): void => {
+      scrollToBottom = false;
+    };
+
+    const subscriptions = [
+      fromEvent(window, 'wheel').subscribe(disableScrollToBottom),
+      fromEvent(window, 'pointerdown').subscribe(disableScrollToBottom),
+      resizeSubject.subscribe(() => {
+        if (scrollToBottom) {
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+      }),
+    ];
+
     return () => {
-      clearTimeout(timerTag);
-      subscription.unsubscribe();
+      subscriptions.forEach((s) => s.unsubscribe());
     };
   }, [resizeSubject, timeline, props.posts]);
 
