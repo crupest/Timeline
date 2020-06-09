@@ -1,6 +1,7 @@
 import React from 'react';
 import { Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
+import { Subject } from 'rxjs';
 
 import { getAlertHost } from '../common/alert-service';
 
@@ -67,6 +68,26 @@ export default function TimelinePageTemplateUI<
     }
   }, []);
 
+  const onLoadSubject = React.useMemo(() => new Subject(), []);
+  const triggerLoadEvent = React.useCallback(() => {
+    onLoadSubject.next(null);
+  }, [onLoadSubject]);
+
+  React.useEffect(() => {
+    let jumpToBottom = true;
+    const timerTag = window.setTimeout(() => {
+      jumpToBottom = false;
+    }, 1000);
+    const subscription = onLoadSubject.subscribe(() => {
+      if (jumpToBottom)
+        window.scrollTo(0, document.body.getBoundingClientRect().height);
+    });
+    return () => {
+      clearTimeout(timerTag);
+      subscription.unsubscribe();
+    };
+  }, [onLoadSubject, timeline, props.posts]);
+
   const [cardHeight, setCardHeight] = React.useState<number>(0);
 
   const onCardHeightChange = React.useCallback((height: number) => {
@@ -104,7 +125,11 @@ export default function TimelinePageTemplateUI<
           );
         } else {
           timelineBody = (
-            <Timeline posts={props.posts} onDelete={props.onDelete} />
+            <Timeline
+              posts={props.posts}
+              onDelete={props.onDelete}
+              onLoad={triggerLoadEvent}
+            />
           );
           if (props.onPost != null) {
             timelineBody = (

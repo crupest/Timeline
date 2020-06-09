@@ -114,15 +114,6 @@ export default function TimelinePageTemplate<
     };
   }, [name, service, user, t, props.dataVersion, props.notFoundI18nKey]);
 
-  React.useEffect(() => {
-    if (posts != null) {
-      window.scrollTo(
-        0,
-        document.body.scrollHeight || document.documentElement.scrollHeight
-      );
-    }
-  }, [posts]);
-
   const closeDialog = React.useCallback((): void => {
     setDialog(null);
   }, []);
