@@ -55,6 +55,7 @@ export interface TimelineItemProps {
   };
   onClick?: () => void;
   avatarVersion?: number;
+  onResize?: () => void;
 }
 
 const TimelineItem: React.FC<TimelineItemProps> = (props) => {
@@ -62,7 +63,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
 
   const current = props.current === true;
 
-  const { more } = props;
+  const { more, onResize } = props;
 
   const avatarUrl = useAvatarUrlWithGivenVersion(
     props.avatarVersion,
@@ -117,7 +118,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             className="float-right float-sm-left mx-2"
             to={'/users/' + props.post.author.username}
           >
-            <img src={avatarUrl} className="avatar rounded" />
+            <img onLoad={onResize} src={avatarUrl} className="avatar rounded" />
           </Link>
           {(() => {
             const { content } = props.post;
@@ -125,7 +126,11 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
               return content.text;
             } else {
               return (
-                <img src={content.url} className="timeline-content-image" />
+                <img
+                  onLoad={onResize}
+                  src={content.url}
+                  className="timeline-content-image"
+                />
               );
             }
           })()}

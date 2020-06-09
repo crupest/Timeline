@@ -18,13 +18,14 @@ export interface TimelineProps {
   className?: string;
   posts: TimelinePostInfoEx[];
   onDelete: TimelineDeleteCallback;
+  onResize?: () => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
   const user = useUser();
   const avatarVersion = useAvatarVersion();
 
-  const { posts, onDelete } = props;
+  const { posts, onDelete, onResize } = props;
 
   const [indexShowDeleteButton, setIndexShowDeleteButton] = React.useState<
     number
@@ -83,6 +84,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
                 }
                 onClick={onItemClick}
                 avatarVersion={av}
+                onResize={onResize}
               />
             );
           });
