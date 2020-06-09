@@ -68,17 +68,17 @@ export default function TimelinePageTemplateUI<
     }
   }, []);
 
-  const onLoadSubject = React.useMemo(() => new Subject(), []);
-  const triggerLoadEvent = React.useCallback(() => {
-    onLoadSubject.next(null);
-  }, [onLoadSubject]);
+  const resizeSubject = React.useMemo(() => new Subject(), []);
+  const triggerResizeEvent = React.useCallback(() => {
+    resizeSubject.next(null);
+  }, [resizeSubject]);
 
   React.useEffect(() => {
     let jumpToBottom = true;
     const timerTag = window.setTimeout(() => {
       jumpToBottom = false;
     }, 1000);
-    const subscription = onLoadSubject.subscribe(() => {
+    const subscription = resizeSubject.subscribe(() => {
       if (jumpToBottom)
         window.scrollTo(0, document.body.getBoundingClientRect().height);
     });
@@ -86,7 +86,7 @@ export default function TimelinePageTemplateUI<
       clearTimeout(timerTag);
       subscription.unsubscribe();
     };
-  }, [onLoadSubject, timeline, props.posts]);
+  }, [resizeSubject, timeline, props.posts]);
 
   const [cardHeight, setCardHeight] = React.useState<number>(0);
 
@@ -128,7 +128,7 @@ export default function TimelinePageTemplateUI<
             <Timeline
               posts={props.posts}
               onDelete={props.onDelete}
-              onLoad={triggerLoadEvent}
+              onResize={triggerResizeEvent}
             />
           );
           if (props.onPost != null) {
