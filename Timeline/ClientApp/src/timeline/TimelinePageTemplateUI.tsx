@@ -1,6 +1,7 @@
 import React from 'react';
 import { Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
+import { Subject, fromEvent } from 'rxjs';
 
 import { getAlertHost } from '../common/alert-service';
 
@@ -67,6 +68,32 @@ export default function TimelinePageTemplateUI<
     }
   }, []);
 
+  const resizeSubject = React.useMemo(() => new Subject(), []);
+  const triggerResizeEvent = React.useCallback(() => {
+    resizeSubject.next(null);
+  }, [resizeSubject]);
+
+  React.useEffect(() => {
+    let scrollToBottom = true;
+    const disableScrollToBottom = (): void => {
+      scrollToBottom = false;
+    };
+
+    const subscriptions = [
+      fromEvent(window, 'wheel').subscribe(disableScrollToBottom),
+      fromEvent(window, 'pointerdown').subscribe(disableScrollToBottom),
+      resizeSubject.subscribe(() => {
+        if (scrollToBottom) {
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+      }),
+    ];
+
+    return () => {
+      subscriptions.forEach((s) => s.unsubscribe());
+    };
+  }, [resizeSubject, timeline, props.posts]);
+
   const [cardHeight, setCardHeight] = React.useState<number>(0);
 
   const onCardHeightChange = React.useCallback((height: number) => {
@@ -104,7 +131,11 @@ export default function TimelinePageTemplateUI<
           );
         } else {
           timelineBody = (
-            <Timeline posts={props.posts} onDelete={props.onDelete} />
+            <Timeline
+              posts={props.posts}
+              onDelete={props.onDelete}
+              onResize={triggerResizeEvent}
+            />
           );
           if (props.onPost != null) {
             timelineBody = (
