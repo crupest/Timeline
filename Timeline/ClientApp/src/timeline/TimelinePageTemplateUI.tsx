@@ -200,10 +200,11 @@ export default function TimelinePageTemplateUI<
   return (
     <>
       <AppBar />
-      <div
-        style={{ marginTop: 56 + cardHeight }}
-        className="timeline-page-container"
-      >
+      <div>
+        <div
+          style={{ height: 56 + cardHeight }}
+          className="timeline-page-top-space flex-fix-length"
+        />
         {body}
       </div>
     </>
