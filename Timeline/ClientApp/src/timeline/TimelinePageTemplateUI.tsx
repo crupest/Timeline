@@ -82,6 +82,7 @@ export default function TimelinePageTemplateUI<
     const subscriptions = [
       fromEvent(window, 'wheel').subscribe(disableScrollToBottom),
       fromEvent(window, 'pointerdown').subscribe(disableScrollToBottom),
+      fromEvent(window, 'keydown').subscribe(disableScrollToBottom),
       resizeSubject.subscribe(() => {
         if (scrollToBottom) {
           window.scrollTo(0, document.body.scrollHeight);
