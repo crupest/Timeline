@@ -116,3 +116,11 @@ $timeline-line-color-current: #36c2e6
 .mask
   background: change-color($color: white, $alpha: 0.8)
   z-index: 100
+
+textarea.timeline-post-edit
+  @extend .border-primary
+  @extend .rounded
+
+  &:focus
+    outline: none
+    box-shadow: 0 0 5px 0 $primary
