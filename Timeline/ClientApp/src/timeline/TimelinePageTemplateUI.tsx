@@ -175,7 +175,7 @@ export default function TimelinePageTemplateUI<
                   newState.toString()
                 );
               }}
-              className="float-right m-1 info-card-collapse-button"
+              className="float-right m-1 info-card-collapse-button text-orange"
             />
             <CardComponent
               timeline={timeline}
