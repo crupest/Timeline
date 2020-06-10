@@ -151,7 +151,11 @@ export default function TimelinePageTemplateUI<
           }
         }
       } else {
-        timelineBody = <Spinner />;
+        timelineBody = (
+          <div className="full-viewport-center-child">
+            <Spinner color="primary" type="grow" />
+          </div>
+        );
       }
       const { CardComponent } = props;
 
@@ -185,7 +189,11 @@ export default function TimelinePageTemplateUI<
         </>
       );
     } else {
-      body = <Spinner />;
+      body = (
+        <div className="full-viewport-center-child">
+          <Spinner color="primary" type="grow" />
+        </div>
+      );
     }
   }
 
