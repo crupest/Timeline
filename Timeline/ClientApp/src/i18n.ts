@@ -24,7 +24,7 @@ const backend: BackendModule = {
         )
       ).default;
       success(res);
-    } else if (language === 'zh') {
+    } else if (language === 'zh-cn' || language === 'zh') {
       const res = (
         await import(
           /* webpackChunkName: "locales-zh" */ './locales/zh/translation'
@@ -44,7 +44,7 @@ export const i18nPromise = i18n
   .use(backend)
   .use(initReactI18next) // bind react-i18next to the instance
   .init({
-    fallbackLng: 'en',
+    fallbackLng: false,
     lowerCaseLng: true,
 
     debug: process.env.NODE_ENV === 'development',
