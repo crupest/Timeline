@@ -56,41 +56,43 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [posts, onDelete]);
 
   return (
-    <div className={clsx('pr-2', props.className)}>
-      <Container fluid className="d-flex flex-column">
-        {(() => {
-          const length = posts.length;
-          return posts.map((post, i) => {
-            const av: number | undefined =
-              user != null && user.username === post.author.username
-                ? avatarVersion
-                : undefined;
+    <Container
+      fluid
+      className={clsx('d-flex flex-column position-relative', props.className)}
+    >
+      <div className="timeline-enter-animation-mask" />
+      {(() => {
+        const length = posts.length;
+        return posts.map((post, i) => {
+          const av: number | undefined =
+            user != null && user.username === post.author.username
+              ? avatarVersion
+              : undefined;
 
-            const toggleMore = onToggleDelete[i];
+          const toggleMore = onToggleDelete[i];
 
-            return (
-              <TimelineItem
-                post={post}
-                key={post.id}
-                current={length - 1 === i}
-                more={
-                  toggleMore
-                    ? {
-                        isOpen: indexShowDeleteButton === i,
-                        toggle: toggleMore,
-                        onDelete: onItemDelete[i],
-                      }
-                    : undefined
-                }
-                onClick={onItemClick}
-                avatarVersion={av}
-                onResize={onResize}
-              />
-            );
-          });
-        })()}
-      </Container>
-    </div>
+          return (
+            <TimelineItem
+              post={post}
+              key={post.id}
+              current={length - 1 === i}
+              more={
+                toggleMore
+                  ? {
+                      isOpen: indexShowDeleteButton === i,
+                      toggle: toggleMore,
+                      onDelete: onItemDelete[i],
+                    }
+                  : undefined
+              }
+              onClick={onItemClick}
+              avatarVersion={av}
+              onResize={onResize}
+            />
+          );
+        });
+      })()}
+    </Container>
   );
 };
 

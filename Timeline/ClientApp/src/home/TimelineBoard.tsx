@@ -35,7 +35,7 @@ const TimelineBoard: React.FC<TimelineBoardProps> = props => {
               ? `/users/${timeline.owner.username}`
               : `/timelines/${name}`;
             return (
-              <div key={name} className="timeline-item">
+              <div key={name} className="timeline-board-item">
                 {isPersonal ? (
                   <UserTimelineLogo className="icon" />
                 ) : (

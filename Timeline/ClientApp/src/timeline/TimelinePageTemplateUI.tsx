@@ -107,9 +107,7 @@ export default function TimelinePageTemplateUI<
   const cardCollapseLocalStorageKey =
     timeline != null ? genCardCollapseLocalStorageKey(timeline.name) : null;
 
-  const [infoCardCollapse, setInfoCardCollapse] = React.useState<boolean>(
-    false
-  );
+  const [infoCardCollapse, setInfoCardCollapse] = React.useState<boolean>(true);
   React.useEffect(() => {
     if (cardCollapseLocalStorageKey != null) {
       const savedCollapse =
