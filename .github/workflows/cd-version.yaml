@@ -1,0 +1,24 @@
+name: Build And Upload Versioned Docker Image
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+    paths-ignore:
+      - "**/README.md"
+
+jobs:
+  deploy:
+    name: Build And Push Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build And Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          repository: crupest/timeline
+          tag_with_ref: true
