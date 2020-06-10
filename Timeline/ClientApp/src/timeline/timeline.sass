@@ -1,5 +1,20 @@
 @use 'sass:color'
 
+@keyframes timeline-enter-animation-mask-animation
+  from
+    height: calc(100% + 300px)
+  to
+    height: 0
+
+.timeline-enter-animation-mask
+  position: absolute
+  left: 0
+  top: 0
+  width: 100%
+  background: linear-gradient(to top, transparent 0, 200px, white 300px)
+  z-index: 100
+  animation: timeline-enter-animation-mask-animation 5s
+
 $timeline-line-width: 7px
 $timeline-line-node-radius: 18px
 $timeline-line-color: $primary

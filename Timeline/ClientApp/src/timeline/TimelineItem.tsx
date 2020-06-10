@@ -56,6 +56,8 @@ export interface TimelineItemProps {
   onClick?: () => void;
   avatarVersion?: number;
   onResize?: () => void;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const TimelineItem: React.FC<TimelineItemProps> = (props) => {
@@ -78,8 +80,13 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
 
   return (
     <Row
-      className={clsx('position-relative flex-nowrap', current && 'current')}
+      className={clsx(
+        'position-relative flex-nowrap',
+        current && 'current',
+        props.className
+      )}
       onClick={props.onClick}
+      style={props.style}
     >
       <Col className="timeline-line-area">
         <div className="timeline-line-segment start"></div>
