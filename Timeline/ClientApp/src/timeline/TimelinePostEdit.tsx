@@ -178,10 +178,10 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   return (
     <div ref={containerRef} className="container-fluid fixed-bottom bg-light">
       <Row>
-        <Col className="px-0">
+        <Col className="px-1 py-1">
           {kind === 'text' ? (
             <textarea
-              className="w-100 h-100"
+              className="w-100 h-100 timeline-post-edit"
               value={text}
               disabled={state === 'process'}
               onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
