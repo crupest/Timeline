@@ -4,11 +4,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const { commonRules, htmlCommonConfig } = require('./webpack.common');
 
 const config = {
-  entry: ['./src/index.tsx'],
+  entry: ['./src/app/index.tsx'],
   mode: 'production',
   devtool: 'source-map',
   module: {
@@ -50,7 +51,12 @@ const config = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin(htmlCommonConfig),
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: './src/app/tsconfig.json',
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: './src/sw/tsconfig.json',
+    }),
     new CopyPlugin({
       patterns: [
         {
@@ -58,6 +64,10 @@ const config = {
           to: path.resolve(__dirname, 'dist/'),
         },
       ],
+    }),
+    new WorkboxPlugin.InjectManifest({
+      swSrc: './src/sw/sw.ts',
+      maximumFileSizeToCacheInBytes: 15000000,
     }),
   ],
 };
