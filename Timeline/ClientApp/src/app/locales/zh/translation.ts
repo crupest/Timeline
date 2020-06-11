@@ -3,6 +3,11 @@ import TranslationResource from '../scheme';
 const translation: TranslationResource = {
   welcome: '欢迎！',
   search: '搜索',
+  serviceWorker: {
+    availableOffline: '这个 App 将会缓存在本地，你将可以离线使用它。',
+    upgradeTitle: 'App 有新版本！',
+    upgradeNow: '现在升级',
+  },
   nav: {
     settings: '设置',
     login: '登陆',

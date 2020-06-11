@@ -3,6 +3,12 @@ import TranslationResource from '../scheme';
 const translation: TranslationResource = {
   welcome: 'Welcome!',
   search: 'Search',
+  serviceWorker: {
+    availableOffline:
+      'This app will be cached in your computer and you can use it offline.',
+    upgradeTitle: 'App is getting a new version!',
+    upgradeNow: 'Upgrade Now',
+  },
   nav: {
     settings: 'Settings',
     login: 'Login',

@@ -1,8 +1,10 @@
+import React from 'react';
 import pull from 'lodash/pull';
 
 export interface AlertInfo {
   type?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
-  message: string;
+  message: string | React.FC<unknown> | { type: 'i18n'; key: string };
+  dismissTime?: number | 'never';
 }
 
 export interface AlertInfoEx extends AlertInfo {

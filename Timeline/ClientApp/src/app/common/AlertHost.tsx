@@ -9,6 +9,7 @@ import {
   kAlertHostId,
   AlertInfo,
 } from './alert-service';
+import { useTranslation } from 'react-i18next';
 
 interface AutoCloseAlertProps {
   alert: AlertInfo;
@@ -17,15 +18,35 @@ interface AutoCloseAlertProps {
 
 export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
   const { alert } = props;
+  const { dismissTime } = alert;
+
+  const { t } = useTranslation();
 
   React.useEffect(() => {
-    const tag = window.setTimeout(props.close, 5000);
-    return () => window.clearTimeout(tag);
-  }, [props.close]);
+    const tag =
+      dismissTime === 'never'
+        ? null
+        : typeof dismissTime === 'number'
+        ? window.setTimeout(props.close, dismissTime)
+        : window.setTimeout(props.close, 5000);
+    return () => {
+      if (tag != null) {
+        window.clearTimeout(tag);
+      }
+    };
+  }, [dismissTime, props.close]);
 
   return (
     <Alert className="m-3" color={alert.type ?? 'primary'} toggle={props.close}>
-      {alert.message}
+      {(() => {
+        const { message } = alert;
+        if (typeof message === 'function') {
+          const Message = message;
+          return <Message />;
+        } else if (typeof message === 'object' && message.type === 'i18n') {
+          return t(message.key);
+        } else return alert.message;
+      })()}
     </Alert>
   );
 };
