@@ -1,7 +1,7 @@
 import React from 'react';
 import { Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
-import { Subject, fromEvent } from 'rxjs';
+import { fromEvent } from 'rxjs';
 
 import { getAlertHost } from '../common/alert-service';
 
@@ -12,6 +12,7 @@ import Timeline, {
 import AppBar from '../common/AppBar';
 import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
 import CollapseButton from '../common/CollapseButton';
+import { useEventEmiiter } from '../common';
 
 export interface TimelineCardComponentProps<TTimeline, TManageItems> {
   timeline: TTimeline;
@@ -68,10 +69,7 @@ export default function TimelinePageTemplateUI<
     }
   }, []);
 
-  const resizeSubject = React.useMemo(() => new Subject(), []);
-  const triggerResizeEvent = React.useCallback(() => {
-    resizeSubject.next(null);
-  }, [resizeSubject]);
+  const [getResizeEvent, triggerResizeEvent] = useEventEmiiter();
 
   React.useEffect(() => {
     let scrollToBottom = true;
@@ -83,7 +81,7 @@ export default function TimelinePageTemplateUI<
       fromEvent(window, 'wheel').subscribe(disableScrollToBottom),
       fromEvent(window, 'pointerdown').subscribe(disableScrollToBottom),
       fromEvent(window, 'keydown').subscribe(disableScrollToBottom),
-      resizeSubject.subscribe(() => {
+      getResizeEvent().subscribe(() => {
         if (scrollToBottom) {
           window.scrollTo(0, document.body.scrollHeight);
         }
@@ -93,13 +91,9 @@ export default function TimelinePageTemplateUI<
     return () => {
       subscriptions.forEach((s) => s.unsubscribe());
     };
-  }, [resizeSubject, timeline, props.posts]);
+  }, [getResizeEvent, timeline, props.posts]);
 
   const [cardHeight, setCardHeight] = React.useState<number>(0);
-
-  const onCardHeightChange = React.useCallback((height: number) => {
-    setCardHeight(height);
-  }, []);
 
   const genCardCollapseLocalStorageKey = (timelineName: string): string =>
     `timeline.${timelineName}.cardCollapse`;
@@ -181,7 +175,7 @@ export default function TimelinePageTemplateUI<
               timeline={timeline}
               onManage={props.onManage}
               onMember={props.onMember}
-              onHeight={onCardHeightChange}
+              onHeight={setCardHeight}
               className="info-card-content"
             />
           </div>
