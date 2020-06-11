@@ -2,12 +2,14 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const { commonRules, htmlCommonConfig } = require('./webpack.common');
 
 const config = {
-  entry: ['react-hot-loader/patch', './src/index.tsx'],
+  entry: ['react-hot-loader/patch', './src/app/index.tsx'],
   mode: 'development',
   devtool: 'eval-source-map',
   module: {
@@ -53,7 +55,7 @@ const config = {
     publicPath: '/',
   },
   devServer: {
-    contentBase: path.join(__dirname, 'public/'),
+    contentBase: false,
     host: '0.0.0.0',
     port: 3000,
     publicPath: 'http://localhost:3000/',
@@ -65,8 +67,25 @@ const config = {
       ...htmlCommonConfig,
       devServer: 'http://localhost:3000',
     }),
-    new ForkTsCheckerWebpackPlugin(),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'public/'),
+          to: path.resolve(__dirname, 'dist/'),
+        },
+      ],
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: './src/app/tsconfig.json',
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: './src/sw/tsconfig.json',
+    }),
     new webpack.HotModuleReplacementPlugin(),
+    new WorkboxPlugin.InjectManifest({
+      swSrc: './src/sw/sw.ts',
+      maximumFileSizeToCacheInBytes: 15000000,
+    }),
   ],
 };
 
