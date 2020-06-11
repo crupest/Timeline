@@ -9,7 +9,7 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 const { commonRules, htmlCommonConfig } = require('./webpack.common');
 
 const config = {
-  entry: ['./src/app/index.tsx'],
+  entry: ['./src/app/index.tsx', './src/app/service-worker.tsx'],
   mode: 'production',
   devtool: 'source-map',
   module: {
