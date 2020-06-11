@@ -14,9 +14,4 @@ import App from './App';
 
 ReactDOM.render(<App />, document.getElementById('app'));
 
-if ('serviceWorker' in navigator) {
-  // Use the window load event to keep the page load performant
-  window.addEventListener('load', () => {
-    void navigator.serviceWorker.register('/sw.js');
-  });
-}
+import './service-worker';

@@ -3,6 +3,11 @@ export default interface TranslationResource {
   search: string;
   chooseImage: string;
   loadImageError: string;
+  serviceWorker: {
+    availableOffline: string;
+    upgradeTitle: string;
+    upgradeNow: string;
+  };
   nav: {
     settings: string;
     login: string;
