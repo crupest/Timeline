@@ -69,29 +69,58 @@ export default function TimelinePageTemplateUI<
     }
   }, []);
 
+  const timelineRef = React.useRef<HTMLDivElement | null>(null);
+
   const [getResizeEvent, triggerResizeEvent] = useEventEmiiter();
 
   React.useEffect(() => {
-    let scrollToBottom = true;
-    const disableScrollToBottom = (): void => {
-      scrollToBottom = false;
-    };
+    const { current: timelineElement } = timelineRef;
+    if (timelineElement != null) {
+      let loadingScrollToBottom = true;
+      let pinBottom = false;
 
-    const subscriptions = [
-      fromEvent(window, 'wheel').subscribe(disableScrollToBottom),
-      fromEvent(window, 'pointerdown').subscribe(disableScrollToBottom),
-      fromEvent(window, 'keydown').subscribe(disableScrollToBottom),
-      getResizeEvent().subscribe(() => {
-        if (scrollToBottom) {
+      const isAtBottom = (): boolean =>
+        window.innerHeight + window.scrollY + 10 >= document.body.scrollHeight;
+
+      const disableLoadingScrollToBottom = (): void => {
+        loadingScrollToBottom = false;
+        if (isAtBottom()) pinBottom = true;
+      };
+
+      const checkAndScrollToBottom = (): void => {
+        if (loadingScrollToBottom || pinBottom) {
           window.scrollTo(0, document.body.scrollHeight);
         }
-      }),
-    ];
+      };
 
-    return () => {
-      subscriptions.forEach((s) => s.unsubscribe());
-    };
-  }, [getResizeEvent, timeline, props.posts]);
+      const subscriptions = [
+        fromEvent(timelineElement, 'wheel').subscribe(
+          disableLoadingScrollToBottom
+        ),
+        fromEvent(timelineElement, 'pointerdown').subscribe(
+          disableLoadingScrollToBottom
+        ),
+        fromEvent(timelineElement, 'keydown').subscribe(
+          disableLoadingScrollToBottom
+        ),
+        fromEvent(window, 'scroll').subscribe(() => {
+          if (loadingScrollToBottom) return;
+
+          if (isAtBottom()) {
+            pinBottom = true;
+          } else {
+            pinBottom = false;
+          }
+        }),
+        fromEvent(window, 'resize').subscribe(checkAndScrollToBottom),
+        getResizeEvent().subscribe(checkAndScrollToBottom),
+      ];
+
+      return () => {
+        subscriptions.forEach((s) => s.unsubscribe());
+      };
+    }
+  }, [getResizeEvent, triggerResizeEvent, timeline, props.posts]);
 
   const [cardHeight, setCardHeight] = React.useState<number>(0);
 
@@ -125,6 +154,7 @@ export default function TimelinePageTemplateUI<
         } else {
           timelineBody = (
             <Timeline
+              containerRef={timelineRef}
               posts={props.posts}
               onDelete={props.onDelete}
               onResize={triggerResizeEvent}

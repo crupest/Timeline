@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Container } from 'reactstrap';
 
 import { TimelinePostInfo } from '../data/timeline';
 import { useUser } from '../data/user';
@@ -19,6 +18,7 @@ export interface TimelineProps {
   posts: TimelinePostInfoEx[];
   onDelete: TimelineDeleteCallback;
   onResize?: () => void;
+  containerRef?: React.Ref<HTMLDivElement>;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
@@ -56,9 +56,12 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [posts, onDelete]);
 
   return (
-    <Container
-      fluid
-      className={clsx('d-flex flex-column position-relative', props.className)}
+    <div
+      ref={props.containerRef}
+      className={clsx(
+        'container-fluid d-flex flex-column position-relative',
+        props.className
+      )}
     >
       <div className="timeline-enter-animation-mask" />
       {(() => {
@@ -92,7 +95,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
           );
         });
       })()}
-    </Container>
+    </div>
   );
 };
 
