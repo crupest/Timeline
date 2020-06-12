@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Timeline.Models;
+using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
 {

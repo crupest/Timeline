@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Timeline.Helpers;
 using Timeline.Models.Http;
 using Timeline.Services;
+using Timeline.Services.Exceptions;
 using static Timeline.Resources.Controllers.TokenController;
 
 namespace Timeline.Controllers
