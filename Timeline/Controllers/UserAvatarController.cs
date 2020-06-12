@@ -10,6 +10,7 @@ using Timeline.Helpers;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
+using Timeline.Services.Exceptions;
 using static Timeline.Resources.Controllers.UserAvatarController;
 
 namespace Timeline.Controllers

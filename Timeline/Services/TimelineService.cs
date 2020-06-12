@@ -10,6 +10,7 @@ using Timeline.Entities;
 using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Validation;
+using Timeline.Services.Exceptions;
 using static Timeline.Resources.Services.TimelineService;
 
 namespace Timeline.Services
@@ -428,7 +429,7 @@ namespace Timeline.Services
             var postEntity = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
             if (postEntity == null)
-                throw new TimelinePostNotExistException(name, postId);
+                throw new TimelinePostNotExistException(name, postId, false);
 
             if (postEntity.Content == null)
                 throw new TimelinePostNotExistException(name, postId, true);
@@ -450,7 +451,7 @@ namespace Timeline.Services
             var postEntity = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
             if (postEntity == null)
-                throw new TimelinePostNotExistException(name, postId);
+                throw new TimelinePostNotExistException(name, postId, false);
 
             if (postEntity.Content == null)
                 throw new TimelinePostNotExistException(name, postId, true);
@@ -586,7 +587,7 @@ namespace Timeline.Services
             var post = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == id).SingleOrDefaultAsync();
 
             if (post == null || post.Content == null)
-                throw new TimelinePostNotExistException(name, id);
+                throw new TimelinePostNotExistException(name, id, false);
 
             string? dataTag = null;
 
@@ -977,7 +978,7 @@ namespace Timeline.Services
             var conflict = await _database.Timelines.AnyAsync(t => t.Name == name);
 
             if (conflict)
-                throw new ConflictException(ExceptionTimelineNameConflict);
+                throw new EntityAlreadyExistException(EntityNames.Timeline, null, ExceptionTimelineNameConflict);
 
             var newEntity = new TimelineEntity
             {

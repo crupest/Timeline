@@ -13,6 +13,7 @@ using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
+using Timeline.Services.Exceptions;
 
 namespace Timeline.Controllers
 {
@@ -283,7 +284,7 @@ namespace Timeline.Controllers
                 var result = _mapper.Map<TimelineInfo>(timeline);
                 return result;
             }
-            catch (ConflictException)
+            catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.Timeline)
             {
                 return BadRequest(ErrorResponse.TimelineController.NameConflict());
             }

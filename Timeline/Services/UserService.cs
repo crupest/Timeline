@@ -8,6 +8,7 @@ using Timeline.Entities;
 using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Validation;
+using Timeline.Services.Exceptions;
 using static Timeline.Resources.Services.UserService;
 
 namespace Timeline.Services
@@ -197,7 +198,7 @@ namespace Timeline.Services
 
         private static void ThrowUsernameConflict()
         {
-            throw new ConflictException(ExceptionUsernameConflict);
+            throw new EntityAlreadyExistException(EntityNames.User, ExceptionUsernameConflict);
         }
 
         private static User CreateUserFromEntity(UserEntity entity)

@@ -11,6 +11,7 @@ using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
+using Timeline.Services.Exceptions;
 using static Timeline.Resources.Controllers.UserController;
 using static Timeline.Resources.Messages;
 
@@ -70,7 +71,7 @@ namespace Timeline.Controllers
                     _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
                     return NotFound(ErrorResponse.UserCommon.NotExist());
                 }
-                catch (ConflictException)
+                catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
                 {
                     return BadRequest(ErrorResponse.UserController.UsernameConflict());
                 }
@@ -116,7 +117,7 @@ namespace Timeline.Controllers
                 var user = await _userService.CreateUser(_mapper.Map<User>(body));
                 return Ok(ConvertToUserInfo(user));
             }
-            catch (ConflictException)
+            catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
             {
                 return BadRequest(ErrorResponse.UserController.UsernameConflict());
             }

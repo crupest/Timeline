@@ -70,15 +70,6 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A present resource conflicts with the given resource..
-        /// </summary>
-        internal static string ConflictException {
-            get {
-                return ResourceManager.GetString("ConflictException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The hashes password is of bad format. It might not be created by server..
         /// </summary>
         internal static string HashedPasswordBadFromatException {
@@ -255,33 +246,6 @@ namespace Timeline.Resources.Services {
         internal static string PasswordBadFormatException {
             get {
                 return ResourceManager.GetString("PasswordBadFormatException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Timeline does not exist. If this is a personal timeline, it means the user does not exist and inner exception should be a UserNotExistException..
-        /// </summary>
-        internal static string TimelineNotExistException {
-            get {
-                return ResourceManager.GetString("TimelineNotExistException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The timeline post does not exist. You can&apos;t do operation on it..
-        /// </summary>
-        internal static string TimelinePostNotExistException {
-            get {
-                return ResourceManager.GetString("TimelinePostNotExistException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The user does not exist..
-        /// </summary>
-        internal static string UserNotExistException {
-            get {
-                return ResourceManager.GetString("UserNotExistException", resourceCulture);
             }
         }
         

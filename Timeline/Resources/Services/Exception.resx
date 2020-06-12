@@ -120,9 +120,6 @@
   <data name="BadPasswordException" xml:space="preserve">
     <value>The password is wrong.</value>
   </data>
-  <data name="ConflictException" xml:space="preserve">
-    <value>A present resource conflicts with the given resource.</value>
-  </data>
   <data name="HashedPasswordBadFromatException" xml:space="preserve">
     <value>The hashes password is of bad format. It might not be created by server.</value>
   </data>
@@ -182,15 +179,6 @@
   </data>
   <data name="PasswordBadFormatException" xml:space="preserve">
     <value>Password is of bad format.</value>
-  </data>
-  <data name="TimelineNotExistException" xml:space="preserve">
-    <value>Timeline does not exist. If this is a personal timeline, it means the user does not exist and inner exception should be a UserNotExistException.</value>
-  </data>
-  <data name="TimelinePostNotExistException" xml:space="preserve">
-    <value>The timeline post does not exist. You can't do operation on it.</value>
-  </data>
-  <data name="UserNotExistException" xml:space="preserve">
-    <value>The user does not exist.</value>
   </data>
   <data name="UserTokenBadFormatException" xml:space="preserve">
     <value>The token is of bad format, which means it may not be created by the server.</value>
