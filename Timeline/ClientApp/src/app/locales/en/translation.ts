@@ -5,9 +5,14 @@ const translation: TranslationResource = {
   search: 'Search',
   serviceWorker: {
     availableOffline:
-      'This app will be cached in your computer and you can use it offline.',
-    upgradeTitle: 'App is getting a new version!',
-    upgradeNow: 'Upgrade Now',
+      'Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉',
+    upgradePrompt: 'App is getting a new version!',
+    upgradeNow: 'Update Now',
+    upgradeSuccess:
+      'Congratulations! App update succeeded! Still you can use it offline. 🎉🎉🎉',
+    externalActivatedPrompt:
+      'A new version of app is activated. Please refresh the page. Or it may be broken.',
+    reloadNow: 'Refresh Now',
   },
   nav: {
     settings: 'Settings',

@@ -40,7 +40,7 @@ const App: React.FC = () => {
     body = <LoadingPage />;
   } else {
     body = (
-      <React.Suspense fallback={<LoadingPage />}>
+      <Router>
         <Switch>
           <Route exact path="/">
             <Home />
@@ -69,15 +69,15 @@ const App: React.FC = () => {
             <NoMatch />
           </Route>
         </Switch>
-      </React.Suspense>
+      </Router>
     );
   }
 
   return (
-    <>
-      <Router>{body}</Router>
+    <React.Suspense fallback={<LoadingPage />}>
+      {body}
       <AlertHost />
-    </>
+    </React.Suspense>
   );
 };
 
