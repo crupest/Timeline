@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.IO;
+using Timeline.Configs;
 
 namespace Timeline.Services
 {
@@ -11,8 +12,6 @@ namespace Timeline.Services
 
     public class PathProvider : IPathProvider
     {
-        const string DatabaseFileName = "timeline.db";
-
         private readonly IConfiguration _configuration;
 
         private readonly string _workingDirectory;
@@ -21,7 +20,7 @@ namespace Timeline.Services
         public PathProvider(IConfiguration configuration)
         {
             _configuration = configuration;
-            _workingDirectory = configuration.GetValue<string?>("WorkDir") ?? "/timeline";
+            _workingDirectory = configuration.GetValue<string?>(ApplicationConfiguration.WorkDirKey) ?? ApplicationConfiguration.DefaultWorkDir;
         }
 
         public string GetWorkingDirectory()
@@ -31,7 +30,7 @@ namespace Timeline.Services
 
         public string GetDatabaseFilePath()
         {
-            return Path.Combine(_workingDirectory, DatabaseFileName);
+            return Path.Combine(_workingDirectory, ApplicationConfiguration.DatabaseFileName);
         }
     }
 }
