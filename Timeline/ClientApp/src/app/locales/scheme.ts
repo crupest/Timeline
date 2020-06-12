@@ -5,8 +5,11 @@ export default interface TranslationResource {
   loadImageError: string;
   serviceWorker: {
     availableOffline: string;
-    upgradeTitle: string;
+    upgradePrompt: string;
     upgradeNow: string;
+    upgradeSuccess: string;
+    externalActivatedPrompt: string;
+    reloadNow: string;
   };
   nav: {
     settings: string;

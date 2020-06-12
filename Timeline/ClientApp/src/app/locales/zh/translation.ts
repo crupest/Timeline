@@ -4,9 +4,13 @@ const translation: TranslationResource = {
   welcome: '欢迎！',
   search: '搜索',
   serviceWorker: {
-    availableOffline: '这个 App 将会缓存在本地，你将可以离线使用它。',
-    upgradeTitle: 'App 有新版本！',
+    availableOffline: 'Timeline 已经缓存在本地，你可以离线使用它。🎉🎉🎉',
+    upgradePrompt: 'App 有新版本！',
     upgradeNow: '现在升级',
+    upgradeSuccess: 'App 升级成功，当然，你仍可以离线使用它。 🎉🎉🎉',
+    externalActivatedPrompt:
+      '一个新的 App 版本已经激活，请刷新页面使用，否则页面可能会出现故障。',
+    reloadNow: '立刻刷新',
   },
   nav: {
     settings: '设置',

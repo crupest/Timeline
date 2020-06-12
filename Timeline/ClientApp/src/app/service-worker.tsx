@@ -1,16 +1,60 @@
 import React from 'react';
-import { WorkboxLifecycleEvent } from 'workbox-window/utils/WorkboxEvent';
 import { Button } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 
 import { pushAlert } from './common/alert-service';
 
 if ('serviceWorker' in navigator) {
+  let isThisTriggerUpgrade = false;
+
+  const upgradeSuccessLocalStorageKey = 'TIMELINE_UPGRADE_SUCCESS';
+
+  if (window.localStorage.getItem(upgradeSuccessLocalStorageKey)) {
+    pushAlert({
+      message: {
+        type: 'i18n',
+        key: 'serviceWorker.upgradeSuccess',
+      },
+      type: 'success',
+    });
+    window.localStorage.removeItem(upgradeSuccessLocalStorageKey);
+  }
+
   void import('workbox-window').then(({ Workbox, messageSW }) => {
     const wb = new Workbox('/sw.js');
     let registration: ServiceWorkerRegistration | undefined;
 
-    const showFirstPrompt = (event: WorkboxLifecycleEvent): void => {
+    // externalactivated is not usable but I still use its name.
+    wb.addEventListener('controlling', () => {
+      const upgradeReload = (): void => {
+        window.localStorage.setItem(upgradeSuccessLocalStorageKey, 'true');
+        window.location.reload();
+      };
+
+      if (isThisTriggerUpgrade) {
+        upgradeReload();
+      } else {
+        const Message: React.FC = () => {
+          const { t } = useTranslation();
+          return (
+            <>
+              {t('serviceWorker.externalActivatedPrompt')}
+              <Button color="success" size="sm" onClick={upgradeReload} outline>
+                {t('serviceWorker.reloadNow')}
+              </Button>
+            </>
+          );
+        };
+
+        pushAlert({
+          message: Message,
+          dismissTime: 'never',
+          type: 'warning',
+        });
+      }
+    });
+
+    wb.addEventListener('activated', (event) => {
       if (!event.isUpdate) {
         pushAlert({
           message: {
@@ -20,20 +64,11 @@ if ('serviceWorker' in navigator) {
           type: 'success',
         });
       }
-    };
-
-    wb.addEventListener('activated', showFirstPrompt);
-    wb.addEventListener('externalactivated', showFirstPrompt);
+    });
 
     const showSkipWaitingPrompt = (): void => {
       const upgrade = (): void => {
-        // Assuming the user accepted the update, set up a listener
-        // that will reload the page as soon as the previously waiting
-        // service worker has taken control.
-        wb.addEventListener('controlling', () => {
-          window.location.reload();
-        });
-
+        isThisTriggerUpgrade = true;
         if (registration && registration.waiting) {
           // Send a message to the waiting service worker,
           // instructing it to activate.
@@ -47,7 +82,7 @@ if ('serviceWorker' in navigator) {
         const { t } = useTranslation();
         return (
           <>
-            {t('serviceWorker.upgradeTitle')}
+            {t('serviceWorker.upgradePrompt')}
             <Button color="success" size="sm" onClick={upgrade} outline>
               {t('serviceWorker.upgradeNow')}
             </Button>
