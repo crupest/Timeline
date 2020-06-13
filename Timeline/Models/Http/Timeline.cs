@@ -26,7 +26,8 @@ namespace Timeline.Models.Http
 
     public class TimelineInfo
     {
-        public string? Name { get; set; }
+        public string UniqueId { get; set; } = default!;
+        public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
         public UserInfo Owner { get; set; } = default!;
         public TimelineVisibility Visibility { get; set; }

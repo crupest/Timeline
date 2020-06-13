@@ -304,6 +304,30 @@ namespace Timeline.Services
 
     }
 
+    internal static class TimelineServiceHelper
+    {
+        public static async Task<Models.Timeline> MapTimelineFromEntity(IUserService userService, TimelineEntity entity)
+        {
+            var owner = await userService.GetUserById(entity.OwnerId);
+
+            var members = new List<User>();
+            foreach (var memberEntity in entity.Members)
+            {
+                members.Add(await userService.GetUserById(memberEntity.UserId));
+            }
+
+            return new Models.Timeline
+            {
+                UniqueID = entity.UniqueId,
+                Name = entity.Name ?? ("@" + owner.Username),
+                Description = entity.Description ?? "",
+                Owner = owner,
+                Visibility = entity.Visibility,
+                Members = members
+            };
+        }
+    }
+
     public abstract class BaseTimelineService : IBaseTimelineService
     {
         protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
@@ -316,7 +340,7 @@ namespace Timeline.Services
             UserService = userService;
         }
 
-        private ILogger<BaseTimelineService> _logger;
+        private readonly ILogger<BaseTimelineService> _logger;
 
         protected IClock Clock { get; }
 
@@ -361,26 +385,9 @@ namespace Timeline.Services
 
             var timelineId = await FindTimelineId(name);
 
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Include(t => t.Members).SingleAsync();
 
-            var timelineMemberEntities = await Database.TimelineMembers.Where(m => m.TimelineId == timelineId).Select(m => new { m.UserId }).ToListAsync();
-
-            var owner = await UserService.GetUserById(timelineEntity.OwnerId);
-
-            var members = new List<User>();
-            foreach (var memberEntity in timelineMemberEntities)
-            {
-                members.Add(await UserService.GetUserById(memberEntity.UserId));
-            }
-
-            return new Models.Timeline
-            {
-                Name = GenerateName(name),
-                Description = timelineEntity.Description ?? "",
-                Owner = owner,
-                Visibility = timelineEntity.Visibility,
-                Members = members
-            };
+            return await TimelineServiceHelper.MapTimelineFromEntity(UserService, timelineEntity);
         }
 
         public async Task<List<TimelinePost>> GetPosts(string name)
@@ -945,22 +952,7 @@ namespace Timeline.Services
 
             foreach (var entity in entities)
             {
-                var owner = await _userService.GetUserById(entity.OwnerId);
-                var timeline = new Models.Timeline
-                {
-                    Name = entity.Name ?? ("@" + owner.Username),
-                    Description = entity.Description ?? "",
-                    Owner = owner,
-                    Visibility = entity.Visibility,
-                    Members = new List<User>()
-                };
-
-                foreach (var m in entity.Members)
-                {
-                    timeline.Members.Add(await _userService.GetUserById(m.UserId));
-                }
-
-                result.Add(timeline);
+                result.Add(await TimelineServiceHelper.MapTimelineFromEntity(_userService, entity));
             }
 
             return result;
@@ -986,20 +978,14 @@ namespace Timeline.Services
                 Name = name,
                 OwnerId = owner,
                 Visibility = TimelineVisibility.Register,
-                CreateTime = _clock.GetCurrentTime()
+                CreateTime = _clock.GetCurrentTime(),
+                Members = new List<TimelineMemberEntity>()
             };
 
             _database.Timelines.Add(newEntity);
             await _database.SaveChangesAsync();
 
-            return new Models.Timeline
-            {
-                Name = name,
-                Description = "",
-                Owner = user,
-                Visibility = newEntity.Visibility,
-                Members = new List<User>()
-            };
+            return await TimelineServiceHelper.MapTimelineFromEntity(_userService, newEntity);
         }
 
         public async Task DeleteTimeline(string name)
