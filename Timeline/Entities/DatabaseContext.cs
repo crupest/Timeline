@@ -1,4 +1,6 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Timeline.Entities
 {
@@ -7,6 +9,15 @@ namespace Timeline.Entities
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
+            if (Database.IsSqlite())
+            {
+                var connection = (SqliteConnection)Database.GetDbConnection();
+                connection.CreateFunction("timeline_create_guid", () => Guid.NewGuid().ToString());
+            }
+            else
+            {
+                throw new InvalidOperationException(Resources.Entities.ExceptionOnlySqliteSupported);
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -14,6 +25,7 @@ namespace Timeline.Entities
             modelBuilder.Entity<UserEntity>().Property(e => e.Version).HasDefaultValue(0);
             modelBuilder.Entity<UserEntity>().HasIndex(e => e.Username).IsUnique();
             modelBuilder.Entity<DataEntity>().HasIndex(e => e.Tag).IsUnique();
+            modelBuilder.Entity<TimelineEntity>().Property(e => e.UniqueId).HasDefaultValueSql("timeline_create_guid()");
         }
 
         public DbSet<UserEntity> Users { get; set; } = default!;
