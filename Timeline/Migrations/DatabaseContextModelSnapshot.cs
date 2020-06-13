@@ -89,12 +89,11 @@ namespace Timeline.Migrations
                         .HasColumnName("owner")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("UniqueId")
-                        .IsRequired()
+                    b.Property<Guid>("UniqueId")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("unique_id")
-                        .HasColumnType("TEXT")
-                        .HasDefaultValueSql("timeline_create_guid()");
+                        .HasColumnType("BLOB")
+                        .HasDefaultValueSql("randomblob(16)");
 
                     b.Property<int>("Visibility")
                         .HasColumnName("visibility")

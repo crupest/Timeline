@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Timeline.Migrations
 {
@@ -12,7 +13,7 @@ ALTER TABLE timelines RENAME TO timelines_backup;
 
 CREATE TABLE timelines (
     id INTEGER NOT NULL CONSTRAINT PK_timelines PRIMARY KEY AUTOINCREMENT,
-	unique_id TEXT NOT NULL DEFAULT (timeline_create_guid()),
+	unique_id BLOB NOT NULL DEFAULT (randomblob(16)),
     name TEXT NULL,
     description TEXT NULL,
     owner INTEGER NOT NULL,
@@ -31,9 +32,6 @@ DROP TABLE timelines_backup;
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "unique_id",
-                table: "timelines");
         }
     }
 }
