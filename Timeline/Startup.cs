@@ -62,7 +62,7 @@ namespace Timeline
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
 
-            services.AddScoped<IPathProvider, PathProvider>();
+            services.AddSingleton<IPathProvider, PathProvider>();
 
             services.AddAutoMapper(GetType().Assembly);
 
