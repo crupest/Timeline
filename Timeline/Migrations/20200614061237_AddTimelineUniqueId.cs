@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Timeline.Migrations
 {
@@ -13,7 +12,7 @@ ALTER TABLE timelines RENAME TO timelines_backup;
 
 CREATE TABLE timelines (
     id INTEGER NOT NULL CONSTRAINT PK_timelines PRIMARY KEY AUTOINCREMENT,
-	unique_id BLOB NOT NULL DEFAULT (randomblob(16)),
+	unique_id TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
     name TEXT NULL,
     description TEXT NULL,
     owner INTEGER NOT NULL,
@@ -27,7 +26,7 @@ INSERT INTO timelines (id, name, description, owner, visibility, create_time)
 
 DROP TABLE timelines_backup;
 "
-            );
+                );
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

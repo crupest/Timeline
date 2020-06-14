@@ -70,7 +70,7 @@ namespace Timeline.Models
     public class Timeline
 #pragma warning restore CA1724 // Type names should not match namespaces
     {
-        public Guid UniqueID { get; set; } = default!;
+        public string UniqueID { get; set; } = default!;
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
         public User Owner { get; set; } = default!;

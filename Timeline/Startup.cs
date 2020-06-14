@@ -62,10 +62,7 @@ namespace Timeline
 
             services.AddScoped<IPathProvider, PathProvider>();
 
-            services.AddAutoMapper((config) =>
-            {
-                config.CreateMap<Guid, string>().ConvertUsing(guid => guid.ToString());
-            }, GetType().Assembly);
+            services.AddAutoMapper(GetType().Assembly);
 
             services.AddTransient<IClock, Clock>();
 

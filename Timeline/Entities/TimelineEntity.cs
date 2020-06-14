@@ -14,8 +14,8 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Column("unique_id", TypeName = "BLOB"), Required]
-        public Guid UniqueId { get; set; } = default!;
+        [Column("unique_id"), Required]
+        public string UniqueId { get; set; } = default!;
 
         /// <summary>
         /// If null, then this timeline is a personal timeline.

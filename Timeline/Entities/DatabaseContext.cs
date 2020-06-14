@@ -14,7 +14,7 @@ namespace Timeline.Entities
             modelBuilder.Entity<UserEntity>().Property(e => e.Version).HasDefaultValue(0);
             modelBuilder.Entity<UserEntity>().HasIndex(e => e.Username).IsUnique();
             modelBuilder.Entity<DataEntity>().HasIndex(e => e.Tag).IsUnique();
-            modelBuilder.Entity<TimelineEntity>().Property(e => e.UniqueId).HasDefaultValueSql("randomblob(16)");
+            modelBuilder.Entity<TimelineEntity>().Property(e => e.UniqueId).HasDefaultValueSql("lower(hex(randomblob(16)))");
         }
 
         public DbSet<UserEntity> Users { get; set; } = default!;
