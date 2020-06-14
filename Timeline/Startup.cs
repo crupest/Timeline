@@ -1,7 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -118,21 +117,6 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            if (string.Equals(System.Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
-            {
-                var options = new ForwardedHeadersOptions
-                {
-                    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
-                    ForwardedHeaders.XForwardedProto
-                };
-                // Only loopback proxies are allowed by default.
-                // Clear that restriction because forwarders are enabled by explicit 
-                // configuration.
-                options.KnownNetworks.Clear();
-                options.KnownProxies.Clear();
-                app.UseForwardedHeaders(options);
-            }
-
             app.UseRouting();
 
             if (!disableFrontEnd && (useMockFrontEnd || !Environment.IsDevelopment()))
