@@ -64,6 +64,8 @@ namespace Timeline
 
             services.AddSingleton<IPathProvider, PathProvider>();
 
+            services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
+
             services.AddAutoMapper(GetType().Assembly);
 
             services.AddTransient<IClock, Clock>();
