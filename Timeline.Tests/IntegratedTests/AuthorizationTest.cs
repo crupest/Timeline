@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Threading.Tasks;
 using Timeline.Tests.Helpers;
@@ -9,11 +8,6 @@ namespace Timeline.Tests.IntegratedTests
 {
     public class AuthorizationTest : IntegratedTestBase
     {
-        public AuthorizationTest(WebApplicationFactory<Startup> factory)
-            : base(factory)
-        {
-        }
-
         private const string BaseUrl = "testing/auth/";
         private const string AuthorizeUrl = BaseUrl + "Authorize";
         private const string UserUrl = BaseUrl + "User";
