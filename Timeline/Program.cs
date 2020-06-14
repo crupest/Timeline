@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Resources;
 using Timeline.Entities;
+using Timeline.Services;
 
 [assembly: NeutralResourcesLanguage("en")]
 
@@ -17,6 +18,10 @@ namespace Timeline
             var host = CreateWebHostBuilder(args).Build();
 
             var env = host.Services.GetRequiredService<IWebHostEnvironment>();
+
+            var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
+            databaseBackupService.BackupNow();
+
             if (env.IsProduction())
             {
                 using (var scope = host.Services.CreateScope())

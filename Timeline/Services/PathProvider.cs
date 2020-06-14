@@ -8,6 +8,7 @@ namespace Timeline.Services
     {
         public string GetWorkingDirectory();
         public string GetDatabaseFilePath();
+        public string GetDatabaseBackupDirectory();
     }
 
     public class PathProvider : IPathProvider
@@ -31,6 +32,11 @@ namespace Timeline.Services
         public string GetDatabaseFilePath()
         {
             return Path.Combine(_workingDirectory, ApplicationConfiguration.DatabaseFileName);
+        }
+
+        public string GetDatabaseBackupDirectory()
+        {
+            return Path.Combine(_workingDirectory, ApplicationConfiguration.DatabaseBackupDirectoryName);
         }
     }
 }
