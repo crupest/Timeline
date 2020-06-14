@@ -20,6 +20,9 @@
         <Content Include="default-avatar.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <Content Include="MockClientApp\index.html">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
@@ -67,6 +70,10 @@
             </ResolvedFileToPublish>
         </ItemGroup>
     </Target>
+
+    <ItemGroup>
+      <None Remove="MockClientApp\index.html" />
+    </ItemGroup>
 
     <ItemGroup>
         <Compile Update="Resources\Authentication\AuthHandler.Designer.cs">

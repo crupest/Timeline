@@ -30,6 +30,16 @@ namespace Timeline.Models.Http
                 return new CommonResponse(ErrorCodes.Common.Forbid, string.Format(message, formatArgs));
             }
 
+            public static CommonResponse UnknownEndpoint(params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.Common.UnknownEndpoint, string.Format(Common_UnknownEndpoint, formatArgs));
+            }
+
+            public static CommonResponse CustomMessage_UnknownEndpoint(string message, params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.Common.UnknownEndpoint, string.Format(message, formatArgs));
+            }
+
             public static class Header
             {
 

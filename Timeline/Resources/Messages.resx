@@ -147,6 +147,9 @@
   <data name="Common_InvalidModel" xml:space="preserve">
     <value>Model is of bad format.</value>
   </data>
+  <data name="Common_UnknownEndpoint" xml:space="preserve">
+    <value>The api endpoint you request is unknown. You might get the wrong api entry.</value>
+  </data>
   <data name="TimelineController_ContentUnknownType" xml:space="preserve">
     <value>Unknown type of post content.</value>
   </data>
