@@ -12,6 +12,7 @@
         {
             public const int InvalidModel = 1_000_0001;
             public const int Forbid = 1_000_0002;
+            public const int UnknownEndpoint = 1_000_0003;
 
             public static class Header
             {

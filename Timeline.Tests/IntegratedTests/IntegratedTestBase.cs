@@ -117,17 +117,23 @@ namespace Timeline.Tests.IntegratedTests
             await TestApp.DisposeAsync();
         }
 
-        public Task<HttpClient> CreateDefaultClient()
+        public Task<HttpClient> CreateDefaultClient(bool setApiBase = true)
         {
             var client = Factory.CreateDefaultClient();
-            client.BaseAddress = new Uri(client.BaseAddress, "api/");
+            if (setApiBase)
+            {
+                client.BaseAddress = new Uri(client.BaseAddress, "api/");
+            }
             return Task.FromResult(client);
         }
 
-        public async Task<HttpClient> CreateClientWithCredential(string username, string password)
+        public async Task<HttpClient> CreateClientWithCredential(string username, string password, bool setApiBase = true)
         {
             var client = Factory.CreateDefaultClient();
-            client.BaseAddress = new Uri(client.BaseAddress, "api/");
+            if (setApiBase)
+            {
+                client.BaseAddress = new Uri(client.BaseAddress, "api/");
+            }
             var response = await client.PostAsJsonAsync("token/create",
                 new CreateTokenRequest { Username = username, Password = password });
             var token = response.Should().HaveStatusCode(200)
@@ -136,24 +142,24 @@ namespace Timeline.Tests.IntegratedTests
             return client;
         }
 
-        public Task<HttpClient> CreateClientAs(int userNumber)
+        public Task<HttpClient> CreateClientAs(int userNumber, bool setApiBase = true)
         {
             if (userNumber < 0)
-                return CreateDefaultClient();
+                return CreateDefaultClient(setApiBase);
             if (userNumber == 0)
-                return CreateClientWithCredential("admin", "adminpw");
+                return CreateClientWithCredential("admin", "adminpw", setApiBase);
             else
-                return CreateClientWithCredential($"user{userNumber}", $"user{userNumber}pw");
+                return CreateClientWithCredential($"user{userNumber}", $"user{userNumber}pw", setApiBase);
         }
 
-        public Task<HttpClient> CreateClientAsAdministrator()
+        public Task<HttpClient> CreateClientAsAdministrator(bool setApiBase = true)
         {
-            return CreateClientAs(0);
+            return CreateClientAs(0, setApiBase);
         }
 
-        public Task<HttpClient> CreateClientAsUser()
+        public Task<HttpClient> CreateClientAsUser(bool setApiBase = true)
         {
-            return CreateClientAs(1);
+            return CreateClientAs(1, setApiBase);
         }
     }
 }

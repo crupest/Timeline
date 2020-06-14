@@ -8,6 +8,14 @@
         "ASPNETCORE_WORKDIR": "D:\\timeline-development"
       }
     },
+    "Timeline-MockFrontEnd": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_USEMOCKFRONTEND": "true",
+        "ASPNETCORE_WORKDIR": "D:\\timeline-development"
+      }
+    },
     "Timeline-Staging": {
       "commandName": "Project",
       "environmentVariables": {

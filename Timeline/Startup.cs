@@ -24,6 +24,7 @@ namespace Timeline
     public class Startup
     {
         private readonly bool disableFrontEnd;
+        private readonly bool useMockFrontEnd;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -31,6 +32,7 @@ namespace Timeline
             Configuration = configuration;
 
             disableFrontEnd = Configuration.GetValue<bool?>(ApplicationConfiguration.DisableFrontEndKey) ?? false;
+            useMockFrontEnd = Configuration.GetValue<bool?>(ApplicationConfiguration.UseMockFrontEndKey) ?? false;
         }
 
         public IWebHostEnvironment Environment { get; }
@@ -90,12 +92,23 @@ namespace Timeline
                 options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
             });
 
-            if (!disableFrontEnd && !Environment.IsDevelopment())
+            if (!disableFrontEnd)
             {
-                services.AddSpaStaticFiles(config =>
+                if (useMockFrontEnd)
                 {
-                    config.RootPath = "ClientApp/dist";
-                });
+                    services.AddSpaStaticFiles(config =>
+                    {
+                        config.RootPath = "MockClientApp";
+                    });
+
+                }
+                else if (!Environment.IsDevelopment()) // In development, we don't want to serve dist. Or it will take precedence than front end dev server.
+                {
+                    services.AddSpaStaticFiles(config =>
+                    {
+                        config.RootPath = "ClientApp/dist";
+                    });
+                }
             }
         }
 
@@ -120,7 +133,7 @@ namespace Timeline
 
             app.UseRouting();
 
-            if (!disableFrontEnd && !Environment.IsDevelopment())
+            if (!disableFrontEnd && (useMockFrontEnd || !Environment.IsDevelopment()))
             {
                 app.UseSpaStaticFiles(new StaticFileOptions
                 {
@@ -136,13 +149,15 @@ namespace Timeline
                 endpoints.MapControllers();
             });
 
+            UnknownEndpointMiddleware.Attach(app);
+
             if (!disableFrontEnd)
             {
                 app.UseSpa(spa =>
                 {
-                    spa.Options.SourcePath = "ClientApp";
+                    spa.Options.SourcePath = useMockFrontEnd ? "MockClientApp" : "ClientApp";
 
-                    if (Environment.IsDevelopment())
+                    if (!useMockFrontEnd && Environment.IsDevelopment())
                     {
                         if (Configuration.GetValue<bool?>(ApplicationConfiguration.FrontEndProxyOnlyKey) ?? false)
                         {

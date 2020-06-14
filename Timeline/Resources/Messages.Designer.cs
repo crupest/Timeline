@@ -151,6 +151,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The api endpoint you request is unknown. You might get the wrong api entry..
+        /// </summary>
+        internal static string Common_UnknownEndpoint {
+            get {
+                return ResourceManager.GetString("Common_UnknownEndpoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown type of post content..
         /// </summary>
         internal static string TimelineController_ContentUnknownType {
