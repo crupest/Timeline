@@ -5,6 +5,5 @@ RUN dotnet publish Timeline/Timeline.csproj --configuration Release --output ./T
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
-ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED true
 COPY --from=build /timeline-app/Timeline/publish .
 ENTRYPOINT ["dotnet", "Timeline.dll"]

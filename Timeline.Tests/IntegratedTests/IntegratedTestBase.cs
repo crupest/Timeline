@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -15,29 +15,27 @@ using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-    public abstract class IntegratedTestBase : IClassFixture<WebApplicationFactory<Startup>>, IAsyncLifetime
+    public abstract class IntegratedTestBase : IAsyncLifetime
     {
         protected TestApplication TestApp { get; }
-
-        protected WebApplicationFactory<Startup> Factory => TestApp.Factory;
 
         public IReadOnlyList<UserInfo> UserInfos { get; private set; }
 
         private readonly int _userCount;
 
-        public IntegratedTestBase(WebApplicationFactory<Startup> factory) : this(factory, 1)
+        public IntegratedTestBase() : this(1)
         {
 
         }
 
-        public IntegratedTestBase(WebApplicationFactory<Startup> factory, int userCount)
+        public IntegratedTestBase(int userCount)
         {
             if (userCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(userCount), userCount, "User count can't be negative.");
 
             _userCount = userCount;
 
-            TestApp = new TestApplication(factory);
+            TestApp = new TestApplication();
         }
 
         protected virtual Task OnInitializeAsync()
@@ -59,7 +57,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             await TestApp.InitializeAsync();
 
-            using (var scope = Factory.Services.CreateScope())
+            using (var scope = TestApp.Host.Services.CreateScope())
             {
                 var users = new List<User>()
                 {
@@ -119,7 +117,7 @@ namespace Timeline.Tests.IntegratedTests
 
         public Task<HttpClient> CreateDefaultClient(bool setApiBase = true)
         {
-            var client = Factory.CreateDefaultClient();
+            var client = TestApp.Host.GetTestServer().CreateClient();
             if (setApiBase)
             {
                 client.BaseAddress = new Uri(client.BaseAddress, "api/");
@@ -129,7 +127,7 @@ namespace Timeline.Tests.IntegratedTests
 
         public async Task<HttpClient> CreateClientWithCredential(string username, string password, bool setApiBase = true)
         {
-            var client = Factory.CreateDefaultClient();
+            var client = TestApp.Host.GetTestServer().CreateClient();
             if (setApiBase)
             {
                 client.BaseAddress = new Uri(client.BaseAddress, "api/");

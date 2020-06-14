@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Timeline.Tests.Helpers;
@@ -9,10 +8,6 @@ namespace Timeline.Tests.IntegratedTests
 {
     public class FrontEndTest : IntegratedTestBase
     {
-        public FrontEndTest(WebApplicationFactory<Startup> factory) : base(factory)
-        {
-        }
-
         [Fact]
         public async Task Index()
         {

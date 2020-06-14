@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -16,12 +15,6 @@ namespace Timeline.Tests.IntegratedTests
     {
         private const string CreateTokenUrl = "token/create";
         private const string VerifyTokenUrl = "token/verify";
-
-        public TokenTest(WebApplicationFactory<Startup> factory)
-            : base(factory)
-        {
-
-        }
 
         private static async Task<CreateTokenResponse> CreateUserTokenAsync(HttpClient client, string username, string password, int? expireOffset = null)
         {
@@ -106,7 +99,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             var token = (await CreateUserTokenAsync(client, "user1", "user1pw")).Token;
 
-            using (var scope = Factory.Services.CreateScope()) // UserService is scoped.
+            using (var scope = TestApp.Host.Services.CreateScope()) // UserService is scoped.
             {
                 // create a user for test
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
@@ -126,7 +119,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             var token = (await CreateUserTokenAsync(client, "user1", "user1pw")).Token;
 
-            using (var scope = Factory.Server.Host.Services.CreateScope()) // UserService is scoped.
+            using (var scope = TestApp.Host.Services.CreateScope()) // UserService is scoped.
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                 await userService.DeleteUser("user1");

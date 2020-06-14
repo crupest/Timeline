@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
@@ -21,12 +20,6 @@ namespace Timeline.Tests.IntegratedTests
 {
     public class UserAvatarTest : IntegratedTestBase
     {
-        public UserAvatarTest(WebApplicationFactory<Startup> factory)
-            : base(factory)
-        {
-
-        }
-
         [Fact]
         public async Task Test()
         {
@@ -45,7 +38,7 @@ namespace Timeline.Tests.IntegratedTests
                         .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
                 }
 
-                var env = Factory.Server.Host.Services.GetRequiredService<IWebHostEnvironment>();
+                var env = TestApp.Host.Services.GetRequiredService<IWebHostEnvironment>();
                 var defaultAvatarData = await File.ReadAllBytesAsync(Path.Combine(env.ContentRootPath, "default-avatar.png"));
 
                 async Task GetReturnDefault(string username = "user1")
