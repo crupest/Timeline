@@ -9,7 +9,7 @@ using Timeline.Entities;
 namespace Timeline.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200613161127_AddTimelineUniqueId")]
+    [Migration("20200614061237_AddTimelineUniqueId")]
     partial class AddTimelineUniqueId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,11 +91,12 @@ namespace Timeline.Migrations
                         .HasColumnName("owner")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("UniqueId")
+                    b.Property<string>("UniqueId")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnName("unique_id")
-                        .HasColumnType("BLOB")
-                        .HasDefaultValueSql("randomblob(16)");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("lower(hex(randomblob(16)))");
 
                     b.Property<int>("Visibility")
                         .HasColumnName("visibility")
