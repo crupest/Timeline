@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -12,12 +11,6 @@ namespace Timeline.Tests.IntegratedTests
 {
     public class UserTest : IntegratedTestBase
     {
-        public UserTest(WebApplicationFactory<Startup> factory)
-            : base(factory)
-        {
-
-        }
-
         [Fact]
         public async Task GetList_NoAuth()
         {

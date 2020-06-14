@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp;
@@ -45,8 +44,7 @@ namespace Timeline.Tests.IntegratedTests
 
     public class TimelineTest : IntegratedTestBase
     {
-        public TimelineTest(WebApplicationFactory<Startup> factory)
-            : base(factory, 3)
+        public TimelineTest() : base(3)
         {
         }
 
@@ -1112,7 +1110,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                using var scope = TestApp.Factory.Services.CreateScope();
+                using var scope = TestApp.Host.Services.CreateScope();
                 var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
                 var count = await database.Data.CountAsync();
                 count.Should().Be(0);
