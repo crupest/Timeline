@@ -198,7 +198,6 @@ export default function TimelinePageTemplateUI<
                   ? arrowsAngleExpandIcon
                   : arrowsAngleContractIcon
               }
-              collapse={infoCardCollapse}
               onClick={() => {
                 const newState = !infoCardCollapse;
                 setInfoCardCollapse(newState);
