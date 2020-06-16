@@ -125,7 +125,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             </div>
           ) : null}
         </Row>
-        <p className="row d-block timeline-content">
+        <p className="row d-block mb-0 timeline-content clearfix">
           <Link
             className="float-right float-sm-left mx-2"
             to={'/users/' + props.post.author.username}
