@@ -11,6 +11,10 @@ import {
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import Svg from 'react-inlinesvg';
+
+import chevronDownIcon from 'bootstrap-icons/icons/chevron-down.svg';
+import trashIcon from 'bootstrap-icons/icons/trash.svg';
 
 import { TimelinePostInfo } from '../data/timeline';
 import { useAvatarUrlWithGivenVersion } from '../user/api';
@@ -110,9 +114,10 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           </div>
           {more != null ? (
             <div className="col-auto px-2 d-flex justify-content-center align-items-center">
-              <i
-                className="fas fa-chevron-circle-down text-info icon-button"
-                onClick={(e) => {
+              <Svg
+                src={chevronDownIcon}
+                className="text-info icon-button"
+                onClick={(e: Event) => {
                   more.toggle();
                   e.stopPropagation();
                 }}
@@ -149,9 +154,10 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
             onClick={more.toggle}
           >
-            <i
-              className="fas fa-trash text-danger large-icon"
-              onClick={(e) => {
+            <Svg
+              src={trashIcon}
+              className="text-danger large-icon-button"
+              onClick={(e: Event) => {
                 toggleDeleteDialog();
                 e.stopPropagation();
               }}

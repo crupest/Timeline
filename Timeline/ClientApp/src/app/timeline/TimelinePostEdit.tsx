@@ -1,7 +1,10 @@
 import React from 'react';
-import clsx from 'clsx';
 import { Button, Spinner, Row, Col } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
+import Svg from 'react-inlinesvg';
+
+import textIcon from 'bootstrap-icons/icons/card-text.svg';
+import imageIcon from 'bootstrap-icons/icons/image.svg';
 
 import { pushAlert } from '../common/alert-service';
 import { CreatePostRequest } from '../data/timeline';
@@ -199,13 +202,13 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
             if (state === 'input') {
               return (
                 <>
-                  <i
-                    className={clsx(
-                      'fas d-block text-center large-icon mt-1 mb-2',
-                      kind === 'text' ? 'fa-image' : 'fa-font'
-                    )}
-                    onClick={toggleKind}
-                  />
+                  <div className="d-block text-center mt-1 mb-2">
+                    <Svg
+                      src={kind === 'text' ? imageIcon : textIcon}
+                      className="icon-button"
+                      onClick={toggleKind}
+                    />
+                  </div>
                   <Button color="primary" onClick={onSend} disabled={!canSend}>
                     {t('timeline.send')}
                   </Button>

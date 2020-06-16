@@ -2,18 +2,17 @@ import React from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 
 import authorAvatarUrl from './author-avatar.png';
+import githubLogoUrl from './github.png';
 
 import AppBar from '../common/AppBar';
 
 const frontendCredits: {
   name: string;
   url: string;
-  icon?: string;
 }[] = [
   {
     name: 'reactjs',
     url: 'https://reactjs.org',
-    icon: 'react',
   },
   {
     name: 'typescript',
@@ -22,7 +21,6 @@ const frontendCredits: {
   {
     name: 'bootstrap',
     url: 'https://getbootstrap.com',
-    icon: 'bootstrap',
   },
   {
     name: 'reactstrap',
@@ -39,12 +37,6 @@ const frontendCredits: {
   {
     name: 'sass',
     url: 'https://sass-lang.com',
-    icon: 'sass',
-  },
-  {
-    name: 'fontawesome',
-    url: 'https://fontawesome.com',
-    icon: 'font-awesome-flag',
   },
   {
     name: 'eslint',
@@ -58,12 +50,15 @@ const frontendCredits: {
     name: 'pepjs',
     url: 'https://github.com/jquery/PEP',
   },
+  {
+    name: 'react-inlinesvg',
+    url: 'https://github.com/gilbarbara/react-inlinesvg',
+  },
 ];
 
 const backendCredits: {
   name: string;
   url: string;
-  icon?: string;
 }[] = [
   {
     name: 'ASP.NET Core',
@@ -113,7 +108,10 @@ const About: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <i className="fab fa-github about-link-icon text-body" />
+                <img
+                  src={githubLogoUrl}
+                  className="about-link-icon text-body"
+                />
               </a>
             </p>
           </div>
@@ -145,9 +143,6 @@ const About: React.FC = () => {
               return (
                 <li key={index}>
                   <a href={item.url} target="_blank" rel="noopener noreferrer">
-                    {item.icon != null && (
-                      <i className={'fab fa-' + item.icon + ' mx-2'} />
-                    )}
                     {item.name}
                   </a>
                 </li>
@@ -161,9 +156,6 @@ const About: React.FC = () => {
               return (
                 <li key={index}>
                   <a href={item.url} target="_blank" rel="noopener noreferrer">
-                    {item.icon != null && (
-                      <i className={'fab fa-' + item.icon + ' mx-2'} />
-                    )}
                     {item.name}
                   </a>
                 </li>
