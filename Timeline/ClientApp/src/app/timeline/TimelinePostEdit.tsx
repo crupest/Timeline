@@ -110,6 +110,12 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
 
+  const notifyHeightChange = (): void => {
+    if (props.onHeightChange) {
+      props.onHeightChange(containerRef.current.clientHeight);
+    }
+  };
+
   React.useEffect(() => {
     if (props.onHeightChange) {
       props.onHeightChange(containerRef.current.clientHeight);
@@ -204,6 +210,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                 <>
                   <div className="d-block text-center mt-1 mb-2">
                     <Svg
+                      onLoad={notifyHeightChange}
                       src={kind === 'text' ? imageIcon : textIcon}
                       className="icon-button"
                       onClick={toggleKind}
