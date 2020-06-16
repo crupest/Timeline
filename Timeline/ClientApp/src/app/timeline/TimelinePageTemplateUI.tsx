@@ -195,8 +195,8 @@ export default function TimelinePageTemplateUI<
             <Svg
               src={
                 infoCardCollapse
-                  ? arrowsAngleContractIcon
-                  : arrowsAngleExpandIcon
+                  ? arrowsAngleExpandIcon
+                  : arrowsAngleContractIcon
               }
               collapse={infoCardCollapse}
               onClick={() => {
