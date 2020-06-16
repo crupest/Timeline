@@ -143,16 +143,9 @@ namespace Timeline
                 {
                     spa.Options.SourcePath = useMockFrontEnd ? "MockClientApp" : "ClientApp";
 
-                    if (!useMockFrontEnd && Environment.IsDevelopment())
+                    if (!useMockFrontEnd && (Configuration.GetValue<bool?>(ApplicationConfiguration.UseProxyFrontEndKey) ?? false))
                     {
-                        if (Configuration.GetValue<bool?>(ApplicationConfiguration.FrontEndProxyOnlyKey) ?? false)
-                        {
-                            spa.UseProxyToSpaDevelopmentServer(new UriBuilder("http", "localhost", 3000).Uri);
-                        }
-                        else
-                        {
-                            SpaServices.SpaDevelopmentServerMiddlewareExtensions.UseSpaDevelopmentServer(spa, packageManager: "yarn", npmScript: "install-and-start", port: 3000);
-                        }
+                        spa.UseProxyToSpaDevelopmentServer(new UriBuilder("http", "localhost", 3000).Uri);
                     }
                 });
             }
