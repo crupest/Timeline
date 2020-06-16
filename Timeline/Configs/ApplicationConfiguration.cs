@@ -7,7 +7,7 @@
         public const string DatabaseFileName = "timeline.db";
         public const string DatabaseBackupDirectoryName = "backup";
         public const string DisableFrontEndKey = "DisableFrontEnd";
-        public const string FrontEndProxyOnlyKey = "FrontEndProxyOnly";
         public const string UseMockFrontEndKey = "UseMockFrontEnd";
+        public const string UseProxyFrontEndKey = "UseProxyFrontEnd";
     }
 }
