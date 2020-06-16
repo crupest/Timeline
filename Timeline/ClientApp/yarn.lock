@@ -1341,13 +1341,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/fontawesome-free@npm:^5.13.0":
-  version: 5.13.0
-  resolution: "@fortawesome/fontawesome-free@npm:5.13.0"
-  checksum: 3/53f4c992a1feac188ae198a9c6fd18ac696022d30d5ebb044ae9013053d0e60e1b7bfe2f831c9a0114adf4accaa457a47023966a9dacf508ddbcbb20a027f719
-  languageName: node
-  linkType: hard
-
 "@hapi/address@npm:2.x.x":
   version: 2.1.4
   resolution: "@hapi/address@npm:2.1.4"
@@ -2707,6 +2700,13 @@ __metadata:
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
   checksum: 3/e827963c416fdb1dbcd57e066a43c40829518f4dcdc9f58ed04519daeebb610adacbb6cf102518bda9f08be593c5b1b49a83e36bf6b7d91b3403f7e35510eeae
+  languageName: node
+  linkType: hard
+
+"bootstrap-icons@npm:^1.0.0-alpha4":
+  version: 1.0.0-alpha4
+  resolution: "bootstrap-icons@npm:1.0.0-alpha4"
+  checksum: 3/08e6842a758b0d494df45356f4c14dc642fddf6075652641118b1fb7fa8229c59679c07d3b56886cd3a5bf041440002e864f9fd47e886726074a205dee86ad82
   languageName: node
   linkType: hard
 
@@ -4596,6 +4596,13 @@ __metadata:
     signal-exit: ^3.0.0
     strip-eof: ^1.0.0
   checksum: 3/39714ea24e349403f9fc92b450f0e6823cdd4573e15b17c0fba6d95f2eecd46dc32624bbf15071d91e2c64a4402c74ce7a362671126964100ad34e2d6210adf9
+  languageName: node
+  linkType: hard
+
+"exenv@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "exenv@npm:1.2.2"
+  checksum: 3/09fd080c0478739f0154916b73dea07f30f97972e1b3be3368d2b96d282d889b509f05e163d830e323c9ab1e94b0a293a9947b410651325df467c404f37f32f1
   languageName: node
   linkType: hard
 
@@ -8563,6 +8570,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"react-from-dom@npm:^0.3.0":
+  version: 0.3.1
+  resolution: "react-from-dom@npm:0.3.1"
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0
+  checksum: 3/a87ccfa17a6439b594488e700cc06878095a1bf12ff2534848ede528b9f8261dc29f13b3a5b5d34e13f750f3bd35d24f080cc222dc286d5156c7b9941085b4d8
+  languageName: node
+  linkType: hard
+
 "react-hot-loader@npm:^4.12.21":
   version: 4.12.21
   resolution: "react-hot-loader@npm:4.12.21"
@@ -8596,6 +8612,18 @@ fsevents@~2.1.2:
     i18next: ">= 19.0.0"
     react: ">= 16.8.0"
   checksum: 3/09fe7c4bb6f154750e808473aa31fea6901359dfb53e9244f86c45e54f0fbb461aaa44359d4fd2ae77e9b4389c866d824e03ff9f31c908662b7e7710b05d6b32
+  languageName: node
+  linkType: hard
+
+"react-inlinesvg@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "react-inlinesvg@npm:1.2.0"
+  dependencies:
+    exenv: ^1.2.2
+    react-from-dom: ^0.3.0
+  peerDependencies:
+    react: ^16.3.0
+  checksum: 3/2e804f764bdbb9d0536ab81b452dad53298ba10317989f4b3abba57068d1b04304fd3d83769aefe090695c78e191672b46afa7283bcf6733f295324e0a589818
   languageName: node
   linkType: hard
 
@@ -10210,7 +10238,6 @@ fsevents@~2.1.2:
     "@babel/preset-env": ^7.10.2
     "@babel/preset-react": ^7.10.1
     "@babel/preset-typescript": ^7.10.1
-    "@fortawesome/fontawesome-free": ^5.13.0
     "@hot-loader/react-dom": ^16.13.0
     "@types/classnames": ^2.2.10
     "@types/lodash": ^4.14.155
@@ -10230,6 +10257,7 @@ fsevents@~2.1.2:
     babel-loader: ^8.1.0
     babel-plugin-transform-builtin-extend: ^1.1.2
     bootstrap: ^4.5.0
+    bootstrap-icons: ^1.0.0-alpha4
     classnames: ^2.2.6
     clean-webpack-plugin: ^3.0.0
     clsx: ^1.1.1
@@ -10257,6 +10285,7 @@ fsevents@~2.1.2:
     react-dom: ^16.13.1
     react-hot-loader: ^4.12.21
     react-i18next: ^11.5.0
+    react-inlinesvg: ^1.2.0
     react-responsive: ^8.1.0
     react-router: ^5.2.0
     react-router-dom: ^5.2.0

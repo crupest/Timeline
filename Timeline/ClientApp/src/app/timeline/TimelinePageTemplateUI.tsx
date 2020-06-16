@@ -2,6 +2,10 @@ import React from 'react';
 import { Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 import { fromEvent } from 'rxjs';
+import Svg from 'react-inlinesvg';
+
+import arrowsAngleContractIcon from 'bootstrap-icons/icons/arrows-angle-contract.svg';
+import arrowsAngleExpandIcon from 'bootstrap-icons/icons/arrows-angle-expand.svg';
 
 import { getAlertHost } from '../common/alert-service';
 
@@ -11,7 +15,6 @@ import Timeline, {
 } from './Timeline';
 import AppBar from '../common/AppBar';
 import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
-import CollapseButton from '../common/CollapseButton';
 import { useEventEmiiter } from '../common';
 
 export interface TimelineCardComponentProps<TTimeline, TManageItems> {
@@ -189,7 +192,12 @@ export default function TimelinePageTemplateUI<
             className="fixed-top mt-appbar info-card-container"
             data-collapse={infoCardCollapse ? 'true' : 'false'}
           >
-            <CollapseButton
+            <Svg
+              src={
+                infoCardCollapse
+                  ? arrowsAngleContractIcon
+                  : arrowsAngleExpandIcon
+              }
               collapse={infoCardCollapse}
               onClick={() => {
                 const newState = !infoCardCollapse;
@@ -199,7 +207,7 @@ export default function TimelinePageTemplateUI<
                   newState.toString()
                 );
               }}
-              className="float-right m-1 info-card-collapse-button text-orange"
+              className="float-right m-1 info-card-collapse-button text-primary icon-button"
             />
             <CardComponent
               timeline={timeline}

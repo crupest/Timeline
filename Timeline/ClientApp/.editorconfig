@@ -9,5 +9,5 @@ tab_width = 2
 [*.css]
 tab_width = 2
 
-[*.scss]
+[*.sass]
 tab_width = 2
