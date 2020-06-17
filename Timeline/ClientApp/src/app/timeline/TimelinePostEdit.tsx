@@ -86,7 +86,7 @@ export interface TimelinePostEditProps {
   className?: string;
   onPost: TimelinePostSendCallback;
   onHeightChange?: (height: number) => void;
-  timelineName: string;
+  timelineUniqueId: string;
 }
 
 const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
@@ -99,7 +99,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   const [text, setText] = React.useState<string>('');
   const [imageBlob, setImageBlob] = React.useState<Blob | null>(null);
 
-  const draftLocalStorageKey = `timeline.${props.timelineName}.postDraft`;
+  const draftLocalStorageKey = `timeline.${props.timelineUniqueId}.postDraft`;
 
   React.useEffect(() => {
     setText(window.localStorage.getItem(draftLocalStorageKey) ?? '');

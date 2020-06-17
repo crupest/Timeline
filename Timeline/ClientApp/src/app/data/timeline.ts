@@ -20,6 +20,7 @@ export const timelineVisibilityTooltipTranslationMap: Record<
 };
 
 export interface TimelineInfo {
+  uniqueId: string;
   name: string;
   description: string;
   owner: User;

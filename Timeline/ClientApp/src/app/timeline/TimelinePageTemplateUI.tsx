@@ -26,7 +26,7 @@ export interface TimelineCardComponentProps<TTimeline, TManageItems> {
 }
 
 export interface TimelinePageTemplateUIProps<
-  TTimeline extends { name: string },
+  TTimeline extends { uniqueId: string },
   TManageItems
 > {
   avatarKey?: string | number;
@@ -43,7 +43,7 @@ export interface TimelinePageTemplateUIProps<
 }
 
 export default function TimelinePageTemplateUI<
-  TTimeline extends { name: string },
+  TTimeline extends { uniqueId: string },
   TEditItems
 >(
   props: TimelinePageTemplateUIProps<TTimeline, TEditItems>
@@ -127,11 +127,11 @@ export default function TimelinePageTemplateUI<
 
   const [cardHeight, setCardHeight] = React.useState<number>(0);
 
-  const genCardCollapseLocalStorageKey = (timelineName: string): string =>
-    `timeline.${timelineName}.cardCollapse`;
+  const genCardCollapseLocalStorageKey = (uniqueId: string): string =>
+    `timeline.${uniqueId}.cardCollapse`;
 
   const cardCollapseLocalStorageKey =
-    timeline != null ? genCardCollapseLocalStorageKey(timeline.name) : null;
+    timeline != null ? genCardCollapseLocalStorageKey(timeline.uniqueId) : null;
 
   const [infoCardCollapse, setInfoCardCollapse] = React.useState<boolean>(true);
   React.useEffect(() => {
@@ -171,7 +171,7 @@ export default function TimelinePageTemplateUI<
                 <TimelinePostEdit
                   onPost={props.onPost}
                   onHeightChange={onPostEditHeightChange}
-                  timelineName={timeline.name}
+                  timelineUniqueId={timeline.uniqueId}
                 />
               </>
             );
@@ -202,7 +202,7 @@ export default function TimelinePageTemplateUI<
                 const newState = !infoCardCollapse;
                 setInfoCardCollapse(newState);
                 window.localStorage.setItem(
-                  genCardCollapseLocalStorageKey(timeline.name),
+                  genCardCollapseLocalStorageKey(timeline.uniqueId),
                   newState.toString()
                 );
               }}
