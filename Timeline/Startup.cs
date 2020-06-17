@@ -82,8 +82,6 @@ namespace Timeline
             services.AddUserAvatarService();
 
             services.AddScoped<ITimelineService, TimelineService>();
-            services.AddScoped<IOrdinaryTimelineService, OrdinaryTimelineService>();
-            services.AddScoped<IPersonalTimelineService, PersonalTimelineService>();
 
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 

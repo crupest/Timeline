@@ -3,6 +3,7 @@ using SixLabors.ImageSharp.Formats;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
 {
@@ -44,7 +45,7 @@ namespace Timeline.Services
                 }
                 catch (UnknownImageFormatException e)
                 {
-                    throw new ImageException(e, ImageException.ErrorReason.CantDecode, data, requestType, null);
+                    throw new ImageException(ImageException.ErrorReason.CantDecode, data, requestType, null, null, e);
                 }
             });
             return format;

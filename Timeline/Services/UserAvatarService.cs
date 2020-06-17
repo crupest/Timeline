@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
+using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
 {
