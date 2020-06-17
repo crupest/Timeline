@@ -19,12 +19,13 @@ CREATE TABLE new_timelines (
     description TEXT NULL,
     owner INTEGER NOT NULL,
     visibility INTEGER NOT NULL,
-    create_time TEXT NOT NULL, current_post_local_id INTEGER NOT NULL DEFAULT 0,
+    create_time TEXT NOT NULL,
+    current_post_local_id INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT FK_timelines_users_owner FOREIGN KEY (owner) REFERENCES users (id) ON DELETE CASCADE
 );
 
-INSERT INTO new_timelines (id, name, description, owner, visibility, create_time)
-	SELECT id, name, description, owner, visibility, create_time FROM timelines;
+INSERT INTO new_timelines (id, name, description, owner, visibility, create_time, current_post_local_id)
+	SELECT id, name, description, owner, visibility, create_time, current_post_local_id FROM timelines;
 	
 DROP TABLE timelines;
 
