@@ -133,7 +133,7 @@
     <value>Can't get data of a non-image post.</value>
   </data>
   <data name="ExceptionTimelineNameBadFormat" xml:space="preserve">
-    <value>The timeline name is of bad format because {0}.</value>
+    <value>The timeline name is of bad format.</value>
   </data>
   <data name="ExceptionTimelineNameConflict" xml:space="preserve">
     <value>The timeline with given name already exists.</value>

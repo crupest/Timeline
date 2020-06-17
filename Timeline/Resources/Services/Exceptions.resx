@@ -112,13 +112,31 @@
   <data name="TimelineNotExistException" xml:space="preserve">
     <value>Request timeline name is "{0}". If this is a personal timeline whose name starts with '@', it means the user does not exist and inner exception should be a UserNotExistException.</value>
   </data>
-  <data name="TimelinePostNotExistExceptionDeleted" xml:space="preserve">
-    <value>Request timeline name is "{0}".  Request timeline post id is "{1}". The post does not exist because it has been deleted.</value>
-  </data>
   <data name="TimelinePostNotExistException" xml:space="preserve">
     <value>Request timeline name is "{0}".  Request timeline post id is "{1}".</value>
   </data>
   <data name="UserNotExistException" xml:space="preserve">
     <value>Request username is "{0}". Request id is "{1}".</value>
+  </data>
+  <data name="TimelineNoDataException" xml:space="preserve">
+    <value>The timeline has no data.</value>
+  </data>
+  <data name="ImageException" xml:space="preserve">
+    <value>Image is in valid because {0}.</value>
+  </data>
+  <data name="ImageExceptionBadSize" xml:space="preserve">
+    <value>image is not of required size</value>
+  </data>
+  <data name="ImageExceptionCantDecode" xml:space="preserve">
+    <value>failed to decode image, see inner exception</value>
+  </data>
+  <data name="ImageExceptionUnknownError" xml:space="preserve">
+    <value>unknown error</value>
+  </data>
+  <data name="ImageExceptionUnmatchedFormat" xml:space="preserve">
+    <value>image's actual mime type is not the specified one</value>
+  </data>
+  <data name="TimelinePostNotExistExceptionDeleted" xml:space="preserve">
+    <value>Request timeline name is "{0}".  Request timeline post id is "{1}". The post does not exist because it is deleted.</value>
   </data>
 </root>

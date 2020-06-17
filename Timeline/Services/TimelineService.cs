@@ -41,148 +41,153 @@ namespace Timeline.Services
 #pragma warning restore CA1819 // Properties should not return arrays
         public string Type { get; set; } = default!;
         public string ETag { get; set; } = default!;
-        public DateTime? LastModified { get; set; }
+        public DateTime? LastModified { get; set; } // TODO: Why nullable?
     }
 
     /// <summary>
-    /// This define the common interface of both personal timeline and normal timeline.
+    /// This define the interface of both personal timeline and ordinary timeline.
     /// </summary>
-    /// <remarks>
-    /// The "name" parameter in each method has different meaning.
-    /// <see cref="IOrdinaryTimelineService"/> => name of the ordinary timeline
-    /// <see cref="IPersonalTimelineService"/> => username of the owner of the personal timeline
-    /// <see cref="ITimelineService"/> => username if begin with '@' otherwise timeline name
-    ///
-    /// <see cref="ArgumentException"/> is thrown when name is illegal.
-    /// For ordinary timeline, it means the name is not a valid timeline name.
-    /// For personal timeline, it means the name is not a valid username.
-    /// 
-    /// <see cref="TimelineNotExistException"> is thrown when timeline does not exist.
-    /// For ordinary timeline, it means the timeline of the name does not exist.
-    /// For personal timeline, it means the user with the username does not exist and the inner exception should be a <see cref="UserNotExistException"/>.
-    /// </remarks>
-    public interface IBaseTimelineService
+    public interface ITimelineService
     {
         /// <summary>
         /// Get the timeline info.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
         /// <returns>The timeline info.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        Task<Models.Timeline> GetTimeline(string name);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task<Models.Timeline> GetTimeline(string timelineName);
 
         /// <summary>
         /// Set the properties of a timeline. 
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
         /// <param name="newProperties">The new properties. Null member means not to change.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="newProperties"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        Task ChangeProperty(string name, TimelineChangePropertyRequest newProperties);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> or <paramref name="newProperties"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task ChangeProperty(string timelineName, TimelineChangePropertyRequest newProperties);
 
         /// <summary>
         /// Get all the posts in the timeline.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
         /// <returns>A list of all posts.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        Task<List<TimelinePost>> GetPosts(string name);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task<List<TimelinePost>> GetPosts(string timelineName);
 
         /// <summary>
         /// Get the etag of data of a post.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline of the post.</param>
         /// <param name="postId">The id of the post.</param>
         /// <returns>The etag of the data.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
         /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
-        /// <exception cref="BadPostTypeException">Thrown when post has no data. See remarks.</exception>
+        /// <exception cref="TimelinePostNoDataException">Thrown when post has no data.</exception>
         /// <seealso cref="GetPostData(string, long)"/>
-        Task<string> GetPostDataETag(string name, long postId);
+        Task<string> GetPostDataETag(string timelineName, long postId);
 
         /// <summary>
         /// Get the data of a post.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline of the post.</param>
         /// <param name="postId">The id of the post.</param>
-        /// <returns>The data and its type.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <returns>The etag of the data.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
         /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
-        /// <exception cref="BadPostTypeException">Thrown when post has no data. See remarks.</exception>
-        /// <remarks>
-        /// Use this method to retrieve the image of image post.
-        /// </remarks>
+        /// <exception cref="TimelinePostNoDataException">Thrown when post has no data.</exception>
         /// <seealso cref="GetPostDataETag(string, long)"/>
-        Task<PostData> GetPostData(string name, long postId);
+        Task<PostData> GetPostData(string timelineName, long postId);
 
         /// <summary>
         /// Create a new text post in timeline.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline to create post against.</param>
         /// <param name="authorId">The author's user id.</param>
         /// <param name="text">The content text.</param>
-        /// <param name="time">The time of the post. If null, then use current time.</param>
+        /// <param name="time">The time of the post. If null, then current time is used.</param>
         /// <returns>The info of the created post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="text"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="UserNotExistException">Thrown if user with <paramref name="authorId"/> does not exist.</exception>
-        Task<TimelinePost> CreateTextPost(string name, long authorId, string text, DateTime? time);
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> or <paramref name="text"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
+        Task<TimelinePost> CreateTextPost(string timelineName, long authorId, string text, DateTime? time);
 
         /// <summary>
         /// Create a new image post in timeline.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline to create post against.</param>
         /// <param name="authorId">The author's user id.</param>
-        /// <param name="data">The image data.</param>
+        /// <param name="imageData">The image data.</param>
         /// <param name="time">The time of the post. If null, then use current time.</param>
         /// <returns>The info of the created post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="data"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="UserNotExistException">Thrown if user with <paramref name="authorId"/> does not exist.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> or <paramref name="imageData"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
         /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
-        Task<TimelinePost> CreateImagePost(string name, long authorId, byte[] data, DateTime? time);
+        Task<TimelinePost> CreateImagePost(string timelineName, long authorId, byte[] imageData, DateTime? time);
 
         /// <summary>
         /// Delete a post.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="id">The id of the post to delete.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelinePostNotExistException">
-        /// Thrown when the post with given id does not exist or is deleted already.
+        /// <param name="timelineName">The name of the timeline to delete post against.</param>
+        /// <param name="postId">The id of the post to delete.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when the post with given id does not exist or is deleted already.</exception>
         /// <remarks>
-        /// First use <see cref="IBaseTimelineService.HasPostModifyPermission(string, long, string)"/>
-        /// to check the permission.
+        /// First use <see cref="HasPostModifyPermission(string, long, long, bool)"/> to check the permission.
         /// </remarks>
-        Task DeletePost(string name, long id);
+        Task DeletePost(string timelineName, long postId);
 
         /// <summary>
-        /// Remove members to a timeline.
+        /// Change member of timeline.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="add">A list of usernames of members to add. May be null.</param>
-        /// <param name="remove">A list of usernames of members to remove. May be null.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="ArgumentException">Thrown when names in <paramref name="add"/> or <paramref name="remove"/> is not a valid username.</exception>
-        /// <exception cref="UserNotExistException">
-        /// Thrown when one of the user to change does not exist.
+        /// <param name="timelineName">The name of the timeline.</param>
+        /// <param name="membersToAdd">A list of usernames of members to add. May be null.</param>
+        /// <param name="membersToRemove">A list of usernames of members to remove. May be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
+        /// <exception cref="ArgumentException">Thrown when names in <paramref name="membersToAdd"/> or <paramref name="membersToRemove"/> is not a valid username.</exception>
+        /// <exception cref="UserNotExistException">Thrown when one of the user to change does not exist.</exception>
         /// <remarks>
         /// Operating on a username that is of bad format or does not exist always throws.
         /// Add a user that already is a member has no effects.
@@ -190,79 +195,86 @@ namespace Timeline.Services
         /// Add and remove an identical user results in no effects.
         /// More than one same usernames are regarded as one.
         /// </remarks>
-        Task ChangeMember(string name, IList<string>? add, IList<string>? remove);
+        Task ChangeMember(string timelineName, IList<string>? membersToAdd, IList<string>? membersToRemove);
 
         /// <summary>
         /// Check whether a user can manage(change timeline info, member, ...) a timeline.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
-        /// <param name="userId">The user id.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
+        /// <param name="userId">The id of the user to check on.</param>
         /// <returns>True if the user can manage the timeline, otherwise false.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <remarks>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with user id does not exist.
         /// </remarks>
-        Task<bool> HasManagePermission(string name, long userId);
+        Task<bool> HasManagePermission(string timelineName, long userId);
 
         /// <summary>
         /// Verify whether a visitor has the permission to read a timeline.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
         /// <param name="visitorId">The id of the user to check on. Null means visitor without account.</param>
         /// <returns>True if can read, false if can't read.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <remarks>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with visitor id does not exist.
         /// </remarks>
-        Task<bool> HasReadPermission(string name, long? visitorId);
+        Task<bool> HasReadPermission(string timelineName, long? visitorId);
 
         /// <summary>
         /// Verify whether a user has the permission to modify a post.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
+        /// <param name="postId">The id of the post.</param>
         /// <param name="modifierId">The id of the user to check on.</param>
         /// <param name="throwOnPostNotExist">True if you want it to throw <see cref="TimelinePostNotExistException"/>. Default false.</param>
         /// <returns>True if can modify, false if can't modify.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
         /// <exception cref="TimelinePostNotExistException">Thrown when the post with given id does not exist or is deleted already and <paramref name="throwOnPostNotExist"/> is true.</exception>
         /// <remarks>
+        /// Unless <paramref name="throwOnPostNotExist"/> is true, this method should return true if the post does not exist.
+        /// If the post is deleted, its author info still exists, so it is checked as the post is not deleted unless <paramref name="throwOnPostNotExist"/> is true.
         /// This method does not check whether the user is administrator.
         /// It only checks whether he is the author of the post or the owner of the timeline.
         /// Return false when user with modifier id does not exist.
         /// </remarks>
-        Task<bool> HasPostModifyPermission(string name, long id, long modifierId, bool throwOnPostNotExist = false);
+        Task<bool> HasPostModifyPermission(string timelineName, long postId, long modifierId, bool throwOnPostNotExist = false);
 
         /// <summary>
         /// Verify whether a user is member of a timeline.
         /// </summary>
-        /// <param name="name">See remarks of <see cref="IBaseTimelineService"/>.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
         /// <param name="userId">The id of user to check on.</param>
         /// <returns>True if it is a member, false if not.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
-        /// <exception cref="TimelineNotExistException">See remarks of <see cref="IBaseTimelineService"/>.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
         /// <remarks>
         /// Timeline owner is also considered as a member.
         /// Return false when user with user id does not exist.
         /// </remarks>
-        Task<bool> IsMemberOf(string name, long userId);
-    }
+        Task<bool> IsMemberOf(string timelineName, long userId);
 
-    /// <summary>
-    /// Service for normal timeline.
-    /// </summary>
-    public interface ITimelineService : IBaseTimelineService
-    {
         /// <summary>
-        /// Get all timelines including personal timelines.
+        /// Get all timelines including personal and ordinary timelines.
         /// </summary>
         /// <param name="relate">Filter timelines related (own or is a member) to specific user.</param>
         /// <param name="visibility">Filter timelines with given visibility. If null or empty, all visibilities are returned. Duplicate value are ignored.</param>
@@ -275,45 +287,69 @@ namespace Timeline.Services
         /// <summary>
         /// Create a timeline.
         /// </summary>
-        /// <param name="name">The name of the timeline.</param>
-        /// <param name="owner">The id of owner of the timeline.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
+        /// <param name="ownerId">The id of owner of the timeline.</param>
         /// <returns>The info of the new timeline.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
-        /// <exception cref="ConflictException">Thrown when the timeline already exists.</exception>
+        /// <exception cref="EntityAlreadyExistException">Thrown when the timeline already exists.</exception>
         /// <exception cref="UserNotExistException">Thrown when the owner user does not exist.</exception>
-        Task<Models.Timeline> CreateTimeline(string name, long owner);
+        Task<Models.Timeline> CreateTimeline(string timelineName, long ownerId);
 
         /// <summary>
         /// Delete a timeline.
         /// </summary>
-        /// <param name="name">The name of the timeline.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
+        /// <param name="timelineName">The name of the timeline to delete.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when the timeline does not exist.</exception>
-        Task DeleteTimeline(string name);
+        Task DeleteTimeline(string timelineName);
     }
 
-    public interface IOrdinaryTimelineService : IBaseTimelineService
+    public class TimelineService : ITimelineService
     {
-
-    }
-
-    public interface IPersonalTimelineService : IBaseTimelineService
-    {
-
-    }
-
-    internal static class TimelineServiceHelper
-    {
-        public static async Task<Models.Timeline> MapTimelineFromEntity(IUserService userService, TimelineEntity entity)
+        public TimelineService(ILogger<TimelineService> logger, DatabaseContext database, IDataManager dataManager, IUserService userService, IImageValidator imageValidator, IClock clock)
         {
-            var owner = await userService.GetUserById(entity.OwnerId);
+            _logger = logger;
+            _database = database;
+            _dataManager = dataManager;
+            _userService = userService;
+            _imageValidator = imageValidator;
+            _clock = clock;
+        }
+
+        private readonly ILogger<TimelineService> _logger;
+
+        private readonly DatabaseContext _database;
+
+        private readonly IDataManager _dataManager;
+
+        private readonly IUserService _userService;
+
+        private readonly IImageValidator _imageValidator;
+
+        private readonly IClock _clock;
+
+        private readonly UsernameValidator _usernameValidator = new UsernameValidator();
+
+        private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
+
+        private void ValidateTimelineName(string name, string paramName)
+        {
+            if (!_timelineNameValidator.Validate(name, out var message))
+            {
+                throw new ArgumentException(ExceptionTimelineNameBadFormat.AppendAdditionalMessage(message), paramName);
+            }
+        }
+
+        private async Task<Models.Timeline> MapTimelineFromEntity(TimelineEntity entity)
+        {
+            var owner = await _userService.GetUserById(entity.OwnerId);
 
             var members = new List<User>();
             foreach (var memberEntity in entity.Members)
             {
-                members.Add(await userService.GetUserById(memberEntity.UserId));
+                members.Add(await _userService.GetUserById(memberEntity.UserId));
             }
 
             return new Models.Timeline
@@ -326,145 +362,186 @@ namespace Timeline.Services
                 Members = members
             };
         }
-    }
 
-    public abstract class BaseTimelineService : IBaseTimelineService
-    {
-        protected BaseTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
+        private TimelineEntity CreateNewTimelineEntity(string? name, long ownerId)
         {
-            _logger = loggerFactory.CreateLogger<BaseTimelineService>();
-            Clock = clock;
-            Database = database;
-            ImageValidator = imageValidator;
-            DataManager = dataManager;
-            UserService = userService;
+            return new TimelineEntity
+            {
+                Name = name,
+                OwnerId = ownerId,
+                Visibility = TimelineVisibility.Register,
+                CreateTime = _clock.GetCurrentTime(),
+                CurrentPostLocalId = 0,
+            };
         }
 
-        private readonly ILogger<BaseTimelineService> _logger;
-
-        protected IClock Clock { get; }
-
-        protected UsernameValidator UsernameValidator { get; } = new UsernameValidator();
-
-        protected DatabaseContext Database { get; }
-
-        protected IImageValidator ImageValidator { get; }
-        protected IDataManager DataManager { get; }
-        protected IUserService UserService { get; }
-
-        /// <summary>
-        /// Find the timeline id by the name.
-        /// For details, see remarks.
-        /// </summary>
-        /// <param name="name">The username or the timeline name. See remarks.</param>
-        /// <returns>The id of the timeline entity.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is illegal. It is not a valid timeline name (for normal timeline service) or a valid username (for personal timeline service).</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline does not exist.
-        /// For normal timeline, it means the name does not exist.
-        /// For personal timeline, it means the user of that username does not exist
-        /// and the inner exception should be a <see cref="UserNotExistException"/>.
-        /// </exception>
-        /// <remarks>
-        /// This is the common but different part for both types of timeline service.
-        /// For class that implements <see cref="IPersonalTimelineService"/>, this method should
-        /// find the timeline entity id by the given <paramref name="name"/> as the username of the owner.
-        /// For class that implements <see cref="ITimelineService"/>, this method should
-        /// find the timeline entity id by the given <paramref name="name"/> as the timeline name.
-        /// This method should be called by many other method that follows the contract.
-        /// </remarks>
-        protected abstract Task<long> FindTimelineId(string name);
-
-        protected abstract string GenerateName(string name);
-
-        public async Task<Models.Timeline> GetTimeline(string name)
+        private static string ExtractTimelineName(string name, out bool isPersonal)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-
-            var timelineId = await FindTimelineId(name);
-
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Include(t => t.Members).SingleAsync();
-
-            return await TimelineServiceHelper.MapTimelineFromEntity(UserService, timelineEntity);
+            if (name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
+            {
+                isPersonal = true;
+                return name.Substring(1);
+            }
+            else
+            {
+                isPersonal = false;
+                return name;
+            }
         }
 
-        public async Task<List<TimelinePost>> GetPosts(string name)
+        // Get timeline id by name. If it is a personal timeline and it does not exist, it will be created.
+        //
+        // This method will check the name format and if it is invalid, ArgumentException is thrown.
+        //
+        // For personal timeline, if the user does not exist, TimelineNotExistException will be thrown with UserNotExistException as inner exception.
+        // For ordinary timeline, if the timeline does not exist, TimelineNotExistException will be thrown.
+        //
+        // It follows all timeline-related function common interface contracts.
+        private async Task<long> FindTimelineId(string timelineName)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            timelineName = ExtractTimelineName(timelineName, out var isPersonal);
 
-            var timelineId = await FindTimelineId(name);
-            var postEntities = await Database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
+            if (isPersonal)
+            {
+                long userId;
+                try
+                {
+                    userId = await _userService.GetUserIdByUsername(timelineName);
+                }
+                catch (ArgumentException e)
+                {
+                    throw new ArgumentException(ExceptionFindTimelineUsernameBadFormat, nameof(timelineName), e);
+                }
+                catch (UserNotExistException e)
+                {
+                    throw new TimelineNotExistException(timelineName, e);
+                }
+
+                var timelineEntity = await _database.Timelines.Where(t => t.OwnerId == userId && t.Name == null).Select(t => new { t.Id }).SingleOrDefaultAsync();
+
+                if (timelineEntity != null)
+                {
+                    return timelineEntity.Id;
+                }
+                else
+                {
+                    var newTimelineEntity = CreateNewTimelineEntity(null, userId);
+                    _database.Timelines.Add(newTimelineEntity);
+                    await _database.SaveChangesAsync();
+
+                    return newTimelineEntity.Id;
+                }
+            }
+            else
+            {
+                if (timelineName == null)
+                    throw new ArgumentNullException(nameof(timelineName));
+
+                ValidateTimelineName(timelineName, nameof(timelineName));
+
+                var timelineEntity = await _database.Timelines.Where(t => t.Name == timelineName).Select(t => new { t.Id }).SingleOrDefaultAsync();
+
+                if (timelineEntity == null)
+                {
+                    throw new TimelineNotExistException(timelineName);
+                }
+                else
+                {
+                    return timelineEntity.Id;
+                }
+            }
+        }
+
+        public async Task<Models.Timeline> GetTimeline(string timelineName)
+        {
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
+
+            var timelineId = await FindTimelineId(timelineName);
+
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Include(t => t.Members).SingleAsync();
+
+            return await MapTimelineFromEntity(timelineEntity);
+        }
+
+        public async Task<List<TimelinePost>> GetPosts(string timelineName)
+        {
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
+
+            var timelineId = await FindTimelineId(timelineName);
+            var postEntities = await _database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
 
             var posts = new List<TimelinePost>();
             foreach (var entity in postEntities)
             {
-                if (entity.Content != null) // otherwise it is deleted
+                if (entity.Content == null)
                 {
-                    var author = await UserService.GetUserById(entity.AuthorId);
-
-                    var type = entity.ContentType;
-
-                    ITimelinePostContent content = type switch
-                    {
-                        TimelinePostContentTypes.Text => new TextTimelinePostContent(entity.Content),
-                        TimelinePostContentTypes.Image => new ImageTimelinePostContent(entity.Content),
-                        _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
-                    };
-
-                    posts.Add(new TimelinePost(
-                        id: entity.LocalId,
-                        content: content,
-                        time: entity.Time,
-                        author: author,
-                        lastUpdated: entity.LastUpdated,
-                        timelineName: GenerateName(name)
-                    ));
+                    throw new Exception();
                 }
+
+                var author = await _userService.GetUserById(entity.AuthorId);
+
+                var type = entity.ContentType;
+
+                ITimelinePostContent content = type switch
+                {
+                    TimelinePostContentTypes.Text => new TextTimelinePostContent(entity.Content),
+                    TimelinePostContentTypes.Image => new ImageTimelinePostContent(entity.Content),
+                    _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
+                };
+
+                posts.Add(new TimelinePost(
+                    id: entity.LocalId,
+                    author: author,
+                    content: content,
+                    time: entity.Time,
+                    lastUpdated: entity.LastUpdated,
+                    timelineName: timelineName
+                ));
             }
             return posts;
         }
 
-        public async Task<string> GetPostDataETag(string name, long postId)
+        public async Task<string> GetPostDataETag(string timelineName, long postId)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            var timelineId = await FindTimelineId(name);
-            var postEntity = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+            var timelineId = await FindTimelineId(timelineName);
+
+            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
             if (postEntity == null)
-                throw new TimelinePostNotExistException(name, postId, false);
+                throw new TimelinePostNotExistException(timelineName, postId, false);
 
             if (postEntity.Content == null)
-                throw new TimelinePostNotExistException(name, postId, true);
+                throw new TimelinePostNotExistException(timelineName, postId, true);
 
             if (postEntity.ContentType != TimelinePostContentTypes.Image)
-                throw new BadPostTypeException(postEntity.ContentType, TimelinePostContentTypes.Image, ExceptionGetDataNonImagePost);
+                throw new TimelinePostNoDataException(ExceptionGetDataNonImagePost);
 
             var tag = postEntity.Content;
 
             return tag;
         }
 
-        public async Task<PostData> GetPostData(string name, long postId)
+        public async Task<PostData> GetPostData(string timelineName, long postId)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            var timelineId = await FindTimelineId(name);
-            var postEntity = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+            var timelineId = await FindTimelineId(timelineName);
+            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
             if (postEntity == null)
-                throw new TimelinePostNotExistException(name, postId, false);
+                throw new TimelinePostNotExistException(timelineName, postId, false);
 
             if (postEntity.Content == null)
-                throw new TimelinePostNotExistException(name, postId, true);
+                throw new TimelinePostNotExistException(timelineName, postId, true);
 
             if (postEntity.ContentType != TimelinePostContentTypes.Image)
-                throw new BadPostTypeException(postEntity.ContentType, TimelinePostContentTypes.Image, ExceptionGetDataNonImagePost);
+                throw new TimelinePostNoDataException(ExceptionGetDataNonImagePost);
 
             var tag = postEntity.Content;
 
@@ -472,7 +549,7 @@ namespace Timeline.Services
 
             try
             {
-                data = await DataManager.GetEntry(tag);
+                data = await _dataManager.GetEntry(tag);
             }
             catch (InvalidOperationException e)
             {
@@ -484,7 +561,7 @@ namespace Timeline.Services
                 _logger.LogWarning(LogGetDataNoFormat);
                 var format = Image.DetectFormat(data);
                 postEntity.ExtraContent = format.DefaultMimeType;
-                await Database.SaveChangesAsync();
+                await _database.SaveChangesAsync();
             }
 
             return new PostData
@@ -496,19 +573,19 @@ namespace Timeline.Services
             };
         }
 
-        public async Task<TimelinePost> CreateTextPost(string name, long authorId, string text, DateTime? time)
+        public async Task<TimelinePost> CreateTextPost(string timelineName, long authorId, string text, DateTime? time)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
             if (text == null)
                 throw new ArgumentNullException(nameof(text));
 
-            var timelineId = await FindTimelineId(name);
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+            var timelineId = await FindTimelineId(timelineName);
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
-            var author = await UserService.GetUserById(authorId);
+            var author = await _userService.GetUserById(authorId);
 
-            var currentTime = Clock.GetCurrentTime();
+            var currentTime = _clock.GetCurrentTime();
             var finalTime = time ?? currentTime;
 
             timelineEntity.CurrentPostLocalId += 1;
@@ -523,8 +600,8 @@ namespace Timeline.Services
                 Time = finalTime,
                 LastUpdated = currentTime
             };
-            Database.TimelinePosts.Add(postEntity);
-            await Database.SaveChangesAsync();
+            _database.TimelinePosts.Add(postEntity);
+            await _database.SaveChangesAsync();
 
 
             return new TimelinePost(
@@ -533,29 +610,29 @@ namespace Timeline.Services
                 time: finalTime,
                 author: author,
                 lastUpdated: currentTime,
-                timelineName: GenerateName(name)
+                timelineName: timelineName
             );
         }
 
-        public async Task<TimelinePost> CreateImagePost(string name, long authorId, byte[] data, DateTime? time)
+        public async Task<TimelinePost> CreateImagePost(string timelineName, long authorId, byte[] data, DateTime? time)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            var timelineId = await FindTimelineId(name);
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+            var timelineId = await FindTimelineId(timelineName);
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
-            var author = await UserService.GetUserById(authorId);
+            var author = await _userService.GetUserById(authorId);
 
-            var imageFormat = await ImageValidator.Validate(data);
+            var imageFormat = await _imageValidator.Validate(data);
 
             var imageFormatText = imageFormat.DefaultMimeType;
 
-            var tag = await DataManager.RetainEntry(data);
+            var tag = await _dataManager.RetainEntry(data);
 
-            var currentTime = Clock.GetCurrentTime();
+            var currentTime = _clock.GetCurrentTime();
             var finalTime = time ?? currentTime;
 
             timelineEntity.CurrentPostLocalId += 1;
@@ -571,8 +648,8 @@ namespace Timeline.Services
                 Time = finalTime,
                 LastUpdated = currentTime
             };
-            Database.TimelinePosts.Add(postEntity);
-            await Database.SaveChangesAsync();
+            _database.TimelinePosts.Add(postEntity);
+            await _database.SaveChangesAsync();
 
             return new TimelinePost(
                 id: postEntity.LocalId,
@@ -580,21 +657,24 @@ namespace Timeline.Services
                 time: finalTime,
                 author: author,
                 lastUpdated: currentTime,
-                timelineName: GenerateName(name)
+                timelineName: timelineName
             );
         }
 
-        public async Task DeletePost(string name, long id)
+        public async Task DeletePost(string timelineName, long id)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            var timelineId = await FindTimelineId(name);
+            var timelineId = await FindTimelineId(timelineName);
 
-            var post = await Database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == id).SingleOrDefaultAsync();
+            var post = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == id).SingleOrDefaultAsync();
 
-            if (post == null || post.Content == null)
-                throw new TimelinePostNotExistException(name, id, false);
+            if (post == null)
+                throw new TimelinePostNotExistException(timelineName, id, false);
+
+            if (post.Content == null)
+                throw new TimelinePostNotExistException(timelineName, id, true);
 
             string? dataTag = null;
 
@@ -604,26 +684,26 @@ namespace Timeline.Services
             }
 
             post.Content = null;
-            post.LastUpdated = Clock.GetCurrentTime();
+            post.LastUpdated = _clock.GetCurrentTime();
 
-            await Database.SaveChangesAsync();
+            await _database.SaveChangesAsync();
 
             if (dataTag != null)
             {
-                await DataManager.FreeEntry(dataTag);
+                await _dataManager.FreeEntry(dataTag);
             }
         }
 
-        public async Task ChangeProperty(string name, TimelineChangePropertyRequest newProperties)
+        public async Task ChangeProperty(string timelineName, TimelineChangePropertyRequest newProperties)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
             if (newProperties == null)
                 throw new ArgumentNullException(nameof(newProperties));
 
-            var timelineId = await FindTimelineId(name);
+            var timelineId = await FindTimelineId(timelineName);
 
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
             if (newProperties.Description != null)
             {
@@ -635,13 +715,13 @@ namespace Timeline.Services
                 timelineEntity.Visibility = newProperties.Visibility.Value;
             }
 
-            await Database.SaveChangesAsync();
+            await _database.SaveChangesAsync();
         }
 
-        public async Task ChangeMember(string name, IList<string>? add, IList<string>? remove)
+        public async Task ChangeMember(string timelineName, IList<string>? add, IList<string>? remove)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
             List<string>? RemoveDuplicateAndCheckFormat(IList<string>? list, string paramName)
             {
@@ -656,7 +736,7 @@ namespace Timeline.Services
                         {
                             continue;
                         }
-                        var (validationResult, message) = UsernameValidator.Validate(username);
+                        var (validationResult, message) = _usernameValidator.Validate(username);
                         if (!validationResult)
                             throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionChangeMemberUsernameBadFormat, index), nameof(paramName));
                         result.Add(username);
@@ -682,7 +762,7 @@ namespace Timeline.Services
                 }
             }
 
-            var timelineId = await FindTimelineId(name);
+            var timelineId = await FindTimelineId(timelineName);
 
             async Task<List<long>?> CheckExistenceAndGetId(List<string>? list)
             {
@@ -692,7 +772,7 @@ namespace Timeline.Services
                 List<long> result = new List<long>();
                 foreach (var username in list)
                 {
-                    result.Add(await UserService.GetUserIdByUsername(username));
+                    result.Add(await _userService.GetUserIdByUsername(username));
                 }
                 return result;
             }
@@ -702,37 +782,36 @@ namespace Timeline.Services
             if (userIdsAdd != null)
             {
                 var membersToAdd = userIdsAdd.Select(id => new TimelineMemberEntity { UserId = id, TimelineId = timelineId }).ToList();
-                Database.TimelineMembers.AddRange(membersToAdd);
+                _database.TimelineMembers.AddRange(membersToAdd);
             }
 
             if (userIdsRemove != null)
             {
-                var membersToRemove = await Database.TimelineMembers.Where(m => m.TimelineId == timelineId && userIdsRemove.Contains(m.UserId)).ToListAsync();
-                Database.TimelineMembers.RemoveRange(membersToRemove);
+                var membersToRemove = await _database.TimelineMembers.Where(m => m.TimelineId == timelineId && userIdsRemove.Contains(m.UserId)).ToListAsync();
+                _database.TimelineMembers.RemoveRange(membersToRemove);
             }
 
-            await Database.SaveChangesAsync();
+            await _database.SaveChangesAsync();
         }
 
-        public async Task<bool> HasManagePermission(string name, long userId)
+        public async Task<bool> HasManagePermission(string timelineName, long userId)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            var timelineId = await FindTimelineId(name);
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
+            var timelineId = await FindTimelineId(timelineName);
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
             return userId == timelineEntity.OwnerId;
         }
 
-        public async Task<bool> HasReadPermission(string name, long? visitorId)
+        public async Task<bool> HasReadPermission(string timelineName, long? visitorId)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            var timelineId = await FindTimelineId(name);
-
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.Visibility }).SingleAsync();
+            var timelineId = await FindTimelineId(timelineName);
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.Visibility }).SingleAsync();
 
             if (timelineEntity.Visibility == TimelineVisibility.Public)
                 return true;
@@ -746,172 +825,51 @@ namespace Timeline.Services
             }
             else
             {
-                var memberEntity = await Database.TimelineMembers.Where(m => m.UserId == visitorId && m.TimelineId == timelineId).SingleOrDefaultAsync();
+                var memberEntity = await _database.TimelineMembers.Where(m => m.UserId == visitorId && m.TimelineId == timelineId).SingleOrDefaultAsync();
                 return memberEntity != null;
             }
         }
 
-        public async Task<bool> HasPostModifyPermission(string name, long id, long modifierId, bool throwOnPostNotExist = false)
+        public async Task<bool> HasPostModifyPermission(string timelineName, long postId, long modifierId, bool throwOnPostNotExist = false)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            var timelineId = await FindTimelineId(name);
+            var timelineId = await FindTimelineId(timelineName);
 
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
-            var postEntity = await Database.TimelinePosts.Where(p => p.Id == id).Select(p => new { p.AuthorId }).SingleOrDefaultAsync();
+            var postEntity = await _database.TimelinePosts.Where(p => p.Id == postId).Select(p => new { p.Content, p.AuthorId }).SingleOrDefaultAsync();
 
-            if (postEntity == null && throwOnPostNotExist)
+            if (postEntity == null)
             {
-                throw new TimelinePostNotExistException(name, id, false);
+                if (throwOnPostNotExist)
+                    throw new TimelinePostNotExistException(timelineName, postId, false);
+                else
+                    return true;
             }
 
-            return timelineEntity.OwnerId == modifierId || postEntity == null || postEntity.AuthorId == modifierId;
+            if (postEntity.Content == null && throwOnPostNotExist)
+            {
+                throw new TimelinePostNotExistException(timelineName, postId, true);
+            }
+
+            return timelineEntity.OwnerId == modifierId || postEntity.AuthorId == modifierId;
         }
 
-        public async Task<bool> IsMemberOf(string name, long userId)
+        public async Task<bool> IsMemberOf(string timelineName, long userId)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            var timelineId = await FindTimelineId(name);
+            var timelineId = await FindTimelineId(timelineName);
 
-            var timelineEntity = await Database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
             if (userId == timelineEntity.OwnerId)
                 return true;
 
-            return await Database.TimelineMembers.AnyAsync(m => m.TimelineId == timelineId && m.UserId == userId);
-        }
-    }
-
-    public class OrdinaryTimelineService : BaseTimelineService, IOrdinaryTimelineService
-    {
-        private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
-
-        private void ValidateTimelineName(string name, string paramName)
-        {
-            if (!_timelineNameValidator.Validate(name, out var message))
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionTimelineNameBadFormat, message), paramName);
-            }
-        }
-
-        public OrdinaryTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
-            : base(loggerFactory, database, imageValidator, dataManager, userService, clock)
-        {
-
-        }
-
-        protected override async Task<long> FindTimelineId(string name)
-        {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-
-            ValidateTimelineName(name, nameof(name));
-
-            var timelineEntity = await Database.Timelines.Where(t => t.Name == name).Select(t => new { t.Id }).SingleOrDefaultAsync();
-
-            if (timelineEntity == null)
-            {
-                throw new TimelineNotExistException(name);
-            }
-            else
-            {
-                return timelineEntity.Id;
-            }
-        }
-
-        protected override string GenerateName(string name)
-        {
-            return name;
-        }
-    }
-
-    public class PersonalTimelineService : BaseTimelineService, IPersonalTimelineService
-    {
-        public PersonalTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IImageValidator imageValidator, IDataManager dataManager, IUserService userService, IClock clock)
-            : base(loggerFactory, database, imageValidator, dataManager, userService, clock)
-        {
-
-        }
-
-        protected override async Task<long> FindTimelineId(string name)
-        {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-
-            long userId;
-            try
-            {
-                userId = await UserService.GetUserIdByUsername(name);
-            }
-            catch (ArgumentException e)
-            {
-                throw new ArgumentException(ExceptionFindTimelineUsernameBadFormat, nameof(name), e);
-            }
-            catch (UserNotExistException e)
-            {
-                throw new TimelineNotExistException(name, e);
-            }
-
-            var timelineEntity = await Database.Timelines.Where(t => t.OwnerId == userId && t.Name == null).Select(t => new { t.Id }).SingleOrDefaultAsync();
-
-            if (timelineEntity != null)
-            {
-                return timelineEntity.Id;
-            }
-            else
-            {
-                var newTimelineEntity = new TimelineEntity
-                {
-                    CurrentPostLocalId = 0,
-                    Name = null,
-                    OwnerId = userId,
-                    Visibility = TimelineVisibility.Register,
-                    CreateTime = Clock.GetCurrentTime()
-                };
-                Database.Timelines.Add(newTimelineEntity);
-                await Database.SaveChangesAsync();
-
-                return newTimelineEntity.Id;
-            }
-        }
-
-        protected override string GenerateName(string name)
-        {
-            return "@" + name;
-        }
-    }
-
-    public class TimelineService : ITimelineService
-    {
-        private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
-
-        private readonly DatabaseContext _database;
-
-        private readonly IUserService _userService;
-        private readonly IClock _clock;
-
-        private readonly IOrdinaryTimelineService _ordinaryTimelineService;
-        private readonly IPersonalTimelineService _personalTimelineService;
-
-        public TimelineService(DatabaseContext database, IUserService userService, IClock clock, IOrdinaryTimelineService ordinaryTimelineService, IPersonalTimelineService personalTimelineService)
-        {
-            _database = database;
-            _userService = userService;
-            _clock = clock;
-            _ordinaryTimelineService = ordinaryTimelineService;
-            _personalTimelineService = personalTimelineService;
-        }
-
-        private void ValidateTimelineName(string name, string paramName)
-        {
-            if (!_timelineNameValidator.Validate(name, out var message))
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionTimelineNameBadFormat, message), paramName);
-            }
+            return await _database.TimelineMembers.AnyAsync(m => m.TimelineId == timelineId && m.UserId == userId);
         }
 
         public async Task<List<Models.Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
@@ -952,7 +910,7 @@ namespace Timeline.Services
 
             foreach (var entity in entities)
             {
-                result.Add(await TimelineServiceHelper.MapTimelineFromEntity(_userService, entity));
+                result.Add(await MapTimelineFromEntity(entity));
             }
 
             return result;
@@ -985,7 +943,7 @@ namespace Timeline.Services
             _database.Timelines.Add(newEntity);
             await _database.SaveChangesAsync();
 
-            return await TimelineServiceHelper.MapTimelineFromEntity(_userService, newEntity);
+            return await MapTimelineFromEntity(newEntity);
         }
 
         public async Task DeleteTimeline(string name)
@@ -1002,102 +960,6 @@ namespace Timeline.Services
 
             _database.Timelines.Remove(entity);
             await _database.SaveChangesAsync();
-        }
-
-
-        private IBaseTimelineService BranchName(string name, out string realName)
-        {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-
-            if (name.StartsWith('@'))
-            {
-                realName = name.Substring(1);
-                return _personalTimelineService;
-            }
-            else
-            {
-                realName = name;
-                return _ordinaryTimelineService;
-            }
-        }
-
-        public Task<Models.Timeline> GetTimeline(string name)
-        {
-            var s = BranchName(name, out var realName);
-            return s.GetTimeline(realName);
-        }
-
-        public Task ChangeProperty(string name, TimelineChangePropertyRequest newProperties)
-        {
-            var s = BranchName(name, out var realName);
-            return s.ChangeProperty(realName, newProperties);
-        }
-
-        public Task<List<TimelinePost>> GetPosts(string name)
-        {
-            var s = BranchName(name, out var realName);
-            return s.GetPosts(realName);
-        }
-
-        public Task<string> GetPostDataETag(string name, long postId)
-        {
-            var s = BranchName(name, out var realName);
-            return s.GetPostDataETag(realName, postId);
-        }
-
-        public Task<PostData> GetPostData(string name, long postId)
-        {
-            var s = BranchName(name, out var realName);
-            return s.GetPostData(realName, postId);
-        }
-
-        public Task<TimelinePost> CreateTextPost(string name, long authorId, string text, DateTime? time)
-        {
-            var s = BranchName(name, out var realName);
-            return s.CreateTextPost(realName, authorId, text, time);
-        }
-
-        public Task<TimelinePost> CreateImagePost(string name, long authorId, byte[] data, DateTime? time)
-        {
-            var s = BranchName(name, out var realName);
-            return s.CreateImagePost(realName, authorId, data, time);
-        }
-
-        public Task DeletePost(string name, long id)
-        {
-            var s = BranchName(name, out var realName);
-            return s.DeletePost(realName, id);
-        }
-
-        public Task ChangeMember(string name, IList<string>? add, IList<string>? remove)
-        {
-            var s = BranchName(name, out var realName);
-            return s.ChangeMember(realName, add, remove);
-        }
-
-        public Task<bool> HasManagePermission(string name, long userId)
-        {
-            var s = BranchName(name, out var realName);
-            return s.HasManagePermission(realName, userId);
-        }
-
-        public Task<bool> HasReadPermission(string name, long? visitorId)
-        {
-            var s = BranchName(name, out var realName);
-            return s.HasReadPermission(realName, visitorId);
-        }
-
-        public Task<bool> HasPostModifyPermission(string name, long id, long modifierId, bool throwOnPostNotExist = false)
-        {
-            var s = BranchName(name, out var realName);
-            return s.HasPostModifyPermission(realName, id, modifierId, throwOnPostNotExist);
-        }
-
-        public Task<bool> IsMemberOf(string name, long userId)
-        {
-            var s = BranchName(name, out var realName);
-            return s.IsMemberOf(realName, userId);
         }
     }
 }

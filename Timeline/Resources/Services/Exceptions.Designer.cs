@@ -97,6 +97,60 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Image is in valid because {0}..
+        /// </summary>
+        internal static string ImageException {
+            get {
+                return ResourceManager.GetString("ImageException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to image is not of required size.
+        /// </summary>
+        internal static string ImageExceptionBadSize {
+            get {
+                return ResourceManager.GetString("ImageExceptionBadSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to failed to decode image, see inner exception.
+        /// </summary>
+        internal static string ImageExceptionCantDecode {
+            get {
+                return ResourceManager.GetString("ImageExceptionCantDecode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to unknown error.
+        /// </summary>
+        internal static string ImageExceptionUnknownError {
+            get {
+                return ResourceManager.GetString("ImageExceptionUnknownError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to image&apos;s actual mime type is not the specified one.
+        /// </summary>
+        internal static string ImageExceptionUnmatchedFormat {
+            get {
+                return ResourceManager.GetString("ImageExceptionUnmatchedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The timeline has no data..
+        /// </summary>
+        internal static string TimelineNoDataException {
+            get {
+                return ResourceManager.GetString("TimelineNoDataException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Request timeline name is &quot;{0}&quot;. If this is a personal timeline whose name starts with &apos;@&apos;, it means the user does not exist and inner exception should be a UserNotExistException..
         /// </summary>
         internal static string TimelineNotExistException {
@@ -115,7 +169,7 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request timeline name is &quot;{0}&quot;.  Request timeline post id is &quot;{1}&quot;. The post does not exist because it has been deleted..
+        ///   Looks up a localized string similar to Request timeline name is &quot;{0}&quot;.  Request timeline post id is &quot;{1}&quot;. The post does not exist because it is deleted..
         /// </summary>
         internal static string TimelinePostNotExistExceptionDeleted {
             get {

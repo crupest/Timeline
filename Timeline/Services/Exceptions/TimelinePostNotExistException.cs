@@ -6,7 +6,7 @@ namespace Timeline.Services.Exceptions
     [Serializable]
     public class TimelinePostNotExistException : EntityNotExistException
     {
-        public TimelinePostNotExistException() { }
+        public TimelinePostNotExistException() : this(null, null, false, null, null) { }
         [Obsolete("This has no meaning.")]
         public TimelinePostNotExistException(string? message) : this(message, null) { }
         [Obsolete("This has no meaning.")]

@@ -141,21 +141,6 @@
   <data name="HashedPasswordBadFromatExceptionNotUnknownMarker" xml:space="preserve">
     <value>Unknown format marker.</value>
   </data>
-  <data name="ImageException" xml:space="preserve">
-    <value>Image is in valid because {0}.</value>
-  </data>
-  <data name="ImageExceptionBadSize" xml:space="preserve">
-    <value>image is not a square, aka, width is not equal to height</value>
-  </data>
-  <data name="ImageExceptionCantDecode" xml:space="preserve">
-    <value>failed to decode image, see inner exception</value>
-  </data>
-  <data name="ImageExceptionUnknownError" xml:space="preserve">
-    <value>unknown error</value>
-  </data>
-  <data name="ImageExceptionUnmatchedFormat" xml:space="preserve">
-    <value>image's actual mime type is not the specified one</value>
-  </data>
   <data name="JwtUserTokenBadFormatException" xml:space="preserve">
     <value>The token didn't pass verification because {0}.</value>
   </data>

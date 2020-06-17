@@ -106,7 +106,7 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The timeline name is of bad format because {0}..
+        ///   Looks up a localized string similar to The timeline name is of bad format..
         /// </summary>
         internal static string ExceptionTimelineNameBadFormat {
             get {
