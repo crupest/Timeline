@@ -72,12 +72,15 @@ namespace Timeline.Models
     {
         public string UniqueID { get; set; } = default!;
         public string Name { get; set; } = default!;
+        public DateTime NameLastModified { get; set; } = default!;
         public string Description { get; set; } = default!;
         public User Owner { get; set; } = default!;
         public TimelineVisibility Visibility { get; set; }
 #pragma warning disable CA2227 // Collection properties should be read only
         public List<User> Members { get; set; } = default!;
 #pragma warning restore CA2227 // Collection properties should be read only
+        public DateTime CreateTime { get; set; } = default!;
+        public DateTime LastModified { get; set; } = default!;
     }
 
     public class TimelineChangePropertyRequest
