@@ -28,12 +28,15 @@ namespace Timeline.Models.Http
     {
         public string UniqueId { get; set; } = default!;
         public string Name { get; set; } = default!;
+        public DateTime NameLastModifed { get; set; } = default!;
         public string Description { get; set; } = default!;
         public UserInfo Owner { get; set; } = default!;
         public TimelineVisibility Visibility { get; set; }
 #pragma warning disable CA2227 // Collection properties should be read only
         public List<UserInfo> Members { get; set; } = default!;
 #pragma warning restore CA2227 // Collection properties should be read only
+        public DateTime CreateTime { get; set; } = default!;
+        public DateTime LastModified { get; set; } = default!;
 
 #pragma warning disable CA1707 // Identifiers should not contain underscores
         public TimelineInfoLinks _links { get; set; } = default!;
