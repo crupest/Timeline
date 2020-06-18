@@ -36,7 +36,7 @@ namespace Timeline.Tests.Helpers
         {
             if (_currentTime == null)
                 return SetMockCurrentTime();
-            _currentTime.Value.Add(timeSpan);
+            _currentTime += timeSpan;
             return _currentTime.Value;
         }
     }
