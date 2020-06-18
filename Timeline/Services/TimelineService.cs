@@ -356,22 +356,30 @@ namespace Timeline.Services
             {
                 UniqueID = entity.UniqueId,
                 Name = entity.Name ?? ("@" + owner.Username),
+                NameLastModified = entity.NameLastModified,
                 Description = entity.Description ?? "",
                 Owner = owner,
                 Visibility = entity.Visibility,
-                Members = members
+                Members = members,
+                CreateTime = entity.CreateTime,
+                LastModified = entity.LastModified
             };
         }
 
         private TimelineEntity CreateNewTimelineEntity(string? name, long ownerId)
         {
+            var currentTime = _clock.GetCurrentTime();
+
             return new TimelineEntity
             {
                 Name = name,
+                NameLastModified = currentTime,
                 OwnerId = ownerId,
                 Visibility = TimelineVisibility.Register,
-                CreateTime = _clock.GetCurrentTime(),
+                CreateTime = currentTime,
+                LastModified = currentTime,
                 CurrentPostLocalId = 0,
+                Members = new List<TimelineMemberEntity>()
             };
         }
 
@@ -930,15 +938,7 @@ namespace Timeline.Services
             if (conflict)
                 throw new EntityAlreadyExistException(EntityNames.Timeline, null, ExceptionTimelineNameConflict);
 
-            var newEntity = new TimelineEntity
-            {
-                CurrentPostLocalId = 0,
-                Name = name,
-                OwnerId = owner,
-                Visibility = TimelineVisibility.Register,
-                CreateTime = _clock.GetCurrentTime(),
-                Members = new List<TimelineMemberEntity>()
-            };
+            var newEntity = CreateNewTimelineEntity(name, user.Id!.Value);
 
             _database.Timelines.Add(newEntity);
             await _database.SaveChangesAsync();
