@@ -1,6 +1,4 @@
-﻿using Castle.Core.Logging;
-using FluentAssertions;
-using FluentAssertions.Xml;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -16,7 +14,7 @@ namespace Timeline.Tests.Services
 {
     public class TimelineServiceTest : IAsyncLifetime, IDisposable
     {
-        private TestDatabase _testDatabase = new TestDatabase();
+        private readonly TestDatabase _testDatabase = new TestDatabase();
 
         private DatabaseContext _databaseContext;
 
