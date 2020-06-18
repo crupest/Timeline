@@ -10,14 +10,13 @@ using System.IO;
 using System.Threading.Tasks;
 using Timeline.Configs;
 using Timeline.Entities;
-using Timeline.Migrations;
 using Xunit;
 
 namespace Timeline.Tests.Helpers
 {
     public class TestApplication : IAsyncLifetime
     {
-        public SqliteConnection DatabaseConnection { get; private set; }
+        public TestDatabase Database { get; }
 
         public IHost Host { get; private set; }
 
@@ -25,29 +24,15 @@ namespace Timeline.Tests.Helpers
 
         public TestApplication()
         {
-
+            Database = new TestDatabase(false);
         }
 
         public async Task InitializeAsync()
         {
+            await Database.InitializeAsync();
+
             WorkDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(WorkDir);
-
-            DatabaseConnection = new SqliteConnection("Data Source=:memory:;");
-            await DatabaseConnection.OpenAsync();
-
-            var options = new DbContextOptionsBuilder<DatabaseContext>()
-                .UseSqlite(DatabaseConnection).Options;
-
-            using (var context = new DatabaseContext(options))
-            {
-                await context.Database.EnsureCreatedAsync();
-                context.JwtToken.Add(new JwtTokenEntity
-                {
-                    Key = JwtTokenGenerateHelper.GenerateKey()
-                });
-                await context.SaveChangesAsync();
-            }
 
             Host = await Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
                 .ConfigureAppConfiguration((context, config) =>
@@ -62,7 +47,7 @@ namespace Timeline.Tests.Helpers
                 {
                     services.AddDbContext<DatabaseContext>(options =>
                     {
-                        options.UseSqlite(DatabaseConnection);
+                        options.UseSqlite(Database.Connection);
                     });
                 })
                 .ConfigureWebHost(webBuilder =>
@@ -79,9 +64,9 @@ namespace Timeline.Tests.Helpers
             await Host.StopAsync();
             Host.Dispose();
 
-            await DatabaseConnection.CloseAsync();
-            await DatabaseConnection.DisposeAsync();
             Directory.Delete(WorkDir, true);
+
+            await Database.DisposeAsync();
         }
     }
 }

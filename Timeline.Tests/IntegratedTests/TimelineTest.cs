@@ -78,10 +78,12 @@ namespace Timeline.Tests.IntegratedTests
             return $"timelines/t{id}/{(subpath ?? "")}";
         }
 
+        public delegate string TimelineUrlGenerator(int userId, string subpath = null);
+
         public static IEnumerable<object[]> TimelineUrlGeneratorData()
         {
-            yield return new[] { new Func<int, string, string>(GeneratePersonalTimelineUrl) };
-            yield return new[] { new Func<int, string, string>(GenerateOrdinaryTimelineUrl) };
+            yield return new[] { new TimelineUrlGenerator(GeneratePersonalTimelineUrl) };
+            yield return new[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl) };
         }
 
         private static string GeneratePersonalTimelineUrlByName(string name, string subpath = null)
@@ -545,7 +547,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Description_Should_Work(Func<int, string, string> generator)
+        public async Task Description_Should_Work(TimelineUrlGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -585,7 +587,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Member_Should_Work(Func<int, string, string> generator)
+        public async Task Member_Should_Work(TimelineUrlGenerator generator)
         {
             var getUrl = generator(1, null);
             using var client = await CreateClientAsUser();
@@ -682,7 +684,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Visibility_Test(Func<int, string, string> generator)
+        public async Task Visibility_Test(TimelineUrlGenerator generator)
         {
             var userUrl = generator(1, "posts");
             var adminUrl = generator(0, "posts");
@@ -765,7 +767,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Permission_Post_Create(Func<int, string, string> generator)
+        public async Task Permission_Post_Create(TimelineUrlGenerator generator)
         {
             using (var client = await CreateClientAsUser())
             {
@@ -817,7 +819,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Permission_Post_Delete(Func<int, string, string> generator)
+        public async Task Permission_Post_Delete(TimelineUrlGenerator generator)
         {
             async Task<long> CreatePost(int userNumber)
             {
@@ -885,7 +887,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task TextPost_ShouldWork(Func<int, string, string> generator)
+        public async Task TextPost_ShouldWork(TimelineUrlGenerator generator)
         {
             {
                 using var client = await CreateClientAsUser();
@@ -963,7 +965,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task GetPost_Should_Ordered(Func<int, string, string> generator)
+        public async Task GetPost_Should_Ordered(TimelineUrlGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -991,7 +993,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task CreatePost_InvalidModel(Func<int, string, string> generator)
+        public async Task CreatePost_InvalidModel(TimelineUrlGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -1035,7 +1037,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task ImagePost_ShouldWork(Func<int, string, string> generator)
+        public async Task ImagePost_ShouldWork(TimelineUrlGenerator generator)
         {
             var imageData = ImageHelper.CreatePngWithSize(100, 200);
 
@@ -1119,7 +1121,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task ImagePost_400(Func<int, string, string> generator)
+        public async Task ImagePost_400(TimelineUrlGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -1143,6 +1145,52 @@ namespace Timeline.Tests.IntegratedTests
                 var res = await client.GetAsync(generator(1, $"posts/{postId}/data"));
                 res.Should().HaveStatusCode(400)
                     .And.HaveCommonBody(ErrorCodes.TimelineController.PostNoData);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task LastModified(TimelineUrlGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            DateTime lastModified;
+
+            {
+                var res = await client.GetAsync(generator(1));
+                lastModified = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.LastModified;
+            }
+
+            await Task.Delay(1000);
+
+            {
+                var res = await client.PatchAsJsonAsync(generator(1), new TimelinePatchRequest { Description = "123" });
+                lastModified = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.LastModified.Should().BeAfter(lastModified).And.Subject.Value;
+            }
+
+            {
+                var res = await client.GetAsync(generator(1));
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.LastModified.Should().Be(lastModified);
+            }
+
+            await Task.Delay(1000);
+
+            {
+                var res = await client.PutAsync(generator(1, "members/user2"), null);
+                res.Should().HaveStatusCode(200);
+            }
+
+            {
+                var res = await client.GetAsync(generator(1));
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.LastModified.Should().BeAfter(lastModified);
             }
         }
     }

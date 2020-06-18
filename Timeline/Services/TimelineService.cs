@@ -15,6 +15,23 @@ using static Timeline.Resources.Services.TimelineService;
 
 namespace Timeline.Services
 {
+    public static class TimelineHelper
+    {
+        public static string ExtractTimelineName(string name, out bool isPersonal)
+        {
+            if (name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
+            {
+                isPersonal = true;
+                return name.Substring(1);
+            }
+            else
+            {
+                isPersonal = false;
+                return name;
+            }
+        }
+    }
+
     public enum TimelineUserRelationshipType
     {
         Own = 0b1,
@@ -356,38 +373,34 @@ namespace Timeline.Services
             {
                 UniqueID = entity.UniqueId,
                 Name = entity.Name ?? ("@" + owner.Username),
+                NameLastModified = entity.NameLastModified,
                 Description = entity.Description ?? "",
                 Owner = owner,
                 Visibility = entity.Visibility,
-                Members = members
+                Members = members,
+                CreateTime = entity.CreateTime,
+                LastModified = entity.LastModified
             };
         }
 
         private TimelineEntity CreateNewTimelineEntity(string? name, long ownerId)
         {
+            var currentTime = _clock.GetCurrentTime();
+
             return new TimelineEntity
             {
                 Name = name,
+                NameLastModified = currentTime,
                 OwnerId = ownerId,
                 Visibility = TimelineVisibility.Register,
-                CreateTime = _clock.GetCurrentTime(),
+                CreateTime = currentTime,
+                LastModified = currentTime,
                 CurrentPostLocalId = 0,
+                Members = new List<TimelineMemberEntity>()
             };
         }
 
-        private static string ExtractTimelineName(string name, out bool isPersonal)
-        {
-            if (name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
-            {
-                isPersonal = true;
-                return name.Substring(1);
-            }
-            else
-            {
-                isPersonal = false;
-                return name;
-            }
-        }
+
 
         // Get timeline id by name. If it is a personal timeline and it does not exist, it will be created.
         //
@@ -399,7 +412,7 @@ namespace Timeline.Services
         // It follows all timeline-related function common interface contracts.
         private async Task<long> FindTimelineId(string timelineName)
         {
-            timelineName = ExtractTimelineName(timelineName, out var isPersonal);
+            timelineName = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
 
             if (isPersonal)
             {
@@ -705,14 +718,24 @@ namespace Timeline.Services
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
+            var changed = false;
+
             if (newProperties.Description != null)
             {
+                changed = true;
                 timelineEntity.Description = newProperties.Description;
             }
 
             if (newProperties.Visibility.HasValue)
             {
+                changed = true;
                 timelineEntity.Visibility = newProperties.Visibility.Value;
+            }
+
+            if (changed)
+            {
+                var currentTime = _clock.GetCurrentTime();
+                timelineEntity.LastModified = currentTime;
             }
 
             await _database.SaveChangesAsync();
@@ -760,7 +783,16 @@ namespace Timeline.Services
                     simplifiedAdd.Remove(u);
                     simplifiedRemove.Remove(u);
                 }
+
+                if (simplifiedAdd.Count == 0)
+                    simplifiedAdd = null;
+
+                if (simplifiedRemove.Count == 0)
+                    simplifiedRemove = null;
             }
+
+            if (simplifiedAdd == null && simplifiedRemove == null)
+                return;
 
             var timelineId = await FindTimelineId(timelineName);
 
@@ -790,6 +822,9 @@ namespace Timeline.Services
                 var membersToRemove = await _database.TimelineMembers.Where(m => m.TimelineId == timelineId && userIdsRemove.Contains(m.UserId)).ToListAsync();
                 _database.TimelineMembers.RemoveRange(membersToRemove);
             }
+
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
+            timelineEntity.LastModified = _clock.GetCurrentTime();
 
             await _database.SaveChangesAsync();
         }
@@ -930,15 +965,7 @@ namespace Timeline.Services
             if (conflict)
                 throw new EntityAlreadyExistException(EntityNames.Timeline, null, ExceptionTimelineNameConflict);
 
-            var newEntity = new TimelineEntity
-            {
-                CurrentPostLocalId = 0,
-                Name = name,
-                OwnerId = owner,
-                Visibility = TimelineVisibility.Register,
-                CreateTime = _clock.GetCurrentTime(),
-                Members = new List<TimelineMemberEntity>()
-            };
+            var newEntity = CreateNewTimelineEntity(name, user.Id!.Value);
 
             _database.Timelines.Add(newEntity);
             await _database.SaveChangesAsync();
