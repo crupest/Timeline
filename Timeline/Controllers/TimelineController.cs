@@ -102,16 +102,20 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("timelines/{name}/posts")]
-        public async Task<ActionResult<List<TimelinePostInfo>>> PostListGet([FromRoute][GeneralTimelineName] string name)
+        public async Task<ActionResult<List<TimelinePostInfo>>> PostListGet([FromRoute][GeneralTimelineName] string name, [FromQuery] DateTime? modifiedSince)
         {
             if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var posts = await _service.GetPosts(name);
-            var result = _mapper.Map<List<TimelinePostInfo>>(posts);
+            List<TimelinePost> posts;
+            if (modifiedSince == null)
+                posts = await _service.GetPosts(name);
+            else
+                posts = await _service.GetPosts(name, modifiedSince.Value);
 
+            var result = _mapper.Map<List<TimelinePostInfo>>(posts);
             return result;
         }
 
