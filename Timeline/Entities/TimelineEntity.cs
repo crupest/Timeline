@@ -23,6 +23,9 @@ namespace Timeline.Entities
         [Column("name")]
         public string? Name { get; set; }
 
+        [Column("name_last_modified")]
+        public DateTime NameLastModified { get; set; }
+
         [Column("description")]
         public string? Description { get; set; }
 
@@ -37,6 +40,9 @@ namespace Timeline.Entities
 
         [Column("create_time")]
         public DateTime CreateTime { get; set; }
+
+        [Column("last_modified")]
+        public DateTime LastModified { get; set; }
 
         [Column("current_post_local_id")]
         public long CurrentPostLocalId { get; set; }
