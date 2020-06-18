@@ -1,18 +1,20 @@
 ﻿using Castle.Core.Logging;
 using FluentAssertions;
+using FluentAssertions.Xml;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Models;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.Services
 {
-    public class TimelineServiceTest : IAsyncLifetime
+    public class TimelineServiceTest : IAsyncLifetime, IDisposable
     {
         private TestDatabase _testDatabase = new TestDatabase();
 
@@ -48,40 +50,45 @@ namespace Timeline.Tests.Services
         public async Task DisposeAsync()
         {
             await _testDatabase.DisposeAsync();
+            await _databaseContext.DisposeAsync();
         }
 
-        [Fact]
-        public async Task PersonalTimeline_LastModified()
+        public void Dispose()
         {
-            var mockTime = new DateTime(2000, 1, 1, 1, 1, 1);
-
-            _clock.SetCurrentTime(mockTime);
-
-            var timeline = await _timelineService.GetTimeline("@user");
-
-            timeline.NameLastModified.Should().Be(mockTime);
-            timeline.LastModified.Should().Be(mockTime);
+            _eTagGenerator.Dispose();
         }
 
-        [Fact]
-        public async Task OrdinaryTimeline_LastModified()
+        [Theory]
+        [InlineData("@user")]
+        [InlineData("tl")]
+        public async Task Timeline_LastModified(string timelineName)
         {
-            var mockTime = new DateTime(2000, 1, 1, 1, 1, 1);
+            _clock.ForwardCurrentTime();
 
-            _clock.SetCurrentTime(mockTime);
-
+            void Check(Models.Timeline timeline)
             {
-                var timeline = await _timelineService.CreateTimeline("tl", await _userService.GetUserIdByUsername("user"));
-
-                timeline.NameLastModified.Should().Be(mockTime);
-                timeline.LastModified.Should().Be(mockTime);
+                timeline.NameLastModified.Should().Be(_clock.GetCurrentTime());
+                timeline.LastModified.Should().Be(_clock.GetCurrentTime());
             }
 
+            async Task GetAndCheck()
             {
-                var timeline = await _timelineService.GetTimeline("tl");
-                timeline.NameLastModified.Should().Be(mockTime);
-                timeline.LastModified.Should().Be(mockTime);
+                Check(await _timelineService.GetTimeline(timelineName));
             }
+
+            var _ = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+            if (!isPersonal)
+                Check(await _timelineService.CreateTimeline(timelineName, await _userService.GetUserIdByUsername("user")));
+
+            await GetAndCheck();
+
+            _clock.ForwardCurrentTime();
+            await _timelineService.ChangeProperty(timelineName, new TimelineChangePropertyRequest { Visibility = TimelineVisibility.Public });
+            await GetAndCheck();
+
+            _clock.ForwardCurrentTime();
+            await _timelineService.ChangeMember(timelineName, new List<string> { "admin" }, null);
+            await GetAndCheck();
         }
     }
 }
