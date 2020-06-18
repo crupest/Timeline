@@ -106,6 +106,15 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The post has been deleted because content of entity is null..
+        /// </summary>
+        internal static string ExceptionPostDeleted {
+            get {
+                return ResourceManager.GetString("ExceptionPostDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The timeline name is of bad format..
         /// </summary>
         internal static string ExceptionTimelineNameBadFormat {

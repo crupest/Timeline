@@ -141,4 +141,7 @@
   <data name="LogGetDataNoFormat" xml:space="preserve">
     <value>Image format type of the post does not exist in column "extra_content". Normally this couldn't be possible because it should be saved when post was created. However, we now re-detect the format and save it.</value>
   </data>
+  <data name="ExceptionPostDeleted" xml:space="preserve">
+    <value>The post has been deleted because content of entity is null.</value>
+  </data>
 </root>
