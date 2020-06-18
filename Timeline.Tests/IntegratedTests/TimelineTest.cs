@@ -5,9 +5,11 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
@@ -68,17 +70,43 @@ namespace Timeline.Tests.IntegratedTests
             }
         }
 
-        private static string GeneratePersonalTimelineUrl(int id, string subpath = null)
+        private static string CalculateUrlTail(string subpath, ICollection<KeyValuePair<string, string>> query)
         {
-            return $"timelines/@{(id == 0 ? "admin" : ("user" + id))}/{(subpath ?? "")}";
+            StringBuilder result = new StringBuilder();
+            if (subpath != null)
+            {
+                if (!subpath.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+                    result.Append("/");
+                result.Append(subpath);
+            }
+
+            if (query != null && query.Count != 0)
+            {
+                result.Append("?");
+                foreach (var (key, value, index) in query.Select((pair, index) => (pair.Key, pair.Value, index)))
+                {
+                    result.Append(WebUtility.UrlEncode(key));
+                    result.Append("=");
+                    result.Append(WebUtility.UrlEncode(value));
+                    if (index != query.Count - 1)
+                        result.Append("&");
+                }
+            }
+
+            return result.ToString();
         }
 
-        private static string GenerateOrdinaryTimelineUrl(int id, string subpath = null)
+        private static string GeneratePersonalTimelineUrl(int id, string subpath = null, ICollection<KeyValuePair<string, string>> query = null)
         {
-            return $"timelines/t{id}/{(subpath ?? "")}";
+            return $"timelines/@{(id == 0 ? "admin" : ("user" + id))}{CalculateUrlTail(subpath, query)}";
         }
 
-        public delegate string TimelineUrlGenerator(int userId, string subpath = null);
+        private static string GenerateOrdinaryTimelineUrl(int id, string subpath = null, ICollection<KeyValuePair<string, string>> query = null)
+        {
+            return $"timelines/t{id}{CalculateUrlTail(subpath, query)}";
+        }
+
+        public delegate string TimelineUrlGenerator(int userId, string subpath = null, ICollection<KeyValuePair<string, string>> query = null);
 
         public static IEnumerable<object[]> TimelineUrlGeneratorData()
         {
@@ -88,12 +116,12 @@ namespace Timeline.Tests.IntegratedTests
 
         private static string GeneratePersonalTimelineUrlByName(string name, string subpath = null)
         {
-            return $"timelines/@{name}/{(subpath ?? "")}";
+            return $"timelines/@{name}{(subpath == null ? "" : "/" + subpath)}";
         }
 
         private static string GenerateOrdinaryTimelineUrlByName(string name, string subpath = null)
         {
-            return $"timelines/{name}/{(subpath ?? "")}";
+            return $"timelines/{name}{(subpath == null ? "" : "/" + subpath)}";
         }
 
         public static IEnumerable<object[]> TimelineUrlByNameGeneratorData()
@@ -632,19 +660,20 @@ namespace Timeline.Tests.IntegratedTests
             await AssertEmptyMembers();
         }
 
-        [Theory]
-        [InlineData(nameof(GenerateOrdinaryTimelineUrl), -1, 200, 401, 401, 401, 401)]
-        [InlineData(nameof(GenerateOrdinaryTimelineUrl), 1, 200, 200, 403, 200, 403)]
-        [InlineData(nameof(GenerateOrdinaryTimelineUrl), 0, 200, 200, 200, 200, 200)]
-        [InlineData(nameof(GeneratePersonalTimelineUrl), -1, 200, 401, 401, 401, 401)]
-        [InlineData(nameof(GeneratePersonalTimelineUrl), 1, 200, 200, 403, 200, 403)]
-        [InlineData(nameof(GeneratePersonalTimelineUrl), 0, 200, 200, 200, 200, 200)]
-
-        public async Task Permission_Timeline(string generatorName, int userNumber, int get, int opPatchUser, int opPatchAdmin, int opMemberUser, int opMemberAdmin)
+        public static IEnumerable<object[]> Permission_Timeline_Data()
         {
-            var method = GetType().GetMethod(generatorName, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            Func<int, string, string> generator = (int id, string subpath) => (string)method.Invoke(null, new object[] { id, subpath });
+            yield return new object[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl), -1, 200, 401, 401, 401, 401 };
+            yield return new object[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl), 1, 200, 200, 403, 200, 403 };
+            yield return new object[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl), 0, 200, 200, 200, 200, 200 };
+            yield return new object[] { new TimelineUrlGenerator(GeneratePersonalTimelineUrl), -1, 200, 401, 401, 401, 401 };
+            yield return new object[] { new TimelineUrlGenerator(GeneratePersonalTimelineUrl), 1, 200, 200, 403, 200, 403 };
+            yield return new object[] { new TimelineUrlGenerator(GeneratePersonalTimelineUrl), 0, 200, 200, 200, 200, 200 };
+        }
 
+        [Theory]
+        [MemberData(nameof(Permission_Timeline_Data))]
+        public async Task Permission_Timeline(TimelineUrlGenerator generator, int userNumber, int get, int opPatchUser, int opPatchAdmin, int opMemberUser, int opMemberAdmin)
+        {
             using var client = await CreateClientAs(userNumber);
             {
                 var res = await client.GetAsync("timelines/t1");
@@ -1150,7 +1179,7 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task LastModified(TimelineUrlGenerator generator)
+        public async Task Timeline_LastModified(TimelineUrlGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -1191,6 +1220,37 @@ namespace Timeline.Tests.IntegratedTests
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>()
                     .Which.LastModified.Should().BeAfter(lastModified);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task Post_ModifiedSince(TimelineUrlGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            DateTime testPoint = new DateTime();
+            var postContentList = new List<string> { "a", "b", "c", "d" };
+
+            foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
+            {
+                var res = await client.PostAsJsonAsync(generator(1, "posts"),
+                    new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                var post = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo>().Which;
+                if (index == 1)
+                    testPoint = post.LastUpdated;
+                await Task.Delay(1000);
+            }
+
+            {
+
+                var res = await client.GetAsync(generator(1, "posts",
+                    new Dictionary<string, string> { { "modifiedSince", testPoint.ToString("s", CultureInfo.InvariantCulture) } }));
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<List<TimelinePostInfo>>()
+                    .Which.Should().HaveCount(3)
+                    .And.Subject.Select(p => p.Content.Text).Should().Equal(postContentList.Skip(1));
             }
         }
     }
