@@ -19,5 +19,25 @@ namespace Timeline.Tests.Helpers
         {
             _currentTime = mockTime;
         }
+
+        public DateTime SetMockCurrentTime()
+        {
+            var time = new DateTime(2000, 1, 1, 1, 1, 1);
+            _currentTime = time;
+            return time;
+        }
+
+        public DateTime ForwardCurrentTime()
+        {
+            return ForwardCurrentTime(TimeSpan.FromDays(1));
+        }
+
+        public DateTime ForwardCurrentTime(TimeSpan timeSpan)
+        {
+            if (_currentTime == null)
+                return SetMockCurrentTime();
+            _currentTime.Value.Add(timeSpan);
+            return _currentTime.Value;
+        }
     }
 }
