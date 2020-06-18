@@ -63,11 +63,11 @@ namespace Timeline.Tests.Services
         [InlineData("tl")]
         public async Task Timeline_LastModified(string timelineName)
         {
-            _clock.ForwardCurrentTime();
+            var initTime = _clock.ForwardCurrentTime();
 
             void Check(Models.Timeline timeline)
             {
-                timeline.NameLastModified.Should().Be(_clock.GetCurrentTime());
+                timeline.NameLastModified.Should().Be(initTime);
                 timeline.LastModified.Should().Be(_clock.GetCurrentTime());
             }
 
@@ -89,6 +89,36 @@ namespace Timeline.Tests.Services
             _clock.ForwardCurrentTime();
             await _timelineService.ChangeMember(timelineName, new List<string> { "admin" }, null);
             await GetAndCheck();
+        }
+
+        [Theory]
+        [InlineData("@user")]
+        [InlineData("tl")]
+        public async Task GetPosts_ModifiedSince(string timelineName)
+        {
+            _clock.ForwardCurrentTime();
+
+            var userId = await _userService.GetUserIdByUsername("user");
+
+            var _ = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+            if (!isPersonal)
+                await _timelineService.CreateTimeline(timelineName, userId);
+
+            var postContentList = new string[] { "a", "b", "c", "d" };
+
+            DateTime testPoint = new DateTime();
+
+            foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
+            {
+                var t = _clock.ForwardCurrentTime();
+                if (index == 1)
+                    testPoint = t;
+                await _timelineService.CreateTextPost(timelineName, userId, content, null);
+            }
+
+            var posts = await _timelineService.GetPosts(timelineName, testPoint);
+            posts.Should().HaveCount(2)
+                .And.Subject.Select(p => (p.Content as TextTimelinePostContent).Text).Should().Equal(postContentList.Skip(2));
         }
     }
 }

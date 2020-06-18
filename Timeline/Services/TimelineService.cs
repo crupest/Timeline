@@ -106,6 +106,20 @@ namespace Timeline.Services
         Task<List<TimelinePost>> GetPosts(string timelineName);
 
         /// <summary>
+        /// Get the posts that have been modified since a given time in the timeline.
+        /// </summary>
+        /// <param name="timelineName">The name of the timeline.</param>
+        /// <param name="modifiedSince">The time that posts have been modified since.</param>
+        /// <returns>A list of all posts.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task<List<TimelinePost>> GetPosts(string timelineName, DateTime modifiedSince);
+
+        /// <summary>
         /// Get the etag of data of a post.
         /// </summary>
         /// <param name="timelineName">The name of the timeline of the post.</param>
@@ -383,6 +397,34 @@ namespace Timeline.Services
             };
         }
 
+        private async Task<TimelinePost> MapTimelinePostFromEntity(TimelinePostEntity entity, string timelineName)
+        {
+            if (entity.Content == null)
+            {
+                throw new ArgumentException(ExceptionPostDeleted, nameof(entity));
+            }
+
+            var author = await _userService.GetUserById(entity.AuthorId);
+
+            var type = entity.ContentType;
+
+            ITimelinePostContent content = type switch
+            {
+                TimelinePostContentTypes.Text => new TextTimelinePostContent(entity.Content),
+                TimelinePostContentTypes.Image => new ImageTimelinePostContent(entity.Content),
+                _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
+            };
+
+            return new TimelinePost(
+                    id: entity.LocalId,
+                    author: author,
+                    content: content,
+                    time: entity.Time,
+                    lastUpdated: entity.LastUpdated,
+                    timelineName: timelineName
+                );
+        }
+
         private TimelineEntity CreateNewTimelineEntity(string? name, long ownerId)
         {
             var currentTime = _clock.GetCurrentTime();
@@ -488,30 +530,23 @@ namespace Timeline.Services
             var posts = new List<TimelinePost>();
             foreach (var entity in postEntities)
             {
-                if (entity.Content == null)
-                {
-                    throw new Exception();
-                }
+                posts.Add(await MapTimelinePostFromEntity(entity, timelineName));
+            }
+            return posts;
+        }
 
-                var author = await _userService.GetUserById(entity.AuthorId);
+        public async Task<List<TimelinePost>> GetPosts(string timelineName, DateTime modifiedSince)
+        {
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-                var type = entity.ContentType;
+            var timelineId = await FindTimelineId(timelineName);
+            var postEntities = await _database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null && p.LastUpdated > modifiedSince).ToListAsync();
 
-                ITimelinePostContent content = type switch
-                {
-                    TimelinePostContentTypes.Text => new TextTimelinePostContent(entity.Content),
-                    TimelinePostContentTypes.Image => new ImageTimelinePostContent(entity.Content),
-                    _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
-                };
-
-                posts.Add(new TimelinePost(
-                    id: entity.LocalId,
-                    author: author,
-                    content: content,
-                    time: entity.Time,
-                    lastUpdated: entity.LastUpdated,
-                    timelineName: timelineName
-                ));
+            var posts = new List<TimelinePost>();
+            foreach (var entity in postEntities)
+            {
+                posts.Add(await MapTimelinePostFromEntity(entity, timelineName));
             }
             return posts;
         }
