@@ -115,8 +115,8 @@ namespace Timeline.Tests.Services
             }
 
             var posts = await _timelineService.GetPosts(timelineName, testPoint);
-            posts.Should().HaveCount(2)
-                .And.Subject.Select(p => (p.Content as TextTimelinePostContent).Text).Should().Equal(postContentList.Skip(2));
+            posts.Should().HaveCount(3)
+                .And.Subject.Select(p => (p.Content as TextTimelinePostContent).Text).Should().Equal(postContentList.Skip(1));
         }
     }
 }
