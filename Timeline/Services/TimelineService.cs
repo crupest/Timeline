@@ -96,20 +96,8 @@ namespace Timeline.Services
         /// Get all the posts in the timeline.
         /// </summary>
         /// <param name="timelineName">The name of the timeline.</param>
-        /// <returns>A list of all posts.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
-        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
-        /// </exception>
-        Task<List<TimelinePost>> GetPosts(string timelineName);
-
-        /// <summary>
-        /// Get the posts that have been modified since a given time in the timeline.
-        /// </summary>
-        /// <param name="timelineName">The name of the timeline.</param>
         /// <param name="modifiedSince">The time that posts have been modified since.</param>
+        /// <param name="includeDeleted">Whether include deleted posts.</param>
         /// <returns>A list of all posts.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
         /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
@@ -117,7 +105,7 @@ namespace Timeline.Services
         /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
-        Task<List<TimelinePost>> GetPosts(string timelineName, DateTime modifiedSince);
+        Task<List<TimelinePost>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false);
 
         /// <summary>
         /// Get the etag of data of a post.
@@ -399,21 +387,23 @@ namespace Timeline.Services
 
         private async Task<TimelinePost> MapTimelinePostFromEntity(TimelinePostEntity entity, string timelineName)
         {
-            if (entity.Content == null)
-            {
-                throw new ArgumentException(ExceptionPostDeleted, nameof(entity));
-            }
+
 
             var author = await _userService.GetUserById(entity.AuthorId);
 
-            var type = entity.ContentType;
+            ITimelinePostContent? content = null;
 
-            ITimelinePostContent content = type switch
+            if (entity.Content != null)
             {
-                TimelinePostContentTypes.Text => new TextTimelinePostContent(entity.Content),
-                TimelinePostContentTypes.Image => new ImageTimelinePostContent(entity.Content),
-                _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
-            };
+                var type = entity.ContentType;
+
+                content = type switch
+                {
+                    TimelinePostContentTypes.Text => new TextTimelinePostContent(entity.Content),
+                    TimelinePostContentTypes.Image => new ImageTimelinePostContent(entity.Content),
+                    _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, ExceptionDatabaseUnknownContentType, type))
+                };
+            }
 
             return new TimelinePost(
                     id: entity.LocalId,
@@ -519,29 +509,25 @@ namespace Timeline.Services
             return await MapTimelineFromEntity(timelineEntity);
         }
 
-        public async Task<List<TimelinePost>> GetPosts(string timelineName)
+        public async Task<List<TimelinePost>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false)
         {
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
 
             var timelineId = await FindTimelineId(timelineName);
-            var postEntities = await _database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null).ToListAsync();
+            var query = _database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId);
 
-            var posts = new List<TimelinePost>();
-            foreach (var entity in postEntities)
+            if (!includeDeleted)
             {
-                posts.Add(await MapTimelinePostFromEntity(entity, timelineName));
+                query = query.Where(p => p.Content != null);
             }
-            return posts;
-        }
 
-        public async Task<List<TimelinePost>> GetPosts(string timelineName, DateTime modifiedSince)
-        {
-            if (timelineName == null)
-                throw new ArgumentNullException(nameof(timelineName));
+            if (modifiedSince.HasValue)
+            {
+                query = query.Where(p => p.LastUpdated >= modifiedSince);
+            }
 
-            var timelineId = await FindTimelineId(timelineName);
-            var postEntities = await _database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId && p.Content != null && p.LastUpdated >= modifiedSince).ToListAsync();
+            var postEntities = await query.ToListAsync();
 
             var posts = new List<TimelinePost>();
             foreach (var entity in postEntities)

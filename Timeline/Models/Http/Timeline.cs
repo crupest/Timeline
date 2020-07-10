@@ -18,7 +18,8 @@ namespace Timeline.Models.Http
     public class TimelinePostInfo
     {
         public long Id { get; set; }
-        public TimelinePostContentInfo Content { get; set; } = default!;
+        public TimelinePostContentInfo? Content { get; set; }
+        public bool Deleted { get; set; }
         public DateTime Time { get; set; }
         public UserInfo Author { get; set; } = default!;
         public DateTime LastUpdated { get; set; } = default!;
@@ -73,7 +74,7 @@ namespace Timeline.Models.Http
         }
     }
 
-    public class TimelinePostContentResolver : IValueResolver<TimelinePost, TimelinePostInfo, TimelinePostContentInfo>
+    public class TimelinePostContentResolver : IValueResolver<TimelinePost, TimelinePostInfo, TimelinePostContentInfo?>
     {
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
@@ -84,12 +85,17 @@ namespace Timeline.Models.Http
             _urlHelperFactory = urlHelperFactory;
         }
 
-        public TimelinePostContentInfo Resolve(TimelinePost source, TimelinePostInfo destination, TimelinePostContentInfo destMember, ResolutionContext context)
+        public TimelinePostContentInfo? Resolve(TimelinePost source, TimelinePostInfo destination, TimelinePostContentInfo? destMember, ResolutionContext context)
         {
             var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
             var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
             var sourceContent = source.Content;
+
+            if (sourceContent == null)
+            {
+                return null;
+            }
 
             if (sourceContent is TextTimelinePostContent textContent)
             {
