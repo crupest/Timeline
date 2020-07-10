@@ -1255,5 +1255,39 @@ namespace Timeline.Tests.IntegratedTests
                     .And.Subject.Select(p => p.Content.Text).Should().Equal(postContentList.Skip(1));
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task PostList_IncludeDeleted(TimelineUrlGenerator urlGenerator)
+        {
+            using var client = await CreateClientAsUser();
+
+            var postContentList = new List<string> { "a", "b", "c", "d" };
+            var posts = new List<TimelinePostInfo>();
+
+            foreach (var content in postContentList)
+            {
+                var res = await client.PostAsJsonAsync(urlGenerator(1, "posts"),
+                    new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                posts.Add(res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo>().Which);
+            }
+
+            foreach (var id in new long[] { posts[0].Id, posts[2].Id })
+            {
+                var res = await client.DeleteAsync(urlGenerator(1, $"posts/{id}"));
+                res.Should().BeDelete(true);
+            }
+
+            {
+                var res = await client.GetAsync(urlGenerator(1, "posts", new Dictionary<string, string> { ["includeDeleted"] = "true" }));
+                posts = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<List<TimelinePostInfo>>()
+                    .Which;
+                posts.Should().HaveCount(4);
+                posts.Select(p => p.Deleted).Should().Equal(true, false, true, false);
+                posts.Select(p => p.Content == null).Should().Equal(true, false, true, false);
+            }
+        }
     }
 }
