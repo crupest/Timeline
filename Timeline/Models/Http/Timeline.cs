@@ -128,8 +128,7 @@ namespace Timeline.Models.Http
         public TimelineInfoAutoMapperProfile()
         {
             CreateMap<Timeline, TimelineInfo>().ForMember(u => u._links, opt => opt.MapFrom<TimelineInfoLinksValueResolver>());
-            CreateMap<TimelinePost, TimelinePostInfo>().ForMember(p => p.Content, opt => opt.MapFrom<TimelinePostContentResolver>())
-                                                       .ForMember(p => p.Deleted, opt => opt.MapFrom((source, dest) => { return source.Content == null; }));
+            CreateMap<TimelinePost, TimelinePostInfo>().ForMember(p => p.Content, opt => opt.MapFrom<TimelinePostContentResolver>());
             CreateMap<TimelinePatchRequest, TimelineChangePropertyRequest>();
         }
     }

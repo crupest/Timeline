@@ -60,6 +60,7 @@ namespace Timeline.Models
 
         public long Id { get; set; }
         public ITimelinePostContent? Content { get; set; }
+        public bool Deleted => Content == null;
         public DateTime Time { get; set; }
         public User Author { get; set; }
         public DateTime LastUpdated { get; set; }

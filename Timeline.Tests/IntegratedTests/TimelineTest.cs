@@ -942,6 +942,7 @@ namespace Timeline.Tests.IntegratedTests
                     body.Should().NotBeNull();
                     body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent));
                     body.Author.Should().BeEquivalentTo(UserInfos[1]);
+                    body.Deleted.Should().BeFalse();
                     createRes = body;
                 }
                 {
@@ -963,6 +964,7 @@ namespace Timeline.Tests.IntegratedTests
                     body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent2));
                     body.Author.Should().BeEquivalentTo(UserInfos[1]);
                     body.Time.Should().BeCloseTo(mockTime2, 1000);
+                    body.Deleted.Should().BeFalse();
                     createRes2 = body;
                 }
                 {
