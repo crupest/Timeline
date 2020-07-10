@@ -1231,28 +1231,31 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsUser();
 
-            DateTime testPoint = new DateTime();
             var postContentList = new List<string> { "a", "b", "c", "d" };
+            var posts = new List<TimelinePostInfo>();
 
-            foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
+            foreach (var content in postContentList)
             {
                 var res = await client.PostAsJsonAsync(generator(1, "posts"),
                     new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
                 var post = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelinePostInfo>().Which;
-                if (index == 1)
-                    testPoint = post.LastUpdated;
+                posts.Add(post);
                 await Task.Delay(1000);
             }
 
             {
+                var res = await client.DeleteAsync(generator(1, $"posts/{posts[2].Id}"));
+                res.Should().BeDelete(true);
+            }
 
+            {
                 var res = await client.GetAsync(generator(1, "posts",
-                    new Dictionary<string, string> { { "modifiedSince", testPoint.ToString("s", CultureInfo.InvariantCulture) } }));
+                    new Dictionary<string, string> { { "modifiedSince", posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) } }));
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<List<TimelinePostInfo>>()
-                    .Which.Should().HaveCount(3)
-                    .And.Subject.Select(p => p.Content.Text).Should().Equal(postContentList.Skip(1));
+                    .Which.Should().HaveCount(2)
+                    .And.Subject.Select(p => p.Content.Text).Should().Equal("b", "d");
             }
         }
 
@@ -1287,6 +1290,46 @@ namespace Timeline.Tests.IntegratedTests
                 posts.Should().HaveCount(4);
                 posts.Select(p => p.Deleted).Should().Equal(true, false, true, false);
                 posts.Select(p => p.Content == null).Should().Equal(true, false, true, false);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task Post_ModifiedSince_And_IncludeDeleted(TimelineUrlGenerator urlGenerator)
+        {
+            using var client = await CreateClientAsUser();
+
+            var postContentList = new List<string> { "a", "b", "c", "d" };
+            var posts = new List<TimelinePostInfo>();
+
+            foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
+            {
+                var res = await client.PostAsJsonAsync(urlGenerator(1, "posts"),
+                    new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                var post = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelinePostInfo>().Which;
+                posts.Add(post);
+                await Task.Delay(1000);
+            }
+
+            {
+                var res = await client.DeleteAsync(urlGenerator(1, $"posts/{posts[2].Id}"));
+                res.Should().BeDelete(true);
+            }
+
+            {
+
+                var res = await client.GetAsync(urlGenerator(1, "posts",
+                    new Dictionary<string, string> {
+                        { "modifiedSince", posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) },
+                        { "includeDeleted", "true" }
+                    }));
+                posts = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<List<TimelinePostInfo>>()
+                    .Which;
+                posts.Should().HaveCount(3);
+                posts.Select(p => p.Deleted).Should().Equal(false, true, false);
+                posts.Select(p => p.Content == null).Should().Equal(false, true, false);
             }
         }
     }
