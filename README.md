@@ -4,7 +4,7 @@
 
 This is the first web app of [me](https://github.com/crupest).
 
-Its back-end is written in C# and built with [ASP.Net Core](https://github.com/dotnet/aspnetcore).
+Its back-end is written in C# and built with [ASP.NET Core](https://github.com/dotnet/aspnetcore).
 
 Its front-end (located [here](https://github.com/crupest/Timeline/tree/dev/Timeline/ClientApp)) is written in [Typescript](https://www.typescriptlang.org/) and [React](https://reactjs.org/).
 
