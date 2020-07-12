@@ -94,11 +94,50 @@ namespace Timeline.Controllers
         }
 
         [HttpGet("timelines/{name}")]
-        public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][GeneralTimelineName] string name)
+        public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][GeneralTimelineName] string name, [FromQuery] string? checkUniqueId, [FromQuery(Name = "ifModifiedSince")] DateTime? queryIfModifiedSince, [FromHeader(Name = "If-Modified-Since")] DateTime? headerIfModifiedSince)
         {
-            var timeline = await _service.GetTimeline(name);
-            var result = _mapper.Map<TimelineInfo>(timeline);
-            return result;
+            DateTime? ifModifiedSince = null;
+            if (queryIfModifiedSince.HasValue)
+            {
+                ifModifiedSince = queryIfModifiedSince.Value;
+            }
+            else if (headerIfModifiedSince != null)
+            {
+                ifModifiedSince = headerIfModifiedSince.Value;
+            }
+
+            bool returnNotModified = false;
+
+            if (ifModifiedSince.HasValue)
+            {
+                var lastModified = await _service.GetTimelineLastModifiedTime(name);
+                if (lastModified < ifModifiedSince.Value)
+                {
+                    if (checkUniqueId != null)
+                    {
+                        var uniqueId = await _service.GetTimelineUniqueId(name);
+                        if (uniqueId == checkUniqueId)
+                        {
+                            returnNotModified = true;
+                        }
+                    }
+                    else
+                    {
+                        returnNotModified = true;
+                    }
+                }
+            }
+
+            if (returnNotModified)
+            {
+                return StatusCode(StatusCodes.Status304NotModified);
+            }
+            else
+            {
+                var timeline = await _service.GetTimeline(name);
+                var result = _mapper.Map<TimelineInfo>(timeline);
+                return result;
+            }
         }
 
         [HttpGet("timelines/{name}/posts")]

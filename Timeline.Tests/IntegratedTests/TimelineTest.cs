@@ -1332,5 +1332,80 @@ namespace Timeline.Tests.IntegratedTests
                 posts.Select(p => p.Content == null).Should().Equal(false, true, false);
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task Timeline_Get_IfModifiedSince_And_CheckUniqueId(TimelineUrlGenerator urlGenerator)
+        {
+            using var client = await CreateClientAsUser();
+
+            DateTime lastModifiedTime;
+            TimelineInfo timeline;
+            string uniqueId;
+
+            {
+                var res = await client.GetAsync(urlGenerator(1));
+                var body = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>().Which;
+                timeline = body;
+                lastModifiedTime = body.LastModified;
+                uniqueId = body.UniqueId;
+            }
+
+            {
+                using var req = new HttpRequestMessage
+                {
+                    RequestUri = new Uri(client.BaseAddress, urlGenerator(1)),
+                    Method = HttpMethod.Get,
+                };
+                req.Headers.IfModifiedSince = lastModifiedTime.AddSeconds(1);
+                var res = await client.SendAsync(req);
+                res.Should().HaveStatusCode(304);
+            }
+
+            {
+                using var req = new HttpRequestMessage
+                {
+                    RequestUri = new Uri(client.BaseAddress, urlGenerator(1)),
+                    Method = HttpMethod.Get,
+                };
+                req.Headers.IfModifiedSince = lastModifiedTime.AddSeconds(-1);
+                var res = await client.SendAsync(req);
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.Should().BeEquivalentTo(timeline);
+            }
+
+            {
+                var res = await client.GetAsync(urlGenerator(1, null,
+                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) } }));
+                res.Should().HaveStatusCode(304);
+            }
+
+            {
+                var res = await client.GetAsync(urlGenerator(1, null,
+                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(-1).ToString("s", CultureInfo.InvariantCulture) } }));
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.Should().BeEquivalentTo(timeline);
+            }
+
+            {
+                var res = await client.GetAsync(urlGenerator(1, null,
+                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) },
+                        {"checkUniqueId", uniqueId } }));
+                res.Should().HaveStatusCode(304);
+            }
+
+            {
+                var testUniqueId = (uniqueId[0] == 'a' ? "b" : "a") + uniqueId[1..];
+                var res = await client.GetAsync(urlGenerator(1, null,
+                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) },
+                        {"checkUniqueId", testUniqueId } }));
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.Should().BeEquivalentTo(timeline);
+            }
+        }
     }
 }
