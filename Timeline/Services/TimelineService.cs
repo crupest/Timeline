@@ -67,6 +67,32 @@ namespace Timeline.Services
     public interface ITimelineService
     {
         /// <summary>
+        /// Get the timeline last modified time (not include name change).
+        /// </summary>
+        /// <param name="timelineName">The name of the timeline.</param>
+        /// <returns>The timeline info.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task<DateTime> GetTimelineLastModifiedTime(string timelineName);
+
+        /// <summary>
+        /// Get the timeline unique id.
+        /// </summary>
+        /// <param name="timelineName">The name of the timeline.</param>
+        /// <returns>The timeline info.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task<string> GetTimelineUniqueId(string timelineName);
+
+        /// <summary>
         /// Get the timeline info.
         /// </summary>
         /// <param name="timelineName">The name of the timeline.</param>
@@ -495,6 +521,30 @@ namespace Timeline.Services
                     return timelineEntity.Id;
                 }
             }
+        }
+
+        public async Task<DateTime> GetTimelineLastModifiedTime(string timelineName)
+        {
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
+
+            var timelineId = await FindTimelineId(timelineName);
+
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.LastModified }).SingleAsync();
+
+            return timelineEntity.LastModified;
+        }
+
+        public async Task<string> GetTimelineUniqueId(string timelineName)
+        {
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
+
+            var timelineId = await FindTimelineId(timelineName);
+
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.UniqueId }).SingleAsync();
+
+            return timelineEntity.UniqueId;
         }
 
         public async Task<Models.Timeline> GetTimeline(string timelineName)
