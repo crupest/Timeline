@@ -59,6 +59,36 @@ namespace Timeline.Tests.Services
         [Theory]
         [InlineData("@user")]
         [InlineData("tl")]
+        public async Task Timeline_GetLastModified(string timelineName)
+        {
+            var time = _clock.ForwardCurrentTime();
+
+            var _ = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+            if (!isPersonal)
+                await _timelineService.CreateTimeline(timelineName, await _userService.GetUserIdByUsername("user"));
+
+            var t = await _timelineService.GetTimelineLastModifiedTime(timelineName);
+
+            t.Should().Be(time);
+        }
+
+        [Theory]
+        [InlineData("@user")]
+        [InlineData("tl")]
+        public async Task Timeline_GetUnqiueId(string timelineName)
+        {
+            var _ = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+            if (!isPersonal)
+                await _timelineService.CreateTimeline(timelineName, await _userService.GetUserIdByUsername("user"));
+
+            var uniqueId = await _timelineService.GetTimelineUniqueId(timelineName);
+
+            uniqueId.Should().NotBeNullOrEmpty();
+        }
+
+        [Theory]
+        [InlineData("@user")]
+        [InlineData("tl")]
         public async Task Timeline_LastModified(string timelineName)
         {
             var initTime = _clock.ForwardCurrentTime();
