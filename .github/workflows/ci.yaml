@@ -1,4 +1,4 @@
-name: Routine Build And Test
+name: CI
 
 on:
   push:
@@ -11,51 +11,8 @@ on:
       - "**/README.md"
 
 jobs:
-  front-end:
-    name: Front End Build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Timeline/ClientApp
-        shell: bash
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Restore Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            Timeline/ClientApp/.pnp.*
-            Timeline/ClientApp/.yarn
-            !Timeline/ClientApp/.yarn/releases
-            !Timeline/ClientApp/.yarn/plugins
-          key: yarn-${{ runner.os }}-${{ hashFiles('Timeline/ClientApp/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ runner.os }}-
-
-      - name: Use Node.js 14
-        uses: actions/setup-node@v1
-        with:
-          node-version: "14"
-
-      - name: Restore Packages
-        run: yarn
-
-      - name: Build App
-        run: yarn build
-
-      - name: Lint Code
-        run: yarn lint
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: front-end
-          path: Timeline/ClientApp/dist/
-
-  back-end:
-    name: Back End Build And Test
+  build:
+    name: Build And Test
     runs-on: ubuntu-latest
     env:
       ASPNETCORE_ENVIRONMENT: "Development"
@@ -84,5 +41,5 @@ jobs:
         uses: actions/upload-artifact@v2
         if: ${{ success() || failure() }}
         with:
-          name: back-end-test
+          name: test-result
           path: Timeline.Tests/TestResults/
