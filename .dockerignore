@@ -1,8 +1,14 @@
 .git
 Timeline/ClientApp/.git
 
-*/bin
-*/obj
+ErrorResponseCodeGenerator/bin
+ErrorResponseCodeGenerator/obj
+Timeline/bin
+Timeline/obj
+Timeline.ErrorCodes/bin
+Timeline.ErrorCodes/obj
+Timeline.Tests/bin
+Timeline.Tests/obj
 Timeline/publish
 
 Timeline/ClientApp/dist
@@ -10,4 +16,6 @@ Timeline/ClientApp/node_modules
 Timeline/ClientApp/.yarn/*
 !Timeline/ClientApp/.yarn/releases
 !Timeline/ClientApp/.yarn/plugins
-Timeline/ClientApp/.pnp.*
+!Timeline/ClientApp/.yarn/cache
+!Timeline/ClientApp/.yarn/sdks
+!Timeline/ClientApp/.yarn/versions
