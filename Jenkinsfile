@@ -21,7 +21,7 @@ pipeline {
       stage('构建与测试') {
         steps {
           sh 'dotnet test --logger:"junit;LogFileName=test-result.xml" --collect:"XPlat Code Coverage" --settings \'./Timeline.Tests/coverletArgs.runsettings\''
-          codingHtmlReport(name: 'test-result', path: 'Timeline.Tests/TestResults/', entryFile: 'index.html')
+          junit 'Timeline.Tests/TestResults/test-result.xml'
         }
       }
     }
