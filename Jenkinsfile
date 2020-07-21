@@ -1,7 +1,13 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'mcr.microsoft.com/dotnet/core/sdk'
+      reuseNode true
+    }
+
+  }
   stages {
-    stage("检出") {
+    stage('检出') {
       steps {
         checkout([
           $class: 'GitSCM',
@@ -9,14 +15,17 @@ pipeline {
           userRemoteConfigs: [[
             url: env.GIT_REPO_URL,
             credentialsId: env.CREDENTIALS_ID
-        ]]])
+          ]]])
+        }
+      }
+      stage('构建与测试') {
+        steps {
+          sh 'dotnet test --logger html --collect:"XPlat Code Coverage" --settings \'./Timeline.Tests/coverletArgs.runsettings\''
+          codingHtmlReport(name: 'test-result', path: 'Timeline.Tests/TestResults/', entryFile: 'index.html')
+        }
       }
     }
-    stage('自定义构建过程') {
-      steps {
-        echo "自定义构建过程开始"
-        // 请在此处补充您的构建过程
-      }
+    environment {
+      ASPNETCORE_ENVIRONMENT = 'Development'
     }
   }
-}
