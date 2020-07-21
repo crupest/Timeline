@@ -20,7 +20,7 @@ pipeline {
       }
       stage('构建与测试') {
         steps {
-          sh 'dotnet test --logger html --collect:"XPlat Code Coverage" --settings \'./Timeline.Tests/coverletArgs.runsettings\''
+          sh 'dotnet test --logger:"html;LogFileName=index.html" --collect:"XPlat Code Coverage" --settings \'./Timeline.Tests/coverletArgs.runsettings\''
           codingHtmlReport(name: 'test-result', path: 'Timeline.Tests/TestResults/', entryFile: 'index.html')
         }
       }
