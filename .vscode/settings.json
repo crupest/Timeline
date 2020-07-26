@@ -1,5 +1,5 @@
 {
     "yaml.schemas": {
-        "/.vscode/github-workflow-schema.json": "/.github/workflows"
+        "https://json.schemastore.org/github-workflow": "/.github/workflows"
     }
 }
