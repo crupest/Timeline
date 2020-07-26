@@ -1,0 +1,132 @@
+import axios from 'axios';
+
+import { BlobWithEtag, NotModified } from '../common';
+import {
+  IHttpUserClient,
+  HttpUser,
+  HttpUserNotExistError,
+  HttpUserPatchRequest,
+  HttpChangePasswordRequest,
+} from '../user';
+
+import { mockStorage, sha1, mockPrepare } from './common';
+
+import defaultAvatarUrl from './default-avatar.png';
+
+let _defaultAvatar: BlobWithEtag | undefined = undefined;
+
+async function getDefaultAvatar(): Promise<BlobWithEtag> {
+  if (_defaultAvatar == null) {
+    const blob = (
+      await axios.get<Blob>(defaultAvatarUrl, {
+        responseType: 'blob',
+      })
+    ).data;
+    const etag = await sha1(blob);
+    _defaultAvatar = {
+      data: blob,
+      etag,
+    };
+  }
+  return _defaultAvatar;
+}
+
+export class MockTokenError extends Error {
+  constructor() {
+    super('Token bad format.');
+  }
+}
+
+export class MockUserNotExistError extends Error {
+  constructor() {
+    super('Only two user "user" and "admin".');
+  }
+}
+
+export function checkUsername(username: string): void {
+  if (!['user', 'admin'].includes(username)) throw new MockUserNotExistError();
+}
+
+export function checkToken(token: string): string {
+  if (!token.startsWith('token-')) {
+    throw new MockTokenError();
+  }
+  return token.substr(6);
+}
+
+export async function getUser(
+  username: 'user' | 'admin' | string
+): Promise<HttpUser> {
+  checkUsername(username);
+  const savedNickname = await mockStorage.getItem<string>(
+    `user.${username}.nickname`
+  );
+  return {
+    username: username,
+    nickname:
+      savedNickname == null || savedNickname === '' ? username : savedNickname,
+    administrator: username === 'admin',
+  };
+}
+
+export class MockHttpUserClient implements IHttpUserClient {
+  async get(username: string): Promise<HttpUser> {
+    await mockPrepare();
+    return await getUser(username).catch((e) => {
+      if (e instanceof MockUserNotExistError) {
+        throw new HttpUserNotExistError();
+      } else {
+        throw e;
+      }
+    });
+  }
+
+  async patch(
+    username: string,
+    req: HttpUserPatchRequest,
+    _token: string
+  ): Promise<HttpUser> {
+    await mockPrepare();
+    if (req.nickname != null) {
+      await mockStorage.setItem(`user.${username}.nickname`, req.nickname);
+    }
+    return await getUser(username);
+  }
+
+  getAvatar(username: string): Promise<BlobWithEtag>;
+  async getAvatar(
+    username: string,
+    etag?: string
+  ): Promise<BlobWithEtag | NotModified> {
+    await mockPrepare();
+
+    const savedEtag = await mockStorage.getItem(`user.${username}.avatar.etag`);
+    if (savedEtag == null) {
+      return await getDefaultAvatar();
+    }
+
+    if (savedEtag === etag) {
+      return new NotModified();
+    }
+
+    return {
+      data: await mockStorage.getItem<Blob>(`user.${username}.avatar.data`),
+      etag: await mockStorage.getItem<string>(`user.${username}.avatar.etag`),
+    };
+  }
+
+  async putAvatar(username: string, data: Blob, _token: string): Promise<void> {
+    await mockPrepare();
+    const etag = await sha1(data);
+    await mockStorage.setItem<Blob>(`user.${username}.avatar.data`, data);
+    await mockStorage.setItem<string>(`user.${username}.avatar.etag`, etag);
+  }
+
+  async changePassword(
+    _req: HttpChangePasswordRequest,
+    _token: string
+  ): Promise<void> {
+    await mockPrepare();
+    throw new Error('Not Implemented.');
+  }
+}

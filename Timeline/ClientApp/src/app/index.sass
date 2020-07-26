@@ -1,0 +1,82 @@
+@import '~bootstrap/scss/bootstrap'
+
+@import './common/common'
+@import './common/alert'
+@import './home/home'
+@import './about/about'
+@import './timeline/timeline'
+@import './timeline/timeline-ui'
+@import './user/user-page'
+
+body
+  margin: 0
+
+#app
+  display: flex
+  flex-direction: column
+
+small
+  line-height: 1.2
+
+.width-1px
+  width: 1px
+
+.flex-fix-length
+  flex-grow: 0
+  flex-shrink: 0
+
+.position-lt
+  left: 0
+  top: 0
+
+.position-rb
+  right: 0
+  bottom: 0
+
+.app-bar
+  z-index: 1035
+
+.avatar
+  width: 60px
+
+.avatar.large
+  width: 100px
+
+.avatar.small
+  width: 40px
+
+.mt-appbar
+  margin-top: 56px
+
+.icon-button
+  font-size: 1.4em
+
+.large-icon-button
+  font-size: 1.6em
+
+.cursor-pointer
+  cursor: pointer
+
+textarea
+  resize: none
+
+.white-space-no-wrap
+  white-space: nowrap
+
+.cru-card
+  @extend .shadow
+  @extend .border
+  @extend .border-primary
+  @extend .rounded
+  @extend .bg-light
+
+.full-viewport-center-child
+  position: fixed
+  width: 100vw
+  height: 100vh
+  display: flex
+  justify-content: center
+  align-items: center
+
+.text-orange
+  color: $orange
