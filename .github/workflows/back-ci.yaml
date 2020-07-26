@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: Build And Test
+    name: Build
     runs-on: ubuntu-latest
     env:
       ASPNETCORE_ENVIRONMENT: "Development"
