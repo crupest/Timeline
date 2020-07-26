@@ -1,0 +1,43 @@
+name: Front End CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Timeline/ClientApp/**"
+  pull_request:
+    branches: [master]
+    paths:
+      - "Timeline/ClientApp/**"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: Timeline/ClientApp
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+
+      - name: Restore Packages
+        run: yarn
+
+      - name: Build App
+        run: yarn build
+
+      - name: Lint Code
+        run: yarn lint
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: Timeline/ClientApp/dist/

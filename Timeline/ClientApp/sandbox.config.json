@@ -1,0 +1,11 @@
+{
+  "infiniteLoopProtection": true,
+  "hardReloadOnChange": false,
+  "view": "browser",
+  "container": {
+    "port": 3000,
+    "startScript": "start:mock"
+  },
+  "port": 3000,
+  "startScript": "start:mock"
+}
