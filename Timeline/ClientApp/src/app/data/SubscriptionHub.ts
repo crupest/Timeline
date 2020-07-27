@@ -8,7 +8,6 @@
 // There might be some bugs, especially memory leaks and in asynchronization codes.
 
 import * as rxjs from 'rxjs';
-import { filter } from 'rxjs/operators';
 
 export type Subscriber<TData> = (data: TData) => void;
 
@@ -26,25 +25,25 @@ class SubscriptionToken {
 
 class SubscriptionLine<TData> {
   private _lastDataPromise: Promise<TData>;
-  private _dataSubject = new rxjs.BehaviorSubject<TData | undefined>(undefined);
-  private _data$: rxjs.Observable<TData> = this._dataSubject.pipe(
-    filter((d) => d !== undefined)
-  ) as rxjs.Observable<TData>;
+  private _dataSubject: rxjs.BehaviorSubject<TData>;
   private _refCount = 0;
 
   constructor(
-    _creator: () => Promise<TData>,
+    defaultValueProvider: () => TData,
+    setup: ((old: TData) => Promise<TData>) | undefined,
     private _destroyer: ((data: TData) => void) | undefined,
     private _onZeroRef: (self: SubscriptionLine<TData>) => void
   ) {
-    this._lastDataPromise = _creator().then((data) => {
-      this._dataSubject.next(data);
-      return data;
-    });
+    const initValue = defaultValueProvider();
+    this._lastDataPromise = Promise.resolve(initValue);
+    this._dataSubject = new rxjs.BehaviorSubject<TData>(initValue);
+    if (setup != null) {
+      this.next(setup);
+    }
   }
 
   subscribe(subscriber: Subscriber<TData>): SubscriptionToken {
-    const subscription = this._data$.subscribe(subscriber);
+    const subscription = this._dataSubject.subscribe(subscriber);
     this._refCount += 1;
     return new SubscriptionToken(subscription);
   }
@@ -53,11 +52,12 @@ class SubscriptionLine<TData> {
     token._subscription.unsubscribe();
     this._refCount -= 1;
     if (this._refCount === 0) {
-      void this._lastDataPromise.then((data) => {
-        if (this._destroyer != null && data !== undefined) {
-          this._destroyer(data);
-        }
-      });
+      const { _destroyer: destroyer } = this;
+      if (destroyer != null) {
+        void this._lastDataPromise.then((data) => {
+          destroyer(data);
+        });
+      }
       this._onZeroRef(this);
     }
   }
@@ -67,7 +67,7 @@ class SubscriptionLine<TData> {
       .then((old) => updator(old))
       .then((data) => {
         const last = this._dataSubject.value;
-        if (this._destroyer != null && last !== undefined) {
+        if (this._destroyer != null) {
           this._destroyer(last);
         }
         this._dataSubject.next(data);
@@ -82,9 +82,11 @@ export interface ISubscriptionHub<TKey, TData> {
 
 export class SubscriptionHub<TKey, TData>
   implements ISubscriptionHub<TKey, TData> {
+  // If setup is set, update is called with setup immediately after setting default value.
   constructor(
     public keyToString: (key: TKey) => string,
-    public creator: (key: TKey) => Promise<TData>,
+    public defaultValueProvider: (key: TKey) => TData,
+    public setup?: (key: TKey) => Promise<TData>,
     public destroyer?: (key: TKey, data: TData) => void
   ) {}
 
@@ -95,9 +97,10 @@ export class SubscriptionHub<TKey, TData>
     const line = (() => {
       const savedLine = this.subscriptionLineMap.get(keyString);
       if (savedLine == null) {
-        const { destroyer } = this;
+        const { setup, destroyer } = this;
         const newLine = new SubscriptionLine<TData>(
-          () => this.creator(key),
+          () => this.defaultValueProvider(key),
+          setup != null ? () => setup(key) : undefined,
           destroyer != null
             ? (data) => {
                 destroyer(key, data);
