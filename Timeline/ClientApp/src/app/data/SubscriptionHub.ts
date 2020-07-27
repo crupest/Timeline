@@ -3,6 +3,8 @@
 // 2. We need a way to finalize the last object. For example, if it has an object url, we need to revoke it.
 // 3. Make api easier to use and write less boilerplate codes.
 //
+// Currently updator will wait for last update or creation to finish. So the old data passed to it will always be right. We may add feature for just cancel last one but not wait for it.
+//
 // There might be some bugs, especially memory leaks and in asynchronization codes.
 
 import * as rxjs from 'rxjs';
@@ -23,7 +25,7 @@ class SubscriptionToken {
 }
 
 class SubscriptionLine<TData> {
-  private _lastDataPromise: Promise<void>;
+  private _lastDataPromise: Promise<TData>;
   private _dataSubject = new rxjs.BehaviorSubject<TData | undefined>(undefined);
   private _data$: rxjs.Observable<TData> = this._dataSubject.pipe(
     filter((d) => d !== undefined)
@@ -32,11 +34,12 @@ class SubscriptionLine<TData> {
 
   constructor(
     _creator: () => Promise<TData>,
-    private _destroyer: (data: TData) => void,
+    private _destroyer: ((data: TData) => void) | undefined,
     private _onZeroRef: (self: SubscriptionLine<TData>) => void
   ) {
     this._lastDataPromise = _creator().then((data) => {
       this._dataSubject.next(data);
+      return data;
     });
   }
 
@@ -50,25 +53,25 @@ class SubscriptionLine<TData> {
     token._subscription.unsubscribe();
     this._refCount -= 1;
     if (this._refCount === 0) {
-      void this._lastDataPromise.then(() => {
-        const last = this._dataSubject.value;
-        if (last !== undefined) {
-          this._destroyer(last);
+      void this._lastDataPromise.then((data) => {
+        if (this._destroyer != null && data !== undefined) {
+          this._destroyer(data);
         }
       });
       this._onZeroRef(this);
     }
   }
 
-  next(updator: () => Promise<TData>): void {
+  next(updator: (old: TData) => Promise<TData>): void {
     this._lastDataPromise = this._lastDataPromise
-      .then(() => updator())
+      .then((old) => updator(old))
       .then((data) => {
         const last = this._dataSubject.value;
-        if (last !== undefined) {
+        if (this._destroyer != null && last !== undefined) {
           this._destroyer(last);
         }
         this._dataSubject.next(data);
+        return data;
       });
   }
 }
@@ -82,7 +85,7 @@ export class SubscriptionHub<TKey, TData>
   constructor(
     public keyToString: (key: TKey) => string,
     public creator: (key: TKey) => Promise<TData>,
-    public destroyer: (key: TKey, data: TData) => void
+    public destroyer?: (key: TKey, data: TData) => void
   ) {}
 
   private subscriptionLineMap = new Map<string, SubscriptionLine<TData>>();
@@ -92,11 +95,14 @@ export class SubscriptionHub<TKey, TData>
     const line = (() => {
       const savedLine = this.subscriptionLineMap.get(keyString);
       if (savedLine == null) {
+        const { destroyer } = this;
         const newLine = new SubscriptionLine<TData>(
           () => this.creator(key),
-          (data) => {
-            this.destroyer(key, data);
-          },
+          destroyer != null
+            ? (data) => {
+                destroyer(key, data);
+              }
+            : undefined,
           () => {
             this.subscriptionLineMap.delete(keyString);
           }
