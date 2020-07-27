@@ -126,6 +126,28 @@ export class TimelineService {
     );
   }
 
+  private _postListSubscriptionHub = new SubscriptionHub<
+    string,
+    TimelinePostInfo[]
+  >(
+    (key) => key,
+    async (key) => {
+      return (
+        await getHttpTimelineClient().listPost(
+          key,
+          userService.currentUser?.token
+        )
+      ).map((post) => ({
+        ...post,
+        timelineName: key,
+      }));
+    }
+  );
+
+  get postListSubscriptionHub(): ISubscriptionHub<string, TimelinePostInfo[]> {
+    return this._postListSubscriptionHub;
+  }
+
   private _postDataSubscriptionHub = new SubscriptionHub<PostKey, BlobWithUrl>(
     (key) => `${key.timelineName}/${key.postId}`,
     async (key) => {
