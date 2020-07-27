@@ -131,6 +131,7 @@ export class TimelineService {
     TimelinePostInfo[]
   >(
     (key) => key,
+    () => [],
     async (key) => {
       return (
         await getHttpTimelineClient().listPost(
@@ -148,8 +149,12 @@ export class TimelineService {
     return this._postListSubscriptionHub;
   }
 
-  private _postDataSubscriptionHub = new SubscriptionHub<PostKey, BlobWithUrl>(
+  private _postDataSubscriptionHub = new SubscriptionHub<
+    PostKey,
+    BlobWithUrl | null
+  >(
     (key) => `${key.timelineName}/${key.postId}`,
+    () => null,
     async (key) => {
       const blob = (
         await getHttpTimelineClient().getPostData(
@@ -165,11 +170,11 @@ export class TimelineService {
       };
     },
     (_key, data) => {
-      URL.revokeObjectURL(data.url);
+      if (data != null) URL.revokeObjectURL(data.url);
     }
   );
 
-  get postDataHub(): ISubscriptionHub<PostKey, BlobWithUrl> {
+  get postDataHub(): ISubscriptionHub<PostKey, BlobWithUrl | null> {
     return this._postDataSubscriptionHub;
   }
 
@@ -275,8 +280,8 @@ export function usePostDataUrl(
         timelineName,
         postId,
       },
-      ({ url }) => {
-        setUrl(url);
+      (data) => {
+        setUrl(data?.url);
       }
     );
     return () => {
