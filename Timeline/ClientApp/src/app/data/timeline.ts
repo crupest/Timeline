@@ -62,6 +62,15 @@ export interface PostKey {
   postId: number;
 }
 
+export interface TimelinePostListState {
+  state:
+    | 'loading' // Loading posts from cache. `posts` is empty array.
+    | 'syncing' // Cache loaded and syncing now.
+    | 'synced' // Sync succeeded.
+    | 'offline'; // Sync failed and use cache.
+  posts: TimelinePostInfo[];
+}
+
 export class TimelineService {
   getTimeline(timelineName: string): Observable<TimelineInfo> {
     return from(getHttpTimelineClient().getTimeline(timelineName)).pipe(
@@ -128,24 +137,34 @@ export class TimelineService {
 
   private _postListSubscriptionHub = new SubscriptionHub<
     string,
-    TimelinePostInfo[]
+    TimelinePostListState
   >(
     (key) => key,
-    () => [],
+    () => ({
+      state: 'loading',
+      posts: [],
+    }),
     async (key) => {
-      return (
-        await getHttpTimelineClient().listPost(
-          key,
-          userService.currentUser?.token
-        )
-      ).map((post) => ({
-        ...post,
-        timelineName: key,
-      }));
+      // TODO: Implement cache
+      return {
+        state: 'synced',
+        posts: (
+          await getHttpTimelineClient().listPost(
+            key,
+            userService.currentUser?.token
+          )
+        ).map((post) => ({
+          ...post,
+          timelineName: key,
+        })),
+      };
     }
   );
 
-  get postListSubscriptionHub(): ISubscriptionHub<string, TimelinePostInfo[]> {
+  get postListSubscriptionHub(): ISubscriptionHub<
+    string,
+    TimelinePostListState
+  > {
     return this._postListSubscriptionHub;
   }
 
