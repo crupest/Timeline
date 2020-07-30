@@ -83,6 +83,11 @@ export default interface TranslationResource {
       inputPrompt: string;
       notMatch: string;
     };
+    postSyncState: {
+      syncing: string;
+      synced: string;
+      offline: string;
+    };
     post: {
       deleteDialog: {
         title: string;

@@ -88,6 +88,11 @@ const translation: TranslationResource = {
         '这是一个危险的操作。如果您确认要删除时间线<1>{{name}}</1>，请在下面输入它的名字并点击确认。',
       notMatch: '名字不匹配',
     },
+    postSyncState: {
+      syncing: '同步中',
+      synced: '同步成功',
+      offline: '离线',
+    },
     post: {
       deleteDialog: {
         title: '确认删除',

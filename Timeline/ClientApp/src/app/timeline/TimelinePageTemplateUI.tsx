@@ -8,7 +8,7 @@ import arrowsAngleContractIcon from 'bootstrap-icons/icons/arrows-angle-contract
 import arrowsAngleExpandIcon from 'bootstrap-icons/icons/arrows-angle-expand.svg';
 
 import { getAlertHost } from '../common/alert-service';
-import { useEventEmiiter } from '../common';
+import { useEventEmiiter, UiLogicError } from '../common';
 import {
   TimelineInfo,
   TimelinePostListState,
@@ -22,6 +22,53 @@ import Timeline, {
 } from './Timeline';
 import AppBar from '../common/AppBar';
 import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
+
+const TimelinePostSyncStateBadge: React.FC<{
+  state: 'syncing' | 'synced' | 'offline';
+}> = ({ state }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="timeline-sync-state-badge">
+      {(() => {
+        switch (state) {
+          case 'syncing': {
+            return (
+              <>
+                <span className="timeline-sync-state-badge-pin bg-warning" />
+                <span className="text-warning">
+                  {t('timeline.postSyncState.syncing')}
+                </span>
+              </>
+            );
+          }
+          case 'synced': {
+            return (
+              <>
+                <span className="timeline-sync-state-badge-pin bg-success" />
+                <span className="text-success">
+                  {t('timeline.postSyncState.synced')}
+                </span>
+              </>
+            );
+          }
+          case 'offline': {
+            return (
+              <>
+                <span className="timeline-sync-state-badge-pin bg-danger" />
+                <span className="text-danger">
+                  {t('timeline.postSyncState.offline')}
+                </span>
+              </>
+            );
+          }
+          default:
+            throw new UiLogicError('Unknown sync state.');
+        }
+      })()}
+    </div>
+  );
+};
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
@@ -147,7 +194,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
   } else {
     if (timeline != null) {
       let timelineBody: React.ReactElement;
-      if (postListState != null) {
+      if (postListState != null && postListState.state !== 'loading') {
         if (postListState.state === 'forbid') {
           timelineBody = (
             <p className="text-danger">{t('timeline.messageCantSee')}</p>
@@ -165,12 +212,15 @@ export default function TimelinePageTemplateUI<TManageItems>(
           );
 
           timelineBody = (
-            <Timeline
-              containerRef={timelineRef}
-              posts={posts}
-              onDelete={props.onDelete}
-              onResize={triggerResizeEvent}
-            />
+            <div className="position-relative">
+              <TimelinePostSyncStateBadge state={postListState.state} />
+              <Timeline
+                containerRef={timelineRef}
+                posts={posts}
+                onDelete={props.onDelete}
+                onResize={triggerResizeEvent}
+              />
+            </div>
           );
           if (props.onPost != null) {
             timelineBody = (
