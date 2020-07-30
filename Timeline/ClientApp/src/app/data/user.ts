@@ -233,8 +233,12 @@ export class UserNotExistError extends Error {}
 export type AvatarInfo = BlobWithUrl;
 
 export class UserInfoService {
-  private _avatarSubscriptionHub = new SubscriptionHub<string, AvatarInfo>(
+  private _avatarSubscriptionHub = new SubscriptionHub<
+    string,
+    AvatarInfo | null
+  >(
     (key) => key,
+    () => null,
     async (key) => {
       const blob = (await getHttpUserClient().getAvatar(key)).data;
       const url = URL.createObjectURL(blob);
@@ -244,7 +248,7 @@ export class UserInfoService {
       };
     },
     (_key, data) => {
-      URL.revokeObjectURL(data.url);
+      if (data != null) URL.revokeObjectURL(data.url);
     }
   );
 
@@ -265,7 +269,7 @@ export class UserInfoService {
     );
   }
 
-  get avatarHub(): ISubscriptionHub<string, AvatarInfo> {
+  get avatarHub(): ISubscriptionHub<string, AvatarInfo | null> {
     return this._avatarSubscriptionHub;
   }
 }
@@ -284,8 +288,8 @@ export function useAvatarUrl(username?: string): string | undefined {
 
     const subscription = userInfoService.avatarHub.subscribe(
       username,
-      ({ url }) => {
-        setAvatarUrl(url);
+      (info) => {
+        setAvatarUrl(info?.url);
       }
     );
     return () => {

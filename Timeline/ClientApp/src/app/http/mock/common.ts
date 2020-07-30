@@ -22,9 +22,15 @@ export async function sha1(data: Blob): Promise<string> {
 }
 
 const disableNetworkKey = 'mockServer.disableNetwork';
+const networkLatencyKey = 'mockServer.networkLatency';
 
 let disableNetwork: boolean =
   localStorage.getItem(disableNetworkKey) === 'true' ? true : false;
+
+const savedNetworkLatency = localStorage.getItem(networkLatencyKey);
+
+let networkLatency: number | null =
+  savedNetworkLatency != null ? Number(savedNetworkLatency) : null;
 
 Object.defineProperty(window, 'disableNetwork', {
   get: () => disableNetwork,
@@ -39,10 +45,32 @@ Object.defineProperty(window, 'disableNetwork', {
   },
 });
 
+Object.defineProperty(window, 'networkLatency', {
+  get: () => networkLatency,
+  set: (value) => {
+    if (typeof value === 'number') {
+      networkLatency = value;
+      localStorage.setItem(networkLatencyKey, value.toString());
+    } else if (value == null) {
+      networkLatency = null;
+      localStorage.removeItem(networkLatencyKey);
+    }
+  },
+});
+
 export async function mockPrepare(): Promise<void> {
   if (disableNetwork) {
     console.warn('Network is disabled for mock server.');
     throw new HttpNetworkError();
   }
+  if (networkLatency != null) {
+    await new Promise((resolve) => {
+      window.setTimeout(() => {
+        resolve();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      }, networkLatency! * 1000);
+    });
+  }
+
   await Promise.resolve();
 }

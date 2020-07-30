@@ -92,6 +92,11 @@ const translation: TranslationResource = {
         'This is a dangerous action. If you are sure to delete timeline<1>{{name}}</1>, please input its name below and click confirm button.',
       notMatch: 'Name does not match.',
     },
+    postSyncState: {
+      syncing: 'Syncing',
+      synced: 'Synced',
+      offline: 'Offline',
+    },
     post: {
       deleteDialog: {
         title: 'Confirm Delete',
