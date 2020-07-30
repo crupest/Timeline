@@ -124,11 +124,11 @@ export class SubscriptionHub<TKey, TData>
 
   // Old data is destroyed automatically.
   // updator is called only if there is subscription.
-  update(key: TKey, updator: (key: TKey) => Promise<TData>): void {
+  update(key: TKey, updator: (key: TKey, old: TData) => Promise<TData>): void {
     const keyString = this.keyToString(key);
     const line = this.subscriptionLineMap.get(keyString);
     if (line != null) {
-      line.next(() => updator(key));
+      line.next((old) => updator(key, old));
     }
   }
 }
