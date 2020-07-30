@@ -53,10 +53,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   return (
     <div
       ref={props.containerRef}
-      className={clsx(
-        'container-fluid d-flex flex-column position-relative',
-        props.className
-      )}
+      className={clsx('container-fluid timeline', props.className)}
     >
       <div className="timeline-enter-animation-mask" />
       {(() => {
