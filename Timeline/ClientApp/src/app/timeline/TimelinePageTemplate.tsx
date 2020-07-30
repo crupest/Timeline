@@ -14,7 +14,7 @@ import {
   usePostList,
 } from '../data/timeline';
 
-import { TimelinePostInfoEx, TimelineDeleteCallback } from './Timeline';
+import { TimelineDeleteCallback } from './Timeline';
 import { TimelineMemberDialog } from './TimelineMember';
 import TimelinePropertyChangeDialog from './TimelinePropertyChangeDialog';
 import { TimelinePageTemplateUIProps } from './TimelinePageTemplateUI';
@@ -55,7 +55,7 @@ export default function TimelinePageTemplate<
     undefined
   );
 
-  const rawPosts = usePostList(timeline?.name);
+  const postListState = usePostList(timeline?.name);
 
   const [error, setError] = React.useState<string | undefined>(undefined);
 
@@ -182,43 +182,19 @@ export default function TimelinePageTemplate<
 
   const onDelete: TimelineDeleteCallback = React.useCallback(
     (index, id) => {
-      service.deletePost(name, id).subscribe(
-        () => {
-          // TODO: Remove this.
-          setPosts((oldPosts) =>
-            without(
-              oldPosts as TimelinePostInfoEx[],
-              (oldPosts as TimelinePostInfoEx[])[index]
-            )
-          );
-        },
-        () => {
-          pushAlert({
-            type: 'danger',
-            message: t('timeline.deletePostFailed'),
-          });
-        }
-      );
+      service.deletePost(name, id).subscribe(null, () => {
+        pushAlert({
+          type: 'danger',
+          message: t('timeline.deletePostFailed'),
+        });
+      });
     },
     [service, name, t]
   );
 
   const onPost: TimelinePostSendCallback = React.useCallback(
     (req) => {
-      return service
-        .createPost(name, req)
-        .pipe(
-          map((newPost) => {
-            // TODO: Remove this.
-            setPosts((oldPosts) =>
-              concat(oldPosts as TimelinePostInfoEx[], {
-                ...newPost,
-                deletable: true,
-              })
-            );
-          })
-        )
-        .toPromise();
+      return service.createPost(name, req).toPromise().then();
     },
     [service, name]
   );
@@ -245,7 +221,7 @@ export default function TimelinePageTemplate<
       <UiComponent
         error={error}
         timeline={timeline}
-        posts={posts}
+        postListState={postListState}
         onDelete={onDelete}
         onPost={
           timeline != null && service.hasPostPermission(user, timeline)
