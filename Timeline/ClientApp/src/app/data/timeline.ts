@@ -6,7 +6,7 @@ import { pull } from 'lodash';
 
 import { convertError } from '../utilities/rxjs';
 
-import { BlobWithUrl, dataStorage } from './common';
+import { BlobWithUrl, dataStorage, ForbiddenError } from './common';
 import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
 
 import { UserAuthInfo, checkLogin, userService } from './user';
@@ -69,6 +69,7 @@ export interface PostKey {
 export interface TimelinePostListState {
   state:
     | 'loading' // Loading posts from cache. `posts` is empty array.
+    | 'forbid' // The list is forbidden to see.
     | 'syncing' // Cache loaded and syncing now.
     | 'synced' // Sync succeeded.
     | 'offline'; // Sync failed and use cache.
@@ -177,6 +178,12 @@ export class TimelineService {
     timelineName: string
   ): Promise<TimelinePostInfo[]> {
     const timeline = await this.getTimeline(timelineName).toPromise();
+    if (!this.hasReadPermission(userService.currentUser, timeline)) {
+      throw new ForbiddenError(
+        'You are not allowed to get posts of this timeline.'
+      );
+    }
+
     const postListInfo = await dataStorage.getItem<PostListInfo | null>(
       this.getPostListInfoKey(timeline.uniqueId)
     );
@@ -197,6 +204,18 @@ export class TimelineService {
 
   async syncPostList(timelineName: string): Promise<TimelinePostInfo[]> {
     const timeline = await this.getTimeline(timelineName).toPromise();
+    if (!this.hasReadPermission(userService.currentUser, timeline)) {
+      this._postListSubscriptionHub.update(timelineName, () =>
+        Promise.resolve({
+          state: 'forbid',
+          posts: [],
+        })
+      );
+      throw new ForbiddenError(
+        'You are not allowed to get posts of this timeline.'
+      );
+    }
+
     const postListInfoKey = this.getPostListInfoKey(timeline.uniqueId);
     const postListInfo = await dataStorage.getItem<PostListInfo | null>(
       postListInfoKey
@@ -325,10 +344,7 @@ export class TimelineService {
     }
   );
 
-  get postListSubscriptionHub(): ISubscriptionHub<
-    string,
-    TimelinePostListState
-  > {
+  get postListHub(): ISubscriptionHub<string, TimelinePostListState> {
     return this._postListSubscriptionHub;
   }
 
@@ -511,6 +527,31 @@ const timelineNameReg = XRegExp('^[-_\\p{L}]*$', 'u');
 
 export function validateTimelineName(name: string): boolean {
   return timelineNameReg.test(name);
+}
+
+export function usePostList(
+  timelineName: string | null | undefined
+): TimelinePostListState | undefined {
+  const [state, setState] = React.useState<TimelinePostListState | undefined>(
+    undefined
+  );
+  React.useEffect(() => {
+    if (timelineName == null) {
+      setState(undefined);
+      return;
+    }
+
+    const subscription = timelineService.postListHub.subscribe(
+      timelineName,
+      (data) => {
+        setState(data);
+      }
+    );
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [timelineName]);
+  return state;
 }
 
 export function usePostDataUrl(
