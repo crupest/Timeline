@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { Spinner } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 import { fromEvent } from 'rxjs';
 import Svg from 'react-inlinesvg';
+import clsx from 'clsx';
 
 import arrowsAngleContractIcon from 'bootstrap-icons/icons/arrows-angle-contract.svg';
 import arrowsAngleExpandIcon from 'bootstrap-icons/icons/arrows-angle-expand.svg';
@@ -25,11 +26,13 @@ import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
 
 const TimelinePostSyncStateBadge: React.FC<{
   state: 'syncing' | 'synced' | 'offline';
-}> = ({ state }) => {
+  style?: CSSProperties;
+  className?: string;
+}> = ({ state, style, className }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="timeline-sync-state-badge">
+    <div style={style} className={clsx('timeline-sync-state-badge', className)}>
       {(() => {
         switch (state) {
           case 'syncing': {
@@ -211,9 +214,16 @@ export default function TimelinePageTemplateUI<TManageItems>(
             })
           );
 
+          const topHeight: string = infoCardCollapse
+            ? 'calc(68px + 1.5em)'
+            : `${cardHeight + 60}px`;
+
           timelineBody = (
-            <div className="position-relative">
-              <TimelinePostSyncStateBadge state={postListState.state} />
+            <div>
+              <TimelinePostSyncStateBadge
+                style={{ top: topHeight }}
+                state={postListState.state}
+              />
               <Timeline
                 containerRef={timelineRef}
                 posts={posts}
