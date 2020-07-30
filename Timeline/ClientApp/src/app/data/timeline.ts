@@ -2,11 +2,14 @@ import React from 'react';
 import XRegExp from 'xregexp';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { pull } from 'lodash';
+
+import { convertError } from '../utilities/rxjs';
+
+import { BlobWithUrl, dataStorage, ForbiddenError } from './common';
+import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
 
 import { UserAuthInfo, checkLogin, userService } from './user';
-
-import { BlobWithUrl } from './common';
-import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
 
 export { kTimelineVisibilities } from '../http/timeline';
 
@@ -27,8 +30,9 @@ import {
   getHttpTimelineClient,
   HttpTimelineNotExistError,
   HttpTimelineNameConflictError,
+  HttpTimelineGenericPostInfo,
 } from '../http/timeline';
-import { convertError } from '../utilities/rxjs';
+import { BlobWithEtag, NotModified } from '../http/common';
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -62,9 +66,36 @@ export interface PostKey {
   postId: number;
 }
 
+export interface TimelinePostListState {
+  state:
+    | 'loading' // Loading posts from cache. `posts` is empty array.
+    | 'forbid' // The list is forbidden to see.
+    | 'syncing' // Cache loaded and syncing now.
+    | 'synced' // Sync succeeded.
+    | 'offline'; // Sync failed and use cache.
+  posts: TimelinePostInfo[];
+}
+
+interface PostListInfo {
+  idList: number[];
+  lastUpdated: string;
+}
+
 export class TimelineService {
+  // TODO: Remove this! This is currently only used to avoid multiple fetch of timeline. Because post list need to use the timeline id and call this method. But after timeline is also saved locally, this should be removed.
+  private timelineCache = new Map<string, Promise<TimelineInfo>>();
+
   getTimeline(timelineName: string): Observable<TimelineInfo> {
-    return from(getHttpTimelineClient().getTimeline(timelineName)).pipe(
+    const cache = this.timelineCache.get(timelineName);
+    let promise: Promise<TimelineInfo>;
+    if (cache == null) {
+      promise = getHttpTimelineClient().getTimeline(timelineName);
+      this.timelineCache.set(timelineName, promise);
+    } else {
+      promise = cache;
+    }
+
+    return from(promise).pipe(
       convertError(HttpTimelineNotExistError, TimelineNotExistError)
     );
   }
@@ -126,28 +157,290 @@ export class TimelineService {
     );
   }
 
-  private _postDataSubscriptionHub = new SubscriptionHub<PostKey, BlobWithUrl>(
-    (key) => `${key.timelineName}/${key.postId}`,
-    async (key) => {
-      const blob = (
-        await getHttpTimelineClient().getPostData(
-          key.timelineName,
-          key.postId,
-          userService.currentUser?.token
+  // post list storage structure:
+  // each timeline has a PostListInfo saved with key created by getPostListInfoKey
+  // each post of a timeline has a HttpTimelinePostInfo with key created by getPostKey
+  // each post with data has BlobWithEtag with key created by getPostDataKey
+
+  private getPostListInfoKey(timelineUniqueId: string): string {
+    return `timeline.${timelineUniqueId}.postListInfo`;
+  }
+
+  private getPostKey(timelineUniqueId: string, id: number): string {
+    return `timeline.${timelineUniqueId}.post.${id}`;
+  }
+
+  private getPostDataKey(timelineUniqueId: string, id: number): string {
+    return `timeline.${timelineUniqueId}.post.${id}.data`;
+  }
+
+  private async getCachedPostList(
+    timelineName: string
+  ): Promise<TimelinePostInfo[]> {
+    const timeline = await this.getTimeline(timelineName).toPromise();
+    if (!this.hasReadPermission(userService.currentUser, timeline)) {
+      throw new ForbiddenError(
+        'You are not allowed to get posts of this timeline.'
+      );
+    }
+
+    const postListInfo = await dataStorage.getItem<PostListInfo | null>(
+      this.getPostListInfoKey(timeline.uniqueId)
+    );
+    if (postListInfo == null) {
+      return [];
+    } else {
+      return (
+        await Promise.all(
+          postListInfo.idList.map((postId) =>
+            dataStorage.getItem<HttpTimelinePostInfo>(
+              this.getPostKey(timeline.uniqueId, postId)
+            )
+          )
         )
-      ).data;
-      const url = URL.createObjectURL(blob);
-      return {
-        blob,
-        url,
+      ).map((post) => ({ ...post, timelineName }));
+    }
+  }
+
+  async syncPostList(timelineName: string): Promise<TimelinePostInfo[]> {
+    const timeline = await this.getTimeline(timelineName).toPromise();
+    if (!this.hasReadPermission(userService.currentUser, timeline)) {
+      this._postListSubscriptionHub.update(timelineName, () =>
+        Promise.resolve({
+          state: 'forbid',
+          posts: [],
+        })
+      );
+      throw new ForbiddenError(
+        'You are not allowed to get posts of this timeline.'
+      );
+    }
+
+    const postListInfoKey = this.getPostListInfoKey(timeline.uniqueId);
+    const postListInfo = await dataStorage.getItem<PostListInfo | null>(
+      postListInfoKey
+    );
+
+    const now = new Date();
+    let posts: TimelinePostInfo[];
+    if (postListInfo == null) {
+      let httpPosts: HttpTimelinePostInfo[];
+      try {
+        httpPosts = await getHttpTimelineClient().listPost(
+          timelineName,
+          userService.currentUser?.token
+        );
+      } catch (e) {
+        this._postListSubscriptionHub.update(timelineName, (_, old) =>
+          Promise.resolve({
+            state: 'offline',
+            posts: old.posts,
+          })
+        );
+        throw e;
+      }
+
+      await dataStorage.setItem<PostListInfo>(postListInfoKey, {
+        idList: httpPosts.map((post) => post.id),
+        lastUpdated: now.toISOString(),
+      });
+
+      for (const post of httpPosts) {
+        await dataStorage.setItem<HttpTimelinePostInfo>(
+          this.getPostKey(timeline.uniqueId, post.id),
+          post
+        );
+      }
+
+      posts = httpPosts.map((post) => ({
+        ...post,
+        timelineName,
+      }));
+    } else {
+      let httpPosts: HttpTimelineGenericPostInfo[];
+      try {
+        httpPosts = await getHttpTimelineClient().listPost(
+          timelineName,
+          userService.currentUser?.token,
+          {
+            modifiedSince: new Date(postListInfo.lastUpdated),
+            includeDeleted: true,
+          }
+        );
+      } catch (e) {
+        this._postListSubscriptionHub.update(timelineName, (_, old) =>
+          Promise.resolve({
+            state: 'offline',
+            posts: old.posts,
+          })
+        );
+        throw e;
+      }
+
+      const newPosts: HttpTimelinePostInfo[] = [];
+
+      for (const post of httpPosts) {
+        if (post.deleted) {
+          pull(postListInfo.idList, post.id);
+          await dataStorage.removeItem(
+            this.getPostKey(timeline.uniqueId, post.id)
+          );
+          await dataStorage.removeItem(
+            this.getPostDataKey(timeline.uniqueId, post.id)
+          );
+        } else {
+          await dataStorage.setItem<HttpTimelinePostInfo>(
+            this.getPostKey(timeline.uniqueId, post.id),
+            post
+          );
+          newPosts.push(post);
+        }
+      }
+
+      const oldIdList = postListInfo.idList;
+
+      postListInfo.idList = [...oldIdList, ...newPosts.map((post) => post.id)];
+      postListInfo.lastUpdated = now.toISOString();
+      await dataStorage.setItem<PostListInfo>(postListInfoKey, postListInfo);
+
+      posts = [
+        ...(await Promise.all(
+          oldIdList.map((postId) =>
+            dataStorage.getItem<HttpTimelinePostInfo>(
+              this.getPostKey(timeline.uniqueId, postId)
+            )
+          )
+        )),
+        ...newPosts,
+      ].map((post) => ({ ...post, timelineName }));
+    }
+
+    this._postListSubscriptionHub.update(timelineName, () =>
+      Promise.resolve({
+        state: 'synced',
+        posts,
+      })
+    );
+
+    return posts;
+  }
+
+  private _postListSubscriptionHub = new SubscriptionHub<
+    string,
+    TimelinePostListState
+  >(
+    (key) => key,
+    () => ({
+      state: 'loading',
+      posts: [],
+    }),
+    async (key) => {
+      const state: TimelinePostListState = {
+        state: 'syncing',
+        posts: await this.getCachedPostList(key),
       };
-    },
-    (_key, data) => {
-      URL.revokeObjectURL(data.url);
+      void this.syncPostList(key);
+      return state;
     }
   );
 
-  get postDataHub(): ISubscriptionHub<PostKey, BlobWithUrl> {
+  get postListHub(): ISubscriptionHub<string, TimelinePostListState> {
+    return this._postListSubscriptionHub;
+  }
+
+  private async getCachePostData(
+    timelineName: string,
+    postId: number
+  ): Promise<Blob | null> {
+    const timeline = await this.getTimeline(timelineName).toPromise();
+    const cache = await dataStorage.getItem<BlobWithEtag | null>(
+      this.getPostDataKey(timeline.uniqueId, postId)
+    );
+    if (cache == null) {
+      return null;
+    } else {
+      return cache.data;
+    }
+  }
+
+  private async syncCachePostData(
+    timelineName: string,
+    postId: number
+  ): Promise<Blob | null> {
+    const timeline = await this.getTimeline(timelineName).toPromise();
+    const dataKey = this.getPostDataKey(timeline.uniqueId, postId);
+    const cache = await dataStorage.getItem<BlobWithEtag | null>(dataKey);
+
+    if (cache == null) {
+      const dataWithEtag = await getHttpTimelineClient().getPostData(
+        timelineName,
+        postId,
+        userService.currentUser?.token
+      );
+      await dataStorage.setItem<BlobWithEtag>(dataKey, dataWithEtag);
+      this._postDataSubscriptionHub.update(
+        {
+          postId,
+          timelineName,
+        },
+        () =>
+          Promise.resolve({
+            blob: dataWithEtag.data,
+            url: URL.createObjectURL(dataWithEtag.data),
+          })
+      );
+      return dataWithEtag.data;
+    } else {
+      const res = await getHttpTimelineClient().getPostData(
+        timelineName,
+        postId,
+        userService.currentUser?.token,
+        cache.etag
+      );
+      if (res instanceof NotModified) {
+        return cache.data;
+      } else {
+        await dataStorage.setItem<BlobWithEtag>(dataKey, res);
+        this._postDataSubscriptionHub.update(
+          {
+            postId,
+            timelineName,
+          },
+          () =>
+            Promise.resolve({
+              blob: res.data,
+              url: URL.createObjectURL(res.data),
+            })
+        );
+        return res.data;
+      }
+    }
+  }
+
+  private _postDataSubscriptionHub = new SubscriptionHub<
+    PostKey,
+    BlobWithUrl | null
+  >(
+    (key) => `${key.timelineName}/${key.postId}`,
+    () => null,
+    async (key) => {
+      const blob = await this.getCachePostData(key.timelineName, key.postId);
+      const result =
+        blob == null
+          ? null
+          : {
+              blob,
+              url: URL.createObjectURL(blob),
+            };
+      void this.syncCachePostData(key.timelineName, key.postId);
+      return result;
+    },
+    (_key, data) => {
+      if (data != null) URL.revokeObjectURL(data.url);
+    }
+  );
+
+  get postDataHub(): ISubscriptionHub<PostKey, BlobWithUrl | null> {
     return this._postDataSubscriptionHub;
   }
 
@@ -157,14 +450,33 @@ export class TimelineService {
   ): Observable<TimelinePostInfo> {
     const user = checkLogin();
     return from(
-      getHttpTimelineClient().postPost(timelineName, request, user.token)
+      getHttpTimelineClient()
+        .postPost(timelineName, request, user.token)
+        .then((res) => {
+          this._postListSubscriptionHub.update(timelineName, (_, old) => {
+            return Promise.resolve({
+              ...old,
+              posts: [...old.posts, { ...res, timelineName }],
+            });
+          });
+          return res;
+        })
     ).pipe(map((post) => ({ ...post, timelineName })));
   }
 
   deletePost(timelineName: string, postId: number): Observable<unknown> {
     const user = checkLogin();
     return from(
-      getHttpTimelineClient().deletePost(timelineName, postId, user.token)
+      getHttpTimelineClient()
+        .deletePost(timelineName, postId, user.token)
+        .then(() => {
+          this._postListSubscriptionHub.update(timelineName, (_, old) => {
+            return Promise.resolve({
+              ...old,
+              posts: old.posts.filter((post) => post.id != postId),
+            });
+          });
+        })
     );
   }
 
@@ -236,6 +548,31 @@ export function validateTimelineName(name: string): boolean {
   return timelineNameReg.test(name);
 }
 
+export function usePostList(
+  timelineName: string | null | undefined
+): TimelinePostListState | undefined {
+  const [state, setState] = React.useState<TimelinePostListState | undefined>(
+    undefined
+  );
+  React.useEffect(() => {
+    if (timelineName == null) {
+      setState(undefined);
+      return;
+    }
+
+    const subscription = timelineService.postListHub.subscribe(
+      timelineName,
+      (data) => {
+        setState(data);
+      }
+    );
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [timelineName]);
+  return state;
+}
+
 export function usePostDataUrl(
   enable: boolean,
   timelineName: string,
@@ -253,8 +590,8 @@ export function usePostDataUrl(
         timelineName,
         postId,
       },
-      ({ url }) => {
-        setUrl(url);
+      (data) => {
+        setUrl(data?.url);
       }
     );
     return () => {
