@@ -8,6 +8,13 @@ import arrowsAngleContractIcon from 'bootstrap-icons/icons/arrows-angle-contract
 import arrowsAngleExpandIcon from 'bootstrap-icons/icons/arrows-angle-expand.svg';
 
 import { getAlertHost } from '../common/alert-service';
+import { useEventEmiiter } from '../common';
+import {
+  TimelineInfo,
+  TimelinePostListState,
+  timelineService,
+} from '../data/timeline';
+import { userService } from '../data/user';
 
 import Timeline, {
   TimelinePostInfoEx,
@@ -15,8 +22,6 @@ import Timeline, {
 } from './Timeline';
 import AppBar from '../common/AppBar';
 import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
-import { useEventEmiiter } from '../common';
-import { TimelineInfo } from '../data/timeline';
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
@@ -29,7 +34,7 @@ export interface TimelineCardComponentProps<TManageItems> {
 export interface TimelinePageTemplateUIProps<TManageItems> {
   avatarKey?: string | number;
   timeline?: TimelineInfo;
-  posts?: TimelinePostInfoEx[] | 'forbid';
+  postListState?: TimelinePostListState;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
   onMember: () => void;
   onManage?: (item: TManageItems | 'property') => void;
@@ -41,7 +46,7 @@ export interface TimelinePageTemplateUIProps<TManageItems> {
 export default function TimelinePageTemplateUI<TManageItems>(
   props: TimelinePageTemplateUIProps<TManageItems>
 ): React.ReactElement | null {
-  const { timeline } = props;
+  const { timeline, postListState } = props;
 
   const { t } = useTranslation();
 
@@ -116,7 +121,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
         subscriptions.forEach((s) => s.unsubscribe());
       };
     }
-  }, [getResizeEvent, triggerResizeEvent, timeline, props.posts]);
+  }, [getResizeEvent, triggerResizeEvent, timeline, postListState]);
 
   const [cardHeight, setCardHeight] = React.useState<number>(0);
 
@@ -142,16 +147,27 @@ export default function TimelinePageTemplateUI<TManageItems>(
   } else {
     if (timeline != null) {
       let timelineBody: React.ReactElement;
-      if (props.posts != null) {
-        if (props.posts === 'forbid') {
+      if (postListState != null) {
+        if (postListState.state === 'forbid') {
           timelineBody = (
             <p className="text-danger">{t('timeline.messageCantSee')}</p>
           );
         } else {
+          const posts: TimelinePostInfoEx[] = postListState.posts.map(
+            (post) => ({
+              ...post,
+              deletable: timelineService.hasModifyPostPermission(
+                userService.currentUser,
+                timeline,
+                post
+              ),
+            })
+          );
+
           timelineBody = (
             <Timeline
               containerRef={timelineRef}
-              posts={props.posts}
+              posts={posts}
               onDelete={props.onDelete}
               onResize={triggerResizeEvent}
             />

@@ -450,14 +450,33 @@ export class TimelineService {
   ): Observable<TimelinePostInfo> {
     const user = checkLogin();
     return from(
-      getHttpTimelineClient().postPost(timelineName, request, user.token)
+      getHttpTimelineClient()
+        .postPost(timelineName, request, user.token)
+        .then((res) => {
+          this._postListSubscriptionHub.update(timelineName, (_, old) => {
+            return Promise.resolve({
+              ...old,
+              posts: [...old.posts, { ...res, timelineName }],
+            });
+          });
+          return res;
+        })
     ).pipe(map((post) => ({ ...post, timelineName })));
   }
 
   deletePost(timelineName: string, postId: number): Observable<unknown> {
     const user = checkLogin();
     return from(
-      getHttpTimelineClient().deletePost(timelineName, postId, user.token)
+      getHttpTimelineClient()
+        .deletePost(timelineName, postId, user.token)
+        .then(() => {
+          this._postListSubscriptionHub.update(timelineName, (_, old) => {
+            return Promise.resolve({
+              ...old,
+              posts: old.posts.filter((post) => post.id != postId),
+            });
+          });
+        })
     );
   }
 
