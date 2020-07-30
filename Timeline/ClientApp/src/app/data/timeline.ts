@@ -32,6 +32,7 @@ import {
   HttpTimelineNameConflictError,
   HttpTimelineGenericPostInfo,
 } from '../http/timeline';
+import { BlobWithEtag, NotModified } from '../http/common';
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -158,6 +159,7 @@ export class TimelineService {
   // post list storage structure:
   // each timeline has a PostListInfo saved with key created by getPostListInfoKey
   // each post of a timeline has a HttpTimelinePostInfo with key created by getPostKey
+  // each post with data has BlobWithEtag with key created by getPostDataKey
 
   private getPostListInfoKey(timelineUniqueId: string): string {
     return `timeline.${timelineUniqueId}.postListInfo`;
@@ -165,6 +167,10 @@ export class TimelineService {
 
   private getPostKey(timelineUniqueId: string, id: number): string {
     return `timeline.${timelineUniqueId}.post.${id}`;
+  }
+
+  private getPostDataKey(timelineUniqueId: string, id: number): string {
+    return `timeline.${timelineUniqueId}.post.${id}.data`;
   }
 
   private async getCachedPostList(
@@ -260,6 +266,9 @@ export class TimelineService {
           await dataStorage.removeItem(
             this.getPostKey(timeline.uniqueId, post.id)
           );
+          await dataStorage.removeItem(
+            this.getPostDataKey(timeline.uniqueId, post.id)
+          );
         } else {
           await dataStorage.setItem<HttpTimelinePostInfo>(
             this.getPostKey(timeline.uniqueId, post.id),
@@ -323,6 +332,75 @@ export class TimelineService {
     return this._postListSubscriptionHub;
   }
 
+  private async getCachePostData(
+    timelineName: string,
+    postId: number
+  ): Promise<Blob | null> {
+    const timeline = await this.getTimeline(timelineName).toPromise();
+    const cache = await dataStorage.getItem<BlobWithEtag | null>(
+      this.getPostDataKey(timeline.uniqueId, postId)
+    );
+    if (cache == null) {
+      return null;
+    } else {
+      return cache.data;
+    }
+  }
+
+  private async syncCachePostData(
+    timelineName: string,
+    postId: number
+  ): Promise<Blob | null> {
+    const timeline = await this.getTimeline(timelineName).toPromise();
+    const dataKey = this.getPostDataKey(timeline.uniqueId, postId);
+    const cache = await dataStorage.getItem<BlobWithEtag | null>(dataKey);
+
+    if (cache == null) {
+      const dataWithEtag = await getHttpTimelineClient().getPostData(
+        timelineName,
+        postId,
+        userService.currentUser?.token
+      );
+      await dataStorage.setItem<BlobWithEtag>(dataKey, dataWithEtag);
+      this._postDataSubscriptionHub.update(
+        {
+          postId,
+          timelineName,
+        },
+        () =>
+          Promise.resolve({
+            blob: dataWithEtag.data,
+            url: URL.createObjectURL(dataWithEtag.data),
+          })
+      );
+      return dataWithEtag.data;
+    } else {
+      const res = await getHttpTimelineClient().getPostData(
+        timelineName,
+        postId,
+        userService.currentUser?.token,
+        cache.etag
+      );
+      if (res instanceof NotModified) {
+        return cache.data;
+      } else {
+        await dataStorage.setItem<BlobWithEtag>(dataKey, res);
+        this._postDataSubscriptionHub.update(
+          {
+            postId,
+            timelineName,
+          },
+          () =>
+            Promise.resolve({
+              blob: res.data,
+              url: URL.createObjectURL(res.data),
+            })
+        );
+        return res.data;
+      }
+    }
+  }
+
   private _postDataSubscriptionHub = new SubscriptionHub<
     PostKey,
     BlobWithUrl | null
@@ -330,18 +408,16 @@ export class TimelineService {
     (key) => `${key.timelineName}/${key.postId}`,
     () => null,
     async (key) => {
-      const blob = (
-        await getHttpTimelineClient().getPostData(
-          key.timelineName,
-          key.postId,
-          userService.currentUser?.token
-        )
-      ).data;
-      const url = URL.createObjectURL(blob);
-      return {
-        blob,
-        url,
-      };
+      const blob = await this.getCachePostData(key.timelineName, key.postId);
+      const result =
+        blob == null
+          ? null
+          : {
+              blob,
+              url: URL.createObjectURL(blob),
+            };
+      void this.syncCachePostData(key.timelineName, key.postId);
+      return result;
     },
     (_key, data) => {
       if (data != null) URL.revokeObjectURL(data.url);
