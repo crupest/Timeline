@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { concat, without } from 'lodash';
 import { of } from 'rxjs';
-import { catchError, switchMap, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 import { ExcludeKey } from '../utilities/type';
 import { pushAlert } from '../common/alert-service';
@@ -11,6 +11,7 @@ import {
   timelineService,
   TimelineInfo,
   TimelineNotExistError,
+  usePostList,
 } from '../data/timeline';
 
 import { TimelinePostInfoEx, TimelineDeleteCallback } from './Timeline';
@@ -22,7 +23,7 @@ import { UiLogicError } from '../common';
 
 export interface TimelinePageTemplateProps<
   TManageItem,
-  TTimeline extends TimelineInfo
+  TTimeline extends TimelineInfo // TODO: Remove this.
 > {
   name: string;
   onManage: (item: TManageItem) => void;
@@ -53,53 +54,27 @@ export default function TimelinePageTemplate<
   const [timeline, setTimeline] = React.useState<TimelineInfo | undefined>(
     undefined
   );
-  const [posts, setPosts] = React.useState<
-    TimelinePostInfoEx[] | 'forbid' | undefined
-  >(undefined);
+
+  const rawPosts = usePostList(timeline?.name);
+
   const [error, setError] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
-    const subscription = service
-      .getTimeline(name)
-      .pipe(
-        switchMap((ti) => {
-          setTimeline(ti);
-          if (!service.hasReadPermission(user, ti)) {
-            setPosts('forbid');
-            return of(null);
-          } else {
-            return service
-              .getPosts(name)
-              .pipe(map((ps) => ({ timeline: ti, posts: ps })));
-          }
-        })
-      )
-      .subscribe(
-        (data) => {
-          if (data != null) {
-            setPosts(
-              data.posts.map((post) => ({
-                ...post,
-                deletable: service.hasModifyPostPermission(
-                  user,
-                  data.timeline,
-                  post
-                ),
-              }))
-            );
-          }
-        },
-        (error) => {
-          if (error instanceof TimelineNotExistError) {
-            setError(t(props.notFoundI18nKey));
-          } else {
-            setError(
-              // TODO: Convert this to a function.
-              (error as { message?: string })?.message ?? 'Unknown error'
-            );
-          }
+    const subscription = service.getTimeline(name).subscribe(
+      (ti) => {
+        setTimeline(ti);
+      },
+      (error) => {
+        if (error instanceof TimelineNotExistError) {
+          setError(t(props.notFoundI18nKey));
+        } else {
+          setError(
+            // TODO: Convert this to a function.
+            (error as { message?: string })?.message ?? 'Unknown error'
+          );
         }
-      );
+      }
+    );
     return () => {
       subscription.unsubscribe();
     };
@@ -209,6 +184,7 @@ export default function TimelinePageTemplate<
     (index, id) => {
       service.deletePost(name, id).subscribe(
         () => {
+          // TODO: Remove this.
           setPosts((oldPosts) =>
             without(
               oldPosts as TimelinePostInfoEx[],
@@ -233,6 +209,7 @@ export default function TimelinePageTemplate<
         .createPost(name, req)
         .pipe(
           map((newPost) => {
+            // TODO: Remove this.
             setPosts((oldPosts) =>
               concat(oldPosts as TimelinePostInfoEx[], {
                 ...newPost,
