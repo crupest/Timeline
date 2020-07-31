@@ -76,15 +76,77 @@ export interface TimelinePostListState {
   posts: TimelinePostInfo[];
 }
 
+export interface TimelineInfoLoadingState {
+  state: 'loading'; // Loading from cache.
+  timeline: null;
+}
+
+export interface TimelineInfoNonLoadingState {
+  state:
+    | 'syncing' // Cache loaded and syncing now. If null means there is no cache for the timeline.
+    | 'offline' // Sync failed and use cache.
+    | 'synced' // Sync succeeded. If null means the timeline does not exist.
+    | 'new'; // This is a new timeline different from cached one. If null means the timeline does not exist.
+  timeline: TimelineInfo | null;
+}
+
+export type TimelineInfoState =
+  | TimelineInfoLoadingState
+  | TimelineInfoNonLoadingState;
+
 interface PostListInfo {
   idList: number[];
   lastUpdated: string;
 }
 
 export class TimelineService {
+  // timeline storage structure:
+  // each timeline has a TimelineInfo saved with key created by getTimelineKey
+
+  private getTimelineKey(timelineName: string): string {
+    return `timeline.${timelineName}`;
+  }
+
+  private getCachedTimeline(
+    timelineName: string
+  ): Promise<TimelineInfo | null> {
+    return dataStorage.getItem<TimelineInfo | null>(
+      this.getTimelineKey(timelineName)
+    );
+  }
+
+  private syncTimeline(timelineName: string): Promise<TimelineInfo> {
+    // TODO: Implement this.
+    throw new Error('Not implemented.');
+  }
+
+  private _timelineSubscriptionHub = new SubscriptionHub<
+    string,
+    TimelineInfoState
+  >(
+    (key) => key,
+    () => ({
+      state: 'loading',
+      timeline: null,
+    }),
+    async (key) => {
+      const result = await this.getCachedTimeline(key);
+      void this.syncTimeline(key);
+      return {
+        state: 'syncing',
+        timeline: result,
+      };
+    }
+  );
+
+  get timelineHub(): ISubscriptionHub<string, TimelineInfoState> {
+    return this._timelineSubscriptionHub;
+  }
+
   // TODO: Remove this! This is currently only used to avoid multiple fetch of timeline. Because post list need to use the timeline id and call this method. But after timeline is also saved locally, this should be removed.
   private timelineCache = new Map<string, Promise<TimelineInfo>>();
 
+  // TODO: Remove this.
   getTimeline(timelineName: string): Observable<TimelineInfo> {
     const cache = this.timelineCache.get(timelineName);
     let promise: Promise<TimelineInfo>;
@@ -145,6 +207,7 @@ export class TimelineService {
     );
   }
 
+  // TODO: Remove this.
   getPosts(timelineName: string): Observable<TimelinePostInfo[]> {
     const token = userService.currentUser?.token;
     return from(getHttpTimelineClient().listPost(timelineName, token)).pipe(
