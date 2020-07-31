@@ -119,6 +119,16 @@ export function convertToNetworkError(
   }
 }
 
+export function extractDataOrConvert304ToNotModified<T>(
+  res: AxiosResponse<T>
+): T | NotModified {
+  if (res.status === 304) {
+    return new NotModified();
+  } else {
+    return res.data;
+  }
+}
+
 export function convertToBlobWithEtag(res: AxiosResponse<Blob>): BlobWithEtag {
   return {
     data: res.data,
