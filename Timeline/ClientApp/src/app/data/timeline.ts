@@ -94,6 +94,11 @@ export type TimelineInfoState =
   | TimelineInfoLoadingState
   | TimelineInfoNonLoadingState;
 
+interface TimelineCache {
+  timeline: TimelineInfo;
+  lastUpdated: string;
+}
+
 interface PostListInfo {
   idList: number[];
   lastUpdated: string;
@@ -101,7 +106,7 @@ interface PostListInfo {
 
 export class TimelineService {
   // timeline storage structure:
-  // each timeline has a TimelineInfo saved with key created by getTimelineKey
+  // each timeline has a TimelineCache saved with key created by getTimelineKey
 
   private getTimelineKey(timelineName: string): string {
     return `timeline.${timelineName}`;
@@ -110,14 +115,70 @@ export class TimelineService {
   private getCachedTimeline(
     timelineName: string
   ): Promise<TimelineInfo | null> {
-    return dataStorage.getItem<TimelineInfo | null>(
-      this.getTimelineKey(timelineName)
-    );
+    return dataStorage
+      .getItem<TimelineCache | null>(this.getTimelineKey(timelineName))
+      .then((cache) => cache?.timeline ?? null);
   }
 
-  private syncTimeline(timelineName: string): Promise<TimelineInfo> {
-    // TODO: Implement this.
-    throw new Error('Not implemented.');
+  private async syncTimeline(timelineName: string): Promise<TimelineInfo> {
+    const cache = await dataStorage.getItem<TimelineCache | null>(timelineName);
+
+    const save = (cache: TimelineCache): Promise<TimelineCache> =>
+      dataStorage.setItem<TimelineCache>(
+        this.getTimelineKey(timelineName),
+        cache
+      );
+    const push = (state: TimelineInfoState): void => {
+      this._timelineSubscriptionHub.update(timelineName, () =>
+        Promise.resolve(state)
+      );
+    };
+
+    let result: TimelineInfo;
+    const now = new Date();
+    if (cache == null) {
+      try {
+        const res = await getHttpTimelineClient().getTimeline(timelineName);
+        result = res;
+        await save({ timeline: result, lastUpdated: now.toISOString() });
+        push({ state: 'synced', timeline: result });
+      } catch (e) {
+        if (e instanceof HttpTimelineNotExistError) {
+          push({ state: 'synced', timeline: null });
+        } else {
+          push({ state: 'offline', timeline: null });
+        }
+        throw e;
+      }
+    } else {
+      try {
+        const res = await getHttpTimelineClient().getTimeline(timelineName, {
+          checkUniqueId: cache.timeline.uniqueId,
+          ifModifiedSince: new Date(cache.lastUpdated),
+        });
+        if (res instanceof NotModified) {
+          result = cache.timeline;
+          await save({ timeline: result, lastUpdated: now.toISOString() });
+          push({ state: 'synced', timeline: result });
+        } else {
+          result = res;
+          await save({ timeline: result, lastUpdated: now.toISOString() });
+          if (res.uniqueId === cache.timeline.uniqueId) {
+            push({ state: 'synced', timeline: result });
+          } else {
+            push({ state: 'new', timeline: result });
+          }
+        }
+      } catch (e) {
+        if (e instanceof HttpTimelineNotExistError) {
+          push({ state: 'new', timeline: null });
+        } else {
+          push({ state: 'offline', timeline: cache.timeline });
+        }
+        throw e;
+      }
+    }
+    return result;
   }
 
   private _timelineSubscriptionHub = new SubscriptionHub<
