@@ -24,6 +24,7 @@ export interface HttpTimelineInfo {
   description: string;
   owner: HttpUser;
   visibility: TimelineVisibility;
+  lastModified: Date;
   members: HttpUser[];
 }
 
@@ -115,6 +116,16 @@ export class HttpTimelineNameConflictError extends Error {
 
 //-------------------- begin: internal model --------------------
 
+interface RawTimelineInfo {
+  uniqueId: string;
+  name: string;
+  description: string;
+  owner: HttpUser;
+  visibility: TimelineVisibility;
+  lastModified: string;
+  members: HttpUser[];
+}
+
 interface RawTimelinePostTextContent {
   type: 'text';
   text: string;
@@ -171,6 +182,13 @@ interface RawTimelinePostPostRequest {
 
 //-------------------- end: internal model --------------------
 
+function processRawTimelineInfo(raw: RawTimelineInfo): HttpTimelineInfo {
+  return {
+    ...raw,
+    lastModified: new Date(raw.lastModified),
+  };
+}
+
 function processRawTimelinePostInfo(
   raw: RawTimelinePostInfo
 ): HttpTimelinePostInfo;
@@ -190,6 +208,19 @@ function processRawTimelinePostInfo(
 export interface IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]>;
   getTimeline(timelineName: string): Promise<HttpTimelineInfo>;
+  getTimeline(
+    timelineName: string,
+    query: {
+      checkUniqueId?: string;
+    }
+  ): Promise<HttpTimelineInfo>;
+  getTimeline(
+    timelineName: string,
+    query: {
+      checkUniqueId?: string;
+      ifModifiedSince: Date;
+    }
+  ): Promise<HttpTimelineInfo | NotModified>;
   postTimeline(
     req: HttpTimelinePostRequest,
     token: string
@@ -256,17 +287,46 @@ export interface IHttpTimelineClient {
 export class HttpTimelineClient implements IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]> {
     return axios
-      .get<HttpTimelineInfo[]>(
+      .get<RawTimelineInfo[]>(
         applyQueryParameters(`${apiBaseUrl}/timelines`, query)
       )
       .then(extractResponseData)
+      .then((list) => list.map(processRawTimelineInfo))
       .catch(convertToNetworkError);
   }
 
-  getTimeline(timelineName: string): Promise<HttpTimelineInfo> {
+  getTimeline(timelineName: string): Promise<HttpTimelineInfo>;
+  getTimeline(
+    timelineName: string,
+    query: {
+      checkUniqueId?: string;
+    }
+  ): Promise<HttpTimelineInfo>;
+  getTimeline(
+    timelineName: string,
+    query: {
+      checkUniqueId?: string;
+      ifModifiedSince: Date;
+    }
+  ): Promise<HttpTimelineInfo | NotModified>;
+  getTimeline(
+    timelineName: string,
+    query?: {
+      checkUniqueId?: string;
+      ifModifiedSince?: Date;
+    }
+  ): Promise<HttpTimelineInfo | NotModified> {
     return axios
-      .get<HttpTimelineInfo>(`${apiBaseUrl}/timelines/${timelineName}`)
-      .then(extractResponseData)
+      .get<RawTimelineInfo>(
+        applyQueryParameters(`${apiBaseUrl}/timelines/${timelineName}`, query)
+      )
+      .then((res) => {
+        if (res.status === 304) {
+          return new NotModified();
+        } else {
+          return processRawTimelineInfo(res.data);
+        }
+      })
       .catch(convertToIfStatusCodeIs(404, HttpTimelineNotExistError))
       .catch(convertToNetworkError);
   }
@@ -276,8 +336,9 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     token: string
   ): Promise<HttpTimelineInfo> {
     return axios
-      .post<HttpTimelineInfo>(`${apiBaseUrl}/timelines?token=${token}`, req)
+      .post<RawTimelineInfo>(`${apiBaseUrl}/timelines?token=${token}`, req)
       .then(extractResponseData)
+      .then(processRawTimelineInfo)
       .catch(convertToIfErrorCodeIs(11040101, HttpTimelineNameConflictError))
       .catch(convertToNetworkError);
   }
@@ -288,11 +349,12 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     token: string
   ): Promise<HttpTimelineInfo> {
     return axios
-      .patch<HttpTimelineInfo>(
+      .patch<RawTimelineInfo>(
         `${apiBaseUrl}/timelines/${timelineName}?token=${token}`,
         req
       )
       .then(extractResponseData)
+      .then(processRawTimelineInfo)
       .catch(convertToNetworkError);
   }
 

@@ -31,6 +31,7 @@ async function setTimelineNameList(newOne: string[]): Promise<void> {
 
 type TimelinePropertyKey =
   | 'uniqueId'
+  | 'lastModified'
   | 'owner'
   | 'description'
   | 'visibility'
@@ -59,6 +60,14 @@ function setTimelinePropertyValue<T>(
   return mockStorage
     .setItem<T>(getTimelinePropertyKey(name, property), value)
     .then();
+}
+
+function updateTimelineLastModified(name: string): Promise<void> {
+  return setTimelinePropertyValue(
+    name,
+    'lastModified',
+    new Date().toISOString()
+  );
 }
 
 interface HttpTimelineInfoEx extends HttpTimelineInfo {
@@ -98,6 +107,7 @@ async function getTimelineInfo(name: string): Promise<HttpTimelineInfoEx> {
     if (optionalUniqueId == null) {
       await setTimelineNameList([...(await getTimelineNameList()), name]);
       await setTimelinePropertyValue(name, 'uniqueId', createUniqueId());
+      await updateTimelineLastModified(name);
     }
   } else {
     const optionalOwnerUsername = await getTimelinePropertyValue<string | null>(
@@ -131,6 +141,9 @@ async function getTimelineInfo(name: string): Promise<HttpTimelineInfoEx> {
         name,
         'visibility'
       )) ?? 'Register',
+    lastModified: new Date(
+      await getTimelinePropertyValue<string>(name, 'lastModified')
+    ),
     members,
     memberUsernames,
   };
@@ -148,6 +161,7 @@ async function createTimeline(name: string, owner: string): Promise<void> {
   await setTimelineNameList([...(await getTimelineNameList()), name]);
   await setTimelinePropertyValue(name, 'uniqueId', createUniqueId());
   await setTimelinePropertyValue(name, 'owner', owner);
+  await updateTimelineLastModified(name);
 }
 
 type TimelinePostPropertyKey =
@@ -304,10 +318,46 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     });
   }
 
-  async getTimeline(timelineName: string): Promise<HttpTimelineInfo> {
+  getTimeline(timelineName: string): Promise<HttpTimelineInfo>;
+  getTimeline(
+    timelineName: string,
+    query: {
+      checkUniqueId?: string;
+    }
+  ): Promise<HttpTimelineInfo>;
+  getTimeline(
+    timelineName: string,
+    query: {
+      checkUniqueId?: string;
+      ifModifiedSince: Date;
+    }
+  ): Promise<HttpTimelineInfo | NotModified>;
+  async getTimeline(
+    timelineName: string,
+    query?: {
+      checkUniqueId?: string;
+      ifModifiedSince?: Date;
+    }
+  ): Promise<HttpTimelineInfo | NotModified> {
     await mockPrepare();
     try {
-      return await getTimelineInfo(timelineName);
+      const timeline = await getTimelineInfo(timelineName);
+      if (query != null && query.ifModifiedSince != null) {
+        if (timeline.lastModified >= query.ifModifiedSince) {
+          return timeline;
+        } else {
+          if (
+            query.checkUniqueId != null &&
+            timeline.uniqueId != query.checkUniqueId
+          ) {
+            return timeline;
+          } else {
+            return new NotModified();
+          }
+        }
+      }
+
+      return timeline;
     } catch (e) {
       if (
         e instanceof MockTimelineNotExistError ||
@@ -342,7 +392,9 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     _token: string
   ): Promise<HttpTimelineInfo> {
     await mockPrepare();
+    let modified = false;
     if (req.description != null) {
+      modified = true;
       await setTimelinePropertyValue(
         timelineName,
         'description',
@@ -350,11 +402,15 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
       );
     }
     if (req.visibility != null) {
+      modified = true;
       await setTimelinePropertyValue(
         timelineName,
         'visibility',
         req.visibility
       );
+    }
+    if (modified) {
+      await updateTimelineLastModified(timelineName);
     }
     return await getTimelineInfo(timelineName);
   }
@@ -387,6 +443,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
         ...oldMembers,
         username,
       ]);
+      await updateTimelineLastModified(timelineName);
     }
   }
 
@@ -407,6 +464,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
         'members',
         without(oldMembers, username)
       );
+      await updateTimelineLastModified(timelineName);
     }
   }
 

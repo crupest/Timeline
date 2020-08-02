@@ -34,8 +34,19 @@ export function updateQueryString(
 }
 
 export function applyQueryParameters<T>(url: string, query: T): string {
+  if (query == null) return url;
+
   for (const [key, value] of Object.entries(query)) {
-    url = updateQueryString(key, String(value), url);
+    if (typeof value === 'string') url = updateQueryString(key, value, url);
+    else if (typeof value === 'number')
+      url = updateQueryString(key, String(value), url);
+    else if (typeof value === 'boolean')
+      url = updateQueryString(key, value ? 'true' : 'false', url);
+    else if (value instanceof Date)
+      url = updateQueryString(key, value.toISOString(), url);
+    else {
+      console.error('Unknown query parameter type. Param: ', value);
+    }
   }
   return url;
 }
