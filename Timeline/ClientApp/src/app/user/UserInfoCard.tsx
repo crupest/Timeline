@@ -11,9 +11,10 @@ import { useTranslation } from 'react-i18next';
 import { fromEvent } from 'rxjs';
 
 import { timelineVisibilityTooltipTranslationMap } from '../data/timeline';
-import { useAvatarUrl } from '../data/user';
+import { useAvatar } from '../data/user';
 
 import { TimelineCardComponentProps } from '../timeline/TimelinePageTemplateUI';
+import BlobImage from '../common/BlobImage';
 
 export type PersonalTimelineManageItem = 'avatar' | 'nickname';
 
@@ -25,7 +26,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
   const { onHeight, onManage } = props;
   const { t } = useTranslation();
 
-  const avatarUrl = useAvatarUrl(props.timeline.owner.username);
+  const avatar = useAvatar(props.timeline.owner.username);
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
@@ -55,8 +56,8 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
       className={clsx('rounded border bg-light p-2', props.className)}
       onTransitionEnd={notifyHeight}
     >
-      <img
-        src={avatarUrl}
+      <BlobImage
+        blob={avatar}
         onLoad={notifyHeight}
         className="avatar large mr-2 mb-2 rounded-circle float-left"
       />

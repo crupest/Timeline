@@ -16,8 +16,10 @@ import Svg from 'react-inlinesvg';
 import chevronDownIcon from 'bootstrap-icons/icons/chevron-down.svg';
 import trashIcon from 'bootstrap-icons/icons/trash.svg';
 
-import { useAvatarUrl } from '../data/user';
-import { TimelinePostInfo, usePostDataUrl } from '../data/timeline';
+import BlobImage from '../common/BlobImage';
+
+import { useAvatar } from '../data/user';
+import { TimelinePostInfo } from '../data/timeline';
 
 const TimelinePostDeleteConfirmDialog: React.FC<{
   toggle: () => void;
@@ -70,13 +72,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
 
   const { more, onResize } = props;
 
-  const avatarUrl = useAvatarUrl(props.post.author.username);
-
-  const dataUrl = usePostDataUrl(
-    props.post.content.type === 'image',
-    props.post.timelineName,
-    props.post.id
-  );
+  const avatar = useAvatar(props.post.author.username);
 
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
   const toggleDeleteDialog = React.useCallback(
@@ -132,7 +128,11 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             className="float-right float-sm-left mx-2"
             to={'/users/' + props.post.author.username}
           >
-            <img onLoad={onResize} src={avatarUrl} className="avatar rounded" />
+            <BlobImage
+              onLoad={onResize}
+              blob={avatar}
+              className="avatar rounded"
+            />
           </Link>
           {(() => {
             const { content } = props.post;
@@ -140,9 +140,9 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
               return content.text;
             } else {
               return (
-                <img
+                <BlobImage
                   onLoad={onResize}
-                  src={dataUrl}
+                  blob={content.data}
                   className="timeline-content-image"
                 />
               );
