@@ -32,7 +32,7 @@ import {
   HttpTimelineNameConflictError,
   HttpTimelineGenericPostInfo,
 } from '../http/timeline';
-import { BlobWithEtag, NotModified } from '../http/common';
+import { BlobWithEtag, NotModified, HttpNetworkError } from '../http/common';
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -76,23 +76,17 @@ export interface TimelinePostListState {
   posts: TimelinePostInfo[];
 }
 
-export interface TimelineInfoLoadingState {
-  state: 'loading'; // Loading from cache.
-  timeline: null;
-}
-
-export interface TimelineInfoNonLoadingState {
-  state:
-    | 'syncing' // Cache loaded and syncing now. If null means there is no cache for the timeline.
-    | 'offline' // Sync failed and use cache.
-    | 'synced' // Sync succeeded. If null means the timeline does not exist.
-    | 'new'; // This is a new timeline different from cached one. If null means the timeline does not exist.
-  timeline: TimelineInfo | null;
-}
-
-export type TimelineInfoState =
-  | TimelineInfoLoadingState
-  | TimelineInfoNonLoadingState;
+export type TimelineWithSyncState =
+  | {
+      syncState:
+        | 'offline' // Sync failed and use cache. Null timeline means no cache.
+        | 'synced'; // Sync succeeded. Null timeline means the timeline does not exist.
+      timeline: TimelineInfo | null;
+    }
+  | {
+      syncState: 'new'; // This is a new timeline different from cached one.
+      timeline: TimelineInfo;
+    };
 
 interface TimelineCache {
   timeline: TimelineInfo;
@@ -112,43 +106,35 @@ export class TimelineService {
     return `timeline.${timelineName}`;
   }
 
-  private getCachedTimeline(
+  private async fetchAndCacheTimeline(
     timelineName: string
-  ): Promise<TimelineInfo | null> {
-    return dataStorage
-      .getItem<TimelineCache | null>(this.getTimelineKey(timelineName))
-      .then((cache) => cache?.timeline ?? null);
-  }
-
-  private async syncTimeline(timelineName: string): Promise<TimelineInfo> {
+  ): Promise<
+    | { timeline: TimelineInfo; type: 'new' | 'cache' | 'synced' }
+    | 'offline'
+    | 'notexist'
+  > {
     const cache = await dataStorage.getItem<TimelineCache | null>(timelineName);
+    const key = this.getTimelineKey(timelineName);
 
     const save = (cache: TimelineCache): Promise<TimelineCache> =>
-      dataStorage.setItem<TimelineCache>(
-        this.getTimelineKey(timelineName),
-        cache
-      );
-    const push = (state: TimelineInfoState): void => {
-      this._timelineSubscriptionHub.update(timelineName, () =>
-        Promise.resolve(state)
-      );
-    };
+      dataStorage.setItem<TimelineCache>(key, cache);
 
-    let result: TimelineInfo;
     const now = new Date();
     if (cache == null) {
       try {
-        const res = await getHttpTimelineClient().getTimeline(timelineName);
-        result = res;
-        await save({ timeline: result, lastUpdated: now.toISOString() });
-        push({ state: 'synced', timeline: result });
+        const timeline = await getHttpTimelineClient().getTimeline(
+          timelineName
+        );
+        await save({ timeline, lastUpdated: now.toISOString() });
+        return { timeline, type: 'synced' };
       } catch (e) {
         if (e instanceof HttpTimelineNotExistError) {
-          push({ state: 'synced', timeline: null });
+          return 'notexist';
+        } else if (e instanceof HttpNetworkError) {
+          return 'offline';
         } else {
-          push({ state: 'offline', timeline: null });
+          throw e;
         }
-        throw e;
       }
     } else {
       try {
@@ -157,50 +143,55 @@ export class TimelineService {
           ifModifiedSince: new Date(cache.lastUpdated),
         });
         if (res instanceof NotModified) {
-          result = cache.timeline;
-          await save({ timeline: result, lastUpdated: now.toISOString() });
-          push({ state: 'synced', timeline: result });
+          const { timeline } = cache;
+          await save({ timeline, lastUpdated: now.toISOString() });
+          return { timeline, type: 'synced' };
         } else {
-          result = res;
-          await save({ timeline: result, lastUpdated: now.toISOString() });
+          const timeline = res;
+          await save({ timeline, lastUpdated: now.toISOString() });
           if (res.uniqueId === cache.timeline.uniqueId) {
-            push({ state: 'synced', timeline: result });
+            return { timeline, type: 'synced' };
           } else {
-            push({ state: 'new', timeline: result });
+            return { timeline, type: 'new' };
           }
         }
       } catch (e) {
         if (e instanceof HttpTimelineNotExistError) {
-          push({ state: 'new', timeline: null });
-        } else {
-          push({ state: 'offline', timeline: cache.timeline });
+          await dataStorage.removeItem(key);
+          return 'notexist';
+        } else if (e instanceof HttpNetworkError) {
+          return { timeline: cache.timeline, type: 'cache' };
         }
         throw e;
       }
     }
-    return result;
   }
 
   private _timelineSubscriptionHub = new SubscriptionHub<
     string,
-    TimelineInfoState
-  >(
-    (key) => key,
-    () => ({
-      state: 'loading',
-      timeline: null,
-    }),
-    async (key) => {
-      const result = await this.getCachedTimeline(key);
-      void this.syncTimeline(key);
-      return {
-        state: 'syncing',
-        timeline: result,
-      };
-    }
-  );
+    TimelineWithSyncState
+  >({
+    setup: (key, next) => {
+      void this.fetchAndCacheTimeline(key).then((result) => {
+        if (result === 'offline') {
+          next({ syncState: 'offline', timeline: null });
+        } else if (result === 'notexist') {
+          next({ syncState: 'synced', timeline: null });
+        } else {
+          const { type, timeline } = result;
+          if (type === 'cache') {
+            next({ syncState: 'offline', timeline });
+          } else if (type === 'synced') {
+            next({ syncState: 'synced', timeline });
+          } else {
+            next({ syncState: 'new', timeline });
+          }
+        }
+      });
+    },
+  });
 
-  get timelineHub(): ISubscriptionHub<string, TimelineInfoState> {
+  get timelineHub(): ISubscriptionHub<string, TimelineWithSyncState> {
     return this._timelineSubscriptionHub;
   }
 

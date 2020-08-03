@@ -1,13 +1,10 @@
 // Remarks for SubscriptionHub:
 // 1. Compared with 'push' sematics in rxjs subject, we need 'pull'. In other words, no subscription, no updating.
-// 2. We need a way to finalize the last object. For example, if it has an object url, we need to revoke it.
-// 3. Make api easier to use and write less boilerplate codes.
-//
-// Currently updator will wait for last update or creation to finish. So the old data passed to it will always be right. We may add feature for just cancel last one but not wait for it.
+// 2. Make api easier to use and write less boilerplate codes.
 //
 // There might be some bugs, especially memory leaks and in asynchronization codes.
 
-import * as rxjs from 'rxjs';
+import { pull } from 'lodash';
 
 export type Subscriber<TData> = (data: TData) => void;
 
@@ -19,60 +16,34 @@ export class Subscription {
   }
 }
 
-class SubscriptionToken {
-  constructor(public _subscription: rxjs.Subscription) {}
-}
+class NoValue {}
 
-class SubscriptionLine<TData> {
-  private _lastDataPromise: Promise<TData>;
-  private _dataSubject: rxjs.BehaviorSubject<TData>;
-  private _refCount = 0;
+export class SubscriptionLine<TData> {
+  private _current: TData | NoValue = new NoValue();
 
-  constructor(
-    defaultValueProvider: () => TData,
-    setup: ((old: TData) => Promise<TData>) | undefined,
-    private _destroyer: ((data: TData) => void) | undefined,
-    private _onZeroRef: (self: SubscriptionLine<TData>) => void
-  ) {
-    const initValue = defaultValueProvider();
-    this._lastDataPromise = Promise.resolve(initValue);
-    this._dataSubject = new rxjs.BehaviorSubject<TData>(initValue);
-    if (setup != null) {
-      this.next(setup);
+  private _observers: Subscriber<TData>[] = [];
+
+  constructor(private config?: { onZeroObserver?: () => void }) {}
+
+  subscribe(subscriber: Subscriber<TData>): Subscription {
+    this._observers.push(subscriber);
+    if (!(this._current instanceof NoValue)) {
+      subscriber(this._current);
+    }
+
+    return new Subscription(() => this.unsubscribe(subscriber));
+  }
+
+  private unsubscribe(subscriber: Subscriber<TData>): void {
+    if (!this._observers.includes(subscriber)) return;
+    pull(this._observers, subscriber);
+    if (this._observers.length === 0) {
+      this?.config?.onZeroObserver?.();
     }
   }
 
-  subscribe(subscriber: Subscriber<TData>): SubscriptionToken {
-    const subscription = this._dataSubject.subscribe(subscriber);
-    this._refCount += 1;
-    return new SubscriptionToken(subscription);
-  }
-
-  unsubscribe(token: SubscriptionToken): void {
-    token._subscription.unsubscribe();
-    this._refCount -= 1;
-    if (this._refCount === 0) {
-      const { _destroyer: destroyer } = this;
-      if (destroyer != null) {
-        void this._lastDataPromise.then((data) => {
-          destroyer(data);
-        });
-      }
-      this._onZeroRef(this);
-    }
-  }
-
-  next(updator: (old: TData) => Promise<TData>): void {
-    this._lastDataPromise = this._lastDataPromise
-      .then((old) => updator(old))
-      .then((data) => {
-        const last = this._dataSubject.value;
-        if (this._destroyer != null) {
-          this._destroyer(last);
-        }
-        this._dataSubject.next(data);
-        return data;
-      });
+  next(value: TData): void {
+    this._observers.forEach((observer) => observer(value));
   }
 }
 
@@ -82,53 +53,78 @@ export interface ISubscriptionHub<TKey, TData> {
 
 export class SubscriptionHub<TKey, TData>
   implements ISubscriptionHub<TKey, TData> {
-  // If setup is set, update is called with setup immediately after setting default value.
-  constructor(
-    public keyToString: (key: TKey) => string,
-    public defaultValueProvider: (key: TKey) => TData,
-    public setup?: (key: TKey) => Promise<TData>,
-    public destroyer?: (key: TKey, data: TData) => void
-  ) {}
+  private keyToString: (key: TKey) => string;
+  private setup?: (
+    key: TKey,
+    next: (value: TData) => void
+  ) => (() => void) | void;
 
-  private subscriptionLineMap = new Map<string, SubscriptionLine<TData>>();
+  private readonly subscriptionLineMap = new Map<
+    string,
+    {
+      line: SubscriptionLine<TData>;
+      destroyer: (() => void) | undefined;
+      destroyTimer?: number; // Cancel it when resubscribe.
+    }
+  >();
+
+  // setup is called after creating line and if it returns a function as destroyer, then when the line is destroyed the destroyer will be called.
+  constructor(config?: {
+    keyToString?: (key: TKey) => string;
+    setup?: (key: TKey, next: (value: TData) => void) => (() => void) | void;
+  }) {
+    this.keyToString =
+      config?.keyToString ??
+      ((value): string => {
+        if (typeof value === 'string') return value;
+        else
+          throw new Error(
+            'Default keyToString function only pass string value.'
+          );
+      });
+
+    this.setup = config?.setup;
+  }
 
   subscribe(key: TKey, subscriber: Subscriber<TData>): Subscription {
     const keyString = this.keyToString(key);
     const line = (() => {
-      const savedLine = this.subscriptionLineMap.get(keyString);
-      if (savedLine == null) {
-        const { setup, destroyer } = this;
-        const newLine = new SubscriptionLine<TData>(
-          () => this.defaultValueProvider(key),
-          setup != null ? () => setup(key) : undefined,
-          destroyer != null
-            ? (data) => {
-                destroyer(key, data);
-              }
-            : undefined,
-          () => {
-            this.subscriptionLineMap.delete(keyString);
-          }
-        );
-        this.subscriptionLineMap.set(keyString, newLine);
+      const info = this.subscriptionLineMap.get(keyString);
+      if (info == null) {
+        const { setup } = this;
+        const newLine = new SubscriptionLine<TData>({
+          onZeroObserver: () => {
+            const i = this.subscriptionLineMap.get(keyString);
+            if (i != null) {
+              i.destroyTimer = window.setTimeout(() => {
+                i.destroyer?.();
+                this.subscriptionLineMap.delete(keyString);
+              }, 10000);
+            }
+          },
+        });
+        const destroyer = setup?.(key, newLine.next.bind(newLine));
+        this.subscriptionLineMap.set(keyString, {
+          line: newLine,
+          destroyer: destroyer != null ? destroyer : undefined,
+        });
         return newLine;
       } else {
-        return savedLine;
+        if (info.destroyTimer != null) {
+          window.clearTimeout(info.destroyTimer);
+          info.destroyTimer = undefined;
+        }
+        return info.line;
       }
     })();
-    const token = line.subscribe(subscriber);
-    return new Subscription(() => {
-      line.unsubscribe(token);
-    });
+    return line.subscribe(subscriber);
   }
 
-  // Old data is destroyed automatically.
-  // updator is called only if there is subscription.
-  update(key: TKey, updator: (key: TKey, old: TData) => Promise<TData>): void {
+  update(key: TKey, value: TData): void {
     const keyString = this.keyToString(key);
-    const line = this.subscriptionLineMap.get(keyString);
-    if (line != null) {
-      line.next((old) => updator(key, old));
+    const info = this.subscriptionLineMap.get(keyString);
+    if (info != null) {
+      info.line.next(value);
     }
   }
 }
