@@ -5,14 +5,15 @@ import { Navbar, NavbarToggler, Collapse, Nav, NavItem } from 'reactstrap';
 import { useMediaQuery } from 'react-responsive';
 import { useTranslation } from 'react-i18next';
 
-import { useUser, useAvatarUrl } from '../data/user';
+import { useUser, useAvatar } from '../data/user';
 
 import TimelineLogo from './TimelineLogo';
+import BlobImage from './BlobImage';
 
 const AppBar: React.FC = (_) => {
   const history = useHistory();
   const user = useUser();
-  const avatarUrl = useAvatarUrl(user?.username);
+  const avatar = useAvatar(user?.username);
 
   const { t } = useTranslation();
 
@@ -34,9 +35,9 @@ const AppBar: React.FC = (_) => {
     <div className="ml-auto mr-2">
       {user != null ? (
         <NavLink to={`/users/${user.username}`}>
-          <img
+          <BlobImage
             className="avatar small rounded-circle bg-white"
-            src={avatarUrl}
+            blob={avatar}
           />
         </NavLink>
       ) : (

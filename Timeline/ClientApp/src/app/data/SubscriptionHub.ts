@@ -16,7 +16,7 @@ export class Subscription {
   }
 }
 
-class NoValue {}
+export class NoValue {}
 
 export class SubscriptionLine<TData> {
   private _current: TData | NoValue = new NoValue();
@@ -30,7 +30,6 @@ export class SubscriptionLine<TData> {
     if (!(this._current instanceof NoValue)) {
       subscriber(this._current);
     }
-
     return new Subscription(() => this.unsubscribe(subscriber));
   }
 
@@ -43,6 +42,13 @@ export class SubscriptionLine<TData> {
   }
 
   next(value: TData): void {
+    this._current = value;
+    this._observers.forEach((observer) => observer(value));
+  }
+
+  nextWithOld(updator: (old: TData | NoValue) => TData): void {
+    const value = updator(this._current);
+    this._current = value;
     this._observers.forEach((observer) => observer(value));
   }
 }
@@ -56,7 +62,8 @@ export class SubscriptionHub<TKey, TData>
   private keyToString: (key: TKey) => string;
   private setup?: (
     key: TKey,
-    next: (value: TData) => void
+    next: (value: TData) => void,
+    line: SubscriptionLine<TData>
   ) => (() => void) | void;
 
   private readonly subscriptionLineMap = new Map<
@@ -103,7 +110,7 @@ export class SubscriptionHub<TKey, TData>
             }
           },
         });
-        const destroyer = setup?.(key, newLine.next.bind(newLine));
+        const destroyer = setup?.(key, newLine.next.bind(newLine), newLine);
         this.subscriptionLineMap.set(keyString, {
           line: newLine,
           destroyer: destroyer != null ? destroyer : undefined,
@@ -125,6 +132,14 @@ export class SubscriptionHub<TKey, TData>
     const info = this.subscriptionLineMap.get(keyString);
     if (info != null) {
       info.line.next(value);
+    }
+  }
+
+  updateWithOld(key: TKey, updator: (old: TData | NoValue) => TData): void {
+    const keyString = this.keyToString(key);
+    const info = this.subscriptionLineMap.get(keyString);
+    if (info != null) {
+      info.line.nextWithOld(updator);
     }
   }
 }

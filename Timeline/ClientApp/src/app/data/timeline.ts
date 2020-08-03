@@ -6,10 +6,10 @@ import { pull } from 'lodash';
 
 import { convertError } from '../utilities/rxjs';
 
-import { BlobWithUrl, dataStorage, ForbiddenError } from './common';
-import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
+import { dataStorage } from './common';
+import { SubscriptionHub, ISubscriptionHub, NoValue } from './SubscriptionHub';
 
-import { UserAuthInfo, checkLogin, userService } from './user';
+import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
 
 export { kTimelineVisibilities } from '../http/timeline';
 
@@ -24,15 +24,13 @@ import {
   HttpTimelinePostPostRequestTextContent,
   HttpTimelinePostPostRequestImageContent,
   HttpTimelinePostInfo,
-  HttpTimelinePostContent,
   HttpTimelinePostTextContent,
-  HttpTimelinePostImageContent,
   getHttpTimelineClient,
   HttpTimelineNotExistError,
   HttpTimelineNameConflictError,
-  HttpTimelineGenericPostInfo,
 } from '../http/timeline';
 import { BlobWithEtag, NotModified, HttpNetworkError } from '../http/common';
+import { HttpUser } from '../http/user';
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -41,13 +39,24 @@ export type TimelineCreatePostContent = HttpTimelinePostPostRequestContent;
 export type TimelineCreatePostTextContent = HttpTimelinePostPostRequestTextContent;
 export type TimelineCreatePostImageContent = HttpTimelinePostPostRequestImageContent;
 
-export interface TimelinePostInfo extends HttpTimelinePostInfo {
-  timelineName: string;
+export type TimelinePostTextContent = HttpTimelinePostTextContent;
+
+export interface TimelinePostImageContent {
+  type: 'image';
+  data: Blob;
 }
 
-export type TimelinePostContent = HttpTimelinePostContent;
-export type TimelinePostTextContent = HttpTimelinePostTextContent;
-export type TimelinePostImageContent = HttpTimelinePostImageContent;
+export type TimelinePostContent =
+  | TimelinePostTextContent
+  | TimelinePostImageContent;
+
+export interface TimelinePostInfo {
+  id: number;
+  content: TimelinePostContent;
+  time: Date;
+  lastUpdated: Date;
+  author: HttpUser;
+}
 
 export const timelineVisibilityTooltipTranslationMap: Record<
   TimelineVisibility,
@@ -61,21 +70,6 @@ export const timelineVisibilityTooltipTranslationMap: Record<
 export class TimelineNotExistError extends Error {}
 export class TimelineNameConflictError extends Error {}
 
-export interface PostKey {
-  timelineName: string;
-  postId: number;
-}
-
-export interface TimelinePostListState {
-  state:
-    | 'loading' // Loading posts from cache. `posts` is empty array.
-    | 'forbid' // The list is forbidden to see.
-    | 'syncing' // Cache loaded and syncing now.
-    | 'synced' // Sync succeeded.
-    | 'offline'; // Sync failed and use cache.
-  posts: TimelinePostInfo[];
-}
-
 export type TimelineWithSyncState =
   | {
       syncState:
@@ -88,12 +82,20 @@ export type TimelineWithSyncState =
       timeline: TimelineInfo;
     };
 
+export interface TimelinePostsWithSyncState {
+  state:
+    | 'forbid' // The list is forbidden to see.
+    | 'synced' // Sync succeeded.
+    | 'offline'; // Sync failed and use cache.
+  posts: TimelinePostInfo[];
+}
+
 interface TimelineCache {
   timeline: TimelineInfo;
   lastUpdated: string;
 }
 
-interface PostListInfo {
+interface PostsInfoCache {
   idList: number[];
   lastUpdated: string;
 }
@@ -195,25 +197,6 @@ export class TimelineService {
     return this._timelineSubscriptionHub;
   }
 
-  // TODO: Remove this! This is currently only used to avoid multiple fetch of timeline. Because post list need to use the timeline id and call this method. But after timeline is also saved locally, this should be removed.
-  private timelineCache = new Map<string, Promise<TimelineInfo>>();
-
-  // TODO: Remove this.
-  getTimeline(timelineName: string): Observable<TimelineInfo> {
-    const cache = this.timelineCache.get(timelineName);
-    let promise: Promise<TimelineInfo>;
-    if (cache == null) {
-      promise = getHttpTimelineClient().getTimeline(timelineName);
-      this.timelineCache.set(timelineName, promise);
-    } else {
-      promise = cache;
-    }
-
-    return from(promise).pipe(
-      convertError(HttpTimelineNotExistError, TimelineNotExistError)
-    );
-  }
-
   createTimeline(timelineName: string): Observable<TimelineInfo> {
     const user = checkLogin();
     return from(
@@ -234,7 +217,15 @@ export class TimelineService {
   ): Observable<TimelineInfo> {
     const user = checkLogin();
     return from(
-      getHttpTimelineClient().patchTimeline(timelineName, req, user.token)
+      getHttpTimelineClient()
+        .patchTimeline(timelineName, req, user.token)
+        .then((timeline) => {
+          this._timelineSubscriptionHub.update(timelineName, {
+            syncState: 'synced',
+            timeline,
+          });
+          return timeline;
+        })
     );
   }
 
@@ -248,36 +239,57 @@ export class TimelineService {
   addMember(timelineName: string, username: string): Observable<unknown> {
     const user = checkLogin();
     return from(
-      getHttpTimelineClient().memberPut(timelineName, username, user.token)
+      getHttpTimelineClient()
+        .memberPut(timelineName, username, user.token)
+        .then(() => {
+          userInfoService.getUserInfo(username).subscribe((newUser) => {
+            this._timelineSubscriptionHub.updateWithOld(timelineName, (old) => {
+              if (old instanceof NoValue || old.timeline == null)
+                throw new Error('Timeline not loaded.');
+
+              return {
+                ...old,
+                timeline: {
+                  ...old.timeline,
+                  members: [...old.timeline.members, newUser],
+                },
+              };
+            });
+          });
+        })
     );
   }
 
   removeMember(timelineName: string, username: string): Observable<unknown> {
     const user = checkLogin();
     return from(
-      getHttpTimelineClient().memberDelete(timelineName, username, user.token)
-    );
-  }
+      getHttpTimelineClient()
+        .memberDelete(timelineName, username, user.token)
+        .then(() => {
+          this._timelineSubscriptionHub.updateWithOld(timelineName, (old) => {
+            if (old instanceof NoValue || old.timeline == null)
+              throw new Error('Timeline not loaded.');
 
-  // TODO: Remove this.
-  getPosts(timelineName: string): Observable<TimelinePostInfo[]> {
-    const token = userService.currentUser?.token;
-    return from(getHttpTimelineClient().listPost(timelineName, token)).pipe(
-      map((posts) => {
-        return posts.map((post) => ({
-          ...post,
-          timelineName,
-        }));
-      })
+            return {
+              ...old,
+              timeline: {
+                ...old.timeline,
+                members: old.timeline.members.filter(
+                  (u) => u.username !== username
+                ),
+              },
+            };
+          });
+        })
     );
   }
 
   // post list storage structure:
-  // each timeline has a PostListInfo saved with key created by getPostListInfoKey
+  // each timeline has a PostsInfoCache saved with key created by getPostsInfoKey
   // each post of a timeline has a HttpTimelinePostInfo with key created by getPostKey
   // each post with data has BlobWithEtag with key created by getPostDataKey
 
-  private getPostListInfoKey(timelineUniqueId: string): string {
+  private getPostsInfoKey(timelineUniqueId: string): string {
     return `timeline.${timelineUniqueId}.postListInfo`;
   }
 
@@ -289,274 +301,262 @@ export class TimelineService {
     return `timeline.${timelineUniqueId}.post.${id}.data`;
   }
 
-  private async getCachedPostList(
-    timelineName: string
-  ): Promise<TimelinePostInfo[]> {
-    const timeline = await this.getTimeline(timelineName).toPromise();
-    if (!this.hasReadPermission(userService.currentUser, timeline)) {
-      throw new ForbiddenError(
-        'You are not allowed to get posts of this timeline.'
-      );
-    }
-
-    const postListInfo = await dataStorage.getItem<PostListInfo | null>(
-      this.getPostListInfoKey(timeline.uniqueId)
-    );
-    if (postListInfo == null) {
-      return [];
+  private convertPost = async (
+    post: HttpTimelinePostInfo,
+    dataProvider: () => Promise<Blob | null | undefined>
+  ): Promise<TimelinePostInfo> => {
+    const { content } = post;
+    if (content.type === 'text') {
+      return {
+        ...post,
+        content,
+      };
     } else {
-      return (
-        await Promise.all(
-          postListInfo.idList.map((postId) =>
-            dataStorage.getItem<HttpTimelinePostInfo>(
-              this.getPostKey(timeline.uniqueId, postId)
-            )
-          )
-        )
-      ).map((post) => ({ ...post, timelineName }));
+      const data = await dataProvider();
+      if (data == null) throw new Error('This post requires data.');
+      return {
+        ...post,
+        content: {
+          type: 'image',
+          data,
+        },
+      };
     }
-  }
+  };
 
-  async syncPostList(timelineName: string): Promise<TimelinePostInfo[]> {
-    const timeline = await this.getTimeline(timelineName).toPromise();
+  async fetchAndCachePosts(
+    timeline: TimelineInfo
+  ): Promise<
+    | { posts: TimelinePostInfo[]; type: 'synced' | 'cache' }
+    | 'forbid'
+    | 'offline'
+  > {
     if (!this.hasReadPermission(userService.currentUser, timeline)) {
-      this._postListSubscriptionHub.update(timelineName, () =>
-        Promise.resolve({
-          state: 'forbid',
-          posts: [],
-        })
-      );
-      throw new ForbiddenError(
-        'You are not allowed to get posts of this timeline.'
-      );
+      return 'forbid';
     }
 
-    const postListInfoKey = this.getPostListInfoKey(timeline.uniqueId);
-    const postListInfo = await dataStorage.getItem<PostListInfo | null>(
-      postListInfoKey
+    const postsInfoKey = this.getPostsInfoKey(timeline.uniqueId);
+    const postsInfo = await dataStorage.getItem<PostsInfoCache | null>(
+      postsInfoKey
     );
+
+    const convertPostList = (
+      posts: HttpTimelinePostInfo[],
+      dataProvider: (
+        post: HttpTimelinePostInfo,
+        index: number
+      ) => Promise<Blob | null | undefined>
+    ): Promise<TimelinePostInfo[]> => {
+      return Promise.all(
+        posts.map((post, index) =>
+          this.convertPost(post, () => dataProvider(post, index))
+        )
+      );
+    };
 
     const now = new Date();
-    let posts: TimelinePostInfo[];
-    if (postListInfo == null) {
-      let httpPosts: HttpTimelinePostInfo[];
+    if (postsInfo == null) {
       try {
-        httpPosts = await getHttpTimelineClient().listPost(
-          timelineName,
-          userService.currentUser?.token
+        const token = userService.currentUser?.token;
+
+        const httpPosts = await getHttpTimelineClient().listPost(
+          timeline.name,
+          token
         );
-      } catch (e) {
-        this._postListSubscriptionHub.update(timelineName, (_, old) =>
-          Promise.resolve({
-            state: 'offline',
-            posts: old.posts,
+
+        const dataList: (BlobWithEtag | null)[] = await Promise.all(
+          httpPosts.map(async (post) => {
+            const { content } = post;
+            if (content.type === 'image') {
+              return await getHttpTimelineClient().getPostData(
+                timeline.name,
+                post.id,
+                token
+              );
+            } else {
+              return null;
+            }
           })
         );
-        throw e;
-      }
 
-      await dataStorage.setItem<PostListInfo>(postListInfoKey, {
-        idList: httpPosts.map((post) => post.id),
-        lastUpdated: now.toISOString(),
-      });
+        await dataStorage.setItem<PostsInfoCache>(postsInfoKey, {
+          idList: httpPosts.map((post) => post.id),
+          lastUpdated: now.toISOString(),
+        });
 
-      for (const post of httpPosts) {
-        await dataStorage.setItem<HttpTimelinePostInfo>(
-          this.getPostKey(timeline.uniqueId, post.id),
-          post
-        );
-      }
-
-      posts = httpPosts.map((post) => ({
-        ...post,
-        timelineName,
-      }));
-    } else {
-      let httpPosts: HttpTimelineGenericPostInfo[];
-      try {
-        httpPosts = await getHttpTimelineClient().listPost(
-          timelineName,
-          userService.currentUser?.token,
-          {
-            modifiedSince: new Date(postListInfo.lastUpdated),
-            includeDeleted: true,
-          }
-        );
-      } catch (e) {
-        this._postListSubscriptionHub.update(timelineName, (_, old) =>
-          Promise.resolve({
-            state: 'offline',
-            posts: old.posts,
-          })
-        );
-        throw e;
-      }
-
-      const newPosts: HttpTimelinePostInfo[] = [];
-
-      for (const post of httpPosts) {
-        if (post.deleted) {
-          pull(postListInfo.idList, post.id);
-          await dataStorage.removeItem(
-            this.getPostKey(timeline.uniqueId, post.id)
-          );
-          await dataStorage.removeItem(
-            this.getPostDataKey(timeline.uniqueId, post.id)
-          );
-        } else {
+        for (const [i, post] of httpPosts.entries()) {
           await dataStorage.setItem<HttpTimelinePostInfo>(
             this.getPostKey(timeline.uniqueId, post.id),
             post
           );
-          newPosts.push(post);
+          const data = dataList[i];
+          if (data != null) {
+            await dataStorage.setItem<BlobWithEtag>(
+              this.getPostDataKey(timeline.uniqueId, post.id),
+              data
+            );
+          }
+        }
+
+        const posts: TimelinePostInfo[] = await convertPostList(
+          httpPosts,
+          (post, i) => Promise.resolve(dataList[i]?.data)
+        );
+
+        return { posts, type: 'synced' };
+      } catch (e) {
+        if (e instanceof HttpNetworkError) {
+          return 'offline';
+        } else {
+          throw e;
         }
       }
-
-      const oldIdList = postListInfo.idList;
-
-      postListInfo.idList = [...oldIdList, ...newPosts.map((post) => post.id)];
-      postListInfo.lastUpdated = now.toISOString();
-      await dataStorage.setItem<PostListInfo>(postListInfoKey, postListInfo);
-
-      posts = [
-        ...(await Promise.all(
-          oldIdList.map((postId) =>
-            dataStorage.getItem<HttpTimelinePostInfo>(
-              this.getPostKey(timeline.uniqueId, postId)
-            )
-          )
-        )),
-        ...newPosts,
-      ].map((post) => ({ ...post, timelineName }));
-    }
-
-    this._postListSubscriptionHub.update(timelineName, () =>
-      Promise.resolve({
-        state: 'synced',
-        posts,
-      })
-    );
-
-    return posts;
-  }
-
-  private _postListSubscriptionHub = new SubscriptionHub<
-    string,
-    TimelinePostListState
-  >(
-    (key) => key,
-    () => ({
-      state: 'loading',
-      posts: [],
-    }),
-    async (key) => {
-      const state: TimelinePostListState = {
-        state: 'syncing',
-        posts: await this.getCachedPostList(key),
-      };
-      void this.syncPostList(key);
-      return state;
-    }
-  );
-
-  get postListHub(): ISubscriptionHub<string, TimelinePostListState> {
-    return this._postListSubscriptionHub;
-  }
-
-  private async getCachePostData(
-    timelineName: string,
-    postId: number
-  ): Promise<Blob | null> {
-    const timeline = await this.getTimeline(timelineName).toPromise();
-    const cache = await dataStorage.getItem<BlobWithEtag | null>(
-      this.getPostDataKey(timeline.uniqueId, postId)
-    );
-    if (cache == null) {
-      return null;
     } else {
-      return cache.data;
-    }
-  }
-
-  private async syncCachePostData(
-    timelineName: string,
-    postId: number
-  ): Promise<Blob | null> {
-    const timeline = await this.getTimeline(timelineName).toPromise();
-    const dataKey = this.getPostDataKey(timeline.uniqueId, postId);
-    const cache = await dataStorage.getItem<BlobWithEtag | null>(dataKey);
-
-    if (cache == null) {
-      const dataWithEtag = await getHttpTimelineClient().getPostData(
-        timelineName,
-        postId,
-        userService.currentUser?.token
-      );
-      await dataStorage.setItem<BlobWithEtag>(dataKey, dataWithEtag);
-      this._postDataSubscriptionHub.update(
-        {
-          postId,
-          timelineName,
-        },
-        () =>
-          Promise.resolve({
-            blob: dataWithEtag.data,
-            url: URL.createObjectURL(dataWithEtag.data),
-          })
-      );
-      return dataWithEtag.data;
-    } else {
-      const res = await getHttpTimelineClient().getPostData(
-        timelineName,
-        postId,
-        userService.currentUser?.token,
-        cache.etag
-      );
-      if (res instanceof NotModified) {
-        return cache.data;
-      } else {
-        await dataStorage.setItem<BlobWithEtag>(dataKey, res);
-        this._postDataSubscriptionHub.update(
+      try {
+        const token = userService.currentUser?.token;
+        const httpPosts = await getHttpTimelineClient().listPost(
+          timeline.name,
+          token,
           {
-            postId,
-            timelineName,
-          },
-          () =>
-            Promise.resolve({
-              blob: res.data,
-              url: URL.createObjectURL(res.data),
-            })
+            modifiedSince: new Date(postsInfo.lastUpdated),
+            includeDeleted: true,
+          }
         );
-        return res.data;
+
+        const dataList: (BlobWithEtag | null)[] = await Promise.all(
+          httpPosts.map(async (post) => {
+            if (post.deleted) return null;
+            const { content } = post;
+            if (content.type === 'image') {
+              return await getHttpTimelineClient().getPostData(
+                timeline.name,
+                post.id,
+                token
+              );
+            } else {
+              return null;
+            }
+          })
+        );
+
+        const newPosts: HttpTimelinePostInfo[] = [];
+        const newPostDataList: (BlobWithEtag | null)[] = [];
+
+        for (const [i, post] of httpPosts.entries()) {
+          if (post.deleted) {
+            pull(postsInfo.idList, post.id);
+            await dataStorage.removeItem(
+              this.getPostKey(timeline.uniqueId, post.id)
+            );
+            await dataStorage.removeItem(
+              this.getPostDataKey(timeline.uniqueId, post.id)
+            );
+          } else {
+            await dataStorage.setItem<HttpTimelinePostInfo>(
+              this.getPostKey(timeline.uniqueId, post.id),
+              post
+            );
+            const data = dataList[i];
+            if (data != null) {
+              await dataStorage.setItem<BlobWithEtag>(
+                this.getPostDataKey(timeline.uniqueId, post.id),
+                data
+              );
+            }
+            newPosts.push(post);
+            newPostDataList.push(data);
+          }
+        }
+
+        const oldIdList = postsInfo.idList;
+
+        postsInfo.idList = [...oldIdList, ...newPosts.map((post) => post.id)];
+        postsInfo.lastUpdated = now.toISOString();
+        await dataStorage.setItem<PostsInfoCache>(postsInfoKey, postsInfo);
+
+        const posts: TimelinePostInfo[] = [
+          ...(await convertPostList(
+            await Promise.all(
+              oldIdList.map((postId) =>
+                dataStorage.getItem<HttpTimelinePostInfo>(
+                  this.getPostKey(timeline.uniqueId, postId)
+                )
+              )
+            ),
+            (post) =>
+              dataStorage
+                .getItem<BlobWithEtag | null>(
+                  this.getPostDataKey(timeline.uniqueId, post.id)
+                )
+                .then((d) => d?.data)
+          )),
+          ...(await convertPostList(newPosts, (post, i) =>
+            Promise.resolve(newPostDataList[i]?.data)
+          )),
+        ];
+        return { posts, type: 'synced' };
+      } catch (e) {
+        if (e instanceof HttpNetworkError) {
+          const httpPosts = await Promise.all(
+            postsInfo.idList.map((postId) =>
+              dataStorage.getItem<HttpTimelinePostInfo>(
+                this.getPostKey(timeline.uniqueId, postId)
+              )
+            )
+          );
+
+          const posts = await convertPostList(httpPosts, (post) =>
+            dataStorage
+              .getItem<BlobWithEtag | null>(
+                this.getPostDataKey(timeline.uniqueId, post.id)
+              )
+              .then((d) => d?.data)
+          );
+
+          return { posts, type: 'cache' };
+        } else {
+          throw e;
+        }
       }
     }
   }
 
-  private _postDataSubscriptionHub = new SubscriptionHub<
-    PostKey,
-    BlobWithUrl | null
-  >(
-    (key) => `${key.timelineName}/${key.postId}`,
-    () => null,
-    async (key) => {
-      const blob = await this.getCachePostData(key.timelineName, key.postId);
-      const result =
-        blob == null
-          ? null
-          : {
-              blob,
-              url: URL.createObjectURL(blob),
-            };
-      void this.syncCachePostData(key.timelineName, key.postId);
-      return result;
+  private _postsSubscriptionHub = new SubscriptionHub<
+    string,
+    TimelinePostsWithSyncState
+  >({
+    setup: (key, next) => {
+      const sub = this.timelineHub.subscribe(key, (timelineState) => {
+        if (timelineState.timeline == null) {
+          if (timelineState.syncState === 'offline') {
+            next({ state: 'offline', posts: [] });
+          } else {
+            next({ state: 'synced', posts: [] });
+          }
+        } else {
+          void this.fetchAndCachePosts(timelineState.timeline).then(
+            (result) => {
+              if (result === 'forbid') {
+                next({ state: 'forbid', posts: [] });
+              } else if (result === 'offline') {
+                next({ state: 'offline', posts: [] });
+              } else if (result.type === 'synced') {
+                next({ state: 'synced', posts: result.posts });
+              } else {
+                next({ state: 'offline', posts: result.posts });
+              }
+            }
+          );
+        }
+      });
+      return () => {
+        sub.unsubscribe();
+      };
     },
-    (_key, data) => {
-      if (data != null) URL.revokeObjectURL(data.url);
-    }
-  );
+  });
 
-  get postDataHub(): ISubscriptionHub<PostKey, BlobWithUrl | null> {
-    return this._postDataSubscriptionHub;
+  get postsHub(): ISubscriptionHub<string, TimelinePostsWithSyncState> {
+    return this._postsSubscriptionHub;
   }
 
   createPost(
@@ -567,14 +567,24 @@ export class TimelineService {
     return from(
       getHttpTimelineClient()
         .postPost(timelineName, request, user.token)
-        .then((res) => {
-          this._postListSubscriptionHub.update(timelineName, (_, old) => {
-            return Promise.resolve({
+        .then((post) =>
+          this.convertPost(post, () =>
+            Promise.resolve(
+              (request.content as TimelineCreatePostImageContent).data
+            )
+          )
+        )
+        .then((post) => {
+          this._postsSubscriptionHub.updateWithOld(timelineName, (old) => {
+            if (old instanceof NoValue) {
+              throw new Error('Posts has not been loaded.');
+            }
+            return {
               ...old,
-              posts: [...old.posts, { ...res, timelineName }],
-            });
+              posts: [...old.posts, post],
+            };
           });
-          return res;
+          return post;
         })
     ).pipe(map((post) => ({ ...post, timelineName })));
   }
@@ -585,11 +595,14 @@ export class TimelineService {
       getHttpTimelineClient()
         .deletePost(timelineName, postId, user.token)
         .then(() => {
-          this._postListSubscriptionHub.update(timelineName, (_, old) => {
-            return Promise.resolve({
+          this._postsSubscriptionHub.updateWithOld(timelineName, (old) => {
+            if (old instanceof NoValue) {
+              throw new Error('Posts has not been loaded.');
+            }
+            return {
               ...old,
               posts: old.posts.filter((post) => post.id != postId),
-            });
+            };
           });
         })
     );
@@ -663,19 +676,14 @@ export function validateTimelineName(name: string): boolean {
   return timelineNameReg.test(name);
 }
 
-export function usePostList(
-  timelineName: string | null | undefined
-): TimelinePostListState | undefined {
-  const [state, setState] = React.useState<TimelinePostListState | undefined>(
+export function useTimelineInfo(
+  timelineName: string
+): TimelineWithSyncState | undefined {
+  const [state, setState] = React.useState<TimelineWithSyncState | undefined>(
     undefined
   );
   React.useEffect(() => {
-    if (timelineName == null) {
-      setState(undefined);
-      return;
-    }
-
-    const subscription = timelineService.postListHub.subscribe(
+    const subscription = timelineService.timelineHub.subscribe(
       timelineName,
       (data) => {
         setState(data);
@@ -688,30 +696,27 @@ export function usePostList(
   return state;
 }
 
-export function usePostDataUrl(
-  enable: boolean,
-  timelineName: string,
-  postId: number
-): string | undefined {
-  const [url, setUrl] = React.useState<string | undefined>(undefined);
+export function usePostList(
+  timelineName: string | null | undefined
+): TimelinePostsWithSyncState | undefined {
+  const [state, setState] = React.useState<
+    TimelinePostsWithSyncState | undefined
+  >(undefined);
   React.useEffect(() => {
-    if (!enable) {
-      setUrl(undefined);
+    if (timelineName == null) {
+      setState(undefined);
       return;
     }
 
-    const subscription = timelineService.postDataHub.subscribe(
-      {
-        timelineName,
-        postId,
-      },
+    const subscription = timelineService.postsHub.subscribe(
+      timelineName,
       (data) => {
-        setUrl(data?.url);
+        setState(data);
       }
     );
     return () => {
       subscription.unsubscribe();
     };
-  }, [timelineName, postId, enable]);
-  return url;
+  }, [timelineName]);
+  return state;
 }

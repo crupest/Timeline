@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { concat, without } from 'lodash';
 import { of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 import { ExcludeKey } from '../utilities/type';
 import { pushAlert } from '../common/alert-service';
@@ -10,8 +9,8 @@ import { useUser, userInfoService, UserNotExistError } from '../data/user';
 import {
   timelineService,
   TimelineInfo,
-  TimelineNotExistError,
   usePostList,
+  useTimelineInfo,
 } from '../data/timeline';
 
 import { TimelineDeleteCallback } from './Timeline';
@@ -51,34 +50,22 @@ export default function TimelinePageTemplate<
   const [dialog, setDialog] = React.useState<null | 'property' | 'member'>(
     null
   );
-  const [timeline, setTimeline] = React.useState<TimelineInfo | undefined>(
-    undefined
-  );
 
-  const postListState = usePostList(timeline?.name);
+  const timelineState = useTimelineInfo(name);
 
-  const [error, setError] = React.useState<string | undefined>(undefined);
+  const timeline = timelineState?.timeline;
 
-  React.useEffect(() => {
-    const subscription = service.getTimeline(name).subscribe(
-      (ti) => {
-        setTimeline(ti);
-      },
-      (error) => {
-        if (error instanceof TimelineNotExistError) {
-          setError(t(props.notFoundI18nKey));
-        } else {
-          setError(
-            // TODO: Convert this to a function.
-            (error as { message?: string })?.message ?? 'Unknown error'
-          );
-        }
-      }
-    );
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [name, service, user, t, props.dataVersion, props.notFoundI18nKey]);
+  const postListState = usePostList(name);
+
+  const error: string | undefined = (() => {
+    if (timelineState != null) {
+      const { syncState, timeline } = timelineState;
+      if (syncState === 'offline' && timeline == null) return 'Network Error';
+      if (syncState !== 'offline' && timeline == null)
+        return t(props.notFoundI18nKey);
+    }
+    return undefined;
+  })();
 
   const closeDialog = React.useCallback((): void => {
     setDialog(null);
@@ -102,14 +89,7 @@ export default function TimelinePageTemplate<
           description: timeline.description,
         }}
         onProcess={(req) => {
-          return service
-            .changeTimelineProperty(name, req)
-            .pipe(
-              map((newTimeline) => {
-                setTimeline(newTimeline);
-              })
-            )
-            .toPromise();
+          return service.changeTimelineProperty(name, req).toPromise().then();
         }}
       />
     );
@@ -143,33 +123,10 @@ export default function TimelinePageTemplate<
                     .toPromise();
                 },
                 onAddUser: (u) => {
-                  return service
-                    .addMember(name, u.username)
-                    .pipe(
-                      map(() => {
-                        setTimeline({
-                          ...timeline,
-                          members: concat(timeline.members, u),
-                        });
-                      })
-                    )
-                    .toPromise();
+                  return service.addMember(name, u.username).toPromise().then();
                 },
                 onRemoveUser: (u) => {
-                  service.removeMember(name, u).subscribe(() => {
-                    const toDelete = timeline.members.find(
-                      (m) => m.username === u
-                    );
-                    if (toDelete == null) {
-                      throw new UiLogicError(
-                        'The member to delete is not in list.'
-                      );
-                    }
-                    setTimeline({
-                      ...timeline,
-                      members: without(timeline.members, toDelete),
-                    });
-                  });
+                  service.removeMember(name, u);
                 },
               }
             : null
@@ -220,7 +177,7 @@ export default function TimelinePageTemplate<
     <>
       <UiComponent
         error={error}
-        timeline={timeline}
+        timeline={timeline ?? undefined}
         postListState={postListState}
         onDelete={onDelete}
         onPost={
