@@ -12,7 +12,7 @@ import { getAlertHost } from '../common/alert-service';
 import { useEventEmiiter, UiLogicError } from '../common';
 import {
   TimelineInfo,
-  TimelinePostListState,
+  TimelinePostsWithSyncState,
   timelineService,
 } from '../data/timeline';
 import { userService } from '../data/user';
@@ -24,8 +24,10 @@ import Timeline, {
 import AppBar from '../common/AppBar';
 import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
 
+type TimelinePostSyncState = 'syncing' | 'synced' | 'offline';
+
 const TimelinePostSyncStateBadge: React.FC<{
-  state: 'syncing' | 'synced' | 'offline';
+  state: TimelinePostSyncState;
   style?: CSSProperties;
   className?: string;
 }> = ({ state, style, className }) => {
@@ -84,7 +86,7 @@ export interface TimelineCardComponentProps<TManageItems> {
 export interface TimelinePageTemplateUIProps<TManageItems> {
   avatarKey?: string | number;
   timeline?: TimelineInfo;
-  postListState?: TimelinePostListState;
+  postListState?: TimelinePostsWithSyncState;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
   onMember: () => void;
   onManage?: (item: TManageItems | 'property') => void;
@@ -197,7 +199,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
   } else {
     if (timeline != null) {
       let timelineBody: React.ReactElement;
-      if (postListState != null && postListState.state !== 'loading') {
+      if (postListState != null) {
         if (postListState.state === 'forbid') {
           timelineBody = (
             <p className="text-danger">{t('timeline.messageCantSee')}</p>

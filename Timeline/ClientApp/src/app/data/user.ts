@@ -19,8 +19,6 @@ import {
   HttpUser,
 } from '../http/user';
 
-import { BlobWithUrl } from './common';
-
 export type User = HttpUser;
 
 export interface UserAuthInfo {
@@ -230,27 +228,16 @@ export function checkLogin(): UserWithToken {
 
 export class UserNotExistError extends Error {}
 
-export type AvatarInfo = BlobWithUrl;
-
 export class UserInfoService {
-  private _avatarSubscriptionHub = new SubscriptionHub<
-    string,
-    AvatarInfo | null
-  >(
-    (key) => key,
-    () => null,
-    async (key) => {
-      const blob = (await getHttpUserClient().getAvatar(key)).data;
-      const url = URL.createObjectURL(blob);
-      return {
-        blob,
-        url,
-      };
+  private _avatarSubscriptionHub = new SubscriptionHub<string, Blob>({
+    setup: (key, next) => {
+      void getHttpUserClient()
+        .getAvatar(key)
+        .then((res) => {
+          next(res.data);
+        });
     },
-    (_key, data) => {
-      if (data != null) URL.revokeObjectURL(data.url);
-    }
-  );
+  });
 
   getUserInfo(username: string): Observable<User> {
     return from(getHttpUserClient().get(username)).pipe(
@@ -261,40 +248,33 @@ export class UserInfoService {
   async setAvatar(username: string, blob: Blob): Promise<void> {
     const user = checkLogin();
     await getHttpUserClient().putAvatar(username, blob, user.token);
-    this._avatarSubscriptionHub.update(username, () =>
-      Promise.resolve({
-        blob,
-        url: URL.createObjectURL(blob),
-      })
-    );
+    this._avatarSubscriptionHub.update(username, blob);
   }
 
-  get avatarHub(): ISubscriptionHub<string, AvatarInfo | null> {
+  get avatarHub(): ISubscriptionHub<string, Blob> {
     return this._avatarSubscriptionHub;
   }
 }
 
 export const userInfoService = new UserInfoService();
 
-export function useAvatarUrl(username?: string): string | undefined {
-  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(
-    undefined
-  );
+export function useAvatar(username?: string): Blob | undefined {
+  const [state, setState] = React.useState<Blob | undefined>(undefined);
   React.useEffect(() => {
     if (username == null) {
-      setAvatarUrl(undefined);
+      setState(undefined);
       return;
     }
 
     const subscription = userInfoService.avatarHub.subscribe(
       username,
-      (info) => {
-        setAvatarUrl(info?.url);
+      (blob) => {
+        setState(blob);
       }
     );
     return () => {
       subscription.unsubscribe();
     };
   }, [username]);
-  return avatarUrl;
+  return state;
 }

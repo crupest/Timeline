@@ -10,9 +10,10 @@ import {
   Button,
 } from 'reactstrap';
 
-import { User, useAvatarUrl } from '../data/user';
+import { User, useAvatar } from '../data/user';
 
 import SearchInput from '../common/SearchInput';
+import BlobImage from '../common/BlobImage';
 
 const TimelineMemberItem: React.FC<{
   user: User;
@@ -21,13 +22,13 @@ const TimelineMemberItem: React.FC<{
 }> = ({ user, owner, onRemove }) => {
   const { t } = useTranslation();
 
-  const avatarUrl = useAvatarUrl(user.username);
+  const avatar = useAvatar(user.username);
 
   return (
     <ListGroupItem className="container">
       <Row>
         <Col className="col-auto">
-          <img src={avatarUrl} className="avatar small" />
+          <BlobImage blob={avatar} className="avatar small" />
         </Col>
         <Col>
           <Row>{user.nickname}</Row>
@@ -84,7 +85,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
     | { type: 'init' }
   >({ type: 'init' });
 
-  const userSearchAvatarUrl = useAvatarUrl(
+  const userSearchAvatar = useAvatar(
     userSearchState.type === 'user' ? userSearchState.data.username : undefined
   );
 
@@ -156,8 +157,8 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                       <Container className="mb-3">
                         <Row>
                           <Col className="col-auto">
-                            <img
-                              src={userSearchAvatarUrl}
+                            <BlobImage
+                              blob={userSearchAvatar}
                               className="avatar small"
                             />
                           </Col>

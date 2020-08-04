@@ -6,11 +6,6 @@ export const dataStorage = localforage.createInstance({
   driver: localforage.INDEXEDDB,
 });
 
-export interface BlobWithUrl {
-  blob: Blob;
-  url: string;
-}
-
 export class ForbiddenError extends Error {
   constructor(message?: string) {
     super(message);
