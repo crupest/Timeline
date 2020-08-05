@@ -8,7 +8,6 @@ import { pushAlert } from '../common/alert-service';
 import { useUser, userInfoService, UserNotExistError } from '../data/user';
 import {
   timelineService,
-  TimelineInfo,
   usePostList,
   useTimelineInfo,
 } from '../data/timeline';
@@ -30,10 +29,9 @@ export interface TimelinePageTemplateProps<TManageItem> {
   notFoundI18nKey: string;
 }
 
-export default function TimelinePageTemplate<
-  TManageItem,
-  TTimeline extends TimelineInfo
->(props: TimelinePageTemplateProps<TManageItem>): React.ReactElement | null {
+export default function TimelinePageTemplate<TManageItem>(
+  props: TimelinePageTemplateProps<TManageItem>
+): React.ReactElement | null {
   const { t } = useTranslation();
 
   const { name } = props;
