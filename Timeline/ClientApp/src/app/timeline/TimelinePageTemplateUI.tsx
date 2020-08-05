@@ -24,7 +24,7 @@ import Timeline, {
 import AppBar from '../common/AppBar';
 import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
 
-type TimelinePostSyncState = 'syncing' | 'synced' | 'offline';
+type TimelinePostSyncState = 'loadcache' | 'syncing' | 'synced' | 'offline';
 
 const TimelinePostSyncStateBadge: React.FC<{
   state: TimelinePostSyncState;
@@ -37,6 +37,7 @@ const TimelinePostSyncStateBadge: React.FC<{
     <div style={style} className={clsx('timeline-sync-state-badge', className)}>
       {(() => {
         switch (state) {
+          case 'loadcache':
           case 'syncing': {
             return (
               <>
@@ -200,6 +201,11 @@ export default function TimelinePageTemplateUI<TManageItems>(
     if (timeline != null) {
       let timelineBody: React.ReactElement;
       if (postListState != null) {
+        if (postListState.posts == null) {
+          throw new UiLogicError(
+            "Timeline is not null but postListState is 'timeline-notexist or 'timeline-offline'."
+          );
+        }
         if (postListState.state === 'forbid') {
           timelineBody = (
             <p className="text-danger">{t('timeline.messageCantSee')}</p>

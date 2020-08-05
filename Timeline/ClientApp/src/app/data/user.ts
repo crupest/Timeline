@@ -230,11 +230,11 @@ export class UserNotExistError extends Error {}
 
 export class UserInfoService {
   private _avatarSubscriptionHub = new SubscriptionHub<string, Blob>({
-    setup: (key, next) => {
+    setup: (key, line) => {
       void getHttpUserClient()
         .getAvatar(key)
         .then((res) => {
-          next(res.data);
+          line.next(res.data);
         });
     },
   });
@@ -248,7 +248,7 @@ export class UserInfoService {
   async setAvatar(username: string, blob: Blob): Promise<void> {
     const user = checkLogin();
     await getHttpUserClient().putAvatar(username, blob, user.token);
-    this._avatarSubscriptionHub.update(username, blob);
+    this._avatarSubscriptionHub.getLine(username)?.next(blob);
   }
 
   get avatarHub(): ISubscriptionHub<string, Blob> {
