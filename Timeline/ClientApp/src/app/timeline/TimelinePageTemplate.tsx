@@ -54,7 +54,7 @@ export default function TimelinePageTemplate<TManageItem>(
     if (timelineState != null) {
       const { syncState, timeline } = timelineState;
       if (syncState === 'offline' && timeline == null) return 'Network Error';
-      if (syncState !== 'offline' && timeline == null)
+      if (syncState === 'synced' && timeline == null)
         return t(props.notFoundI18nKey);
     }
     return undefined;
