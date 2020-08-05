@@ -781,7 +781,11 @@ export class TimelineService {
     } else if (visibility === 'Register') {
       if (user != null) return true;
     } else if (visibility === 'Private') {
-      if (user != null && this.isMemberOf(user.username, timeline)) {
+      if (
+        user != null &&
+        (user.username === timeline.owner.username ||
+          this.isMemberOf(user.username, timeline))
+      ) {
         return true;
       }
     }
