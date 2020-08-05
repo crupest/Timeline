@@ -20,10 +20,7 @@ import { TimelinePageTemplateUIProps } from './TimelinePageTemplateUI';
 import { TimelinePostSendCallback } from './TimelinePostEdit';
 import { UiLogicError } from '../common';
 
-export interface TimelinePageTemplateProps<
-  TManageItem,
-  TTimeline extends TimelineInfo // TODO: Remove this.
-> {
+export interface TimelinePageTemplateProps<TManageItem> {
   name: string;
   onManage: (item: TManageItem) => void;
   UiComponent: React.ComponentType<
@@ -36,9 +33,7 @@ export interface TimelinePageTemplateProps<
 export default function TimelinePageTemplate<
   TManageItem,
   TTimeline extends TimelineInfo
->(
-  props: TimelinePageTemplateProps<TManageItem, TTimeline>
-): React.ReactElement | null {
+>(props: TimelinePageTemplateProps<TManageItem>): React.ReactElement | null {
   const { t } = useTranslation();
 
   const { name } = props;
