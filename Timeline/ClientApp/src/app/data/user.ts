@@ -19,6 +19,7 @@ import {
   HttpUserNotExistError,
   HttpUser,
 } from '../http/user';
+import { queue } from './queue';
 
 export type User = HttpUser;
 
@@ -235,7 +236,21 @@ export class UserInfoService {
     return `user.${username}.avatar`;
   }
 
+  private getCachedAvatar(username: string): Promise<Blob | null> {
+    return dataStorage
+      .getItem<BlobWithEtag | null>(this.getAvatarKey(username))
+      .then((data) => data?.data ?? null);
+  }
+
   private async fetchAndCacheAvatar(
+    username: string
+  ): Promise<{ data: Blob; type: 'synced' | 'cache' } | 'offline'> {
+    return queue(`UserService.fetchAndCacheAvatar.${username}`, () =>
+      this.doFetchAndCacheAvatar(username)
+    );
+  }
+
+  private async doFetchAndCacheAvatar(
     username: string
   ): Promise<{ data: Blob; type: 'synced' | 'cache' } | 'offline'> {
     const key = this.getAvatarKey(username);
@@ -286,10 +301,19 @@ export class UserInfoService {
 
   private _avatarSubscriptionHub = new SubscriptionHub<string, Blob>({
     setup: (key, line) => {
-      void getHttpUserClient()
-        .getAvatar(key)
-        .then((res) => {
-          line.next(res.data);
+      void this.getCachedAvatar(key)
+        .then((avatar) => {
+          if (avatar != null) {
+            line.next(avatar);
+          }
+        })
+        .then(() => {
+          return this.fetchAndCacheAvatar(key);
+        })
+        .then((result) => {
+          if (result !== 'offline') {
+            line.next(result.data);
+          }
         });
     },
   });
