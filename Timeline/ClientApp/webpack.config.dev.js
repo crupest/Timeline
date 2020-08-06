@@ -15,7 +15,7 @@ module.exports = (env) => {
   return {
     entry,
     mode: 'development',
-    devtool: 'eval-source-map',
+    devtool: 'eval-cheap-module-source-map',
     module: {
       rules: [
         ...commonRules,
