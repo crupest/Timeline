@@ -6,9 +6,10 @@ import { UiLogicError } from '../common';
 import { convertError } from '../utilities/rxjs';
 import { pushAlert } from '../common/alert-service';
 
+import { dataStorage } from './common';
 import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
 
-import { HttpNetworkError } from '../http/common';
+import { HttpNetworkError, BlobWithEtag, NotModified } from '../http/common';
 import {
   getHttpTokenClient,
   HttpCreateTokenBadCredentialError,
@@ -55,8 +56,9 @@ export class UserService {
   }
 
   checkLoginState(): Observable<UserWithToken | null> {
-    if (this.currentUser !== undefined)
-      throw new UiLogicError("Already checked user. Can't check twice.");
+    if (this.currentUser !== undefined) {
+      console.warn("Already checked user. Can't check twice.");
+    }
 
     const savedToken = window.localStorage.getItem(TOKEN_STORAGE_KEY);
     if (savedToken) {
@@ -229,6 +231,59 @@ export function checkLogin(): UserWithToken {
 export class UserNotExistError extends Error {}
 
 export class UserInfoService {
+  private getAvatarKey(username: string): string {
+    return `user.${username}.avatar`;
+  }
+
+  private async fetchAndCacheAvatar(
+    username: string
+  ): Promise<{ data: Blob; type: 'synced' | 'cache' } | 'offline'> {
+    const key = this.getAvatarKey(username);
+    const cache = await dataStorage.getItem<BlobWithEtag | null>(key);
+    if (cache == null) {
+      try {
+        const avatar = await getHttpUserClient().getAvatar(key);
+        await dataStorage.setItem<BlobWithEtag>(key, avatar);
+        return {
+          data: avatar.data,
+          type: 'synced',
+        };
+      } catch (e) {
+        if (e instanceof HttpNetworkError) {
+          return 'offline';
+        } else {
+          throw e;
+        }
+      }
+    } else {
+      try {
+        const res = await getHttpUserClient().getAvatar(key, cache.etag);
+        if (res instanceof NotModified) {
+          return {
+            data: cache.data,
+            type: 'synced',
+          };
+        } else {
+          const avatar = res;
+          await dataStorage.setItem<BlobWithEtag>(key, avatar);
+          return {
+            data: avatar.data,
+            type: 'synced',
+          };
+        }
+      } catch (e) {
+        if (e instanceof HttpNetworkError) {
+          return {
+            data: cache.data,
+            type: 'cache',
+          };
+        } else {
+          throw e;
+        }
+      }
+    }
+  }
+
   private _avatarSubscriptionHub = new SubscriptionHub<string, Blob>({
     setup: (key, line) => {
       void getHttpUserClient()
