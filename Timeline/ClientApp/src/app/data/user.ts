@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BehaviorSubject, Observable, of, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, from } from 'rxjs';
 
 import { UiLogicError } from '../common';
 import { convertError } from '../utilities/rxjs';
@@ -41,7 +40,7 @@ export class BadCredentialError {
   message = 'login.badCredential';
 }
 
-const TOKEN_STORAGE_KEY = 'token';
+const USER_STORAGE_KEY = 'currentuser';
 
 export class UserService {
   private userSubject = new BehaviorSubject<UserWithToken | null | undefined>(
@@ -56,96 +55,92 @@ export class UserService {
     return this.userSubject.value;
   }
 
-  checkLoginState(): Observable<UserWithToken | null> {
+  async checkLoginState(): Promise<UserWithToken | null> {
     if (this.currentUser !== undefined) {
       console.warn("Already checked user. Can't check twice.");
     }
 
-    const savedToken = window.localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (savedToken) {
-      const u$ = from(getHttpTokenClient().verify({ token: savedToken })).pipe(
-        map(
-          (res) =>
-            ({
-              ...res.user,
-              token: savedToken,
-            } as UserWithToken)
-        )
-      );
-      u$.subscribe(
-        (user) => {
-          if (user != null) {
-            pushAlert({
-              type: 'success',
-              message: {
-                type: 'i18n',
-                key: 'user.welcomeBack',
-              },
-            });
-          }
-          this.userSubject.next(user);
-        },
-        (error) => {
-          if (error instanceof HttpNetworkError) {
-            pushAlert({
-              type: 'danger',
-              message: { type: 'i18n', key: 'user.verifyTokenFailedNetwork' },
-            });
-          } else {
-            window.localStorage.removeItem(TOKEN_STORAGE_KEY);
-            pushAlert({
-              type: 'danger',
-              message: { type: 'i18n', key: 'user.verifyTokenFailed' },
-            });
-          }
-          this.userSubject.next(null);
-        }
-      );
-      return u$;
+    const savedUser = await dataStorage.getItem<UserWithToken | null>(
+      USER_STORAGE_KEY
+    );
+
+    if (savedUser == null) {
+      this.userSubject.next(null);
+      return null;
     }
-    this.userSubject.next(null);
-    return of(null);
+
+    this.userSubject.next(savedUser);
+
+    const savedToken = savedUser.token;
+    try {
+      const res = await getHttpTokenClient().verify({ token: savedToken });
+      const user: UserWithToken = { ...res.user, token: savedToken };
+      await dataStorage.setItem<UserWithToken>(USER_STORAGE_KEY, user);
+      this.userSubject.next(user);
+      pushAlert({
+        type: 'success',
+        message: {
+          type: 'i18n',
+          key: 'user.welcomeBack',
+        },
+      });
+      return user;
+    } catch (error) {
+      if (error instanceof HttpNetworkError) {
+        pushAlert({
+          type: 'danger',
+          message: { type: 'i18n', key: 'user.verifyTokenFailedNetwork' },
+        });
+        return savedUser;
+      } else {
+        await dataStorage.removeItem(USER_STORAGE_KEY);
+        this.userSubject.next(null);
+        pushAlert({
+          type: 'danger',
+          message: { type: 'i18n', key: 'user.verifyTokenFailed' },
+        });
+        return null;
+      }
+    }
   }
 
-  login(
+  async login(
     credentials: LoginCredentials,
     rememberMe: boolean
-  ): Observable<UserWithToken> {
+  ): Promise<void> {
     if (this.currentUser) {
       throw new UiLogicError('Already login.');
     }
-    const u$ = from(
-      getHttpTokenClient().create({
+    try {
+      const res = await getHttpTokenClient().create({
         ...credentials,
         expire: 30,
-      })
-    ).pipe(
-      map(
-        (res) =>
-          ({
-            ...res.user,
-            token: res.token,
-          } as UserWithToken)
-      ),
-      convertError(HttpCreateTokenBadCredentialError, BadCredentialError)
-    );
-    u$.subscribe((user) => {
+      });
+      const user: UserWithToken = {
+        ...res.user,
+        token: res.token,
+      };
       if (rememberMe) {
-        window.localStorage.setItem(TOKEN_STORAGE_KEY, user.token);
+        await dataStorage.setItem<UserWithToken>(USER_STORAGE_KEY, user);
       }
       this.userSubject.next(user);
-    });
-    return u$;
+    } catch (e) {
+      if (e instanceof HttpCreateTokenBadCredentialError) {
+        throw new BadCredentialError();
+      } else {
+        throw e;
+      }
+    }
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
     if (this.currentUser === undefined) {
       throw new UiLogicError('Please check user first.');
     }
     if (this.currentUser === null) {
       throw new UiLogicError('No login.');
     }
-    window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+    await dataStorage.removeItem(USER_STORAGE_KEY);
     this.userSubject.next(null);
   }
 
@@ -166,7 +161,7 @@ export class UserService {
       )
     );
     $.subscribe(() => {
-      this.logout();
+      void this.logout();
     });
     return $;
   }
