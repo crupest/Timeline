@@ -156,8 +156,8 @@ export class TimelineService {
   private async doFetchAndCacheTimeline(
     timelineName: string
   ): Promise<FetchAndCacheTimelineResult> {
-    const cache = await dataStorage.getItem<TimelineCache | null>(timelineName);
     const key = this.getTimelineKey(timelineName);
+    const cache = await dataStorage.getItem<TimelineCache | null>(key);
 
     const save = (cache: TimelineCache): Promise<TimelineCache> =>
       dataStorage.setItem<TimelineCache>(key, cache);
