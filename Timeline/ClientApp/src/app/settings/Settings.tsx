@@ -81,7 +81,7 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
         await userService
           .changePassword(oldPassword as string, newPassword as string)
           .toPromise();
-        userService.logout();
+        await userService.logout();
         setRedirect(true);
       }}
       close={() => {
@@ -204,8 +204,9 @@ const Settings: React.FC = (_) => {
                 <ConfirmLogoutDialog
                   toggle={() => setDialog(null)}
                   onConfirm={() => {
-                    userService.logout();
-                    history.push('/');
+                    void userService.logout().then(() => {
+                      history.push('/');
+                    });
                   }}
                 />
               );
