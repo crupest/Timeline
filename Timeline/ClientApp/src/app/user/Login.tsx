@@ -62,8 +62,8 @@ const Login: React.FC = (_) => {
         },
         rememberMe
       )
-      .subscribe(
-        (_) => {
+      .then(
+        () => {
           if (history.length === 0) {
             history.push('/');
           } else {
