@@ -3,6 +3,7 @@ import TranslationResource from '../scheme';
 const translation: TranslationResource = {
   welcome: 'Welcome!',
   search: 'Search',
+  loadFailReload: 'Load failed, click <1>here</1> to reload.',
   serviceWorker: {
     availableOffline:
       'Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉',
@@ -26,6 +27,8 @@ const translation: TranslationResource = {
     allTimeline: 'All Timelines',
     joinTimeline: 'Joined Timelines',
     ownTimeline: 'Owned Timelines',
+    offlinePrompt:
+      'Oh oh, it seems you are offline. Here list some timelines cached locally. You can view them or click <1>here</1> to refresh.',
     createButton: 'Create Timeline',
     createDialog: {
       title: 'Create Timeline!',

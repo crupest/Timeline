@@ -3,6 +3,7 @@ export default interface TranslationResource {
   search: string;
   chooseImage: string;
   loadImageError: string;
+  loadFailReload: string;
   serviceWorker: {
     availableOffline: string;
     upgradePrompt: string;
@@ -21,6 +22,7 @@ export default interface TranslationResource {
     allTimeline: string;
     joinTimeline: string;
     ownTimeline: string;
+    offlinePrompt: string;
     createButton: string;
     createDialog: {
       title: string;

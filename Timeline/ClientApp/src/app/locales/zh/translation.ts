@@ -3,6 +3,7 @@ import TranslationResource from '../scheme';
 const translation: TranslationResource = {
   welcome: '欢迎！',
   search: '搜索',
+  loadFailReload: '加载失败，<1>点击</1>重试。',
   serviceWorker: {
     availableOffline: 'Timeline 已经缓存在本地，你可以离线使用它。🎉🎉🎉',
     upgradePrompt: 'App 有新版本！',
@@ -24,6 +25,8 @@ const translation: TranslationResource = {
     allTimeline: '所有的时间线',
     joinTimeline: '加入的时间线',
     ownTimeline: '拥有的时间线',
+    offlinePrompt:
+      '你好像处于离线状态。以下是一些缓存在本地的时间线。你可以查看它们或者<1>点击</1>重新获取在线信息。',
     createButton: '创建时间线',
     createDialog: {
       title: '创建时间线！',
