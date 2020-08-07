@@ -201,9 +201,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
     if (timeline != null) {
       let timelineBody: React.ReactElement;
       if (postListState != null) {
-        if (postListState.posts == null) {
+        if (postListState.state === 'notexist') {
           throw new UiLogicError(
-            "Timeline is not null but postListState is 'timeline-notexist or 'timeline-offline'."
+            'Timeline is not null but post list state is notexist.'
           );
         }
         if (postListState.state === 'forbid') {

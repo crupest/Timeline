@@ -11,6 +11,7 @@ import {
   BlobWithEtag,
   NotModified,
   convertToBlobWithEtagOrNotModified,
+  convertToForbiddenError,
 } from './common';
 import { HttpUser } from './user';
 
@@ -441,6 +442,8 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     return axios
       .get<RawTimelineGenericPostInfo[]>(url)
       .then(extractResponseData)
+      .catch(convertToIfStatusCodeIs(404, HttpTimelineNotExistError))
+      .catch(convertToForbiddenError)
       .catch(convertToNetworkError)
       .then((rawPosts) =>
         rawPosts.map((raw) => processRawTimelinePostInfo(raw))

@@ -45,6 +45,12 @@ export class HttpNetworkError extends Error {
   }
 }
 
+export class HttpForbiddenError extends Error {
+  constructor(public innerError?: AxiosError) {
+    super();
+  }
+}
+
 export class NotModified {}
 
 export interface BlobWithEtag {
@@ -114,6 +120,20 @@ export function convertToNetworkError(
 ): never {
   if (error.isAxiosError && error.response == null) {
     throw new HttpNetworkError(error);
+  } else {
+    throw error;
+  }
+}
+
+export function convertToForbiddenError(
+  error: AxiosError<CommonErrorResponse>
+): never {
+  if (
+    error.isAxiosError &&
+    error.response != null &&
+    (error.response.status == 403 || error.response.status == 403)
+  ) {
+    throw new HttpForbiddenError(error);
   } else {
     throw error;
   }
