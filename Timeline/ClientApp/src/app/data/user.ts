@@ -7,6 +7,7 @@ import { pushAlert } from '../common/alert-service';
 
 import { dataStorage } from './common';
 import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
+import { queue } from './queue';
 
 import { HttpNetworkError, BlobWithEtag, NotModified } from '../http/common';
 import {
@@ -18,7 +19,6 @@ import {
   HttpUserNotExistError,
   HttpUser,
 } from '../http/user';
-import { queue } from './queue';
 
 export type User = HttpUser;
 
@@ -252,7 +252,7 @@ export class UserInfoService {
     const cache = await dataStorage.getItem<BlobWithEtag | null>(key);
     if (cache == null) {
       try {
-        const avatar = await getHttpUserClient().getAvatar(key);
+        const avatar = await getHttpUserClient().getAvatar(username);
         await dataStorage.setItem<BlobWithEtag>(key, avatar);
         return {
           data: avatar.data,
@@ -267,7 +267,7 @@ export class UserInfoService {
       }
     } else {
       try {
-        const res = await getHttpUserClient().getAvatar(key, cache.etag);
+        const res = await getHttpUserClient().getAvatar(username, cache.etag);
         if (res instanceof NotModified) {
           return {
             data: cache.data,
