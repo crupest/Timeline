@@ -881,3 +881,13 @@ export function usePostList(
   }, [timelineName]);
   return state;
 }
+
+export async function getAllCachedTimelineNames(): Promise<string[]> {
+  const keys = await dataStorage.keys();
+  return keys
+    .filter(
+      (key) =>
+        key.startsWith('timeline.') && (key.match(/\./g) ?? []).length === 1
+    )
+    .map((key) => key.substr('timeline.'.length));
+}
