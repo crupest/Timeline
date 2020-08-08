@@ -126,4 +126,7 @@
   <data name="MessageTooLong" xml:space="preserve">
     <value>Too long, more than 26 characters is not premitted.</value>
   </data>
+  <data name="MessageUnqiueId" xml:space="preserve">
+    <value>Name can't be of the same format of unique id.</value>
+  </data>
 </root>
