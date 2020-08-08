@@ -43,7 +43,9 @@ export class MockUserNotExistError extends Error {
   }
 }
 
-export function checkUsername(username: string): void {
+export function checkUsername(
+  username: string
+): asserts username is 'user' | 'admin' {
   if (!['user', 'admin'].includes(username)) throw new MockUserNotExistError();
 }
 
@@ -54,6 +56,11 @@ export function checkToken(token: string): string {
   return token.substr(6);
 }
 
+const uniqueIdMap = {
+  user: 'e4c80127d092d9b2fc19c5e04612d4c0',
+  admin: '5640fa45435f9a55077b9f77c42a77bb',
+};
+
 export async function getUser(
   username: 'user' | 'admin' | string
 ): Promise<HttpUser> {
@@ -62,6 +69,7 @@ export async function getUser(
     `user.${username}.nickname`
   );
   return {
+    uniqueId: uniqueIdMap[username],
     username: username,
     nickname:
       savedNickname == null || savedNickname === '' ? username : savedNickname,

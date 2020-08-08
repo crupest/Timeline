@@ -12,6 +12,7 @@ import {
 } from './common';
 
 export interface HttpUser {
+  uniqueId: string;
   username: string;
   administrator: boolean;
   nickname: string;
