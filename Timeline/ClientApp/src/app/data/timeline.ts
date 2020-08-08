@@ -2,6 +2,7 @@ import React from 'react';
 import XRegExp from 'xregexp';
 import { Observable, from, combineLatest, of } from 'rxjs';
 import { map, switchMap, filter } from 'rxjs/operators';
+import { uniqBy } from 'lodash';
 
 import { convertError } from '../utilities/rxjs';
 
@@ -132,6 +133,11 @@ export class TimelineService {
       const httpTimeline = await getHttpTimelineClient().getTimeline(
         timelineName
       );
+
+      [httpTimeline.owner, ...httpTimeline.members].forEach(
+        (user) => void userInfoService.saveUser(user)
+      );
+
       const timeline = this.convertHttpTimelineToData(httpTimeline);
       await dataStorage.setItem<TimelineData>(
         `timeline.${timelineName}`,
@@ -309,6 +315,12 @@ export class TimelineService {
         timelineName,
         userService.currentUser?.token
       );
+
+      uniqBy(
+        httpPosts.map((post) => post.author),
+        'username'
+      ).forEach((user) => void userInfoService.saveUser(user));
+
       const posts = this.convertHttpPostToDataList(httpPosts);
       await dataStorage.setItem<TimelinePostData[]>(dataKey, posts);
 
