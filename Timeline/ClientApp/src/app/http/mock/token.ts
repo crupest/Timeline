@@ -14,7 +14,7 @@ import { getUser, MockUserNotExistError, checkToken } from './user';
 export class MockHttpTokenClient implements IHttpTokenClient {
   // TODO: Mock bad credentials error.
   async create(req: HttpCreateTokenRequest): Promise<HttpCreateTokenResponse> {
-    await mockPrepare();
+    await mockPrepare('token.create');
     try {
       const user = await getUser(req.username);
       return {
@@ -35,7 +35,7 @@ export class MockHttpTokenClient implements IHttpTokenClient {
   }
 
   async verify(req: HttpVerifyTokenRequest): Promise<HttpVerifyTokenResponse> {
-    await mockPrepare();
+    await mockPrepare('token.verify');
     try {
       const user = await getUser(checkToken(req.token));
       return {

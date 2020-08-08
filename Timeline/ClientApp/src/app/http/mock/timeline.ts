@@ -286,7 +286,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
   async listTimeline(
     query: HttpTimelineListQuery
   ): Promise<HttpTimelineInfo[]> {
-    await mockPrepare();
+    await mockPrepare('timeline.list');
     return (
       await Promise.all(
         (await getTimelineNameList()).map((name) => getTimelineInfo(name))
@@ -339,7 +339,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
       ifModifiedSince?: Date;
     }
   ): Promise<HttpTimelineInfo | NotModified> {
-    await mockPrepare();
+    await mockPrepare('timeline.get');
     try {
       const timeline = await getTimelineInfo(timelineName);
       if (query != null && query.ifModifiedSince != null) {
@@ -373,7 +373,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     req: HttpTimelinePostRequest,
     token: string
   ): Promise<HttpTimelineInfo> {
-    await mockPrepare();
+    await mockPrepare('timeline.post');
     const user = checkToken(token);
     try {
       await createTimeline(req.name, user);
@@ -391,7 +391,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     req: HttpTimelinePatchRequest,
     _token: string
   ): Promise<HttpTimelineInfo> {
-    await mockPrepare();
+    await mockPrepare('timeline.patch');
     let modified = false;
     if (req.description != null) {
       modified = true;
@@ -416,7 +416,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
   }
 
   async deleteTimeline(timelineName: string, _token: string): Promise<void> {
-    await mockPrepare();
+    await mockPrepare('timeline.delete');
     await setTimelineNameList(
       without(await getTimelineNameList(), timelineName)
     );
@@ -432,7 +432,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     username: string,
     _token: string
   ): Promise<void> {
-    await mockPrepare();
+    await mockPrepare('timeline.member.put');
     const oldMembers =
       (await getTimelinePropertyValue<string[] | null>(
         timelineName,
@@ -452,7 +452,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     username: string,
     _token: string
   ): Promise<void> {
-    await mockPrepare();
+    await mockPrepare('timeline.member.delete');
     const oldMembers =
       (await getTimelinePropertyValue<string[] | null>(
         timelineName,
@@ -496,7 +496,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
       includeDeleted?: boolean;
     }
   ): Promise<HttpTimelineGenericPostInfo[]> {
-    await mockPrepare();
+    await mockPrepare('timeline.post.list');
     // TODO: Permission check.
 
     const currentPostId = await getTimelinePropertyValue<number | null>(
@@ -538,7 +538,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     _token?: string,
     etag?: string
   ): Promise<BlobWithEtag | NotModified> {
-    await mockPrepare();
+    await mockPrepare('timeline.post.data.get');
     // TODO: Permission check.
 
     const optionalSavedEtag = await getTimelinePostPropertyValue<string>(
@@ -580,7 +580,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     req: HttpTimelinePostPostRequest,
     token: string
   ): Promise<HttpTimelinePostInfo> {
-    await mockPrepare();
+    await mockPrepare('timeline.post.post');
     const user = checkToken(token);
 
     const savedId = await getTimelinePropertyValue<number | null>(
@@ -643,7 +643,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     postId: number,
     _token: string
   ): Promise<void> {
-    await mockPrepare();
+    await mockPrepare('timeline.post.delete');
     // TODO: permission check
     await removeTimelinePostProperty(timelineName, postId, 'type');
     await removeTimelinePostProperty(timelineName, postId, 'data');

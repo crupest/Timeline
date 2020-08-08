@@ -58,7 +58,9 @@ Object.defineProperty(window, 'networkLatency', {
   },
 });
 
-export async function mockPrepare(): Promise<void> {
+export async function mockPrepare(key: string): Promise<void> {
+  console.log(`Recieve request: ${key}`);
+
   if (disableNetwork) {
     console.warn('Network is disabled for mock server.');
     throw new HttpNetworkError();
