@@ -8,7 +8,8 @@ import {
   convertToIfErrorCodeIs,
   NotModified,
   BlobWithEtag,
-  convertToBlobWithEtagOrNotModified,
+  convertToBlobWithEtag,
+  convertToNotModified,
 } from './common';
 
 export interface HttpUser {
@@ -92,7 +93,8 @@ export class HttpUserClient implements IHttpUserClient {
         responseType: 'blob',
         headers,
       })
-      .then(convertToBlobWithEtagOrNotModified)
+      .then(convertToBlobWithEtag)
+      .catch(convertToNotModified)
       .catch(convertToIfStatusCodeIs(404, HttpUserNotExistError))
       .catch(convertToNetworkError);
   }
