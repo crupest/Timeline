@@ -17,6 +17,9 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [Column("unique_id"), Required]
+        public string UniqueId { get; set; } = default!;
+
         [Column("username"), Required]
         public string Username { get; set; } = default!;
 
