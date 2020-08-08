@@ -2,6 +2,7 @@
 {
     public class User
     {
+        public string? UniqueId { get; set; }
         public string? Username { get; set; }
         public string? Nickname { get; set; }
 
