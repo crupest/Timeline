@@ -9,6 +9,7 @@ namespace Timeline.Models.Http
 {
     public class UserInfo
     {
+        public string UniqueId { get; set; } = default!;
         public string Username { get; set; } = default!;
         public string Nickname { get; set; } = default!;
         public bool? Administrator { get; set; } = default!;
