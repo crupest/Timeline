@@ -1,7 +1,7 @@
 import React from 'react';
 import XRegExp from 'xregexp';
 import { Observable, from, combineLatest } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, filter } from 'rxjs/operators';
 
 import { convertError } from '../utilities/rxjs';
 
@@ -109,6 +109,10 @@ type FetchAndCachePostsResult =
 type TimelineData = Omit<HttpTimelineInfo, 'owner' | 'members'> & {
   owner: string;
   members: string[];
+};
+
+type TimelinePostData = Omit<HttpTimelinePostInfo, 'author'> & {
+  author: string;
 };
 
 export class TimelineService {
@@ -261,9 +265,7 @@ export class TimelineService {
       getHttpTimelineClient()
         .memberPut(timelineName, username, user.token)
         .then(() => {
-          userInfoService.getUserInfo(username).subscribe(() => {
-            void this.syncTimeline(timelineName);
-          });
+          void this.syncTimeline(timelineName);
         })
     );
   }
@@ -499,6 +501,103 @@ export class TimelineService {
 
   get postsHub(): ISubscriptionHub<string, TimelinePostsWithSyncState> {
     return this._postsSubscriptionHub;
+  }
+
+  private getCachedPostData(
+    timelineName: string,
+    postId: number
+  ): Promise<Blob | null> {
+    return dataStorage
+      .getItem<BlobWithEtag | null>(
+        `timeline.${timelineName}.post.${postId}.data`
+      )
+      .then((data) => data?.data ?? null);
+  }
+
+  private async syncPostData(
+    timelineName: string,
+    postId: number
+  ): Promise<void> {
+    const syncStatusKey = `user.timeline.${timelineName}.post.data.${postId}`;
+    if (syncStatusHub.get(syncStatusKey)) return;
+    syncStatusHub.begin(syncStatusKey);
+
+    const dataKey = `timeline.${timelineName}.post.${postId}.data`;
+
+    const cache = await dataStorage.getItem<BlobWithEtag | null>(dataKey);
+    if (cache == null) {
+      try {
+        const data = await getHttpTimelineClient().getPostData(
+          timelineName,
+          postId
+        );
+        await dataStorage.setItem<BlobWithEtag>(dataKey, data);
+        syncStatusHub.end(syncStatusKey);
+        this._postDataHub
+          .getLine({ timelineName, postId })
+          ?.next({ data: data.data, type: 'synced' });
+      } catch (e) {
+        syncStatusHub.end(syncStatusKey);
+        this._postDataHub
+          .getLine({ timelineName, postId })
+          ?.next({ type: 'offline' });
+        if (!(e instanceof HttpNetworkError)) {
+          throw e;
+        }
+      }
+    } else {
+      try {
+        const res = await getHttpTimelineClient().getPostData(
+          timelineName,
+          postId,
+          cache.etag
+        );
+        if (res instanceof NotModified) {
+          syncStatusHub.end(syncStatusKey);
+          this._postDataHub
+            .getLine({ timelineName, postId })
+            ?.next({ data: cache.data, type: 'synced' });
+        } else {
+          const avatar = res;
+          await dataStorage.setItem<BlobWithEtag>(dataKey, avatar);
+          syncStatusHub.end(syncStatusKey);
+          this._postDataHub
+            .getLine({ timelineName, postId })
+            ?.next({ data: avatar.data, type: 'synced' });
+        }
+      } catch (e) {
+        syncStatusHub.end(syncStatusKey);
+        this._postDataHub
+          .getLine({ timelineName, postId })
+          ?.next({ data: cache.data, type: 'offline' });
+        if (!(e instanceof HttpNetworkError)) {
+          throw e;
+        }
+      }
+    }
+  }
+
+  private _postDataHub = new SubscriptionHub<
+    { timelineName: string; postId: number },
+    | { data: Blob; type: 'cache' | 'synced' | 'offline' }
+    | { data?: undefined; type: 'notexist' | 'offline' }
+  >({
+    keyToString: (key) => `${key.timelineName}.${key.postId}`,
+    setup: (key, line) => {
+      void this.getCachedPostData(key.timelineName, key.postId).then((data) => {
+        if (data != null) {
+          line.next({ data: data, type: 'cache' });
+        }
+        return this.syncPostData(key.timelineName, key.postId);
+      });
+    },
+  });
+
+  getPostData$(timelineName: string, postId: number): Observable<Blob> {
+    return this._postDataHub.getObservable({ timelineName, postId }).pipe(
+      map((state) => state.data),
+      filter((blob): blob is Blob => blob != null)
+    );
   }
 
   createPost(
