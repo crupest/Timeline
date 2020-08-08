@@ -131,7 +131,7 @@ export function convertToForbiddenError(
   if (
     error.isAxiosError &&
     error.response != null &&
-    (error.response.status == 403 || error.response.status == 403)
+    (error.response.status == 401 || error.response.status == 403)
   ) {
     throw new HttpForbiddenError(error);
   } else {
@@ -139,13 +139,17 @@ export function convertToForbiddenError(
   }
 }
 
-export function extractDataOrConvert304ToNotModified<T>(
-  res: AxiosResponse<T>
-): T | NotModified {
-  if (res.status === 304) {
+export function convertToNotModified(
+  error: AxiosError<CommonErrorResponse>
+): NotModified {
+  if (
+    error.isAxiosError &&
+    error.response != null &&
+    error.response.status == 304
+  ) {
     return new NotModified();
   } else {
-    return res.data;
+    throw error;
   }
 }
 
@@ -154,17 +158,4 @@ export function convertToBlobWithEtag(res: AxiosResponse<Blob>): BlobWithEtag {
     data: res.data,
     etag: (res.headers as Record<'etag', string>)['etag'],
   };
-}
-
-export function convertToBlobWithEtagOrNotModified(
-  res: AxiosResponse<Blob>
-): BlobWithEtag | NotModified {
-  if (res.status === 304) {
-    return new NotModified();
-  } else {
-    return {
-      data: res.data,
-      etag: (res.headers as Record<'etag', string>)['etag'],
-    };
-  }
 }

@@ -10,8 +10,9 @@ import {
   convertToIfErrorCodeIs,
   BlobWithEtag,
   NotModified,
-  convertToBlobWithEtagOrNotModified,
+  convertToNotModified,
   convertToForbiddenError,
+  convertToBlobWithEtag,
 } from './common';
 import { HttpUser } from './user';
 
@@ -476,7 +477,8 @@ export class HttpTimelineClient implements IHttpTimelineClient {
         responseType: 'blob',
         headers,
       })
-      .then(convertToBlobWithEtagOrNotModified)
+      .then(convertToBlobWithEtag)
+      .catch(convertToNotModified)
       .catch(convertToIfStatusCodeIs(404, HttpTimelinePostNotExistError))
       .catch(convertToNetworkError);
   }

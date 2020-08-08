@@ -371,6 +371,13 @@ export class TimelineService {
   getPosts$(timelineName: string): Observable<TimelinePostsWithSyncState> {
     return this._postsHub.getObservable(timelineName).pipe(
       switchMap((state) => {
+        if (state.posts.length === 0) {
+          return of({
+            type: state.type,
+            posts: [],
+          });
+        }
+
         return combineLatest([
           combineLatest(
             state.posts.map((post) => userInfoService.getUser$(post.author))
