@@ -1,4 +1,5 @@
 import { pull } from 'lodash';
+import { Observable } from 'rxjs';
 
 export type Subscriber<TData> = (data: TData) => void;
 
@@ -153,6 +154,17 @@ export class SubscriptionHub<TKey, TData>
       }
     })();
     return line.subscribe(subscriber);
+  }
+
+  getObservable(key: TKey): Observable<TData> {
+    return new Observable((observer) => {
+      const sub = this.subscribe(key, (data) => {
+        observer.next(data);
+      });
+      return () => {
+        sub.unsubscribe();
+      };
+    });
   }
 
   getLine(key: TKey): ISubscriptionLine<TData> | null {
