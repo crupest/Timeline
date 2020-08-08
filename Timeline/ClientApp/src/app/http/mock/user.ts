@@ -79,7 +79,7 @@ export async function getUser(
 
 export class MockHttpUserClient implements IHttpUserClient {
   async get(username: string): Promise<HttpUser> {
-    await mockPrepare();
+    await mockPrepare('user.get');
     return await getUser(username).catch((e) => {
       if (e instanceof MockUserNotExistError) {
         throw new HttpUserNotExistError();
@@ -94,7 +94,7 @@ export class MockHttpUserClient implements IHttpUserClient {
     req: HttpUserPatchRequest,
     _token: string
   ): Promise<HttpUser> {
-    await mockPrepare();
+    await mockPrepare('user.patch');
     if (req.nickname != null) {
       await mockStorage.setItem(`user.${username}.nickname`, req.nickname);
     }
@@ -106,7 +106,7 @@ export class MockHttpUserClient implements IHttpUserClient {
     username: string,
     etag?: string
   ): Promise<BlobWithEtag | NotModified> {
-    await mockPrepare();
+    await mockPrepare('user.avatar.get');
 
     const savedEtag = await mockStorage.getItem(`user.${username}.avatar.etag`);
     if (savedEtag == null) {
@@ -124,7 +124,7 @@ export class MockHttpUserClient implements IHttpUserClient {
   }
 
   async putAvatar(username: string, data: Blob, _token: string): Promise<void> {
-    await mockPrepare();
+    await mockPrepare('user.avatar.put');
     const etag = await sha1(data);
     await mockStorage.setItem<Blob>(`user.${username}.avatar.data`, data);
     await mockStorage.setItem<string>(`user.${username}.avatar.etag`, etag);
@@ -134,7 +134,7 @@ export class MockHttpUserClient implements IHttpUserClient {
     _req: HttpChangePasswordRequest,
     _token: string
   ): Promise<void> {
-    await mockPrepare();
+    await mockPrepare('userop.changepassowrd');
     throw new Error('Not Implemented.');
   }
 }
