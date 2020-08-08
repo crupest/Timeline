@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BehaviorSubject, Observable, from } from 'rxjs';
-import { map, filter, switchMap, take } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 
 import { UiLogicError } from '../common';
 import { convertError } from '../utilities/rxjs';
@@ -237,18 +237,12 @@ export class UserInfoService {
     this._userHub.getLine(user.username)?.next({ user, type: 'synced' });
   }
 
-  private async getCachedUser(username: string): Promise<User | null> {
-    const uniqueId = await dataStorage.getItem<string | null>(
-      `user.${username}`
-    );
-    if (uniqueId == null) return null;
-    const user = await dataStorage.getItem<HttpUser | null>(`user.${uniqueId}`);
-    return user;
+  private getCachedUser(username: string): Promise<User | null> {
+    return dataStorage.getItem<HttpUser | null>(`user.${username}`);
   }
 
   private async doSaveUser(user: HttpUser): Promise<void> {
-    await dataStorage.setItem<string>(`user.${user.username}`, user.uniqueId);
-    await dataStorage.setItem<HttpUser>(`user.${user.uniqueId}`, user);
+    await dataStorage.setItem<HttpUser>(`user.${user.username}`, user);
   }
 
   private async syncUser(username: string): Promise<void> {
@@ -302,60 +296,54 @@ export class UserInfoService {
     );
   }
 
-  private getCachedAvatar(uniqueId: string): Promise<Blob | null> {
+  private getCachedAvatar(username: string): Promise<Blob | null> {
     return dataStorage
-      .getItem<BlobWithEtag | null>(`user.${uniqueId}.avatar`)
+      .getItem<BlobWithEtag | null>(`user.${username}.avatar`)
       .then((data) => data?.data ?? null);
   }
 
-  private async syncAvatar(user: {
-    username: string;
-    uniqueId: string;
-  }): Promise<void> {
-    const syncStatusKey = `user.avatar.${user.uniqueId}`;
+  private async syncAvatar(username: string): Promise<void> {
+    const syncStatusKey = `user.avatar.${username}`;
     if (syncStatusHub.get(syncStatusKey)) return;
     syncStatusHub.begin(syncStatusKey);
 
-    const dataKey = `user.${user.uniqueId}.avatar`;
+    const dataKey = `user.${username}.avatar`;
     const cache = await dataStorage.getItem<BlobWithEtag | null>(dataKey);
     if (cache == null) {
       try {
-        const avatar = await getHttpUserClient().getAvatar(user.username);
+        const avatar = await getHttpUserClient().getAvatar(username);
         await dataStorage.setItem<BlobWithEtag>(dataKey, avatar);
         syncStatusHub.end(syncStatusKey);
         this._avatarHub
-          .getLine(user)
+          .getLine(username)
           ?.next({ data: avatar.data, type: 'synced' });
       } catch (e) {
         syncStatusHub.end(syncStatusKey);
-        this._avatarHub.getLine(user)?.next({ type: 'offline' });
+        this._avatarHub.getLine(username)?.next({ type: 'offline' });
         if (!(e instanceof HttpNetworkError)) {
           throw e;
         }
       }
     } else {
       try {
-        const res = await getHttpUserClient().getAvatar(
-          user.username,
-          cache.etag
-        );
+        const res = await getHttpUserClient().getAvatar(username, cache.etag);
         if (res instanceof NotModified) {
           syncStatusHub.end(syncStatusKey);
           this._avatarHub
-            .getLine(user)
+            .getLine(username)
             ?.next({ data: cache.data, type: 'synced' });
         } else {
           const avatar = res;
           await dataStorage.setItem<BlobWithEtag>(dataKey, avatar);
           syncStatusHub.end(syncStatusKey);
           this._avatarHub
-            .getLine(user)
+            .getLine(username)
             ?.next({ data: avatar.data, type: 'synced' });
         }
       } catch (e) {
         syncStatusHub.end(syncStatusKey);
         this._avatarHub
-          .getLine(user)
+          .getLine(username)
           ?.next({ data: cache.data, type: 'offline' });
         if (!(e instanceof HttpNetworkError)) {
           throw e;
@@ -365,13 +353,12 @@ export class UserInfoService {
   }
 
   private _avatarHub = new SubscriptionHub<
-    { username: string; uniqueId: string },
+    string,
     | { data: Blob; type: 'cache' | 'synced' | 'offline' }
     | { data?: undefined; type: 'notexist' | 'offline' }
   >({
-    keyToString: (key) => `${key.username}.${key.uniqueId}`,
     setup: (key, line) => {
-      void this.getCachedAvatar(key.uniqueId).then((avatar) => {
+      void this.getCachedAvatar(key).then((avatar) => {
         if (avatar != null) {
           line.next({ data: avatar, type: 'cache' });
         }
@@ -381,19 +368,9 @@ export class UserInfoService {
   });
 
   getAvatar$(username: string): Observable<Blob> {
-    return this._userHub.getObservable(username).pipe(
-      switchMap((state) => {
-        if (state.user == null) return [];
-        if (state.type === 'synced')
-          return this._avatarHub.getObservable(state.user).pipe(
-            map((state) => state?.data),
-            filter((data): data is Blob => data != null)
-          );
-        else
-          return from(this.getCachedAvatar(state.user.uniqueId)).pipe(
-            filter((data): data is Blob => data != null)
-          );
-      })
+    return this._avatarHub.getObservable(username).pipe(
+      map((state) => state.data),
+      filter((blob): blob is Blob => blob != null)
     );
   }
 
@@ -406,11 +383,7 @@ export class UserInfoService {
   async setAvatar(username: string, blob: Blob): Promise<void> {
     const user = checkLogin();
     await getHttpUserClient().putAvatar(username, blob, user.token);
-    this.getUser$(username)
-      .pipe(take(1))
-      .subscribe((user) => {
-        this._avatarHub.getLine(user)?.next({ data: blob, type: 'synced' });
-      });
+    this._avatarHub.getLine(username)?.next({ data: blob, type: 'synced' });
   }
 }
 
