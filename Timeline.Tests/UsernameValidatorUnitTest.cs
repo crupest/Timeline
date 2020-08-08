@@ -52,6 +52,12 @@ namespace Timeline.Tests
             FailAndMessage(new string('a', 40)).Should().ContainEquivalentOf("long");
         }
 
+        [Fact(Skip = "Currently name can't be longer than 26. So this will print message of too long.")]
+        public void UniqueId()
+        {
+            FailAndMessage("e4c80127d092d9b2fc19c5e04612d4c0").Should().ContainEquivalentOf("unique id");
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("abc")]

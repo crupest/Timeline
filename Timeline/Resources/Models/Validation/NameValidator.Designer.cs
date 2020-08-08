@@ -86,5 +86,14 @@ namespace Timeline.Resources.Models.Validation {
                 return ResourceManager.GetString("MessageTooLong", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name can&apos;t be of the same format of unique id..
+        /// </summary>
+        internal static string MessageUnqiueId {
+            get {
+                return ResourceManager.GetString("MessageUnqiueId", resourceCulture);
+            }
+        }
     }
 }
