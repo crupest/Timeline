@@ -52,9 +52,9 @@ export default function TimelinePageTemplate<TManageItem>(
 
   const error: string | undefined = (() => {
     if (timelineState != null) {
-      const { syncState, timeline } = timelineState;
-      if (syncState === 'offline' && timeline == null) return 'Network Error';
-      if (syncState === 'synced' && timeline == null)
+      const { type, timeline } = timelineState;
+      if (type === 'offline' && timeline == null) return 'Network Error';
+      if (type === 'synced' && timeline == null)
         return t(props.notFoundI18nKey);
     }
     return undefined;

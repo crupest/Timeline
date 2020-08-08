@@ -1,12 +1,13 @@
 import React from 'react';
 import XRegExp from 'xregexp';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from, combineLatest } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 import { convertError } from '../utilities/rxjs';
 
 import { dataStorage } from './common';
 import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
+import syncStatusHub from './SyncStatusHub';
 
 import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
 
@@ -74,18 +75,18 @@ export const timelineVisibilityTooltipTranslationMap: Record<
 export class TimelineNotExistError extends Error {}
 export class TimelineNameConflictError extends Error {}
 
-export type TimelineWithSyncState =
+export type TimelineWithSyncStatus =
   | {
-      syncState: 'loadcache'; // Loading cache now.
-      timeline?: undefined;
+      type: 'cache';
+      timeline: TimelineInfo;
     }
   | {
-      syncState:
-        | 'syncing' // Cache loaded and syncing for the first time.
-        | 'offline' // Sync failed and use cache. Null timeline means no cache.
-        | 'synced' // Sync succeeded. Null timeline means the timeline does not exist.
-        | 'new'; // This is a new timeline different from cached one. Null timeline means the timeline does not exist.
+      type: 'offline' | 'synced';
       timeline: TimelineInfo | null;
+    }
+  | {
+      type: 'notexist';
+      timeline?: undefined;
     };
 
 export interface TimelinePostsWithSyncState {
@@ -99,107 +100,123 @@ export interface TimelinePostsWithSyncState {
   posts: TimelinePostInfo[];
 }
 
-type FetchAndCacheTimelineResult = TimelineInfo | 'offline' | 'notexist';
-
 type FetchAndCachePostsResult =
   | TimelinePostInfo[]
   | 'notexist'
   | 'forbid'
   | 'offline';
 
-export class TimelineService {
-  private getTimelineKey(timelineName: string): string {
-    return `timeline.${timelineName}`;
-  }
+type TimelineData = Omit<HttpTimelineInfo, 'owner' | 'members'> & {
+  owner: string;
+  members: string[];
+};
 
+export class TimelineService {
   private getCachedTimeline(
     timelineName: string
-  ): Promise<TimelineInfo | null> {
-    return dataStorage.getItem<TimelineInfo | null>(
-      this.getTimelineKey(timelineName)
-    );
+  ): Promise<TimelineData | null> {
+    return dataStorage.getItem<TimelineData | null>(`timeline.${timelineName}`);
   }
 
-  private async fetchAndCacheTimeline(
-    timelineName: string
-  ): Promise<FetchAndCacheTimelineResult> {
+  private convertHttpTimelineToData(timeline: HttpTimelineInfo): TimelineData {
+    return {
+      ...timeline,
+      owner: timeline.owner.username,
+      members: timeline.members.map((m) => m.username),
+    };
+  }
+
+  private async syncTimeline(timelineName: string): Promise<void> {
+    const syncStatusKey = `timeline.${timelineName}`;
+    if (syncStatusHub.get(syncStatusKey)) return;
+    syncStatusHub.begin(syncStatusKey);
+
     try {
-      const timeline = await getHttpTimelineClient().getTimeline(timelineName);
-      await dataStorage.setItem<TimelineInfo>(
-        this.getTimelineKey(timelineName),
+      const httpTimeline = await getHttpTimelineClient().getTimeline(
+        timelineName
+      );
+      const timeline = this.convertHttpTimelineToData(httpTimeline);
+      await dataStorage.setItem<TimelineData>(
+        `timeline.${timelineName}`,
         timeline
       );
-      return timeline;
+
+      syncStatusHub.end(syncStatusKey);
+      this._timelineHub
+        .getLine(timelineName)
+        ?.next({ type: 'synced', timeline });
     } catch (e) {
+      syncStatusHub.end(syncStatusKey);
       if (e instanceof HttpTimelineNotExistError) {
-        return 'notexist';
+        this._timelineHub
+          .getLine(timelineName)
+          ?.next({ type: 'synced', timeline: null });
       } else if (e instanceof HttpNetworkError) {
-        return 'offline';
+        const cache = await this.getCachedTimeline(timelineName);
+        if (cache == null)
+          this._timelineHub
+            .getLine(timelineName)
+            ?.next({ type: 'offline', timeline: null });
+        else
+          this._timelineHub
+            .getLine(timelineName)
+            ?.next({ type: 'offline', timeline: cache });
       } else {
         throw e;
       }
     }
   }
 
-  private async syncTimeline(timelineName: string): Promise<void> {
-    const line = this._timelineSubscriptionHub.getLine(timelineName);
-
-    if (line == null) {
-      console.log('No subscription, skip sync!');
-      return;
-    }
-
-    const old = line.value;
-
-    if (
-      old != null &&
-      (old.syncState === 'loadcache' || old.syncState === 'syncing')
-    ) {
-      return;
-    }
-
-    const next = line.next.bind(line);
-
-    if (old == undefined) {
-      next({ syncState: 'loadcache' });
-      const timeline = await this.getCachedTimeline(timelineName);
-      next({ syncState: 'syncing', timeline });
-    } else {
-      next({ syncState: 'syncing', timeline: old?.timeline });
-    }
-
-    const result = await this.fetchAndCacheTimeline(timelineName);
-
-    if (result === 'offline') {
-      next({ syncState: 'offline', timeline: line.value?.timeline ?? null });
-    } else if (result === 'notexist') {
-      if (line.value?.timeline != null) {
-        next({ syncState: 'new', timeline: null });
-      } else {
-        next({ syncState: 'synced', timeline: null });
-      }
-    } else {
-      if (result.uniqueId === line.value?.timeline?.uniqueId) {
-        next({ syncState: 'synced', timeline: result });
-      } else {
-        next({ syncState: 'new', timeline: result });
-      }
-    }
-  }
-
-  private _timelineSubscriptionHub = new SubscriptionHub<
+  private _timelineHub = new SubscriptionHub<
     string,
-    TimelineWithSyncState
+    | {
+        type: 'cache';
+        timeline: TimelineData;
+      }
+    | {
+        type: 'offline' | 'synced';
+        timeline: TimelineData | null;
+      }
   >({
-    setup: (key) => {
-      void this.syncTimeline(key);
+    setup: (key, line) => {
+      void this.getCachedTimeline(key).then((timeline) => {
+        if (timeline != null) {
+          line.next({ type: 'cache', timeline });
+        }
+        return this.syncTimeline(key);
+      });
     },
-    destroyable: (_, value) =>
-      value?.syncState !== 'loadcache' && value?.syncState !== 'syncing',
   });
 
-  get timelineHub(): ISubscriptionHub<string, TimelineWithSyncState> {
-    return this._timelineSubscriptionHub;
+  getTimeline$(timelineName: string): Observable<TimelineWithSyncStatus> {
+    return this._timelineHub.getObservable(timelineName).pipe(
+      switchMap((state) => {
+        if (state.timeline != null) {
+          return combineLatest(
+            [state.timeline.owner, ...state.timeline.members].map((u) =>
+              userInfoService.getUser$(u)
+            )
+          ).pipe(
+            map((users) => {
+              return {
+                type: 'cache',
+                timeline: {
+                  ...state.timeline,
+                  owner: users[0],
+                  members: users.slice(1),
+                },
+              } as TimelineWithSyncStatus;
+            })
+          );
+        } else {
+          return [
+            {
+              ...state,
+            } as TimelineWithSyncStatus,
+          ];
+        }
+      })
+    );
   }
 
   createTimeline(timelineName: string): Observable<TimelineInfo> {
@@ -591,17 +608,16 @@ export function validateTimelineName(name: string): boolean {
 
 export function useTimelineInfo(
   timelineName: string
-): TimelineWithSyncState | undefined {
-  const [state, setState] = React.useState<TimelineWithSyncState | undefined>(
+): TimelineWithSyncStatus | undefined {
+  const [state, setState] = React.useState<TimelineWithSyncStatus | undefined>(
     undefined
   );
   React.useEffect(() => {
-    const subscription = timelineService.timelineHub.subscribe(
-      timelineName,
-      (data) => {
+    const subscription = timelineService
+      .getTimeline$(timelineName)
+      .subscribe((data) => {
         setState(data);
-      }
-    );
+      });
     return () => {
       subscription.unsubscribe();
     };
