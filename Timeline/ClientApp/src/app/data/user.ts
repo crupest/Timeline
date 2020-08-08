@@ -6,6 +6,7 @@ import { convertError } from '../utilities/rxjs';
 import { pushAlert } from '../common/alert-service';
 
 import { dataStorage } from './common';
+import { syncStatusHub } from './SyncStatusHub';
 import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
 
 import { HttpNetworkError, BlobWithEtag, NotModified } from '../http/common';
@@ -18,6 +19,7 @@ import {
   HttpUserNotExistError,
   HttpUser,
 } from '../http/user';
+import { map, filter } from 'rxjs/operators';
 
 export type User = HttpUser;
 
@@ -226,6 +228,80 @@ export function checkLogin(): UserWithToken {
 export class UserNotExistError extends Error {}
 
 export class UserInfoService {
+  async saveUser(user: HttpUser): Promise<void> {
+    const syncStatusKey = `user.${user.username}`;
+    if (syncStatusHub.get(syncStatusKey)) return;
+    syncStatusHub.begin(syncStatusKey);
+    await this.doSaveUser(user);
+    syncStatusHub.end(syncStatusKey);
+    this._userHub.getLine(user.username)?.next({ user, type: 'synced' });
+  }
+
+  private async getCachedUser(username: string): Promise<User | null> {
+    const uniqueId = await dataStorage.getItem<string | null>(
+      `user.${username}`
+    );
+    if (uniqueId == null) return null;
+    const user = await dataStorage.getItem<HttpUser | null>(`user.${uniqueId}`);
+    return user;
+  }
+
+  private async doSaveUser(user: HttpUser): Promise<void> {
+    await dataStorage.setItem<string>(`user.${user.username}`, user.uniqueId);
+    await dataStorage.setItem<HttpUser>(`user.${user.uniqueId}`, user);
+  }
+
+  private async syncUser(username: string): Promise<void> {
+    const syncStatusKey = `user.${username}`;
+    if (syncStatusHub.get(syncStatusKey)) return;
+    syncStatusHub.begin(syncStatusKey);
+
+    try {
+      const res = await getHttpUserClient().get(username);
+      await this.doSaveUser(res);
+      syncStatusHub.end(syncStatusKey);
+      this._userHub.getLine(username)?.next({ user: res, type: 'synced' });
+    } catch (e) {
+      if (e instanceof HttpUserNotExistError) {
+        syncStatusHub.end(syncStatusKey);
+        this._userHub.getLine(username)?.next({ type: 'notexist' });
+      } else {
+        syncStatusHub.end(syncStatusKey);
+        const line = this._userHub.getLine(username);
+        if (line != null) {
+          const cache = await this.getCachedUser(username);
+          if (cache == null) line.next({ type: 'offline' });
+          else line.next({ user: cache, type: 'offline' });
+        }
+        if (!(e instanceof HttpNetworkError)) {
+          throw e;
+        }
+      }
+    }
+  }
+
+  private _userHub = new SubscriptionHub<
+    string,
+    | { user: User; type: 'cache' | 'synced' | 'offline' }
+    | { user?: undefined; type: 'notexist' | 'offline' }
+  >({
+    setup: (key, line) => {
+      void this.getCachedUser(key).then((cache) => {
+        if (cache != null) {
+          line.next({ user: cache, type: 'cache' });
+        }
+        return this.syncUser(key);
+      });
+    },
+  });
+
+  getUser$(username: string): Observable<User> {
+    return this._userHub.getObservable(username).pipe(
+      map((state) => state?.user),
+      filter((user): user is User => user != null)
+    );
+  }
+
   private getAvatarKey(username: string): string {
     return `user.${username}.avatar`;
   }
