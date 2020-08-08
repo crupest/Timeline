@@ -12,6 +12,15 @@ namespace Timeline.Tests.IntegratedTests
     public class UserTest : IntegratedTestBase
     {
         [Fact]
+        public void UserListShouldHaveUniqueId()
+        {
+            foreach (var user in UserInfos)
+            {
+                user.UniqueId.Should().NotBeNullOrWhiteSpace();
+            }
+        }
+
+        [Fact]
         public async Task GetList_NoAuth()
         {
             using var client = await CreateDefaultClient();

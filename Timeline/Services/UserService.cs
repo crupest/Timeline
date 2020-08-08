@@ -205,6 +205,7 @@ namespace Timeline.Services
         {
             return new User
             {
+                UniqueId = entity.UniqueId,
                 Username = entity.Username,
                 Administrator = UserRoleConvert.ToBool(entity.Roles),
                 Nickname = string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
