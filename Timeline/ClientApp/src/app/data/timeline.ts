@@ -6,7 +6,6 @@ import { map } from 'rxjs/operators';
 import { convertError } from '../utilities/rxjs';
 
 import { dataStorage } from './common';
-import { queue } from './queue';
 import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
 
 import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
@@ -121,15 +120,7 @@ export class TimelineService {
     );
   }
 
-  private fetchAndCacheTimeline(
-    timelineName: string
-  ): Promise<FetchAndCacheTimelineResult> {
-    return queue(`TimelineService.fetchAndCacheTimeline.${timelineName}`, () =>
-      this.doFetchAndCacheTimeline(timelineName)
-    );
-  }
-
-  private async doFetchAndCacheTimeline(
+  private async fetchAndCacheTimeline(
     timelineName: string
   ): Promise<FetchAndCacheTimelineResult> {
     try {
@@ -337,16 +328,7 @@ export class TimelineService {
     return posts;
   }
 
-  private fetchAndCachePosts(
-    timelineName: string,
-    notUseDataCache = false
-  ): Promise<FetchAndCachePostsResult> {
-    return queue(`TimelineService.fetchAndCachePosts.${timelineName}`, () =>
-      this.doFetchAndCachePosts(timelineName, notUseDataCache)
-    );
-  }
-
-  private async doFetchAndCachePosts(
+  private async fetchAndCachePosts(
     timelineName: string,
     notUseDataCache = false
   ): Promise<FetchAndCachePostsResult> {

@@ -7,7 +7,6 @@ import { pushAlert } from '../common/alert-service';
 
 import { dataStorage } from './common';
 import { SubscriptionHub, ISubscriptionHub } from './SubscriptionHub';
-import { queue } from './queue';
 
 import { HttpNetworkError, BlobWithEtag, NotModified } from '../http/common';
 import {
@@ -238,14 +237,6 @@ export class UserInfoService {
   }
 
   private async fetchAndCacheAvatar(
-    username: string
-  ): Promise<{ data: Blob; type: 'synced' | 'cache' } | 'offline'> {
-    return queue(`UserService.fetchAndCacheAvatar.${username}`, () =>
-      this.doFetchAndCacheAvatar(username)
-    );
-  }
-
-  private async doFetchAndCacheAvatar(
     username: string
   ): Promise<{ data: Blob; type: 'synced' | 'cache' } | 'offline'> {
     const key = this.getAvatarKey(username);
