@@ -154,7 +154,7 @@ export class TimelineService {
         this._timelineHub
           .getLine(timelineName)
           ?.next({ type: 'synced', timeline: null });
-      } else if (e instanceof HttpNetworkError) {
+      } else {
         const cache = await this.getCachedTimeline(timelineName);
         if (cache == null)
           this._timelineHub
@@ -164,8 +164,8 @@ export class TimelineService {
           this._timelineHub
             .getLine(timelineName)
             ?.next({ type: 'offline', timeline: cache });
-      } else {
-        throw e;
+
+        if (!(e instanceof HttpNetworkError)) throw e;
       }
     }
   }
@@ -336,7 +336,7 @@ export class TimelineService {
         this._postsHub
           .getLine(timelineName)
           ?.next({ type: 'forbid', posts: [] });
-      } else if (e instanceof HttpNetworkError) {
+      } else {
         const cache = await this.getCachedPosts(timelineName);
         if (cache == null)
           this._postsHub
@@ -346,8 +346,7 @@ export class TimelineService {
           this._postsHub
             .getLine(timelineName)
             ?.next({ type: 'offline', posts: cache });
-      } else {
-        throw e;
+        if (!(e instanceof HttpNetworkError)) throw e;
       }
     }
   }
