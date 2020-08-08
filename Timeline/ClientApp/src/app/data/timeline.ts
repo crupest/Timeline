@@ -202,7 +202,7 @@ export class TimelineService {
           ).pipe(
             map((users) => {
               return {
-                type: 'cache',
+                type: state.type,
                 timeline: {
                   ...state.timeline,
                   owner: users[0],
