@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 export type Subscriber<TData> = (data: TData) => void;
 
-export interface ISubscriptionLine<TData> {
+export interface IDataLine<TData> {
   readonly value: undefined | TData;
   next(value: TData): void;
   readonly isSyncing: boolean;
@@ -12,7 +12,7 @@ export interface ISubscriptionLine<TData> {
   endSyncAndNext(value: TData): void;
 }
 
-export class SubscriptionLine<TData> implements ISubscriptionLine<TData> {
+export class DataLine<TData> implements IDataLine<TData> {
   private _current: TData | undefined = undefined;
 
   private _syncing = false;
@@ -75,25 +75,19 @@ export class SubscriptionLine<TData> implements ISubscriptionLine<TData> {
   }
 }
 
-export class SubscriptionHub<TKey, TData> {
+export class DataHub<TKey, TData> {
   private keyToString: (key: TKey) => string;
-  private setup?: (
-    key: TKey,
-    line: ISubscriptionLine<TData>
-  ) => (() => void) | void;
+  private setup?: (key: TKey, line: IDataLine<TData>) => (() => void) | void;
   private destroyable?: (key: TKey, value: TData | undefined) => boolean;
 
-  private readonly subscriptionLineMap = new Map<
-    string,
-    SubscriptionLine<TData>
-  >();
+  private readonly subscriptionLineMap = new Map<string, DataLine<TData>>();
 
   private cleanTimerId = 0;
 
   // setup is called after creating line and if it returns a function as destroyer, then when the line is destroyed the destroyer will be called.
   constructor(config?: {
     keyToString?: (key: TKey) => string;
-    setup?: (key: TKey, line: ISubscriptionLine<TData>) => void;
+    setup?: (key: TKey, line: IDataLine<TData>) => void;
     destroyable?: (key: TKey, value: TData | undefined) => boolean;
   }) {
     this.keyToString =
@@ -130,10 +124,10 @@ export class SubscriptionHub<TKey, TData> {
     }
   }
 
-  private createLine(key: TKey, useSetup = true): SubscriptionLine<TData> {
+  private createLine(key: TKey, useSetup = true): DataLine<TData> {
     const keyString = this.keyToString(key);
     const { setup, destroyable } = this;
-    const newLine = new SubscriptionLine<TData>({
+    const newLine = new DataLine<TData>({
       destroyable:
         destroyable != null ? (value) => destroyable(key, value) : undefined,
     });
@@ -173,12 +167,12 @@ export class SubscriptionHub<TKey, TData> {
     });
   }
 
-  getLine(key: TKey): ISubscriptionLine<TData> | null {
+  getLine(key: TKey): IDataLine<TData> | null {
     const keyString = this.keyToString(key);
     return this.subscriptionLineMap.get(keyString) ?? null;
   }
 
-  getLineOrCreateWithoutSetup(key: TKey): ISubscriptionLine<TData> {
+  getLineOrCreateWithoutSetup(key: TKey): IDataLine<TData> {
     const keyString = this.keyToString(key);
     return (
       this.subscriptionLineMap.get(keyString) ?? this.createLine(key, false)

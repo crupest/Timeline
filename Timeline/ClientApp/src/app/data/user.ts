@@ -7,7 +7,7 @@ import { convertError } from '../utilities/rxjs';
 import { pushAlert } from '../common/alert-service';
 
 import { dataStorage, throwIfNotNetworkError } from './common';
-import { SubscriptionHub } from './SubscriptionHub';
+import { DataHub } from './DataHub';
 
 import { HttpNetworkError, BlobWithEtag, NotModified } from '../http/common';
 import {
@@ -271,7 +271,7 @@ export class UserInfoService {
     }
   }
 
-  private _userHub = new SubscriptionHub<
+  private _userHub = new DataHub<
     string,
     | { user: User; type: 'cache' | 'synced' | 'offline' }
     | { user?: undefined; type: 'notexist' | 'offline' }
@@ -336,7 +336,7 @@ export class UserInfoService {
     }
   }
 
-  private _avatarHub = new SubscriptionHub<
+  private _avatarHub = new DataHub<
     string,
     | { data: Blob; type: 'cache' | 'synced' | 'offline' }
     | { data?: undefined; type: 'notexist' | 'offline' }
