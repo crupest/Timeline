@@ -1,21 +1,15 @@
 import { pull } from 'lodash';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export type Subscriber<TData> = (data: TData) => void;
 
-export interface IDataLine<TData> {
-  readonly value: undefined | TData;
-  next(value: TData): void;
-  readonly isSyncing: boolean;
-  beginSync(): void;
-  endSync(): void;
-  endSyncAndNext(value: TData): void;
-}
+export type WithSyncStatus<T> = T & { syncing: boolean };
 
-export class DataLine<TData> implements IDataLine<TData> {
+export class DataLine<TData> {
   private _current: TData | undefined = undefined;
 
-  private _syncing = false;
+  private _syncingSubject = new BehaviorSubject<boolean>(false);
 
   private _observers: Subscriber<TData>[] = [];
 
@@ -23,16 +17,45 @@ export class DataLine<TData> implements IDataLine<TData> {
     private config?: { destroyable?: (value: TData | undefined) => boolean }
   ) {}
 
-  subscribe(subscriber: Subscriber<TData>): void {
+  private subscribe(subscriber: Subscriber<TData>): void {
     this._observers.push(subscriber);
     if (this._current !== undefined) {
       subscriber(this._current);
     }
   }
 
-  unsubscribe(subscriber: Subscriber<TData>): void {
+  private unsubscribe(subscriber: Subscriber<TData>): void {
     if (!this._observers.includes(subscriber)) return;
     pull(this._observers, subscriber);
+  }
+
+  getObservable(): Observable<TData> {
+    return new Observable<TData>((observer) => {
+      const f = (data: TData): void => {
+        observer.next(data);
+      };
+      this.subscribe(f);
+
+      return () => {
+        this.unsubscribe(f);
+      };
+    });
+  }
+
+  getSyncStatusObservable(): Observable<boolean> {
+    return this._syncingSubject.asObservable();
+  }
+
+  getDataWithSyncStatusObservable(): Observable<WithSyncStatus<TData>> {
+    return combineLatest([
+      this.getObservable(),
+      this.getSyncStatusObservable(),
+    ]).pipe(
+      map(([data, syncing]) => ({
+        ...data,
+        syncing,
+      }))
+    );
   }
 
   get value(): TData | undefined {
@@ -45,18 +68,18 @@ export class DataLine<TData> implements IDataLine<TData> {
   }
 
   get isSyncing(): boolean {
-    return this._syncing;
+    return this._syncingSubject.value;
   }
 
   beginSync(): void {
-    if (!this._syncing) {
-      this._syncing = true;
+    if (!this._syncingSubject.value) {
+      this._syncingSubject.next(true);
     }
   }
 
   endSync(): void {
-    if (this._syncing) {
-      this._syncing = false;
+    if (this._syncingSubject.value) {
+      this._syncingSubject.next(false);
     }
   }
 
@@ -77,7 +100,7 @@ export class DataLine<TData> implements IDataLine<TData> {
 
 export class DataHub<TKey, TData> {
   private keyToString: (key: TKey) => string;
-  private setup?: (key: TKey, line: IDataLine<TData>) => (() => void) | void;
+  private setup?: (key: TKey, line: DataLine<TData>) => (() => void) | void;
   private destroyable?: (key: TKey, value: TData | undefined) => boolean;
 
   private readonly subscriptionLineMap = new Map<string, DataLine<TData>>();
@@ -87,7 +110,7 @@ export class DataHub<TKey, TData> {
   // setup is called after creating line and if it returns a function as destroyer, then when the line is destroyed the destroyer will be called.
   constructor(config?: {
     keyToString?: (key: TKey) => string;
-    setup?: (key: TKey, line: IDataLine<TData>) => void;
+    setup?: (key: TKey, line: DataLine<TData>) => void;
     destroyable?: (key: TKey, value: TData | undefined) => boolean;
   }) {
     this.keyToString =
@@ -141,38 +164,31 @@ export class DataHub<TKey, TData> {
     return newLine;
   }
 
-  subscribe(key: TKey, subscriber: Subscriber<TData>): void {
-    const keyString = this.keyToString(key);
-    const line =
-      this.subscriptionLineMap.get(keyString) ?? this.createLine(key);
-    return line.subscribe(subscriber);
-  }
-
-  unsubscribe(key: TKey, subscriber: Subscriber<TData>): void {
-    const keyString = this.keyToString(key);
-    const line = this.subscriptionLineMap.get(keyString);
-    return line?.unsubscribe(subscriber);
-  }
-
   getObservable(key: TKey): Observable<TData> {
-    return new Observable((observer) => {
-      const f = (data: TData): void => {
-        observer.next(data);
-      };
-
-      this.subscribe(key, f);
-      return () => {
-        this.unsubscribe(key, f);
-      };
-    });
+    return this.getLineOrCreateWithSetup(key).getObservable();
   }
 
-  getLine(key: TKey): IDataLine<TData> | null {
+  getSyncStatusObservable(key: TKey): Observable<boolean> {
+    return this.getLineOrCreateWithSetup(key).getSyncStatusObservable();
+  }
+
+  getDataWithSyncStatusObservable(
+    key: TKey
+  ): Observable<WithSyncStatus<TData>> {
+    return this.getLineOrCreateWithSetup(key).getDataWithSyncStatusObservable();
+  }
+
+  getLine(key: TKey): DataLine<TData> | null {
     const keyString = this.keyToString(key);
     return this.subscriptionLineMap.get(keyString) ?? null;
   }
 
-  getLineOrCreateWithoutSetup(key: TKey): IDataLine<TData> {
+  getLineOrCreateWithSetup(key: TKey): DataLine<TData> {
+    const keyString = this.keyToString(key);
+    return this.subscriptionLineMap.get(keyString) ?? this.createLine(key);
+  }
+
+  getLineOrCreateWithoutSetup(key: TKey): DataLine<TData> {
     const keyString = this.keyToString(key);
     return (
       this.subscriptionLineMap.get(keyString) ?? this.createLine(key, false)
