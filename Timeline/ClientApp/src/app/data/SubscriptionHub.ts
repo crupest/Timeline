@@ -6,10 +6,16 @@ export type Subscriber<TData> = (data: TData) => void;
 export interface ISubscriptionLine<TData> {
   readonly value: undefined | TData;
   next(value: TData): void;
+  readonly isSyncing: boolean;
+  beginSync(): void;
+  endSync(): void;
+  endSyncAndNext(value: TData): void;
 }
 
 export class SubscriptionLine<TData> implements ISubscriptionLine<TData> {
   private _current: TData | undefined = undefined;
+
+  private _syncing = false;
 
   private _observers: Subscriber<TData>[] = [];
 
@@ -38,6 +44,22 @@ export class SubscriptionLine<TData> implements ISubscriptionLine<TData> {
     this._observers.forEach((observer) => observer(value));
   }
 
+  get isSyncing(): boolean {
+    return this._syncing;
+  }
+
+  beginSync(): void {
+    if (!this._syncing) {
+      this._syncing = true;
+    }
+  }
+
+  endSync(): void {
+    if (this._syncing) {
+      this._syncing = false;
+    }
+  }
+
   get destroyable(): boolean {
     const customDestroyable = this.config?.destroyable;
 
@@ -45,6 +67,11 @@ export class SubscriptionLine<TData> implements ISubscriptionLine<TData> {
       this._observers.length === 0 &&
       (customDestroyable != null ? customDestroyable(this._current) : true)
     );
+  }
+
+  endSyncAndNext(value: TData): void {
+    this.endSync();
+    this.next(value);
   }
 }
 
