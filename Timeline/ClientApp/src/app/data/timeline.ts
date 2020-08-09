@@ -7,7 +7,7 @@ import { uniqBy } from 'lodash';
 import { convertError } from '../utilities/rxjs';
 
 import { dataStorage, throwIfNotNetworkError } from './common';
-import { SubscriptionHub } from './SubscriptionHub';
+import { DataHub } from './DataHub';
 
 import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
 
@@ -165,7 +165,7 @@ export class TimelineService {
     }
   }
 
-  private _timelineHub = new SubscriptionHub<
+  private _timelineHub = new DataHub<
     string,
     | {
         type: 'cache';
@@ -343,7 +343,7 @@ export class TimelineService {
     }
   }
 
-  private _postsHub = new SubscriptionHub<
+  private _postsHub = new DataHub<
     string,
     {
       type: 'cache' | 'offline' | 'synced' | 'forbid' | 'notexist';
@@ -476,7 +476,7 @@ export class TimelineService {
     }
   }
 
-  private _postDataHub = new SubscriptionHub<
+  private _postDataHub = new DataHub<
     { timelineName: string; postId: number },
     | { data: Blob; type: 'cache' | 'synced' | 'offline' }
     | { data?: undefined; type: 'notexist' | 'offline' }
