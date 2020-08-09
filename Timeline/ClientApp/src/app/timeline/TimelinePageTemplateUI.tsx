@@ -24,7 +24,7 @@ import Timeline, {
 import AppBar from '../common/AppBar';
 import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
 
-type TimelinePostSyncState = 'cache' | 'syncing' | 'synced' | 'offline';
+type TimelinePostSyncState = 'syncing' | 'synced' | 'offline';
 
 const TimelinePostSyncStateBadge: React.FC<{
   state: TimelinePostSyncState;
@@ -37,7 +37,6 @@ const TimelinePostSyncStateBadge: React.FC<{
     <div style={style} className={clsx('timeline-sync-state-badge', className)}>
       {(() => {
         switch (state) {
-          case 'cache':
           case 'syncing': {
             return (
               <>
@@ -226,11 +225,17 @@ export default function TimelinePageTemplateUI<TManageItems>(
             ? 'calc(68px + 1.5em)'
             : `${cardHeight + 60}px`;
 
+          const syncState: TimelinePostSyncState = postListState.syncing
+            ? 'syncing'
+            : postListState.type === 'synced'
+            ? 'synced'
+            : 'offline';
+
           timelineBody = (
             <div>
               <TimelinePostSyncStateBadge
                 style={{ top: topHeight }}
-                state={postListState.type}
+                state={syncState}
               />
               <Timeline
                 containerRef={timelineRef}
