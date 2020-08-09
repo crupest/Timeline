@@ -6,8 +6,7 @@ import { UiLogicError } from '../common';
 import { convertError } from '../utilities/rxjs';
 import { pushAlert } from '../common/alert-service';
 
-import { dataStorage } from './common';
-import { syncStatusHub } from './SyncStatusHub';
+import { dataStorage, throwIfNotNetworkError } from './common';
 import { SubscriptionHub } from './SubscriptionHub';
 
 import { HttpNetworkError, BlobWithEtag, NotModified } from '../http/common';
@@ -229,47 +228,45 @@ export class UserNotExistError extends Error {}
 
 export class UserInfoService {
   async saveUser(user: HttpUser): Promise<void> {
-    const syncStatusKey = `user.${user.username}`;
-    if (syncStatusHub.get(syncStatusKey)) return;
-    syncStatusHub.begin(syncStatusKey);
+    const key = user.username;
+    const line = this._userHub.getLineOrCreateWithoutSetup(key);
+    if (line.isSyncing) return;
+    line.beginSync();
     await this.doSaveUser(user);
-    syncStatusHub.end(syncStatusKey);
-    this._userHub.getLine(user.username)?.next({ user, type: 'synced' });
+    line.endSyncAndNext({ user, type: 'synced' });
   }
 
   private getCachedUser(username: string): Promise<User | null> {
     return dataStorage.getItem<HttpUser | null>(`user.${username}`);
   }
 
-  private async doSaveUser(user: HttpUser): Promise<void> {
-    await dataStorage.setItem<HttpUser>(`user.${user.username}`, user);
+  private doSaveUser(user: HttpUser): Promise<void> {
+    return dataStorage.setItem<HttpUser>(`user.${user.username}`, user).then();
   }
 
   private async syncUser(username: string): Promise<void> {
-    const syncStatusKey = `user.${username}`;
-    if (syncStatusHub.get(syncStatusKey)) return;
-    syncStatusHub.begin(syncStatusKey);
+    const line = this._userHub.getLineOrCreateWithoutSetup(username);
+    if (line.isSyncing) return;
+    line.beginSync();
+
+    if (line.value == undefined) {
+      const cache = await this.getCachedUser(username);
+      if (cache != null) {
+        line.next({ user: cache, type: 'cache' });
+      }
+    }
 
     try {
       const res = await getHttpUserClient().get(username);
       await this.doSaveUser(res);
-      syncStatusHub.end(syncStatusKey);
-      this._userHub.getLine(username)?.next({ user: res, type: 'synced' });
+      line.endSyncAndNext({ user: res, type: 'synced' });
     } catch (e) {
       if (e instanceof HttpUserNotExistError) {
-        syncStatusHub.end(syncStatusKey);
-        this._userHub.getLine(username)?.next({ type: 'notexist' });
+        line.endSyncAndNext({ type: 'notexist' });
       } else {
-        syncStatusHub.end(syncStatusKey);
-        const line = this._userHub.getLine(username);
-        if (line != null) {
-          const cache = await this.getCachedUser(username);
-          if (cache == null) line.next({ type: 'offline' });
-          else line.next({ user: cache, type: 'offline' });
-        }
-        if (!(e instanceof HttpNetworkError)) {
-          throw e;
-        }
+        const cache = await this.getCachedUser(username);
+        line.endSyncAndNext({ user: cache ?? undefined, type: 'offline' });
+        throwIfNotNetworkError(e);
       }
     }
   }
@@ -279,13 +276,8 @@ export class UserInfoService {
     | { user: User; type: 'cache' | 'synced' | 'offline' }
     | { user?: undefined; type: 'notexist' | 'offline' }
   >({
-    setup: (key, line) => {
-      void this.getCachedUser(key).then((cache) => {
-        if (cache != null) {
-          line.next({ user: cache, type: 'cache' });
-        }
-        return this.syncUser(key);
-      });
+    setup: (key) => {
+      void this.syncUser(key);
     },
   });
 
@@ -296,58 +288,50 @@ export class UserInfoService {
     );
   }
 
-  private getCachedAvatar(username: string): Promise<Blob | null> {
+  private getCachedAvatar(username: string): Promise<BlobWithEtag | null> {
+    return dataStorage.getItem<BlobWithEtag | null>(`user.${username}.avatar`);
+  }
+
+  private saveAvatar(username: string, data: BlobWithEtag): Promise<void> {
     return dataStorage
-      .getItem<BlobWithEtag | null>(`user.${username}.avatar`)
-      .then((data) => data?.data ?? null);
+      .setItem<BlobWithEtag>(`user.${username}.avatar`, data)
+      .then();
   }
 
   private async syncAvatar(username: string): Promise<void> {
-    const syncStatusKey = `user.avatar.${username}`;
-    if (syncStatusHub.get(syncStatusKey)) return;
-    syncStatusHub.begin(syncStatusKey);
+    const line = this._avatarHub.getLineOrCreateWithoutSetup(username);
+    if (line.isSyncing) return;
+    line.beginSync();
 
-    const dataKey = `user.${username}.avatar`;
-    const cache = await dataStorage.getItem<BlobWithEtag | null>(dataKey);
+    const cache = await this.getCachedAvatar(username);
+    if (line.value == null) {
+      if (cache != null) {
+        line.next({ data: cache.data, type: 'cache' });
+      }
+    }
+
     if (cache == null) {
       try {
         const avatar = await getHttpUserClient().getAvatar(username);
-        await dataStorage.setItem<BlobWithEtag>(dataKey, avatar);
-        syncStatusHub.end(syncStatusKey);
-        this._avatarHub
-          .getLine(username)
-          ?.next({ data: avatar.data, type: 'synced' });
+        await this.saveAvatar(username, avatar);
+        line.endSyncAndNext({ data: avatar.data, type: 'synced' });
       } catch (e) {
-        syncStatusHub.end(syncStatusKey);
-        this._avatarHub.getLine(username)?.next({ type: 'offline' });
-        if (!(e instanceof HttpNetworkError)) {
-          throw e;
-        }
+        line.endSyncAndNext({ type: 'offline' });
+        throwIfNotNetworkError(e);
       }
     } else {
       try {
         const res = await getHttpUserClient().getAvatar(username, cache.etag);
         if (res instanceof NotModified) {
-          syncStatusHub.end(syncStatusKey);
-          this._avatarHub
-            .getLine(username)
-            ?.next({ data: cache.data, type: 'synced' });
+          line.endSyncAndNext({ data: cache.data, type: 'synced' });
         } else {
           const avatar = res;
-          await dataStorage.setItem<BlobWithEtag>(dataKey, avatar);
-          syncStatusHub.end(syncStatusKey);
-          this._avatarHub
-            .getLine(username)
-            ?.next({ data: avatar.data, type: 'synced' });
+          await this.saveAvatar(username, avatar);
+          line.endSyncAndNext({ data: avatar.data, type: 'synced' });
         }
       } catch (e) {
-        syncStatusHub.end(syncStatusKey);
-        this._avatarHub
-          .getLine(username)
-          ?.next({ data: cache.data, type: 'offline' });
-        if (!(e instanceof HttpNetworkError)) {
-          throw e;
-        }
+        line.endSyncAndNext({ data: cache.data, type: 'offline' });
+        throwIfNotNetworkError(e);
       }
     }
   }
@@ -357,13 +341,8 @@ export class UserInfoService {
     | { data: Blob; type: 'cache' | 'synced' | 'offline' }
     | { data?: undefined; type: 'notexist' | 'offline' }
   >({
-    setup: (key, line) => {
-      void this.getCachedAvatar(key).then((avatar) => {
-        if (avatar != null) {
-          line.next({ data: avatar, type: 'cache' });
-        }
-        return this.syncAvatar(key);
-      });
+    setup: (key) => {
+      void this.syncAvatar(key);
     },
   });
 

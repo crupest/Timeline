@@ -6,9 +6,8 @@ import { uniqBy } from 'lodash';
 
 import { convertError } from '../utilities/rxjs';
 
-import { dataStorage } from './common';
+import { dataStorage, throwIfNotNetworkError } from './common';
 import { SubscriptionHub } from './SubscriptionHub';
-import syncStatusHub from './SyncStatusHub';
 
 import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
 
@@ -30,12 +29,7 @@ import {
   HttpTimelineNotExistError,
   HttpTimelineNameConflictError,
 } from '../http/timeline';
-import {
-  BlobWithEtag,
-  NotModified,
-  HttpNetworkError,
-  HttpForbiddenError,
-} from '../http/common';
+import { BlobWithEtag, NotModified, HttpForbiddenError } from '../http/common';
 import { HttpUser } from '../http/user';
 
 export type TimelineInfo = HttpTimelineInfo;
@@ -116,6 +110,15 @@ export class TimelineService {
     return dataStorage.getItem<TimelineData | null>(`timeline.${timelineName}`);
   }
 
+  private saveTimeline(
+    timelineName: string,
+    data: TimelineData
+  ): Promise<void> {
+    return dataStorage
+      .setItem<TimelineData>(`timeline.${timelineName}`, data)
+      .then();
+  }
+
   private convertHttpTimelineToData(timeline: HttpTimelineInfo): TimelineData {
     return {
       ...timeline,
@@ -125,9 +128,15 @@ export class TimelineService {
   }
 
   private async syncTimeline(timelineName: string): Promise<void> {
-    const syncStatusKey = `timeline.${timelineName}`;
-    if (syncStatusHub.get(syncStatusKey)) return;
-    syncStatusHub.begin(syncStatusKey);
+    const line = this._timelineHub.getLineOrCreateWithoutSetup(timelineName);
+    if (line.isSyncing) return;
+
+    if (line.value == undefined) {
+      const cache = await this.getCachedTimeline(timelineName);
+      if (cache != null) {
+        line.next({ type: 'cache', timeline: cache });
+      }
+    }
 
     try {
       const httpTimeline = await getHttpTimelineClient().getTimeline(
@@ -139,33 +148,19 @@ export class TimelineService {
       );
 
       const timeline = this.convertHttpTimelineToData(httpTimeline);
-      await dataStorage.setItem<TimelineData>(
-        `timeline.${timelineName}`,
-        timeline
-      );
-
-      syncStatusHub.end(syncStatusKey);
-      this._timelineHub
-        .getLine(timelineName)
-        ?.next({ type: 'synced', timeline });
+      await this.saveTimeline(timelineName, timeline);
+      line.endSyncAndNext({ type: 'synced', timeline });
     } catch (e) {
-      syncStatusHub.end(syncStatusKey);
       if (e instanceof HttpTimelineNotExistError) {
-        this._timelineHub
-          .getLine(timelineName)
-          ?.next({ type: 'synced', timeline: null });
+        line.endSyncAndNext({ type: 'synced', timeline: null });
       } else {
         const cache = await this.getCachedTimeline(timelineName);
-        if (cache == null)
-          this._timelineHub
-            .getLine(timelineName)
-            ?.next({ type: 'offline', timeline: null });
-        else
-          this._timelineHub
-            .getLine(timelineName)
-            ?.next({ type: 'offline', timeline: cache });
-
-        if (!(e instanceof HttpNetworkError)) throw e;
+        if (cache == null) {
+          line.endSyncAndNext({ type: 'offline', timeline: null });
+        } else {
+          line.endSyncAndNext({ type: 'offline', timeline: cache });
+        }
+        throwIfNotNetworkError(e);
       }
     }
   }
@@ -181,13 +176,8 @@ export class TimelineService {
         timeline: TimelineData | null;
       }
   >({
-    setup: (key, line) => {
-      void this.getCachedTimeline(key).then((timeline) => {
-        if (timeline != null) {
-          line.next({ type: 'cache', timeline });
-        }
-        return this.syncTimeline(key);
-      });
+    setup: (key) => {
+      void this.syncTimeline(key);
     },
   });
 
@@ -293,22 +283,34 @@ export class TimelineService {
     return posts.map((post) => this.convertHttpPostToData(post));
   }
 
-  private async getCachedPosts(
+  private getCachedPosts(
     timelineName: string
-  ): Promise<TimelinePostData[]> {
-    const posts = await dataStorage.getItem<TimelinePostData[] | null>(
+  ): Promise<TimelinePostData[] | null> {
+    return dataStorage.getItem<TimelinePostData[] | null>(
       `timeline.${timelineName}.posts`
     );
-    if (posts == null) return [];
-    return posts;
+  }
+
+  private savePosts(
+    timelineName: string,
+    data: TimelinePostData[]
+  ): Promise<void> {
+    return dataStorage
+      .setItem<TimelinePostData[]>(`timeline.${timelineName}.posts`, data)
+      .then();
   }
 
   private async syncPosts(timelineName: string): Promise<void> {
-    const syncStatusKey = `timeline.posts.${timelineName}`;
+    const line = this._postsHub.getLineOrCreateWithoutSetup(timelineName);
+    if (line.isSyncing) return;
+    line.beginSync();
 
-    const dataKey = `timeline.${timelineName}.posts`;
-    if (syncStatusHub.get(syncStatusKey)) return;
-    syncStatusHub.begin(syncStatusKey);
+    if (line.value == null) {
+      const cache = await this.getCachedPosts(timelineName);
+      if (cache != null) {
+        line.next({ type: 'cache', posts: cache });
+      }
+    }
 
     try {
       const httpPosts = await getHttpTimelineClient().listPost(
@@ -322,31 +324,21 @@ export class TimelineService {
       ).forEach((user) => void userInfoService.saveUser(user));
 
       const posts = this.convertHttpPostToDataList(httpPosts);
-      await dataStorage.setItem<TimelinePostData[]>(dataKey, posts);
-
-      syncStatusHub.end(syncStatusKey);
-      this._postsHub.getLine(timelineName)?.next({ type: 'synced', posts });
+      await this.savePosts(timelineName, posts);
+      line.endSyncAndNext({ type: 'synced', posts });
     } catch (e) {
-      syncStatusHub.end(syncStatusKey);
       if (e instanceof HttpTimelineNotExistError) {
-        this._postsHub
-          .getLine(timelineName)
-          ?.next({ type: 'notexist', posts: [] });
+        line.endSyncAndNext({ type: 'notexist', posts: [] });
       } else if (e instanceof HttpForbiddenError) {
-        this._postsHub
-          .getLine(timelineName)
-          ?.next({ type: 'forbid', posts: [] });
+        line.endSyncAndNext({ type: 'forbid', posts: [] });
       } else {
         const cache = await this.getCachedPosts(timelineName);
-        if (cache == null)
-          this._postsHub
-            .getLine(timelineName)
-            ?.next({ type: 'offline', posts: [] });
-        else
-          this._postsHub
-            .getLine(timelineName)
-            ?.next({ type: 'offline', posts: cache });
-        if (!(e instanceof HttpNetworkError)) throw e;
+        if (cache == null) {
+          line.endSyncAndNext({ type: 'offline', posts: [] });
+        } else {
+          line.endSyncAndNext({ type: 'offline', posts: cache });
+        }
+        throwIfNotNetworkError(e);
       }
     }
   }
@@ -358,13 +350,8 @@ export class TimelineService {
       posts: TimelinePostData[];
     }
   >({
-    setup: (key, line) => {
-      void this.getCachedPosts(key).then((posts) => {
-        if (posts != null) {
-          line.next({ type: 'cache', posts });
-        }
-        return this.syncPosts(key);
-      });
+    setup: (key) => {
+      void this.syncPosts(key);
     },
   });
 
@@ -418,76 +405,73 @@ export class TimelineService {
     );
   }
 
-  private getCachedPostData(
-    timelineName: string,
-    postId: number
-  ): Promise<Blob | null> {
-    return dataStorage
-      .getItem<BlobWithEtag | null>(
-        `timeline.${timelineName}.post.${postId}.data`
-      )
-      .then((data) => data?.data ?? null);
+  private getCachedPostData(key: {
+    timelineName: string;
+    postId: number;
+  }): Promise<BlobWithEtag | null> {
+    return dataStorage.getItem<BlobWithEtag | null>(
+      `timeline.${key.timelineName}.post.${key.postId}.data`
+    );
   }
 
-  private async syncPostData(
-    timelineName: string,
-    postId: number
+  private savePostData(
+    key: {
+      timelineName: string;
+      postId: number;
+    },
+    data: BlobWithEtag
   ): Promise<void> {
-    const syncStatusKey = `user.timeline.${timelineName}.post.data.${postId}`;
-    if (syncStatusHub.get(syncStatusKey)) return;
-    syncStatusHub.begin(syncStatusKey);
+    return dataStorage
+      .setItem<BlobWithEtag>(
+        `timeline.${key.timelineName}.post.${key.postId}.data`,
+        data
+      )
+      .then();
+  }
 
-    const dataKey = `timeline.${timelineName}.post.${postId}.data`;
+  private async syncPostData(key: {
+    timelineName: string;
+    postId: number;
+  }): Promise<void> {
+    const line = this._postDataHub.getLineOrCreateWithoutSetup(key);
+    if (line.isSyncing) return;
+    line.beginSync();
 
-    const cache = await dataStorage.getItem<BlobWithEtag | null>(dataKey);
+    const cache = await this.getCachedPostData(key);
+    if (line.value == null) {
+      if (cache != null) {
+        line.next({ type: 'cache', data: cache.data });
+      }
+    }
+
     if (cache == null) {
       try {
-        const data = await getHttpTimelineClient().getPostData(
-          timelineName,
-          postId
+        const res = await getHttpTimelineClient().getPostData(
+          key.timelineName,
+          key.postId
         );
-        await dataStorage.setItem<BlobWithEtag>(dataKey, data);
-        syncStatusHub.end(syncStatusKey);
-        this._postDataHub
-          .getLine({ timelineName, postId })
-          ?.next({ data: data.data, type: 'synced' });
+        await this.savePostData(key, res);
+        line.endSyncAndNext({ data: res.data, type: 'synced' });
       } catch (e) {
-        syncStatusHub.end(syncStatusKey);
-        this._postDataHub
-          .getLine({ timelineName, postId })
-          ?.next({ type: 'offline' });
-        if (!(e instanceof HttpNetworkError)) {
-          throw e;
-        }
+        line.endSyncAndNext({ type: 'offline' });
+        throwIfNotNetworkError(e);
       }
     } else {
       try {
         const res = await getHttpTimelineClient().getPostData(
-          timelineName,
-          postId,
+          key.timelineName,
+          key.postId,
           cache.etag
         );
         if (res instanceof NotModified) {
-          syncStatusHub.end(syncStatusKey);
-          this._postDataHub
-            .getLine({ timelineName, postId })
-            ?.next({ data: cache.data, type: 'synced' });
+          line.endSyncAndNext({ data: cache.data, type: 'synced' });
         } else {
-          const avatar = res;
-          await dataStorage.setItem<BlobWithEtag>(dataKey, avatar);
-          syncStatusHub.end(syncStatusKey);
-          this._postDataHub
-            .getLine({ timelineName, postId })
-            ?.next({ data: avatar.data, type: 'synced' });
+          await this.savePostData(key, res);
+          line.endSyncAndNext({ data: res.data, type: 'synced' });
         }
       } catch (e) {
-        syncStatusHub.end(syncStatusKey);
-        this._postDataHub
-          .getLine({ timelineName, postId })
-          ?.next({ data: cache.data, type: 'offline' });
-        if (!(e instanceof HttpNetworkError)) {
-          throw e;
-        }
+        line.endSyncAndNext({ data: cache.data, type: 'offline' });
+        throwIfNotNetworkError(e);
       }
     }
   }
@@ -498,13 +482,8 @@ export class TimelineService {
     | { data?: undefined; type: 'notexist' | 'offline' }
   >({
     keyToString: (key) => `${key.timelineName}.${key.postId}`,
-    setup: (key, line) => {
-      void this.getCachedPostData(key.timelineName, key.postId).then((data) => {
-        if (data != null) {
-          line.next({ data: data, type: 'cache' });
-        }
-        return this.syncPostData(key.timelineName, key.postId);
-      });
+    setup: (key) => {
+      void this.syncPostData(key);
     },
   });
 
