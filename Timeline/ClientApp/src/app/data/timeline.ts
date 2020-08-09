@@ -7,7 +7,7 @@ import { uniqBy } from 'lodash';
 import { convertError } from '../utilities/rxjs';
 
 import { dataStorage, throwIfNotNetworkError } from './common';
-import { DataHub } from './DataHub';
+import { DataHub, WithSyncStatus } from './DataHub';
 
 import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
 
@@ -70,7 +70,7 @@ export const timelineVisibilityTooltipTranslationMap: Record<
 export class TimelineNotExistError extends Error {}
 export class TimelineNameConflictError extends Error {}
 
-export type TimelineWithSyncStatus =
+export type TimelineWithSyncStatus = WithSyncStatus<
   | {
       type: 'cache';
       timeline: TimelineInfo;
@@ -79,12 +79,9 @@ export type TimelineWithSyncStatus =
       type: 'offline' | 'synced';
       timeline: TimelineInfo | null;
     }
-  | {
-      type: 'notexist';
-      timeline?: undefined;
-    };
+>;
 
-export interface TimelinePostsWithSyncState {
+export type TimelinePostsWithSyncState = WithSyncStatus<{
   type:
     | 'cache'
     | 'offline' // Sync failed and use cache.
@@ -92,7 +89,7 @@ export interface TimelinePostsWithSyncState {
     | 'forbid' // The list is forbidden to see.
     | 'notexist'; // The timeline does not exist.
   posts: TimelinePostInfo[];
-}
+}>;
 
 type TimelineData = Omit<HttpTimelineInfo, 'owner' | 'members'> & {
   owner: string;
@@ -182,31 +179,28 @@ export class TimelineService {
   });
 
   getTimeline$(timelineName: string): Observable<TimelineWithSyncStatus> {
-    return this._timelineHub.getObservable(timelineName).pipe(
+    return this._timelineHub.getDataWithSyncStatusObservable(timelineName).pipe(
       switchMap((state) => {
-        if (state.timeline != null) {
+        const { timeline } = state;
+        if (timeline != null) {
           return combineLatest(
-            [state.timeline.owner, ...state.timeline.members].map((u) =>
+            [timeline.owner, ...timeline.members].map((u) =>
               userInfoService.getUser$(u)
             )
           ).pipe(
             map((users) => {
               return {
-                type: state.type,
+                ...state,
                 timeline: {
-                  ...state.timeline,
+                  ...timeline,
                   owner: users[0],
                   members: users.slice(1),
                 },
-              } as TimelineWithSyncStatus;
+              };
             })
           );
         } else {
-          return [
-            {
-              ...state,
-            } as TimelineWithSyncStatus,
-          ];
+          return of(state as TimelineWithSyncStatus);
         }
       })
     );
@@ -356,11 +350,11 @@ export class TimelineService {
   });
 
   getPosts$(timelineName: string): Observable<TimelinePostsWithSyncState> {
-    return this._postsHub.getObservable(timelineName).pipe(
+    return this._postsHub.getDataWithSyncStatusObservable(timelineName).pipe(
       switchMap((state) => {
         if (state.posts.length === 0) {
           return of({
-            type: state.type,
+            ...state,
             posts: [],
           });
         }
@@ -381,7 +375,7 @@ export class TimelineService {
         ]).pipe(
           map(([authors, datas]) => {
             return {
-              type: state.type,
+              ...state,
               posts: state.posts.map((post, i) => {
                 const { content } = post;
 
