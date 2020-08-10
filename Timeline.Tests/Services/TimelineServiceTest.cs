@@ -41,7 +41,7 @@ namespace Timeline.Tests.Services
             await _testDatabase.InitializeAsync();
             _databaseContext = _testDatabase.CreateContext();
             _dataManager = new DataManager(_databaseContext, _eTagGenerator);
-            _userService = new UserService(NullLogger<UserService>.Instance, _databaseContext, _passwordService);
+            _userService = new UserService(NullLogger<UserService>.Instance, _databaseContext, _passwordService, _clock);
             _timelineService = new TimelineService(NullLogger<TimelineService>.Instance, _databaseContext, _dataManager, _userService, _imageValidator, _clock);
         }
 
