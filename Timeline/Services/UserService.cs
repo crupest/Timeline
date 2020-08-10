@@ -158,6 +158,7 @@ namespace Timeline.Services
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
+        private readonly IClock _clock;
 
         private readonly DatabaseContext _databaseContext;
 
@@ -165,9 +166,10 @@ namespace Timeline.Services
 
         private readonly UsernameValidator _usernameValidator = new UsernameValidator();
         private readonly NicknameValidator _nicknameValidator = new NicknameValidator();
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService)
+        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IClock clock)
         {
             _logger = logger;
+            _clock = clock;
             _databaseContext = databaseContext;
             _passwordService = passwordService;
         }
@@ -210,7 +212,10 @@ namespace Timeline.Services
                 Administrator = UserRoleConvert.ToBool(entity.Roles),
                 Nickname = string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
                 Id = entity.Id,
-                Version = entity.Version
+                Version = entity.Version,
+                CreateTime = entity.CreateTime,
+                UsernameChangeTime = entity.UsernameChangeTime,
+                LastModified = entity.LastModified
             };
         }
 
@@ -343,14 +348,19 @@ namespace Timeline.Services
         {
             if (info != null)
             {
+                DateTimeOffset now = _clock.GetCurrentTime();
+                bool updateLastModified = false;
+
                 var username = info.Username;
-                if (username != null)
+                if (username != null && username != entity.Username)
                 {
                     var conflict = await _databaseContext.Users.AnyAsync(u => u.Username == username);
                     if (conflict)
                         ThrowUsernameConflict();
 
                     entity.Username = username;
+                    entity.UsernameChangeTime = now;
+                    updateLastModified = true;
                 }
 
                 var password = info.Password;
@@ -361,15 +371,22 @@ namespace Timeline.Services
                 }
 
                 var administrator = info.Administrator;
-                if (administrator.HasValue)
+                if (administrator.HasValue && UserRoleConvert.ToBool(entity.Roles) != administrator)
                 {
                     entity.Roles = UserRoleConvert.ToString(administrator.Value);
+                    updateLastModified = true;
                 }
 
                 var nickname = info.Nickname;
-                if (nickname != null)
+                if (nickname != null && nickname != entity.Nickname)
                 {
                     entity.Nickname = nickname;
+                    updateLastModified = true;
+                }
+
+                if (updateLastModified)
+                {
+                    entity.LastModified = now;
                 }
             }
         }

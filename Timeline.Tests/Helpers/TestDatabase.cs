@@ -36,7 +36,7 @@ namespace Timeline.Tests.Helpers
                 if (_createUser)
                 {
                     var passwordService = new PasswordService();
-                    var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService);
+                    var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new Clock());
 
                     await userService.CreateUser(new User
                     {

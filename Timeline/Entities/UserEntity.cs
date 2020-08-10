@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,6 +24,9 @@ namespace Timeline.Entities
         [Column("username"), Required]
         public string Username { get; set; } = default!;
 
+        [Column("username_change_time")]
+        public DateTimeOffset UsernameChangeTime { get; set; }
+
         [Column("password"), Required]
         public string Password { get; set; } = default!;
 
@@ -34,6 +38,12 @@ namespace Timeline.Entities
 
         [Column("nickname")]
         public string? Nickname { get; set; }
+
+        [Column("create_time")]
+        public DateTimeOffset CreateTime { get; set; }
+
+        [Column("last_modified")]
+        public DateTimeOffset LastModified { get; set; }
 
         public UserAvatarEntity? Avatar { get; set; }
 
