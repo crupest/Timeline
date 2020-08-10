@@ -88,6 +88,7 @@ export class DataLine<TData> {
 
     return (
       this._observers.length === 0 &&
+      !this._syncingSubject.value &&
       (customDestroyable != null ? customDestroyable(this._current) : true)
     );
   }
