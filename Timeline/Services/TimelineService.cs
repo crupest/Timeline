@@ -413,9 +413,7 @@ namespace Timeline.Services
 
         private async Task<TimelinePost> MapTimelinePostFromEntity(TimelinePostEntity entity, string timelineName)
         {
-
-
-            var author = await _userService.GetUserById(entity.AuthorId);
+            User? author = entity.AuthorId.HasValue ? await _userService.GetUserById(entity.AuthorId.Value) : null;
 
             ITimelinePostContent? content = null;
 
