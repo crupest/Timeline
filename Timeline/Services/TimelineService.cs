@@ -220,6 +220,12 @@ namespace Timeline.Services
         Task DeletePost(string timelineName, long postId);
 
         /// <summary>
+        /// Delete all posts of the given user. Used when delete a user.
+        /// </summary>
+        /// <param name="userId">The id of the user.</param>
+        Task DeleteAllPostsOfUser(long userId);
+
+        /// <summary>
         /// Change member of timeline.
         /// </summary>
         /// <param name="timelineName">The name of the timeline.</param>
@@ -771,6 +777,35 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
 
             if (dataTag != null)
+            {
+                await _dataManager.FreeEntry(dataTag);
+            }
+        }
+
+        public async Task DeleteAllPostsOfUser(long userId)
+        {
+            var posts = await _database.TimelinePosts.Where(p => p.AuthorId == userId).ToListAsync();
+
+            var now = _clock.GetCurrentTime();
+
+            var dataTags = new List<string>();
+
+            foreach (var post in posts)
+            {
+                if (post.Content != null)
+                {
+                    if (post.ContentType == TimelinePostContentTypes.Image)
+                    {
+                        dataTags.Add(post.Content);
+                    }
+                    post.Content = null;
+                }
+                post.LastUpdated = now;
+            }
+
+            await _database.SaveChangesAsync();
+
+            foreach (var dataTag in dataTags)
             {
                 await _dataManager.FreeEntry(dataTag);
             }

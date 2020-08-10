@@ -71,6 +71,7 @@ namespace Timeline
 
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserDeleteService, UserDeleteService>();
             services.AddScoped<IUserTokenService, JwtUserTokenService>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
 

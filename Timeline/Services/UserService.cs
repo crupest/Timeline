@@ -127,22 +127,6 @@ namespace Timeline.Services
         Task<User> ModifyUser(string username, User? info);
 
         /// <summary>
-        /// Delete a user of given id.
-        /// </summary>
-        /// <param name="id">Id of the user to delete.</param>
-        /// <returns>True if user is deleted, false if user not exist.</returns>
-        Task<bool> DeleteUser(long id);
-
-        /// <summary>
-        /// Delete a user of given username.
-        /// </summary>
-        /// <param name="username">Username of the user to delete. Can't be null.</param>
-        /// <returns>True if user is deleted, false if user not exist.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        Task<bool> DeleteUser(string username);
-
-        /// <summary>
         /// Try to change a user's password with old password.
         /// </summary>
         /// <param name="id">The id of user to change password of.</param>
@@ -426,34 +410,6 @@ namespace Timeline.Services
             _logger.LogInformation(LogDatabaseUpdate, ("Username", username));
 
             return CreateUserFromEntity(entity);
-        }
-
-        public async Task<bool> DeleteUser(long id)
-        {
-            var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
-            if (user == null)
-                return false;
-
-            _databaseContext.Users.Remove(user);
-            await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Log.Format(LogDatabaseRemove, ("Id", id), ("Username", user.Username)));
-            return true;
-        }
-
-        public async Task<bool> DeleteUser(string username)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-            CheckUsernameFormat(username, nameof(username));
-
-            var user = await _databaseContext.Users.Where(u => u.Username == username).SingleOrDefaultAsync();
-            if (user == null)
-                return false;
-
-            _databaseContext.Users.Remove(user);
-            await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Log.Format(LogDatabaseRemove, ("Id", user.Id), ("Username", username)));
-            return true;
         }
 
         public async Task ChangePassword(long id, string oldPassword, string newPassword)

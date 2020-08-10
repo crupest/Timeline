@@ -119,9 +119,9 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             var token = (await CreateUserTokenAsync(client, "user1", "user1pw")).Token;
 
-            using (var scope = TestApp.Host.Services.CreateScope()) // UserService is scoped.
+            using (var scope = TestApp.Host.Services.CreateScope()) // UserDeleteService is scoped.
             {
-                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserDeleteService>();
                 await userService.DeleteUser("user1");
             }
 
