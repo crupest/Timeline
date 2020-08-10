@@ -48,7 +48,7 @@ namespace Timeline.Models
 
     public class TimelinePost
     {
-        public TimelinePost(long id, ITimelinePostContent? content, DateTime time, User author, DateTime lastUpdated, string timelineName)
+        public TimelinePost(long id, ITimelinePostContent? content, DateTime time, User? author, DateTime lastUpdated, string timelineName)
         {
             Id = id;
             Content = content;
@@ -62,7 +62,7 @@ namespace Timeline.Models
         public ITimelinePostContent? Content { get; set; }
         public bool Deleted => Content == null;
         public DateTime Time { get; set; }
-        public User Author { get; set; }
+        public User? Author { get; set; }
         public DateTime LastUpdated { get; set; }
         public string TimelineName { get; set; }
     }
