@@ -19,3 +19,5 @@ export function throwIfNotNetworkError(e: unknown): void {
     throw e;
   }
 }
+
+export type BlobOrStatus = Blob | 'loading' | 'error';

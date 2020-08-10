@@ -1,12 +1,12 @@
 import React from 'react';
 import XRegExp from 'xregexp';
 import { Observable, from, combineLatest, of } from 'rxjs';
-import { map, switchMap, filter } from 'rxjs/operators';
+import { map, switchMap, startWith } from 'rxjs/operators';
 import { uniqBy } from 'lodash';
 
 import { convertError } from '../utilities/rxjs';
 
-import { dataStorage, throwIfNotNetworkError } from './common';
+import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from './common';
 import { DataHub, WithSyncStatus } from './DataHub';
 
 import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
@@ -43,7 +43,7 @@ export type TimelinePostTextContent = HttpTimelinePostTextContent;
 
 export interface TimelinePostImageContent {
   type: 'image';
-  data: Blob;
+  data: BlobOrStatus;
 }
 
 export type TimelinePostContent =
@@ -481,10 +481,10 @@ export class TimelineService {
     },
   });
 
-  getPostData$(timelineName: string, postId: number): Observable<Blob> {
+  getPostData$(timelineName: string, postId: number): Observable<BlobOrStatus> {
     return this._postDataHub.getObservable({ timelineName, postId }).pipe(
-      map((state) => state.data),
-      filter((blob): blob is Blob => blob != null)
+      map((state): BlobOrStatus => state.data ?? 'error'),
+      startWith('loading')
     );
   }
 

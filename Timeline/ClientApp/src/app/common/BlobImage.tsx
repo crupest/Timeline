@@ -3,14 +3,16 @@ import React from 'react';
 import { ExcludeKey } from '../utilities/type';
 
 const BlobImage: React.FC<
-  ExcludeKey<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> & { blob?: Blob }
+  ExcludeKey<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> & {
+    blob?: Blob | unknown;
+  }
 > = (props) => {
   const { blob, ...otherProps } = props;
 
   const [url, setUrl] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
-    if (blob != null) {
+    if (blob instanceof Blob) {
       const url = URL.createObjectURL(blob);
       setUrl(url);
       return () => {
