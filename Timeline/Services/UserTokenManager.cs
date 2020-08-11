@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Services.Exceptions;
 
@@ -57,6 +58,8 @@ namespace Timeline.Services
 
         public async Task<UserTokenCreateResult> CreateToken(string username, string password, DateTime? expireAt = null)
         {
+            expireAt = expireAt?.MyToUtc();
+
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
             if (password == null)
