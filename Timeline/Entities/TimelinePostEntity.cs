@@ -20,10 +20,10 @@ namespace Timeline.Entities
         public TimelineEntity Timeline { get; set; } = default!;
 
         [Column("author")]
-        public long AuthorId { get; set; }
+        public long? AuthorId { get; set; }
 
         [ForeignKey(nameof(AuthorId))]
-        public UserEntity Author { get; set; } = default!;
+        public UserEntity? Author { get; set; } = default!;
 
         [Column("content_type"), Required]
         public string ContentType { get; set; } = default!;

@@ -952,7 +952,7 @@ namespace Timeline.Tests.IntegratedTests
                         .Which.Should().NotBeNull().And.BeEquivalentTo(createRes);
                 }
                 const string mockContent2 = "bbb";
-                var mockTime2 = DateTime.Now.AddDays(-1);
+                var mockTime2 = DateTime.UtcNow.AddDays(-1);
                 TimelinePostInfo createRes2;
                 {
                     var res = await client.PostAsJsonAsync(generator(1, "posts"),
@@ -1009,7 +1009,7 @@ namespace Timeline.Tests.IntegratedTests
                     .Which.Id;
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var id0 = await CreatePost(now.AddDays(1));
             var id1 = await CreatePost(now.AddDays(-1));
             var id2 = await CreatePost(now);

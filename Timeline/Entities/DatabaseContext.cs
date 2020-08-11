@@ -19,6 +19,8 @@ namespace Timeline.Entities
             modelBuilder.Entity<UserEntity>().Property(e => e.LastModified).HasDefaultValueSql("datetime('now', 'utc')");
             modelBuilder.Entity<DataEntity>().HasIndex(e => e.Tag).IsUnique();
             modelBuilder.Entity<TimelineEntity>().Property(e => e.UniqueId).HasDefaultValueSql("lower(hex(randomblob(16)))");
+
+            modelBuilder.ApplyUtcDateTimeConverter();
         }
 
         public DbSet<UserEntity> Users { get; set; } = default!;

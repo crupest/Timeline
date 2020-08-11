@@ -220,6 +220,12 @@ namespace Timeline.Services
         Task DeletePost(string timelineName, long postId);
 
         /// <summary>
+        /// Delete all posts of the given user. Used when delete a user.
+        /// </summary>
+        /// <param name="userId">The id of the user.</param>
+        Task DeleteAllPostsOfUser(long userId);
+
+        /// <summary>
         /// Change member of timeline.
         /// </summary>
         /// <param name="timelineName">The name of the timeline.</param>
@@ -413,9 +419,7 @@ namespace Timeline.Services
 
         private async Task<TimelinePost> MapTimelinePostFromEntity(TimelinePostEntity entity, string timelineName)
         {
-
-
-            var author = await _userService.GetUserById(entity.AuthorId);
+            User? author = entity.AuthorId.HasValue ? await _userService.GetUserById(entity.AuthorId.Value) : null;
 
             ITimelinePostContent? content = null;
 
@@ -561,11 +565,13 @@ namespace Timeline.Services
 
         public async Task<List<TimelinePost>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false)
         {
+            modifiedSince = modifiedSince?.MyToUtc();
+
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
 
             var timelineId = await FindTimelineId(timelineName);
-            var query = _database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId);
+            IQueryable<TimelinePostEntity> query = _database.TimelinePosts.Where(p => p.TimelineId == timelineId);
 
             if (!includeDeleted)
             {
@@ -574,8 +580,10 @@ namespace Timeline.Services
 
             if (modifiedSince.HasValue)
             {
-                query = query.Where(p => p.LastUpdated >= modifiedSince);
+                query = query.Include(p => p.Author).Where(p => p.LastUpdated >= modifiedSince || (p.Author != null && p.Author.UsernameChangeTime >= modifiedSince));
             }
+
+            query = query.OrderBy(p => p.Time);
 
             var postEntities = await query.ToListAsync();
 
@@ -659,6 +667,8 @@ namespace Timeline.Services
 
         public async Task<TimelinePost> CreateTextPost(string timelineName, long authorId, string text, DateTime? time)
         {
+            time = time?.MyToUtc();
+
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
             if (text == null)
@@ -700,6 +710,8 @@ namespace Timeline.Services
 
         public async Task<TimelinePost> CreateImagePost(string timelineName, long authorId, byte[] data, DateTime? time)
         {
+            time = time?.MyToUtc();
+
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
             if (data == null)
@@ -773,6 +785,35 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
 
             if (dataTag != null)
+            {
+                await _dataManager.FreeEntry(dataTag);
+            }
+        }
+
+        public async Task DeleteAllPostsOfUser(long userId)
+        {
+            var posts = await _database.TimelinePosts.Where(p => p.AuthorId == userId).ToListAsync();
+
+            var now = _clock.GetCurrentTime();
+
+            var dataTags = new List<string>();
+
+            foreach (var post in posts)
+            {
+                if (post.Content != null)
+                {
+                    if (post.ContentType == TimelinePostContentTypes.Image)
+                    {
+                        dataTags.Add(post.Content);
+                    }
+                    post.Content = null;
+                }
+                post.LastUpdated = now;
+            }
+
+            await _database.SaveChangesAsync();
+
+            foreach (var dataTag in dataTags)
             {
                 await _dataManager.FreeEntry(dataTag);
             }
