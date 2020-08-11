@@ -22,12 +22,14 @@ namespace Timeline.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IUserDeleteService _userDeleteService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IUserDeleteService userDeleteService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _userDeleteService = userDeleteService;
             _mapper = mapper;
         }
 
@@ -102,7 +104,7 @@ namespace Timeline.Controllers
         [HttpDelete("users/{username}"), AdminAuthorize]
         public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute][Username] string username)
         {
-            var delete = await _userService.DeleteUser(username);
+            var delete = await _userDeleteService.DeleteUser(username);
             if (delete)
                 return Ok(CommonDeleteResponse.Delete());
             else

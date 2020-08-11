@@ -21,7 +21,7 @@ namespace Timeline.Models.Http
         public TimelinePostContentInfo? Content { get; set; }
         public bool Deleted { get; set; }
         public DateTime Time { get; set; }
-        public UserInfo Author { get; set; } = default!;
+        public UserInfo? Author { get; set; } = default!;
         public DateTime LastUpdated { get; set; } = default!;
     }
 

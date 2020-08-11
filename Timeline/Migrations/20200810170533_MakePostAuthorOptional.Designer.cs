@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timeline.Entities;
 
 namespace Timeline.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200810170533_MakePostAuthorOptional")]
+    partial class MakePostAuthorOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,13 +228,13 @@ namespace Timeline.Migrations
                         .HasColumnName("id")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreateTime")
+                    b.Property<DateTimeOffset>("CreateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("create_time")
                         .HasColumnType("TEXT")
                         .HasDefaultValueSql("datetime('now', 'utc')");
 
-                    b.Property<DateTime>("LastModified")
+                    b.Property<DateTimeOffset>("LastModified")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("last_modified")
                         .HasColumnType("TEXT")
@@ -264,7 +266,7 @@ namespace Timeline.Migrations
                         .HasColumnName("username")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("UsernameChangeTime")
+                    b.Property<DateTimeOffset>("UsernameChangeTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("username_change_time")
                         .HasColumnType("TEXT")

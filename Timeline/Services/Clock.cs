@@ -23,7 +23,7 @@ namespace Timeline.Services
 
         public DateTime GetCurrentTime()
         {
-            return DateTime.Now;
+            return DateTime.UtcNow;
         }
     }
 }

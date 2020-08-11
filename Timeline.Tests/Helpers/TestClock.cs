@@ -12,7 +12,7 @@ namespace Timeline.Tests.Helpers
 
         public DateTime GetCurrentTime()
         {
-            return _currentTime ?? DateTime.Now;
+            return _currentTime ?? DateTime.UtcNow;
         }
 
         public void SetCurrentTime(DateTime? mockTime)
@@ -22,7 +22,7 @@ namespace Timeline.Tests.Helpers
 
         public DateTime SetMockCurrentTime()
         {
-            var time = new DateTime(2000, 1, 1, 1, 1, 1);
+            var time = new DateTime(3000, 1, 1, 1, 1, 1, DateTimeKind.Utc);
             _currentTime = time;
             return time;
         }

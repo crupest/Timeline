@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -40,6 +41,8 @@ namespace Timeline
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            TypeDescriptor.AddAttributes(typeof(DateTime), new TypeConverterAttribute(typeof(MyDateTimeConverter)));
+
             services.AddControllers(setup =>
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
@@ -71,6 +74,7 @@ namespace Timeline
 
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserDeleteService, UserDeleteService>();
             services.AddScoped<IUserTokenService, JwtUserTokenService>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
 
