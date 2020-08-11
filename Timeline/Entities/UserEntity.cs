@@ -25,7 +25,7 @@ namespace Timeline.Entities
         public string Username { get; set; } = default!;
 
         [Column("username_change_time")]
-        public DateTimeOffset UsernameChangeTime { get; set; }
+        public DateTime UsernameChangeTime { get; set; }
 
         [Column("password"), Required]
         public string Password { get; set; } = default!;
@@ -40,10 +40,10 @@ namespace Timeline.Entities
         public string? Nickname { get; set; }
 
         [Column("create_time")]
-        public DateTimeOffset CreateTime { get; set; }
+        public DateTime CreateTime { get; set; }
 
         [Column("last_modified")]
-        public DateTimeOffset LastModified { get; set; }
+        public DateTime LastModified { get; set; }
 
         public UserAvatarEntity? Avatar { get; set; }
 

@@ -13,9 +13,9 @@ namespace Timeline.Models
         public long? Id { get; set; }
         public string? Password { get; set; }
         public long? Version { get; set; }
-        public DateTimeOffset? UsernameChangeTime { get; set; }
-        public DateTimeOffset? CreateTime { get; set; }
-        public DateTimeOffset? LastModified { get; set; }
+        public DateTime? UsernameChangeTime { get; set; }
+        public DateTime? CreateTime { get; set; }
+        public DateTime? LastModified { get; set; }
         #endregion secret
     }
 }

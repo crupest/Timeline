@@ -332,7 +332,7 @@ namespace Timeline.Services
         {
             if (info != null)
             {
-                DateTimeOffset now = _clock.GetCurrentTime();
+                var now = _clock.GetCurrentTime();
                 bool updateLastModified = false;
 
                 var username = info.Username;
