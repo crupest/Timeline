@@ -565,11 +565,13 @@ namespace Timeline.Services
 
         public async Task<List<TimelinePost>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false)
         {
+            modifiedSince = modifiedSince?.MyToUtc();
+
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
 
             var timelineId = await FindTimelineId(timelineName);
-            var query = _database.TimelinePosts.OrderBy(p => p.Time).Where(p => p.TimelineId == timelineId);
+            IQueryable<TimelinePostEntity> query = _database.TimelinePosts.Where(p => p.TimelineId == timelineId);
 
             if (!includeDeleted)
             {
@@ -578,8 +580,10 @@ namespace Timeline.Services
 
             if (modifiedSince.HasValue)
             {
-                query = query.Where(p => p.LastUpdated >= modifiedSince);
+                query = query.Include(p => p.Author).Where(p => p.LastUpdated >= modifiedSince || (p.Author != null && p.Author.UsernameChangeTime >= modifiedSince));
             }
+
+            query = query.OrderBy(p => p.Time);
 
             var postEntities = await query.ToListAsync();
 
@@ -663,6 +667,8 @@ namespace Timeline.Services
 
         public async Task<TimelinePost> CreateTextPost(string timelineName, long authorId, string text, DateTime? time)
         {
+            time = time?.MyToUtc();
+
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
             if (text == null)
@@ -704,6 +710,8 @@ namespace Timeline.Services
 
         public async Task<TimelinePost> CreateImagePost(string timelineName, long authorId, byte[] data, DateTime? time)
         {
+            time = time?.MyToUtc();
+
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
             if (data == null)
