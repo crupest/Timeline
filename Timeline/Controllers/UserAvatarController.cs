@@ -15,7 +15,11 @@ using static Timeline.Resources.Controllers.UserAvatarController;
 
 namespace Timeline.Controllers
 {
+    /// <summary>
+    /// Operations about user avatar.
+    /// </summary>
     [ApiController]
+    [ProducesErrorResponseType(typeof(CommonResponse))]
     public class UserAvatarController : Controller
     {
         private readonly ILogger<UserAvatarController> _logger;
@@ -23,6 +27,9 @@ namespace Timeline.Controllers
         private readonly IUserService _userService;
         private readonly IUserAvatarService _service;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public UserAvatarController(ILogger<UserAvatarController> logger, IUserService userService, IUserAvatarService service)
         {
             _logger = logger;
@@ -30,9 +37,21 @@ namespace Timeline.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Get avatar of a user.
+        /// </summary>
+        /// <param name="username">Username of the user to get avatar of.</param>
+        /// <param name="ifNoneMatch">If-None-Match header.</param>
+        /// <response code="200">Succeeded to get the avatar.</response>
+        /// <response code="304">The avatar does not change.</response>
+        /// <response code="404">The user does not exist.</response>
         [HttpGet("users/{username}/avatar")]
-        public async Task<IActionResult> Get([FromRoute][Username] string username)
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get([FromRoute][Username] string username, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
         {
+            _ = ifNoneMatch;
             long id;
             try
             {
@@ -51,10 +70,22 @@ namespace Timeline.Controllers
             });
         }
 
+        /// <summary>
+        /// Set avatar of a user. You have to be administrator to change other's.
+        /// </summary>
+        /// <param name="username">Username of the user to set avatar of.</param>
+        /// <response code="200">Succeeded to set avatar.</response>
+        /// <response code="400">Error code is 10010001 if user does not exist. Or avatar is of bad format.</response>
+        /// <response code="401">You have not logged in.</response>
+        /// <response code="403">You are not administrator.</response>
         [HttpPut("users/{username}/avatar")]
         [Authorize]
         [RequireContentType, RequireContentLength]
         [Consumes("image/png", "image/jpeg", "image/gif", "image/webp")]
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Put([FromRoute][Username] string username)
         {
             var contentLength = Request.ContentLength!.Value;
@@ -115,7 +146,19 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Reset the avatar to the default one. You have to be administrator to reset other's.
+        /// </summary>
+        /// <param name="username">Username of the user.</param>
+        /// <response code="200">Succeeded to reset.</response>
+        /// <response code="400">Error code is 10010001 if user does not exist.</response>
+        /// <response code="401">You have not logged in.</response>
+        /// <response code="403">You are not administrator.</response>
         [HttpDelete("users/{username}/avatar")]
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute][Username] string username)
         {
