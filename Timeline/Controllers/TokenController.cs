@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,8 +14,12 @@ using static Timeline.Resources.Controllers.TokenController;
 
 namespace Timeline.Controllers
 {
+    /// <summary>
+    /// Operation about tokens.
+    /// </summary>
     [Route("token")]
     [ApiController]
+    [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TokenController : Controller
     {
         private readonly IUserTokenManager _userTokenManager;
@@ -23,6 +28,7 @@ namespace Timeline.Controllers
 
         private readonly IMapper _mapper;
 
+        /// <summary></summary>
         public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
         {
             _userTokenManager = userTokenManager;
@@ -31,8 +37,15 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Create a new token for a user.
+        /// </summary>
+        /// <response code="200">Succeed to create token.</response>
+        /// <response code="400">Error code is 11010101 if user does not exist or password is wrong.</response>
         [HttpPost("create")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(CreateTokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<CreateTokenResponse>> Create([FromBody] CreateTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null)
@@ -75,8 +88,15 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Verify a token.
+        /// </summary>
+        /// <response code="200">Token is valid.</response>
+        /// <response code="400">Error code is 11010201 if token is of bad format (it may not be created by this server). Error code is 11010202 if user does not exist. Error code is 11010203 if token is of old version (user may have changed password). Error code is 11010204 if token is expired.</response>
         [HttpPost("verify")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(VerifyTokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<VerifyTokenResponse>> Verify([FromBody] VerifyTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null, params (string, object?)[] otherProperties)
