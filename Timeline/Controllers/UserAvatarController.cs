@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Filters;
 using Timeline.Helpers;
+using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
@@ -72,20 +74,17 @@ namespace Timeline.Controllers
         /// Set avatar of a user. You have to be administrator to change other's.
         /// </summary>
         /// <param name="username">Username of the user to set avatar of.</param>
+        /// <param name="body">The avatar data.</param>
         [HttpPut("users/{username}/avatar")]
         [Authorize]
-        [RequireContentType, RequireContentLength]
         [Consumes("image/png", "image/jpeg", "image/gif", "image/webp")]
+        [MaxContentLength(1000 * 1000 * 10)]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Put([FromRoute][Username] string username)
+        public async Task<IActionResult> Put([FromRoute][Username] string username, [FromBody] ByteData body)
         {
-            var contentLength = Request.ContentLength!.Value;
-            if (contentLength > 1000 * 1000 * 10)
-                return BadRequest(ErrorResponse.Common.Content.TooBig("10MB"));
-
             if (!User.IsAdministrator() && User.Identity.Name != username)
             {
                 _logger.LogInformation(Log.Format(LogPutForbid,
@@ -106,20 +105,10 @@ namespace Timeline.Controllers
 
             try
             {
-                var data = new byte[contentLength];
-                var bytesRead = await Request.Body.ReadAsync(data);
-
-                if (bytesRead != contentLength)
-                    return BadRequest(ErrorResponse.Common.Content.UnmatchedLength_Smaller());
-
-                var extraByte = new byte[1];
-                if (await Request.Body.ReadAsync(extraByte) != 0)
-                    return BadRequest(ErrorResponse.Common.Content.UnmatchedLength_Bigger());
-
                 await _service.SetAvatar(id, new Avatar
                 {
-                    Data = data,
-                    Type = Request.ContentType
+                    Data = body.Data,
+                    Type = body.ContentType
                 });
 
                 _logger.LogInformation(Log.Format(LogPutSuccess,

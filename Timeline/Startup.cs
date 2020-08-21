@@ -49,6 +49,7 @@ namespace Timeline
             services.AddControllers(setup =>
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
+                setup.InputFormatters.Add(new BytesInputFormatter());
                 setup.UseApiRoutePrefix("api");
             })
             .AddJsonOptions(options =>
