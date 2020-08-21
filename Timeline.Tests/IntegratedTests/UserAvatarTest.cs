@@ -66,16 +66,14 @@ namespace Timeline.Tests.IntegratedTests
                     using var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
-                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Header.ContentLength_Missing); ;
+                    res.Should().BeInvalidModel();
                 }
 
                 {
                     using var content = new ByteArrayContent(new[] { (byte)0x00 });
                     content.Headers.ContentLength = 1;
                     var res = await client.PutAsync("users/user1/avatar", content);
-                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Header.ContentType_Missing);
+                    res.Should().BeInvalidModel();
                 }
 
                 {
@@ -83,8 +81,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentLength = 0;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
-                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Header.ContentLength_Zero);
+                    res.Should().BeInvalidModel();
                 }
 
                 {
@@ -106,8 +103,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentLength = 2;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
-                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Content.UnmatchedLength_Smaller);
+                    res.Should().BeInvalidModel();
                 }
 
                 {
@@ -115,8 +111,7 @@ namespace Timeline.Tests.IntegratedTests
                     content.Headers.ContentLength = 1;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
-                    res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                        .And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.Common.Content.UnmatchedLength_Bigger);
+                    res.Should().BeInvalidModel();
                 }
 
                 {
