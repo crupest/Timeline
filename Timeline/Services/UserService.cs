@@ -65,11 +65,10 @@ namespace Timeline.Services
         /// Create a user with given info.
         /// </summary>
         /// <param name="info">The info of new user.</param>
-        /// <param name="password">The password, can't be null or empty.</param>
         /// <returns>The the new user.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="info"/>is null.</exception>
         /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="info"/> is bad.</exception>
-        /// <exception cref="ConflictException">Thrown when a user with given username already exists.</exception>
+        /// <exception cref="EntityAlreadyExistException">Thrown when a user with given username already exists.</exception>
         /// <remarks>
         /// <see cref="User.Username"/> must not be null and must be a valid username.
         /// <see cref="User.Password"/> must not be null or empty.
@@ -110,7 +109,7 @@ namespace Timeline.Services
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format or some fields in <paramref name="info"/> is bad.</exception>
         /// <exception cref="UserNotExistException">Thrown when user with given id does not exist.</exception>
-        /// <exception cref="ConflictException">Thrown when user with the newusername already exist.</exception>
+        /// <exception cref="EntityAlreadyExistException">Thrown when user with the newusername already exist.</exception>
         /// <remarks>
         /// Only <see cref="User.Administrator"/>, <see cref="User.Password"/> and <see cref="User.Nickname"/> will be used.
         /// If null, then not change.

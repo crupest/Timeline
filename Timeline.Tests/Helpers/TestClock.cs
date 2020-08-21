@@ -8,7 +8,7 @@ namespace Timeline.Tests.Helpers
 {
     public class TestClock : IClock
     {
-        private DateTime? _currentTime = null;
+        private DateTime? _currentTime;
 
         public DateTime GetCurrentTime()
         {

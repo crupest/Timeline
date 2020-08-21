@@ -35,11 +35,11 @@ namespace Timeline.Models.Validation
     /// </summary>
     /// <typeparam name="T">The type of accepted value.</typeparam>
     /// <remarks>
-    /// Subclass should override <see cref="DoValidate(T, out string)"/> to do the real validation.
+    /// Subclass should override <see cref="DoValidate(T)"/> to do the real validation.
     /// This class will check the nullity and type of value.
     /// If value is null, it will pass or fail depending on <see cref="PermitNull"/>.
     /// If value is not null and not of type <typeparamref name="T"/>
-    /// it will fail and not call <see cref="DoValidate(T, out string)"/>.
+    /// it will fail and not call <see cref="DoValidate(T)"/>.
     /// 
     /// <see cref="PermitNull"/> is true by default.
     /// 
