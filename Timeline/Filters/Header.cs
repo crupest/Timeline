@@ -4,45 +4,60 @@ using Timeline.Models.Http;
 
 namespace Timeline.Filters
 {
-    public class RequireContentTypeAttribute : ActionFilterAttribute
+    /// <summary>
+    /// Restrict max content length.
+    /// </summary>
+    public class MaxContentLengthFilter : IResourceFilter
     {
-        public override void OnActionExecuting(ActionExecutingContext context)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="maxByteLength">Max length.</param>
+        public MaxContentLengthFilter(long maxByteLength)
         {
-            if (context.HttpContext.Request.ContentType == null)
+            MaxByteLength = maxByteLength;
+        }
+
+        /// <summary>
+        /// Max length.
+        /// </summary>
+        public long MaxByteLength { get; set; }
+
+        /// <inheritdoc/>
+        public void OnResourceExecuted(ResourceExecutedContext context)
+        {
+        }
+
+        /// <inheritdoc/>
+        public void OnResourceExecuting(ResourceExecutingContext context)
+        {
+            var contentLength = context.HttpContext.Request.ContentLength;
+            if (contentLength != null && contentLength > MaxByteLength)
             {
-                context.Result = new BadRequestObjectResult(ErrorResponse.Common.Header.ContentType_Missing());
+                context.Result = new BadRequestObjectResult(ErrorResponse.Common.Content.TooBig(MaxByteLength + "B"));
             }
         }
     }
 
-    public class RequireContentLengthAttribute : ActionFilterAttribute
+    /// <summary>
+    /// Restrict max content length.
+    /// </summary>
+    public class MaxContentLengthAttribute : TypeFilterAttribute
     {
-        public RequireContentLengthAttribute()
-        : this(true)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="maxByteLength">Max length.</param>
+        public MaxContentLengthAttribute(long maxByteLength)
+            : base(typeof(MaxContentLengthFilter))
         {
-
+            MaxByteLength = maxByteLength;
+            Arguments = new object[] { maxByteLength };
         }
 
-        public RequireContentLengthAttribute(bool requireNonZero)
-        {
-            RequireNonZero = requireNonZero;
-        }
-
-        public bool RequireNonZero { get; set; }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            if (context.HttpContext.Request.ContentLength == null)
-            {
-                context.Result = new BadRequestObjectResult(ErrorResponse.Common.Header.ContentLength_Missing());
-                return;
-            }
-
-            if (RequireNonZero && context.HttpContext.Request.ContentLength.Value == 0)
-            {
-                context.Result = new BadRequestObjectResult(ErrorResponse.Common.Header.ContentLength_Zero());
-                return;
-            }
-        }
+        /// <summary>
+        /// Max length.
+        /// </summary>
+        public long MaxByteLength { get; }
     }
 }

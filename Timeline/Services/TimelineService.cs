@@ -260,6 +260,7 @@ namespace Timeline.Services
         /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
+        /// <remarks>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with user id does not exist.
         /// </remarks>
@@ -277,6 +278,7 @@ namespace Timeline.Services
         /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
+        /// <remarks>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with visitor id does not exist.
         /// </remarks>

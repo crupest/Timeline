@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,8 +14,12 @@ using static Timeline.Resources.Controllers.TokenController;
 
 namespace Timeline.Controllers
 {
+    /// <summary>
+    /// Operation about tokens.
+    /// </summary>
     [Route("token")]
     [ApiController]
+    [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TokenController : Controller
     {
         private readonly IUserTokenManager _userTokenManager;
@@ -23,6 +28,7 @@ namespace Timeline.Controllers
 
         private readonly IMapper _mapper;
 
+        /// <summary></summary>
         public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
         {
             _userTokenManager = userTokenManager;
@@ -31,8 +37,14 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Create a new token for a user.
+        /// </summary>
+        /// <returns>Result of token creation.</returns>
         [HttpPost("create")]
         [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<CreateTokenResponse>> Create([FromBody] CreateTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null)
@@ -75,8 +87,14 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Verify a token.
+        /// </summary>
+        /// <returns>Result of token verification.</returns>
         [HttpPost("verify")]
         [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<VerifyTokenResponse>> Verify([FromBody] VerifyTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null, params (string, object?)[] otherProperties)

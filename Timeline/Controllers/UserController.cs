@@ -17,7 +17,11 @@ using static Timeline.Resources.Messages;
 
 namespace Timeline.Controllers
 {
+    /// <summary>
+    /// Operations about users.
+    /// </summary>
     [ApiController]
+    [ProducesErrorResponseType(typeof(CommonResponse))]
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
@@ -25,6 +29,7 @@ namespace Timeline.Controllers
         private readonly IUserDeleteService _userDeleteService;
         private readonly IMapper _mapper;
 
+        /// <summary></summary>
         public UserController(ILogger<UserController> logger, IUserService userService, IUserDeleteService userDeleteService, IMapper mapper)
         {
             _logger = logger;
@@ -35,7 +40,12 @@ namespace Timeline.Controllers
 
         private UserInfo ConvertToUserInfo(User user) => _mapper.Map<UserInfo>(user);
 
+        /// <summary>
+        /// Get all users.
+        /// </summary>
+        /// <returns>All user list.</returns>
         [HttpGet("users")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<UserInfo[]>> List()
         {
             var users = await _userService.GetUsers();
@@ -43,7 +53,14 @@ namespace Timeline.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get a user's info.
+        /// </summary>
+        /// <param name="username">Username of the user.</param>
+        /// <returns>User info.</returns>
         [HttpGet("users/{username}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserInfo>> Get([FromRoute][Username] string username)
         {
             try
@@ -58,7 +75,18 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Change a user's property.
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="username">Username of the user to change.</param>
+        /// <returns>The new user info.</returns>
         [HttpPatch("users/{username}"), Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserInfo>> Patch([FromBody] UserPatchRequest body, [FromRoute][Username] string username)
         {
             if (this.IsAdministrator())
@@ -101,7 +129,15 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete a user and all his related data. You have to be administrator.
+        /// </summary>
+        /// <param name="username">Username of the user to delete.</param>
+        /// <returns>Info of deletion.</returns>
         [HttpDelete("users/{username}"), AdminAuthorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute][Username] string username)
         {
             var delete = await _userDeleteService.DeleteUser(username);
@@ -111,7 +147,15 @@ namespace Timeline.Controllers
                 return Ok(CommonDeleteResponse.NotExist());
         }
 
+        /// <summary>
+        /// Create a new user. You have to be administrator.
+        /// </summary>
+        /// <returns>The new user's info.</returns>
         [HttpPost("userop/createuser"), AdminAuthorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<UserInfo>> CreateUser([FromBody] CreateUserRequest body)
         {
             try
@@ -125,7 +169,13 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Change password with old password.
+        /// </summary>
         [HttpPost("userop/changepassword"), Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             try

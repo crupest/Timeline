@@ -33,7 +33,7 @@ namespace Timeline.Services
             return Task.Run(() => Convert.ToBase64String(_sha1.ComputeHash(source)));
         }
 
-        private bool _disposed = false; // To detect redundant calls
+        private bool _disposed; // To detect redundant calls
 
         public void Dispose()
         {

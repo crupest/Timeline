@@ -17,8 +17,12 @@ using Timeline.Services.Exceptions;
 
 namespace Timeline.Controllers
 {
+    /// <summary>
+    /// Operations about timeline.
+    /// </summary>
     [ApiController]
     [CatchTimelineNotExistException]
+    [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TimelineController : Controller
     {
         private readonly ILogger<TimelineController> _logger;
@@ -28,6 +32,9 @@ namespace Timeline.Controllers
 
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public TimelineController(ILogger<TimelineController> logger, IUserService userService, ITimelineService service, IMapper mapper)
         {
             _logger = logger;
@@ -36,7 +43,16 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// List all timelines.
+        /// </summary>
+        /// <param name="relate">A username. If set, only timelines related to the user will return.</param>
+        /// <param name="relateType">Specify the relation type, may be 'own' or 'join'. If not set, both type will return.</param>
+        /// <param name="visibility">"Private" or "Register" or "Public". If set, only timelines whose visibility is specified one will return.</param>
+        /// <returns>The timeline list.</returns>
         [HttpGet("timelines")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<List<TimelineInfo>>> TimelineList([FromQuery][Username] string? relate, [FromQuery][RegularExpression("(own)|(join)")] string? relateType, [FromQuery] string? visibility)
         {
             List<TimelineVisibility>? visibilityFilter = null;
@@ -93,7 +109,18 @@ namespace Timeline.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Get info of a timeline.
+        /// </summary>
+        /// <param name="name">The timeline name.</param>
+        /// <param name="checkUniqueId">A unique id. If specified and if-modified-since is also specified, the timeline info will return when unique id is not the specified one even if it is not modified.</param>
+        /// <param name="queryIfModifiedSince">Same effect as If-Modified-Since header and take precedence than it.</param>
+        /// <param name="headerIfModifiedSince">If specified, will return 304 if not modified.</param>
+        /// <returns>The timeline info.</returns>
         [HttpGet("timelines/{name}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status304NotModified)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TimelineInfo>> TimelineGet([FromRoute][GeneralTimelineName] string name, [FromQuery] string? checkUniqueId, [FromQuery(Name = "ifModifiedSince")] DateTime? queryIfModifiedSince, [FromHeader(Name = "If-Modified-Since")] DateTime? headerIfModifiedSince)
         {
             DateTime? ifModifiedSince = null;
@@ -140,7 +167,17 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Get posts of a timeline.
+        /// </summary>
+        /// <param name="name">The name of the timeline.</param>
+        /// <param name="modifiedSince">If set, only posts modified since the time will return.</param>
+        /// <param name="includeDeleted">If set to true, deleted post will also return.</param>
+        /// <returns>The post list.</returns>
         [HttpGet("timelines/{name}/posts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<TimelinePostInfo>>> PostListGet([FromRoute][GeneralTimelineName] string name, [FromQuery] DateTime? modifiedSince, [FromQuery] bool? includeDeleted)
         {
             if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
@@ -154,9 +191,22 @@ namespace Timeline.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Get the data of a post. Usually a image post.
+        /// </summary>
+        /// <param name="name">Timeline name.</param>
+        /// <param name="id">The id of the post.</param>
+        /// <param name="ifNoneMatch">If-None-Match header.</param>
+        /// <returns>The data.</returns>
         [HttpGet("timelines/{name}/posts/{id}/data")]
-        public async Task<ActionResult<List<TimelinePostInfo>>> PostDataGet([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PostDataGet([FromRoute][GeneralTimelineName] string name, [FromRoute] long id, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
         {
+            _ = ifNoneMatch;
             if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
@@ -180,8 +230,18 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Create a new post.
+        /// </summary>
+        /// <param name="name">Timeline name.</param>
+        /// <param name="body"></param>
+        /// <returns>Info of new post.</returns>
         [HttpPost("timelines/{name}/posts")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<TimelinePostInfo>> PostPost([FromRoute][GeneralTimelineName] string name, [FromBody] TimelinePostCreateRequest body)
         {
             var id = this.GetUserId();
@@ -238,8 +298,17 @@ namespace Timeline.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Delete a post.
+        /// </summary>
+        /// <param name="name">Timeline name.</param>
+        /// <param name="id">Post id.</param>
+        /// <returns>Info of deletion.</returns>
         [HttpDelete("timelines/{name}/posts/{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
         {
             if (!this.IsAdministrator() && !await _service.HasPostModifyPermission(name, id, this.GetUserId()))
@@ -257,8 +326,17 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Change properties of a timeline.
+        /// </summary>
+        /// <param name="name">Timeline name.</param>
+        /// <param name="body"></param>
+        /// <returns>The new info.</returns>
         [HttpPatch("timelines/{name}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<TimelineInfo>> TimelinePatch([FromRoute][GeneralTimelineName] string name, [FromBody] TimelinePatchRequest body)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
@@ -271,8 +349,17 @@ namespace Timeline.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Add a member to timeline.
+        /// </summary>
+        /// <param name="name">Timeline name.</param>
+        /// <param name="member">The new member's username.</param>
         [HttpPut("timelines/{name}/members/{member}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> TimelineMemberPut([FromRoute][GeneralTimelineName] string name, [FromRoute][Username] string member)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
@@ -291,8 +378,16 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Remove a member from timeline.
+        /// </summary>
+        /// <param name="name">Timeline name.</param>
+        /// <param name="member">The member's username.</param>
         [HttpDelete("timelines/{name}/members/{member}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> TimelineMemberDelete([FromRoute][GeneralTimelineName] string name, [FromRoute][Username] string member)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
@@ -311,8 +406,16 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Create a timeline.
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns>Info of new timeline.</returns>
         [HttpPost("timelines")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<TimelineInfo>> TimelineCreate([FromBody] TimelineCreateRequest body)
         {
             var userId = this.GetUserId();
@@ -329,8 +432,17 @@ namespace Timeline.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete a timeline.
+        /// </summary>
+        /// <param name="name">Timeline name.</param>
+        /// <returns>Info of deletion.</returns>
         [HttpDelete("timelines/{name}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> TimelineDelete([FromRoute][TimelineName] string name)
         {
             if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))

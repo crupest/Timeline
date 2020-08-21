@@ -31,9 +31,9 @@ namespace Timeline.Services
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        public DateTime ExpireTime { get; private set; } = default;
+        public DateTime ExpireTime { get; private set; }
 
-        public DateTime VerifyTime { get; private set; } = default;
+        public DateTime VerifyTime { get; private set; }
     }
 
     [Serializable]
