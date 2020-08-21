@@ -40,11 +40,10 @@ namespace Timeline.Controllers
         /// <summary>
         /// Create a new token for a user.
         /// </summary>
-        /// <response code="200">Succeed to create token.</response>
-        /// <response code="400">Error code is 11010101 if user does not exist or password is wrong.</response>
+        /// <returns>Result of token creation.</returns>
         [HttpPost("create")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(CreateTokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<CreateTokenResponse>> Create([FromBody] CreateTokenRequest request)
         {
@@ -91,11 +90,10 @@ namespace Timeline.Controllers
         /// <summary>
         /// Verify a token.
         /// </summary>
-        /// <response code="200">Token is valid.</response>
-        /// <response code="400">Error code is 11010201 if token is of bad format (it may not be created by this server). Error code is 11010202 if user does not exist. Error code is 11010203 if token is of old version (user may have changed password). Error code is 11010204 if token is expired.</response>
+        /// <returns>Result of token verification.</returns>
         [HttpPost("verify")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(VerifyTokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<VerifyTokenResponse>> Verify([FromBody] VerifyTokenRequest request)
         {

@@ -49,8 +49,7 @@ namespace Timeline.Controllers
         /// <param name="relate">A username. If set, only timelines related to the user will return.</param>
         /// <param name="relateType">Specify the relation type, may be 'own' or 'join'. If not set, both type will return.</param>
         /// <param name="visibility">"Private" or "Register" or "Public". If set, only timelines whose visibility is specified one will return.</param>
-        /// <response code="200">Succeeded to get timelines.</response>
-        /// <response code="400">Model is invalid. Or user specified by "relate" param does not exist.</response>
+        /// <returns>The timeline list.</returns>
         [HttpGet("timelines")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,9 +116,7 @@ namespace Timeline.Controllers
         /// <param name="checkUniqueId">A unique id. If specified and if-modified-since is also specified, the timeline info will return when unique id is not the specified one even if it is not modified.</param>
         /// <param name="queryIfModifiedSince">Same effect as If-Modified-Since header and take precedence than it.</param>
         /// <param name="headerIfModifiedSince">If specified, will return 304 if not modified.</param>
-        /// <response code="200">Succeeded to get timeline info.</response>
-        /// <response code="304">Timeline not change.</response>
-        /// <response code="404">Timeline does not exist.</response>
+        /// <returns>The timeline info.</returns>
         [HttpGet("timelines/{name}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status304NotModified)]
@@ -171,14 +168,12 @@ namespace Timeline.Controllers
         }
 
         /// <summary>
-        /// Get posts of a timeline. You need to have permission.
+        /// Get posts of a timeline.
         /// </summary>
         /// <param name="name">The name of the timeline.</param>
         /// <param name="modifiedSince">If set, only posts modified since the time will return.</param>
         /// <param name="includeDeleted">If set to true, deleted post will also return.</param>
-        /// <response code="200">Succeeded to get posts.</response>
-        /// <response code="403">You have no permission.</response>
-        /// <response code="404">The timeline does not exist.</response>
+        /// <returns>The post list.</returns>
         [HttpGet("timelines/{name}/posts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -197,16 +192,12 @@ namespace Timeline.Controllers
         }
 
         /// <summary>
-        /// Get the data of a post. Usually a image post. You need to have permission.
+        /// Get the data of a post. Usually a image post.
         /// </summary>
         /// <param name="name">Timeline name.</param>
         /// <param name="id">The id of the post.</param>
         /// <param name="ifNoneMatch">If-None-Match header.</param>
-        /// <response code="200">Succeeded to get data.</response>
-        /// <response code="304">Data not changed.</response>
-        /// <response code="400">Error code is 11040502 if post has no data.</response>
-        /// <response code="403">You have no permission.</response>
-        /// <response code="404">Timeline or post does not exist.</response>
+        /// <returns>The data.</returns>
         [HttpGet("timelines/{name}/posts/{id}/data")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
@@ -240,15 +231,11 @@ namespace Timeline.Controllers
         }
 
         /// <summary>
-        /// Create a new post. You need to have permission.
+        /// Create a new post.
         /// </summary>
         /// <param name="name">Timeline name.</param>
         /// <param name="body"></param>
         /// <returns>Info of new post.</returns>
-        /// <response code="200">Succeeded to create post and return info of new post.</response>
-        /// <response code="400">Body model is invalid.</response>
-        /// <response code="401">You have not logged in.</response>
-        /// <response code="403">You have no permission.</response>
         [HttpPost("timelines/{name}/posts")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -316,9 +303,7 @@ namespace Timeline.Controllers
         /// </summary>
         /// <param name="name">Timeline name.</param>
         /// <param name="id">Post id.</param>
-        /// <response code="200">Succeeded to delete post. Or post does not exist.</response>
-        /// <response code="401">You have not logged in.</response>
-        /// <response code="403">You have no permission.</response>
+        /// <returns>Info of deletion.</returns>
         [HttpDelete("timelines/{name}/posts/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -347,9 +332,6 @@ namespace Timeline.Controllers
         /// <param name="name">Timeline name.</param>
         /// <param name="body"></param>
         /// <returns>The new info.</returns>
-        /// <response code="200">Succeeded to change properties of timeline. Return the new info.</response>
-        /// <response code="401">You have not logged in.</response>
-        /// <response code="403">You have no permission.</response>
         [HttpPatch("timelines/{name}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -372,10 +354,6 @@ namespace Timeline.Controllers
         /// </summary>
         /// <param name="name">Timeline name.</param>
         /// <param name="member">The new member's username.</param>
-        /// <response code="200">Succeeded.</response>
-        /// <response code="400">User does not exist.</response>
-        /// <response code="401">You have not logged in.</response>
-        /// <response code="403">You have no permission.</response>
         [HttpPut("timelines/{name}/members/{member}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -405,9 +383,6 @@ namespace Timeline.Controllers
         /// </summary>
         /// <param name="name">Timeline name.</param>
         /// <param name="member">The member's username.</param>
-        /// <response code="200">Succeeded. Or the user is not a member.</response>
-        /// <response code="401">You have not logged in.</response>
-        /// <response code="403">You have no permission.</response>
         [HttpDelete("timelines/{name}/members/{member}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -436,9 +411,6 @@ namespace Timeline.Controllers
         /// </summary>
         /// <param name="body"></param>
         /// <returns>Info of new timeline.</returns>
-        /// <response code="200">Succeeded and return info of new timeline.</response>
-        /// <response code="400">Timeline name is conflict.</response>
-        /// <response code="401">You have not logged in.</response>
         [HttpPost("timelines")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -464,9 +436,7 @@ namespace Timeline.Controllers
         /// Delete a timeline.
         /// </summary>
         /// <param name="name">Timeline name.</param>
-        /// <response code="200">Succeeded. Or timeline does not exist.</response>
-        /// <response code="401">You have not logged in.</response>
-        /// <response code="403">You have no permission.</response>
+        /// <returns>Info of deletion.</returns>
         [HttpDelete("timelines/{name}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]

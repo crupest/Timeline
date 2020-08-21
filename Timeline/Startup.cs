@@ -20,6 +20,7 @@ using Timeline.Helpers;
 using Timeline.Models.Converters;
 using Timeline.Routes;
 using Timeline.Services;
+using Timeline.Swagger;
 
 namespace Timeline
 {
@@ -112,6 +113,7 @@ namespace Timeline
                         Description = "Type into the textbox: Bearer {your JWT token}."
                     }));
                 document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+                document.OperationProcessors.Add(new DefaultDescriptionOperationProcessor());
             });
 
             if (!disableFrontEnd)
