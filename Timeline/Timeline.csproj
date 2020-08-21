@@ -18,6 +18,8 @@
         <Version>0.3.0</Version>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+
+        <NoWarn>1701;1702;1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
