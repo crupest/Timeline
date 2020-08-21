@@ -17,16 +17,11 @@
             public static class Header
             {
                 public const int IfNonMatch_BadFormat = 1_000_01_01;
-                public const int ContentType_Missing = 1_000_02_01;
-                public const int ContentLength_Missing = 1_000_03_01;
-                public const int ContentLength_Zero = 1_000_03_02;
             }
 
             public static class Content
             {
                 public const int TooBig = 1_000_11_01;
-                public const int UnmatchedLength_Smaller = 1_000_11_02;
-                public const int UnmatchedLength_Bigger = 1_000_11_03;
             }
         }
 

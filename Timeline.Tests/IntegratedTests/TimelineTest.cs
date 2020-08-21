@@ -76,20 +76,20 @@ namespace Timeline.Tests.IntegratedTests
             if (subpath != null)
             {
                 if (!subpath.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-                    result.Append("/");
+                    result.Append('/');
                 result.Append(subpath);
             }
 
             if (query != null && query.Count != 0)
             {
-                result.Append("?");
+                result.Append('?');
                 foreach (var (key, value, index) in query.Select((pair, index) => (pair.Key, pair.Value, index)))
                 {
                     result.Append(WebUtility.UrlEncode(key));
-                    result.Append("=");
+                    result.Append('=');
                     result.Append(WebUtility.UrlEncode(value));
                     if (index != query.Count - 1)
-                        result.Append("&");
+                        result.Append('&');
                 }
             }
 

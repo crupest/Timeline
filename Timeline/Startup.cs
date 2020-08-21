@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
@@ -18,6 +20,7 @@ using Timeline.Helpers;
 using Timeline.Models.Converters;
 using Timeline.Routes;
 using Timeline.Services;
+using Timeline.Swagger;
 
 namespace Timeline
 {
@@ -46,6 +49,7 @@ namespace Timeline
             services.AddControllers(setup =>
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
+                setup.InputFormatters.Add(new BytesInputFormatter());
                 setup.UseApiRoutePrefix("api");
             })
             .AddJsonOptions(options =>
@@ -95,6 +99,25 @@ namespace Timeline
                 options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
             });
 
+            services.AddSwaggerDocument(document =>
+            {
+                document.DocumentName = "Timeline";
+                document.Title = "Timeline REST API Reference";
+                document.Version = typeof(Startup).Assembly.GetName().Version?.ToString() ?? "unknown version";
+                document.DocumentProcessors.Add(
+                    new SecurityDefinitionAppender("JWT",
+                    new OpenApiSecurityScheme
+                    {
+                        Type = OpenApiSecuritySchemeType.ApiKey,
+                        Name = "Authorization",
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Description = "Type into the textbox: Bearer {your JWT token}."
+                    }));
+                document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+                document.OperationProcessors.Add(new DefaultDescriptionOperationProcessor());
+                document.OperationProcessors.Add(new ByteDataRequestOperationProcessor());
+            });
+
             if (!disableFrontEnd)
             {
                 if (useMockFrontEnd)
@@ -128,6 +151,9 @@ namespace Timeline
                     ServeUnknownFileTypes = true
                 });
             }
+
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
 
             app.UseAuthentication();
             app.UseAuthorization();
