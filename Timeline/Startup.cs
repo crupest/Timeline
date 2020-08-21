@@ -115,6 +115,7 @@ namespace Timeline
                     }));
                 document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
                 document.OperationProcessors.Add(new DefaultDescriptionOperationProcessor());
+                document.OperationProcessors.Add(new ByteDataRequestOperationProcessor());
             });
 
             if (!disableFrontEnd)
