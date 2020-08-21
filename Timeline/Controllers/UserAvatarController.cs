@@ -42,9 +42,7 @@ namespace Timeline.Controllers
         /// </summary>
         /// <param name="username">Username of the user to get avatar of.</param>
         /// <param name="ifNoneMatch">If-None-Match header.</param>
-        /// <response code="200">Succeeded to get the avatar.</response>
-        /// <response code="304">The avatar does not change.</response>
-        /// <response code="404">The user does not exist.</response>
+        /// <returns>Avatar data.</returns>
         [HttpGet("users/{username}/avatar")]
         [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
@@ -74,10 +72,6 @@ namespace Timeline.Controllers
         /// Set avatar of a user. You have to be administrator to change other's.
         /// </summary>
         /// <param name="username">Username of the user to set avatar of.</param>
-        /// <response code="200">Succeeded to set avatar.</response>
-        /// <response code="400">Error code is 10010001 if user does not exist. Or avatar is of bad format.</response>
-        /// <response code="401">You have not logged in.</response>
-        /// <response code="403">You are not administrator.</response>
         [HttpPut("users/{username}/avatar")]
         [Authorize]
         [RequireContentType, RequireContentLength]
