@@ -2,26 +2,55 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
-using System;
 using Timeline.Controllers;
 
 namespace Timeline.Models.Http
 {
+    /// <summary>
+    /// Info of a user.
+    /// </summary>
     public class UserInfo
     {
+        /// <summary>
+        /// Unique id.
+        /// </summary>
         public string UniqueId { get; set; } = default!;
+        /// <summary>
+        /// Username.
+        /// </summary>
         public string Username { get; set; } = default!;
+        /// <summary>
+        /// Nickname.
+        /// </summary>
         public string Nickname { get; set; } = default!;
+        /// <summary>
+        /// True if the user is a administrator.
+        /// </summary>
         public bool? Administrator { get; set; } = default!;
 #pragma warning disable CA1707 // Identifiers should not contain underscores
+        /// <summary>
+        /// Related links.
+        /// </summary>
         public UserInfoLinks _links { get; set; } = default!;
 #pragma warning restore CA1707 // Identifiers should not contain underscores
     }
 
+    /// <summary>
+    /// Related links for user.
+    /// </summary>
     public class UserInfoLinks
     {
+        /// <summary>
+        /// Self.
+        /// </summary>
         public string Self { get; set; } = default!;
+        /// <summary>
+        /// Avatar url.
+        /// </summary>
         public string Avatar { get; set; } = default!;
+        /// <summary>
+        /// Personal timeline url.
+        /// </summary>
         public string Timeline { get; set; } = default!;
     }
 
