@@ -53,36 +53,6 @@ namespace Timeline.Models.Http
                     return new CommonResponse(ErrorCodes.Common.Header.IfNonMatch_BadFormat, string.Format(message, formatArgs));
                 }
 
-                public static CommonResponse ContentType_Missing(params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Header.ContentType_Missing, string.Format(Common_Header_ContentType_Missing, formatArgs));
-                }
-
-                public static CommonResponse CustomMessage_ContentType_Missing(string message, params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Header.ContentType_Missing, string.Format(message, formatArgs));
-                }
-
-                public static CommonResponse ContentLength_Missing(params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Header.ContentLength_Missing, string.Format(Common_Header_ContentLength_Missing, formatArgs));
-                }
-
-                public static CommonResponse CustomMessage_ContentLength_Missing(string message, params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Header.ContentLength_Missing, string.Format(message, formatArgs));
-                }
-
-                public static CommonResponse ContentLength_Zero(params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Header.ContentLength_Zero, string.Format(Common_Header_ContentLength_Zero, formatArgs));
-                }
-
-                public static CommonResponse CustomMessage_ContentLength_Zero(string message, params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Header.ContentLength_Zero, string.Format(message, formatArgs));
-                }
-
             }
 
             public static class Content
@@ -96,26 +66,6 @@ namespace Timeline.Models.Http
                 public static CommonResponse CustomMessage_TooBig(string message, params object?[] formatArgs)
                 {
                     return new CommonResponse(ErrorCodes.Common.Content.TooBig, string.Format(message, formatArgs));
-                }
-
-                public static CommonResponse UnmatchedLength_Smaller(params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Content.UnmatchedLength_Smaller, string.Format(Common_Content_UnmatchedLength_Smaller, formatArgs));
-                }
-
-                public static CommonResponse CustomMessage_UnmatchedLength_Smaller(string message, params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Content.UnmatchedLength_Smaller, string.Format(message, formatArgs));
-                }
-
-                public static CommonResponse UnmatchedLength_Bigger(params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Content.UnmatchedLength_Bigger, string.Format(Common_Content_UnmatchedLength_Bigger, formatArgs));
-                }
-
-                public static CommonResponse CustomMessage_UnmatchedLength_Bigger(string message, params object?[] formatArgs)
-                {
-                    return new CommonResponse(ErrorCodes.Common.Content.UnmatchedLength_Bigger, string.Format(message, formatArgs));
                 }
 
             }
