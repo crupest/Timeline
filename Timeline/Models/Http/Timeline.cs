@@ -8,45 +8,120 @@ using Timeline.Controllers;
 
 namespace Timeline.Models.Http
 {
+    /// <summary>
+    /// Info of post content.
+    /// </summary>
     public class TimelinePostContentInfo
     {
+        /// <summary>
+        /// Type of the post content.
+        /// </summary>
         public string Type { get; set; } = default!;
+        /// <summary>
+        /// If post is of text type. This is the text.
+        /// </summary>
         public string? Text { get; set; }
+        /// <summary>
+        /// If post is of image type. This is the image url.
+        /// </summary>
         public string? Url { get; set; }
     }
 
+    /// <summary>
+    /// Info of a post.
+    /// </summary>
     public class TimelinePostInfo
     {
+        /// <summary>
+        /// Post id.
+        /// </summary>
         public long Id { get; set; }
+        /// <summary>
+        /// Content of the post. May be null if post is deleted.
+        /// </summary>
         public TimelinePostContentInfo? Content { get; set; }
+        /// <summary>
+        /// True if post is deleted.
+        /// </summary>
         public bool Deleted { get; set; }
+        /// <summary>
+        /// Post time.
+        /// </summary>
         public DateTime Time { get; set; }
+        /// <summary>
+        /// The author. May be null if the user has been deleted.
+        /// </summary>
         public UserInfo? Author { get; set; } = default!;
+        /// <summary>
+        /// Last updated time.
+        /// </summary>
         public DateTime LastUpdated { get; set; } = default!;
     }
 
+    /// <summary>
+    /// Info of a timeline.
+    /// </summary>
     public class TimelineInfo
     {
+        /// <summary>
+        /// Unique id.
+        /// </summary>
         public string UniqueId { get; set; } = default!;
+        /// <summary>
+        /// Name of timeline.
+        /// </summary>
         public string Name { get; set; } = default!;
+        /// <summary>
+        /// Last modified time of timeline name.
+        /// </summary>
         public DateTime NameLastModifed { get; set; } = default!;
+        /// <summary>
+        /// Timeline description.
+        /// </summary>
         public string Description { get; set; } = default!;
+        /// <summary>
+        /// Owner of the timeline.
+        /// </summary>
         public UserInfo Owner { get; set; } = default!;
+        /// <summary>
+        /// Visibility of the timeline.
+        /// </summary>
         public TimelineVisibility Visibility { get; set; }
 #pragma warning disable CA2227 // Collection properties should be read only
+        /// <summary>
+        /// Members of timeline.
+        /// </summary>
         public List<UserInfo> Members { get; set; } = default!;
 #pragma warning restore CA2227 // Collection properties should be read only
+        /// <summary>
+        /// Create time of timeline.
+        /// </summary>
         public DateTime CreateTime { get; set; } = default!;
+        /// <summary>
+        /// Last modified time of timeline.
+        /// </summary>
         public DateTime LastModified { get; set; } = default!;
 
 #pragma warning disable CA1707 // Identifiers should not contain underscores
+        /// <summary>
+        /// Related links.
+        /// </summary>
         public TimelineInfoLinks _links { get; set; } = default!;
 #pragma warning restore CA1707 // Identifiers should not contain underscores
     }
 
+    /// <summary>
+    /// Related links for timeline.
+    /// </summary>
     public class TimelineInfoLinks
     {
+        /// <summary>
+        /// Self.
+        /// </summary>
         public string Self { get; set; } = default!;
+        /// <summary>
+        /// Posts url.
+        /// </summary>
         public string Posts { get; set; } = default!;
     }
 

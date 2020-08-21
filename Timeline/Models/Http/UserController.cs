@@ -82,14 +82,8 @@ namespace Timeline.Models.Http
         public string NewPassword { get; set; } = default!;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public class UserControllerAutoMapperProfile : Profile
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public UserControllerAutoMapperProfile()
         {
             CreateMap<UserPatchRequest, User>(MemberList.Source);
