@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using NSwag;
 using NSwag.Generation.Processors.Security;
 using System;
 using System.ComponentModel;
+using System.Net.Mime;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -50,6 +52,8 @@ namespace Timeline
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
                 setup.InputFormatters.Add(new BytesInputFormatter());
+                setup.Filters.Add(new ConsumesAttribute(MediaTypeNames.Application.Json, "text/json"));
+                setup.Filters.Add(new ProducesAttribute(MediaTypeNames.Application.Json, "text/json"));
                 setup.UseApiRoutePrefix("api");
             })
             .AddJsonOptions(options =>
