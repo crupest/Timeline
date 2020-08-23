@@ -107,7 +107,7 @@ namespace Timeline.Helpers
                     controller.Response.Headers.Add(ETagHeaderKey, eTagValue);
                     controller.Response.Headers.Add(CacheControlHeaderKey, GenerateCacheControlHeaderValue());
 
-                    return controller.StatusCode(StatusCodes.Status304NotModified);
+                    return controller.StatusCode(StatusCodes.Status304NotModified, null);
                 }
             }
 
