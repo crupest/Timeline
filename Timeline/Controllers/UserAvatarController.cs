@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Filters;
@@ -46,6 +45,7 @@ namespace Timeline.Controllers
         /// <param name="ifNoneMatch">If-None-Match header.</param>
         /// <returns>Avatar data.</returns>
         [HttpGet("users/{username}/avatar")]
+        [Produces("image/png", "image/jpeg", "image/gif", "image/webp", "application/json", "text/json")]
         [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

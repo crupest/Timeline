@@ -199,7 +199,8 @@ namespace Timeline.Controllers
         /// <param name="ifNoneMatch">If-None-Match header.</param>
         /// <returns>The data.</returns>
         [HttpGet("timelines/{name}/posts/{id}/data")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Produces("image/png", "image/jpeg", "image/gif", "image/webp", "application/json", "text/json")]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
