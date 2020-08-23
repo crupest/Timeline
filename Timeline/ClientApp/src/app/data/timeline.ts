@@ -306,20 +306,78 @@ export class TimelineService {
       }
     }
 
+    const now = new Date();
+
+    const lastUpdatedTime = await dataStorage.getItem<Date | null>(
+      `timeline.${timelineName}.lastUpdated`
+    );
+
     try {
-      const httpPosts = await getHttpTimelineClient().listPost(
-        timelineName,
-        userService.currentUser?.token
-      );
+      if (lastUpdatedTime == null) {
+        const httpPosts = await getHttpTimelineClient().listPost(
+          timelineName,
+          userService.currentUser?.token
+        );
 
-      uniqBy(
-        httpPosts.map((post) => post.author),
-        'username'
-      ).forEach((user) => void userInfoService.saveUser(user));
+        uniqBy(
+          httpPosts.map((post) => post.author),
+          'username'
+        ).forEach((user) => void userInfoService.saveUser(user));
 
-      const posts = this.convertHttpPostToDataList(httpPosts);
-      await this.savePosts(timelineName, posts);
-      line.endSyncAndNext({ type: 'synced', posts });
+        const posts = this.convertHttpPostToDataList(httpPosts);
+        await this.savePosts(timelineName, posts);
+        await dataStorage.setItem<Date>(
+          `timeline.${timelineName}.lastUpdated`,
+          now
+        );
+
+        line.endSyncAndNext({ type: 'synced', posts });
+      } else {
+        const httpPosts = await getHttpTimelineClient().listPost(
+          timelineName,
+          userService.currentUser?.token,
+          {
+            modifiedSince: lastUpdatedTime,
+            includeDeleted: true,
+          }
+        );
+
+        const deletedIds = httpPosts.filter((p) => p.deleted).map((p) => p.id);
+        const changed = httpPosts.filter(
+          (p): p is HttpTimelinePostInfo => !p.deleted
+        );
+
+        uniqBy(
+          httpPosts
+            .map((post) => post.author)
+            .filter((u): u is HttpUser => u != null),
+          'username'
+        ).forEach((user) => void userInfoService.saveUser(user));
+
+        const cache = (await this.getCachedPosts(timelineName)) ?? [];
+
+        const posts = cache.filter((p) => !deletedIds.includes(p.id));
+
+        for (const changedPost of changed) {
+          const savedChangedPostIndex = posts.findIndex(
+            (p) => p.id === changedPost.id
+          );
+          if (savedChangedPostIndex === -1) {
+            posts.push(this.convertHttpPostToData(changedPost));
+          } else {
+            posts[savedChangedPostIndex] = this.convertHttpPostToData(
+              changedPost
+            );
+          }
+        }
+
+        await this.savePosts(timelineName, posts);
+        await dataStorage.setItem<Date>(
+          `timeline.${timelineName}.lastUpdated`,
+          now
+        );
+        line.endSyncAndNext({ type: 'synced', posts });
+      }
     } catch (e) {
       if (e instanceof HttpTimelineNotExistError) {
         line.endSyncAndNext({ type: 'notexist', posts: [] });

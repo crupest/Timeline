@@ -66,7 +66,7 @@ export interface HttpTimelineDeletedPostInfo {
   id: number;
   time: Date;
   lastUpdated: Date;
-  author: HttpUser;
+  author?: HttpUser;
   deleted: true;
 }
 
