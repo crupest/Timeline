@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using NSwag;
 using NSwag.Generation.Processors.Security;
 using System;
 using System.ComponentModel;
+using System.Net.Mime;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -50,6 +52,8 @@ namespace Timeline
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
                 setup.InputFormatters.Add(new BytesInputFormatter());
+                setup.Filters.Add(new ConsumesAttribute(MediaTypeNames.Application.Json, "text/json"));
+                setup.Filters.Add(new ProducesAttribute(MediaTypeNames.Application.Json, "text/json"));
                 setup.UseApiRoutePrefix("api");
             })
             .AddJsonOptions(options =>
@@ -104,6 +108,7 @@ namespace Timeline
                 document.DocumentName = "Timeline";
                 document.Title = "Timeline REST API Reference";
                 document.Version = typeof(Startup).Assembly.GetName().Version?.ToString() ?? "unknown version";
+                document.DocumentProcessors.Add(new DocumentDescriptionDocumentProcessor());
                 document.DocumentProcessors.Add(
                     new SecurityDefinitionAppender("JWT",
                     new OpenApiSecurityScheme
@@ -111,7 +116,7 @@ namespace Timeline
                         Type = OpenApiSecuritySchemeType.ApiKey,
                         Name = "Authorization",
                         In = OpenApiSecurityApiKeyLocation.Header,
-                        Description = "Type into the textbox: Bearer {your JWT token}."
+                        Description = "Create token via `/api/token/create` ."
                     }));
                 document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
                 document.OperationProcessors.Add(new DefaultDescriptionOperationProcessor());
@@ -153,7 +158,7 @@ namespace Timeline
             }
 
             app.UseOpenApi();
-            app.UseSwaggerUi3();
+            app.UseReDoc();
 
             app.UseAuthentication();
             app.UseAuthorization();
