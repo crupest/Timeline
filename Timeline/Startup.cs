@@ -104,6 +104,7 @@ namespace Timeline
                 document.DocumentName = "Timeline";
                 document.Title = "Timeline REST API Reference";
                 document.Version = typeof(Startup).Assembly.GetName().Version?.ToString() ?? "unknown version";
+                document.DocumentProcessors.Add(new DocumentDescriptionDocumentProcessor());
                 document.DocumentProcessors.Add(
                     new SecurityDefinitionAppender("JWT",
                     new OpenApiSecurityScheme
@@ -111,7 +112,7 @@ namespace Timeline
                         Type = OpenApiSecuritySchemeType.ApiKey,
                         Name = "Authorization",
                         In = OpenApiSecurityApiKeyLocation.Header,
-                        Description = "Type into the textbox: Bearer {your JWT token}."
+                        Description = "Create token via `/api/token/create` ."
                     }));
                 document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
                 document.OperationProcessors.Add(new DefaultDescriptionOperationProcessor());
@@ -153,7 +154,7 @@ namespace Timeline
             }
 
             app.UseOpenApi();
-            app.UseSwaggerUi3();
+            app.UseReDoc();
 
             app.UseAuthentication();
             app.UseAuthorization();
