@@ -1,12 +1,12 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 
 import {
   apiBaseUrl,
   convertToNetworkError,
   convertToIfErrorCodeIs,
   extractResponseData,
-} from './common';
-import { HttpUser } from './user';
+} from "./common";
+import { HttpUser } from "./user";
 
 export interface HttpCreateTokenRequest {
   username: string;

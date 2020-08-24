@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import { ExcludeKey } from '../utilities/type';
+import { ExcludeKey } from "../utilities/type";
 
 const BlobImage: React.FC<
-  ExcludeKey<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> & {
+  ExcludeKey<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
     blob?: Blob | unknown;
   }
 > = (props) => {

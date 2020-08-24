@@ -1,19 +1,18 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { hot } from 'react-hot-loader/root';
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { hot } from "react-hot-loader/root";
 
-import AppBar from './common/AppBar';
-import LoadingPage from './common/LoadingPage';
-import Home from './home/Home';
-import Login from './user/Login';
-import Settings from './settings/Settings';
-import About from './about/About';
-import User from './user/User';
-import TimelinePage from './timeline/TimelinePage';
-import AlertHost from './common/AlertHost';
-
-import { dataStorage } from './data/common';
-import { userService, useRawUser } from './data/user';
+import AppBar from "./common/AppBar";
+import LoadingPage from "./common/LoadingPage";
+import Home from "./home/Home";
+import Login from "./user/Login";
+import Settings from "./settings/Settings";
+import About from "./about/About";
+import User from "./user/User";
+import TimelinePage from "./timeline/TimelinePage";
+import AlertHost from "./common/AlertHost";
+import { dataStorage } from "./data/common";
+import { userService, useRawUser } from "./data/user";
 
 const NoMatch: React.FC = () => {
   return (
@@ -25,8 +24,8 @@ const NoMatch: React.FC = () => {
   );
 };
 
-const LazyAdmin = React.lazy(() =>
-  import(/* webpackChunkName: "admin" */ './admin/Admin')
+const LazyAdmin = React.lazy(
+  () => import(/* webpackChunkName: "admin" */ "./admin/Admin")
 );
 
 const App: React.FC = () => {

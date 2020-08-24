@@ -1,14 +1,13 @@
-import React from 'react';
+import React from "react";
 
 import {
   TimelineVisibility,
   kTimelineVisibilities,
   TimelineChangePropertyRequest,
-} from '../data/timeline';
-
+} from "../data/timeline";
 import OperationDialog, {
   OperationSelectInputInfoOption,
-} from '../common/OperationDialog';
+} from "../common/OperationDialog";
 
 export interface TimelinePropertyInfo {
   visibility: TimelineVisibility;
@@ -23,9 +22,9 @@ export interface TimelinePropertyChangeDialogProps {
 }
 
 const labelMap: { [key in TimelineVisibility]: string } = {
-  Private: 'timeline.visibility.private',
-  Public: 'timeline.visibility.public',
-  Register: 'timeline.visibility.register',
+  Private: "timeline.visibility.private",
+  Public: "timeline.visibility.public",
+  Register: "timeline.visibility.register",
 };
 
 const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> = (
@@ -33,12 +32,12 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
 ) => {
   return (
     <OperationDialog
-      title={'timeline.dialogChangeProperty.title'}
+      title={"timeline.dialogChangeProperty.title"}
       titleColor="default"
       inputScheme={[
         {
-          type: 'select',
-          label: 'timeline.dialogChangeProperty.visibility',
+          type: "select",
+          label: "timeline.dialogChangeProperty.visibility",
           options: kTimelineVisibilities.map<OperationSelectInputInfoOption>(
             (v) => ({
               label: labelMap[v],
@@ -48,8 +47,8 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
           initValue: props.oldInfo.visibility,
         },
         {
-          type: 'text',
-          label: 'timeline.dialogChangeProperty.description',
+          type: "text",
+          label: "timeline.dialogChangeProperty.description",
           initValue: props.oldInfo.description,
         },
       ]}

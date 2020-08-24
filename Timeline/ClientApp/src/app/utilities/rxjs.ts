@@ -1,5 +1,5 @@
-import { OperatorFunction } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { OperatorFunction } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 export function convertError<T, NewError>(
   oldErrorType: { new (...args: never[]): unknown },

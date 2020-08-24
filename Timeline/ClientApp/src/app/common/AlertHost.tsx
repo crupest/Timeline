@@ -1,15 +1,15 @@
-import React, { useCallback } from 'react';
-import { Alert } from 'reactstrap';
-import without from 'lodash/without';
-import concat from 'lodash/concat';
+import React, { useCallback } from "react";
+import { Alert } from "reactstrap";
+import without from "lodash/without";
+import concat from "lodash/concat";
+import { useTranslation } from "react-i18next";
 
 import {
   alertService,
   AlertInfoEx,
   kAlertHostId,
   AlertInfo,
-} from './alert-service';
-import { useTranslation } from 'react-i18next';
+} from "./alert-service";
 
 interface AutoCloseAlertProps {
   alert: AlertInfo;
@@ -24,9 +24,9 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
 
   React.useEffect(() => {
     const tag =
-      dismissTime === 'never'
+      dismissTime === "never"
         ? null
-        : typeof dismissTime === 'number'
+        : typeof dismissTime === "number"
         ? window.setTimeout(props.close, dismissTime)
         : window.setTimeout(props.close, 5000);
     return () => {
@@ -37,13 +37,13 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
   }, [dismissTime, props.close]);
 
   return (
-    <Alert className="m-3" color={alert.type ?? 'primary'} toggle={props.close}>
+    <Alert className="m-3" color={alert.type ?? "primary"} toggle={props.close}>
       {(() => {
         const { message } = alert;
-        if (typeof message === 'function') {
+        if (typeof message === "function") {
           const Message = message;
           return <Message />;
-        } else if (typeof message === 'object' && message.type === 'i18n') {
+        } else if (typeof message === "object" && message.type === "i18n") {
           return t(message.key);
         } else return alert.message;
       })()}
@@ -56,7 +56,7 @@ interface AlertInfoExEx extends AlertInfoEx {
   close: () => void;
 }
 
-export const AlertHost: React.FC = () => {
+const AlertHost: React.FC = () => {
   const [alerts, setAlerts] = React.useState<AlertInfoExEx[]>([]);
 
   // react guarantee that state setters are stable, so we don't need to add it to dependency list

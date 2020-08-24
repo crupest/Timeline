@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { BehaviorSubject, Observable, from } from 'rxjs';
-import { map, filter } from 'rxjs/operators';
+import React, { useState, useEffect } from "react";
+import { BehaviorSubject, Observable, from } from "rxjs";
+import { map, filter } from "rxjs/operators";
 
-import { UiLogicError } from '../common';
-import { convertError } from '../utilities/rxjs';
-import { pushAlert } from '../common/alert-service';
-
-import { dataStorage, throwIfNotNetworkError } from './common';
-import { DataHub } from './DataHub';
-
-import { HttpNetworkError, BlobWithEtag, NotModified } from '../http/common';
+import { UiLogicError } from "../common";
+import { convertError } from "../utilities/rxjs";
+import { pushAlert } from "../common/alert-service";
+import { HttpNetworkError, BlobWithEtag, NotModified } from "../http/common";
 import {
   getHttpTokenClient,
   HttpCreateTokenBadCredentialError,
-} from '../http/token';
+} from "../http/token";
 import {
   getHttpUserClient,
   HttpUserNotExistError,
   HttpUser,
-} from '../http/user';
+} from "../http/user";
+
+import { DataHub } from "./DataHub";
+import { dataStorage, throwIfNotNetworkError } from "./common";
 
 export type User = HttpUser;
 
@@ -37,10 +36,10 @@ export interface LoginCredentials {
 }
 
 export class BadCredentialError {
-  message = 'login.badCredential';
+  message = "login.badCredential";
 }
 
-const USER_STORAGE_KEY = 'currentuser';
+const USER_STORAGE_KEY = "currentuser";
 
 export class UserService {
   private userSubject = new BehaviorSubject<UserWithToken | null | undefined>(
@@ -78,26 +77,26 @@ export class UserService {
       await dataStorage.setItem<UserWithToken>(USER_STORAGE_KEY, user);
       this.userSubject.next(user);
       pushAlert({
-        type: 'success',
+        type: "success",
         message: {
-          type: 'i18n',
-          key: 'user.welcomeBack',
+          type: "i18n",
+          key: "user.welcomeBack",
         },
       });
       return user;
     } catch (error) {
       if (error instanceof HttpNetworkError) {
         pushAlert({
-          type: 'danger',
-          message: { type: 'i18n', key: 'user.verifyTokenFailedNetwork' },
+          type: "danger",
+          message: { type: "i18n", key: "user.verifyTokenFailedNetwork" },
         });
         return savedUser;
       } else {
         await dataStorage.removeItem(USER_STORAGE_KEY);
         this.userSubject.next(null);
         pushAlert({
-          type: 'danger',
-          message: { type: 'i18n', key: 'user.verifyTokenFailed' },
+          type: "danger",
+          message: { type: "i18n", key: "user.verifyTokenFailed" },
         });
         return null;
       }
@@ -109,7 +108,7 @@ export class UserService {
     rememberMe: boolean
   ): Promise<void> {
     if (this.currentUser) {
-      throw new UiLogicError('Already login.');
+      throw new UiLogicError("Already login.");
     }
     try {
       const res = await getHttpTokenClient().create({
@@ -135,10 +134,10 @@ export class UserService {
 
   async logout(): Promise<void> {
     if (this.currentUser === undefined) {
-      throw new UiLogicError('Please check user first.');
+      throw new UiLogicError("Please check user first.");
     }
     if (this.currentUser === null) {
-      throw new UiLogicError('No login.');
+      throw new UiLogicError("No login.");
     }
     await dataStorage.removeItem(USER_STORAGE_KEY);
     this.userSubject.next(null);
@@ -211,7 +210,7 @@ export function useUser(): UserWithToken | null {
 export function useUserLoggedIn(): UserWithToken {
   const user = useUser();
   if (user == null) {
-    throw new UiLogicError('You assert user has logged in but actually not.');
+    throw new UiLogicError("You assert user has logged in but actually not.");
   }
   return user;
 }
@@ -219,7 +218,7 @@ export function useUserLoggedIn(): UserWithToken {
 export function checkLogin(): UserWithToken {
   const user = userService.currentUser;
   if (user == null) {
-    throw new UiLogicError('You must login to perform the operation.');
+    throw new UiLogicError("You must login to perform the operation.");
   }
   return user;
 }
@@ -233,7 +232,7 @@ export class UserInfoService {
     if (line.isSyncing) return;
     line.beginSync();
     await this.doSaveUser(user);
-    line.endSyncAndNext({ user, type: 'synced' });
+    line.endSyncAndNext({ user, type: "synced" });
   }
 
   private getCachedUser(username: string): Promise<User | null> {
@@ -252,20 +251,20 @@ export class UserInfoService {
     if (line.value == undefined) {
       const cache = await this.getCachedUser(username);
       if (cache != null) {
-        line.next({ user: cache, type: 'cache' });
+        line.next({ user: cache, type: "cache" });
       }
     }
 
     try {
       const res = await getHttpUserClient().get(username);
       await this.doSaveUser(res);
-      line.endSyncAndNext({ user: res, type: 'synced' });
+      line.endSyncAndNext({ user: res, type: "synced" });
     } catch (e) {
       if (e instanceof HttpUserNotExistError) {
-        line.endSyncAndNext({ type: 'notexist' });
+        line.endSyncAndNext({ type: "notexist" });
       } else {
         const cache = await this.getCachedUser(username);
-        line.endSyncAndNext({ user: cache ?? undefined, type: 'offline' });
+        line.endSyncAndNext({ user: cache ?? undefined, type: "offline" });
         throwIfNotNetworkError(e);
       }
     }
@@ -273,8 +272,8 @@ export class UserInfoService {
 
   private _userHub = new DataHub<
     string,
-    | { user: User; type: 'cache' | 'synced' | 'offline' }
-    | { user?: undefined; type: 'notexist' | 'offline' }
+    | { user: User; type: "cache" | "synced" | "offline" }
+    | { user?: undefined; type: "notexist" | "offline" }
   >({
     setup: (key) => {
       void this.syncUser(key);
@@ -306,7 +305,7 @@ export class UserInfoService {
     const cache = await this.getCachedAvatar(username);
     if (line.value == null) {
       if (cache != null) {
-        line.next({ data: cache.data, type: 'cache' });
+        line.next({ data: cache.data, type: "cache" });
       }
     }
 
@@ -314,23 +313,23 @@ export class UserInfoService {
       try {
         const avatar = await getHttpUserClient().getAvatar(username);
         await this.saveAvatar(username, avatar);
-        line.endSyncAndNext({ data: avatar.data, type: 'synced' });
+        line.endSyncAndNext({ data: avatar.data, type: "synced" });
       } catch (e) {
-        line.endSyncAndNext({ type: 'offline' });
+        line.endSyncAndNext({ type: "offline" });
         throwIfNotNetworkError(e);
       }
     } else {
       try {
         const res = await getHttpUserClient().getAvatar(username, cache.etag);
         if (res instanceof NotModified) {
-          line.endSyncAndNext({ data: cache.data, type: 'synced' });
+          line.endSyncAndNext({ data: cache.data, type: "synced" });
         } else {
           const avatar = res;
           await this.saveAvatar(username, avatar);
-          line.endSyncAndNext({ data: avatar.data, type: 'synced' });
+          line.endSyncAndNext({ data: avatar.data, type: "synced" });
         }
       } catch (e) {
-        line.endSyncAndNext({ data: cache.data, type: 'offline' });
+        line.endSyncAndNext({ data: cache.data, type: "offline" });
         throwIfNotNetworkError(e);
       }
     }
@@ -338,8 +337,8 @@ export class UserInfoService {
 
   private _avatarHub = new DataHub<
     string,
-    | { data: Blob; type: 'cache' | 'synced' | 'offline' }
-    | { data?: undefined; type: 'notexist' | 'offline' }
+    | { data: Blob; type: "cache" | "synced" | "offline" }
+    | { data?: undefined; type: "notexist" | "offline" }
   >({
     setup: (key) => {
       void this.syncAvatar(key);
@@ -362,7 +361,7 @@ export class UserInfoService {
   async setAvatar(username: string, blob: Blob): Promise<void> {
     const user = checkLogin();
     await getHttpUserClient().putAvatar(username, blob, user.token);
-    this._avatarHub.getLine(username)?.next({ data: blob, type: 'synced' });
+    this._avatarHub.getLine(username)?.next({ data: blob, type: "synced" });
   }
 }
 

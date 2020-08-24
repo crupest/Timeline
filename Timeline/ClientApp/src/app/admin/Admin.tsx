@@ -1,29 +1,29 @@
-import React, { Fragment } from 'react';
-import { Nav, NavItem, NavLink } from 'reactstrap';
+import React, { Fragment } from "react";
+import { Nav, NavItem, NavLink } from "reactstrap";
 import {
   Redirect,
   Route,
   Switch,
   useRouteMatch,
-  useHistory
-} from 'react-router';
-import classnames from 'classnames';
+  useHistory,
+} from "react-router";
+import classnames from "classnames";
 
-import AppBar from '../common/AppBar';
-import UserAdmin from './UserAdmin';
+import AppBar from "../common/AppBar";
+import { UserWithToken } from "../data/user";
 
-import { UserWithToken } from '../data/user';
+import UserAdmin from "./UserAdmin";
 
 interface AdminProps {
   user: UserWithToken;
 }
 
-const Admin: React.FC<AdminProps> = props => {
+const Admin: React.FC<AdminProps> = (props) => {
   const match = useRouteMatch();
   const history = useHistory();
-  type TabNames = 'users' | 'more';
+  type TabNames = "users" | "more";
 
-  const tabName = history.location.pathname.replace(match.path + '/', '');
+  const tabName = history.location.pathname.replace(match.path + "/", "");
 
   function toggle(newTab: TabNames): void {
     history.push(`${match.url}/${newTab}`);
@@ -40,9 +40,9 @@ const Admin: React.FC<AdminProps> = props => {
         <Nav tabs>
           <NavItem>
             <NavLink
-              className={classnames({ active: tabName === 'users' })}
+              className={classnames({ active: tabName === "users" })}
               onClick={() => {
-                toggle('users');
+                toggle("users");
               }}
             >
               Users
@@ -50,9 +50,9 @@ const Admin: React.FC<AdminProps> = props => {
           </NavItem>
           <NavItem>
             <NavLink
-              className={classnames({ active: tabName === 'more' })}
+              className={classnames({ active: tabName === "more" })}
               onClick={() => {
-                toggle('more');
+                toggle("more");
               }}
             >
               More
@@ -68,8 +68,8 @@ const Admin: React.FC<AdminProps> = props => {
     <Fragment>
       <Switch>
         <Redirect from={match.path} to={`${match.path}/users`} exact />
-        {createRoute('users', <UserAdmin user={props.user} />)}
-        {createRoute('more', <div>More Page Works</div>)}
+        {createRoute("users", <UserAdmin user={props.user} />)}
+        {createRoute("more", <div>More Page Works</div>)}
       </Switch>
     </Fragment>
   );

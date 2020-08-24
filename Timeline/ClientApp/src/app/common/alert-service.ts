@@ -1,10 +1,10 @@
-import React from 'react';
-import pull from 'lodash/pull';
+import React from "react";
+import pull from "lodash/pull";
 
 export interface AlertInfo {
-  type?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
-  message: string | React.FC<unknown> | { type: 'i18n'; key: string };
-  dismissTime?: number | 'never';
+  type?: "primary" | "secondary" | "success" | "danger" | "warning" | "info";
+  message: string | React.FC<unknown> | { type: "i18n"; key: string };
+  dismissTime?: number | "never";
 }
 
 export interface AlertInfoEx extends AlertInfo {
@@ -54,7 +54,7 @@ export function pushAlert(alert: AlertInfo): void {
   alertService.push(alert);
 }
 
-export const kAlertHostId = 'alert-host';
+export const kAlertHostId = "alert-host";
 
 export function getAlertHost(): HTMLElement | null {
   return document.getElementById(kAlertHostId);

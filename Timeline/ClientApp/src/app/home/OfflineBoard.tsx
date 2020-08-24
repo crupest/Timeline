@@ -1,11 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Trans } from 'react-i18next';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Trans } from "react-i18next";
 
-import { getAllCachedTimelineNames } from '../data/timeline';
-
-import UserTimelineLogo from '../common/UserTimelineLogo';
-import TimelineLogo from '../common/TimelineLogo';
+import { getAllCachedTimelineNames } from "../data/timeline";
+import UserTimelineLogo from "../common/UserTimelineLogo";
+import TimelineLogo from "../common/TimelineLogo";
 
 export interface OfflineBoardProps {
   onReload: () => void;
@@ -40,7 +39,7 @@ const OfflineBoard: React.FC<OfflineBoardProps> = ({ onReload }) => {
         2
       </Trans>
       {timelines.map((timeline) => {
-        const isPersonal = timeline.startsWith('@');
+        const isPersonal = timeline.startsWith("@");
         const url = isPersonal
           ? `/users/${timeline.slice(1)}`
           : `/timelines/${timeline}`;

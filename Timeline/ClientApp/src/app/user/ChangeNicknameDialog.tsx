@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import OperationDialog from '../common/OperationDialog';
+import OperationDialog from "../common/OperationDialog";
 
 export interface ChangeNicknameDialogProps {
   open: boolean;
@@ -8,14 +8,14 @@ export interface ChangeNicknameDialogProps {
   onProcess: (newNickname: string) => Promise<void>;
 }
 
-const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = props => {
+const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
   return (
     <OperationDialog
       open={props.open}
       title="userPage.dialogChangeNickname.title"
       titleColor="default"
       inputScheme={[
-        { type: 'text', label: 'userPage.dialogChangeNickname.inputLabel' }
+        { type: "text", label: "userPage.dialogChangeNickname.inputLabel" },
       ]}
       onProcess={([newNickname]) => {
         return props.onProcess(newNickname as string);

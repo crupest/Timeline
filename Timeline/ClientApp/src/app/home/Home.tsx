@@ -1,15 +1,15 @@
-import React from 'react';
-import { useHistory } from 'react-router';
-import { Row, Container, Button, Col } from 'reactstrap';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useHistory } from "react-router";
+import { Row, Container, Button, Col } from "reactstrap";
+import { useTranslation } from "react-i18next";
 
-import { useUser } from '../data/user';
+import { useUser } from "../data/user";
+import AppBar from "../common/AppBar";
+import SearchInput from "../common/SearchInput";
 
-import AppBar from '../common/AppBar';
-import SearchInput from '../common/SearchInput';
-import BoardWithoutUser from './BoardWithoutUser';
-import BoardWithUser from './BoardWithUser';
-import TimelineCreateDialog from './TimelineCreateDialog';
+import BoardWithoutUser from "./BoardWithoutUser";
+import BoardWithUser from "./BoardWithUser";
+import TimelineCreateDialog from "./TimelineCreateDialog";
 
 const Home: React.FC = () => {
   const history = useHistory();
@@ -18,14 +18,14 @@ const Home: React.FC = () => {
 
   const user = useUser();
 
-  const [navText, setNavText] = React.useState<string>('');
+  const [navText, setNavText] = React.useState<string>("");
 
-  const [dialog, setDialog] = React.useState<'create' | null>(null);
+  const [dialog, setDialog] = React.useState<"create" | null>(null);
 
   const goto = React.useCallback((): void => {
-    if (navText === '') {
-      history.push('users/crupest');
-    } else if (navText.startsWith('@')) {
+    if (navText === "") {
+      history.push("users/crupest");
+    } else if (navText.startsWith("@")) {
       history.push(`users/${navText.slice(1)}`);
     } else {
       history.push(`timelines/${navText}`);
@@ -35,7 +35,7 @@ const Home: React.FC = () => {
   return (
     <>
       <AppBar />
-      <Container fluid style={{ marginTop: '56px' }}>
+      <Container fluid style={{ marginTop: "56px" }}>
         <Row>
           <Col>
             <SearchInput
@@ -43,7 +43,7 @@ const Home: React.FC = () => {
               value={navText}
               onChange={setNavText}
               onButtonClick={goto}
-              buttonText={t('home.go')}
+              buttonText={t("home.go")}
               placeholder="@crupest"
               additionalButton={
                 user != null && (
@@ -51,10 +51,10 @@ const Home: React.FC = () => {
                     color="success"
                     outline
                     onClick={() => {
-                      setDialog('create');
+                      setDialog("create");
                     }}
                   >
-                    {t('home.createButton')}
+                    {t("home.createButton")}
                   </Button>
                 )
               }
@@ -87,7 +87,7 @@ const Home: React.FC = () => {
           <small className="white-space-no-wrap">公安备案 42112102000124</small>
         </a>
       </footer>
-      {dialog === 'create' && (
+      {dialog === "create" && (
         <TimelineCreateDialog
           open
           close={() => {

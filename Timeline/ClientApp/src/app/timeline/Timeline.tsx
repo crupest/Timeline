@@ -1,9 +1,9 @@
-import React from 'react';
-import clsx from 'clsx';
+import React from "react";
+import clsx from "clsx";
 
-import { TimelinePostInfo } from '../data/timeline';
+import { TimelinePostInfo } from "../data/timeline";
 
-import TimelineItem from './TimelineItem';
+import TimelineItem from "./TimelineItem";
 
 export interface TimelinePostInfoEx extends TimelinePostInfo {
   deletable: boolean;
@@ -53,7 +53,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   return (
     <div
       ref={props.containerRef}
-      className={clsx('container-fluid timeline', props.className)}
+      className={clsx("container-fluid timeline", props.className)}
     >
       <div className="timeline-enter-animation-mask" />
       {(() => {

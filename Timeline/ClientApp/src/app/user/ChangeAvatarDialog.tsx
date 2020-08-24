@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Modal,
   ModalHeader,
@@ -7,11 +7,11 @@ import {
   Button,
   ModalBody,
   ModalFooter,
-} from 'reactstrap';
-import { AxiosError } from 'axios';
+} from "reactstrap";
+import { AxiosError } from "axios";
 
-import ImageCropper, { Clip, applyClipToImage } from '../common/ImageCropper';
-import { UiLogicError } from '../common';
+import ImageCropper, { Clip, applyClipToImage } from "../common/ImageCropper";
+import { UiLogicError } from "../common";
 
 export interface ChangeAvatarDialogProps {
   open: boolean;
@@ -33,30 +33,30 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
   const [resultUrl, setResultUrl] = React.useState<string | null>(null);
 
   const [state, setState] = React.useState<
-    | 'select'
-    | 'crop'
-    | 'processcrop'
-    | 'preview'
-    | 'uploading'
-    | 'success'
-    | 'error'
-  >('select');
+    | "select"
+    | "crop"
+    | "processcrop"
+    | "preview"
+    | "uploading"
+    | "success"
+    | "error"
+  >("select");
 
   const [message, setMessage] = useState<
-    string | { type: 'custom'; text: string } | null
-  >('userPage.dialogChangeAvatar.prompt.select');
+    string | { type: "custom"; text: string } | null
+  >("userPage.dialogChangeAvatar.prompt.select");
 
   const trueMessage =
     message == null
       ? null
-      : typeof message === 'string'
+      : typeof message === "string"
       ? t(message)
       : message.text;
 
   const closeDialog = props.close;
 
   const toggle = React.useCallback((): void => {
-    if (!(state === 'uploading')) {
+    if (!(state === "uploading")) {
       closeDialog();
     }
   }, [state, closeDialog]);
@@ -66,13 +66,13 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       const url = URL.createObjectURL(file);
       setClip(null);
       setFileUrl(url);
-      setState('crop');
+      setState("crop");
       return () => {
         URL.revokeObjectURL(url);
       };
     } else {
       setFileUrl(null);
-      setState('select');
+      setState("select");
     }
   }, [file]);
 
@@ -80,7 +80,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
     if (resultBlob != null) {
       const url = URL.createObjectURL(resultBlob);
       setResultUrl(url);
-      setState('preview');
+      setState("preview");
       return () => {
         URL.revokeObjectURL(url);
       };
@@ -111,7 +111,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       throw new UiLogicError();
     }
 
-    setState('processcrop');
+    setState("processcrop");
     void applyClipToImage(cropImgElement, clip, file.type).then((b) => {
       setResultBlob(b);
     });
@@ -119,12 +119,12 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
 
   const onCropPrevious = React.useCallback(() => {
     setFile(null);
-    setState('select');
+    setState("select");
   }, []);
 
   const onPreviewPrevious = React.useCallback(() => {
     setResultBlob(null);
-    setState('crop');
+    setState("crop");
   }, []);
 
   const process = props.process;
@@ -134,14 +134,14 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       throw new UiLogicError();
     }
 
-    setState('uploading');
+    setState("uploading");
     process(resultBlob).then(
       () => {
-        setState('success');
+        setState("success");
       },
       (e: unknown) => {
-        setState('error');
-        setMessage({ type: 'custom', text: (e as AxiosError).message });
+        setState("error");
+        setMessage({ type: "custom", text: (e as AxiosError).message });
       }
     );
   }, [resultBlob, process]);
@@ -155,7 +155,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
         <img
           className="change-avatar-img"
           src={resultUrl}
-          alt={t('userPage.dialogChangeAvatar.previewImgAlt')}
+          alt={t("userPage.dialogChangeAvatar.previewImgAlt")}
         />
       </Row>
     );
@@ -163,25 +163,25 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
 
   return (
     <Modal isOpen={props.open} toggle={toggle}>
-      <ModalHeader> {t('userPage.dialogChangeAvatar.title')}</ModalHeader>
+      <ModalHeader> {t("userPage.dialogChangeAvatar.title")}</ModalHeader>
       {(() => {
-        if (state === 'select') {
+        if (state === "select") {
           return (
             <>
               <ModalBody className="container">
-                <Row>{t('userPage.dialogChangeAvatar.prompt.select')}</Row>
+                <Row>{t("userPage.dialogChangeAvatar.prompt.select")}</Row>
                 <Row>
                   <input type="file" accept="image/*" onChange={onSelectFile} />
                 </Row>
               </ModalBody>
               <ModalFooter>
                 <Button color="secondary" onClick={toggle}>
-                  {t('operationDialog.cancel')}
+                  {t("operationDialog.cancel")}
                 </Button>
               </ModalFooter>
             </>
           );
-        } else if (state === 'crop') {
+        } else if (state === "crop") {
           if (fileUrl == null) {
             throw new UiLogicError();
           }
@@ -196,14 +196,14 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                     imageElementCallback={setCropImgElement}
                   />
                 </Row>
-                <Row>{t('userPage.dialogChangeAvatar.prompt.crop')}</Row>
+                <Row>{t("userPage.dialogChangeAvatar.prompt.crop")}</Row>
               </ModalBody>
               <ModalFooter>
                 <Button color="secondary" onClick={toggle}>
-                  {t('operationDialog.cancel')}
+                  {t("operationDialog.cancel")}
                 </Button>
                 <Button color="secondary" onClick={onCropPrevious}>
-                  {t('operationDialog.previousStep')}
+                  {t("operationDialog.previousStep")}
                 </Button>
                 <Button
                   color="primary"
@@ -212,70 +212,70 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                     cropImgElement == null || clip == null || clip.width === 0
                   }
                 >
-                  {t('operationDialog.nextStep')}
+                  {t("operationDialog.nextStep")}
                 </Button>
               </ModalFooter>
             </>
           );
-        } else if (state === 'processcrop') {
+        } else if (state === "processcrop") {
           return (
             <>
               <ModalBody className="container">
                 <Row>
-                  {t('userPage.dialogChangeAvatar.prompt.processingCrop')}
+                  {t("userPage.dialogChangeAvatar.prompt.processingCrop")}
                 </Row>
               </ModalBody>
               <ModalFooter>
                 <Button color="secondary" onClick={toggle}>
-                  {t('operationDialog.cancel')}
+                  {t("operationDialog.cancel")}
                 </Button>
                 <Button color="secondary" onClick={onPreviewPrevious}>
-                  {t('operationDialog.previousStep')}
+                  {t("operationDialog.previousStep")}
                 </Button>
               </ModalFooter>
             </>
           );
-        } else if (state === 'preview') {
+        } else if (state === "preview") {
           return (
             <>
               <ModalBody className="container">
                 {createPreviewRow()}
-                <Row>{t('userPage.dialogChangeAvatar.prompt.preview')}</Row>
+                <Row>{t("userPage.dialogChangeAvatar.prompt.preview")}</Row>
               </ModalBody>
               <ModalFooter>
                 <Button color="secondary" onClick={toggle}>
-                  {t('operationDialog.cancel')}
+                  {t("operationDialog.cancel")}
                 </Button>
                 <Button color="secondary" onClick={onPreviewPrevious}>
-                  {t('operationDialog.previousStep')}
+                  {t("operationDialog.previousStep")}
                 </Button>
                 <Button color="primary" onClick={upload}>
-                  {t('userPage.dialogChangeAvatar.upload')}
+                  {t("userPage.dialogChangeAvatar.upload")}
                 </Button>
               </ModalFooter>
             </>
           );
-        } else if (state === 'uploading') {
+        } else if (state === "uploading") {
           return (
             <>
               <ModalBody className="container">
                 {createPreviewRow()}
-                <Row>{t('userPage.dialogChangeAvatar.prompt.uploading')}</Row>
+                <Row>{t("userPage.dialogChangeAvatar.prompt.uploading")}</Row>
               </ModalBody>
               <ModalFooter></ModalFooter>
             </>
           );
-        } else if (state === 'success') {
+        } else if (state === "success") {
           return (
             <>
               <ModalBody className="container">
                 <Row className="p-4 text-success">
-                  {t('operationDialog.success')}
+                  {t("operationDialog.success")}
                 </Row>
               </ModalBody>
               <ModalFooter>
                 <Button color="success" onClick={toggle}>
-                  {t('operationDialog.ok')}
+                  {t("operationDialog.ok")}
                 </Button>
               </ModalFooter>
             </>
@@ -289,10 +289,10 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
               </ModalBody>
               <ModalFooter>
                 <Button color="secondary" onClick={toggle}>
-                  {t('operationDialog.cancel')}
+                  {t("operationDialog.cancel")}
                 </Button>
                 <Button color="primary" onClick={upload}>
-                  {t('operationDialog.retry')}
+                  {t("operationDialog.retry")}
                 </Button>
               </ModalFooter>
             </>
