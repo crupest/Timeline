@@ -5,7 +5,6 @@ import {
   kTimelineVisibilities,
   TimelineChangePropertyRequest,
 } from "../data/timeline";
-
 import OperationDialog, {
   OperationSelectInputInfoOption,
 } from "../common/OperationDialog";

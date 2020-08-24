@@ -11,7 +11,6 @@ import {
 } from "reactstrap";
 
 import { User, useAvatar } from "../data/user";
-
 import SearchInput from "../common/SearchInput";
 import BlobImage from "../common/BlobImage";
 

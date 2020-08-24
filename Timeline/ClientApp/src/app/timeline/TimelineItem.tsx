@@ -12,12 +12,10 @@ import {
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Svg from "react-inlinesvg";
-
 import chevronDownIcon from "bootstrap-icons/icons/chevron-down.svg";
 import trashIcon from "bootstrap-icons/icons/trash.svg";
 
 import BlobImage from "../common/BlobImage";
-
 import { useAvatar } from "../data/user";
 import { TimelinePostInfo } from "../data/timeline";
 

@@ -3,12 +3,12 @@ import { useParams } from "react-router";
 
 import { UiLogicError } from "../common";
 import { useUser, userInfoService } from "../data/user";
-import { changeNickname } from "./api";
+import TimelinePageTemplate from "../timeline/TimelinePageTemplate";
 
+import { changeNickname } from "./api";
 import UserPage from "./UserPage";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
-import TimelinePageTemplate from "../timeline/TimelinePageTemplate";
 import { PersonalTimelineManageItem } from "./UserInfoCard";
 
 const User: React.FC = (_) => {

@@ -2,7 +2,6 @@ import React from "react";
 import { Row, Col } from "reactstrap";
 
 import { TimelineInfo } from "../data/timeline";
-
 import { getHttpTimelineClient } from "../http/timeline";
 
 import TimelineBoard from "./TimelineBoard";

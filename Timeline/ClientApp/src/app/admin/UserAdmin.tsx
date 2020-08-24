@@ -13,7 +13,6 @@ import {
 import axios from "axios";
 
 import OperationDialog from "../common/OperationDialog";
-
 import { User, UserWithToken } from "../data/user";
 
 const apiBaseUrl = "/api";

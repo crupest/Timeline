@@ -1,10 +1,10 @@
 import React from "react";
 import { useTranslation, Trans } from "react-i18next";
 
+import AppBar from "../common/AppBar";
+
 import authorAvatarUrl from "./author-avatar.png";
 import githubLogoUrl from "./github.png";
-
-import AppBar from "../common/AppBar";
 
 const frontendCredits: {
   name: string;

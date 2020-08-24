@@ -10,7 +10,6 @@ import {
 } from "../user";
 
 import { mockStorage, sha1, mockPrepare } from "./common";
-
 import defaultAvatarUrl from "./default-avatar.png";
 
 let _defaultAvatar: BlobWithEtag | undefined = undefined;

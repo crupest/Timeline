@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { getAllCachedTimelineNames } from "../data/timeline";
-
 import UserTimelineLogo from "../common/UserTimelineLogo";
 import TimelineLogo from "../common/TimelineLogo";
 

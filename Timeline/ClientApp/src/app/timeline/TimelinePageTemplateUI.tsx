@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { fromEvent } from "rxjs";
 import Svg from "react-inlinesvg";
 import clsx from "clsx";
-
 import arrowsAngleContractIcon from "bootstrap-icons/icons/arrows-angle-contract.svg";
 import arrowsAngleExpandIcon from "bootstrap-icons/icons/arrows-angle-expand.svg";
 
@@ -16,12 +15,12 @@ import {
   timelineService,
 } from "../data/timeline";
 import { userService } from "../data/user";
+import AppBar from "../common/AppBar";
 
 import Timeline, {
   TimelinePostInfoEx,
   TimelineDeleteCallback,
 } from "./Timeline";
-import AppBar from "../common/AppBar";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 
 type TimelinePostSyncState = "syncing" | "synced" | "offline";

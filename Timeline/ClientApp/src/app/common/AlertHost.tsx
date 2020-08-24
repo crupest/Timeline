@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { Alert } from "reactstrap";
 import without from "lodash/without";
 import concat from "lodash/concat";
+import { useTranslation } from "react-i18next";
 
 import {
   alertService,
@@ -9,7 +10,6 @@ import {
   kAlertHostId,
   AlertInfo,
 } from "./alert-service";
-import { useTranslation } from "react-i18next";
 
 interface AutoCloseAlertProps {
   alert: AlertInfo;
@@ -56,7 +56,7 @@ interface AlertInfoExEx extends AlertInfoEx {
   close: () => void;
 }
 
-export const AlertHost: React.FC = () => {
+const AlertHost: React.FC = () => {
   const [alerts, setAlerts] = React.useState<AlertInfoExEx[]>([]);
 
   // react guarantee that state setters are stable, so we don't need to add it to dependency list

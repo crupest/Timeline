@@ -11,13 +11,13 @@ import {
   usePostList,
   useTimelineInfo,
 } from "../data/timeline";
+import { UiLogicError } from "../common";
 
 import { TimelineDeleteCallback } from "./Timeline";
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import { TimelinePageTemplateUIProps } from "./TimelinePageTemplateUI";
 import { TimelinePostSendCallback } from "./TimelinePostEdit";
-import { UiLogicError } from "../common";
 
 export interface TimelinePageTemplateProps<TManageItem> {
   name: string;

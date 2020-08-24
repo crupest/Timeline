@@ -5,7 +5,6 @@ import { Spinner } from "reactstrap";
 import { Trans } from "react-i18next";
 
 import { TimelineInfo } from "../data/timeline";
-
 import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
 

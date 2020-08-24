@@ -10,9 +10,9 @@ import {
 import classnames from "classnames";
 
 import AppBar from "../common/AppBar";
-import UserAdmin from "./UserAdmin";
-
 import { UserWithToken } from "../data/user";
+
+import UserAdmin from "./UserAdmin";
 
 interface AdminProps {
   user: UserWithToken;

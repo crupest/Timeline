@@ -1,10 +1,6 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-
-import AppBar from "../common/AppBar";
-
-import { useUser, userService } from "../data/user";
 import {
   Label,
   FormGroup,
@@ -14,6 +10,9 @@ import {
   Spinner,
   Button,
 } from "reactstrap";
+
+import AppBar from "../common/AppBar";
+import { useUser, userService } from "../data/user";
 
 const Login: React.FC = (_) => {
   const { t } = useTranslation();
