@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 
 import {
   apiBaseUrl,
@@ -10,7 +10,7 @@ import {
   BlobWithEtag,
   convertToBlobWithEtag,
   convertToNotModified,
-} from './common';
+} from "./common";
 
 export interface HttpUser {
   uniqueId: string;
@@ -84,13 +84,13 @@ export class HttpUserClient implements IHttpUserClient {
     const headers =
       etag != null
         ? {
-            'If-None-Match': etag,
+            "If-None-Match": etag,
           }
         : undefined;
 
     return axios
       .get(`${apiBaseUrl}/users/${username}/avatar`, {
-        responseType: 'blob',
+        responseType: "blob",
         headers,
       })
       .then(convertToBlobWithEtag)
@@ -103,7 +103,7 @@ export class HttpUserClient implements IHttpUserClient {
     return axios
       .put(`${apiBaseUrl}/users/${username}/avatar?token=${token}`, data, {
         headers: {
-          'Content-Type': data.type,
+          "Content-Type": data.type,
         },
       })
       .catch(convertToNetworkError)

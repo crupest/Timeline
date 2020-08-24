@@ -1,58 +1,58 @@
-import React from 'react';
-import { useTranslation, Trans } from 'react-i18next';
+import React from "react";
+import { useTranslation, Trans } from "react-i18next";
 
-import authorAvatarUrl from './author-avatar.png';
-import githubLogoUrl from './github.png';
+import authorAvatarUrl from "./author-avatar.png";
+import githubLogoUrl from "./github.png";
 
-import AppBar from '../common/AppBar';
+import AppBar from "../common/AppBar";
 
 const frontendCredits: {
   name: string;
   url: string;
 }[] = [
   {
-    name: 'reactjs',
-    url: 'https://reactjs.org',
+    name: "reactjs",
+    url: "https://reactjs.org",
   },
   {
-    name: 'typescript',
-    url: 'https://www.typescriptlang.org',
+    name: "typescript",
+    url: "https://www.typescriptlang.org",
   },
   {
-    name: 'bootstrap',
-    url: 'https://getbootstrap.com',
+    name: "bootstrap",
+    url: "https://getbootstrap.com",
   },
   {
-    name: 'reactstrap',
-    url: 'https://reactstrap.github.io',
+    name: "reactstrap",
+    url: "https://reactstrap.github.io",
   },
   {
-    name: 'babeljs',
-    url: 'https://babeljs.io',
+    name: "babeljs",
+    url: "https://babeljs.io",
   },
   {
-    name: 'webpack',
-    url: 'https://webpack.js.org',
+    name: "webpack",
+    url: "https://webpack.js.org",
   },
   {
-    name: 'sass',
-    url: 'https://sass-lang.com',
+    name: "sass",
+    url: "https://sass-lang.com",
   },
   {
-    name: 'eslint',
-    url: 'https://eslint.org',
+    name: "eslint",
+    url: "https://eslint.org",
   },
   {
-    name: 'prettier',
-    url: 'https://prettier.io',
+    name: "prettier",
+    url: "https://prettier.io",
   },
   {
-    name: 'pepjs',
-    url: 'https://github.com/jquery/PEP',
+    name: "pepjs",
+    url: "https://github.com/jquery/PEP",
   },
   {
-    name: 'react-inlinesvg',
-    url: 'https://github.com/gilbarbara/react-inlinesvg',
+    name: "react-inlinesvg",
+    url: "https://github.com/gilbarbara/react-inlinesvg",
   },
 ];
 
@@ -61,13 +61,13 @@ const backendCredits: {
   url: string;
 }[] = [
   {
-    name: 'ASP.NET Core',
-    url: 'https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core',
+    name: "ASP.NET Core",
+    url: "https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core",
   },
-  { name: 'sqlite', url: 'https://sqlite.org' },
+  { name: "sqlite", url: "https://sqlite.org" },
   {
-    name: 'ImageSharp',
-    url: 'https://github.com/SixLabors/ImageSharp',
+    name: "ImageSharp",
+    url: "https://github.com/SixLabors/ImageSharp",
   },
 ];
 
@@ -79,7 +79,7 @@ const About: React.FC = () => {
       <AppBar />
       <div className="mt-appbar px-2 mb-4">
         <div className="container mt-4 py-3 shadow border border-primary rounded bg-light">
-          <h4 id="author-info">{t('about.author.title')}</h4>
+          <h4 id="author-info">{t("about.author.title")}</h4>
           <div>
             <div className="d-flex">
               <img
@@ -88,21 +88,21 @@ const About: React.FC = () => {
               />
               <div>
                 <p>
-                  <small>{t('about.author.fullname')}</small>
+                  <small>{t("about.author.fullname")}</small>
                   <span className="text-primary">杨宇千</span>
                 </p>
                 <p>
-                  <small>{t('about.author.nickname')}</small>
+                  <small>{t("about.author.nickname")}</small>
                   <span className="text-primary">crupest</span>
                 </p>
                 <p>
-                  <small>{t('about.author.introduction')}</small>
-                  {t('about.author.introductionContent')}
+                  <small>{t("about.author.introduction")}</small>
+                  {t("about.author.introductionContent")}
                 </p>
               </div>
             </div>
             <p>
-              <small>{t('about.author.links')}</small>
+              <small>{t("about.author.links")}</small>
               <a
                 href="https://github.com/crupest"
                 target="_blank"
@@ -117,7 +117,7 @@ const About: React.FC = () => {
           </div>
         </div>
         <div className="container mt-4 py-3 shadow border border-primary rounded bg-light">
-          <h4>{t('about.site.title')}</h4>
+          <h4>{t("about.site.title")}</h4>
           <p>
             <Trans i18nKey="about.site.content">
               0<span className="text-primary">1</span>2<b>3</b>4
@@ -130,14 +130,14 @@ const About: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t('about.site.repo')}
+              {t("about.site.repo")}
             </a>
           </p>
         </div>
         <div className="container mt-4 py-3 shadow border border-primary rounded bg-light">
-          <h4>{t('about.credits.title')}</h4>
-          <p>{t('about.credits.content')}</p>
-          <p>{t('about.credits.frontend')}</p>
+          <h4>{t("about.credits.title")}</h4>
+          <p>{t("about.credits.content")}</p>
+          <p>{t("about.credits.frontend")}</p>
           <ul>
             {frontendCredits.map((item, index) => {
               return (
@@ -150,7 +150,7 @@ const About: React.FC = () => {
             })}
             <li>...</li>
           </ul>
-          <p>{t('about.credits.backend')}</p>
+          <p>{t("about.credits.backend")}</p>
           <ul>
             {backendCredits.map((item, index) => {
               return (

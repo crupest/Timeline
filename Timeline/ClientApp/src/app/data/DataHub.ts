@@ -1,6 +1,6 @@
-import { pull } from 'lodash';
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { pull } from "lodash";
+import { Observable, BehaviorSubject, combineLatest } from "rxjs";
+import { map } from "rxjs/operators";
 
 export type Subscriber<TData> = (data: TData) => void;
 
@@ -117,10 +117,10 @@ export class DataHub<TKey, TData> {
     this.keyToString =
       config?.keyToString ??
       ((value): string => {
-        if (typeof value === 'string') return value;
+        if (typeof value === "string") return value;
         else
           throw new Error(
-            'Default keyToString function only pass string value.'
+            "Default keyToString function only pass string value."
           );
       });
 

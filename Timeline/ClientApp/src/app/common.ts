@@ -1,5 +1,5 @@
-import React from 'react';
-import { Observable, Subject } from 'rxjs';
+import React from "react";
+import { Observable, Subject } from "rxjs";
 
 // This error is thrown when ui goes wrong with bad logic.
 // Such as a variable should not be null, but it does.

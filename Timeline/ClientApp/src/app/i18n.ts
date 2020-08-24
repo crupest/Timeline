@@ -1,9 +1,9 @@
-import i18n, { BackendModule, ResourceKey } from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import { initReactI18next } from 'react-i18next';
+import i18n, { BackendModule, ResourceKey } from "i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import { initReactI18next } from "react-i18next";
 
 const backend: BackendModule = {
-  type: 'backend',
+  type: "backend",
   async read(language, namespace, callback) {
     function error(message: string): void {
       callback(new Error(message), false);
@@ -13,21 +13,21 @@ const backend: BackendModule = {
       callback(null, result);
     }
 
-    if (namespace !== 'translation') {
+    if (namespace !== "translation") {
       error("Namespace must be 'translation'.");
     }
 
-    if (language === 'en') {
+    if (language === "en") {
       const res = (
         await import(
-          /* webpackChunkName: "locales-en" */ './locales/en/translation'
+          /* webpackChunkName: "locales-en" */ "./locales/en/translation"
         )
       ).default;
       success(res);
-    } else if (language === 'zh-cn' || language === 'zh') {
+    } else if (language === "zh-cn" || language === "zh") {
       const res = (
         await import(
-          /* webpackChunkName: "locales-zh" */ './locales/zh/translation'
+          /* webpackChunkName: "locales-zh" */ "./locales/zh/translation"
         )
       ).default;
       success(res);
@@ -47,7 +47,7 @@ export const i18nPromise = i18n
     fallbackLng: false,
     lowerCaseLng: true,
 
-    debug: process.env.NODE_ENV === 'development',
+    debug: process.env.NODE_ENV === "development",
 
     interpolation: {
       escapeValue: false, // not needed for react!!
@@ -69,7 +69,7 @@ export const i18nPromise = i18n
 
 if (module.hot) {
   module.hot.accept(
-    ['./locales/en/translation', './locales/zh/translation'],
+    ["./locales/en/translation", "./locales/zh/translation"],
     () => {
       void i18n.reloadResources();
     }

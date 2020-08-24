@@ -1,12 +1,12 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from "axios";
 
-export const apiBaseUrl = '/api';
+export const apiBaseUrl = "/api";
 
 export function base64(blob: Blob): Promise<string> {
   return new Promise<string>((resolve) => {
     const reader = new FileReader();
     reader.onload = function () {
-      resolve((reader.result as string).replace(/^data:.+;base64,/, ''));
+      resolve((reader.result as string).replace(/^data:.+;base64,/, ""));
     };
     reader.readAsDataURL(blob);
   });
@@ -15,7 +15,7 @@ export function base64(blob: Blob): Promise<string> {
 export function extractStatusCode(error: AxiosError): number | null {
   if (error.isAxiosError) {
     const code = error?.response?.status;
-    if (typeof code === 'number') {
+    if (typeof code === "number") {
       return code;
     }
   }
@@ -32,7 +32,7 @@ export function extractErrorCode(
 ): number | null {
   if (error.isAxiosError) {
     const code = error.response?.data?.code;
-    if (typeof code === 'number') {
+    if (typeof code === "number") {
       return code;
     }
   }
@@ -156,6 +156,6 @@ export function convertToNotModified(
 export function convertToBlobWithEtag(res: AxiosResponse<Blob>): BlobWithEtag {
   return {
     data: res.data,
-    etag: (res.headers as Record<'etag', string>)['etag'],
+    etag: (res.headers as Record<"etag", string>)["etag"],
   };
 }

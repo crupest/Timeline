@@ -1,12 +1,12 @@
-import React, { SVGAttributes } from 'react';
+import React, { SVGAttributes } from "react";
 
 export interface UserTimelineLogoProps extends SVGAttributes<SVGElement> {
   color?: string;
 }
 
-const UserTimelineLogo: React.FC<UserTimelineLogoProps> = props => {
+const UserTimelineLogo: React.FC<UserTimelineLogoProps> = (props) => {
   const { color, ...forwardProps } = props;
-  const coercedColor = color ?? 'currentcolor';
+  const coercedColor = color ?? "currentcolor";
 
   return (
     <svg viewBox="0 0 100 100" {...forwardProps}>

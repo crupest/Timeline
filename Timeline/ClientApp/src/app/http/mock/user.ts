@@ -1,17 +1,17 @@
-import axios from 'axios';
+import axios from "axios";
 
-import { BlobWithEtag, NotModified } from '../common';
+import { BlobWithEtag, NotModified } from "../common";
 import {
   IHttpUserClient,
   HttpUser,
   HttpUserNotExistError,
   HttpUserPatchRequest,
   HttpChangePasswordRequest,
-} from '../user';
+} from "../user";
 
-import { mockStorage, sha1, mockPrepare } from './common';
+import { mockStorage, sha1, mockPrepare } from "./common";
 
-import defaultAvatarUrl from './default-avatar.png';
+import defaultAvatarUrl from "./default-avatar.png";
 
 let _defaultAvatar: BlobWithEtag | undefined = undefined;
 
@@ -19,7 +19,7 @@ async function getDefaultAvatar(): Promise<BlobWithEtag> {
   if (_defaultAvatar == null) {
     const blob = (
       await axios.get<Blob>(defaultAvatarUrl, {
-        responseType: 'blob',
+        responseType: "blob",
       })
     ).data;
     const etag = await sha1(blob);
@@ -33,7 +33,7 @@ async function getDefaultAvatar(): Promise<BlobWithEtag> {
 
 export class MockTokenError extends Error {
   constructor() {
-    super('Token bad format.');
+    super("Token bad format.");
   }
 }
 
@@ -45,24 +45,24 @@ export class MockUserNotExistError extends Error {
 
 export function checkUsername(
   username: string
-): asserts username is 'user' | 'admin' {
-  if (!['user', 'admin'].includes(username)) throw new MockUserNotExistError();
+): asserts username is "user" | "admin" {
+  if (!["user", "admin"].includes(username)) throw new MockUserNotExistError();
 }
 
 export function checkToken(token: string): string {
-  if (!token.startsWith('token-')) {
+  if (!token.startsWith("token-")) {
     throw new MockTokenError();
   }
   return token.substr(6);
 }
 
 const uniqueIdMap = {
-  user: 'e4c80127d092d9b2fc19c5e04612d4c0',
-  admin: '5640fa45435f9a55077b9f77c42a77bb',
+  user: "e4c80127d092d9b2fc19c5e04612d4c0",
+  admin: "5640fa45435f9a55077b9f77c42a77bb",
 };
 
 export async function getUser(
-  username: 'user' | 'admin' | string
+  username: "user" | "admin" | string
 ): Promise<HttpUser> {
   checkUsername(username);
   const savedNickname = await mockStorage.getItem<string>(
@@ -72,14 +72,14 @@ export async function getUser(
     uniqueId: uniqueIdMap[username],
     username: username,
     nickname:
-      savedNickname == null || savedNickname === '' ? username : savedNickname,
-    administrator: username === 'admin',
+      savedNickname == null || savedNickname === "" ? username : savedNickname,
+    administrator: username === "admin",
   };
 }
 
 export class MockHttpUserClient implements IHttpUserClient {
   async get(username: string): Promise<HttpUser> {
-    await mockPrepare('user.get');
+    await mockPrepare("user.get");
     return await getUser(username).catch((e) => {
       if (e instanceof MockUserNotExistError) {
         throw new HttpUserNotExistError();
@@ -94,7 +94,7 @@ export class MockHttpUserClient implements IHttpUserClient {
     req: HttpUserPatchRequest,
     _token: string
   ): Promise<HttpUser> {
-    await mockPrepare('user.patch');
+    await mockPrepare("user.patch");
     if (req.nickname != null) {
       await mockStorage.setItem(`user.${username}.nickname`, req.nickname);
     }
@@ -106,7 +106,7 @@ export class MockHttpUserClient implements IHttpUserClient {
     username: string,
     etag?: string
   ): Promise<BlobWithEtag | NotModified> {
-    await mockPrepare('user.avatar.get');
+    await mockPrepare("user.avatar.get");
 
     const savedEtag = await mockStorage.getItem(`user.${username}.avatar.etag`);
     if (savedEtag == null) {
@@ -124,7 +124,7 @@ export class MockHttpUserClient implements IHttpUserClient {
   }
 
   async putAvatar(username: string, data: Blob, _token: string): Promise<void> {
-    await mockPrepare('user.avatar.put');
+    await mockPrepare("user.avatar.put");
     const etag = await sha1(data);
     await mockStorage.setItem<Blob>(`user.${username}.avatar.data`, data);
     await mockStorage.setItem<string>(`user.${username}.avatar.etag`, etag);
@@ -134,7 +134,7 @@ export class MockHttpUserClient implements IHttpUserClient {
     _req: HttpChangePasswordRequest,
     _token: string
   ): Promise<void> {
-    await mockPrepare('userop.changepassowrd');
-    throw new Error('Not Implemented.');
+    await mockPrepare("userop.changepassowrd");
+    throw new Error("Not Implemented.");
   }
 }

@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { AxiosError } from "axios";
 
 import {
   IHttpTokenClient,
@@ -6,15 +6,15 @@ import {
   HttpCreateTokenResponse,
   HttpVerifyTokenRequest,
   HttpVerifyTokenResponse,
-} from '../token';
+} from "../token";
 
-import { mockPrepare } from './common';
-import { getUser, MockUserNotExistError, checkToken } from './user';
+import { mockPrepare } from "./common";
+import { getUser, MockUserNotExistError, checkToken } from "./user";
 
 export class MockHttpTokenClient implements IHttpTokenClient {
   // TODO: Mock bad credentials error.
   async create(req: HttpCreateTokenRequest): Promise<HttpCreateTokenResponse> {
-    await mockPrepare('token.create');
+    await mockPrepare("token.create");
     try {
       const user = await getUser(req.username);
       return {
@@ -35,7 +35,7 @@ export class MockHttpTokenClient implements IHttpTokenClient {
   }
 
   async verify(req: HttpVerifyTokenRequest): Promise<HttpVerifyTokenResponse> {
-    await mockPrepare('token.verify');
+    await mockPrepare("token.verify");
     try {
       const user = await getUser(checkToken(req.token));
       return {

@@ -1,30 +1,30 @@
-import React from 'react';
-import { Row, Col } from 'reactstrap';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { Row, Col } from "reactstrap";
+import { useTranslation } from "react-i18next";
 
-import { UserWithToken } from '../data/user';
-import { TimelineInfo } from '../data/timeline';
+import { UserWithToken } from "../data/user";
+import { TimelineInfo } from "../data/timeline";
 
-import { getHttpTimelineClient } from '../http/timeline';
+import { getHttpTimelineClient } from "../http/timeline";
 
-import TimelineBoard from './TimelineBoard';
-import OfflineBoard from './OfflineBoard';
+import TimelineBoard from "./TimelineBoard";
+import OfflineBoard from "./OfflineBoard";
 
 const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
   const { t } = useTranslation();
 
   const [ownTimelines, setOwnTimelines] = React.useState<
-    TimelineInfo[] | 'offline' | 'loading'
-  >('loading');
+    TimelineInfo[] | "offline" | "loading"
+  >("loading");
   const [joinTimelines, setJoinTimelines] = React.useState<
-    TimelineInfo[] | 'offline' | 'loading'
-  >('loading');
+    TimelineInfo[] | "offline" | "loading"
+  >("loading");
 
   React.useEffect(() => {
     let subscribe = true;
-    if (ownTimelines === 'loading') {
+    if (ownTimelines === "loading") {
       void getHttpTimelineClient()
-        .listTimeline({ relate: user.username, relateType: 'own' })
+        .listTimeline({ relate: user.username, relateType: "own" })
         .then(
           (timelines) => {
             if (subscribe) {
@@ -32,7 +32,7 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
             }
           },
           () => {
-            setOwnTimelines('offline');
+            setOwnTimelines("offline");
           }
         );
     }
@@ -43,9 +43,9 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
 
   React.useEffect(() => {
     let subscribe = true;
-    if (joinTimelines === 'loading') {
+    if (joinTimelines === "loading") {
       void getHttpTimelineClient()
-        .listTimeline({ relate: user.username, relateType: 'join' })
+        .listTimeline({ relate: user.username, relateType: "join" })
         .then(
           (timelines) => {
             if (subscribe) {
@@ -53,7 +53,7 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
             }
           },
           () => {
-            setJoinTimelines('offline');
+            setJoinTimelines("offline");
           }
         );
     }
@@ -64,12 +64,12 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
 
   return (
     <Row className="my-2 justify-content-center">
-      {ownTimelines === 'offline' && joinTimelines === 'offline' ? (
+      {ownTimelines === "offline" && joinTimelines === "offline" ? (
         <Col className="py-2" sm="8" lg="6">
           <OfflineBoard
             onReload={() => {
-              setOwnTimelines('loading');
-              setJoinTimelines('loading');
+              setOwnTimelines("loading");
+              setJoinTimelines("loading");
             }}
           />
         </Col>
@@ -77,19 +77,19 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
         <>
           <Col sm="6" lg="5" className="py-2">
             <TimelineBoard
-              title={t('home.ownTimeline')}
+              title={t("home.ownTimeline")}
               timelines={ownTimelines}
               onReload={() => {
-                setOwnTimelines('loading');
+                setOwnTimelines("loading");
               }}
             />
           </Col>
           <Col sm="6" lg="5" className="py-2">
             <TimelineBoard
-              title={t('home.joinTimeline')}
+              title={t("home.joinTimeline")}
               timelines={joinTimelines}
               onReload={() => {
-                setJoinTimelines('loading');
+                setJoinTimelines("loading");
               }}
             />
           </Col>

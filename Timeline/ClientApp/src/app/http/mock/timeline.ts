@@ -1,6 +1,6 @@
-import { random, without, range } from 'lodash';
+import { random, without, range } from "lodash";
 
-import { BlobWithEtag, NotModified } from '../common';
+import { BlobWithEtag, NotModified } from "../common";
 import {
   IHttpTimelineClient,
   HttpTimelineInfo,
@@ -15,28 +15,28 @@ import {
   HttpTimelinePostPostRequest,
   HttpTimelinePostNotExistError,
   HttpTimelineGenericPostInfo,
-} from '../timeline';
-import { HttpUser } from '../user';
+} from "../timeline";
+import { HttpUser } from "../user";
 
-import { mockStorage, sha1, mockPrepare } from './common';
-import { getUser, MockUserNotExistError, checkToken } from './user';
+import { mockStorage, sha1, mockPrepare } from "./common";
+import { getUser, MockUserNotExistError, checkToken } from "./user";
 
 async function getTimelineNameList(): Promise<string[]> {
-  return (await mockStorage.getItem<string[]>('timelines')) ?? [];
+  return (await mockStorage.getItem<string[]>("timelines")) ?? [];
 }
 
 async function setTimelineNameList(newOne: string[]): Promise<void> {
-  await mockStorage.setItem<string[]>('timelines', newOne);
+  await mockStorage.setItem<string[]>("timelines", newOne);
 }
 
 type TimelinePropertyKey =
-  | 'uniqueId'
-  | 'lastModified'
-  | 'owner'
-  | 'description'
-  | 'visibility'
-  | 'members'
-  | 'currentPostId';
+  | "uniqueId"
+  | "lastModified"
+  | "owner"
+  | "description"
+  | "visibility"
+  | "members"
+  | "currentPostId";
 
 function getTimelinePropertyKey(
   name: string,
@@ -65,7 +65,7 @@ function setTimelinePropertyValue<T>(
 function updateTimelineLastModified(name: string): Promise<void> {
   return setTimelinePropertyValue(
     name,
-    'lastModified',
+    "lastModified",
     new Date().toISOString()
   );
 }
@@ -75,8 +75,8 @@ interface HttpTimelineInfoEx extends HttpTimelineInfo {
 }
 
 function createUniqueId(): string {
-  const s = 'abcdefghijklmnopqrstuvwxz0123456789';
-  let result = '';
+  const s = "abcdefghijklmnopqrstuvwxz0123456789";
+  let result = "";
   for (let i = 0; i < 16; i++) {
     result += s[random(0, s.length - 1)];
   }
@@ -85,34 +85,34 @@ function createUniqueId(): string {
 
 class MockTimelineNotExistError extends Error {
   constructor() {
-    super('Timeline not exist.');
+    super("Timeline not exist.");
   }
 }
 
 class MockTimelineAlreadyExistError extends Error {
   constructor() {
-    super('Timeline already exist.');
+    super("Timeline already exist.");
   }
 }
 
 async function getTimelineInfo(name: string): Promise<HttpTimelineInfoEx> {
   let owner: HttpUser;
-  if (name.startsWith('@')) {
+  if (name.startsWith("@")) {
     const ownerUsername = name.substr(1);
     owner = await getUser(ownerUsername);
     const optionalUniqueId = await getTimelinePropertyValue<string | null>(
       name,
-      'uniqueId'
+      "uniqueId"
     );
     if (optionalUniqueId == null) {
       await setTimelineNameList([...(await getTimelineNameList()), name]);
-      await setTimelinePropertyValue(name, 'uniqueId', createUniqueId());
+      await setTimelinePropertyValue(name, "uniqueId", createUniqueId());
       await updateTimelineLastModified(name);
     }
   } else {
     const optionalOwnerUsername = await getTimelinePropertyValue<string | null>(
       name,
-      'owner'
+      "owner"
     );
     if (optionalOwnerUsername == null) {
       throw new MockTimelineNotExistError();
@@ -122,7 +122,7 @@ async function getTimelineInfo(name: string): Promise<HttpTimelineInfoEx> {
   }
 
   const memberUsernames =
-    (await getTimelinePropertyValue<string[] | null>(name, 'members')) ?? [];
+    (await getTimelinePropertyValue<string[] | null>(name, "members")) ?? [];
   const members = await Promise.all(
     memberUsernames.map(async (username) => {
       return await getUser(username);
@@ -131,18 +131,18 @@ async function getTimelineInfo(name: string): Promise<HttpTimelineInfoEx> {
 
   return {
     name,
-    uniqueId: await getTimelinePropertyValue<string>(name, 'uniqueId'),
+    uniqueId: await getTimelinePropertyValue<string>(name, "uniqueId"),
     owner,
     description:
-      (await getTimelinePropertyValue<string | null>(name, 'description')) ??
-      '',
+      (await getTimelinePropertyValue<string | null>(name, "description")) ??
+      "",
     visibility:
       (await getTimelinePropertyValue<TimelineVisibility | null>(
         name,
-        'visibility'
-      )) ?? 'Register',
+        "visibility"
+      )) ?? "Register",
     lastModified: new Date(
-      await getTimelinePropertyValue<string>(name, 'lastModified')
+      await getTimelinePropertyValue<string>(name, "lastModified")
     ),
     members,
     memberUsernames,
@@ -152,25 +152,25 @@ async function getTimelineInfo(name: string): Promise<HttpTimelineInfoEx> {
 async function createTimeline(name: string, owner: string): Promise<void> {
   const optionalOwnerUsername = await getTimelinePropertyValue<string | null>(
     name,
-    'owner'
+    "owner"
   );
   if (optionalOwnerUsername != null) {
     throw new MockTimelineAlreadyExistError();
   }
 
   await setTimelineNameList([...(await getTimelineNameList()), name]);
-  await setTimelinePropertyValue(name, 'uniqueId', createUniqueId());
-  await setTimelinePropertyValue(name, 'owner', owner);
+  await setTimelinePropertyValue(name, "uniqueId", createUniqueId());
+  await setTimelinePropertyValue(name, "owner", owner);
   await updateTimelineLastModified(name);
 }
 
 type TimelinePostPropertyKey =
-  | 'type'
-  | 'data'
-  | 'etag'
-  | 'author'
-  | 'time'
-  | 'lastUpdated';
+  | "type"
+  | "data"
+  | "etag"
+  | "author"
+  | "time"
+  | "lastUpdated";
 
 function getTimelinePostPropertyKey(
   timelineName: string,
@@ -218,7 +218,7 @@ async function getTimelinePostInfo(
 ): Promise<HttpTimelineGenericPostInfo> {
   const currentPostId = await getTimelinePropertyValue<number | null>(
     timelineName,
-    'currentPostId'
+    "currentPostId"
   );
   if (currentPostId == null || id > currentPostId) {
     throw new HttpTimelinePostNotExistError();
@@ -227,53 +227,53 @@ async function getTimelinePostInfo(
   const type = await getTimelinePostPropertyValue<string | null>(
     timelineName,
     id,
-    'type'
+    "type"
   );
 
   if (type == null) {
     return {
       id,
       author: await getUser(
-        await getTimelinePostPropertyValue<string>(timelineName, id, 'author')
+        await getTimelinePostPropertyValue<string>(timelineName, id, "author")
       ),
       time: new Date(
-        await getTimelinePostPropertyValue<string>(timelineName, id, 'time')
+        await getTimelinePostPropertyValue<string>(timelineName, id, "time")
       ),
       lastUpdated: new Date(
         await getTimelinePostPropertyValue<string>(
           timelineName,
           id,
-          'lastUpdated'
+          "lastUpdated"
         )
       ),
       deleted: true,
     };
   } else {
     let content: HttpTimelinePostContent;
-    if (type === 'text') {
+    if (type === "text") {
       content = {
-        type: 'text',
-        text: await getTimelinePostPropertyValue(timelineName, id, 'data'),
+        type: "text",
+        text: await getTimelinePostPropertyValue(timelineName, id, "data"),
       };
     } else {
       content = {
-        type: 'image',
+        type: "image",
       };
     }
 
     return {
       id,
       author: await getUser(
-        await getTimelinePostPropertyValue<string>(timelineName, id, 'author')
+        await getTimelinePostPropertyValue<string>(timelineName, id, "author")
       ),
       time: new Date(
-        await getTimelinePostPropertyValue<string>(timelineName, id, 'time')
+        await getTimelinePostPropertyValue<string>(timelineName, id, "time")
       ),
       lastUpdated: new Date(
         await getTimelinePostPropertyValue<string>(
           timelineName,
           id,
-          'lastUpdated'
+          "lastUpdated"
         )
       ),
       content,
@@ -286,7 +286,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
   async listTimeline(
     query: HttpTimelineListQuery
   ): Promise<HttpTimelineInfo[]> {
-    await mockPrepare('timeline.list');
+    await mockPrepare("timeline.list");
     return (
       await Promise.all(
         (await getTimelineNameList()).map((name) => getTimelineInfo(name))
@@ -299,11 +299,11 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
         return false;
       }
       if (query.relate != null) {
-        if (query.relateType === 'own') {
+        if (query.relateType === "own") {
           if (timeline.owner.username !== query.relate) {
             return false;
           }
-        } else if (query.relateType === 'join') {
+        } else if (query.relateType === "join") {
           if (!timeline.memberUsernames.includes(query.relate)) {
             return false;
           }
@@ -339,7 +339,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
       ifModifiedSince?: Date;
     }
   ): Promise<HttpTimelineInfo | NotModified> {
-    await mockPrepare('timeline.get');
+    await mockPrepare("timeline.get");
     try {
       const timeline = await getTimelineInfo(timelineName);
       if (query != null && query.ifModifiedSince != null) {
@@ -373,7 +373,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     req: HttpTimelinePostRequest,
     token: string
   ): Promise<HttpTimelineInfo> {
-    await mockPrepare('timeline.post');
+    await mockPrepare("timeline.post");
     const user = checkToken(token);
     try {
       await createTimeline(req.name, user);
@@ -391,13 +391,13 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     req: HttpTimelinePatchRequest,
     _token: string
   ): Promise<HttpTimelineInfo> {
-    await mockPrepare('timeline.patch');
+    await mockPrepare("timeline.patch");
     let modified = false;
     if (req.description != null) {
       modified = true;
       await setTimelinePropertyValue(
         timelineName,
-        'description',
+        "description",
         req.description
       );
     }
@@ -405,7 +405,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
       modified = true;
       await setTimelinePropertyValue(
         timelineName,
-        'visibility',
+        "visibility",
         req.visibility
       );
     }
@@ -416,12 +416,12 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
   }
 
   async deleteTimeline(timelineName: string, _token: string): Promise<void> {
-    await mockPrepare('timeline.delete');
+    await mockPrepare("timeline.delete");
     await setTimelineNameList(
       without(await getTimelineNameList(), timelineName)
     );
     await mockStorage.removeItem(
-      getTimelinePropertyKey(timelineName, 'uniqueId')
+      getTimelinePropertyKey(timelineName, "uniqueId")
     );
 
     // TODO: remove other things
@@ -432,14 +432,14 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     username: string,
     _token: string
   ): Promise<void> {
-    await mockPrepare('timeline.member.put');
+    await mockPrepare("timeline.member.put");
     const oldMembers =
       (await getTimelinePropertyValue<string[] | null>(
         timelineName,
-        'members'
+        "members"
       )) ?? [];
     if (!oldMembers.includes(username)) {
-      await setTimelinePropertyValue(timelineName, 'members', [
+      await setTimelinePropertyValue(timelineName, "members", [
         ...oldMembers,
         username,
       ]);
@@ -452,16 +452,16 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     username: string,
     _token: string
   ): Promise<void> {
-    await mockPrepare('timeline.member.delete');
+    await mockPrepare("timeline.member.delete");
     const oldMembers =
       (await getTimelinePropertyValue<string[] | null>(
         timelineName,
-        'members'
+        "members"
       )) ?? [];
     if (oldMembers.includes(username)) {
       await setTimelinePropertyValue(
         timelineName,
-        'members',
+        "members",
         without(oldMembers, username)
       );
       await updateTimelineLastModified(timelineName);
@@ -496,12 +496,12 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
       includeDeleted?: boolean;
     }
   ): Promise<HttpTimelineGenericPostInfo[]> {
-    await mockPrepare('timeline.post.list');
+    await mockPrepare("timeline.post.list");
     // TODO: Permission check.
 
     const currentPostId = await getTimelinePropertyValue<number | null>(
       timelineName,
-      'currentPostId'
+      "currentPostId"
     );
 
     return (
@@ -538,24 +538,24 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     _token?: string,
     etag?: string
   ): Promise<BlobWithEtag | NotModified> {
-    await mockPrepare('timeline.post.data.get');
+    await mockPrepare("timeline.post.data.get");
     // TODO: Permission check.
 
     const optionalSavedEtag = await getTimelinePostPropertyValue<string>(
       timelineName,
       postId,
-      'etag'
+      "etag"
     );
 
     if (optionalSavedEtag == null) {
       const optionalType = await getTimelinePostPropertyValue<string>(
         timelineName,
         postId,
-        'type'
+        "type"
       );
 
       if (optionalType != null) {
-        throw new Error('Post of this type has no data.');
+        throw new Error("Post of this type has no data.");
       } else {
         throw new HttpTimelinePostNotExistError();
       }
@@ -569,7 +569,7 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
       data: await getTimelinePostPropertyValue<Blob>(
         timelineName,
         postId,
-        'data'
+        "data"
       ),
       etag: optionalSavedEtag,
     };
@@ -580,54 +580,54 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     req: HttpTimelinePostPostRequest,
     token: string
   ): Promise<HttpTimelinePostInfo> {
-    await mockPrepare('timeline.post.post');
+    await mockPrepare("timeline.post.post");
     const user = checkToken(token);
 
     const savedId = await getTimelinePropertyValue<number | null>(
       timelineName,
-      'currentPostId'
+      "currentPostId"
     );
     const id = savedId ? savedId + 1 : 1;
-    await setTimelinePropertyValue(timelineName, 'currentPostId', id);
+    await setTimelinePropertyValue(timelineName, "currentPostId", id);
 
-    await setTimelinePostPropertyValue(timelineName, id, 'author', user);
+    await setTimelinePostPropertyValue(timelineName, id, "author", user);
 
     const currentTimeString = new Date().toISOString();
     await setTimelinePostPropertyValue(
       timelineName,
       id,
-      'lastUpdated',
+      "lastUpdated",
       currentTimeString
     );
 
     await setTimelinePostPropertyValue(
       timelineName,
       id,
-      'time',
+      "time",
       req.time != null ? req.time.toISOString() : currentTimeString
     );
 
     const { content } = req;
-    if (content.type === 'text') {
-      await setTimelinePostPropertyValue(timelineName, id, 'type', 'text');
+    if (content.type === "text") {
+      await setTimelinePostPropertyValue(timelineName, id, "type", "text");
       await setTimelinePostPropertyValue(
         timelineName,
         id,
-        'data',
+        "data",
         content.text
       );
     } else {
-      await setTimelinePostPropertyValue(timelineName, id, 'type', 'image');
+      await setTimelinePostPropertyValue(timelineName, id, "type", "image");
       await setTimelinePostPropertyValue(
         timelineName,
         id,
-        'data',
+        "data",
         content.data
       );
       await setTimelinePostPropertyValue(
         timelineName,
         id,
-        'etag',
+        "etag",
         await sha1(content.data)
       );
     }
@@ -643,15 +643,15 @@ export class MockHttpTimelineClient implements IHttpTimelineClient {
     postId: number,
     _token: string
   ): Promise<void> {
-    await mockPrepare('timeline.post.delete');
+    await mockPrepare("timeline.post.delete");
     // TODO: permission check
-    await removeTimelinePostProperty(timelineName, postId, 'type');
-    await removeTimelinePostProperty(timelineName, postId, 'data');
-    await removeTimelinePostProperty(timelineName, postId, 'etag');
+    await removeTimelinePostProperty(timelineName, postId, "type");
+    await removeTimelinePostProperty(timelineName, postId, "data");
+    await removeTimelinePostProperty(timelineName, postId, "etag");
     await setTimelinePostPropertyValue(
       timelineName,
       postId,
-      'lastUpdated',
+      "lastUpdated",
       new Date().toISOString()
     );
   }

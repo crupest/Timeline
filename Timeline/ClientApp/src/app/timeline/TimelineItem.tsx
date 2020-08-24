@@ -1,5 +1,5 @@
-import React from 'react';
-import clsx from 'clsx';
+import React from "react";
+import clsx from "clsx";
 import {
   Row,
   Col,
@@ -8,18 +8,18 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-} from 'reactstrap';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import Svg from 'react-inlinesvg';
+} from "reactstrap";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import Svg from "react-inlinesvg";
 
-import chevronDownIcon from 'bootstrap-icons/icons/chevron-down.svg';
-import trashIcon from 'bootstrap-icons/icons/trash.svg';
+import chevronDownIcon from "bootstrap-icons/icons/chevron-down.svg";
+import trashIcon from "bootstrap-icons/icons/trash.svg";
 
-import BlobImage from '../common/BlobImage';
+import BlobImage from "../common/BlobImage";
 
-import { useAvatar } from '../data/user';
-import { TimelinePostInfo } from '../data/timeline';
+import { useAvatar } from "../data/user";
+import { TimelinePostInfo } from "../data/timeline";
 
 const TimelinePostDeleteConfirmDialog: React.FC<{
   toggle: () => void;
@@ -30,12 +30,12 @@ const TimelinePostDeleteConfirmDialog: React.FC<{
   return (
     <Modal toggle={toggle} isOpen centered>
       <ModalHeader className="text-danger">
-        {t('timeline.post.deleteDialog.title')}
+        {t("timeline.post.deleteDialog.title")}
       </ModalHeader>
-      <ModalBody>{t('timeline.post.deleteDialog.prompt')}</ModalBody>
+      <ModalBody>{t("timeline.post.deleteDialog.prompt")}</ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={toggle}>
-          {t('operationDialog.cancel')}
+          {t("operationDialog.cancel")}
         </Button>
         <Button
           color="danger"
@@ -44,7 +44,7 @@ const TimelinePostDeleteConfirmDialog: React.FC<{
             toggle();
           }}
         >
-          {t('operationDialog.confirm')}
+          {t("operationDialog.confirm")}
         </Button>
       </ModalFooter>
     </Modal>
@@ -83,8 +83,8 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
   return (
     <Row
       className={clsx(
-        'position-relative flex-nowrap',
-        current && 'current',
+        "position-relative flex-nowrap",
+        current && "current",
         props.className
       )}
       onClick={props.onClick}
@@ -126,7 +126,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
         <div className="row d-block timeline-content">
           <Link
             className="float-right float-sm-left mx-2"
-            to={'/users/' + props.post.author.username}
+            to={"/users/" + props.post.author.username}
           >
             <BlobImage
               onLoad={onResize}
@@ -136,7 +136,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           </Link>
           {(() => {
             const { content } = props.post;
-            if (content.type === 'text') {
+            if (content.type === "text") {
               return content.text;
             } else {
               return (
