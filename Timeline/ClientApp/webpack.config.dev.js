@@ -21,6 +21,20 @@ config.module
     plugins: ['react-hot-loader/babel'],
   });
 
+config.module
+  .rule('css')
+  .use('style')
+  .before('css')
+  .loader('style-loader')
+  .end();
+
+config.module
+  .rule('sass')
+  .use('style')
+  .before('css')
+  .loader('style-loader')
+  .end();
+
 config.devtool('eval-cheap-module-source-map');
 
 config.resolve.alias.set('react-dom', '@hot-loader/react-dom');

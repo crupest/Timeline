@@ -33,9 +33,6 @@ config.module
 config.module
   .rule('css')
   .test(/\.css$/)
-  .use('style')
-  .loader('style-loader')
-  .end()
   .use('css')
   .loader('css-loader')
   .end()
@@ -49,9 +46,6 @@ config.module
 config.module
   .rule('sass')
   .test(/\.(scss|sass)$/)
-  .use('style')
-  .loader('style-loader')
-  .end()
   .use('css')
   .loader('css-loader')
   .end()
