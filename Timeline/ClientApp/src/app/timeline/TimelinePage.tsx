@@ -1,10 +1,10 @@
-import React from 'react';
-import { useParams } from 'react-router';
+import React from "react";
+import { useParams } from "react-router";
 
-import TimelinePageUI from './TimelinePageUI';
-import TimelinePageTemplate from '../timeline/TimelinePageTemplate';
-import { OrdinaryTimelineManageItem } from './TimelineInfoCard';
-import TimelineDeleteDialog from './TimelineDeleteDialog';
+import TimelinePageUI from "./TimelinePageUI";
+import TimelinePageTemplate from "../timeline/TimelinePageTemplate";
+import { OrdinaryTimelineManageItem } from "./TimelineInfoCard";
+import TimelineDeleteDialog from "./TimelineDeleteDialog";
 
 const TimelinePage: React.FC = (_) => {
   const { name } = useParams<{ name: string }>();
@@ -14,7 +14,7 @@ const TimelinePage: React.FC = (_) => {
   );
 
   let dialogElement: React.ReactElement | undefined;
-  if (dialog === 'delete') {
+  if (dialog === "delete") {
     dialogElement = (
       <TimelineDeleteDialog open close={() => setDialog(null)} name={name} />
     );

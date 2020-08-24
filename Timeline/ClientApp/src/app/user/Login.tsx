@@ -1,10 +1,10 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { useHistory } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import React, { Fragment, useState, useEffect } from "react";
+import { useHistory } from "react-router";
+import { useTranslation } from "react-i18next";
 
-import AppBar from '../common/AppBar';
+import AppBar from "../common/AppBar";
 
-import { useUser, userService } from '../data/user';
+import { useUser, userService } from "../data/user";
 import {
   Label,
   FormGroup,
@@ -13,14 +13,14 @@ import {
   FormFeedback,
   Spinner,
   Button,
-} from 'reactstrap';
+} from "reactstrap";
 
 const Login: React.FC = (_) => {
   const { t } = useTranslation();
   const history = useHistory();
-  const [username, setUsername] = useState<string>('');
+  const [username, setUsername] = useState<string>("");
   const [usernameDirty, setUsernameDirty] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>('');
+  const [password, setPassword] = useState<string>("");
   const [passwordDirty, setPasswordDirty] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(true);
   const [process, setProcess] = useState<boolean>(false);
@@ -30,7 +30,7 @@ const Login: React.FC = (_) => {
 
   useEffect(() => {
     if (user != null) {
-      const id = setTimeout(() => history.push('/'), 3000);
+      const id = setTimeout(() => history.push("/"), 3000);
       return () => {
         clearTimeout(id);
       };
@@ -41,13 +41,13 @@ const Login: React.FC = (_) => {
     return (
       <>
         <AppBar />
-        <p className="mt-appbar">{t('login.alreadyLogin')}</p>
+        <p className="mt-appbar">{t("login.alreadyLogin")}</p>
       </>
     );
   }
 
   function onSubmit(event: React.SyntheticEvent): void {
-    if (username === '' || password === '') {
+    if (username === "" || password === "") {
       setUsernameDirty(true);
       setPasswordDirty(true);
       return;
@@ -65,7 +65,7 @@ const Login: React.FC = (_) => {
       .then(
         () => {
           if (history.length === 0) {
-            history.push('/');
+            history.push("/");
           } else {
             history.goBack();
           }
@@ -82,10 +82,10 @@ const Login: React.FC = (_) => {
     <Fragment>
       <AppBar />
       <div className="container login-container mt-appbar">
-        <h1>{t('welcome')}</h1>
+        <h1>{t("welcome")}</h1>
         <Form>
           <FormGroup>
-            <Label for="username">{t('user.username')}</Label>
+            <Label for="username">{t("user.username")}</Label>
             <Input
               id="username"
               disabled={process}
@@ -94,14 +94,14 @@ const Login: React.FC = (_) => {
                 setUsernameDirty(true);
               }}
               value={username}
-              invalid={usernameDirty && username === ''}
+              invalid={usernameDirty && username === ""}
             />
-            {usernameDirty && username === '' && (
-              <FormFeedback>{t('login.emptyUsername')}</FormFeedback>
+            {usernameDirty && username === "" && (
+              <FormFeedback>{t("login.emptyUsername")}</FormFeedback>
             )}
           </FormGroup>
           <FormGroup>
-            <Label for="password">{t('user.password')}</Label>
+            <Label for="password">{t("user.password")}</Label>
             <Input
               id="password"
               type="password"
@@ -111,10 +111,10 @@ const Login: React.FC = (_) => {
                 setPasswordDirty(true);
               }}
               value={password}
-              invalid={passwordDirty && password === ''}
+              invalid={passwordDirty && password === ""}
             />
-            {passwordDirty && password === '' && (
-              <FormFeedback>{t('login.emptyPassword')}</FormFeedback>
+            {passwordDirty && password === "" && (
+              <FormFeedback>{t("login.emptyPassword")}</FormFeedback>
             )}
           </FormGroup>
           <FormGroup check>
@@ -127,7 +127,7 @@ const Login: React.FC = (_) => {
                 setRememberMe(v);
               }}
             />
-            <Label for="remember-me">{t('user.rememberMe')}</Label>
+            <Label for="remember-me">{t("user.rememberMe")}</Label>
           </FormGroup>
           {error ? <p className="text-error">{t(error)}</p> : null}
           <div>
@@ -135,7 +135,7 @@ const Login: React.FC = (_) => {
               <Spinner />
             ) : (
               <Button color="primary" onClick={onSubmit}>
-                {t('user.login')}
+                {t("user.login")}
               </Button>
             )}
           </div>

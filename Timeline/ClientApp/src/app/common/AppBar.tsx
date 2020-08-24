@@ -1,14 +1,14 @@
-import React from 'react';
-import { useHistory, matchPath } from 'react-router';
-import { Link, NavLink } from 'react-router-dom';
-import { Navbar, NavbarToggler, Collapse, Nav, NavItem } from 'reactstrap';
-import { useMediaQuery } from 'react-responsive';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useHistory, matchPath } from "react-router";
+import { Link, NavLink } from "react-router-dom";
+import { Navbar, NavbarToggler, Collapse, Nav, NavItem } from "reactstrap";
+import { useMediaQuery } from "react-responsive";
+import { useTranslation } from "react-i18next";
 
-import { useUser, useAvatar } from '../data/user';
+import { useUser, useAvatar } from "../data/user";
 
-import TimelineLogo from './TimelineLogo';
-import BlobImage from './BlobImage';
+import TimelineLogo from "./TimelineLogo";
+import BlobImage from "./BlobImage";
 
 const AppBar: React.FC = (_) => {
   const history = useHistory();
@@ -19,7 +19,7 @@ const AppBar: React.FC = (_) => {
 
   const isUpMd = useMediaQuery({
     minWidth: getComputedStyle(document.documentElement).getPropertyValue(
-      '--breakpoint-md'
+      "--breakpoint-md"
     ),
   });
 
@@ -42,7 +42,7 @@ const AppBar: React.FC = (_) => {
         </NavLink>
       ) : (
         <NavLink className="text-light" to="/login">
-          {t('nav.login')}
+          {t("nav.login")}
         </NavLink>
       )}
     </div>
@@ -51,7 +51,7 @@ const AppBar: React.FC = (_) => {
   return (
     <Navbar dark className="fixed-top w-100 bg-primary app-bar" expand="md">
       <Link to="/" className="navbar-brand d-flex align-items-center">
-        <TimelineLogo style={{ height: '1em' }} />
+        <TimelineLogo style={{ height: "1em" }} />
         Timeline
       </Link>
 
@@ -62,33 +62,33 @@ const AppBar: React.FC = (_) => {
         <Nav className="mr-auto" navbar>
           <NavItem
             className={
-              matchPath(history.location.pathname, '/settings')
-                ? 'active'
+              matchPath(history.location.pathname, "/settings")
+                ? "active"
                 : undefined
             }
           >
             <NavLink className="nav-link" to="/settings">
-              {t('nav.settings')}
+              {t("nav.settings")}
             </NavLink>
           </NavItem>
 
           <NavItem
             className={
-              matchPath(history.location.pathname, '/about')
-                ? 'active'
+              matchPath(history.location.pathname, "/about")
+                ? "active"
                 : undefined
             }
           >
             <NavLink className="nav-link" to="/about">
-              {t('nav.about')}
+              {t("nav.about")}
             </NavLink>
           </NavItem>
 
           {isAdministrator && (
             <NavItem
               className={
-                matchPath(history.location.pathname, '/admin')
-                  ? 'active'
+                matchPath(history.location.pathname, "/admin")
+                  ? "active"
                   : undefined
               }
             >

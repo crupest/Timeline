@@ -1,16 +1,16 @@
-import React from 'react';
-import { Button, Spinner, Row, Col } from 'reactstrap';
-import { useTranslation } from 'react-i18next';
-import Svg from 'react-inlinesvg';
+import React from "react";
+import { Button, Spinner, Row, Col } from "reactstrap";
+import { useTranslation } from "react-i18next";
+import Svg from "react-inlinesvg";
 
-import textIcon from 'bootstrap-icons/icons/card-text.svg';
-import imageIcon from 'bootstrap-icons/icons/image.svg';
+import textIcon from "bootstrap-icons/icons/card-text.svg";
+import imageIcon from "bootstrap-icons/icons/image.svg";
 
-import { pushAlert } from '../common/alert-service';
-import { TimelineCreatePostRequest } from '../data/timeline';
+import { pushAlert } from "../common/alert-service";
+import { TimelineCreatePostRequest } from "../data/timeline";
 
-import FileInput from '../common/FileInput';
-import { UiLogicError } from '../common';
+import FileInput from "../common/FileInput";
+import { UiLogicError } from "../common";
 
 interface TimelinePostEditImageProps {
   onSelect: (blob: Blob | null) => void;
@@ -54,13 +54,13 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
   }, [onSelect, file]);
 
   const onImgError = React.useCallback(() => {
-    setError('loadImageError');
+    setError("loadImageError");
   }, []);
 
   return (
     <>
       <FileInput
-        labelText={t('chooseImage')}
+        labelText={t("chooseImage")}
         onChange={onInputChange}
         accept="image/*"
         className="mx-3 my-1"
@@ -94,18 +94,18 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   const { t } = useTranslation();
 
-  const [state, setState] = React.useState<'input' | 'process'>('input');
-  const [kind, setKind] = React.useState<'text' | 'image'>('text');
-  const [text, setText] = React.useState<string>('');
+  const [state, setState] = React.useState<"input" | "process">("input");
+  const [kind, setKind] = React.useState<"text" | "image">("text");
+  const [text, setText] = React.useState<string>("");
   const [imageBlob, setImageBlob] = React.useState<Blob | null>(null);
 
   const draftLocalStorageKey = `timeline.${props.timelineUniqueId}.postDraft`;
 
   React.useEffect(() => {
-    setText(window.localStorage.getItem(draftLocalStorageKey) ?? '');
+    setText(window.localStorage.getItem(draftLocalStorageKey) ?? "");
   }, [draftLocalStorageKey]);
 
-  const canSend = kind === 'text' || (kind === 'image' && imageBlob != null);
+  const canSend = kind === "text" || (kind === "image" && imageBlob != null);
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
@@ -128,54 +128,54 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   });
 
   const toggleKind = React.useCallback(() => {
-    setKind((oldKind) => (oldKind === 'text' ? 'image' : 'text'));
+    setKind((oldKind) => (oldKind === "text" ? "image" : "text"));
     setImageBlob(null);
   }, []);
 
   const onSend = React.useCallback(() => {
-    setState('process');
+    setState("process");
 
     const req: TimelineCreatePostRequest = (() => {
       switch (kind) {
-        case 'text':
+        case "text":
           return {
             content: {
-              type: 'text',
+              type: "text",
               text: text,
             },
           } as TimelineCreatePostRequest;
-        case 'image':
+        case "image":
           if (imageBlob == null) {
             throw new UiLogicError(
-              'Content type is image but image blob is null.'
+              "Content type is image but image blob is null."
             );
           }
           return {
             content: {
-              type: 'image',
+              type: "image",
               data: imageBlob,
             },
           } as TimelineCreatePostRequest;
         default:
-          throw new UiLogicError('Unknown content type.');
+          throw new UiLogicError("Unknown content type.");
       }
     })();
 
     onPost(req).then(
       (_) => {
-        if (kind === 'text') {
-          setText('');
+        if (kind === "text") {
+          setText("");
           window.localStorage.removeItem(draftLocalStorageKey);
         }
-        setState('input');
-        setKind('text');
+        setState("input");
+        setKind("text");
       },
       (_) => {
         pushAlert({
-          type: 'danger',
-          message: t('timeline.sendPostFailed'),
+          type: "danger",
+          message: t("timeline.sendPostFailed"),
         });
-        setState('input');
+        setState("input");
       }
     );
   }, [onPost, kind, text, imageBlob, t, draftLocalStorageKey]);
@@ -188,11 +188,11 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
     <div ref={containerRef} className="container-fluid fixed-bottom bg-light">
       <Row>
         <Col className="px-1 py-1">
-          {kind === 'text' ? (
+          {kind === "text" ? (
             <textarea
               className="w-100 h-100 timeline-post-edit"
               value={text}
-              disabled={state === 'process'}
+              disabled={state === "process"}
               onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
                 const value = event.currentTarget.value;
                 setText(value);
@@ -205,19 +205,19 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         </Col>
         <Col sm="col-auto align-self-end m-1">
           {(() => {
-            if (state === 'input') {
+            if (state === "input") {
               return (
                 <>
                   <div className="d-block text-center mt-1 mb-2">
                     <Svg
                       onLoad={notifyHeightChange}
-                      src={kind === 'text' ? imageIcon : textIcon}
+                      src={kind === "text" ? imageIcon : textIcon}
                       className="icon-button"
                       onClick={toggleKind}
                     />
                   </div>
                   <Button color="primary" onClick={onSend} disabled={!canSend}>
-                    {t('timeline.send')}
+                    {t("timeline.send")}
                   </Button>
                 </>
               );

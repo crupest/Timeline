@@ -1,10 +1,10 @@
-import localforage from 'localforage';
+import localforage from "localforage";
 
-import { HttpNetworkError } from '../http/common';
+import { HttpNetworkError } from "../http/common";
 
 export const dataStorage = localforage.createInstance({
-  name: 'data',
-  description: 'Database for offline data.',
+  name: "data",
+  description: "Database for offline data.",
   driver: localforage.INDEXEDDB,
 });
 
@@ -20,4 +20,4 @@ export function throwIfNotNetworkError(e: unknown): void {
   }
 }
 
-export type BlobOrStatus = Blob | 'loading' | 'error';
+export type BlobOrStatus = Blob | "loading" | "error";

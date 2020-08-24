@@ -1,6 +1,6 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 
-import { updateQueryString, applyQueryParameters } from '../utilities/url';
+import { updateQueryString, applyQueryParameters } from "../utilities/url";
 import {
   apiBaseUrl,
   extractResponseData,
@@ -13,10 +13,10 @@ import {
   convertToNotModified,
   convertToForbiddenError,
   convertToBlobWithEtag,
-} from './common';
-import { HttpUser } from './user';
+} from "./common";
+import { HttpUser } from "./user";
 
-export const kTimelineVisibilities = ['Public', 'Register', 'Private'] as const;
+export const kTimelineVisibilities = ["Public", "Register", "Private"] as const;
 
 export type TimelineVisibility = typeof kTimelineVisibilities[number];
 
@@ -33,7 +33,7 @@ export interface HttpTimelineInfo {
 export interface HttpTimelineListQuery {
   visibility?: TimelineVisibility;
   relate?: string;
-  relateType?: 'own' | 'join';
+  relateType?: "own" | "join";
 }
 
 export interface HttpTimelinePostRequest {
@@ -41,12 +41,12 @@ export interface HttpTimelinePostRequest {
 }
 
 export interface HttpTimelinePostTextContent {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
 export interface HttpTimelinePostImageContent {
-  type: 'image';
+  type: "image";
 }
 
 export type HttpTimelinePostContent =
@@ -75,12 +75,12 @@ export type HttpTimelineGenericPostInfo =
   | HttpTimelineDeletedPostInfo;
 
 export interface HttpTimelinePostPostRequestTextContent {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
 export interface HttpTimelinePostPostRequestImageContent {
-  type: 'image';
+  type: "image";
   data: Blob;
 }
 
@@ -129,12 +129,12 @@ interface RawTimelineInfo {
 }
 
 interface RawTimelinePostTextContent {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
 interface RawTimelinePostImageContent {
-  type: 'image';
+  type: "image";
   url: string;
 }
 
@@ -164,12 +164,12 @@ type RawTimelineGenericPostInfo =
   | RawTimelineDeletedPostInfo;
 
 interface RawTimelinePostPostRequestTextContent {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
 interface RawTimelinePostPostRequestImageContent {
-  type: 'image';
+  type: "image";
   data: string;
 }
 
@@ -422,19 +422,19 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     }
   ): Promise<HttpTimelineGenericPostInfo[]> {
     let url = `${apiBaseUrl}/timelines/${timelineName}/posts`;
-    url = updateQueryString('token', token, url);
+    url = updateQueryString("token", token, url);
     if (query != null) {
       if (query.modifiedSince != null) {
         url = updateQueryString(
-          'modifiedSince',
+          "modifiedSince",
           query.modifiedSince.toISOString(),
           url
         );
       }
       if (query.includeDeleted != null) {
         url = updateQueryString(
-          'includeDeleted',
-          query.includeDeleted ? 'true' : 'false',
+          "includeDeleted",
+          query.includeDeleted ? "true" : "false",
           url
         );
       }
@@ -465,16 +465,16 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     const headers =
       etag != null
         ? {
-            'If-None-Match': etag,
+            "If-None-Match": etag,
           }
         : undefined;
 
     let url = `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}/data`;
-    url = updateQueryString('token', token, url);
+    url = updateQueryString("token", token, url);
 
     return axios
       .get(url, {
-        responseType: 'blob',
+        responseType: "blob",
         headers,
       })
       .then(convertToBlobWithEtag)
@@ -489,7 +489,7 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     token: string
   ): Promise<HttpTimelinePostInfo> {
     let content: RawTimelinePostPostRequestContent;
-    if (req.content.type === 'image') {
+    if (req.content.type === "image") {
       const base64Data = await base64(req.content.data);
       content = {
         ...req.content,

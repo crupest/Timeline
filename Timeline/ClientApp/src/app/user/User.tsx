@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router';
+import React, { useState } from "react";
+import { useParams } from "react-router";
 
-import { UiLogicError } from '../common';
-import { useUser, userInfoService } from '../data/user';
-import { changeNickname } from './api';
+import { UiLogicError } from "../common";
+import { useUser, userInfoService } from "../data/user";
+import { changeNickname } from "./api";
 
-import UserPage from './UserPage';
-import ChangeNicknameDialog from './ChangeNicknameDialog';
-import ChangeAvatarDialog from './ChangeAvatarDialog';
-import TimelinePageTemplate from '../timeline/TimelinePageTemplate';
-import { PersonalTimelineManageItem } from './UserInfoCard';
+import UserPage from "./UserPage";
+import ChangeNicknameDialog from "./ChangeNicknameDialog";
+import ChangeAvatarDialog from "./ChangeAvatarDialog";
+import TimelinePageTemplate from "../timeline/TimelinePageTemplate";
+import { PersonalTimelineManageItem } from "./UserInfoCard";
 
 const User: React.FC = (_) => {
   const { username } = useParams<{ username: string }>();
@@ -25,9 +25,9 @@ const User: React.FC = (_) => {
     setDialog(null);
   };
 
-  if (dialog === 'nickname') {
+  if (dialog === "nickname") {
     if (user == null) {
-      throw new UiLogicError('Change nickname without login.');
+      throw new UiLogicError("Change nickname without login.");
     }
 
     dialogElement = (
@@ -42,9 +42,9 @@ const User: React.FC = (_) => {
         }}
       />
     );
-  } else if (dialog === 'avatar') {
+  } else if (dialog === "avatar") {
     if (user == null) {
-      throw new UiLogicError('Change avatar without login.');
+      throw new UiLogicError("Change avatar without login.");
     }
 
     dialogElement = (

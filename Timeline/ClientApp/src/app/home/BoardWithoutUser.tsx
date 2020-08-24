@@ -1,23 +1,23 @@
-import React from 'react';
-import { Row, Col } from 'reactstrap';
+import React from "react";
+import { Row, Col } from "reactstrap";
 
-import { TimelineInfo } from '../data/timeline';
+import { TimelineInfo } from "../data/timeline";
 
-import { getHttpTimelineClient } from '../http/timeline';
+import { getHttpTimelineClient } from "../http/timeline";
 
-import TimelineBoard from './TimelineBoard';
-import OfflineBoard from './OfflineBoard';
+import TimelineBoard from "./TimelineBoard";
+import OfflineBoard from "./OfflineBoard";
 
 const BoardWithoutUser: React.FC = () => {
   const [publicTimelines, setPublicTimelines] = React.useState<
-    TimelineInfo[] | 'offline' | 'loading'
-  >('loading');
+    TimelineInfo[] | "offline" | "loading"
+  >("loading");
 
   React.useEffect(() => {
     let subscribe = true;
-    if (publicTimelines === 'loading') {
+    if (publicTimelines === "loading") {
       void getHttpTimelineClient()
-        .listTimeline({ visibility: 'Public' })
+        .listTimeline({ visibility: "Public" })
         .then(
           (timelines) => {
             if (subscribe) {
@@ -25,7 +25,7 @@ const BoardWithoutUser: React.FC = () => {
             }
           },
           () => {
-            setPublicTimelines('offline');
+            setPublicTimelines("offline");
           }
         );
     }
@@ -36,11 +36,11 @@ const BoardWithoutUser: React.FC = () => {
 
   return (
     <Row className="my-2 justify-content-center">
-      {publicTimelines === 'offline' ? (
+      {publicTimelines === "offline" ? (
         <Col sm="8" lg="6">
           <OfflineBoard
             onReload={() => {
-              setPublicTimelines('loading');
+              setPublicTimelines("loading");
             }}
           />
         </Col>
@@ -49,7 +49,7 @@ const BoardWithoutUser: React.FC = () => {
           <TimelineBoard
             timelines={publicTimelines}
             onReload={() => {
-              setPublicTimelines('loading');
+              setPublicTimelines("loading");
             }}
           />
         </Col>

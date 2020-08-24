@@ -1,22 +1,22 @@
-import React from 'react';
-import clsx from 'clsx';
+import React from "react";
+import clsx from "clsx";
 import {
   Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
   Button,
-} from 'reactstrap';
-import { useTranslation } from 'react-i18next';
-import { fromEvent } from 'rxjs';
+} from "reactstrap";
+import { useTranslation } from "react-i18next";
+import { fromEvent } from "rxjs";
 
-import { useAvatar } from '../data/user';
-import { timelineVisibilityTooltipTranslationMap } from '../data/timeline';
+import { useAvatar } from "../data/user";
+import { timelineVisibilityTooltipTranslationMap } from "../data/timeline";
 
-import { TimelineCardComponentProps } from './TimelinePageTemplateUI';
-import BlobImage from '../common/BlobImage';
+import { TimelineCardComponentProps } from "./TimelinePageTemplateUI";
+import BlobImage from "../common/BlobImage";
 
-export type OrdinaryTimelineManageItem = 'delete';
+export type OrdinaryTimelineManageItem = "delete";
 
 export type TimelineInfoCardProps = TimelineCardComponentProps<
   OrdinaryTimelineManageItem
@@ -39,7 +39,7 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
   }, [onHeight]);
 
   React.useEffect(() => {
-    const subscription = fromEvent(window, 'resize').subscribe(notifyHeight);
+    const subscription = fromEvent(window, "resize").subscribe(notifyHeight);
     return () => subscription.unsubscribe();
   });
 
@@ -54,7 +54,7 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
   return (
     <div
       ref={containerRef}
-      className={clsx('rounded border p-2 bg-light', props.className)}
+      className={clsx("rounded border p-2 bg-light", props.className)}
       onTransitionEnd={notifyHeight}
     >
       <h3 className="text-primary mx-3 d-inline-block align-middle">
@@ -79,27 +79,27 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
         {onManage != null ? (
           <Dropdown isOpen={manageDropdownOpen} toggle={toggleManageDropdown}>
             <DropdownToggle outline color="primary">
-              {t('timeline.manage')}
+              {t("timeline.manage")}
             </DropdownToggle>
             <DropdownMenu>
-              <DropdownItem onClick={() => onManage('property')}>
-                {t('timeline.manageItem.property')}
+              <DropdownItem onClick={() => onManage("property")}>
+                {t("timeline.manageItem.property")}
               </DropdownItem>
               <DropdownItem onClick={props.onMember}>
-                {t('timeline.manageItem.member')}
+                {t("timeline.manageItem.member")}
               </DropdownItem>
               <DropdownItem divider />
               <DropdownItem
                 className="text-danger"
-                onClick={() => onManage('delete')}
+                onClick={() => onManage("delete")}
               >
-                {t('timeline.manageItem.delete')}
+                {t("timeline.manageItem.delete")}
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         ) : (
           <Button color="primary" outline onClick={props.onMember}>
-            {t('timeline.memberButton')}
+            {t("timeline.memberButton")}
           </Button>
         )}
       </div>

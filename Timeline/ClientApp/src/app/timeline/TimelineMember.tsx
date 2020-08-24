@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Container,
   ListGroup,
@@ -8,12 +8,12 @@ import {
   Row,
   Col,
   Button,
-} from 'reactstrap';
+} from "reactstrap";
 
-import { User, useAvatar } from '../data/user';
+import { User, useAvatar } from "../data/user";
 
-import SearchInput from '../common/SearchInput';
-import BlobImage from '../common/BlobImage';
+import SearchInput from "../common/SearchInput";
+import BlobImage from "../common/BlobImage";
 
 const TimelineMemberItem: React.FC<{
   user: User;
@@ -33,7 +33,7 @@ const TimelineMemberItem: React.FC<{
         <Col>
           <Row>{user.nickname}</Row>
           <Row>
-            <small>{'@' + user.username}</small>
+            <small>{"@" + user.username}</small>
           </Row>
         </Col>
         {(() => {
@@ -51,7 +51,7 @@ const TimelineMemberItem: React.FC<{
                 onRemove(user.username);
               }}
             >
-              {t('timeline.member.remove')}
+              {t("timeline.member.remove")}
             </Button>
           );
         })()}
@@ -74,19 +74,19 @@ export interface TimelineMemberProps {
 const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
   const { t } = useTranslation();
 
-  const [userSearchText, setUserSearchText] = useState<string>('');
+  const [userSearchText, setUserSearchText] = useState<string>("");
   const [userSearchState, setUserSearchState] = useState<
     | {
-        type: 'user';
+        type: "user";
         data: User;
       }
-    | { type: 'error'; data: string }
-    | { type: 'loading' }
-    | { type: 'init' }
-  >({ type: 'init' });
+    | { type: "error"; data: string }
+    | { type: "loading" }
+    | { type: "init" }
+  >({ type: "init" });
 
   const userSearchAvatar = useAvatar(
-    userSearchState.type === 'user' ? userSearchState.data.username : undefined
+    userSearchState.type === "user" ? userSearchState.data.username : undefined
   );
 
   const members = props.members;
@@ -113,31 +113,31 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                 onChange={(v) => {
                   setUserSearchText(v);
                 }}
-                loading={userSearchState.type === 'loading'}
+                loading={userSearchState.type === "loading"}
                 onButtonClick={() => {
-                  if (userSearchText === '') {
+                  if (userSearchText === "") {
                     setUserSearchState({
-                      type: 'error',
-                      data: 'login.emptyUsername',
+                      type: "error",
+                      data: "login.emptyUsername",
                     });
                     return;
                   }
 
-                  setUserSearchState({ type: 'loading' });
+                  setUserSearchState({ type: "loading" });
                   edit.onCheckUser(userSearchText).then(
                     (u) => {
                       if (u == null) {
                         setUserSearchState({
-                          type: 'error',
-                          data: 'timeline.userNotExist',
+                          type: "error",
+                          data: "timeline.userNotExist",
                         });
                       } else {
-                        setUserSearchState({ type: 'user', data: u });
+                        setUserSearchState({ type: "user", data: u });
                       }
                     },
                     (e) => {
                       setUserSearchState({
-                        type: 'error',
+                        type: "error",
                         data: `${e as string}`,
                       });
                     }
@@ -145,14 +145,14 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                 }}
               />
               {(() => {
-                if (userSearchState.type === 'user') {
+                if (userSearchState.type === "user") {
                   const u = userSearchState.data;
                   const addable =
                     members.findIndex((m) => m.username === u.username) === -1;
                   return (
                     <>
                       {!addable ? (
-                        <p>{t('timeline.member.alreadyMember')}</p>
+                        <p>{t("timeline.member.alreadyMember")}</p>
                       ) : null}
                       <Container className="mb-3">
                         <Row>
@@ -165,7 +165,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                           <Col>
                             <Row>{u.nickname}</Row>
                             <Row>
-                              <small>{'@' + u.username}</small>
+                              <small>{"@" + u.username}</small>
                             </Row>
                           </Col>
                           <Button
@@ -174,18 +174,18 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                             disabled={!addable}
                             onClick={() => {
                               void edit.onAddUser(u).then((_) => {
-                                setUserSearchText('');
-                                setUserSearchState({ type: 'init' });
+                                setUserSearchText("");
+                                setUserSearchState({ type: "init" });
                               });
                             }}
                           >
-                            {t('timeline.member.add')}
+                            {t("timeline.member.add")}
                           </Button>
                         </Row>
                       </Container>
                     </>
                   );
-                } else if (userSearchState.type === 'error') {
+                } else if (userSearchState.type === "error") {
                   return (
                     <p className="text-danger">{t(userSearchState.data)}</p>
                   );

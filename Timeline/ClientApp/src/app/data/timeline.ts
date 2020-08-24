@@ -1,19 +1,19 @@
-import React from 'react';
-import XRegExp from 'xregexp';
-import { Observable, from, combineLatest, of } from 'rxjs';
-import { map, switchMap, startWith } from 'rxjs/operators';
-import { uniqBy } from 'lodash';
+import React from "react";
+import XRegExp from "xregexp";
+import { Observable, from, combineLatest, of } from "rxjs";
+import { map, switchMap, startWith } from "rxjs/operators";
+import { uniqBy } from "lodash";
 
-import { convertError } from '../utilities/rxjs';
+import { convertError } from "../utilities/rxjs";
 
-import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from './common';
-import { DataHub, WithSyncStatus } from './DataHub';
+import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from "./common";
+import { DataHub, WithSyncStatus } from "./DataHub";
 
-import { UserAuthInfo, checkLogin, userService, userInfoService } from './user';
+import { UserAuthInfo, checkLogin, userService, userInfoService } from "./user";
 
-export { kTimelineVisibilities } from '../http/timeline';
+export { kTimelineVisibilities } from "../http/timeline";
 
-export type { TimelineVisibility } from '../http/timeline';
+export type { TimelineVisibility } from "../http/timeline";
 
 import {
   TimelineVisibility,
@@ -28,9 +28,9 @@ import {
   getHttpTimelineClient,
   HttpTimelineNotExistError,
   HttpTimelineNameConflictError,
-} from '../http/timeline';
-import { BlobWithEtag, NotModified, HttpForbiddenError } from '../http/common';
-import { HttpUser } from '../http/user';
+} from "../http/timeline";
+import { BlobWithEtag, NotModified, HttpForbiddenError } from "../http/common";
+import { HttpUser } from "../http/user";
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -42,7 +42,7 @@ export type TimelineCreatePostImageContent = HttpTimelinePostPostRequestImageCon
 export type TimelinePostTextContent = HttpTimelinePostTextContent;
 
 export interface TimelinePostImageContent {
-  type: 'image';
+  type: "image";
   data: BlobOrStatus;
 }
 
@@ -62,9 +62,9 @@ export const timelineVisibilityTooltipTranslationMap: Record<
   TimelineVisibility,
   string
 > = {
-  Public: 'timeline.visibilityTooltip.public',
-  Register: 'timeline.visibilityTooltip.register',
-  Private: 'timeline.visibilityTooltip.private',
+  Public: "timeline.visibilityTooltip.public",
+  Register: "timeline.visibilityTooltip.register",
+  Private: "timeline.visibilityTooltip.private",
 };
 
 export class TimelineNotExistError extends Error {}
@@ -72,31 +72,31 @@ export class TimelineNameConflictError extends Error {}
 
 export type TimelineWithSyncStatus = WithSyncStatus<
   | {
-      type: 'cache';
+      type: "cache";
       timeline: TimelineInfo;
     }
   | {
-      type: 'offline' | 'synced';
+      type: "offline" | "synced";
       timeline: TimelineInfo | null;
     }
 >;
 
 export type TimelinePostsWithSyncState = WithSyncStatus<{
   type:
-    | 'cache'
-    | 'offline' // Sync failed and use cache.
-    | 'synced' // Sync succeeded.
-    | 'forbid' // The list is forbidden to see.
-    | 'notexist'; // The timeline does not exist.
+    | "cache"
+    | "offline" // Sync failed and use cache.
+    | "synced" // Sync succeeded.
+    | "forbid" // The list is forbidden to see.
+    | "notexist"; // The timeline does not exist.
   posts: TimelinePostInfo[];
 }>;
 
-type TimelineData = Omit<HttpTimelineInfo, 'owner' | 'members'> & {
+type TimelineData = Omit<HttpTimelineInfo, "owner" | "members"> & {
   owner: string;
   members: string[];
 };
 
-type TimelinePostData = Omit<HttpTimelinePostInfo, 'author'> & {
+type TimelinePostData = Omit<HttpTimelinePostInfo, "author"> & {
   author: string;
 };
 
@@ -131,7 +131,7 @@ export class TimelineService {
     if (line.value == undefined) {
       const cache = await this.getCachedTimeline(timelineName);
       if (cache != null) {
-        line.next({ type: 'cache', timeline: cache });
+        line.next({ type: "cache", timeline: cache });
       }
     }
 
@@ -146,16 +146,16 @@ export class TimelineService {
 
       const timeline = this.convertHttpTimelineToData(httpTimeline);
       await this.saveTimeline(timelineName, timeline);
-      line.endSyncAndNext({ type: 'synced', timeline });
+      line.endSyncAndNext({ type: "synced", timeline });
     } catch (e) {
       if (e instanceof HttpTimelineNotExistError) {
-        line.endSyncAndNext({ type: 'synced', timeline: null });
+        line.endSyncAndNext({ type: "synced", timeline: null });
       } else {
         const cache = await this.getCachedTimeline(timelineName);
         if (cache == null) {
-          line.endSyncAndNext({ type: 'offline', timeline: null });
+          line.endSyncAndNext({ type: "offline", timeline: null });
         } else {
-          line.endSyncAndNext({ type: 'offline', timeline: cache });
+          line.endSyncAndNext({ type: "offline", timeline: cache });
         }
         throwIfNotNetworkError(e);
       }
@@ -165,11 +165,11 @@ export class TimelineService {
   private _timelineHub = new DataHub<
     string,
     | {
-        type: 'cache';
+        type: "cache";
         timeline: TimelineData;
       }
     | {
-        type: 'offline' | 'synced';
+        type: "offline" | "synced";
         timeline: TimelineData | null;
       }
   >({
@@ -302,7 +302,7 @@ export class TimelineService {
     if (line.value == null) {
       const cache = await this.getCachedPosts(timelineName);
       if (cache != null) {
-        line.next({ type: 'cache', posts: cache });
+        line.next({ type: "cache", posts: cache });
       }
     }
 
@@ -321,7 +321,7 @@ export class TimelineService {
 
         uniqBy(
           httpPosts.map((post) => post.author),
-          'username'
+          "username"
         ).forEach((user) => void userInfoService.saveUser(user));
 
         const posts = this.convertHttpPostToDataList(httpPosts);
@@ -331,7 +331,7 @@ export class TimelineService {
           now
         );
 
-        line.endSyncAndNext({ type: 'synced', posts });
+        line.endSyncAndNext({ type: "synced", posts });
       } else {
         const httpPosts = await getHttpTimelineClient().listPost(
           timelineName,
@@ -351,7 +351,7 @@ export class TimelineService {
           httpPosts
             .map((post) => post.author)
             .filter((u): u is HttpUser => u != null),
-          'username'
+          "username"
         ).forEach((user) => void userInfoService.saveUser(user));
 
         const cache = (await this.getCachedPosts(timelineName)) ?? [];
@@ -376,19 +376,19 @@ export class TimelineService {
           `timeline.${timelineName}.lastUpdated`,
           now
         );
-        line.endSyncAndNext({ type: 'synced', posts });
+        line.endSyncAndNext({ type: "synced", posts });
       }
     } catch (e) {
       if (e instanceof HttpTimelineNotExistError) {
-        line.endSyncAndNext({ type: 'notexist', posts: [] });
+        line.endSyncAndNext({ type: "notexist", posts: [] });
       } else if (e instanceof HttpForbiddenError) {
-        line.endSyncAndNext({ type: 'forbid', posts: [] });
+        line.endSyncAndNext({ type: "forbid", posts: [] });
       } else {
         const cache = await this.getCachedPosts(timelineName);
         if (cache == null) {
-          line.endSyncAndNext({ type: 'offline', posts: [] });
+          line.endSyncAndNext({ type: "offline", posts: [] });
         } else {
-          line.endSyncAndNext({ type: 'offline', posts: cache });
+          line.endSyncAndNext({ type: "offline", posts: cache });
         }
         throwIfNotNetworkError(e);
       }
@@ -398,7 +398,7 @@ export class TimelineService {
   private _postsHub = new DataHub<
     string,
     {
-      type: 'cache' | 'offline' | 'synced' | 'forbid' | 'notexist';
+      type: "cache" | "offline" | "synced" | "forbid" | "notexist";
       posts: TimelinePostData[];
     }
   >({
@@ -423,7 +423,7 @@ export class TimelineService {
           ),
           combineLatest(
             state.posts.map((post) => {
-              if (post.content.type === 'image') {
+              if (post.content.type === "image") {
                 return this.getPostData$(timelineName, post.id);
               } else {
                 return of(null);
@@ -441,10 +441,10 @@ export class TimelineService {
                   ...post,
                   author: authors[i],
                   content: (() => {
-                    if (content.type === 'text') return content;
+                    if (content.type === "text") return content;
                     else
                       return {
-                        type: 'image',
+                        type: "image",
                         data: datas[i],
                       } as TimelinePostImageContent;
                   })(),
@@ -492,7 +492,7 @@ export class TimelineService {
     const cache = await this.getCachedPostData(key);
     if (line.value == null) {
       if (cache != null) {
-        line.next({ type: 'cache', data: cache.data });
+        line.next({ type: "cache", data: cache.data });
       }
     }
 
@@ -503,9 +503,9 @@ export class TimelineService {
           key.postId
         );
         await this.savePostData(key, res);
-        line.endSyncAndNext({ data: res.data, type: 'synced' });
+        line.endSyncAndNext({ data: res.data, type: "synced" });
       } catch (e) {
-        line.endSyncAndNext({ type: 'offline' });
+        line.endSyncAndNext({ type: "offline" });
         throwIfNotNetworkError(e);
       }
     } else {
@@ -516,13 +516,13 @@ export class TimelineService {
           cache.etag
         );
         if (res instanceof NotModified) {
-          line.endSyncAndNext({ data: cache.data, type: 'synced' });
+          line.endSyncAndNext({ data: cache.data, type: "synced" });
         } else {
           await this.savePostData(key, res);
-          line.endSyncAndNext({ data: res.data, type: 'synced' });
+          line.endSyncAndNext({ data: res.data, type: "synced" });
         }
       } catch (e) {
-        line.endSyncAndNext({ data: cache.data, type: 'offline' });
+        line.endSyncAndNext({ data: cache.data, type: "offline" });
         throwIfNotNetworkError(e);
       }
     }
@@ -530,8 +530,8 @@ export class TimelineService {
 
   private _postDataHub = new DataHub<
     { timelineName: string; postId: number },
-    | { data: Blob; type: 'cache' | 'synced' | 'offline' }
-    | { data?: undefined; type: 'notexist' | 'offline' }
+    | { data: Blob; type: "cache" | "synced" | "offline" }
+    | { data?: undefined; type: "notexist" | "offline" }
   >({
     keyToString: (key) => `${key.timelineName}.${key.postId}`,
     setup: (key) => {
@@ -541,8 +541,8 @@ export class TimelineService {
 
   getPostData$(timelineName: string, postId: number): Observable<BlobOrStatus> {
     return this._postDataHub.getObservable({ timelineName, postId }).pipe(
-      map((state): BlobOrStatus => state.data ?? 'error'),
-      startWith('loading')
+      map((state): BlobOrStatus => state.data ?? "error"),
+      startWith("loading")
     );
   }
 
@@ -582,11 +582,11 @@ export class TimelineService {
     if (user != null && user.administrator) return true;
 
     const { visibility } = timeline;
-    if (visibility === 'Public') {
+    if (visibility === "Public") {
       return true;
-    } else if (visibility === 'Register') {
+    } else if (visibility === "Register") {
       if (user != null) return true;
-    } else if (visibility === 'Private') {
+    } else if (visibility === "Private") {
       if (
         user != null &&
         (user.username === timeline.owner.username ||
@@ -637,7 +637,7 @@ export class TimelineService {
 
 export const timelineService = new TimelineService();
 
-const timelineNameReg = XRegExp('^[-_\\p{L}]*$', 'u');
+const timelineNameReg = XRegExp("^[-_\\p{L}]*$", "u");
 
 export function validateTimelineName(name: string): boolean {
   return timelineNameReg.test(name);
@@ -691,7 +691,7 @@ export async function getAllCachedTimelineNames(): Promise<string[]> {
   return keys
     .filter(
       (key) =>
-        key.startsWith('timeline.') && (key.match(/\./g) ?? []).length === 1
+        key.startsWith("timeline.") && (key.match(/\./g) ?? []).length === 1
     )
-    .map((key) => key.substr('timeline.'.length));
+    .map((key) => key.substr("timeline.".length));
 }

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from "react";
+import { useHistory } from "react-router";
+import { useTranslation } from "react-i18next";
 import {
   Container,
   Row,
@@ -11,14 +11,14 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-} from 'reactstrap';
+} from "reactstrap";
 
-import { useUser, userService } from '../data/user';
+import { useUser, userService } from "../data/user";
 
-import AppBar from '../common/AppBar';
+import AppBar from "../common/AppBar";
 import OperationDialog, {
   OperationInputErrorInfo,
-} from '../common/OperationDialog';
+} from "../common/OperationDialog";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -34,46 +34,46 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
   return (
     <OperationDialog
       open={props.open}
-      title={t('settings.dialogChangePassword.title')}
+      title={t("settings.dialogChangePassword.title")}
       titleColor="dangerous"
-      inputPrompt={t('settings.dialogChangePassword.prompt')}
+      inputPrompt={t("settings.dialogChangePassword.prompt")}
       inputScheme={[
         {
-          type: 'text',
-          label: t('settings.dialogChangePassword.inputOldPassword'),
+          type: "text",
+          label: t("settings.dialogChangePassword.inputOldPassword"),
           password: true,
           validator: (v) =>
-            v === ''
-              ? 'settings.dialogChangePassword.errorEmptyOldPassword'
+            v === ""
+              ? "settings.dialogChangePassword.errorEmptyOldPassword"
               : null,
         },
         {
-          type: 'text',
-          label: t('settings.dialogChangePassword.inputNewPassword'),
+          type: "text",
+          label: t("settings.dialogChangePassword.inputNewPassword"),
           password: true,
           validator: (v, values) => {
             const error: OperationInputErrorInfo = {};
             error[1] =
-              v === ''
-                ? 'settings.dialogChangePassword.errorEmptyNewPassword'
+              v === ""
+                ? "settings.dialogChangePassword.errorEmptyNewPassword"
                 : null;
             if (v === values[2]) {
               error[2] = null;
             } else {
-              if (values[2] !== '') {
-                error[2] = 'settings.dialogChangePassword.errorRetypeNotMatch';
+              if (values[2] !== "") {
+                error[2] = "settings.dialogChangePassword.errorRetypeNotMatch";
               }
             }
             return error;
           },
         },
         {
-          type: 'text',
-          label: t('settings.dialogChangePassword.inputRetypeNewPassword'),
+          type: "text",
+          label: t("settings.dialogChangePassword.inputRetypeNewPassword"),
           password: true,
           validator: (v, values) =>
             v !== values[1]
-              ? 'settings.dialogChangePassword.errorRetypeNotMatch'
+              ? "settings.dialogChangePassword.errorRetypeNotMatch"
               : null,
         },
       ]}
@@ -87,7 +87,7 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
       close={() => {
         props.close();
         if (redirect) {
-          history.push('/login');
+          history.push("/login");
         }
       }}
     />
@@ -103,15 +103,15 @@ const ConfirmLogoutDialog: React.FC<{
   return (
     <Modal isOpen centered>
       <ModalHeader className="text-danger">
-        {t('settings.dialogConfirmLogout.title')}
+        {t("settings.dialogConfirmLogout.title")}
       </ModalHeader>
-      <ModalBody>{t('settings.dialogConfirmLogout.prompt')}</ModalBody>
+      <ModalBody>{t("settings.dialogConfirmLogout.prompt")}</ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={toggle}>
-          {t('operationDialog.cancel')}
+          {t("operationDialog.cancel")}
         </Button>
         <Button color="danger" onClick={onConfirm}>
-          {t('operationDialog.confirm')}
+          {t("operationDialog.confirm")}
         </Button>
       </ModalFooter>
     </Modal>
@@ -123,7 +123,7 @@ const Settings: React.FC = (_) => {
   const user = useUser();
   const history = useHistory();
 
-  const [dialog, setDialog] = useState<null | 'changepassword' | 'logout'>(
+  const [dialog, setDialog] = useState<null | "changepassword" | "logout">(
     null
   );
 
@@ -142,7 +142,7 @@ const Settings: React.FC = (_) => {
                     history.push(`/users/${user.username}`);
                   }}
                 >
-                  {t('settings.gotoSelf')}
+                  {t("settings.gotoSelf")}
                 </h5>
               </Col>
             </Row>
@@ -150,9 +150,9 @@ const Settings: React.FC = (_) => {
               <Col xs="12">
                 <h5
                   className="text-danger"
-                  onClick={() => setDialog('changepassword')}
+                  onClick={() => setDialog("changepassword")}
                 >
-                  {t('settings.changePassword')}
+                  {t("settings.changePassword")}
                 </h5>
               </Col>
             </Row>
@@ -161,10 +161,10 @@ const Settings: React.FC = (_) => {
                 <h5
                   className="text-danger"
                   onClick={() => {
-                    setDialog('logout');
+                    setDialog("logout");
                   }}
                 >
-                  {t('settings.logout')}
+                  {t("settings.logout")}
                 </h5>
               </Col>
             </Row>
@@ -172,8 +172,8 @@ const Settings: React.FC = (_) => {
         ) : null}
         <Row className="align-items-center border-bottom p-3">
           <Col xs="12" sm="auto">
-            <h5>{t('settings.languagePrimary')}</h5>
-            <p>{t('settings.languageSecondary')}</p>
+            <h5>{t("settings.languagePrimary")}</h5>
+            <p>{t("settings.languageSecondary")}</p>
           </Col>
           <Col xs="auto" className="ml-auto">
             <Input
@@ -190,7 +190,7 @@ const Settings: React.FC = (_) => {
         </Row>
         {(() => {
           switch (dialog) {
-            case 'changepassword':
+            case "changepassword":
               return (
                 <ChangePasswordDialog
                   open
@@ -199,13 +199,13 @@ const Settings: React.FC = (_) => {
                   }}
                 />
               );
-            case 'logout':
+            case "logout":
               return (
                 <ConfirmLogoutDialog
                   toggle={() => setDialog(null)}
                   onConfirm={() => {
                     void userService.logout().then(() => {
-                      history.push('/');
+                      history.push("/");
                     });
                   }}
                 />

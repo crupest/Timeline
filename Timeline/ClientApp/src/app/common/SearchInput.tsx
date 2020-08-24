@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
-import clsx from 'clsx';
-import { Spinner, Input, Button } from 'reactstrap';
-import { useTranslation } from 'react-i18next';
+import React, { useCallback } from "react";
+import clsx from "clsx";
+import { Spinner, Input, Button } from "reactstrap";
+import { useTranslation } from "react-i18next";
 
 export interface SearchInputProps {
   value: string;
@@ -28,7 +28,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
 
   const onInputKeyPress = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>): void => {
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         onButtonClick();
       }
     },
@@ -36,7 +36,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   );
 
   return (
-    <div className={clsx('form-inline my-2', props.className)}>
+    <div className={clsx("form-inline my-2", props.className)}>
       <Input
         className="mr-sm-2"
         value={props.value}
@@ -52,7 +52,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           <Spinner />
         ) : (
           <Button outline color="primary" onClick={props.onButtonClick}>
-            {props.buttonText ?? t('search')}
+            {props.buttonText ?? t("search")}
           </Button>
         )}
       </div>

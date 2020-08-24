@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Spinner,
   Container,
@@ -13,9 +13,9 @@ import {
   Modal,
   ModalHeader,
   FormText,
-} from 'reactstrap';
+} from "reactstrap";
 
-import { UiLogicError } from '../common';
+import { UiLogicError } from "../common";
 
 const DefaultProcessPrompt: React.FC = (_) => {
   return (
@@ -32,7 +32,7 @@ interface DefaultErrorPromptProps {
 const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = (props) => {
   const { t } = useTranslation();
 
-  let result = <p className="text-danger">{t('operationDialog.error')}</p>;
+  let result = <p className="text-danger">{t("operationDialog.error")}</p>;
 
   if (props.error != null) {
     result = (
@@ -58,20 +58,20 @@ export type OperationInputValidator<TValue> = (
 ) => OperationInputOptionalError | OperationInputErrorInfo;
 
 export interface OperationTextInputInfo {
-  type: 'text';
+  type: "text";
   password?: boolean;
   label?: string;
   initValue?: string;
   textFieldProps?: Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
-    'type' | 'value' | 'onChange'
+    "type" | "value" | "onChange"
   >;
   helperText?: string;
   validator?: OperationInputValidator<string>;
 }
 
 export interface OperationBoolInputInfo {
-  type: 'bool';
+  type: "bool";
   label: string;
   initValue?: boolean;
 }
@@ -83,7 +83,7 @@ export interface OperationSelectInputInfoOption {
 }
 
 export interface OperationSelectInputInfo {
-  type: 'select';
+  type: "select";
   label: string;
   options: OperationSelectInputInfoOption[];
   initValue?: string;
@@ -95,7 +95,7 @@ export type OperationInputInfo =
   | OperationSelectInputInfo;
 
 interface OperationResult {
-  type: 'success' | 'failure';
+  type: "success" | "failure";
   data: unknown;
 }
 
@@ -103,7 +103,7 @@ interface OperationDialogProps {
   open: boolean;
   close: () => void;
   title: React.ReactNode;
-  titleColor?: 'default' | 'dangerous' | 'create' | string;
+  titleColor?: "default" | "dangerous" | "create" | string;
   onProcess: (inputs: (string | boolean)[]) => Promise<unknown>;
   inputScheme?: OperationInputInfo[];
   inputPrompt?: string | (() => React.ReactNode);
@@ -118,48 +118,48 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
 
   const { t } = useTranslation();
 
-  type Step = 'input' | 'process' | OperationResult;
-  const [step, setStep] = useState<Step>('input');
+  type Step = "input" | "process" | OperationResult;
+  const [step, setStep] = useState<Step>("input");
   const [values, setValues] = useState<(boolean | string)[]>(
     inputScheme.map((i) => {
-      if (i.type === 'bool') {
+      if (i.type === "bool") {
         return i.initValue ?? false;
-      } else if (i.type === 'text' || i.type === 'select') {
-        return i.initValue ?? '';
+      } else if (i.type === "text" || i.type === "select") {
+        return i.initValue ?? "";
       } else {
-        throw new UiLogicError('Unknown input scheme.');
+        throw new UiLogicError("Unknown input scheme.");
       }
     })
   );
   const [inputError, setInputError] = useState<OperationInputErrorInfo>({});
 
   const close = (): void => {
-    if (step !== 'process') {
+    if (step !== "process") {
       props.close();
       if (
-        typeof step === 'object' &&
-        step.type === 'success' &&
+        typeof step === "object" &&
+        step.type === "success" &&
         props.onSuccessAndClose
       ) {
         props.onSuccessAndClose();
       }
     } else {
-      console.log('Attempt to close modal when processing.');
+      console.log("Attempt to close modal when processing.");
     }
   };
 
   const onConfirm = (): void => {
-    setStep('process');
+    setStep("process");
     props.onProcess(values).then(
       (d: unknown) => {
         setStep({
-          type: 'success',
+          type: "success",
           data: d,
         });
       },
       (e: unknown) => {
         setStep({
-          type: 'failure',
+          type: "failure",
           data: e,
         });
       }
@@ -167,9 +167,9 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
   };
 
   let body: React.ReactNode;
-  if (step === 'input') {
+  if (step === "input") {
     let inputPrompt =
-      typeof props.inputPrompt === 'function'
+      typeof props.inputPrompt === "function"
         ? props.inputPrompt()
         : props.inputPrompt;
     inputPrompt = <h6>{inputPrompt}</h6>;
@@ -187,7 +187,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
 
     const testErrorInfo = (errorInfo: OperationInputErrorInfo): boolean => {
       for (let i = 0; i < inputScheme.length; i++) {
-        if (inputScheme[i].type === 'text' && errorInfo[i] != null) {
+        if (inputScheme[i].type === "text" && errorInfo[i] != null) {
           return true;
         }
       }
@@ -201,7 +201,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
     ): OperationInputErrorInfo => {
       if (newError === undefined) {
         return oldError;
-      } else if (newError === null || typeof newError === 'string') {
+      } else if (newError === null || typeof newError === "string") {
         return { ...oldError, [index]: newError };
       } else {
         const newInputError: OperationInputErrorInfo = { ...oldError };
@@ -218,7 +218,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
       let newInputError = inputError;
       for (let i = 0; i < inputScheme.length; i++) {
         const item = inputScheme[i];
-        if (item.type === 'text') {
+        if (item.type === "text") {
           newInputError = calculateError(
             newInputError,
             i,
@@ -238,14 +238,14 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
           {inputScheme.map((item, index) => {
             const value = values[index];
             const error: string | undefined = ((e) =>
-              typeof e === 'string' ? t(e) : undefined)(inputError?.[index]);
+              typeof e === "string" ? t(e) : undefined)(inputError?.[index]);
 
-            if (item.type === 'text') {
+            if (item.type === "text") {
               return (
                 <FormGroup key={index}>
                   {item.label && <Label>{t(item.label)}</Label>}
                   <Input
-                    type={item.password === true ? 'password' : 'text'}
+                    type={item.password === true ? "password" : "text"}
                     value={value as string}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -265,7 +265,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                   {item.helperText && <FormText>{t(item.helperText)}</FormText>}
                 </FormGroup>
               );
-            } else if (item.type === 'bool') {
+            } else if (item.type === "bool") {
               return (
                 <FormGroup check key={index}>
                   <Input
@@ -281,7 +281,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                   <Label check>{t(item.label)}</Label>
                 </FormGroup>
               );
-            } else if (item.type === 'select') {
+            } else if (item.type === "select") {
               return (
                 <FormGroup key={index}>
                   <Label>{t(item.label)}</Label>
@@ -308,7 +308,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={close}>
-            {t('operationDialog.cancel')}
+            {t("operationDialog.cancel")}
           </Button>
           <Button
             color="primary"
@@ -319,12 +319,12 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
               }
             }}
           >
-            {t('operationDialog.confirm')}
+            {t("operationDialog.confirm")}
           </Button>
         </ModalFooter>
       </>
     );
-  } else if (step === 'process') {
+  } else if (step === "process") {
     body = (
       <ModalBody>
         {props.processPrompt?.() ?? <DefaultProcessPrompt />}
@@ -333,14 +333,14 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
   } else {
     let content: React.ReactNode;
     const result = step;
-    if (result.type === 'success') {
+    if (result.type === "success") {
       content =
-        props.successPrompt?.(result.data) ?? t('operationDialog.success');
-      if (typeof content === 'string')
+        props.successPrompt?.(result.data) ?? t("operationDialog.success");
+      if (typeof content === "string")
         content = <p className="text-success">{content}</p>;
     } else {
       content = props.failurePrompt?.(result.data) ?? <DefaultErrorPrompt />;
-      if (typeof content === 'string')
+      if (typeof content === "string")
         content = <DefaultErrorPrompt error={content} />;
     }
     body = (
@@ -348,25 +348,25 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
         <ModalBody>{content}</ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={close}>
-            {t('operationDialog.ok')}
+            {t("operationDialog.ok")}
           </Button>
         </ModalFooter>
       </>
     );
   }
 
-  const title = typeof props.title === 'string' ? t(props.title) : props.title;
+  const title = typeof props.title === "string" ? t(props.title) : props.title;
 
   return (
     <Modal isOpen={props.open} toggle={close}>
       <ModalHeader
         className={
           props.titleColor != null
-            ? 'text-' +
-              (props.titleColor === 'create'
-                ? 'success'
-                : props.titleColor === 'dangerous'
-                ? 'danger'
+            ? "text-" +
+              (props.titleColor === "create"
+                ? "success"
+                : props.titleColor === "dangerous"
+                ? "danger"
                 : props.titleColor)
             : undefined
         }

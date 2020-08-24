@@ -1,5 +1,5 @@
-import { getHttpUserClient } from '../http/user';
-import { User } from '../data/user';
+import { getHttpUserClient } from "../http/user";
+import { User } from "../data/user";
 
 export function changeNickname(
   token: string,

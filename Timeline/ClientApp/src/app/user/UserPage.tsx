@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import { ExcludeKey } from '../utilities/type';
+import { ExcludeKey } from "../utilities/type";
 
 import TimelinePageTemplateUI, {
   TimelinePageTemplateUIProps,
-} from '../timeline/TimelinePageTemplateUI';
-import UserInfoCard, { PersonalTimelineManageItem } from './UserInfoCard';
+} from "../timeline/TimelinePageTemplateUI";
+import UserInfoCard, { PersonalTimelineManageItem } from "./UserInfoCard";
 
 export type UserPageProps = ExcludeKey<
   TimelinePageTemplateUIProps<PersonalTimelineManageItem>,
-  'CardComponent'
+  "CardComponent"
 >;
 
 const UserPage: React.FC<UserPageProps> = (props) => {

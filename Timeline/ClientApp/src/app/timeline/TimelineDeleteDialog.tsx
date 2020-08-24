@@ -1,9 +1,9 @@
-import React from 'react';
-import { useHistory } from 'react-router';
-import { Trans } from 'react-i18next';
+import React from "react";
+import { useHistory } from "react-router";
+import { Trans } from "react-i18next";
 
-import OperationDialog from '../common/OperationDialog';
-import { timelineService } from '../data/timeline';
+import OperationDialog from "../common/OperationDialog";
+import { timelineService } from "../data/timeline";
 
 interface TimelineDeleteDialog {
   open: boolean;
@@ -31,10 +31,10 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
       }}
       inputScheme={[
         {
-          type: 'text',
+          type: "text",
           validator: (value) => {
             if (value !== name) {
-              return 'timeline.deleteDialog.notMatch';
+              return "timeline.deleteDialog.notMatch";
             } else {
               return null;
             }
@@ -45,7 +45,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
         return timelineService.deleteTimeline(name).toPromise();
       }}
       onSuccessAndClose={() => {
-        history.replace('/');
+        history.replace("/");
       }}
     />
   );
