@@ -5938,15 +5938,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"html-webpack-template@npm:^6.2.0":
-  version: 6.2.0
-  resolution: "html-webpack-template@npm:6.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-template%2Fdownload%2Fhtml-webpack-template-6.2.0.tgz"
-  peerDependencies:
-    html-webpack-plugin: 2.x || ^3
-  checksum: 099bbb5a5dc30f285054be63244324f8fa4248e5385eff9a8acaafa140a9160bfa69ede6add094201dc242bf126498c709a86c07993e576dda7cd09c762a24cb
-  languageName: node
-  linkType: hard
-
 "htmlparser2@npm:^3.3.0":
   version: 3.10.1
   resolution: "htmlparser2@npm:3.10.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtmlparser2%2Fdownload%2Fhtmlparser2-3.10.1.tgz"
@@ -10860,7 +10851,6 @@ fsevents@~2.1.2:
     eslint-plugin-react-hooks: ^4.0.8
     file-loader: ^6.0.0
     html-webpack-plugin: ^3.2.0
-    html-webpack-template: ^6.2.0
     http-server: ^0.12.3
     i18next: ^19.6.2
     i18next-browser-languagedetector: ^5.0.0

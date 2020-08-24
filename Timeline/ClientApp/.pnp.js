@@ -206,10 +206,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:3.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-plugin%2Fdownload%2Fhtml-webpack-plugin-3.2.0.tgz"
       ],
       [
-        "html-webpack-template",
-        "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-template%2Fdownload%2Fhtml-webpack-template-6.2.0.tgz"
-      ],
-      [
         "http-server",
         "npm:0.12.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhttp-server%2Fdownload%2Fhttp-server-0.12.3.tgz"
       ],
@@ -413,7 +409,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-react-hooks", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.0.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Feslint-plugin-react-hooks%2Fdownload%2Feslint-plugin-react-hooks-4.0.8.tgz"],
             ["file-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Ffile-loader%2Fdownload%2Ffile-loader-6.0.0.tgz"],
             ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:3.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-plugin%2Fdownload%2Fhtml-webpack-plugin-3.2.0.tgz"],
-            ["html-webpack-template", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-template%2Fdownload%2Fhtml-webpack-template-6.2.0.tgz"],
             ["http-server", "npm:0.12.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhttp-server%2Fdownload%2Fhttp-server-0.12.3.tgz"],
             ["i18next", "npm:19.6.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fi18next%2Fdownload%2Fi18next-19.6.2.tgz"],
             ["i18next-browser-languagedetector", "npm:5.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fi18next-browser-languagedetector%2Fdownload%2Fi18next-browser-languagedetector-5.0.0.tgz"],
@@ -7219,19 +7214,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["html-webpack-template", [
-        ["virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-template%2Fdownload%2Fhtml-webpack-template-6.2.0.tgz", {
-          "packageLocation": "./.yarn/$$virtual/html-webpack-template-virtual-34f1f008e3/0/cache/html-webpack-template-npm-6.2.0-eb72de38c4-099bbb5a5d.zip/node_modules/html-webpack-template/",
-          "packageDependencies": [
-            ["html-webpack-template", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-template%2Fdownload%2Fhtml-webpack-template-6.2.0.tgz"],
-            ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:3.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-plugin%2Fdownload%2Fhtml-webpack-plugin-3.2.0.tgz"]
-          ],
-          "packagePeers": [
-            "html-webpack-plugin"
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["htmlparser2", [
         ["npm:3.10.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtmlparser2%2Fdownload%2Fhtmlparser2-3.10.1.tgz", {
           "packageLocation": "./.yarn/cache/htmlparser2-npm-3.10.1-8b44da0721-94fa6312e6.zip/node_modules/htmlparser2/",
@@ -12685,7 +12667,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-react-hooks", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.0.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Feslint-plugin-react-hooks%2Fdownload%2Feslint-plugin-react-hooks-4.0.8.tgz"],
             ["file-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Ffile-loader%2Fdownload%2Ffile-loader-6.0.0.tgz"],
             ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:3.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-plugin%2Fdownload%2Fhtml-webpack-plugin-3.2.0.tgz"],
-            ["html-webpack-template", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-webpack-template%2Fdownload%2Fhtml-webpack-template-6.2.0.tgz"],
             ["http-server", "npm:0.12.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhttp-server%2Fdownload%2Fhttp-server-0.12.3.tgz"],
             ["i18next", "npm:19.6.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fi18next%2Fdownload%2Fi18next-19.6.2.tgz"],
             ["i18next-browser-languagedetector", "npm:5.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fi18next-browser-languagedetector%2Fdownload%2Fi18next-browser-languagedetector-5.0.0.tgz"],
