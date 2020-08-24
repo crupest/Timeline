@@ -38,6 +38,12 @@ config.module
   .end()
   .use('css')
   .loader('css-loader')
+  .end()
+  .use('postcss')
+  .loader('postcss-loader')
+  .options({
+    plugins: () => [postcssPresetEnv(/* pluginOptions */)],
+  })
   .end();
 
 config.module
