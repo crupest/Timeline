@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 
 import { UserWithToken } from "../data/user";
 import { TimelineInfo } from "../data/timeline";
-
 import { getHttpTimelineClient } from "../http/timeline";
 
 import TimelineBoard from "./TimelineBoard";

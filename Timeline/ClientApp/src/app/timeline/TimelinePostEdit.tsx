@@ -2,13 +2,11 @@ import React from "react";
 import { Button, Spinner, Row, Col } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import Svg from "react-inlinesvg";
-
 import textIcon from "bootstrap-icons/icons/card-text.svg";
 import imageIcon from "bootstrap-icons/icons/image.svg";
 
 import { pushAlert } from "../common/alert-service";
 import { TimelineCreatePostRequest } from "../data/timeline";
-
 import FileInput from "../common/FileInput";
 import { UiLogicError } from "../common";
 

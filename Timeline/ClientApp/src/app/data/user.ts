@@ -5,10 +5,6 @@ import { map, filter } from "rxjs/operators";
 import { UiLogicError } from "../common";
 import { convertError } from "../utilities/rxjs";
 import { pushAlert } from "../common/alert-service";
-
-import { dataStorage, throwIfNotNetworkError } from "./common";
-import { DataHub } from "./DataHub";
-
 import { HttpNetworkError, BlobWithEtag, NotModified } from "../http/common";
 import {
   getHttpTokenClient,
@@ -19,6 +15,9 @@ import {
   HttpUserNotExistError,
   HttpUser,
 } from "../http/user";
+
+import { DataHub } from "./DataHub";
+import { dataStorage, throwIfNotNetworkError } from "./common";
 
 export type User = HttpUser;
 

@@ -1,8 +1,9 @@
 import React from "react";
 import { useParams } from "react-router";
 
-import TimelinePageUI from "./TimelinePageUI";
 import TimelinePageTemplate from "../timeline/TimelinePageTemplate";
+
+import TimelinePageUI from "./TimelinePageUI";
 import { OrdinaryTimelineManageItem } from "./TimelineInfoCard";
 import TimelineDeleteDialog from "./TimelineDeleteDialog";
 

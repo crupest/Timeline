@@ -11,7 +11,6 @@ import About from "./about/About";
 import User from "./user/User";
 import TimelinePage from "./timeline/TimelinePage";
 import AlertHost from "./common/AlertHost";
-
 import { dataStorage } from "./data/common";
 import { userService, useRawUser } from "./data/user";
 

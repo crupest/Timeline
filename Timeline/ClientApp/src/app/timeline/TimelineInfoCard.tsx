@@ -12,9 +12,9 @@ import { fromEvent } from "rxjs";
 
 import { useAvatar } from "../data/user";
 import { timelineVisibilityTooltipTranslationMap } from "../data/timeline";
+import BlobImage from "../common/BlobImage";
 
 import { TimelineCardComponentProps } from "./TimelinePageTemplateUI";
-import BlobImage from "../common/BlobImage";
 
 export type OrdinaryTimelineManageItem = "delete";
 

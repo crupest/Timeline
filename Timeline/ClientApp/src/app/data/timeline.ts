@@ -5,16 +5,6 @@ import { map, switchMap, startWith } from "rxjs/operators";
 import { uniqBy } from "lodash";
 
 import { convertError } from "../utilities/rxjs";
-
-import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from "./common";
-import { DataHub, WithSyncStatus } from "./DataHub";
-
-import { UserAuthInfo, checkLogin, userService, userInfoService } from "./user";
-
-export { kTimelineVisibilities } from "../http/timeline";
-
-export type { TimelineVisibility } from "../http/timeline";
-
 import {
   TimelineVisibility,
   HttpTimelineInfo,
@@ -31,6 +21,14 @@ import {
 } from "../http/timeline";
 import { BlobWithEtag, NotModified, HttpForbiddenError } from "../http/common";
 import { HttpUser } from "../http/user";
+
+import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from "./common";
+import { DataHub, WithSyncStatus } from "./DataHub";
+import { UserAuthInfo, checkLogin, userService, userInfoService } from "./user";
+
+export { kTimelineVisibilities } from "../http/timeline";
+
+export type { TimelineVisibility } from "../http/timeline";
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;

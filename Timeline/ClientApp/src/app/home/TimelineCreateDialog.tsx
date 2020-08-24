@@ -2,7 +2,6 @@ import React from "react";
 import { useHistory } from "react-router";
 
 import { validateTimelineName, timelineService } from "../data/timeline";
-
 import OperationDialog from "../common/OperationDialog";
 
 interface TimelineCreateDialogProps {

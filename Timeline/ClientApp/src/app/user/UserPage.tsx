@@ -1,10 +1,10 @@
 import React from "react";
 
 import { ExcludeKey } from "../utilities/type";
-
 import TimelinePageTemplateUI, {
   TimelinePageTemplateUIProps,
 } from "../timeline/TimelinePageTemplateUI";
+
 import UserInfoCard, { PersonalTimelineManageItem } from "./UserInfoCard";
 
 export type UserPageProps = ExcludeKey<

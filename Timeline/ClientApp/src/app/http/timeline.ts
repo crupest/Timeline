@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 
 import { updateQueryString, applyQueryParameters } from "../utilities/url";
+
 import {
   apiBaseUrl,
   extractResponseData,

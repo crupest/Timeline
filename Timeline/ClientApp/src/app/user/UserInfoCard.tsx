@@ -12,7 +12,6 @@ import { fromEvent } from "rxjs";
 
 import { timelineVisibilityTooltipTranslationMap } from "../data/timeline";
 import { useAvatar } from "../data/user";
-
 import { TimelineCardComponentProps } from "../timeline/TimelinePageTemplateUI";
 import BlobImage from "../common/BlobImage";
 

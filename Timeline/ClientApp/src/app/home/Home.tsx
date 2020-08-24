@@ -4,9 +4,9 @@ import { Row, Container, Button, Col } from "reactstrap";
 import { useTranslation } from "react-i18next";
 
 import { useUser } from "../data/user";
-
 import AppBar from "../common/AppBar";
 import SearchInput from "../common/SearchInput";
+
 import BoardWithoutUser from "./BoardWithoutUser";
 import BoardWithUser from "./BoardWithUser";
 import TimelineCreateDialog from "./TimelineCreateDialog";
