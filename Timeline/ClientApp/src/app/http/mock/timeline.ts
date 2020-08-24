@@ -49,7 +49,9 @@ function getTimelinePropertyValue<T>(
   name: string,
   property: TimelinePropertyKey
 ): Promise<T> {
-  return mockStorage.getItem<T>(getTimelinePropertyKey(name, property));
+  return mockStorage.getItem<T>(
+    getTimelinePropertyKey(name, property)
+  ) as Promise<T>;
 }
 
 function setTimelinePropertyValue<T>(
@@ -187,7 +189,7 @@ function getTimelinePostPropertyValue<T>(
 ): Promise<T> {
   return mockStorage.getItem<T>(
     getTimelinePostPropertyKey(timelineName, id, propertyKey)
-  );
+  ) as Promise<T>;
 }
 
 function setTimelinePostPropertyValue<T>(
