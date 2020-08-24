@@ -1,33 +1,33 @@
-import React from 'react';
-import { Button } from 'reactstrap';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { Button } from "reactstrap";
+import { useTranslation } from "react-i18next";
 
-import { pushAlert } from './common/alert-service';
+import { pushAlert } from "./common/alert-service";
 
-if ('serviceWorker' in navigator) {
+if ("serviceWorker" in navigator) {
   let isThisTriggerUpgrade = false;
 
-  const upgradeSuccessLocalStorageKey = 'TIMELINE_UPGRADE_SUCCESS';
+  const upgradeSuccessLocalStorageKey = "TIMELINE_UPGRADE_SUCCESS";
 
   if (window.localStorage.getItem(upgradeSuccessLocalStorageKey)) {
     pushAlert({
       message: {
-        type: 'i18n',
-        key: 'serviceWorker.upgradeSuccess',
+        type: "i18n",
+        key: "serviceWorker.upgradeSuccess",
       },
-      type: 'success',
+      type: "success",
     });
     window.localStorage.removeItem(upgradeSuccessLocalStorageKey);
   }
 
-  void import('workbox-window').then(({ Workbox, messageSW }) => {
-    const wb = new Workbox('/sw.js');
+  void import("workbox-window").then(({ Workbox, messageSW }) => {
+    const wb = new Workbox("/sw.js");
     let registration: ServiceWorkerRegistration | undefined;
 
     // externalactivated is not usable but I still use its name.
-    wb.addEventListener('controlling', () => {
+    wb.addEventListener("controlling", () => {
       const upgradeReload = (): void => {
-        window.localStorage.setItem(upgradeSuccessLocalStorageKey, 'true');
+        window.localStorage.setItem(upgradeSuccessLocalStorageKey, "true");
         window.location.reload();
       };
 
@@ -38,9 +38,9 @@ if ('serviceWorker' in navigator) {
           const { t } = useTranslation();
           return (
             <>
-              {t('serviceWorker.externalActivatedPrompt')}
+              {t("serviceWorker.externalActivatedPrompt")}
               <Button color="success" size="sm" onClick={upgradeReload} outline>
-                {t('serviceWorker.reloadNow')}
+                {t("serviceWorker.reloadNow")}
               </Button>
             </>
           );
@@ -48,20 +48,20 @@ if ('serviceWorker' in navigator) {
 
         pushAlert({
           message: Message,
-          dismissTime: 'never',
-          type: 'warning',
+          dismissTime: "never",
+          type: "warning",
         });
       }
     });
 
-    wb.addEventListener('activated', (event) => {
+    wb.addEventListener("activated", (event) => {
       if (!event.isUpdate) {
         pushAlert({
           message: {
-            type: 'i18n',
-            key: 'serviceWorker.availableOffline',
+            type: "i18n",
+            key: "serviceWorker.availableOffline",
           },
-          type: 'success',
+          type: "success",
         });
       }
     });
@@ -74,7 +74,7 @@ if ('serviceWorker' in navigator) {
           // instructing it to activate.
           // Note: for this to work, you have to add a message
           // listener in your service worker. See below.
-          void messageSW(registration.waiting, { type: 'SKIP_WAITING' });
+          void messageSW(registration.waiting, { type: "SKIP_WAITING" });
         }
       };
 
@@ -82,9 +82,9 @@ if ('serviceWorker' in navigator) {
         const { t } = useTranslation();
         return (
           <>
-            {t('serviceWorker.upgradePrompt')}
+            {t("serviceWorker.upgradePrompt")}
             <Button color="success" size="sm" onClick={upgrade} outline>
-              {t('serviceWorker.upgradeNow')}
+              {t("serviceWorker.upgradeNow")}
             </Button>
           </>
         );
@@ -92,15 +92,15 @@ if ('serviceWorker' in navigator) {
 
       pushAlert({
         message: UpgradeMessage,
-        dismissTime: 'never',
-        type: 'success',
+        dismissTime: "never",
+        type: "success",
       });
     };
 
     // Add an event listener to detect when the registered
     // service worker has installed but is waiting to activate.
-    wb.addEventListener('waiting', showSkipWaitingPrompt);
-    wb.addEventListener('externalwaiting', showSkipWaitingPrompt);
+    wb.addEventListener("waiting", showSkipWaitingPrompt);
+    wb.addEventListener("externalwaiting", showSkipWaitingPrompt);
 
     void wb.register().then((reg) => {
       registration = reg;

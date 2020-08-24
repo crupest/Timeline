@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   ListGroupItem,
   Row,
@@ -9,14 +9,13 @@ import {
   DropdownItem,
   Spinner,
   Button,
-} from 'reactstrap';
-import axios from 'axios';
+} from "reactstrap";
+import axios from "axios";
 
-import OperationDialog from '../common/OperationDialog';
+import OperationDialog from "../common/OperationDialog";
+import { User, UserWithToken } from "../data/user";
 
-import { User, UserWithToken } from '../data/user';
-
-const apiBaseUrl = '/api';
+const apiBaseUrl = "/api";
 
 async function fetchUserList(_token: string): Promise<User[]> {
   const res = await axios.get<User[]>(`${apiBaseUrl}/users`);
@@ -71,10 +70,10 @@ function changePermission(
   });
 }
 
-const kChangeUsername = 'changeusername';
-const kChangePassword = 'changepassword';
-const kChangePermission = 'changepermission';
-const kDelete = 'delete';
+const kChangeUsername = "changeusername";
+const kChangePassword = "changepassword";
+const kChangePermission = "changepermission";
+const kDelete = "delete";
 
 type TChangeUsername = typeof kChangeUsername;
 type TChangePassword = typeof kChangePassword;
@@ -107,9 +106,9 @@ const UserItem: React.FC<UserCardProps> = (props) => {
         <Col>
           <p className="mb-0 text-primary">{user.username}</p>
           <small
-            className={user.administrator ? 'text-danger' : 'text-secondary'}
+            className={user.administrator ? "text-danger" : "text-secondary"}
           >
-            {user.administrator ? 'administrator' : 'user'}
+            {user.administrator ? "administrator" : "user"}
           </small>
         </Col>
         <Col className="col-auto">
@@ -157,9 +156,9 @@ const CreateUserDialog: React.FC<CreateUserDialogProps> = (props) => {
       titleColor="create"
       inputPrompt="You are creating a new user."
       inputScheme={[
-        { type: 'text', label: 'Username' },
-        { type: 'text', label: 'Password' },
-        { type: 'bool', label: 'Administrator' },
+        { type: "text", label: "Username" },
+        { type: "text", label: "Password" },
+        { type: "bool", label: "Administrator" },
       ]}
       onProcess={([username, password, administrator]) =>
         props.process({
@@ -175,7 +174,7 @@ const CreateUserDialog: React.FC<CreateUserDialogProps> = (props) => {
 };
 
 const UsernameLabel: React.FC = (props) => {
-  return <span style={{ color: 'blue' }}>{props.children}</span>;
+  return <span style={{ color: "blue" }}>{props.children}</span>;
 };
 
 interface UserDeleteDialogProps extends DialogProps {
@@ -192,9 +191,9 @@ const UserDeleteDialog: React.FC<UserDeleteDialogProps> = (props) => {
       titleColor="dangerous"
       inputPrompt={() => (
         <>
-          {'You are deleting user '}
+          {"You are deleting user "}
           <UsernameLabel>{props.username}</UsernameLabel>
-          {' !'}
+          {" !"}
         </>
       )}
       onProcess={props.process}
@@ -218,12 +217,12 @@ const UserChangeUsernameDialog: React.FC<UserModifyDialogProps<string>> = (
       titleColor="dangerous"
       inputPrompt={() => (
         <>
-          {'You are change the username of user '}
+          {"You are change the username of user "}
           <UsernameLabel>{props.username}</UsernameLabel>
-          {' !'}
+          {" !"}
         </>
       )}
-      inputScheme={[{ type: 'text', label: 'New Username' }]}
+      inputScheme={[{ type: "text", label: "New Username" }]}
       onProcess={([newUsername]) => {
         return props.process(newUsername as string);
       }}
@@ -242,12 +241,12 @@ const UserChangePasswordDialog: React.FC<UserModifyDialogProps<string>> = (
       titleColor="dangerous"
       inputPrompt={() => (
         <>
-          {'You are change the password of user '}
+          {"You are change the password of user "}
           <UsernameLabel>{props.username}</UsernameLabel>
-          {' !'}
+          {" !"}
         </>
       )}
-      inputScheme={[{ type: 'text', label: 'New Password' }]}
+      inputScheme={[{ type: "text", label: "New Password" }]}
       onProcess={([newPassword]) => {
         return props.process(newPassword as string);
       }}
@@ -272,13 +271,13 @@ const UserChangePermissionDialog: React.FC<UserChangePermissionDialogProps> = (
       titleColor="dangerous"
       inputPrompt={() => (
         <>
-          {'You are change user '}
+          {"You are change user "}
           <UsernameLabel>{props.username}</UsernameLabel>
-          {' to '}
-          <span style={{ color: 'orange' }}>
-            {props.newPermission ? 'administrator' : 'normal user'}
+          {" to "}
+          <span style={{ color: "orange" }}>
+            {props.newPermission ? "administrator" : "normal user"}
           </span>
-          {' !'}
+          {" !"}
         </>
       )}
       onProcess={props.process}
@@ -294,7 +293,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
   type DialogInfo =
     | null
     | {
-        type: 'create';
+        type: "create";
       }
     | { type: TDelete; username: string }
     | {
@@ -331,7 +330,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
   let dialogNode: React.ReactNode;
   if (dialog)
     switch (dialog.type) {
-      case 'create':
+      case "create":
         dialogNode = (
           <CreateUserDialog
             open
@@ -343,7 +342,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           />
         );
         break;
-      case 'delete':
+      case "delete":
         dialogNode = (
           <UserDeleteDialog
             open
@@ -445,7 +444,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           color="success"
           onClick={() =>
             setDialog({
-              type: 'create',
+              type: "create",
             })
           }
           className="align-self-end"

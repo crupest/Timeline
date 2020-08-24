@@ -1,7 +1,7 @@
-import * as React from 'react';
-import clsx from 'clsx';
+import * as React from "react";
+import clsx from "clsx";
 
-import { UiLogicError } from '../common';
+import { UiLogicError } from "../common";
 
 export interface Clip {
   left: number;
@@ -127,7 +127,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
       const { current: imgElement } = imgElementRef;
 
-      if (imgElement == null) throw new UiLogicError('Image element is null.');
+      if (imgElement == null) throw new UiLogicError("Image element is null.");
 
       const moveRatio = {
         x: movement.x / imgElement.width,
@@ -166,7 +166,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
       const { current: imgElement } = imgElementRef;
 
-      if (imgElement == null) throw new UiLogicError('Image element is null.');
+      if (imgElement == null) throw new UiLogicError("Image element is null.");
 
       const moveRatio = {
         x: movement.x / imgElement.width,
@@ -204,17 +204,17 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
   // fuck!!! I just can't find a better way to implement this in pure css
   const containerStyle: React.CSSProperties = (() => {
     if (imageInfo == null) {
-      return { width: '100%', paddingTop: '100%', height: 0 };
+      return { width: "100%", paddingTop: "100%", height: 0 };
     } else {
       if (imageInfo.ratio > 1) {
         return {
           width: toPercentage(100 / imageInfo.ratio),
-          paddingTop: '100%',
+          paddingTop: "100%",
           height: 0,
         };
       } else {
         return {
-          width: '100%',
+          width: "100%",
           paddingTop: toPercentage(100 * imageInfo.ratio),
           height: 0,
         };
@@ -224,7 +224,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
   return (
     <div
-      className={clsx('image-cropper-container', className)}
+      className={clsx("image-cropper-container", className)}
       style={containerStyle}
     >
       <img ref={onImageRef} src={imageUrl} onLoad={onImageLoad} alt="to crop" />
@@ -276,12 +276,12 @@ export function applyClipToImage(
       length: naturalSize.width * clip.width,
     };
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = clipArea.length;
     canvas.height = clipArea.length;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
 
-    if (context == null) throw new Error('Failed to create context.');
+    if (context == null) throw new Error("Failed to create context.");
 
     context.drawImage(
       image,
@@ -297,7 +297,7 @@ export function applyClipToImage(
 
     canvas.toBlob((blob) => {
       if (blob == null) {
-        reject(new Error('canvas.toBlob returns null'));
+        reject(new Error("canvas.toBlob returns null"));
       } else {
         resolve(blob);
       }

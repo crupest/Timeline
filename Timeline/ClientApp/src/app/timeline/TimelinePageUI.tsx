@@ -1,17 +1,17 @@
-import React from 'react';
+import React from "react";
 
-import { ExcludeKey } from '../utilities/type';
+import { ExcludeKey } from "../utilities/type";
 
 import TimelinePageTemplateUI, {
   TimelinePageTemplateUIProps,
-} from './TimelinePageTemplateUI';
+} from "./TimelinePageTemplateUI";
 import TimelineInfoCard, {
   OrdinaryTimelineManageItem,
-} from './TimelineInfoCard';
+} from "./TimelineInfoCard";
 
 export type TimelinePageUIProps = ExcludeKey<
   TimelinePageTemplateUIProps<OrdinaryTimelineManageItem>,
-  'CardComponent'
+  "CardComponent"
 >;
 
 const TimelinePageUI: React.FC<TimelinePageUIProps> = (props) => {

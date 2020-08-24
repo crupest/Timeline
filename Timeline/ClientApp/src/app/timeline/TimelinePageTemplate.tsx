@@ -1,29 +1,29 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { of } from "rxjs";
+import { catchError } from "rxjs/operators";
 
-import { ExcludeKey } from '../utilities/type';
-import { pushAlert } from '../common/alert-service';
-import { useUser, userInfoService, UserNotExistError } from '../data/user';
+import { ExcludeKey } from "../utilities/type";
+import { pushAlert } from "../common/alert-service";
+import { useUser, userInfoService, UserNotExistError } from "../data/user";
 import {
   timelineService,
   usePostList,
   useTimelineInfo,
-} from '../data/timeline';
+} from "../data/timeline";
+import { UiLogicError } from "../common";
 
-import { TimelineDeleteCallback } from './Timeline';
-import { TimelineMemberDialog } from './TimelineMember';
-import TimelinePropertyChangeDialog from './TimelinePropertyChangeDialog';
-import { TimelinePageTemplateUIProps } from './TimelinePageTemplateUI';
-import { TimelinePostSendCallback } from './TimelinePostEdit';
-import { UiLogicError } from '../common';
+import { TimelineDeleteCallback } from "./Timeline";
+import { TimelineMemberDialog } from "./TimelineMember";
+import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
+import { TimelinePageTemplateUIProps } from "./TimelinePageTemplateUI";
+import { TimelinePostSendCallback } from "./TimelinePostEdit";
 
 export interface TimelinePageTemplateProps<TManageItem> {
   name: string;
   onManage: (item: TManageItem) => void;
   UiComponent: React.ComponentType<
-    ExcludeKey<TimelinePageTemplateUIProps<TManageItem>, 'CardComponent'>
+    ExcludeKey<TimelinePageTemplateUIProps<TManageItem>, "CardComponent">
   >;
   dataVersion?: number;
   notFoundI18nKey: string;
@@ -40,7 +40,7 @@ export default function TimelinePageTemplate<TManageItem>(
 
   const user = useUser();
 
-  const [dialog, setDialog] = React.useState<null | 'property' | 'member'>(
+  const [dialog, setDialog] = React.useState<null | "property" | "member">(
     null
   );
 
@@ -53,8 +53,8 @@ export default function TimelinePageTemplate<TManageItem>(
   const error: string | undefined = (() => {
     if (timelineState != null) {
       const { type, timeline } = timelineState;
-      if (type === 'offline' && timeline == null) return 'Network Error';
-      if (type === 'synced' && timeline == null)
+      if (type === "offline" && timeline == null) return "Network Error";
+      if (type === "synced" && timeline == null)
         return t(props.notFoundI18nKey);
     }
     return undefined;
@@ -66,10 +66,10 @@ export default function TimelinePageTemplate<TManageItem>(
 
   let dialogElement: React.ReactElement | undefined;
 
-  if (dialog === 'property') {
+  if (dialog === "property") {
     if (timeline == null) {
       throw new UiLogicError(
-        'Timeline is null but attempt to open change property dialog.'
+        "Timeline is null but attempt to open change property dialog."
       );
     }
 
@@ -86,10 +86,10 @@ export default function TimelinePageTemplate<TManageItem>(
         }}
       />
     );
-  } else if (dialog === 'member') {
+  } else if (dialog === "member") {
     if (timeline == null) {
       throw new UiLogicError(
-        'Timeline is null but attempt to open change property dialog.'
+        "Timeline is null but attempt to open change property dialog."
       );
     }
 
@@ -134,8 +134,8 @@ export default function TimelinePageTemplate<TManageItem>(
     (index, id) => {
       service.deletePost(name, id).subscribe(null, () => {
         pushAlert({
-          type: 'danger',
-          message: t('timeline.deletePostFailed'),
+          type: "danger",
+          message: t("timeline.deletePostFailed"),
         });
       });
     },
@@ -152,8 +152,8 @@ export default function TimelinePageTemplate<TManageItem>(
   const onManageProp = props.onManage;
 
   const onManage = React.useCallback(
-    (item: 'property' | TManageItem) => {
-      if (item === 'property') {
+    (item: "property" | TManageItem) => {
+      if (item === "property") {
         setDialog(item);
       } else {
         onManageProp(item);
@@ -163,7 +163,7 @@ export default function TimelinePageTemplate<TManageItem>(
   );
 
   const onMember = React.useCallback(() => {
-    setDialog('member');
+    setDialog("member");
   }, []);
 
   return (

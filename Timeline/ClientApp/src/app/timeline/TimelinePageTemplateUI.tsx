@@ -1,30 +1,29 @@
-import React, { CSSProperties } from 'react';
-import { Spinner } from 'reactstrap';
-import { useTranslation } from 'react-i18next';
-import { fromEvent } from 'rxjs';
-import Svg from 'react-inlinesvg';
-import clsx from 'clsx';
+import React, { CSSProperties } from "react";
+import { Spinner } from "reactstrap";
+import { useTranslation } from "react-i18next";
+import { fromEvent } from "rxjs";
+import Svg from "react-inlinesvg";
+import clsx from "clsx";
+import arrowsAngleContractIcon from "bootstrap-icons/icons/arrows-angle-contract.svg";
+import arrowsAngleExpandIcon from "bootstrap-icons/icons/arrows-angle-expand.svg";
 
-import arrowsAngleContractIcon from 'bootstrap-icons/icons/arrows-angle-contract.svg';
-import arrowsAngleExpandIcon from 'bootstrap-icons/icons/arrows-angle-expand.svg';
-
-import { getAlertHost } from '../common/alert-service';
-import { useEventEmiiter, UiLogicError } from '../common';
+import { getAlertHost } from "../common/alert-service";
+import { useEventEmiiter, UiLogicError } from "../common";
 import {
   TimelineInfo,
   TimelinePostsWithSyncState,
   timelineService,
-} from '../data/timeline';
-import { userService } from '../data/user';
+} from "../data/timeline";
+import { userService } from "../data/user";
+import AppBar from "../common/AppBar";
 
 import Timeline, {
   TimelinePostInfoEx,
   TimelineDeleteCallback,
-} from './Timeline';
-import AppBar from '../common/AppBar';
-import TimelinePostEdit, { TimelinePostSendCallback } from './TimelinePostEdit';
+} from "./Timeline";
+import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 
-type TimelinePostSyncState = 'syncing' | 'synced' | 'offline';
+type TimelinePostSyncState = "syncing" | "synced" | "offline";
 
 const TimelinePostSyncStateBadge: React.FC<{
   state: TimelinePostSyncState;
@@ -34,41 +33,41 @@ const TimelinePostSyncStateBadge: React.FC<{
   const { t } = useTranslation();
 
   return (
-    <div style={style} className={clsx('timeline-sync-state-badge', className)}>
+    <div style={style} className={clsx("timeline-sync-state-badge", className)}>
       {(() => {
         switch (state) {
-          case 'syncing': {
+          case "syncing": {
             return (
               <>
                 <span className="timeline-sync-state-badge-pin bg-warning" />
                 <span className="text-warning">
-                  {t('timeline.postSyncState.syncing')}
+                  {t("timeline.postSyncState.syncing")}
                 </span>
               </>
             );
           }
-          case 'synced': {
+          case "synced": {
             return (
               <>
                 <span className="timeline-sync-state-badge-pin bg-success" />
                 <span className="text-success">
-                  {t('timeline.postSyncState.synced')}
+                  {t("timeline.postSyncState.synced")}
                 </span>
               </>
             );
           }
-          case 'offline': {
+          case "offline": {
             return (
               <>
                 <span className="timeline-sync-state-badge-pin bg-danger" />
                 <span className="text-danger">
-                  {t('timeline.postSyncState.offline')}
+                  {t("timeline.postSyncState.offline")}
                 </span>
               </>
             );
           }
           default:
-            throw new UiLogicError('Unknown sync state.');
+            throw new UiLogicError("Unknown sync state.");
         }
       })()}
     </div>
@@ -77,7 +76,7 @@ const TimelinePostSyncStateBadge: React.FC<{
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
-  onManage?: (item: TManageItems | 'property') => void;
+  onManage?: (item: TManageItems | "property") => void;
   onMember: () => void;
   className?: string;
   onHeight?: (height: number) => void;
@@ -89,7 +88,7 @@ export interface TimelinePageTemplateUIProps<TManageItems> {
   postListState?: TimelinePostsWithSyncState;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
   onMember: () => void;
-  onManage?: (item: TManageItems | 'property') => void;
+  onManage?: (item: TManageItems | "property") => void;
   onPost?: TimelinePostSendCallback;
   onDelete: TimelineDeleteCallback;
   error?: string;
@@ -112,7 +111,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
     if (height === 0) {
       const alertHost = getAlertHost();
       if (alertHost != null) {
-        alertHost.style.removeProperty('margin-bottom');
+        alertHost.style.removeProperty("margin-bottom");
       }
     } else {
       const alertHost = getAlertHost();
@@ -147,16 +146,16 @@ export default function TimelinePageTemplateUI<TManageItems>(
       };
 
       const subscriptions = [
-        fromEvent(timelineElement, 'wheel').subscribe(
+        fromEvent(timelineElement, "wheel").subscribe(
           disableLoadingScrollToBottom
         ),
-        fromEvent(timelineElement, 'pointerdown').subscribe(
+        fromEvent(timelineElement, "pointerdown").subscribe(
           disableLoadingScrollToBottom
         ),
-        fromEvent(timelineElement, 'keydown').subscribe(
+        fromEvent(timelineElement, "keydown").subscribe(
           disableLoadingScrollToBottom
         ),
-        fromEvent(window, 'scroll').subscribe(() => {
+        fromEvent(window, "scroll").subscribe(() => {
           if (loadingScrollToBottom) return;
 
           if (isAtBottom()) {
@@ -165,7 +164,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             pinBottom = false;
           }
         }),
-        fromEvent(window, 'resize').subscribe(checkAndScrollToBottom),
+        fromEvent(window, "resize").subscribe(checkAndScrollToBottom),
         getResizeEvent().subscribe(checkAndScrollToBottom),
       ];
 
@@ -187,7 +186,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
   React.useEffect(() => {
     if (cardCollapseLocalStorageKey != null) {
       const savedCollapse =
-        window.localStorage.getItem(cardCollapseLocalStorageKey) === 'true';
+        window.localStorage.getItem(cardCollapseLocalStorageKey) === "true";
       setInfoCardCollapse(savedCollapse);
     }
   }, [cardCollapseLocalStorageKey]);
@@ -200,14 +199,14 @@ export default function TimelinePageTemplateUI<TManageItems>(
     if (timeline != null) {
       let timelineBody: React.ReactElement;
       if (postListState != null) {
-        if (postListState.type === 'notexist') {
+        if (postListState.type === "notexist") {
           throw new UiLogicError(
-            'Timeline is not null but post list state is notexist.'
+            "Timeline is not null but post list state is notexist."
           );
         }
-        if (postListState.type === 'forbid') {
+        if (postListState.type === "forbid") {
           timelineBody = (
-            <p className="text-danger">{t('timeline.messageCantSee')}</p>
+            <p className="text-danger">{t("timeline.messageCantSee")}</p>
           );
         } else {
           const posts: TimelinePostInfoEx[] = postListState.posts.map(
@@ -222,14 +221,14 @@ export default function TimelinePageTemplateUI<TManageItems>(
           );
 
           const topHeight: string = infoCardCollapse
-            ? 'calc(68px + 1.5em)'
+            ? "calc(68px + 1.5em)"
             : `${cardHeight + 60}px`;
 
           const syncState: TimelinePostSyncState = postListState.syncing
-            ? 'syncing'
-            : postListState.type === 'synced'
-            ? 'synced'
-            : 'offline';
+            ? "syncing"
+            : postListState.type === "synced"
+            ? "synced"
+            : "offline";
 
           timelineBody = (
             <div>
@@ -272,7 +271,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
         <>
           <div
             className="fixed-top mt-appbar info-card-container"
-            data-collapse={infoCardCollapse ? 'true' : 'false'}
+            data-collapse={infoCardCollapse ? "true" : "false"}
           >
             <Svg
               src={
