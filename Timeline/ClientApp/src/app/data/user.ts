@@ -363,6 +363,15 @@ export class UserInfoService {
     await getHttpUserClient().putAvatar(username, blob, user.token);
     this._avatarHub.getLine(username)?.next({ data: blob, type: "synced" });
   }
+
+  async setNickname(username: string, nickname: string): Promise<void> {
+    const user = checkLogin();
+    return getHttpUserClient()
+      .patch(username, { nickname }, user.token)
+      .then((user) => {
+        void this.saveUser(user);
+      });
+  }
 }
 
 export const userInfoService = new UserInfoService();
