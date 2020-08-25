@@ -5,7 +5,6 @@ import { UiLogicError } from "../common";
 import { useUser, userInfoService } from "../data/user";
 import TimelinePageTemplate from "../timeline/TimelinePageTemplate";
 
-import { changeNickname } from "./api";
 import UserPage from "./UserPage";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
@@ -17,7 +16,6 @@ const User: React.FC = (_) => {
   const user = useUser();
 
   const [dialog, setDialog] = useState<null | PersonalTimelineManageItem>(null);
-  const [dataKey, setDataKey] = useState<number>(0);
 
   let dialogElement: React.ReactElement | undefined;
 
@@ -34,12 +32,9 @@ const User: React.FC = (_) => {
       <ChangeNicknameDialog
         open
         close={closeDialogHandler}
-        onProcess={(newNickname) => {
-          const p = changeNickname(user.token, username, newNickname);
-          return p.then((_) => {
-            setDataKey(dataKey + 1);
-          });
-        }}
+        onProcess={(newNickname) =>
+          userInfoService.setNickname(username, newNickname)
+        }
       />
     );
   } else if (dialog === "avatar") {
@@ -63,7 +58,6 @@ const User: React.FC = (_) => {
   return (
     <>
       <TimelinePageTemplate
-        dataVersion={dataKey}
         name={`@${username}`}
         UiComponent={UserPage}
         onManage={onManage}
