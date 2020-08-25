@@ -152,7 +152,7 @@ export class TimelineService {
       try {
         const httpTimeline = await getHttpTimelineClient().getTimeline(key);
 
-        await userInfoService.saveUsers([
+        userInfoService.saveUsers([
           httpTimeline.owner,
           ...httpTimeline.members,
         ]);
@@ -339,7 +339,7 @@ export class TimelineService {
             userService.currentUser?.token
           );
 
-          await userInfoService.saveUsers(
+          userInfoService.saveUsers(
             uniqBy(
               httpPosts.map((post) => post.author),
               "username"
@@ -368,7 +368,7 @@ export class TimelineService {
             (p): p is HttpTimelinePostInfo => !p.deleted
           );
 
-          await userInfoService.saveUsers(
+          userInfoService.saveUsers(
             uniqBy(
               httpPosts
                 .map((post) => post.author)

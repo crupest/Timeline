@@ -226,16 +226,16 @@ export function checkLogin(): UserWithToken {
 export class UserNotExistError extends Error {}
 
 export class UserInfoService {
-  saveUser(user: HttpUser): Promise<void> {
+  saveUser(user: HttpUser): void {
     const key = user.username;
-    return this._userHub.optionalInitLineWithSyncAction(key, async (line) => {
+    void this._userHub.optionalInitLineWithSyncAction(key, async (line) => {
       await this.doSaveUser(user);
       line.next({ user, type: "synced" });
     });
   }
 
-  saveUsers(users: HttpUser[]): Promise<void> {
-    return Promise.all(users.map((user) => this.saveUser(user))).then();
+  saveUsers(users: HttpUser[]): void {
+    return users.forEach((user) => this.saveUser(user));
   }
 
   private getCachedUser(username: string): Promise<User | null> {
@@ -364,7 +364,7 @@ export class UserInfoService {
     return getHttpUserClient()
       .patch(username, { nickname }, user.token)
       .then((user) => {
-        void this.saveUser(user);
+        this.saveUser(user);
       });
   }
 }
