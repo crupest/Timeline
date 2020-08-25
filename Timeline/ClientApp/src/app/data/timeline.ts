@@ -114,50 +114,19 @@ export class TimelineService {
       .then();
   }
 
+  private async clearTimelineData(timelineName: string): Promise<void> {
+    const keys = (await dataStorage.keys()).filter((k) =>
+      k.startsWith(`timeline.${timelineName}`)
+    );
+    await Promise.all(keys.map((k) => dataStorage.removeItem(k)));
+  }
+
   private convertHttpTimelineToData(timeline: HttpTimelineInfo): TimelineData {
     return {
       ...timeline,
       owner: timeline.owner.username,
       members: timeline.members.map((m) => m.username),
     };
-  }
-
-  private async syncTimeline(timelineName: string): Promise<void> {
-    const line = this._timelineHub.getLineOrCreateWithoutSetup(timelineName);
-    if (line.isSyncing) return;
-
-    if (line.value == undefined) {
-      const cache = await this.getCachedTimeline(timelineName);
-      if (cache != null) {
-        line.next({ type: "cache", timeline: cache });
-      }
-    }
-
-    try {
-      const httpTimeline = await getHttpTimelineClient().getTimeline(
-        timelineName
-      );
-
-      [httpTimeline.owner, ...httpTimeline.members].forEach(
-        (user) => void userInfoService.saveUser(user)
-      );
-
-      const timeline = this.convertHttpTimelineToData(httpTimeline);
-      await this.saveTimeline(timelineName, timeline);
-      line.endSyncAndNext({ type: "synced", timeline });
-    } catch (e) {
-      if (e instanceof HttpTimelineNotExistError) {
-        line.endSyncAndNext({ type: "synced", timeline: null });
-      } else {
-        const cache = await this.getCachedTimeline(timelineName);
-        if (cache == null) {
-          line.endSyncAndNext({ type: "offline", timeline: null });
-        } else {
-          line.endSyncAndNext({ type: "offline", timeline: cache });
-        }
-        throwIfNotNetworkError(e);
-      }
-    }
   }
 
   private _timelineHub = new DataHub<
@@ -171,10 +140,53 @@ export class TimelineService {
         timeline: TimelineData | null;
       }
   >({
-    setup: (key) => {
-      void this.syncTimeline(key);
+    sync: async (key, line) => {
+      const cache = await this.getCachedTimeline(key);
+
+      if (line.value == undefined) {
+        if (cache != null) {
+          line.next({ type: "cache", timeline: cache });
+        }
+      }
+
+      try {
+        const httpTimeline = await getHttpTimelineClient().getTimeline(key);
+
+        await userInfoService.saveUsers([
+          httpTimeline.owner,
+          ...httpTimeline.members,
+        ]);
+
+        const timeline = this.convertHttpTimelineToData(httpTimeline);
+
+        if (cache != null && timeline.uniqueId !== cache.uniqueId) {
+          console.log(
+            `Timeline with name ${key} has changed to a new one. Clear old data.`
+          );
+          await this.clearTimelineData(key); // If timeline has changed, clear all old data.
+        }
+
+        await this.saveTimeline(key, timeline);
+
+        line.next({ type: "synced", timeline });
+      } catch (e) {
+        if (e instanceof HttpTimelineNotExistError) {
+          line.next({ type: "synced", timeline: null });
+        } else {
+          if (cache == null) {
+            line.next({ type: "offline", timeline: null });
+          } else {
+            line.next({ type: "offline", timeline: cache });
+          }
+          throwIfNotNetworkError(e);
+        }
+      }
     },
   });
+
+  syncTimeline(timelineName: string): Promise<void> {
+    return this._timelineHub.getLineOrCreate(timelineName).sync();
+  }
 
   getTimeline$(timelineName: string): Observable<TimelineWithSyncStatus> {
     return this._timelineHub.getDataWithSyncStatusObservable(timelineName).pipe(
@@ -292,105 +304,8 @@ export class TimelineService {
       .then();
   }
 
-  private async syncPosts(timelineName: string): Promise<void> {
-    const line = this._postsHub.getLineOrCreateWithoutSetup(timelineName);
-    if (line.isSyncing) return;
-    line.beginSync();
-
-    if (line.value == null) {
-      const cache = await this.getCachedPosts(timelineName);
-      if (cache != null) {
-        line.next({ type: "cache", posts: cache });
-      }
-    }
-
-    const now = new Date();
-
-    const lastUpdatedTime = await dataStorage.getItem<Date | null>(
-      `timeline.${timelineName}.lastUpdated`
-    );
-
-    try {
-      if (lastUpdatedTime == null) {
-        const httpPosts = await getHttpTimelineClient().listPost(
-          timelineName,
-          userService.currentUser?.token
-        );
-
-        uniqBy(
-          httpPosts.map((post) => post.author),
-          "username"
-        ).forEach((user) => void userInfoService.saveUser(user));
-
-        const posts = this.convertHttpPostToDataList(httpPosts);
-        await this.savePosts(timelineName, posts);
-        await dataStorage.setItem<Date>(
-          `timeline.${timelineName}.lastUpdated`,
-          now
-        );
-
-        line.endSyncAndNext({ type: "synced", posts });
-      } else {
-        const httpPosts = await getHttpTimelineClient().listPost(
-          timelineName,
-          userService.currentUser?.token,
-          {
-            modifiedSince: lastUpdatedTime,
-            includeDeleted: true,
-          }
-        );
-
-        const deletedIds = httpPosts.filter((p) => p.deleted).map((p) => p.id);
-        const changed = httpPosts.filter(
-          (p): p is HttpTimelinePostInfo => !p.deleted
-        );
-
-        uniqBy(
-          httpPosts
-            .map((post) => post.author)
-            .filter((u): u is HttpUser => u != null),
-          "username"
-        ).forEach((user) => void userInfoService.saveUser(user));
-
-        const cache = (await this.getCachedPosts(timelineName)) ?? [];
-
-        const posts = cache.filter((p) => !deletedIds.includes(p.id));
-
-        for (const changedPost of changed) {
-          const savedChangedPostIndex = posts.findIndex(
-            (p) => p.id === changedPost.id
-          );
-          if (savedChangedPostIndex === -1) {
-            posts.push(this.convertHttpPostToData(changedPost));
-          } else {
-            posts[savedChangedPostIndex] = this.convertHttpPostToData(
-              changedPost
-            );
-          }
-        }
-
-        await this.savePosts(timelineName, posts);
-        await dataStorage.setItem<Date>(
-          `timeline.${timelineName}.lastUpdated`,
-          now
-        );
-        line.endSyncAndNext({ type: "synced", posts });
-      }
-    } catch (e) {
-      if (e instanceof HttpTimelineNotExistError) {
-        line.endSyncAndNext({ type: "notexist", posts: [] });
-      } else if (e instanceof HttpForbiddenError) {
-        line.endSyncAndNext({ type: "forbid", posts: [] });
-      } else {
-        const cache = await this.getCachedPosts(timelineName);
-        if (cache == null) {
-          line.endSyncAndNext({ type: "offline", posts: [] });
-        } else {
-          line.endSyncAndNext({ type: "offline", posts: cache });
-        }
-        throwIfNotNetworkError(e);
-      }
-    }
+  private syncPosts(timelineName: string): Promise<void> {
+    return this._postsHub.getLineOrCreate(timelineName).sync();
   }
 
   private _postsHub = new DataHub<
@@ -400,8 +315,104 @@ export class TimelineService {
       posts: TimelinePostData[];
     }
   >({
-    setup: (key) => {
-      void this.syncPosts(key);
+    sync: async (key, line) => {
+      // Wait for timeline synced. In case the timeline has changed to another and old data has been cleaned.
+      await this.syncTimeline(key);
+
+      if (line.value == null) {
+        const cache = await this.getCachedPosts(key);
+        if (cache != null) {
+          line.next({ type: "cache", posts: cache });
+        }
+      }
+
+      const now = new Date();
+
+      const lastUpdatedTime = await dataStorage.getItem<Date | null>(
+        `timeline.${key}.lastUpdated`
+      );
+
+      try {
+        if (lastUpdatedTime == null) {
+          const httpPosts = await getHttpTimelineClient().listPost(
+            key,
+            userService.currentUser?.token
+          );
+
+          await userInfoService.saveUsers(
+            uniqBy(
+              httpPosts.map((post) => post.author),
+              "username"
+            )
+          );
+
+          const posts = this.convertHttpPostToDataList(httpPosts);
+          await this.savePosts(key, posts);
+          await dataStorage.setItem<Date>(`timeline.${key}.lastUpdated`, now);
+
+          line.next({ type: "synced", posts });
+        } else {
+          const httpPosts = await getHttpTimelineClient().listPost(
+            key,
+            userService.currentUser?.token,
+            {
+              modifiedSince: lastUpdatedTime,
+              includeDeleted: true,
+            }
+          );
+
+          const deletedIds = httpPosts
+            .filter((p) => p.deleted)
+            .map((p) => p.id);
+          const changed = httpPosts.filter(
+            (p): p is HttpTimelinePostInfo => !p.deleted
+          );
+
+          await userInfoService.saveUsers(
+            uniqBy(
+              httpPosts
+                .map((post) => post.author)
+                .filter((u): u is HttpUser => u != null),
+              "username"
+            )
+          );
+
+          const cache = (await this.getCachedPosts(key)) ?? [];
+
+          const posts = cache.filter((p) => !deletedIds.includes(p.id));
+
+          for (const changedPost of changed) {
+            const savedChangedPostIndex = posts.findIndex(
+              (p) => p.id === changedPost.id
+            );
+            if (savedChangedPostIndex === -1) {
+              posts.push(this.convertHttpPostToData(changedPost));
+            } else {
+              posts[savedChangedPostIndex] = this.convertHttpPostToData(
+                changedPost
+              );
+            }
+          }
+
+          await this.savePosts(key, posts);
+          await dataStorage.setItem<Date>(`timeline.${key}.lastUpdated`, now);
+          line.next({ type: "synced", posts });
+        }
+      } catch (e) {
+        if (e instanceof HttpTimelineNotExistError) {
+          line.next({ type: "notexist", posts: [] });
+        } else if (e instanceof HttpForbiddenError) {
+          line.next({ type: "forbid", posts: [] });
+        } else {
+          const cache = await this.getCachedPosts(key);
+          if (cache == null) {
+            line.next({ type: "offline", posts: [] });
+          } else {
+            line.next({ type: "offline", posts: cache });
+          }
+          throwIfNotNetworkError(e);
+        }
+      }
     },
   });
 
@@ -479,51 +490,11 @@ export class TimelineService {
       .then();
   }
 
-  private async syncPostData(key: {
+  private syncPostData(key: {
     timelineName: string;
     postId: number;
   }): Promise<void> {
-    const line = this._postDataHub.getLineOrCreateWithoutSetup(key);
-    if (line.isSyncing) return;
-    line.beginSync();
-
-    const cache = await this.getCachedPostData(key);
-    if (line.value == null) {
-      if (cache != null) {
-        line.next({ type: "cache", data: cache.data });
-      }
-    }
-
-    if (cache == null) {
-      try {
-        const res = await getHttpTimelineClient().getPostData(
-          key.timelineName,
-          key.postId
-        );
-        await this.savePostData(key, res);
-        line.endSyncAndNext({ data: res.data, type: "synced" });
-      } catch (e) {
-        line.endSyncAndNext({ type: "offline" });
-        throwIfNotNetworkError(e);
-      }
-    } else {
-      try {
-        const res = await getHttpTimelineClient().getPostData(
-          key.timelineName,
-          key.postId,
-          cache.etag
-        );
-        if (res instanceof NotModified) {
-          line.endSyncAndNext({ data: cache.data, type: "synced" });
-        } else {
-          await this.savePostData(key, res);
-          line.endSyncAndNext({ data: res.data, type: "synced" });
-        }
-      } catch (e) {
-        line.endSyncAndNext({ data: cache.data, type: "offline" });
-        throwIfNotNetworkError(e);
-      }
-    }
+    return this._postDataHub.getLineOrCreate(key).sync();
   }
 
   private _postDataHub = new DataHub<
@@ -532,8 +503,44 @@ export class TimelineService {
     | { data?: undefined; type: "notexist" | "offline" }
   >({
     keyToString: (key) => `${key.timelineName}.${key.postId}`,
-    setup: (key) => {
-      void this.syncPostData(key);
+    sync: async (key, line) => {
+      const cache = await this.getCachedPostData(key);
+      if (line.value == null) {
+        if (cache != null) {
+          line.next({ type: "cache", data: cache.data });
+        }
+      }
+
+      if (cache == null) {
+        try {
+          const res = await getHttpTimelineClient().getPostData(
+            key.timelineName,
+            key.postId
+          );
+          await this.savePostData(key, res);
+          line.next({ data: res.data, type: "synced" });
+        } catch (e) {
+          line.next({ type: "offline" });
+          throwIfNotNetworkError(e);
+        }
+      } else {
+        try {
+          const res = await getHttpTimelineClient().getPostData(
+            key.timelineName,
+            key.postId,
+            cache.etag
+          );
+          if (res instanceof NotModified) {
+            line.next({ data: cache.data, type: "synced" });
+          } else {
+            await this.savePostData(key, res);
+            line.next({ data: res.data, type: "synced" });
+          }
+        } catch (e) {
+          line.next({ data: cache.data, type: "offline" });
+          throwIfNotNetworkError(e);
+        }
+      }
     },
   });
 
