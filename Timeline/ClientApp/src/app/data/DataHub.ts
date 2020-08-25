@@ -9,13 +9,22 @@ export type WithSyncStatus<T> = T & { syncing: boolean };
 export class DataLine<TData> {
   private _current: TData | undefined = undefined;
 
+  private _syncPromise: Promise<void> | null = null;
   private _syncingSubject = new BehaviorSubject<boolean>(false);
 
   private _observers: Subscriber<TData>[] = [];
 
   constructor(
-    private config?: { destroyable?: (value: TData | undefined) => boolean }
-  ) {}
+    private config: {
+      sync: () => Promise<void>;
+      destroyable?: (value: TData | undefined) => boolean;
+      disableInitSync?: boolean;
+    }
+  ) {
+    if (config.disableInitSync !== true) {
+      setImmediate(() => void this.sync());
+    }
+  }
 
   private subscribe(subscriber: Subscriber<TData>): void {
     this._observers.push(subscriber);
@@ -68,19 +77,33 @@ export class DataLine<TData> {
   }
 
   get isSyncing(): boolean {
-    return this._syncingSubject.value;
+    return this._syncPromise != null;
   }
 
-  beginSync(): void {
-    if (!this._syncingSubject.value) {
+  sync(): Promise<void> {
+    if (this._syncPromise == null) {
       this._syncingSubject.next(true);
+      this._syncPromise = this.config.sync().then(() => {
+        this._syncingSubject.next(false);
+        this._syncPromise = null;
+      });
     }
+
+    return this._syncPromise;
   }
 
-  endSync(): void {
-    if (this._syncingSubject.value) {
-      this._syncingSubject.next(false);
+  syncWithAction(
+    syncAction: (line: DataLine<TData>) => Promise<void>
+  ): Promise<void> {
+    if (this._syncPromise == null) {
+      this._syncingSubject.next(true);
+      this._syncPromise = syncAction(this).then(() => {
+        this._syncingSubject.next(false);
+        this._syncPromise = null;
+      });
     }
+
+    return this._syncPromise;
   }
 
   get destroyable(): boolean {
@@ -88,20 +111,15 @@ export class DataLine<TData> {
 
     return (
       this._observers.length === 0 &&
-      !this._syncingSubject.value &&
+      !this.isSyncing &&
       (customDestroyable != null ? customDestroyable(this._current) : true)
     );
-  }
-
-  endSyncAndNext(value: TData): void {
-    this.endSync();
-    this.next(value);
   }
 }
 
 export class DataHub<TKey, TData> {
+  private sync: (key: TKey, line: DataLine<TData>) => Promise<void>;
   private keyToString: (key: TKey) => string;
-  private setup?: (key: TKey, line: DataLine<TData>) => (() => void) | void;
   private destroyable?: (key: TKey, value: TData | undefined) => boolean;
 
   private readonly subscriptionLineMap = new Map<string, DataLine<TData>>();
@@ -109,13 +127,14 @@ export class DataHub<TKey, TData> {
   private cleanTimerId = 0;
 
   // setup is called after creating line and if it returns a function as destroyer, then when the line is destroyed the destroyer will be called.
-  constructor(config?: {
+  constructor(config: {
+    sync: (key: TKey, line: DataLine<TData>) => Promise<void>;
     keyToString?: (key: TKey) => string;
-    setup?: (key: TKey, line: DataLine<TData>) => void;
     destroyable?: (key: TKey, value: TData | undefined) => boolean;
   }) {
+    this.sync = config.sync;
     this.keyToString =
-      config?.keyToString ??
+      config.keyToString ??
       ((value): string => {
         if (typeof value === "string") return value;
         else
@@ -124,8 +143,7 @@ export class DataHub<TKey, TData> {
           );
       });
 
-    this.setup = config?.setup;
-    this.destroyable = config?.destroyable;
+    this.destroyable = config.destroyable;
   }
 
   private cleanLines(): void {
@@ -148,17 +166,16 @@ export class DataHub<TKey, TData> {
     }
   }
 
-  private createLine(key: TKey, useSetup = true): DataLine<TData> {
+  private createLine(key: TKey, disableInitSync = false): DataLine<TData> {
     const keyString = this.keyToString(key);
-    const { setup, destroyable } = this;
-    const newLine = new DataLine<TData>({
+    const { destroyable } = this;
+    const newLine: DataLine<TData> = new DataLine<TData>({
+      sync: () => this.sync(key, newLine),
       destroyable:
         destroyable != null ? (value) => destroyable(key, value) : undefined,
+      disableInitSync: disableInitSync,
     });
     this.subscriptionLineMap.set(keyString, newLine);
-    if (useSetup) {
-      setup?.(key, newLine);
-    }
     if (this.subscriptionLineMap.size === 1) {
       this.cleanTimerId = window.setInterval(this.cleanLines.bind(this), 20000);
     }
@@ -166,17 +183,17 @@ export class DataHub<TKey, TData> {
   }
 
   getObservable(key: TKey): Observable<TData> {
-    return this.getLineOrCreateWithSetup(key).getObservable();
+    return this.getLineOrCreate(key).getObservable();
   }
 
   getSyncStatusObservable(key: TKey): Observable<boolean> {
-    return this.getLineOrCreateWithSetup(key).getSyncStatusObservable();
+    return this.getLineOrCreate(key).getSyncStatusObservable();
   }
 
   getDataWithSyncStatusObservable(
     key: TKey
   ): Observable<WithSyncStatus<TData>> {
-    return this.getLineOrCreateWithSetup(key).getDataWithSyncStatusObservable();
+    return this.getLineOrCreate(key).getDataWithSyncStatusObservable();
   }
 
   getLine(key: TKey): DataLine<TData> | null {
@@ -184,15 +201,25 @@ export class DataHub<TKey, TData> {
     return this.subscriptionLineMap.get(keyString) ?? null;
   }
 
-  getLineOrCreateWithSetup(key: TKey): DataLine<TData> {
+  getLineOrCreate(key: TKey): DataLine<TData> {
     const keyString = this.keyToString(key);
     return this.subscriptionLineMap.get(keyString) ?? this.createLine(key);
   }
 
-  getLineOrCreateWithoutSetup(key: TKey): DataLine<TData> {
+  getLineOrCreateWithoutInitSync(key: TKey): DataLine<TData> {
     const keyString = this.keyToString(key);
     return (
-      this.subscriptionLineMap.get(keyString) ?? this.createLine(key, false)
+      this.subscriptionLineMap.get(keyString) ?? this.createLine(key, true)
     );
+  }
+
+  optionalInitLineWithSyncAction(
+    key: TKey,
+    syncAction: (line: DataLine<TData>) => Promise<void>
+  ): Promise<void> {
+    const optionalLine = this.getLine(key);
+    if (optionalLine != null) return Promise.resolve();
+    const line = this.createLine(key, true);
+    return line.syncWithAction(syncAction);
   }
 }
