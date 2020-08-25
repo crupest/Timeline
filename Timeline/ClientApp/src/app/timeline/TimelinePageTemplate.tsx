@@ -25,7 +25,6 @@ export interface TimelinePageTemplateProps<TManageItem> {
   UiComponent: React.ComponentType<
     ExcludeKey<TimelinePageTemplateUIProps<TManageItem>, "CardComponent">
   >;
-  dataVersion?: number;
   notFoundI18nKey: string;
 }
 
