@@ -1407,5 +1407,34 @@ namespace Timeline.Tests.IntegratedTests
                     .Which.Should().BeEquivalentTo(timeline);
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task Title(TimelineUrlGenerator urlGenerator)
+        {
+            using var client = await CreateClientAsUser();
+
+            {
+                var res = await client.GetAsync(urlGenerator(1));
+                var timeline = res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which;
+                timeline.Title.Should().Be(timeline.Name);
+            }
+
+            {
+                var res = await client.PatchAsJsonAsync(urlGenerator(1), new TimelinePatchRequest { Title = "atitle" });
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.Title.Should().Be("atitle");
+            }
+
+            {
+                var res = await client.GetAsync(urlGenerator(1));
+                res.Should().HaveStatusCode(200)
+                    .And.HaveJsonBody<TimelineInfo>()
+                    .Which.Title.Should().Be("atitle");
+            }
+        }
     }
 }

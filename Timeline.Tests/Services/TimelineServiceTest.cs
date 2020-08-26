@@ -271,5 +271,32 @@ namespace Timeline.Tests.Services
                 posts.Should().HaveCount(4);
             }
         }
+
+        [Theory]
+        [InlineData("@admin")]
+        [InlineData("tl")]
+        public async Task Title(string timelineName)
+        {
+            var _ = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+            if (!isPersonal)
+                await _timelineService.CreateTimeline(timelineName, await _userService.GetUserIdByUsername("user"));
+
+            {
+                var timeline = await _timelineService.GetTimeline(timelineName);
+                timeline.Title.Should().Be(timelineName);
+            }
+
+            {
+                await _timelineService.ChangeProperty(timelineName, new TimelineChangePropertyRequest { Title = null });
+                var timeline = await _timelineService.GetTimeline(timelineName);
+                timeline.Title.Should().Be(timelineName);
+            }
+
+            {
+                await _timelineService.ChangeProperty(timelineName, new TimelineChangePropertyRequest { Title = "atitle" });
+                var timeline = await _timelineService.GetTimeline(timelineName);
+                timeline.Title.Should().Be("atitle");
+            }
+        }
     }
 }
