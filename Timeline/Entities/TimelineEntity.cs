@@ -23,6 +23,9 @@ namespace Timeline.Entities
         [Column("name")]
         public string? Name { get; set; }
 
+        [Column("title")]
+        public string? Title { get; set; }
+
         [Column("name_last_modified")]
         public DateTime NameLastModified { get; set; }
 
