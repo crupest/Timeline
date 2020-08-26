@@ -68,6 +68,10 @@ namespace Timeline.Models.Http
         /// </summary>
         public string UniqueId { get; set; } = default!;
         /// <summary>
+        /// Title.
+        /// </summary>
+        public string Title { get; set; } = default!;
+        /// <summary>
         /// Name of timeline.
         /// </summary>
         public string Name { get; set; } = default!;

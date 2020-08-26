@@ -405,11 +405,14 @@ namespace Timeline.Services
                 members.Add(await _userService.GetUserById(memberEntity.UserId));
             }
 
+            var name = entity.Name ?? ("@" + owner.Username);
+
             return new Models.Timeline
             {
                 UniqueID = entity.UniqueId,
-                Name = entity.Name ?? ("@" + owner.Username),
+                Name = name,
                 NameLastModified = entity.NameLastModified,
+                Title = string.IsNullOrEmpty(entity.Title) ? name : entity.Title,
                 Description = entity.Description ?? "",
                 Owner = owner,
                 Visibility = entity.Visibility,
@@ -833,6 +836,12 @@ namespace Timeline.Services
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
             var changed = false;
+
+            if (newProperties.Title != null)
+            {
+                changed = true;
+                timelineEntity.Title = newProperties.Title;
+            }
 
             if (newProperties.Description != null)
             {

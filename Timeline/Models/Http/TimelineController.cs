@@ -57,6 +57,11 @@ namespace Timeline.Models.Http
     public class TimelinePatchRequest
     {
         /// <summary>
+        /// New title. Null for not change.
+        /// </summary>
+        public string? Title { get; set; }
+
+        /// <summary>
         /// New description. Null for not change.
         /// </summary>
         public string? Description { get; set; }
