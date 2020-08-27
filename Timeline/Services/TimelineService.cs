@@ -411,6 +411,7 @@ namespace Timeline.Services
             }
         }
 
+        /// Remember to include Members when query.
         private async Task<Models.Timeline> MapTimelineFromEntity(TimelineEntity entity)
         {
             var owner = await _userService.GetUserById(entity.OwnerId);
@@ -1138,7 +1139,7 @@ namespace Timeline.Services
             ValidateTimelineName(oldTimelineName, nameof(oldTimelineName));
             ValidateTimelineName(newTimelineName, nameof(newTimelineName));
 
-            var entity = await _database.Timelines.Where(t => t.Name == oldTimelineName).SingleOrDefaultAsync();
+            var entity = await _database.Timelines.Include(t => t.Members).Where(t => t.Name == oldTimelineName).SingleOrDefaultAsync();
 
             if (entity == null)
                 throw new TimelineNotExistException(oldTimelineName);

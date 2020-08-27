@@ -488,7 +488,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 {
                     var res = await client.DeleteAsync("timelines/t1");
-                    res.Should().HaveStatusCode(HttpStatusCode.NotFound);
+                    res.Should().HaveStatusCode(400);
                 }
             }
         }
@@ -545,15 +545,15 @@ namespace Timeline.Tests.IntegratedTests
             }
             {
                 var res = await client.PatchAsJsonAsync(generator("notexist", null), new TimelinePatchRequest { });
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
+                res.Should().HaveStatusCode(400).And.HaveCommonBody(errorCode);
             }
             {
                 var res = await client.PutAsync(generator("notexist", "members/user1"), null);
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
+                res.Should().HaveStatusCode(400).And.HaveCommonBody(errorCode);
             }
             {
                 var res = await client.DeleteAsync(generator("notexist", "members/user1"));
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
+                res.Should().HaveStatusCode(400).And.HaveCommonBody(errorCode);
             }
             {
                 var res = await client.GetAsync(generator("notexist", "posts"));
@@ -561,11 +561,11 @@ namespace Timeline.Tests.IntegratedTests
             }
             {
                 var res = await client.PostAsJsonAsync(generator("notexist", "posts"), TimelineHelper.TextPostCreateRequest("aaa"));
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
+                res.Should().HaveStatusCode(400).And.HaveCommonBody(errorCode);
             }
             {
                 var res = await client.DeleteAsync(generator("notexist", "posts/123"));
-                res.Should().HaveStatusCode(404).And.HaveCommonBody(errorCode);
+                res.Should().HaveStatusCode(400).And.HaveCommonBody(errorCode);
             }
             {
                 var res = await client.GetAsync(generator("notexist", "posts/123/data"));
@@ -1434,6 +1434,55 @@ namespace Timeline.Tests.IntegratedTests
                 res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<TimelineInfo>()
                     .Which.Title.Should().Be("atitle");
+            }
+        }
+
+        [Fact]
+        public async Task ChangeName()
+        {
+            {
+                using var client = await CreateDefaultClient();
+                var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
+                res.Should().HaveStatusCode(401);
+            }
+
+            {
+                using var client = await CreateClientAs(2);
+                var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
+                res.Should().HaveStatusCode(403);
+            }
+
+            using (var client = await CreateClientAsUser())
+            {
+                {
+                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "!!!", NewName = "tttttttt" });
+                    res.Should().BeInvalidModel();
+                }
+
+                {
+                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttt", NewName = "!!!!" });
+                    res.Should().BeInvalidModel();
+                }
+
+                {
+                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttttt", NewName = "tttttttt" });
+                    res.Should().HaveStatusCode(400).And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.TimelineController.NotExist);
+                }
+
+                {
+                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "newt" });
+                    res.Should().HaveStatusCode(200).And.HaveJsonBody<TimelineInfo>().Which.Name.Should().Be("newt");
+                }
+
+                {
+                    var res = await client.GetAsync("timelines/t1");
+                    res.Should().HaveStatusCode(404);
+                }
+
+                {
+                    var res = await client.GetAsync("timelines/newt");
+                    res.Should().HaveStatusCode(200).And.HaveJsonBody<TimelineInfo>().Which.Name.Should().Be("newt");
+                }
             }
         }
     }
