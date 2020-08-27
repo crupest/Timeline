@@ -71,4 +71,23 @@ namespace Timeline.Models.Http
         /// </summary>
         public TimelineVisibility? Visibility { get; set; }
     }
+
+    /// <summary>
+    /// Change timeline name request model.
+    /// </summary>
+    public class TimelineChangeNameRequest
+    {
+        /// <summary>
+        /// Old name of timeline.
+        /// </summary>
+        [Required]
+        [TimelineName]
+        public string OldName { get; set; } = default!;
+        /// <summary>
+        /// New name of timeline.
+        /// </summary>
+        [Required]
+        [TimelineName]
+        public string NewName { get; set; } = default!;
+    }
 }

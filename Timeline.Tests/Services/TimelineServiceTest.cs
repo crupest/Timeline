@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Services;
+using Timeline.Services.Exceptions;
 using Timeline.Tests.Helpers;
 using Xunit;
 
@@ -304,7 +305,14 @@ namespace Timeline.Tests.Services
         {
             _clock.ForwardCurrentTime();
 
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("!!!", "newtl")).Should().ThrowAsync<ArgumentException>();
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("tl", "!!!")).Should().ThrowAsync<ArgumentException>();
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("tl", "newtl")).Should().ThrowAsync<TimelineNotExistException>();
+
             await _timelineService.CreateTimeline("tl", await _userService.GetUserIdByUsername("user"));
+            await _timelineService.CreateTimeline("tl2", await _userService.GetUserIdByUsername("user"));
+
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("tl", "tl2")).Should().ThrowAsync<EntityAlreadyExistException>();
 
             var time = _clock.ForwardCurrentTime();
 
