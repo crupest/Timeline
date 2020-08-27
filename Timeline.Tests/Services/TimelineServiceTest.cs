@@ -298,5 +298,24 @@ namespace Timeline.Tests.Services
                 timeline.Title.Should().Be("atitle");
             }
         }
+
+        [Fact]
+        public async Task ChangeName()
+        {
+            _clock.ForwardCurrentTime();
+
+            await _timelineService.CreateTimeline("tl", await _userService.GetUserIdByUsername("user"));
+
+            var time = _clock.ForwardCurrentTime();
+
+            await _timelineService.ChangeTimelineName("tl", "newtl");
+
+            {
+                var timeline = await _timelineService.GetTimeline("newtl");
+                timeline.Name.Should().Be("newtl");
+                timeline.LastModified.Should().Be(time);
+                timeline.NameLastModified.Should().Be(time);
+            }
+        }
     }
 }
