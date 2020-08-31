@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "reactstrap";
 import { useTranslation } from "react-i18next";
 
-import { pushAlert } from "./common/alert-service";
+import { pushAlert } from "./services/alert";
 
 if ("serviceWorker" in navigator) {
   let isThisTriggerUpgrade = false;

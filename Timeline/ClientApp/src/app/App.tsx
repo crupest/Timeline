@@ -2,17 +2,17 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { hot } from "react-hot-loader/root";
 
-import AppBar from "./common/AppBar";
-import LoadingPage from "./common/LoadingPage";
-import Home from "./home/Home";
-import Login from "./user/Login";
-import Settings from "./settings/Settings";
-import About from "./about/About";
-import User from "./user/User";
-import TimelinePage from "./timeline/TimelinePage";
-import AlertHost from "./common/AlertHost";
-import { dataStorage } from "./data/common";
-import { userService, useRawUser } from "./data/user";
+import AppBar from "./views/common/AppBar";
+import LoadingPage from "./views/common/LoadingPage";
+import Home from "./views/home";
+import Login from "./views/login";
+import Settings from "./views/settings";
+import About from "./views/about";
+import User from "./views/user";
+import TimelinePage from "./views/timeline";
+import AlertHost from "./views/common/alert/AlertHost";
+import { dataStorage } from "./services/common";
+import { userService, useRawUser } from "./services/user";
 
 const NoMatch: React.FC = () => {
   return (
@@ -25,7 +25,7 @@ const NoMatch: React.FC = () => {
 };
 
 const LazyAdmin = React.lazy(
-  () => import(/* webpackChunkName: "admin" */ "./admin/Admin")
+  () => import(/* webpackChunkName: "admin" */ "./views/admin/Admin")
 );
 
 const App: React.FC = () => {
