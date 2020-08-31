@@ -308,6 +308,7 @@ namespace Timeline.Controllers
         [HttpDelete("timelines/{name}/posts/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
@@ -336,6 +337,7 @@ namespace Timeline.Controllers
         [HttpPatch("timelines/{name}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<TimelineInfo>> TimelinePatch([FromRoute][GeneralTimelineName] string name, [FromBody] TimelinePatchRequest body)
@@ -459,6 +461,30 @@ namespace Timeline.Controllers
             catch (TimelineNotExistException)
             {
                 return CommonDeleteResponse.NotExist();
+            }
+        }
+
+        [HttpPost("timelineop/changename")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<TimelineInfo>> TimelineOpChangeName([FromBody] TimelineChangeNameRequest body)
+        {
+            if (!this.IsAdministrator() && !(await _service.HasManagePermission(body.OldName, this.GetUserId())))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
+
+            try
+            {
+                var timeline = await _service.ChangeTimelineName(body.OldName, body.NewName);
+                return Ok(_mapper.Map<TimelineInfo>(timeline));
+            }
+            catch (EntityAlreadyExistException)
+            {
+                return BadRequest(ErrorResponse.TimelineController.NameConflict());
             }
         }
     }
