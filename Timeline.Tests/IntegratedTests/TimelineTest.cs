@@ -1485,5 +1485,39 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineUrlGeneratorData))]
+        public async Task PostDataETag(TimelineUrlGenerator urlGenerator)
+        {
+            using var client = await CreateClientAsUser();
+
+            long id;
+            string etag;
+
+            {
+                var res = await client.PostAsJsonAsync(urlGenerator(1, "posts"), new TimelinePostCreateRequest
+                {
+                    Content = new TimelinePostCreateRequestContent
+                    {
+                        Type = TimelinePostContentTypes.Image,
+                        Data = Convert.ToBase64String(ImageHelper.CreatePngWithSize(100, 50))
+                    }
+                });
+                res.Should().HaveStatusCode(200);
+                var body = await res.ReadBodyAsJsonAsync<TimelinePostInfo>();
+                body.Content.ETag.Should().NotBeNullOrEmpty();
+
+                id = body.Id;
+                etag = body.Content.ETag;
+            }
+
+            {
+                var res = await client.GetAsync(urlGenerator(1, $"posts/{id}/data"));
+                res.Should().HaveStatusCode(200);
+                res.Headers.ETag.Should().NotBeNull();
+                res.Headers.ETag.ToString().Should().Be(etag);
+            }
+        }
     }
 }
