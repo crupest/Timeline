@@ -77,6 +77,8 @@ config.resolve.extensions
   .plugin("pnp")
   .use(PnpWebpackPlugin);
 
+config.resolve.alias.set("@", path.resolve(__dirname, "src/app"));
+
 config.resolveLoader.plugin("pnp").use(PnpWebpackPlugin.moduleLoader(module));
 
 config.output
