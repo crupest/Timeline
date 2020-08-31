@@ -43,6 +43,10 @@ namespace Timeline.Models
         public ImageTimelinePostContent(string dataTag) { DataTag = dataTag; }
 
         public string Type { get; } = TimelinePostContentTypes.Image;
+
+        /// <summary>
+        /// The tag of the data. The tag of the entry in DataManager. Also the etag (not quoted).
+        /// </summary>
         public string DataTag { get; set; }
     }
 
