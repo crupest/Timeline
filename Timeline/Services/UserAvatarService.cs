@@ -71,9 +71,10 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="id">The id of the user to set avatar for.</param>
         /// <param name="avatar">The avatar. Can be null to delete the saved avatar.</param>
+        /// <returns>The etag of the avatar.</returns>
         /// <exception cref="ArgumentException">Thrown if any field in <paramref name="avatar"/> is null when <paramref name="avatar"/> is not null.</exception>
         /// <exception cref="ImageException">Thrown if avatar is of bad format.</exception>
-        Task SetAvatar(long id, Avatar? avatar);
+        Task<string> SetAvatar(long id, Avatar? avatar);
     }
 
     // TODO! : Make this configurable.
@@ -199,7 +200,7 @@ namespace Timeline.Services
             return defaultAvatar;
         }
 
-        public async Task SetAvatar(long id, Avatar? avatar)
+        public async Task<string> SetAvatar(long id, Avatar? avatar)
         {
             if (avatar != null)
             {
@@ -213,11 +214,7 @@ namespace Timeline.Services
 
             if (avatar == null)
             {
-                if (avatarEntity == null || avatarEntity.DataTag == null)
-                {
-                    return;
-                }
-                else
+                if (avatarEntity != null && avatarEntity.DataTag != null)
                 {
                     await _dataManager.FreeEntry(avatarEntity.DataTag);
                     avatarEntity.DataTag = null;
@@ -226,6 +223,7 @@ namespace Timeline.Services
                     await _database.SaveChangesAsync();
                     _logger.LogInformation(Resources.Services.UserAvatarService.LogUpdateEntity);
                 }
+                return await _defaultUserAvatarProvider.GetDefaultAvatarETag();
             }
             else
             {
@@ -250,6 +248,8 @@ namespace Timeline.Services
                 {
                     await _dataManager.FreeEntry(oldTag);
                 }
+
+                return avatarEntity.DataTag;
             }
         }
     }

@@ -43,6 +43,10 @@ namespace Timeline.Models
         public ImageTimelinePostContent(string dataTag) { DataTag = dataTag; }
 
         public string Type { get; } = TimelinePostContentTypes.Image;
+
+        /// <summary>
+        /// The tag of the data. The tag of the entry in DataManager. Also the etag (not quoted).
+        /// </summary>
         public string DataTag { get; set; }
     }
 
@@ -74,6 +78,7 @@ namespace Timeline.Models
         public string UniqueID { get; set; } = default!;
         public string Name { get; set; } = default!;
         public DateTime NameLastModified { get; set; } = default!;
+        public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
         public User Owner { get; set; } = default!;
         public TimelineVisibility Visibility { get; set; }
@@ -86,6 +91,7 @@ namespace Timeline.Models
 
     public class TimelineChangePropertyRequest
     {
+        public string? Title { get; set; }
         public string? Description { get; set; }
         public TimelineVisibility? Visibility { get; set; }
     }

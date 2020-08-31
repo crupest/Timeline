@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
 using Timeline.Auth;
@@ -105,7 +106,7 @@ namespace Timeline.Controllers
 
             try
             {
-                await _service.SetAvatar(id, new Avatar
+                var etag = await _service.SetAvatar(id, new Avatar
                 {
                     Data = body.Data,
                     Type = body.ContentType
@@ -113,6 +114,9 @@ namespace Timeline.Controllers
 
                 _logger.LogInformation(Log.Format(LogPutSuccess,
                     ("Username", username), ("Mime Type", Request.ContentType)));
+
+                Response.Headers.Append("ETag", new EntityTagHeaderValue($"\"{etag}\"").ToString());
+
                 return Ok();
             }
             catch (ImageException e)

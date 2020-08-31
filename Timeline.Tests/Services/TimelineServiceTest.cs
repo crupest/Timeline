@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Services;
+using Timeline.Services.Exceptions;
 using Timeline.Tests.Helpers;
 using Xunit;
 
@@ -269,6 +270,59 @@ namespace Timeline.Tests.Services
             {
                 var posts = await _timelineService.GetPosts(timelineName, time2, true);
                 posts.Should().HaveCount(4);
+            }
+        }
+
+        [Theory]
+        [InlineData("@admin")]
+        [InlineData("tl")]
+        public async Task Title(string timelineName)
+        {
+            var _ = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+            if (!isPersonal)
+                await _timelineService.CreateTimeline(timelineName, await _userService.GetUserIdByUsername("user"));
+
+            {
+                var timeline = await _timelineService.GetTimeline(timelineName);
+                timeline.Title.Should().Be(timelineName);
+            }
+
+            {
+                await _timelineService.ChangeProperty(timelineName, new TimelineChangePropertyRequest { Title = null });
+                var timeline = await _timelineService.GetTimeline(timelineName);
+                timeline.Title.Should().Be(timelineName);
+            }
+
+            {
+                await _timelineService.ChangeProperty(timelineName, new TimelineChangePropertyRequest { Title = "atitle" });
+                var timeline = await _timelineService.GetTimeline(timelineName);
+                timeline.Title.Should().Be("atitle");
+            }
+        }
+
+        [Fact]
+        public async Task ChangeName()
+        {
+            _clock.ForwardCurrentTime();
+
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("!!!", "newtl")).Should().ThrowAsync<ArgumentException>();
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("tl", "!!!")).Should().ThrowAsync<ArgumentException>();
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("tl", "newtl")).Should().ThrowAsync<TimelineNotExistException>();
+
+            await _timelineService.CreateTimeline("tl", await _userService.GetUserIdByUsername("user"));
+            await _timelineService.CreateTimeline("tl2", await _userService.GetUserIdByUsername("user"));
+
+            await _timelineService.Awaiting(s => s.ChangeTimelineName("tl", "tl2")).Should().ThrowAsync<EntityAlreadyExistException>();
+
+            var time = _clock.ForwardCurrentTime();
+
+            await _timelineService.ChangeTimelineName("tl", "newtl");
+
+            {
+                var timeline = await _timelineService.GetTimeline("newtl");
+                timeline.Name.Should().Be("newtl");
+                timeline.LastModified.Should().Be(time);
+                timeline.NameLastModified.Should().Be(time);
             }
         }
     }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
@@ -357,6 +358,21 @@ namespace Timeline.Services
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when the timeline does not exist.</exception>
         Task DeleteTimeline(string timelineName);
+
+        /// <summary>
+        /// Change name of a timeline.
+        /// </summary>
+        /// <param name="oldTimelineName">The old timeline name.</param>
+        /// <param name="newTimelineName">The new timeline name.</param>
+        /// <returns>The new timeline info.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="oldTimelineName"/> or <paramref name="newTimelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="oldTimelineName"/> or <paramref name="newTimelineName"/> is of invalid format.</exception>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityAlreadyExistException">Thrown when a timeline with new name already exists.</exception>
+        /// <remarks>
+        /// You can only change name of general timeline.
+        /// </remarks>
+        Task<Models.Timeline> ChangeTimelineName(string oldTimelineName, string newTimelineName);
     }
 
     public class TimelineService : ITimelineService
@@ -395,6 +411,7 @@ namespace Timeline.Services
             }
         }
 
+        /// Remember to include Members when query.
         private async Task<Models.Timeline> MapTimelineFromEntity(TimelineEntity entity)
         {
             var owner = await _userService.GetUserById(entity.OwnerId);
@@ -405,11 +422,14 @@ namespace Timeline.Services
                 members.Add(await _userService.GetUserById(memberEntity.UserId));
             }
 
+            var name = entity.Name ?? ("@" + owner.Username);
+
             return new Models.Timeline
             {
                 UniqueID = entity.UniqueId,
-                Name = entity.Name ?? ("@" + owner.Username),
+                Name = name,
                 NameLastModified = entity.NameLastModified,
+                Title = string.IsNullOrEmpty(entity.Title) ? name : entity.Title,
                 Description = entity.Description ?? "",
                 Owner = owner,
                 Visibility = entity.Visibility,
@@ -834,6 +854,12 @@ namespace Timeline.Services
 
             var changed = false;
 
+            if (newProperties.Title != null)
+            {
+                changed = true;
+                timelineEntity.Title = newProperties.Title;
+            }
+
             if (newProperties.Description != null)
             {
                 changed = true;
@@ -1101,6 +1127,40 @@ namespace Timeline.Services
 
             _database.Timelines.Remove(entity);
             await _database.SaveChangesAsync();
+        }
+
+        public async Task<Models.Timeline> ChangeTimelineName(string oldTimelineName, string newTimelineName)
+        {
+            if (oldTimelineName == null)
+                throw new ArgumentNullException(nameof(oldTimelineName));
+            if (newTimelineName == null)
+                throw new ArgumentNullException(nameof(newTimelineName));
+
+            ValidateTimelineName(oldTimelineName, nameof(oldTimelineName));
+            ValidateTimelineName(newTimelineName, nameof(newTimelineName));
+
+            var entity = await _database.Timelines.Include(t => t.Members).Where(t => t.Name == oldTimelineName).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw new TimelineNotExistException(oldTimelineName);
+
+            if (oldTimelineName == newTimelineName)
+                return await MapTimelineFromEntity(entity);
+
+            var conflict = await _database.Timelines.AnyAsync(t => t.Name == newTimelineName);
+
+            if (conflict)
+                throw new EntityAlreadyExistException(EntityNames.Timeline, null, ExceptionTimelineNameConflict);
+
+            var now = _clock.GetCurrentTime();
+
+            entity.Name = newTimelineName;
+            entity.NameLastModified = now;
+            entity.LastModified = now;
+
+            await _database.SaveChangesAsync();
+
+            return await MapTimelineFromEntity(entity);
         }
     }
 }

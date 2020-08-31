@@ -25,6 +25,10 @@ namespace Timeline.Models.Http
         /// If post is of image type. This is the image url.
         /// </summary>
         public string? Url { get; set; }
+        /// <summary>
+        /// If post has data (currently it means it's a image post), this is the data etag.
+        /// </summary>
+        public string? ETag { get; set; }
     }
 
     /// <summary>
@@ -67,6 +71,10 @@ namespace Timeline.Models.Http
         /// Unique id.
         /// </summary>
         public string UniqueId { get; set; } = default!;
+        /// <summary>
+        /// Title.
+        /// </summary>
+        public string Title { get; set; } = default!;
         /// <summary>
         /// Name of timeline.
         /// </summary>
@@ -188,7 +196,8 @@ namespace Timeline.Models.Http
                     Url = urlHelper.ActionLink(
                         action: nameof(TimelineController.PostDataGet),
                         controller: nameof(TimelineController)[0..^nameof(Controller).Length],
-                        values: new { Name = source.TimelineName, Id = source.Id })
+                        values: new { Name = source.TimelineName, Id = source.Id }),
+                    ETag = $"\"{imageContent.DataTag}\""
                 };
             }
             else

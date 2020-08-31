@@ -57,6 +57,11 @@ namespace Timeline.Models.Http
     public class TimelinePatchRequest
     {
         /// <summary>
+        /// New title. Null for not change.
+        /// </summary>
+        public string? Title { get; set; }
+
+        /// <summary>
         /// New description. Null for not change.
         /// </summary>
         public string? Description { get; set; }
@@ -65,5 +70,24 @@ namespace Timeline.Models.Http
         /// New visibility. Null for not change.
         /// </summary>
         public TimelineVisibility? Visibility { get; set; }
+    }
+
+    /// <summary>
+    /// Change timeline name request model.
+    /// </summary>
+    public class TimelineChangeNameRequest
+    {
+        /// <summary>
+        /// Old name of timeline.
+        /// </summary>
+        [Required]
+        [TimelineName]
+        public string OldName { get; set; } = default!;
+        /// <summary>
+        /// New name of timeline.
+        /// </summary>
+        [Required]
+        [TimelineName]
+        public string NewName { get; set; } = default!;
     }
 }

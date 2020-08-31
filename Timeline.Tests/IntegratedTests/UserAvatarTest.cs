@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services;
@@ -220,6 +221,30 @@ namespace Timeline.Tests.IntegratedTests
                     var res = await client.DeleteAsync("users/u!ser/avatar");
                     res.Should().BeInvalidModel();
                 }
+            }
+        }
+
+        [Fact]
+        public async Task AvatarPutReturnETag()
+        {
+            using var client = await CreateClientAsUser();
+
+            EntityTagHeaderValue etag;
+
+            {
+                var image = ImageHelper.CreatePngWithSize(100, 100);
+                var res = await client.PutByteArrayAsync("users/user1/avatar", image, PngFormat.Instance.DefaultMimeType);
+                res.Should().HaveStatusCode(200);
+                etag = res.Headers.ETag;
+                etag.Should().NotBeNull();
+                etag.Tag.Should().NotBeNullOrEmpty();
+            }
+
+            {
+                var res = await client.GetAsync("users/user1/avatar");
+                res.Should().HaveStatusCode(200);
+                res.Headers.ETag.Should().Be(etag);
+                res.Headers.ETag.Tag.Should().Be(etag.Tag);
             }
         }
     }
