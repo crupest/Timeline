@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router";
-import { Row, Container, Button, Col } from "reactstrap";
 import { useTranslation } from "react-i18next";
+import { Row, Container, Button, Col } from "react-bootstrap";
 
 import { useUser } from "@/services/user";
 import AppBar from "../common/AppBar";
@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
   return (
     <>
       <AppBar />
-      <Container fluid style={{ marginTop: "56px" }}>
+      <Container fluid>
         <Row>
           <Col>
             <SearchInput
@@ -48,8 +48,7 @@ const HomePage: React.FC = () => {
               additionalButton={
                 user != null && (
                   <Button
-                    color="success"
-                    outline
+                    variant="outline-success"
                     onClick={() => {
                       setDialog("create");
                     }}

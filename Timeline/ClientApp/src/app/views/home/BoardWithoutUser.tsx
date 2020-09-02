@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col } from "reactstrap";
+import { Row, Col } from "react-bootstrap";
 
 import { TimelineInfo } from "@/services/timeline";
 import { getHttpTimelineClient } from "@/http/timeline";

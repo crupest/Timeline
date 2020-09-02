@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col } from "reactstrap";
+import { Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { UserWithToken } from "@/services/user";

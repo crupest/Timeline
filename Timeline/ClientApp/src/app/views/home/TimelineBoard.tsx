@@ -1,8 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
-import { Spinner } from "reactstrap";
 import { Trans } from "react-i18next";
+import { Spinner } from "react-bootstrap";
 
 import { TimelineInfo } from "@/services/timeline";
 import TimelineLogo from "../common/TimelineLogo";
@@ -25,7 +25,7 @@ const TimelineBoard: React.FC<TimelineBoardProps> = (props) => {
         if (timelines === "loading") {
           return (
             <div className="d-flex flex-grow-1 justify-content-center align-items-center">
-              <Spinner color="primary" />
+              <Spinner variant="primary" animation="border" />
             </div>
           );
         } else if (timelines === "offline") {
