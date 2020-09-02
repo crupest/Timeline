@@ -1497,6 +1497,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.4.2, @babel/runtime@npm:^7.4.5, @babel/runtime@npm:^7.6.3, @babel/runtime@npm:^7.8.7":
+  version: 7.11.2
+  resolution: "@babel/runtime@npm:7.11.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.11.2.tgz"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 2f127ad60a0f0568faa0044e5b48329d8166c7fd3a0a3ce774070010a1c441ebf5570f526dd6bb26e214fb1a01bb987ab6a4c3f60a00f04d02448939f4c61e1e
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.10.4":
   version: 7.10.4
   resolution: "@babel/template@npm:7.10.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Ftemplate%2Fdownload%2F%40babel%2Ftemplate-7.10.4.tgz"
@@ -1660,6 +1669,34 @@ __metadata:
   dependencies:
     mkdirp: ^1.0.4
   checksum: ed2cb75eefe218113794416fae43b5307f7c30476506942ed6c6c51f702713323842f81102ae1327f9134130bec0360312e6f858ddef143c21d9e269e90737ac
+  languageName: node
+  linkType: hard
+
+"@popperjs/core@npm:^2.0.0":
+  version: 2.4.4
+  resolution: "@popperjs/core@npm:2.4.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.4.4.tgz"
+  checksum: 49a1e6cfa2ec5004c541b0a1bd7d523c8aa7d728aa26e05df10f0af8c1e6c0db7fb9ebc8bee6dbfcdc7ad422999d9bf7d8a1c2b07dff3292b7dfa61a63af8b49
+  languageName: node
+  linkType: hard
+
+"@restart/context@npm:^2.1.4":
+  version: 2.1.4
+  resolution: "@restart/context@npm:2.1.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fcontext%2Fdownload%2F%40restart%2Fcontext-2.1.4.tgz"
+  peerDependencies:
+    react: ">=16.3.2"
+  checksum: f9dd1416c16988b5bd66d3306dedfc9b95665d3af2c5b88cd2040b0825dfcf778eb9bd992c6e810c62187f981a78ea34923fb582a023f896079634edb3b1bc2c
+  languageName: node
+  linkType: hard
+
+"@restart/hooks@npm:^0.3.12, @restart/hooks@npm:^0.3.21":
+  version: 0.3.25
+  resolution: "@restart/hooks@npm:0.3.25::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fhooks%2Fdownload%2F%40restart%2Fhooks-0.3.25.tgz"
+  dependencies:
+    lodash: ^4.17.15
+    lodash-es: ^4.17.15
+  peerDependencies:
+    react: ^16.8.0
+  checksum: 08aefc359f597f9def83454c182e40efef034ca6e0eac41d28e013d8a3940d354911f60f89e73bad72ac9aee1bff56e84d4b26b95d46877818b733483ed95cad
   languageName: node
   linkType: hard
 
@@ -1828,6 +1865,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/invariant@npm:^2.2.33":
+  version: 2.2.34
+  resolution: "@types/invariant@npm:2.2.34::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Finvariant%2Fdownload%2F%40types%2Finvariant-2.2.34.tgz"
+  checksum: d0ecc665e5c95abf1ad7263c8cc32604d6b3444cfbc97657fede7e63f3751554a4f35f72ae565d70c28184dfb8b0cd4c058eaec1af972999edfd0a81b365f74b
+  languageName: node
+  linkType: hard
+
 "@types/json-schema@npm:^7.0.3, @types/json-schema@npm:^7.0.4, @types/json-schema@npm:^7.0.5":
   version: 7.0.5
   resolution: "@types/json-schema@npm:7.0.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fjson-schema%2Fdownload%2F%40types%2Fjson-schema-7.0.5.tgz"
@@ -1886,7 +1930,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prop-types@npm:*":
+"@types/prop-types@npm:*, @types/prop-types@npm:^15.7.3":
   version: 15.7.3
   resolution: "@types/prop-types@npm:15.7.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fprop-types%2Fdownload%2F%40types%2Fprop-types-15.7.3.tgz"
   checksum: bd0eab69d5120ad3784d0c9985f902653d5924707a7f2b3702a330e762dfd61b6494954cb54ad0c52b918ffd6f1e7e27c9270e4442bc15250de348596f2f60cb
@@ -1911,7 +1955,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-router-dom@npm:^5.1.5":
+"@types/react-router-bootstrap@npm:^0.24.5":
+  version: 0.24.5
+  resolution: "@types/react-router-bootstrap@npm:0.24.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-bootstrap%2Fdownload%2F%40types%2Freact-router-bootstrap-0.24.5.tgz"
+  dependencies:
+    "@types/react": "*"
+    "@types/react-router-dom": "*"
+  checksum: 08b8ed99b750ffa14546653f73bcc2e39ab5149c4a22e1ef8d8dd0d73874bd38b5c7873bba34753cee4942141d9eabd520d5e36a12ead6309626699ba8d85faa
+  languageName: node
+  linkType: hard
+
+"@types/react-router-dom@npm:*, @types/react-router-dom@npm:^5.1.5":
   version: 5.1.5
   resolution: "@types/react-router-dom@npm:5.1.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-dom%2Fdownload%2F%40types%2Freact-router-dom-5.1.5.tgz"
   dependencies:
@@ -1932,6 +1986,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-transition-group@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "@types/react-transition-group@npm:4.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-transition-group%2Fdownload%2F%40types%2Freact-transition-group-4.4.0.tgz"
+  dependencies:
+    "@types/react": "*"
+  checksum: b761f70623ca2a386a310536886e7ceed15087e59a3b6c68478c9965d38edd819c5b29e3fb79a5d911ee4b1db5ab397ae0ebb5a5ddf98f08708a6d592cb7c256
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:*":
   version: 16.9.43
   resolution: "@types/react@npm:16.9.43::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact%2Fdownload%2F%40types%2Freact-16.9.43.tgz"
@@ -1942,7 +2005,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^16.9.49":
+"@types/react@npm:^16.9.11, @types/react@npm:^16.9.35, @types/react@npm:^16.9.49":
   version: 16.9.49
   resolution: "@types/react@npm:16.9.49::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact%2Fdownload%2F%40types%2Freact-16.9.49.tgz"
   dependencies:
@@ -2000,6 +2063,13 @@ __metadata:
   dependencies:
     source-map: ^0.6.1
   checksum: b12ae05d8faace173070c3ab2d0a7345a4fdefd9c1a248ac6256200f9ba5ad129c89f313e7e12544027906ffc620a56b458ab3731102f65c5412c0c068232374
+  languageName: node
+  linkType: hard
+
+"@types/warning@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@types/warning@npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwarning%2Fdownload%2F%40types%2Fwarning-3.0.0.tgz"
+  checksum: cb7a16aa88641beceec53ce765274c1ba3a9136e3c7c53cafd769d5063ea96f8899332ce7031c6f374bd23b5713a9a733d42c369ebdb4b62daf9b7562700848c
   languageName: node
   linkType: hard
 
@@ -4734,6 +4804,16 @@ __metadata:
   dependencies:
     "@babel/runtime": ^7.1.2
   checksum: 7625598dbfef65a50801e194b88f277ab398dd92c27398280fd8d69294326f05d9b0588922560ba50e10d9fe5ee8096f90995d679b7db2b776afd579d495b962
+  languageName: node
+  linkType: hard
+
+"dom-helpers@npm:^5.0.1, dom-helpers@npm:^5.1.0, dom-helpers@npm:^5.1.2":
+  version: 5.2.0
+  resolution: "dom-helpers@npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-helpers%2Fdownload%2Fdom-helpers-5.2.0.tgz"
+  dependencies:
+    "@babel/runtime": ^7.8.7
+    csstype: ^3.0.2
+  checksum: 9ef27628f4ccfdfa0537b35ecf3b9600f1656f9c66f57a1530b552a65b51f4466d44514f2cb87399a15feee3c51047a77760327971e9aabc64fe637efd319156
   languageName: node
   linkType: hard
 
@@ -7544,6 +7624,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"lodash-es@npm:^4.17.15":
+  version: 4.17.15
+  resolution: "lodash-es@npm:4.17.15::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash-es%2Fdownload%2Flodash-es-4.17.15.tgz"
+  checksum: ee2871b76deefd1754527e659a8c8b688f2e427e67b30709296878e18ad9cb54b4f0fc16a7161298156b4e0ebc2a37dfe501a3ea8725f195763f9de8a7ba6da6
+  languageName: node
+  linkType: hard
+
 "lodash._reinterpolate@npm:^3.0.0":
   version: 3.0.0
   resolution: "lodash._reinterpolate@npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash._reinterpolate%2Fdownload%2Flodash._reinterpolate-3.0.0.tgz"
@@ -9552,7 +9639,19 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.8, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
+"prop-types-extra@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "prop-types-extra@npm:1.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types-extra%2Fdownload%2Fprop-types-extra-1.1.1.tgz"
+  dependencies:
+    react-is: ^16.3.2
+    warning: ^4.0.0
+  peerDependencies:
+    react: ">=0.14.0"
+  checksum: f1f1cc23b95423615da6ab3ad5726a228011c64612fc77cb773a507437d34543d16758d5ec54fa987611c85e7de6fc4f44e8d3fcec9e343fa5578bca8a09378a
+  languageName: node
+  linkType: hard
+
+"prop-types@npm:^15.5.10, prop-types@npm:^15.5.8, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
   version: 15.7.2
   resolution: "prop-types@npm:15.7.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types%2Fdownload%2Fprop-types-15.7.2.tgz"
   dependencies:
@@ -9750,6 +9849,35 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"react-bootstrap@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "react-bootstrap@npm:1.3.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-bootstrap%2Fdownload%2Freact-bootstrap-1.3.0.tgz"
+  dependencies:
+    "@babel/runtime": ^7.4.2
+    "@restart/context": ^2.1.4
+    "@restart/hooks": ^0.3.21
+    "@types/classnames": ^2.2.10
+    "@types/invariant": ^2.2.33
+    "@types/prop-types": ^15.7.3
+    "@types/react": ^16.9.35
+    "@types/react-transition-group": ^4.4.0
+    "@types/warning": ^3.0.0
+    classnames: ^2.2.6
+    dom-helpers: ^5.1.2
+    invariant: ^2.2.4
+    prop-types: ^15.7.2
+    prop-types-extra: ^1.1.0
+    react-overlays: ^4.1.0
+    react-transition-group: ^4.4.1
+    uncontrollable: ^7.0.0
+    warning: ^4.0.3
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: f9dc21c00db84134bf1c80f247ec88c27cfecae2f6a787d210b5cbf8684fdc71f2efaf3255b74df0e9755006880d446539de93b0a0acffc601c1a160a96850b9
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^16.13.1":
   version: 16.13.1
   resolution: "react-dom@npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz"
@@ -9821,7 +9949,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.6.0, react-is@npm:^16.7.0, react-is@npm:^16.8.1":
+"react-is@npm:^16.3.2, react-is@npm:^16.6.0, react-is@npm:^16.7.0, react-is@npm:^16.8.1":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-is%2Fdownload%2Freact-is-16.13.1.tgz"
   checksum: 11bcf1267a314a522615f626f3ce3727a3a24cdbf61c4d452add3550a7875326669631326cfb1ba3e92b6f72244c32ffecf93ad21c0cad8455d3e169d0e3f060
@@ -9832,6 +9960,25 @@ fsevents@~2.1.2:
   version: 3.0.4
   resolution: "react-lifecycles-compat@npm:3.0.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-lifecycles-compat%2Fdownload%2Freact-lifecycles-compat-3.0.4.tgz"
   checksum: 82176a55ef7526414d770d5e07dc1d28b4c7f20281f22c6f53f3a98df9dbbb5d70c94bebee57b4ea8ccc2eee430b907ca7b564a42fbdd0ed21e7c43bfee35404
+  languageName: node
+  linkType: hard
+
+"react-overlays@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "react-overlays@npm:4.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-overlays%2Fdownload%2Freact-overlays-4.1.0.tgz"
+  dependencies:
+    "@babel/runtime": ^7.4.5
+    "@popperjs/core": ^2.0.0
+    "@restart/hooks": ^0.3.12
+    "@types/warning": ^3.0.0
+    dom-helpers: ^5.1.0
+    prop-types: ^15.7.2
+    uncontrollable: ^7.0.0
+    warning: ^4.0.3
+  peerDependencies:
+    react: ">=16.3.0"
+    react-dom: ">=16.3.0"
+  checksum: 64d46694be7969885c8aa60b671b2a5e9e2fa30431efdd554f12793bc730d045a084a3e245f65e61cb5bcf94884e16f850fa3e870438b463f914556455ac1261
   languageName: node
   linkType: hard
 
@@ -9863,6 +10010,18 @@ fsevents@~2.1.2:
   peerDependencies:
     react: ^16.8.0
   checksum: 059c460fd4aa826254442ca1d0739d19e262ad08e0960ca62bd74556377021645394c44104256e1dc929d3106d5d91d736f7643c2c6f6d47f0bcd62567c213a8
+  languageName: node
+  linkType: hard
+
+"react-router-bootstrap@npm:^0.25.0":
+  version: 0.25.0
+  resolution: "react-router-bootstrap@npm:0.25.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-bootstrap%2Fdownload%2Freact-router-bootstrap-0.25.0.tgz"
+  dependencies:
+    prop-types: ^15.5.10
+  peerDependencies:
+    react: ">=0.14.0"
+    react-router-dom: ">=4.0.0"
+  checksum: c9a66a8cc92ff2eaffe76e95577c8db5dda68e8a6c7386832e8c8e34da4e3956ea928960391ef3dd9e99f537f1faa08b6689a43dee03bd331eeb8731180803f6
   languageName: node
   linkType: hard
 
@@ -9915,6 +10074,21 @@ fsevents@~2.1.2:
     react: ">=15.0.0"
     react-dom: ">=15.0.0"
   checksum: eefed08c48a0d377b5fac3ac7fac54ed986d5dcdd4494f36075954c9d2d257072a9d18cc02c6d8e6698034722b1ff9419ad0c24ef068dea742edcff9f8ea4ba9
+  languageName: node
+  linkType: hard
+
+"react-transition-group@npm:^4.4.1":
+  version: 4.4.1
+  resolution: "react-transition-group@npm:4.4.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-transition-group%2Fdownload%2Freact-transition-group-4.4.1.tgz"
+  dependencies:
+    "@babel/runtime": ^7.5.5
+    dom-helpers: ^5.0.1
+    loose-envify: ^1.4.0
+    prop-types: ^15.6.2
+  peerDependencies:
+    react: ">=16.6.0"
+    react-dom: ">=16.6.0"
+  checksum: e14446123f820e804335c64be5270333c29e8cfaa43dfc33387e132c5d521cf4a0a7c2408058a147b254ae82a6569f373394d83e977ef340d6937bc2f4ff7d6c
   languageName: node
   linkType: hard
 
@@ -11481,6 +11655,7 @@ fsevents@~2.1.2:
     "@types/react-dom": ^16.9.8
     "@types/react-responsive": ^8.0.2
     "@types/react-router": ^5.1.8
+    "@types/react-router-bootstrap": ^0.24.5
     "@types/react-router-dom": ^5.1.5
     "@types/reactstrap": ^8.5.1
     "@types/webpack-env": ^1.15.2
@@ -11521,12 +11696,14 @@ fsevents@~2.1.2:
     postcss-preset-env: ^6.7.0
     prettier: ^2.1.1
     react: ^16.13.1
+    react-bootstrap: ^1.3.0
     react-dom: ^16.13.1
     react-hot-loader: ^4.12.21
     react-i18next: ^11.7.2
     react-inlinesvg: ^2.0.0
     react-responsive: ^8.1.0
     react-router: ^5.2.0
+    react-router-bootstrap: ^0.25.0
     react-router-dom: ^5.2.0
     reactstrap: ^8.5.1
     regenerator-runtime: ^0.13.7
@@ -11802,6 +11979,20 @@ typescript@^4.0.2:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: b8b689ef994cce4fe59950d56ddfffce3c4bdda8edb85b72e752d4a6d27bf7df8a318e76ccde25cbe6e642058f2f4ccf47187db4b243bbc98278a2844db9461b
+  languageName: node
+  linkType: hard
+
+"uncontrollable@npm:^7.0.0":
+  version: 7.1.1
+  resolution: "uncontrollable@npm:7.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Funcontrollable%2Fdownload%2Funcontrollable-7.1.1.tgz"
+  dependencies:
+    "@babel/runtime": ^7.6.3
+    "@types/react": ^16.9.11
+    invariant: ^2.2.4
+    react-lifecycles-compat: ^3.0.4
+  peerDependencies:
+    react: ">=15.0.0"
+  checksum: 208d397c41bb8293e884dc615dfeb1163c14d470e4a677e9afb695ce8cc339bbe8cafb1e8e6c8d20d3b826621bacf07906ce65fee9667b8e5f1f08f42bf9e3d7
   languageName: node
   linkType: hard
 
@@ -12110,7 +12301,7 @@ typescript@^4.0.2:
   languageName: node
   linkType: hard
 
-"warning@npm:^4.0.2, warning@npm:^4.0.3":
+"warning@npm:^4.0.0, warning@npm:^4.0.2, warning@npm:^4.0.3":
   version: 4.0.3
   resolution: "warning@npm:4.0.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fwarning%2Fdownload%2Fwarning-4.0.3.tgz"
   dependencies:

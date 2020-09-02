@@ -1,9 +1,7 @@
 import React from "react";
-import { useHistory, matchPath } from "react-router";
-import { Link, NavLink } from "react-router-dom";
-import { Navbar, NavbarToggler, Collapse, Nav, NavItem } from "reactstrap";
-import { useMediaQuery } from "react-responsive";
 import { useTranslation } from "react-i18next";
+import { LinkContainer } from "react-router-bootstrap";
+import { Navbar, Nav } from "react-bootstrap";
 
 import { useUser, useAvatar } from "@/services/user";
 
@@ -11,95 +9,54 @@ import TimelineLogo from "./TimelineLogo";
 import BlobImage from "./BlobImage";
 
 const AppBar: React.FC = (_) => {
-  const history = useHistory();
   const user = useUser();
   const avatar = useAvatar(user?.username);
 
   const { t } = useTranslation();
 
-  const isUpMd = useMediaQuery({
-    minWidth: getComputedStyle(document.documentElement).getPropertyValue(
-      "--breakpoint-md"
-    ),
-  });
-
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
-  const toggleMenu = React.useCallback((): void => {
-    setIsMenuOpen((oldIsMenuOpen) => !oldIsMenuOpen);
-  }, []);
-
   const isAdministrator = user && user.administrator;
 
-  const rightArea = (
-    <div className="ml-auto mr-2">
-      {user != null ? (
-        <NavLink to={`/users/${user.username}`}>
-          <BlobImage
-            className="avatar small rounded-circle bg-white"
-            blob={avatar}
-          />
-        </NavLink>
-      ) : (
-        <NavLink className="text-light" to="/login">
-          {t("nav.login")}
-        </NavLink>
-      )}
-    </div>
-  );
-
   return (
-    <Navbar dark className="fixed-top w-100 bg-primary app-bar" expand="md">
-      <Link to="/" className="navbar-brand d-flex align-items-center">
-        <TimelineLogo style={{ height: "1em" }} />
-        Timeline
-      </Link>
+    <Navbar bg="primary" variant="dark" expand="md">
+      <LinkContainer to="/">
+        <Navbar.Brand className="d-flex align-items-center">
+          <TimelineLogo style={{ height: "1em" }} />
+          Timeline
+        </Navbar.Brand>
+      </LinkContainer>
 
-      {isUpMd ? null : rightArea}
+      <Navbar.Toggle />
+      <Navbar.Collapse>
+        <Nav className="mr-auto">
+          <LinkContainer to="/settings">
+            <Nav.Link>{t("nav.settings")}</Nav.Link>
+          </LinkContainer>
 
-      <NavbarToggler onClick={toggleMenu} />
-      <Collapse isOpen={isMenuOpen} navbar>
-        <Nav className="mr-auto" navbar>
-          <NavItem
-            className={
-              matchPath(history.location.pathname, "/settings")
-                ? "active"
-                : undefined
-            }
-          >
-            <NavLink className="nav-link" to="/settings">
-              {t("nav.settings")}
-            </NavLink>
-          </NavItem>
-
-          <NavItem
-            className={
-              matchPath(history.location.pathname, "/about")
-                ? "active"
-                : undefined
-            }
-          >
-            <NavLink className="nav-link" to="/about">
-              {t("nav.about")}
-            </NavLink>
-          </NavItem>
+          <LinkContainer to="/about">
+            <Nav.Link>{t("nav.about")}</Nav.Link>
+          </LinkContainer>
 
           {isAdministrator && (
-            <NavItem
-              className={
-                matchPath(history.location.pathname, "/admin")
-                  ? "active"
-                  : undefined
-              }
-            >
-              <NavLink className="nav-link" to="/admin">
-                Administration
-              </NavLink>
-            </NavItem>
+            <LinkContainer to="/admin">
+              <Nav.Link>Administration</Nav.Link>
+            </LinkContainer>
           )}
         </Nav>
-        {isUpMd ? rightArea : null}
-      </Collapse>
+        <Nav className="ml-auto mr-2">
+          {user != null ? (
+            <LinkContainer to={`/users/${user.username}`}>
+              <BlobImage
+                className="avatar small rounded-circle bg-white"
+                blob={avatar}
+              />
+            </LinkContainer>
+          ) : (
+            <LinkContainer to="/login">
+              <Nav.Link>{t("nav.login")}</Nav.Link>
+            </LinkContainer>
+          )}
+        </Nav>
+      </Navbar.Collapse>
     </Navbar>
   );
 };

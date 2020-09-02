@@ -102,6 +102,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:5.1.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router%2Fdownload%2F%40types%2Freact-router-5.1.8.tgz"
       ],
       [
+        "@types/react-router-bootstrap",
+        "npm:0.24.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-bootstrap%2Fdownload%2F%40types%2Freact-router-bootstrap-0.24.5.tgz"
+      ],
+      [
         "@types/react-router-dom",
         "npm:5.1.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-dom%2Fdownload%2F%40types%2Freact-router-dom-5.1.5.tgz"
       ],
@@ -262,6 +266,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"
       ],
       [
+        "react-bootstrap",
+        "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:1.3.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-bootstrap%2Fdownload%2Freact-bootstrap-1.3.0.tgz"
+      ],
+      [
         "react-dom",
         "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz"
       ],
@@ -284,6 +292,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "react-router",
         "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router%2Fdownload%2Freact-router-5.2.0.tgz"
+      ],
+      [
+        "react-router-bootstrap",
+        "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:0.25.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-bootstrap%2Fdownload%2Freact-router-bootstrap-0.25.0.tgz"
       ],
       [
         "react-router-dom",
@@ -391,6 +403,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", "npm:16.9.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-dom%2Fdownload%2F%40types%2Freact-dom-16.9.8.tgz"],
             ["@types/react-responsive", "npm:8.0.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-responsive%2Fdownload%2F%40types%2Freact-responsive-8.0.2.tgz"],
             ["@types/react-router", "npm:5.1.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router%2Fdownload%2F%40types%2Freact-router-5.1.8.tgz"],
+            ["@types/react-router-bootstrap", "npm:0.24.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-bootstrap%2Fdownload%2F%40types%2Freact-router-bootstrap-0.24.5.tgz"],
             ["@types/react-router-dom", "npm:5.1.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-dom%2Fdownload%2F%40types%2Freact-router-dom-5.1.5.tgz"],
             ["@types/reactstrap", "npm:8.5.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freactstrap%2Fdownload%2F%40types%2Freactstrap-8.5.1.tgz"],
             ["@types/webpack-env", "npm:1.15.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwebpack-env%2Fdownload%2F%40types%2Fwebpack-env-1.15.2.tgz"],
@@ -431,12 +444,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["postcss-preset-env", "npm:6.7.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fpostcss-preset-env%2Fdownload%2Fpostcss-preset-env-6.7.0.tgz"],
             ["prettier", "npm:2.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprettier%2Fdownload%2Fprettier-2.1.1.tgz"],
             ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-bootstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:1.3.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-bootstrap%2Fdownload%2Freact-bootstrap-1.3.0.tgz"],
             ["react-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz"],
             ["react-hot-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.12.21::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-hot-loader%2Fdownload%2Freact-hot-loader-4.12.21.tgz"],
             ["react-i18next", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:11.7.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-i18next%2Fdownload%2Freact-i18next-11.7.2.tgz"],
             ["react-inlinesvg", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:2.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-inlinesvg%2Fdownload%2Freact-inlinesvg-2.0.0.tgz"],
             ["react-responsive", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:8.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-responsive%2Fdownload%2Freact-responsive-8.1.0.tgz"],
             ["react-router", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router%2Fdownload%2Freact-router-5.2.0.tgz"],
+            ["react-router-bootstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:0.25.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-bootstrap%2Fdownload%2Freact-router-bootstrap-0.25.0.tgz"],
             ["react-router-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-dom%2Fdownload%2Freact-router-dom-5.2.0.tgz"],
             ["reactstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:8.5.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freactstrap%2Fdownload%2Freactstrap-8.5.1.tgz"],
             ["regenerator-runtime", "npm:0.13.7::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fregenerator-runtime%2Fdownload%2Fregenerator-runtime-0.13.7.tgz"],
@@ -2894,6 +2909,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["regenerator-runtime", "npm:0.13.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fregenerator-runtime%2Fdownload%2Fregenerator-runtime-0.13.5.tgz"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:7.11.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.11.2.tgz", {
+          "packageLocation": "./.yarn/cache/@babel-runtime-npm-7.11.2-84d52b99b9-2f127ad60a.zip/node_modules/@babel/runtime/",
+          "packageDependencies": [
+            ["@babel/runtime", "npm:7.11.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.11.2.tgz"],
+            ["regenerator-runtime", "npm:0.13.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fregenerator-runtime%2Fdownload%2Fregenerator-runtime-0.13.5.tgz"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["@babel/runtime-corejs3", [
@@ -3088,6 +3111,43 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@npmcli/move-file", "npm:1.0.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40npmcli%2Fmove-file%2Fdownload%2F%40npmcli%2Fmove-file-1.0.1.tgz"],
             ["mkdirp", "npm:1.0.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fmkdirp%2Fdownload%2Fmkdirp-1.0.4.tgz"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@popperjs/core", [
+        ["npm:2.4.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.4.4.tgz", {
+          "packageLocation": "./.yarn/cache/@popperjs-core-npm-2.4.4-0690f2896b-49a1e6cfa2.zip/node_modules/@popperjs/core/",
+          "packageDependencies": [
+            ["@popperjs/core", "npm:2.4.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.4.4.tgz"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@restart/context", [
+        ["virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:2.1.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fcontext%2Fdownload%2F%40restart%2Fcontext-2.1.4.tgz", {
+          "packageLocation": "./.yarn/$$virtual/@restart-context-virtual-27eb50dd8d/0/cache/@restart-context-npm-2.1.4-ad630f5721-f9dd1416c1.zip/node_modules/@restart/context/",
+          "packageDependencies": [
+            ["@restart/context", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:2.1.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fcontext%2Fdownload%2F%40restart%2Fcontext-2.1.4.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"]
+          ],
+          "packagePeers": [
+            "react"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@restart/hooks", [
+        ["virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:0.3.25::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fhooks%2Fdownload%2F%40restart%2Fhooks-0.3.25.tgz", {
+          "packageLocation": "./.yarn/$$virtual/@restart-hooks-virtual-a2069ac77d/0/cache/@restart-hooks-npm-0.3.25-f85d375986-08aefc359f.zip/node_modules/@restart/hooks/",
+          "packageDependencies": [
+            ["@restart/hooks", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:0.3.25::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fhooks%2Fdownload%2F%40restart%2Fhooks-0.3.25.tgz"],
+            ["lodash", "npm:4.17.19::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash%2Fdownload%2Flodash-4.17.19.tgz"],
+            ["lodash-es", "npm:4.17.15::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash-es%2Fdownload%2Flodash-es-4.17.15.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"]
+          ],
+          "packagePeers": [
+            "react"
           ],
           "linkType": "HARD",
         }]
@@ -3292,6 +3352,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@types/invariant", [
+        ["npm:2.2.34::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Finvariant%2Fdownload%2F%40types%2Finvariant-2.2.34.tgz", {
+          "packageLocation": "./.yarn/cache/@types-invariant-npm-2.2.34-dc486af7a1-d0ecc665e5.zip/node_modules/@types/invariant/",
+          "packageDependencies": [
+            ["@types/invariant", "npm:2.2.34::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Finvariant%2Fdownload%2F%40types%2Finvariant-2.2.34.tgz"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@types/json-schema", [
         ["npm:7.0.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fjson-schema%2Fdownload%2F%40types%2Fjson-schema-7.0.5.tgz", {
           "packageLocation": "./.yarn/cache/@types-json-schema-npm-7.0.5-8c7a0ff5b6-6290f9fe93.zip/node_modules/@types/json-schema/",
@@ -3421,6 +3490,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@types/react-router-bootstrap", [
+        ["npm:0.24.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-bootstrap%2Fdownload%2F%40types%2Freact-router-bootstrap-0.24.5.tgz", {
+          "packageLocation": "./.yarn/cache/@types-react-router-bootstrap-npm-0.24.5-e11aa3d45e-08b8ed99b7.zip/node_modules/@types/react-router-bootstrap/",
+          "packageDependencies": [
+            ["@types/react-router-bootstrap", "npm:0.24.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-bootstrap%2Fdownload%2F%40types%2Freact-router-bootstrap-0.24.5.tgz"],
+            ["@types/react", "npm:16.9.43::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact%2Fdownload%2F%40types%2Freact-16.9.43.tgz"],
+            ["@types/react-router-dom", "npm:5.1.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-dom%2Fdownload%2F%40types%2Freact-router-dom-5.1.5.tgz"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@types/react-router-dom", [
         ["npm:5.1.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-dom%2Fdownload%2F%40types%2Freact-router-dom-5.1.5.tgz", {
           "packageLocation": "./.yarn/cache/@types-react-router-dom-npm-5.1.5-bb10e455cb-d25c11cb71.zip/node_modules/@types/react-router-dom/",
@@ -3429,6 +3509,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/history", "npm:4.7.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fhistory%2Fdownload%2F%40types%2Fhistory-4.7.6.tgz"],
             ["@types/react", "npm:16.9.43::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact%2Fdownload%2F%40types%2Freact-16.9.43.tgz"],
             ["@types/react-router", "npm:5.1.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router%2Fdownload%2F%40types%2Freact-router-5.1.8.tgz"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/react-transition-group", [
+        ["npm:4.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-transition-group%2Fdownload%2F%40types%2Freact-transition-group-4.4.0.tgz", {
+          "packageLocation": "./.yarn/cache/@types-react-transition-group-npm-4.4.0-44ecca32b5-b761f70623.zip/node_modules/@types/react-transition-group/",
+          "packageDependencies": [
+            ["@types/react-transition-group", "npm:4.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-transition-group%2Fdownload%2F%40types%2Freact-transition-group-4.4.0.tgz"],
+            ["@types/react", "npm:16.9.43::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact%2Fdownload%2F%40types%2Freact-16.9.43.tgz"]
           ],
           "linkType": "HARD",
         }]
@@ -3488,6 +3578,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@types/uglify-js", "npm:3.9.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fuglify-js%2Fdownload%2F%40types%2Fuglify-js-3.9.3.tgz"],
             ["source-map", "npm:0.6.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fsource-map%2Fdownload%2Fsource-map-0.6.1.tgz"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/warning", [
+        ["npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwarning%2Fdownload%2F%40types%2Fwarning-3.0.0.tgz", {
+          "packageLocation": "./.yarn/cache/@types-warning-npm-3.0.0-32d6269905-cb7a16aa88.zip/node_modules/@types/warning/",
+          "packageDependencies": [
+            ["@types/warning", "npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwarning%2Fdownload%2F%40types%2Fwarning-3.0.0.tgz"]
           ],
           "linkType": "HARD",
         }]
@@ -6579,6 +6678,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["dom-helpers", "npm:3.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-helpers%2Fdownload%2Fdom-helpers-3.4.0.tgz"],
             ["@babel/runtime", "npm:7.10.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.10.5.tgz"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-helpers%2Fdownload%2Fdom-helpers-5.2.0.tgz", {
+          "packageLocation": "./.yarn/cache/dom-helpers-npm-5.2.0-50f26cbd58-9ef27628f4.zip/node_modules/dom-helpers/",
+          "packageDependencies": [
+            ["dom-helpers", "npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-helpers%2Fdownload%2Fdom-helpers-5.2.0.tgz"],
+            ["@babel/runtime", "npm:7.11.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.11.2.tgz"],
+            ["csstype", "npm:3.0.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcsstype%2Fdownload%2Fcsstype-3.0.2.tgz"]
           ],
           "linkType": "HARD",
         }]
@@ -9703,6 +9811,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["lodash-es", [
+        ["npm:4.17.15::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash-es%2Fdownload%2Flodash-es-4.17.15.tgz", {
+          "packageLocation": "./.yarn/cache/lodash-es-npm-4.17.15-15cd80072f-ee2871b76d.zip/node_modules/lodash-es/",
+          "packageDependencies": [
+            ["lodash-es", "npm:4.17.15::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash-es%2Fdownload%2Flodash-es-4.17.15.tgz"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["lodash._reinterpolate", [
         ["npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash._reinterpolate%2Fdownload%2Flodash._reinterpolate-3.0.0.tgz", {
           "packageLocation": "./.yarn/cache/lodash._reinterpolate-npm-3.0.0-7f339ed5b7-27513557d6.zip/node_modules/lodash._reinterpolate/",
@@ -11931,6 +12048,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["prop-types-extra", [
+        ["virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:1.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types-extra%2Fdownload%2Fprop-types-extra-1.1.1.tgz", {
+          "packageLocation": "./.yarn/$$virtual/prop-types-extra-virtual-76d118382a/0/cache/prop-types-extra-npm-1.1.1-20a8bf7d72-f1f1cc23b9.zip/node_modules/prop-types-extra/",
+          "packageDependencies": [
+            ["prop-types-extra", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:1.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types-extra%2Fdownload%2Fprop-types-extra-1.1.1.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-is", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-is%2Fdownload%2Freact-is-16.13.1.tgz"],
+            ["warning", "npm:4.0.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fwarning%2Fdownload%2Fwarning-4.0.3.tgz"]
+          ],
+          "packagePeers": [
+            "react"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["proxy-addr", [
         ["npm:2.0.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fproxy-addr%2Fdownload%2Fproxy-addr-2.0.6.tgz", {
           "packageLocation": "./.yarn/cache/proxy-addr-npm-2.0.6-b18b3fba9e-a7dcfd7025.zip/node_modules/proxy-addr/",
@@ -12155,6 +12287,39 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["react-bootstrap", [
+        ["virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:1.3.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-bootstrap%2Fdownload%2Freact-bootstrap-1.3.0.tgz", {
+          "packageLocation": "./.yarn/$$virtual/react-bootstrap-virtual-1f601461ce/0/cache/react-bootstrap-npm-1.3.0-f2b404ff68-f9dc21c00d.zip/node_modules/react-bootstrap/",
+          "packageDependencies": [
+            ["react-bootstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:1.3.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-bootstrap%2Fdownload%2Freact-bootstrap-1.3.0.tgz"],
+            ["@babel/runtime", "npm:7.11.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.11.2.tgz"],
+            ["@restart/context", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:2.1.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fcontext%2Fdownload%2F%40restart%2Fcontext-2.1.4.tgz"],
+            ["@restart/hooks", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:0.3.25::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fhooks%2Fdownload%2F%40restart%2Fhooks-0.3.25.tgz"],
+            ["@types/classnames", "npm:2.2.10::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fclassnames%2Fdownload%2F%40types%2Fclassnames-2.2.10.tgz"],
+            ["@types/invariant", "npm:2.2.34::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Finvariant%2Fdownload%2F%40types%2Finvariant-2.2.34.tgz"],
+            ["@types/prop-types", "npm:15.7.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fprop-types%2Fdownload%2F%40types%2Fprop-types-15.7.3.tgz"],
+            ["@types/react", "npm:16.9.49::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact%2Fdownload%2F%40types%2Freact-16.9.49.tgz"],
+            ["@types/react-transition-group", "npm:4.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-transition-group%2Fdownload%2F%40types%2Freact-transition-group-4.4.0.tgz"],
+            ["@types/warning", "npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwarning%2Fdownload%2F%40types%2Fwarning-3.0.0.tgz"],
+            ["classnames", "npm:2.2.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fclassnames%2Fdownload%2Fclassnames-2.2.6.tgz"],
+            ["dom-helpers", "npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-helpers%2Fdownload%2Fdom-helpers-5.2.0.tgz"],
+            ["invariant", "npm:2.2.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Finvariant%2Fdownload%2Finvariant-2.2.4.tgz"],
+            ["prop-types", "npm:15.7.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types%2Fdownload%2Fprop-types-15.7.2.tgz"],
+            ["prop-types-extra", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:1.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types-extra%2Fdownload%2Fprop-types-extra-1.1.1.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz"],
+            ["react-overlays", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:4.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-overlays%2Fdownload%2Freact-overlays-4.1.0.tgz"],
+            ["react-transition-group", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:4.4.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-transition-group%2Fdownload%2Freact-transition-group-4.4.1.tgz"],
+            ["uncontrollable", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:7.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Funcontrollable%2Fdownload%2Funcontrollable-7.1.1.tgz"],
+            ["warning", "npm:4.0.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fwarning%2Fdownload%2Fwarning-4.0.3.tgz"]
+          ],
+          "packagePeers": [
+            "react",
+            "react-dom"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["react-dom", [
         ["virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz", {
           "packageLocation": "./.yarn/$$virtual/react-dom-virtual-cee64bb823/0/cache/react-dom-npm-16.13.1-d5a639d8b8-fb5c3ad413.zip/node_modules/react-dom/",
@@ -12260,6 +12425,29 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["react-overlays", [
+        ["virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:4.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-overlays%2Fdownload%2Freact-overlays-4.1.0.tgz", {
+          "packageLocation": "./.yarn/$$virtual/react-overlays-virtual-be6c660a55/0/cache/react-overlays-npm-4.1.0-8e31f6545e-64d46694be.zip/node_modules/react-overlays/",
+          "packageDependencies": [
+            ["react-overlays", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:4.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-overlays%2Fdownload%2Freact-overlays-4.1.0.tgz"],
+            ["@babel/runtime", "npm:7.11.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.11.2.tgz"],
+            ["@popperjs/core", "npm:2.4.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.4.4.tgz"],
+            ["@restart/hooks", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:0.3.25::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40restart%2Fhooks%2Fdownload%2F%40restart%2Fhooks-0.3.25.tgz"],
+            ["@types/warning", "npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwarning%2Fdownload%2F%40types%2Fwarning-3.0.0.tgz"],
+            ["dom-helpers", "npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-helpers%2Fdownload%2Fdom-helpers-5.2.0.tgz"],
+            ["prop-types", "npm:15.7.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types%2Fdownload%2Fprop-types-15.7.2.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz"],
+            ["uncontrollable", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:7.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Funcontrollable%2Fdownload%2Funcontrollable-7.1.1.tgz"],
+            ["warning", "npm:4.0.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fwarning%2Fdownload%2Fwarning-4.0.3.tgz"]
+          ],
+          "packagePeers": [
+            "react",
+            "react-dom"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["react-popper", [
         ["virtual:3b2ce7b5c8060bb05f2f5c2935213be0b80cbf02d12c698b50272c06d2940bcce3e52fed2f822d06cfa7b13a6aae64654f797a522ecaeb419458c4c10e644495#npm:1.3.7::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-popper%2Fdownload%2Freact-popper-1.3.7.tgz", {
           "packageLocation": "./.yarn/$$virtual/react-popper-virtual-3edf6c5f28/0/cache/react-popper-npm-1.3.7-0019173f32-09ef58054b.zip/node_modules/react-popper/",
@@ -12320,6 +12508,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["react-router-bootstrap", [
+        ["virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:0.25.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-bootstrap%2Fdownload%2Freact-router-bootstrap-0.25.0.tgz", {
+          "packageLocation": "./.yarn/$$virtual/react-router-bootstrap-virtual-2a8441681c/0/cache/react-router-bootstrap-npm-0.25.0-28ad5f848b-c9a66a8cc9.zip/node_modules/react-router-bootstrap/",
+          "packageDependencies": [
+            ["react-router-bootstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:0.25.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-bootstrap%2Fdownload%2Freact-router-bootstrap-0.25.0.tgz"],
+            ["prop-types", "npm:15.7.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types%2Fdownload%2Fprop-types-15.7.2.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-router-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-dom%2Fdownload%2Freact-router-dom-5.2.0.tgz"]
+          ],
+          "packagePeers": [
+            "react",
+            "react-router-dom"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["react-router-dom", [
         ["virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-dom%2Fdownload%2Freact-router-dom-5.2.0.tgz", {
           "packageLocation": "./.yarn/$$virtual/react-router-dom-virtual-86c7a05f52/0/cache/react-router-dom-npm-5.2.0-8e78cd9ea8-9ad2d72630.zip/node_modules/react-router-dom/",
@@ -12341,6 +12545,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["react-transition-group", [
+        ["virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:4.4.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-transition-group%2Fdownload%2Freact-transition-group-4.4.1.tgz", {
+          "packageLocation": "./.yarn/$$virtual/react-transition-group-virtual-de7e044c4a/0/cache/react-transition-group-npm-4.4.1-7d60c95184-e14446123f.zip/node_modules/react-transition-group/",
+          "packageDependencies": [
+            ["react-transition-group", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:4.4.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-transition-group%2Fdownload%2Freact-transition-group-4.4.1.tgz"],
+            ["@babel/runtime", "npm:7.10.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.10.5.tgz"],
+            ["dom-helpers", "npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-helpers%2Fdownload%2Fdom-helpers-5.2.0.tgz"],
+            ["loose-envify", "npm:1.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Floose-envify%2Fdownload%2Floose-envify-1.4.0.tgz"],
+            ["prop-types", "npm:15.7.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprop-types%2Fdownload%2Fprop-types-15.7.2.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz"]
+          ],
+          "packagePeers": [
+            "react",
+            "react-dom"
+          ],
+          "linkType": "HARD",
+        }],
         ["virtual:3b2ce7b5c8060bb05f2f5c2935213be0b80cbf02d12c698b50272c06d2940bcce3e52fed2f822d06cfa7b13a6aae64654f797a522ecaeb419458c4c10e644495#npm:2.9.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-transition-group%2Fdownload%2Freact-transition-group-2.9.0.tgz", {
           "packageLocation": "./.yarn/$$virtual/react-transition-group-virtual-96734f4ac2/0/cache/react-transition-group-npm-2.9.0-67f8b00a44-eefed08c48.zip/node_modules/react-transition-group/",
           "packageDependencies": [
@@ -14048,6 +14269,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", "npm:16.9.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-dom%2Fdownload%2F%40types%2Freact-dom-16.9.8.tgz"],
             ["@types/react-responsive", "npm:8.0.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-responsive%2Fdownload%2F%40types%2Freact-responsive-8.0.2.tgz"],
             ["@types/react-router", "npm:5.1.8::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router%2Fdownload%2F%40types%2Freact-router-5.1.8.tgz"],
+            ["@types/react-router-bootstrap", "npm:0.24.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-bootstrap%2Fdownload%2F%40types%2Freact-router-bootstrap-0.24.5.tgz"],
             ["@types/react-router-dom", "npm:5.1.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-router-dom%2Fdownload%2F%40types%2Freact-router-dom-5.1.5.tgz"],
             ["@types/reactstrap", "npm:8.5.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freactstrap%2Fdownload%2F%40types%2Freactstrap-8.5.1.tgz"],
             ["@types/webpack-env", "npm:1.15.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwebpack-env%2Fdownload%2F%40types%2Fwebpack-env-1.15.2.tgz"],
@@ -14088,12 +14310,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["postcss-preset-env", "npm:6.7.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fpostcss-preset-env%2Fdownload%2Fpostcss-preset-env-6.7.0.tgz"],
             ["prettier", "npm:2.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprettier%2Fdownload%2Fprettier-2.1.1.tgz"],
             ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-bootstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:1.3.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-bootstrap%2Fdownload%2Freact-bootstrap-1.3.0.tgz"],
             ["react-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-dom%2Fdownload%2Freact-dom-16.13.1.tgz"],
             ["react-hot-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.12.21::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-hot-loader%2Fdownload%2Freact-hot-loader-4.12.21.tgz"],
             ["react-i18next", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:11.7.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-i18next%2Fdownload%2Freact-i18next-11.7.2.tgz"],
             ["react-inlinesvg", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:2.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-inlinesvg%2Fdownload%2Freact-inlinesvg-2.0.0.tgz"],
             ["react-responsive", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:8.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-responsive%2Fdownload%2Freact-responsive-8.1.0.tgz"],
             ["react-router", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router%2Fdownload%2Freact-router-5.2.0.tgz"],
+            ["react-router-bootstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:0.25.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-bootstrap%2Fdownload%2Freact-router-bootstrap-0.25.0.tgz"],
             ["react-router-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-router-dom%2Fdownload%2Freact-router-dom-5.2.0.tgz"],
             ["reactstrap", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:8.5.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freactstrap%2Fdownload%2Freactstrap-8.5.1.tgz"],
             ["regenerator-runtime", "npm:0.13.7::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fregenerator-runtime%2Fdownload%2Fregenerator-runtime-0.13.7.tgz"],
@@ -14409,6 +14633,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/typescript-patch-ad8d4a081d-b8b689ef99.zip/node_modules/typescript/",
           "packageDependencies": [
             ["typescript", "patch:typescript@npm%3A4.0.2%3A%3A__archiveUrl=https%253A%252F%252Fregistry.npm.taobao.org%252Ftypescript%252Fdownload%252Ftypescript-4.0.2.tgz#builtin<compat/typescript>::version=4.0.2&hash=5b02a2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["uncontrollable", [
+        ["virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:7.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Funcontrollable%2Fdownload%2Funcontrollable-7.1.1.tgz", {
+          "packageLocation": "./.yarn/$$virtual/uncontrollable-virtual-8850ccda84/0/cache/uncontrollable-npm-7.1.1-26d270508f-208d397c41.zip/node_modules/uncontrollable/",
+          "packageDependencies": [
+            ["uncontrollable", "virtual:1f601461ce4bcd02e67eb3e52606d30f8a0e9010becfebdf768394bdced194207f1da63f8bbe3d9dd191b372deda04c1e7c5b145234f01cd0a6a8f90072f9fbc#npm:7.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Funcontrollable%2Fdownload%2Funcontrollable-7.1.1.tgz"],
+            ["@babel/runtime", "npm:7.11.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.11.2.tgz"],
+            ["@types/react", "npm:16.9.49::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact%2Fdownload%2F%40types%2Freact-16.9.49.tgz"],
+            ["invariant", "npm:2.2.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Finvariant%2Fdownload%2Finvariant-2.2.4.tgz"],
+            ["react", "npm:16.13.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact%2Fdownload%2Freact-16.13.1.tgz"],
+            ["react-lifecycles-compat", "npm:3.0.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-lifecycles-compat%2Fdownload%2Freact-lifecycles-compat-3.0.4.tgz"]
+          ],
+          "packagePeers": [
+            "react"
           ],
           "linkType": "HARD",
         }]
