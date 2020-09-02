@@ -1,10 +1,10 @@
 import React from "react";
-import { Spinner } from "reactstrap";
+import { Spinner } from "react-bootstrap";
 
 const LoadingPage: React.FC = () => {
   return (
     <div className="position-fixed w-100 h-100 d-flex justify-content-center align-items-center">
-      <Spinner style={{ height: "2.5rem", width: "2.5rem" }} color="primary" />
+      <Spinner variant="primary" animation="border" />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import clsx from "clsx";
-import { Spinner, Input, Button } from "reactstrap";
 import { useTranslation } from "react-i18next";
+import { Spinner, Form, Button } from "react-bootstrap";
 
 export interface SearchInputProps {
   value: string;
@@ -37,7 +37,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
 
   return (
     <div className={clsx("form-inline my-2", props.className)}>
-      <Input
+      <Form.Control
         className="mr-sm-2"
         value={props.value}
         onChange={onInputChange}
@@ -49,9 +49,9 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
       </div>
       <div className="mt-2 mt-sm-0 ml-auto ml-sm-0">
         {props.loading ? (
-          <Spinner />
+          <Spinner variant="primary" animation="border" />
         ) : (
-          <Button outline color="primary" onClick={props.onButtonClick}>
+          <Button variant="outline-primary" onClick={props.onButtonClick}>
             {props.buttonText ?? t("search")}
           </Button>
         )}
