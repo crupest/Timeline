@@ -1,17 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import {
-  Container,
-  Row,
-  Col,
-  Input,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "reactstrap";
+import { Form, Container, Row, Col, Button, Modal } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
 import AppBar from "../common/AppBar";
@@ -100,19 +90,21 @@ const ConfirmLogoutDialog: React.FC<{
   const { t } = useTranslation();
 
   return (
-    <Modal isOpen centered>
-      <ModalHeader className="text-danger">
-        {t("settings.dialogConfirmLogout.title")}
-      </ModalHeader>
-      <ModalBody>{t("settings.dialogConfirmLogout.prompt")}</ModalBody>
-      <ModalFooter>
-        <Button color="secondary" onClick={toggle}>
+    <Modal show centered onHide={toggle}>
+      <Modal.Header>
+        <Modal.Title className="text-danger">
+          {t("settings.dialogConfirmLogout.title")}
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{t("settings.dialogConfirmLogout.prompt")}</Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={toggle}>
           {t("operationDialog.cancel")}
         </Button>
-        <Button color="danger" onClick={onConfirm}>
+        <Button variant="danger" onClick={onConfirm}>
           {t("operationDialog.confirm")}
         </Button>
-      </ModalFooter>
+      </Modal.Footer>
     </Modal>
   );
 };
@@ -131,7 +123,7 @@ const SettingsPage: React.FC = (_) => {
   return (
     <>
       <AppBar />
-      <Container fluid className="mt-appbar">
+      <Container fluid>
         {user ? (
           <>
             <Row className="border-bottom p-3 cursor-pointer">
@@ -175,8 +167,8 @@ const SettingsPage: React.FC = (_) => {
             <p>{t("settings.languageSecondary")}</p>
           </Col>
           <Col xs="auto" className="ml-auto">
-            <Input
-              type="select"
+            <Form.Control
+              as="select"
               value={language}
               onChange={(e) => {
                 void i18n.changeLanguage(e.target.value);
@@ -184,7 +176,7 @@ const SettingsPage: React.FC = (_) => {
             >
               <option value="zh">中文</option>
               <option value="en">English</option>
-            </Input>
+            </Form.Control>
           </Col>
         </Row>
         {(() => {
