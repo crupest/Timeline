@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Spinner, Container, Form, Button, Modal } from "react-bootstrap";
+import { Form, Button, Modal } from "react-bootstrap";
 
 import { UiLogicError } from "@/common";
 
-const DefaultProcessPrompt: React.FC = (_) => {
-  return (
-    <Container className="justify-content-center align-items-center">
-      <Spinner animation="border" variant="success" />
-    </Container>
-  );
-};
+import LoadingButton from "./LoadingButton";
 
 interface DefaultErrorPromptProps {
   error?: string;
@@ -154,7 +148,9 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
   };
 
   let body: React.ReactNode;
-  if (step === "input") {
+  if (step === "input" || step === "process") {
+    const process = step === "process";
+
     let inputPrompt =
       typeof props.inputPrompt === "function"
         ? props.inputPrompt()
@@ -246,9 +242,12 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                       );
                     }}
                     isInvalid={error != null}
+                    disabled={process}
                   />
                   {error != null && (
-                    <Form.Control.Feedback>{error}</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">
+                      {error}
+                    </Form.Control.Feedback>
                   )}
                   {item.helperText && (
                     <Form.Text>{t(item.helperText)}</Form.Text>
@@ -265,6 +264,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                       updateValue(index, event.currentTarget.checked);
                     }}
                     label={t(item.label)}
+                    disabled={process}
                   />
                 </Form.Group>
               );
@@ -278,6 +278,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                     onChange={(event) => {
                       updateValue(index, event.target.value);
                     }}
+                    disabled={process}
                   >
                     {item.options.map((option, i) => {
                       return (
@@ -294,11 +295,12 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
           })}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={close}>
+          <Button variant="outline-secondary" onClick={close}>
             {t("operationDialog.cancel")}
           </Button>
-          <Button
+          <LoadingButton
             variant="primary"
+            loading={process}
             disabled={testErrorInfo(inputError)}
             onClick={() => {
               if (validateAll()) {
@@ -307,15 +309,9 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
             }}
           >
             {t("operationDialog.confirm")}
-          </Button>
+          </LoadingButton>
         </Modal.Footer>
       </>
-    );
-  } else if (step === "process") {
-    body = (
-      <Modal.Body>
-        {props.processPrompt?.() ?? <DefaultProcessPrompt />}
-      </Modal.Body>
     );
   } else {
     let content: React.ReactNode;
@@ -345,7 +341,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
   const title = typeof props.title === "string" ? t(props.title) : props.title;
 
   return (
-    <Modal isOpen={props.open} toggle={close}>
+    <Modal show={props.open} onHide={close}>
       <Modal.Header
         className={
           props.titleColor != null
