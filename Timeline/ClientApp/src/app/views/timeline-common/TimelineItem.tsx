@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import Svg from "react-inlinesvg";
 import chevronDownIcon from "bootstrap-icons/icons/chevron-down.svg";
 import trashIcon from "bootstrap-icons/icons/trash.svg";
-import { Row, Col, Modal, Button } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 
 import { useAvatar } from "@/services/user";
 import { TimelinePostInfo } from "@/services/timeline";
@@ -74,51 +74,45 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
   );
 
   return (
-    <Row
+    <div
       className={clsx(
-        "position-relative flex-nowrap",
+        "timeline-item position-relative",
         current && "current",
         props.className
       )}
       onClick={props.onClick}
       style={props.style}
     >
-      <Col className="timeline-line-area">
+      <div className="timeline-line-area">
         <div className="timeline-line-segment start"></div>
         <div className="timeline-line-node-container">
           <div className="timeline-line-node"></div>
         </div>
         <div className="timeline-line-segment end"></div>
         {current && <div className="timeline-line-segment current-end" />}
-      </Col>
-      <Col className="timeline-pt-start">
-        <Row className="flex-nowrap">
-          <div className="col-auto flex-shrink-1 px-0">
-            <Row className="ml-n3 mr-0 align-items-center">
-              <span className="ml-3 text-primary white-space-no-wrap">
-                {props.post.time.toLocaleString(i18n.languages)}
-              </span>
-              <small className="text-dark ml-3">
-                {props.post.author.nickname}
-              </small>
-            </Row>
-          </div>
+      </div>
+      <div className="timeline-content-area">
+        <div>
+          <span className="mr-2">
+            <span className="text-primary white-space-no-wrap mr-2">
+              {props.post.time.toLocaleString(i18n.languages)}
+            </span>
+            <small className="text-dark">{props.post.author.nickname}</small>
+          </span>
           {more != null ? (
-            <div className="col-auto px-2 d-flex justify-content-center align-items-center">
-              <Svg
-                src={chevronDownIcon}
-                className="text-info icon-button"
-                onClick={(e: Event) => {
-                  more.toggle();
-                  e.stopPropagation();
-                }}
-              />
-            </div>
+            <Svg
+              src={chevronDownIcon}
+              className="text-info icon-button"
+              onClick={(e: Event) => {
+                more.toggle();
+                e.stopPropagation();
+              }}
+            />
           ) : null}
-        </Row>
-        <div className="row d-block timeline-content">
+        </div>
+        <div className="timeline-content">
           <Link
-            className="float-right float-sm-left mx-2"
+            className="float-left m-2"
             to={"/users/" + props.post.author.username}
           >
             <BlobImage
@@ -142,7 +136,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             }
           })()}
         </div>
-      </Col>
+      </div>
       {more != null && more.isOpen ? (
         <>
           <div
@@ -169,7 +163,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           ) : null}
         </>
       ) : null}
-    </Row>
+    </div>
   );
 };
 

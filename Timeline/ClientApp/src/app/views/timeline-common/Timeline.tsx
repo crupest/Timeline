@@ -51,10 +51,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [posts, onDelete]);
 
   return (
-    <div
-      ref={props.containerRef}
-      className={clsx("container-fluid timeline", props.className)}
-    >
+    <div ref={props.containerRef} className={clsx("timeline", props.className)}>
       <div className="timeline-enter-animation-mask" />
       {(() => {
         const length = posts.length;

@@ -1,10 +1,11 @@
 @use 'sass:color'
 
 .timeline
-  display: flex
-  flex-direction: column
   z-index: 0
   position: relative
+
+  &-item
+    display: flex
 
 @keyframes timeline-enter-animation-mask-animation
   to
@@ -96,8 +97,9 @@ $timeline-line-color-current: #36c2e6
     &-node
       animation-name: timeline-line-node-current
 
-.timeline-pt-start
+.timeline-content-area
   padding-top: 18px
+  flex-grow: 1
 
 .timeline-item-delete-button
   position: absolute
@@ -123,10 +125,6 @@ $timeline-line-color-current: #36c2e6
   transition: height 0.5s
 
 .timeline-sync-state-badge
-  position: fixed
-  top: 0
-  right: 0
-  z-index: 1
   font-size: 0.8em
   padding: 3px 8px
   border-radius: 5px
@@ -140,7 +138,14 @@ $timeline-line-color-current: #36c2e6
   vertical-align: middle
   margin-right: 0.6em
 
-.info-card-container
+.timeline-info-card
   position: sticky
-  top: 56px
   z-index: 1
+  top: 56px
+  margin: 0.5em
+
+  @include media-breakpoint-down(sm)
+    margin-bottom: 0
+
+  @include media-breakpoint-up(sm)
+    float: right
