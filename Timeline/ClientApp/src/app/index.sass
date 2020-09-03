@@ -15,9 +15,6 @@ body
 small
   line-height: 1.2
 
-.width-1px
-  width: 1px
-
 .flex-fix-length
   flex-grow: 0
   flex-shrink: 0
@@ -26,27 +23,20 @@ small
   left: 0
   top: 0
 
-.position-rb
-  right: 0
-  bottom: 0
-
 .avatar
   width: 60px
-
-.avatar.large
-  width: 100px
-
-.avatar.small
-  width: 40px
+  &.large
+    width: 100px
+  &.small
+    width: 40px
 
 .mt-appbar
   margin-top: 56px
 
 .icon-button
   font-size: 1.4em
-
-.large-icon-button
-  font-size: 1.6em
+  &.large
+    font-size: 1.6em
 
 .cursor-pointer
   cursor: pointer

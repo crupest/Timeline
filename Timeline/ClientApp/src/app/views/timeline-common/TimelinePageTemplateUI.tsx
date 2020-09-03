@@ -18,6 +18,7 @@ import Timeline, {
 } from "./Timeline";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 import { TimelineSyncStatus } from "./SyncStatusBadge";
+import clsx from "clsx";
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
@@ -206,24 +207,30 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
       body = (
         <>
-          <CardComponent
-            timeline={timeline}
-            onManage={props.onManage}
-            onMember={props.onMember}
-            className="timeline-info-card"
-            syncStatus={syncStatus}
-            collapse={infoCardCollapse}
-            toggleCollapse={() => {
-              const newState = !infoCardCollapse;
-              setInfoCardCollapse(newState);
-              if (timeline != null) {
-                window.localStorage.setItem(
-                  genCardCollapseLocalStorageKey(timeline.uniqueId),
-                  newState.toString()
-                );
-              }
-            }}
-          />
+          <div
+            className={clsx(
+              "timeline-template-info-card",
+              infoCardCollapse && "my-collapse"
+            )}
+          >
+            <CardComponent
+              timeline={timeline}
+              onManage={props.onManage}
+              onMember={props.onMember}
+              syncStatus={syncStatus}
+              collapse={infoCardCollapse}
+              toggleCollapse={() => {
+                const newState = !infoCardCollapse;
+                setInfoCardCollapse(newState);
+                if (timeline != null) {
+                  window.localStorage.setItem(
+                    genCardCollapseLocalStorageKey(timeline.uniqueId),
+                    newState.toString()
+                  );
+                }
+              }}
+            />
+          </div>
           {timelineBody}
         </>
       );
