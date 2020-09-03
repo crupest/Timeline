@@ -1,5 +1,3 @@
-const path = require("path");
-
 module.exports = {
   env: {
     browser: true,
@@ -15,8 +13,6 @@ module.exports = {
     "prettier/react",
     "prettier/@typescript-eslint",
     "plugin:react-hooks/recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
   ],
   globals: {
     Atomics: "readonly",
@@ -30,15 +26,10 @@ module.exports = {
     },
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint", "react-hooks", "import"],
+  plugins: ["react", "@typescript-eslint", "react-hooks"],
   settings: {
     react: {
       version: "detect",
-    },
-    "import/resolver": {
-      webpack: {
-        config: path.resolve(__dirname, "webpack.config.dev.js"),
-      },
     },
   },
   rules: {
@@ -50,12 +41,6 @@ module.exports = {
         allowExpressions: true,
         allowTypedFunctionExpressions: true,
         allowHigherOrderFunctions: true,
-      },
-    ],
-    "import/order": [
-      "warn",
-      {
-        "newlines-between": "always",
       },
     ],
   },
