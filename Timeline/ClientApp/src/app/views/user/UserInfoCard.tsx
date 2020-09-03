@@ -1,7 +1,6 @@
 import React from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
-import { fromEvent } from "rxjs";
 import { Dropdown, Button } from "react-bootstrap";
 
 import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
@@ -17,10 +16,10 @@ export type UserInfoCardProps = TimelineCardComponentProps<
 >;
 
 const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
-  const { onManage } = props;
+  const { onManage, timeline } = props;
   const { t } = useTranslation();
 
-  const avatar = useAvatar(props.timeline.owner.username);
+  const avatar = useAvatar(timeline?.owner?.username);
 
   return (
     <div className={clsx("rounded border bg-light p-2", props.className)}>
@@ -29,14 +28,14 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
         className="avatar large mr-2 rounded-circle float-left"
       />
       <div>
-        {props.timeline.owner.nickname}
+        {timeline.owner.nickname}
         <small className="ml-3 text-secondary">
-          @{props.timeline.owner.username}
+          @{timeline.owner.username}
         </small>
       </div>
-      <p className="mb-0">{props.timeline.description}</p>
+      <p className="mb-0">{timeline.description}</p>
       <small className="mt-1 d-block">
-        {t(timelineVisibilityTooltipTranslationMap[props.timeline.visibility])}
+        {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
       </small>
       <div className="text-right mt-2">
         {onManage != null ? (

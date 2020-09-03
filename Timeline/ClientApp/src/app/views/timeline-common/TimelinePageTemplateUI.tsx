@@ -1,11 +1,7 @@
-import React, { CSSProperties } from "react";
-import clsx from "clsx";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { fromEvent } from "rxjs";
-import Svg from "react-inlinesvg";
-import { Spinner, Collapse } from "react-bootstrap";
-import arrowsAngleContractIcon from "bootstrap-icons/icons/arrows-angle-contract.svg";
-import arrowsAngleExpandIcon from "bootstrap-icons/icons/arrows-angle-expand.svg";
+import { Spinner } from "react-bootstrap";
 
 import { getAlertHost } from "@/services/alert";
 import { useEventEmiiter, UiLogicError } from "@/common";
@@ -21,63 +17,16 @@ import Timeline, {
   TimelineDeleteCallback,
 } from "./Timeline";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
-
-type TimelinePostSyncState = "syncing" | "synced" | "offline";
-
-const TimelinePostSyncStateBadge: React.FC<{
-  state: TimelinePostSyncState;
-  style?: CSSProperties;
-  className?: string;
-}> = ({ state, style, className }) => {
-  const { t } = useTranslation();
-
-  return (
-    <div style={style} className={clsx("timeline-sync-state-badge", className)}>
-      {(() => {
-        switch (state) {
-          case "syncing": {
-            return (
-              <>
-                <span className="timeline-sync-state-badge-pin bg-warning" />
-                <span className="text-warning">
-                  {t("timeline.postSyncState.syncing")}
-                </span>
-              </>
-            );
-          }
-          case "synced": {
-            return (
-              <>
-                <span className="timeline-sync-state-badge-pin bg-success" />
-                <span className="text-success">
-                  {t("timeline.postSyncState.synced")}
-                </span>
-              </>
-            );
-          }
-          case "offline": {
-            return (
-              <>
-                <span className="timeline-sync-state-badge-pin bg-danger" />
-                <span className="text-danger">
-                  {t("timeline.postSyncState.offline")}
-                </span>
-              </>
-            );
-          }
-          default:
-            throw new UiLogicError("Unknown sync state.");
-        }
-      })()}
-    </div>
-  );
-};
+import { TimelineSyncStatus } from "./SyncStatusBadge";
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
   onManage?: (item: TManageItems | "property") => void;
   onMember: () => void;
   className?: string;
+  collapse: boolean;
+  syncStatus: TimelineSyncStatus;
+  toggleCollapse: () => void;
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
@@ -216,22 +165,13 @@ export default function TimelinePageTemplateUI<TManageItems>(
             })
           );
 
-          const syncState: TimelinePostSyncState = postListState.syncing
-            ? "syncing"
-            : postListState.type === "synced"
-            ? "synced"
-            : "offline";
-
           timelineBody = (
-            <div>
-              <TimelinePostSyncStateBadge state={syncState} />
-              <Timeline
-                containerRef={timelineRef}
-                posts={posts}
-                onDelete={props.onDelete}
-                onResize={triggerResizeEvent}
-              />
-            </div>
+            <Timeline
+              containerRef={timelineRef}
+              posts={posts}
+              onDelete={props.onDelete}
+              onResize={triggerResizeEvent}
+            />
           );
           if (props.onPost != null) {
             timelineBody = (
@@ -255,37 +195,35 @@ export default function TimelinePageTemplateUI<TManageItems>(
           </div>
         );
       }
+
       const { CardComponent } = props;
+      const syncStatus: TimelineSyncStatus =
+        postListState == null || postListState.syncing
+          ? "syncing"
+          : postListState.type === "synced"
+          ? "synced"
+          : "offline";
 
       body = (
         <>
-          <div className="info-card-container">
-            <Svg
-              src={
-                infoCardCollapse
-                  ? arrowsAngleExpandIcon
-                  : arrowsAngleContractIcon
-              }
-              onClick={() => {
-                const newState = !infoCardCollapse;
-                setInfoCardCollapse(newState);
+          <CardComponent
+            timeline={timeline}
+            onManage={props.onManage}
+            onMember={props.onMember}
+            className="timeline-info-card"
+            syncStatus={syncStatus}
+            collapse={infoCardCollapse}
+            toggleCollapse={() => {
+              const newState = !infoCardCollapse;
+              setInfoCardCollapse(newState);
+              if (timeline != null) {
                 window.localStorage.setItem(
                   genCardCollapseLocalStorageKey(timeline.uniqueId),
                   newState.toString()
                 );
-              }}
-              className="float-right m-1 info-card-collapse-button text-primary icon-button"
-            />
-            <Collapse in={!infoCardCollapse}>
-              <CardComponent
-                timeline={timeline}
-                onManage={props.onManage}
-                onMember={props.onMember}
-                className="info-card-content"
-              />
-            </Collapse>
-          </div>
-
+              }
+            }}
+          />
           {timelineBody}
         </>
       );
