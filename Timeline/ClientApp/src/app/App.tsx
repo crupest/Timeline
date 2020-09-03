@@ -2,17 +2,18 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { hot } from "react-hot-loader/root";
 
-import AppBar from "./common/AppBar";
-import LoadingPage from "./common/LoadingPage";
-import Home from "./home/Home";
-import Login from "./user/Login";
-import Settings from "./settings/Settings";
-import About from "./about/About";
-import User from "./user/User";
-import TimelinePage from "./timeline/TimelinePage";
-import AlertHost from "./common/AlertHost";
-import { dataStorage } from "./data/common";
-import { userService, useRawUser } from "./data/user";
+import AppBar from "./views/common/AppBar";
+import LoadingPage from "./views/common/LoadingPage";
+import Home from "./views/home";
+import Login from "./views/login";
+import Settings from "./views/settings";
+import About from "./views/about";
+import User from "./views/user";
+import TimelinePage from "./views/timeline";
+import AlertHost from "./views/common/alert/AlertHost";
+
+import { dataStorage } from "./services/common";
+import { userService, useRawUser } from "./services/user";
 
 const NoMatch: React.FC = () => {
   return (
@@ -25,7 +26,7 @@ const NoMatch: React.FC = () => {
 };
 
 const LazyAdmin = React.lazy(
-  () => import(/* webpackChunkName: "admin" */ "./admin/Admin")
+  () => import(/* webpackChunkName: "admin" */ "./views/admin/Admin")
 );
 
 const App: React.FC = () => {
@@ -38,50 +39,46 @@ const App: React.FC = () => {
     void dataStorage.ready().then(() => setLoading(false));
   }, []);
 
-  let body;
   if (user === undefined || loading) {
-    body = <LoadingPage />;
+    return <LoadingPage />;
   } else {
-    body = (
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route exact path="/login">
-            <Login />
-          </Route>
-          <Route path="/settings">
-            <Settings />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/timelines/:name">
-            <TimelinePage />
-          </Route>
-          <Route path="/users/:username">
-            <User />
-          </Route>
-          {user && user.administrator && (
-            <Route path="/admin">
-              <LazyAdmin user={user} />
+    return (
+      <React.Suspense fallback={<LoadingPage />}>
+        <Router>
+          <AppBar />
+          <Switch>
+            <Route exact path="/">
+              <Home />
             </Route>
-          )}
-          <Route>
-            <NoMatch />
-          </Route>
-        </Switch>
-      </Router>
+            <Route exact path="/login">
+              <Login />
+            </Route>
+            <Route path="/settings">
+              <Settings />
+            </Route>
+            <Route path="/about">
+              <About />
+            </Route>
+            <Route path="/timelines/:name">
+              <TimelinePage />
+            </Route>
+            <Route path="/users/:username">
+              <User />
+            </Route>
+            {user && user.administrator && (
+              <Route path="/admin">
+                <LazyAdmin user={user} />
+              </Route>
+            )}
+            <Route>
+              <NoMatch />
+            </Route>
+          </Switch>
+          <AlertHost />
+        </Router>
+      </React.Suspense>
     );
   }
-
-  return (
-    <React.Suspense fallback={<LoadingPage />}>
-      {body}
-      <AlertHost />
-    </React.Suspense>
-  );
 };
 
 export default hot(App);
