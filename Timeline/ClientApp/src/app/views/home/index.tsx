@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Row, Container, Button, Col } from "react-bootstrap";
 
 import { useUser } from "@/services/user";
-import AppBar from "../common/AppBar";
 import SearchInput from "../common/SearchInput";
 
 import BoardWithoutUser from "./BoardWithoutUser";
@@ -34,7 +33,6 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <AppBar />
       <Container fluid>
         <Row>
           <Col>
