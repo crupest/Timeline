@@ -4,12 +4,13 @@ import { Button, ButtonProps, Spinner } from "react-bootstrap";
 const LoadingButton: React.FC<{ loading?: boolean } & ButtonProps> = ({
   loading,
   variant,
+  disabled,
   ...otherProps
 }) => {
   return (
     <Button
       variant={variant != null ? `outline-${variant}` : "outline-primary"}
-      disabled={loading}
+      disabled={disabled || loading}
       {...otherProps}
     >
       {otherProps.children}
