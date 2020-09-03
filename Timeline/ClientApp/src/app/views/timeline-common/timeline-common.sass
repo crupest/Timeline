@@ -7,20 +7,6 @@
   &-item
     display: flex
 
-@keyframes timeline-enter-animation-mask-animation
-  to
-    height: 0
-
-.timeline-enter-animation-mask
-  position: absolute
-  left: 0
-  top: 0
-  height: calc(100% + 300px)
-  width: 100%
-  background: linear-gradient(to top, #ffffff00 0, 200px, white 300px, white)
-  z-index: 100
-  animation: timeline-enter-animation-mask-animation 5s 0.3s forwards // Give it 0.3s to load, which I think is reasonable
-
 $timeline-line-width: 7px
 $timeline-line-node-radius: 18px
 $timeline-line-color: $primary
