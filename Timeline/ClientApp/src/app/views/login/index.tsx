@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Form } from "react-bootstrap";
+import { Container, Form } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
 
@@ -39,7 +39,7 @@ const LoginPage: React.FC = (_) => {
     );
   }
 
-  function onSubmit(event: React.SyntheticEvent): void {
+  const submit = (): void => {
     if (username === "" || password === "") {
       setUsernameDirty(true);
       setPasswordDirty(true);
@@ -68,12 +68,17 @@ const LoginPage: React.FC = (_) => {
           setError(e.message);
         }
       );
-    event.preventDefault();
-  }
+  };
+
+  const onEnterPressInPassword: React.KeyboardEventHandler = (e) => {
+    if (e.key === "Enter") {
+      submit();
+    }
+  };
 
   return (
-    <div className="container login-container mt-appbar">
-      <h1>{t("welcome")}</h1>
+    <Container fluid className="login-container mt-2">
+      <h1 className="text-center">{t("welcome")}</h1>
       <Form>
         <Form.Group>
           <Form.Label htmlFor="username">{t("user.username")}</Form.Label>
@@ -104,6 +109,7 @@ const LoginPage: React.FC = (_) => {
               setPasswordDirty(true);
             }}
             value={password}
+            onKeyDown={onEnterPressInPassword}
             isInvalid={passwordDirty && password === ""}
           />
           {passwordDirty && password === "" && (
@@ -128,14 +134,17 @@ const LoginPage: React.FC = (_) => {
           <LoadingButton
             loading={process}
             variant="primary"
-            onClick={onSubmit}
+            onClick={(e) => {
+              submit();
+              e.preventDefault();
+            }}
             disabled={username === "" || password === "" ? true : undefined}
           >
             {t("user.login")}
           </LoadingButton>
         </div>
       </Form>
-    </div>
+    </Container>
   );
 };
 

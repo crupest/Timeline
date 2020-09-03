@@ -16,8 +16,6 @@ import {
 } from "@/services/timeline";
 import { userService } from "@/services/user";
 
-import AppBar from "../common/AppBar";
-
 import Timeline, {
   TimelinePostInfoEx,
   TimelineDeleteCallback,
