@@ -6,6 +6,7 @@ import { Form, Spinner, Button } from "react-bootstrap";
 import { useUser, userService } from "@/services/user";
 
 import AppBar from "../common/AppBar";
+import LoadingButton from "../common/LoadingButton";
 
 const LoginPage: React.FC = (_) => {
   const { t } = useTranslation();
@@ -89,7 +90,7 @@ const LoginPage: React.FC = (_) => {
               isInvalid={usernameDirty && username === ""}
             />
             {usernameDirty && username === "" && (
-              <Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">
                 {t("login.emptyUsername")}
               </Form.Control.Feedback>
             )}
@@ -108,7 +109,7 @@ const LoginPage: React.FC = (_) => {
               isInvalid={passwordDirty && password === ""}
             />
             {passwordDirty && password === "" && (
-              <Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">
                 {t("login.emptyPassword")}
               </Form.Control.Feedback>
             )}
@@ -124,15 +125,16 @@ const LoginPage: React.FC = (_) => {
               label={t("user.rememberMe")}
             />
           </Form.Group>
-          {error ? <p className="text-error">{t(error)}</p> : null}
-          <div>
-            {process ? (
-              <Spinner animation="border" />
-            ) : (
-              <Button variant="primary" onClick={onSubmit}>
-                {t("user.login")}
-              </Button>
-            )}
+          {error ? <p className="text-danger">{t(error)}</p> : null}
+          <div className="text-right">
+            <LoadingButton
+              loading={process}
+              variant="primary"
+              onClick={onSubmit}
+              disabled={username === "" || password === "" ? true : undefined}
+            >
+              {t("user.login")}
+            </LoadingButton>
           </div>
         </Form>
       </div>
