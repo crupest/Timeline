@@ -1,7 +1,7 @@
 import React from "react";
-import { Button, Spinner, Row, Col } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import Svg from "react-inlinesvg";
+import { Button, Spinner, Row, Col, Form } from "react-bootstrap";
 import textIcon from "bootstrap-icons/icons/card-text.svg";
 import imageIcon from "bootstrap-icons/icons/image.svg";
 
@@ -9,8 +9,6 @@ import { UiLogicError } from "@/common";
 
 import { pushAlert } from "@/services/alert";
 import { TimelineCreatePostRequest } from "@/services/timeline";
-
-import FileInput from "../common/FileInput";
 
 interface TimelinePostEditImageProps {
   onSelect: (blob: Blob | null) => void;
@@ -59,11 +57,11 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
 
   return (
     <>
-      <FileInput
-        labelText={t("chooseImage")}
+      <Form.File
+        label={t("chooseImage")}
         onChange={onInputChange}
         accept="image/*"
-        className="mx-3 my-1"
+        className="mx-3 my-1 d-inline-block"
       />
       {fileUrl && error == null && (
         <img
@@ -189,7 +187,8 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       <Row>
         <Col className="px-1 py-1">
           {kind === "text" ? (
-            <textarea
+            <Form.Control
+              as="textarea"
               className="w-100 h-100 timeline-post-edit"
               value={text}
               disabled={state === "process"}
@@ -203,7 +202,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
             <TimelinePostEditImage onSelect={onImageSelect} />
           )}
         </Col>
-        <Col sm="col-auto align-self-end m-1">
+        <Col xs="auto" className="align-self-end m-1">
           {(() => {
             if (state === "input") {
               return (
@@ -216,13 +215,17 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                       onClick={toggleKind}
                     />
                   </div>
-                  <Button color="primary" onClick={onSend} disabled={!canSend}>
+                  <Button
+                    variant="primary"
+                    onClick={onSend}
+                    disabled={!canSend}
+                  >
                     {t("timeline.send")}
                   </Button>
                 </>
               );
             } else {
-              return <Spinner />;
+              return <Spinner variant="primary" animation="border" />;
             }
           })()}
         </Col>

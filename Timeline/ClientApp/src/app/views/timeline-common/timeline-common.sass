@@ -119,14 +119,6 @@ $timeline-line-color-current: #36c2e6
   background: change-color($color: white, $alpha: 0.8)
   z-index: 100
 
-textarea.timeline-post-edit
-  @extend .border-primary
-  @extend .rounded
-
-  &:focus
-    outline: none
-    box-shadow: 0 0 5px 0 $primary
-
 .timeline-page-top-space
   transition: height 0.5s
 
@@ -147,3 +139,20 @@ textarea.timeline-post-edit
   border-radius: 50%
   vertical-align: middle
   margin-right: 0.6em
+
+.info-card-container
+  position: sticky
+  z-index: 1
+
+  .info-card-collapse-button
+    z-index: 1
+    position: relative
+
+  .info-card-content
+    width: 100%
+    transform-origin: right top
+    transition: transform 0.5s
+
+  &[data-collapse='true']
+    .info-card-content
+      transform: scale(0)

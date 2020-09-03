@@ -1,19 +1,11 @@
 import React from "react";
 import clsx from "clsx";
-import {
-  Row,
-  Col,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "reactstrap";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Svg from "react-inlinesvg";
 import chevronDownIcon from "bootstrap-icons/icons/chevron-down.svg";
 import trashIcon from "bootstrap-icons/icons/trash.svg";
+import { Row, Col, Modal, Button } from "react-bootstrap";
 
 import { useAvatar } from "@/services/user";
 import { TimelinePostInfo } from "@/services/timeline";
@@ -28,16 +20,18 @@ const TimelinePostDeleteConfirmDialog: React.FC<{
 
   return (
     <Modal toggle={toggle} isOpen centered>
-      <ModalHeader className="text-danger">
-        {t("timeline.post.deleteDialog.title")}
-      </ModalHeader>
-      <ModalBody>{t("timeline.post.deleteDialog.prompt")}</ModalBody>
-      <ModalFooter>
-        <Button color="secondary" onClick={toggle}>
+      <Modal.Header>
+        <Modal.Title className="text-danger">
+          {t("timeline.post.deleteDialog.title")}
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{t("timeline.post.deleteDialog.prompt")}</Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={toggle}>
           {t("operationDialog.cancel")}
         </Button>
         <Button
-          color="danger"
+          variant="danger"
           onClick={() => {
             onConfirm();
             toggle();
@@ -45,7 +39,7 @@ const TimelinePostDeleteConfirmDialog: React.FC<{
         >
           {t("operationDialog.confirm")}
         </Button>
-      </ModalFooter>
+      </Modal.Footer>
     </Modal>
   );
 };

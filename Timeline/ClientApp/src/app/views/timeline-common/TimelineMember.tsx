@@ -1,14 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Container,
-  ListGroup,
-  ListGroupItem,
-  Modal,
-  Row,
-  Col,
-  Button,
-} from "reactstrap";
+import { Container, ListGroup, Modal, Row, Col, Button } from "react-bootstrap";
 
 import { User, useAvatar } from "@/services/user";
 
@@ -25,9 +17,9 @@ const TimelineMemberItem: React.FC<{
   const avatar = useAvatar(user.username);
 
   return (
-    <ListGroupItem className="container">
+    <ListGroup.Item className="container">
       <Row>
-        <Col className="col-auto">
+        <Col xs="auto">
           <BlobImage blob={avatar} className="avatar small" />
         </Col>
         <Col>
@@ -46,7 +38,7 @@ const TimelineMemberItem: React.FC<{
           return (
             <Button
               className="align-self-center"
-              color="danger"
+              variant="danger"
               onClick={() => {
                 onRemove(user.username);
               }}
@@ -56,7 +48,7 @@ const TimelineMemberItem: React.FC<{
           );
         })()}
       </Row>
-    </ListGroupItem>
+    </ListGroup.Item>
   );
 };
 
@@ -169,7 +161,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                             </Row>
                           </Col>
                           <Button
-                            color="primary"
+                            variant="primary"
                             className="align-self-center"
                             disabled={!addable}
                             onClick={() => {
@@ -212,7 +204,7 @@ export const TimelineMemberDialog: React.FC<TimelineMemberDialogProps> = (
   props
 ) => {
   return (
-    <Modal isOpen={props.open} toggle={props.onClose}>
+    <Modal show centered onHide={props.onClose}>
       <TimelineMember {...props} />
     </Modal>
   );

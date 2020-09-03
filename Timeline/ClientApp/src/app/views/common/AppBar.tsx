@@ -17,7 +17,7 @@ const AppBar: React.FC = (_) => {
   const isAdministrator = user && user.administrator;
 
   return (
-    <Navbar bg="primary" variant="dark" expand="md">
+    <Navbar bg="primary" variant="dark" expand="md" sticky="top">
       <LinkContainer to="/">
         <Navbar.Brand className="d-flex align-items-center">
           <TimelineLogo style={{ height: "1em" }} />

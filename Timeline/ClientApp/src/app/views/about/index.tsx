@@ -23,8 +23,8 @@ const frontendCredits: {
     url: "https://getbootstrap.com",
   },
   {
-    name: "reactstrap",
-    url: "https://reactstrap.github.io",
+    name: "react-bootstrap",
+    url: "https://react-bootstrap.github.io",
   },
   {
     name: "babeljs",
