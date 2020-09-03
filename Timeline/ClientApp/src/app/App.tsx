@@ -11,6 +11,7 @@ import About from "./views/about";
 import User from "./views/user";
 import TimelinePage from "./views/timeline";
 import AlertHost from "./views/common/alert/AlertHost";
+
 import { dataStorage } from "./services/common";
 import { userService, useRawUser } from "./services/user";
 
@@ -38,50 +39,46 @@ const App: React.FC = () => {
     void dataStorage.ready().then(() => setLoading(false));
   }, []);
 
-  let body;
   if (user === undefined || loading) {
-    body = <LoadingPage />;
+    return <LoadingPage />;
   } else {
-    body = (
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route exact path="/login">
-            <Login />
-          </Route>
-          <Route path="/settings">
-            <Settings />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/timelines/:name">
-            <TimelinePage />
-          </Route>
-          <Route path="/users/:username">
-            <User />
-          </Route>
-          {user && user.administrator && (
-            <Route path="/admin">
-              <LazyAdmin user={user} />
+    return (
+      <React.Suspense fallback={<LoadingPage />}>
+        <Router>
+          <AppBar />
+          <Switch>
+            <Route exact path="/">
+              <Home />
             </Route>
-          )}
-          <Route>
-            <NoMatch />
-          </Route>
-        </Switch>
-      </Router>
+            <Route exact path="/login">
+              <Login />
+            </Route>
+            <Route path="/settings">
+              <Settings />
+            </Route>
+            <Route path="/about">
+              <About />
+            </Route>
+            <Route path="/timelines/:name">
+              <TimelinePage />
+            </Route>
+            <Route path="/users/:username">
+              <User />
+            </Route>
+            {user && user.administrator && (
+              <Route path="/admin">
+                <LazyAdmin user={user} />
+              </Route>
+            )}
+            <Route>
+              <NoMatch />
+            </Route>
+          </Switch>
+          <AlertHost />
+        </Router>
+      </React.Suspense>
     );
   }
-
-  return (
-    <React.Suspense fallback={<LoadingPage />}>
-      {body}
-      <AlertHost />
-    </React.Suspense>
-  );
 };
 
 export default hot(App);

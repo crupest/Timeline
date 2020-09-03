@@ -310,10 +310,5 @@ export default function TimelinePageTemplateUI<TManageItems>(
     }
   }
 
-  return (
-    <>
-      <AppBar />
-      {body}
-    </>
-  );
+  return body;
 }

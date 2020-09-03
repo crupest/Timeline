@@ -8,7 +8,6 @@ import {
 } from "react-router";
 import { Nav } from "react-bootstrap";
 
-import AppBar from "../common/AppBar";
 import { UserWithToken } from "@/services/user";
 
 import UserAdmin from "./UserAdmin";
@@ -34,7 +33,6 @@ const Admin: React.FC<AdminProps> = (props) => {
   ): React.ReactNode => {
     return (
       <Route path={`${match.path}/${name}`}>
-        <AppBar />
         <div style={{ height: 56 }} className="flex-fix-length" />
         <Nav variant="tabs">
           <Nav.Item>

@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Form, Container, Row, Col, Button, Modal } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
-import AppBar from "../common/AppBar";
 import OperationDialog, {
   OperationInputErrorInfo,
 } from "../common/OperationDialog";
@@ -121,92 +120,89 @@ const SettingsPage: React.FC = (_) => {
   const language = i18n.language.slice(0, 2);
 
   return (
-    <>
-      <AppBar />
-      <Container fluid>
-        {user ? (
-          <>
-            <Row className="border-bottom p-3 cursor-pointer">
-              <Col xs="12">
-                <h5
-                  onClick={() => {
-                    history.push(`/users/${user.username}`);
-                  }}
-                >
-                  {t("settings.gotoSelf")}
-                </h5>
-              </Col>
-            </Row>
-            <Row className="border-bottom p-3 cursor-pointer">
-              <Col xs="12">
-                <h5
-                  className="text-danger"
-                  onClick={() => setDialog("changepassword")}
-                >
-                  {t("settings.changePassword")}
-                </h5>
-              </Col>
-            </Row>
-            <Row className="border-bottom p-3 cursor-pointer">
-              <Col xs="12">
-                <h5
-                  className="text-danger"
-                  onClick={() => {
-                    setDialog("logout");
-                  }}
-                >
-                  {t("settings.logout")}
-                </h5>
-              </Col>
-            </Row>
-          </>
-        ) : null}
-        <Row className="align-items-center border-bottom p-3">
-          <Col xs="12" sm="auto">
-            <h5>{t("settings.languagePrimary")}</h5>
-            <p>{t("settings.languageSecondary")}</p>
-          </Col>
-          <Col xs="auto" className="ml-auto">
-            <Form.Control
-              as="select"
-              value={language}
-              onChange={(e) => {
-                void i18n.changeLanguage(e.target.value);
-              }}
-            >
-              <option value="zh">中文</option>
-              <option value="en">English</option>
-            </Form.Control>
-          </Col>
-        </Row>
-        {(() => {
-          switch (dialog) {
-            case "changepassword":
-              return (
-                <ChangePasswordDialog
-                  open
-                  close={() => {
-                    setDialog(null);
-                  }}
-                />
-              );
-            case "logout":
-              return (
-                <ConfirmLogoutDialog
-                  toggle={() => setDialog(null)}
-                  onConfirm={() => {
-                    void userService.logout().then(() => {
-                      history.push("/");
-                    });
-                  }}
-                />
-              );
-            default:
-              return null;
-          }
-        })()}
-      </Container>
-    </>
+    <Container fluid>
+      {user ? (
+        <>
+          <Row className="border-bottom p-3 cursor-pointer">
+            <Col xs="12">
+              <h5
+                onClick={() => {
+                  history.push(`/users/${user.username}`);
+                }}
+              >
+                {t("settings.gotoSelf")}
+              </h5>
+            </Col>
+          </Row>
+          <Row className="border-bottom p-3 cursor-pointer">
+            <Col xs="12">
+              <h5
+                className="text-danger"
+                onClick={() => setDialog("changepassword")}
+              >
+                {t("settings.changePassword")}
+              </h5>
+            </Col>
+          </Row>
+          <Row className="border-bottom p-3 cursor-pointer">
+            <Col xs="12">
+              <h5
+                className="text-danger"
+                onClick={() => {
+                  setDialog("logout");
+                }}
+              >
+                {t("settings.logout")}
+              </h5>
+            </Col>
+          </Row>
+        </>
+      ) : null}
+      <Row className="align-items-center border-bottom p-3">
+        <Col xs="12" sm="auto">
+          <h5>{t("settings.languagePrimary")}</h5>
+          <p>{t("settings.languageSecondary")}</p>
+        </Col>
+        <Col xs="auto" className="ml-auto">
+          <Form.Control
+            as="select"
+            value={language}
+            onChange={(e) => {
+              void i18n.changeLanguage(e.target.value);
+            }}
+          >
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </Form.Control>
+        </Col>
+      </Row>
+      {(() => {
+        switch (dialog) {
+          case "changepassword":
+            return (
+              <ChangePasswordDialog
+                open
+                close={() => {
+                  setDialog(null);
+                }}
+              />
+            );
+          case "logout":
+            return (
+              <ConfirmLogoutDialog
+                toggle={() => setDialog(null)}
+                onConfirm={() => {
+                  void userService.logout().then(() => {
+                    history.push("/");
+                  });
+                }}
+              />
+            );
+          default:
+            return null;
+        }
+      })()}
+    </Container>
   );
 };
 
