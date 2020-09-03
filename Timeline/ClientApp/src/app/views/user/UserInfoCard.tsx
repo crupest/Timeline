@@ -17,34 +17,15 @@ export type UserInfoCardProps = TimelineCardComponentProps<
 >;
 
 const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
-  const { onHeight, onManage } = props;
+  const { onManage } = props;
   const { t } = useTranslation();
 
   const avatar = useAvatar(props.timeline.owner.username);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const containerRef = React.useRef<HTMLDivElement>(null!);
-
-  const notifyHeight = React.useCallback((): void => {
-    if (onHeight) {
-      onHeight(containerRef.current.getBoundingClientRect().height);
-    }
-  }, [onHeight]);
-
-  React.useEffect(() => {
-    const subscription = fromEvent(window, "resize").subscribe(notifyHeight);
-    return () => subscription.unsubscribe();
-  });
-
   return (
-    <div
-      ref={containerRef}
-      className={clsx("rounded border bg-light p-2 clearfix", props.className)}
-      onTransitionEnd={notifyHeight}
-    >
+    <div className={clsx("rounded border bg-light p-2", props.className)}>
       <BlobImage
         blob={avatar}
-        onLoad={notifyHeight}
         className="avatar large mr-2 rounded-circle float-left"
       />
       <div>

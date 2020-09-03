@@ -142,17 +142,5 @@ $timeline-line-color-current: #36c2e6
 
 .info-card-container
   position: sticky
+  top: 56px
   z-index: 1
-
-  .info-card-collapse-button
-    z-index: 1
-    position: relative
-
-  .info-card-content
-    width: 100%
-    transform-origin: right top
-    transition: transform 0.5s
-
-  &[data-collapse='true']
-    .info-card-content
-      transform: scale(0)

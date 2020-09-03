@@ -1,7 +1,6 @@
 import React from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
-import { fromEvent } from "rxjs";
 import { Dropdown, Button } from "react-bootstrap";
 
 import { useAvatar } from "@/services/user";
@@ -17,41 +16,19 @@ export type TimelineInfoCardProps = TimelineCardComponentProps<
 >;
 
 const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
-  const { onHeight, onMember, onManage } = props;
+  const { onMember, onManage } = props;
 
   const { t } = useTranslation();
 
   const avatar = useAvatar(props.timeline.owner.username);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const containerRef = React.useRef<HTMLDivElement>(null!);
-
-  const notifyHeight = React.useCallback((): void => {
-    if (onHeight) {
-      onHeight(containerRef.current.getBoundingClientRect().height);
-    }
-  }, [onHeight]);
-
-  React.useEffect(() => {
-    const subscription = fromEvent(window, "resize").subscribe(notifyHeight);
-    return () => subscription.unsubscribe();
-  });
-
   return (
-    <div
-      ref={containerRef}
-      className={clsx("rounded border p-2 bg-light clearfix", props.className)}
-      onTransitionEnd={notifyHeight}
-    >
+    <div className={clsx("rounded border p-2 bg-light", props.className)}>
       <h3 className="text-primary mx-3 d-inline-block align-middle">
         {props.timeline.name}
       </h3>
       <div className="d-inline-block align-middle">
-        <BlobImage
-          blob={avatar}
-          onLoad={notifyHeight}
-          className="avatar small rounded-circle"
-        />
+        <BlobImage blob={avatar} className="avatar small rounded-circle" />
         {props.timeline.owner.nickname}
         <small className="ml-3 text-secondary">
           @{props.timeline.owner.username}
