@@ -32,13 +32,7 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
   const avatar = useAvatar(timeline?.owner?.username);
 
   return (
-    <div
-      className={clsx(
-        "rounded border p-2 bg-light",
-        props.className,
-        collapse && "align-self-end"
-      )}
-    >
+    <div className={clsx("cru-card p-2 clearfix", props.className)}>
       <div className="float-right d-flex align-items-center">
         <SyncStatusBadge status={syncStatus} className="mr-2" />
         <CollapseButton collapse={collapse} onClick={toggleCollapse} />

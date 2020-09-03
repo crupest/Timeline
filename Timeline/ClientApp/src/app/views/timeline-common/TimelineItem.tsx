@@ -145,7 +145,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           >
             <Svg
               src={trashIcon}
-              className="text-danger large-icon-button"
+              className="text-danger icon-button large"
               onClick={(e: Event) => {
                 toggleDeleteDialog();
                 e.stopPropagation();
