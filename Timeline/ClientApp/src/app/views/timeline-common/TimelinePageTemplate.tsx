@@ -160,10 +160,6 @@ export default function TimelinePageTemplate<TManageItem>(
     [onManageProp]
   );
 
-  const onMember = React.useCallback(() => {
-    setDialog("member");
-  }, []);
-
   return (
     <>
       <UiComponent
@@ -181,7 +177,7 @@ export default function TimelinePageTemplate<TManageItem>(
             ? onManage
             : undefined
         }
-        onMember={onMember}
+        onMember={() => setDialog("member")}
       />
       {dialogElement}
     </>

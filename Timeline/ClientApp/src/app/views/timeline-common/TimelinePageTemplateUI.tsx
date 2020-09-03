@@ -1,9 +1,9 @@
 import React, { CSSProperties } from "react";
-import { Spinner } from "reactstrap";
+import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { fromEvent } from "rxjs";
 import Svg from "react-inlinesvg";
-import clsx from "clsx";
+import { Spinner } from "react-bootstrap";
 import arrowsAngleContractIcon from "bootstrap-icons/icons/arrows-angle-contract.svg";
 import arrowsAngleExpandIcon from "bootstrap-icons/icons/arrows-angle-expand.svg";
 
@@ -262,7 +262,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
       } else {
         timelineBody = (
           <div className="full-viewport-center-child">
-            <Spinner color="primary" type="grow" />
+            <Spinner variant="primary" animation="grow" />
           </div>
         );
       }
@@ -271,7 +271,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
       body = (
         <>
           <div
-            className="fixed-top mt-appbar info-card-container"
+            className="info-card-container"
             data-collapse={infoCardCollapse ? "true" : "false"}
           >
             <Svg
@@ -304,7 +304,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
     } else {
       body = (
         <div className="full-viewport-center-child">
-          <Spinner color="primary" type="grow" />
+          <Spinner variant="primary" animation="grow" />
         </div>
       );
     }
@@ -313,13 +313,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
   return (
     <>
       <AppBar />
-      <div>
-        <div
-          style={{ height: 56 + cardHeight }}
-          className="timeline-page-top-space flex-fix-length"
-        />
-        {body}
-      </div>
+      {body}
     </>
   );
 }

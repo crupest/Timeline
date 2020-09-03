@@ -1,15 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import {
-  Label,
-  FormGroup,
-  Input,
-  Form,
-  FormFeedback,
-  Spinner,
-  Button,
-} from "reactstrap";
+import { Form, Spinner, Button } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
 
@@ -84,9 +76,9 @@ const LoginPage: React.FC = (_) => {
       <div className="container login-container mt-appbar">
         <h1>{t("welcome")}</h1>
         <Form>
-          <FormGroup>
-            <Label for="username">{t("user.username")}</Label>
-            <Input
+          <Form.Group>
+            <Form.Label htmlFor="username">{t("user.username")}</Form.Label>
+            <Form.Control
               id="username"
               disabled={process}
               onChange={(e) => {
@@ -94,15 +86,17 @@ const LoginPage: React.FC = (_) => {
                 setUsernameDirty(true);
               }}
               value={username}
-              invalid={usernameDirty && username === ""}
+              isInvalid={usernameDirty && username === ""}
             />
             {usernameDirty && username === "" && (
-              <FormFeedback>{t("login.emptyUsername")}</FormFeedback>
+              <Form.Control.Feedback>
+                {t("login.emptyUsername")}
+              </Form.Control.Feedback>
             )}
-          </FormGroup>
-          <FormGroup>
-            <Label for="password">{t("user.password")}</Label>
-            <Input
+          </Form.Group>
+          <Form.Group>
+            <Form.Label htmlFor="password">{t("user.password")}</Form.Label>
+            <Form.Control
               id="password"
               type="password"
               disabled={process}
@@ -111,30 +105,31 @@ const LoginPage: React.FC = (_) => {
                 setPasswordDirty(true);
               }}
               value={password}
-              invalid={passwordDirty && password === ""}
+              isInvalid={passwordDirty && password === ""}
             />
             {passwordDirty && password === "" && (
-              <FormFeedback>{t("login.emptyPassword")}</FormFeedback>
+              <Form.Control.Feedback>
+                {t("login.emptyPassword")}
+              </Form.Control.Feedback>
             )}
-          </FormGroup>
-          <FormGroup check>
-            <Input
+          </Form.Group>
+          <Form.Group>
+            <Form.Check<"input">
               id="remember-me"
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => {
-                const v = (e.target as HTMLInputElement).checked;
-                setRememberMe(v);
+                setRememberMe(e.target.checked);
               }}
+              label={t("user.rememberMe")}
             />
-            <Label for="remember-me">{t("user.rememberMe")}</Label>
-          </FormGroup>
+          </Form.Group>
           {error ? <p className="text-error">{t(error)}</p> : null}
           <div>
             {process ? (
-              <Spinner />
+              <Spinner animation="border" />
             ) : (
-              <Button color="primary" onClick={onSubmit}>
+              <Button variant="primary" onClick={onSubmit}>
                 {t("user.login")}
               </Button>
             )}

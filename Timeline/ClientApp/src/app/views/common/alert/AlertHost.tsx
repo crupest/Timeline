@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
-import { Alert } from "reactstrap";
 import without from "lodash/without";
 import concat from "lodash/concat";
 import { useTranslation } from "react-i18next";
+import { Alert } from "react-bootstrap";
 
 import {
   alertService,
@@ -37,7 +37,12 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
   }, [dismissTime, props.close]);
 
   return (
-    <Alert className="m-3" color={alert.type ?? "primary"} toggle={props.close}>
+    <Alert
+      className="m-3"
+      variant={alert.type ?? "primary"}
+      onClose={props.close}
+      dismissible
+    >
       {(() => {
         const { message } = alert;
         if (typeof message === "function") {

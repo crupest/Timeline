@@ -1,14 +1,8 @@
 import React from "react";
 import clsx from "clsx";
-import {
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-} from "reactstrap";
 import { useTranslation } from "react-i18next";
 import { fromEvent } from "rxjs";
+import { Dropdown, Button } from "react-bootstrap";
 
 import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
 import { useAvatar } from "@/services/user";
@@ -42,24 +36,16 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
     return () => subscription.unsubscribe();
   });
 
-  const [manageDropdownOpen, setManageDropdownOpen] = React.useState<boolean>(
-    false
-  );
-  const toggleManageDropdown = React.useCallback(
-    (): void => setManageDropdownOpen((old) => !old),
-    []
-  );
-
   return (
     <div
       ref={containerRef}
-      className={clsx("rounded border bg-light p-2", props.className)}
+      className={clsx("rounded border bg-light p-2 clearfix", props.className)}
       onTransitionEnd={notifyHeight}
     >
       <BlobImage
         blob={avatar}
         onLoad={notifyHeight}
-        className="avatar large mr-2 mb-2 rounded-circle float-left"
+        className="avatar large mr-2 rounded-circle float-left"
       />
       <div>
         {props.timeline.owner.nickname}
@@ -73,27 +59,27 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
       </small>
       <div className="text-right mt-2">
         {onManage != null ? (
-          <Dropdown isOpen={manageDropdownOpen} toggle={toggleManageDropdown}>
-            <DropdownToggle outline color="primary">
+          <Dropdown>
+            <Dropdown.Toggle variant="outline-primary">
               {t("timeline.manage")}
-            </DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={() => onManage("nickname")}>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => onManage("nickname")}>
                 {t("timeline.manageItem.nickname")}
-              </DropdownItem>
-              <DropdownItem onClick={() => onManage("avatar")}>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => onManage("avatar")}>
                 {t("timeline.manageItem.avatar")}
-              </DropdownItem>
-              <DropdownItem onClick={() => onManage("property")}>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => onManage("property")}>
                 {t("timeline.manageItem.property")}
-              </DropdownItem>
-              <DropdownItem onClick={props.onMember}>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={props.onMember}>
                 {t("timeline.manageItem.member")}
-              </DropdownItem>
-            </DropdownMenu>
+              </Dropdown.Item>
+            </Dropdown.Menu>
           </Dropdown>
         ) : (
-          <Button color="primary" outline onClick={props.onMember}>
+          <Button variant="outline-primary" onClick={props.onMember}>
             {t("timeline.memberButton")}
           </Button>
         )}

@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "reactstrap";
 import { useTranslation } from "react-i18next";
+import { Button } from "react-bootstrap";
 
 import { pushAlert } from "./services/alert";
 
@@ -39,7 +39,11 @@ if ("serviceWorker" in navigator) {
           return (
             <>
               {t("serviceWorker.externalActivatedPrompt")}
-              <Button color="success" size="sm" onClick={upgradeReload} outline>
+              <Button
+                variant="outline-success"
+                size="sm"
+                onClick={upgradeReload}
+              >
                 {t("serviceWorker.reloadNow")}
               </Button>
             </>
@@ -83,7 +87,7 @@ if ("serviceWorker" in navigator) {
         return (
           <>
             {t("serviceWorker.upgradePrompt")}
-            <Button color="success" size="sm" onClick={upgrade} outline>
+            <Button variant="outline-success" size="sm" onClick={upgrade}>
               {t("serviceWorker.upgradeNow")}
             </Button>
           </>

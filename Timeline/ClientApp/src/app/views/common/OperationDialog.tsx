@@ -1,26 +1,13 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Spinner,
-  Container,
-  ModalBody,
-  Label,
-  Input,
-  FormGroup,
-  FormFeedback,
-  ModalFooter,
-  Button,
-  Modal,
-  ModalHeader,
-  FormText,
-} from "reactstrap";
+import { Spinner, Container, Form, Button, Modal } from "react-bootstrap";
 
 import { UiLogicError } from "@/common";
 
 const DefaultProcessPrompt: React.FC = (_) => {
   return (
     <Container className="justify-content-center align-items-center">
-      <Spinner />
+      <Spinner animation="border" variant="success" />
     </Container>
   );
 };
@@ -233,7 +220,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
 
     body = (
       <>
-        <ModalBody>
+        <Modal.Body>
           {inputPrompt}
           {inputScheme.map((item, index) => {
             const value = values[index];
@@ -242,9 +229,9 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
 
             if (item.type === "text") {
               return (
-                <FormGroup key={index}>
-                  {item.label && <Label>{t(item.label)}</Label>}
-                  <Input
+                <Form.Group key={index}>
+                  {item.label && <Form.Label>{t(item.label)}</Form.Label>}
+                  <Form.Control
                     type={item.password === true ? "password" : "text"}
                     value={value as string}
                     onChange={(e) => {
@@ -258,35 +245,35 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                         )
                       );
                     }}
-                    invalid={error != null}
-                    {...item.textFieldProps}
+                    isInvalid={error != null}
                   />
-                  {error != null && <FormFeedback>{error}</FormFeedback>}
-                  {item.helperText && <FormText>{t(item.helperText)}</FormText>}
-                </FormGroup>
+                  {error != null && (
+                    <Form.Control.Feedback>{error}</Form.Control.Feedback>
+                  )}
+                  {item.helperText && (
+                    <Form.Text>{t(item.helperText)}</Form.Text>
+                  )}
+                </Form.Group>
               );
             } else if (item.type === "bool") {
               return (
-                <FormGroup check key={index}>
-                  <Input
+                <Form.Group key={index}>
+                  <Form.Check<"input">
                     type="checkbox"
-                    value={value as string}
-                    onChange={(e) => {
-                      updateValue(
-                        index,
-                        (e.target as HTMLInputElement).checked
-                      );
+                    checked={value as boolean}
+                    onChange={(event) => {
+                      updateValue(index, event.currentTarget.checked);
                     }}
+                    label={t(item.label)}
                   />
-                  <Label check>{t(item.label)}</Label>
-                </FormGroup>
+                </Form.Group>
               );
             } else if (item.type === "select") {
               return (
-                <FormGroup key={index}>
-                  <Label>{t(item.label)}</Label>
-                  <Input
-                    type="select"
+                <Form.Group key={index}>
+                  <Form.Label>{t(item.label)}</Form.Label>
+                  <Form.Control
+                    as="select"
                     value={value as string}
                     onChange={(event) => {
                       updateValue(index, event.target.value);
@@ -300,18 +287,18 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                         </option>
                       );
                     })}
-                  </Input>
-                </FormGroup>
+                  </Form.Control>
+                </Form.Group>
               );
             }
           })}
-        </ModalBody>
-        <ModalFooter>
-          <Button color="secondary" onClick={close}>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={close}>
             {t("operationDialog.cancel")}
           </Button>
           <Button
-            color="primary"
+            variant="primary"
             disabled={testErrorInfo(inputError)}
             onClick={() => {
               if (validateAll()) {
@@ -321,14 +308,14 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
           >
             {t("operationDialog.confirm")}
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </>
     );
   } else if (step === "process") {
     body = (
-      <ModalBody>
+      <Modal.Body>
         {props.processPrompt?.() ?? <DefaultProcessPrompt />}
-      </ModalBody>
+      </Modal.Body>
     );
   } else {
     let content: React.ReactNode;
@@ -345,12 +332,12 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
     }
     body = (
       <>
-        <ModalBody>{content}</ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={close}>
+        <Modal.Body>{content}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={close}>
             {t("operationDialog.ok")}
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </>
     );
   }
@@ -359,7 +346,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
 
   return (
     <Modal isOpen={props.open} toggle={close}>
-      <ModalHeader
+      <Modal.Header
         className={
           props.titleColor != null
             ? "text-" +
@@ -372,7 +359,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
         }
       >
         {title}
-      </ModalHeader>
+      </Modal.Header>
       {body}
     </Modal>
   );

@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
-  ListGroupItem,
+  ListGroup,
   Row,
   Col,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
+  Dropdown,
   Spinner,
   Button,
-} from "reactstrap";
-import axios from "axios";
+} from "react-bootstrap";
 
 import OperationDialog from "../common/OperationDialog";
 import { User, UserWithToken } from "@/services/user";
@@ -101,7 +98,7 @@ const UserItem: React.FC<UserCardProps> = (props) => {
   };
 
   return (
-    <ListGroupItem className="container">
+    <ListGroup.Item className="container">
       <Row className="align-items-center">
         <Col>
           <p className="mb-0 text-primary">{user.username}</p>
@@ -112,31 +109,31 @@ const UserItem: React.FC<UserCardProps> = (props) => {
           </small>
         </Col>
         <Col className="col-auto">
-          <UncontrolledDropdown>
-            <DropdownToggle color="warning" className="text-light" caret>
+          <Dropdown>
+            <Dropdown.Toggle variant="warning" className="text-light">
               Manage
-            </DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={createClickCallback(kChangeUsername)}>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={createClickCallback(kChangeUsername)}>
                 Change Username
-              </DropdownItem>
-              <DropdownItem onClick={createClickCallback(kChangePassword)}>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={createClickCallback(kChangePassword)}>
                 Change Password
-              </DropdownItem>
-              <DropdownItem onClick={createClickCallback(kChangePermission)}>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={createClickCallback(kChangePermission)}>
                 Change Permission
-              </DropdownItem>
-              <DropdownItem
+              </Dropdown.Item>
+              <Dropdown.Item
                 className="text-danger"
                 onClick={createClickCallback(kDelete)}
               >
                 Delete
-              </DropdownItem>
-            </DropdownMenu>
-          </UncontrolledDropdown>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </Col>
       </Row>
-    </ListGroupItem>
+    </ListGroup.Item>
   );
 };
 
@@ -441,7 +438,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
     return (
       <>
         <Button
-          color="success"
+          variant="success"
           onClick={() =>
             setDialog({
               type: "create",
@@ -456,7 +453,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
       </>
     );
   } else {
-    return <Spinner />;
+    return <Spinner animation="border" />;
   }
 };
 

@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-import { Nav, NavItem, NavLink } from "reactstrap";
 import {
   Redirect,
   Route,
@@ -7,7 +6,7 @@ import {
   useRouteMatch,
   useHistory,
 } from "react-router";
-import classnames from "classnames";
+import { Nav } from "react-bootstrap";
 
 import AppBar from "../common/AppBar";
 import { UserWithToken } from "@/services/user";
@@ -37,27 +36,27 @@ const Admin: React.FC<AdminProps> = (props) => {
       <Route path={`${match.path}/${name}`}>
         <AppBar />
         <div style={{ height: 56 }} className="flex-fix-length" />
-        <Nav tabs>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: tabName === "users" })}
+        <Nav variant="tabs">
+          <Nav.Item>
+            <Nav.Link
+              active={tabName === "users"}
               onClick={() => {
                 toggle("users");
               }}
             >
               Users
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: tabName === "more" })}
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              active={tabName === "more"}
               onClick={() => {
                 toggle("more");
               }}
             >
               More
-            </NavLink>
-          </NavItem>
+            </Nav.Link>
+          </Nav.Item>
         </Nav>
         {body}
       </Route>
