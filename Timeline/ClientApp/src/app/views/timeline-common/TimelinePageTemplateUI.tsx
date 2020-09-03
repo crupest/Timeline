@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { fromEvent } from "rxjs";
 import Svg from "react-inlinesvg";
-import { Spinner } from "react-bootstrap";
+import { Spinner, Collapse } from "react-bootstrap";
 import arrowsAngleContractIcon from "bootstrap-icons/icons/arrows-angle-contract.svg";
 import arrowsAngleExpandIcon from "bootstrap-icons/icons/arrows-angle-expand.svg";
 
@@ -78,7 +78,6 @@ export interface TimelineCardComponentProps<TManageItems> {
   onManage?: (item: TManageItems | "property") => void;
   onMember: () => void;
   className?: string;
-  onHeight?: (height: number) => void;
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
@@ -173,8 +172,6 @@ export default function TimelinePageTemplateUI<TManageItems>(
     }
   }, [getResizeEvent, triggerResizeEvent, timeline, postListState]);
 
-  const [cardHeight, setCardHeight] = React.useState<number>(0);
-
   const genCardCollapseLocalStorageKey = (uniqueId: string): string =>
     `timeline.${uniqueId}.cardCollapse`;
 
@@ -219,10 +216,6 @@ export default function TimelinePageTemplateUI<TManageItems>(
             })
           );
 
-          const topHeight: string = infoCardCollapse
-            ? "calc(68px + 1.5em)"
-            : `${cardHeight + 60}px`;
-
           const syncState: TimelinePostSyncState = postListState.syncing
             ? "syncing"
             : postListState.type === "synced"
@@ -231,10 +224,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
           timelineBody = (
             <div>
-              <TimelinePostSyncStateBadge
-                style={{ top: topHeight }}
-                state={syncState}
-              />
+              <TimelinePostSyncStateBadge state={syncState} />
               <Timeline
                 containerRef={timelineRef}
                 posts={posts}
@@ -249,6 +239,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
                 {timelineBody}
                 <div ref={bottomSpaceRef} className="flex-fix-length" />
                 <TimelinePostEdit
+                  className="fixed-bottom"
                   onPost={props.onPost}
                   onHeightChange={onPostEditHeightChange}
                   timelineUniqueId={timeline.uniqueId}
@@ -268,10 +259,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
       body = (
         <>
-          <div
-            className="info-card-container"
-            data-collapse={infoCardCollapse ? "true" : "false"}
-          >
+          <div className="info-card-container">
             <Svg
               src={
                 infoCardCollapse
@@ -288,14 +276,16 @@ export default function TimelinePageTemplateUI<TManageItems>(
               }}
               className="float-right m-1 info-card-collapse-button text-primary icon-button"
             />
-            <CardComponent
-              timeline={timeline}
-              onManage={props.onManage}
-              onMember={props.onMember}
-              onHeight={setCardHeight}
-              className="info-card-content"
-            />
+            <Collapse in={!infoCardCollapse}>
+              <CardComponent
+                timeline={timeline}
+                onManage={props.onManage}
+                onMember={props.onMember}
+                className="info-card-content"
+              />
+            </Collapse>
           </div>
+
           {timelineBody}
         </>
       );

@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import Svg from "react-inlinesvg";
 import { Button, Spinner, Row, Col, Form } from "react-bootstrap";
@@ -183,7 +184,10 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   }, []);
 
   return (
-    <div ref={containerRef} className="container-fluid fixed-bottom bg-light">
+    <div
+      ref={containerRef}
+      className={clsx("container-fluid bg-light", props.className)}
+    >
       <Row>
         <Col className="px-1 py-1">
           {kind === "text" ? (
