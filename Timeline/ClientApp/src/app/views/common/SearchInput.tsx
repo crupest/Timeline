@@ -36,9 +36,9 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   );
 
   return (
-    <div className={clsx("form-inline my-2", props.className)}>
+    <Form inline className={clsx("my-2", props.className)}>
       <Form.Control
-        className="mr-sm-2"
+        className="mr-sm-2 flex-grow-1"
         value={props.value}
         onChange={onInputChange}
         onKeyPress={onInputKeyPress}
@@ -56,7 +56,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           </Button>
         )}
       </div>
-    </div>
+    </Form>
   );
 };
 
