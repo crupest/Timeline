@@ -52,7 +52,6 @@ const Timeline: React.FC<TimelineProps> = (props) => {
 
   return (
     <div ref={props.containerRef} className={clsx("timeline", props.className)}>
-      <div className="timeline-enter-animation-mask" />
       {(() => {
         const length = posts.length;
         return posts.map((post, i) => {
