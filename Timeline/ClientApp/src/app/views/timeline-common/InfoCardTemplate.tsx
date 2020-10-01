@@ -8,17 +8,17 @@ import CollapseButton from "../timeline-common/CollapseButton";
 const InfoCardTemplate: React.FC<
   Pick<
     TimelineCardComponentProps<"">,
-    "toggleCollapse" | "syncStatus" | "className"
+    "collapse" | "toggleCollapse" | "syncStatus" | "className"
   > & { children: React.ReactElement[] }
-> = ({ toggleCollapse, syncStatus, className, children }) => {
+> = ({ collapse, toggleCollapse, syncStatus, className, children }) => {
   return (
     <div className={clsx("cru-card p-2 clearfix", className)}>
       <div className="float-right d-flex align-items-center">
         <SyncStatusBadge status={syncStatus} className="mr-2" />
-        <CollapseButton collapse={false} onClick={toggleCollapse} />
+        <CollapseButton collapse={collapse} onClick={toggleCollapse} />
       </div>
 
-      <div>{children}</div>
+      <div style={{ display: collapse ? "none" : "block" }}>{children}</div>
     </div>
   );
 };

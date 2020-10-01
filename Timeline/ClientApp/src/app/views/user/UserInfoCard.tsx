@@ -16,7 +16,14 @@ export type UserInfoCardProps = TimelineCardComponentProps<
 >;
 
 const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
-  const { timeline, onMember, onManage, syncStatus, toggleCollapse } = props;
+  const {
+    timeline,
+    collapse,
+    onMember,
+    onManage,
+    syncStatus,
+    toggleCollapse,
+  } = props;
   const { t } = useTranslation();
 
   const avatar = useAvatar(timeline?.owner?.username);
@@ -25,6 +32,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
     <InfoCardTemplate
       className={props.className}
       syncStatus={syncStatus}
+      collapse={collapse}
       toggleCollapse={toggleCollapse}
     >
       <div>

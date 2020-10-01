@@ -17,16 +17,15 @@ import Timeline, {
   TimelineDeleteCallback,
 } from "./Timeline";
 import TimelineTop from "./TimelineTop";
-import CollapseCard from "./CollapseCard";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 import { TimelineSyncStatus } from "./SyncStatusBadge";
-import clsx from "clsx";
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
   onManage?: (item: TManageItems | "property") => void;
   onMember: () => void;
   className?: string;
+  collapse: boolean;
   syncStatus: TimelineSyncStatus;
   toggleCollapse: () => void;
 }
@@ -219,31 +218,16 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
       body = (
         <>
-          <TimelineTop>
-            <div
-              className={clsx(
-                "timeline-template-card-container",
-                cardCollapse || "my-expand"
-              )}
-            >
-              <CollapseCard
-                visible={cardCollapse}
-                syncStatus={syncStatus}
-                toggleCollapse={toggleCardCollapse}
-              />
-              <CardComponent
-                className={clsx(
-                  "timeline-template-card",
-                  cardCollapse && "d-none"
-                )}
-                timeline={timeline}
-                onManage={props.onManage}
-                onMember={props.onMember}
-                syncStatus={syncStatus}
-                toggleCollapse={toggleCardCollapse}
-              />
-            </div>
-          </TimelineTop>
+          <CardComponent
+            className="timeline-template-card"
+            timeline={timeline}
+            onManage={props.onManage}
+            onMember={props.onMember}
+            syncStatus={syncStatus}
+            collapse={cardCollapse}
+            toggleCollapse={toggleCardCollapse}
+          />
+          <TimelineTop height="56px" />
           {timelineBody}
         </>
       );
