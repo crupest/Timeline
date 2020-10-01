@@ -16,7 +16,14 @@ export type TimelineInfoCardProps = TimelineCardComponentProps<
 >;
 
 const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
-  const { timeline, onMember, onManage, syncStatus, toggleCollapse } = props;
+  const {
+    timeline,
+    collapse,
+    onMember,
+    onManage,
+    syncStatus,
+    toggleCollapse,
+  } = props;
 
   const { t } = useTranslation();
 
@@ -26,6 +33,7 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
     <InfoCardTemplate
       className={props.className}
       syncStatus={syncStatus}
+      collapse={collapse}
       toggleCollapse={toggleCollapse}
     >
       <h3 className="text-primary mx-3 d-inline-block align-middle">

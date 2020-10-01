@@ -83,13 +83,15 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
       onClick={props.onClick}
       style={props.style}
     >
-      <div className="timeline-line-area">
-        <div className="timeline-line-segment start"></div>
-        <div className="timeline-line-node-container">
-          <div className="timeline-line-node"></div>
+      <div className="timeline-line-area-container">
+        <div className="timeline-line-area">
+          <div className="timeline-line-segment start"></div>
+          <div className="timeline-line-node-container">
+            <div className="timeline-line-node"></div>
+          </div>
+          <div className="timeline-line-segment end"></div>
+          {current && <div className="timeline-line-segment current-end" />}
         </div>
-        <div className="timeline-line-segment end"></div>
-        {current && <div className="timeline-line-segment current-end" />}
       </div>
       <div className="timeline-content-area">
         <div>
