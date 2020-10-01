@@ -16,6 +16,8 @@ import Timeline, {
   TimelinePostInfoEx,
   TimelineDeleteCallback,
 } from "./Timeline";
+import TimelineTop from "./TimelineTop";
+import CollapseCard from "./CollapseCard";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 import { TimelineSyncStatus } from "./SyncStatusBadge";
 import clsx from "clsx";
@@ -25,7 +27,6 @@ export interface TimelineCardComponentProps<TManageItems> {
   onManage?: (item: TManageItems | "property") => void;
   onMember: () => void;
   className?: string;
-  collapse: boolean;
   syncStatus: TimelineSyncStatus;
   toggleCollapse: () => void;
 }
@@ -128,14 +129,25 @@ export default function TimelinePageTemplateUI<TManageItems>(
   const cardCollapseLocalStorageKey =
     timeline != null ? genCardCollapseLocalStorageKey(timeline.uniqueId) : null;
 
-  const [infoCardCollapse, setInfoCardCollapse] = React.useState<boolean>(true);
+  const [cardCollapse, setCardCollapse] = React.useState<boolean>(true);
   React.useEffect(() => {
     if (cardCollapseLocalStorageKey != null) {
       const savedCollapse =
         window.localStorage.getItem(cardCollapseLocalStorageKey) === "true";
-      setInfoCardCollapse(savedCollapse);
+      setCardCollapse(savedCollapse);
     }
   }, [cardCollapseLocalStorageKey]);
+
+  const toggleCardCollapse = (): void => {
+    const newState = !cardCollapse;
+    setCardCollapse(newState);
+    if (timeline != null) {
+      window.localStorage.setItem(
+        genCardCollapseLocalStorageKey(timeline.uniqueId),
+        newState.toString()
+      );
+    }
+  };
 
   let body: React.ReactElement;
 
@@ -207,30 +219,31 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
       body = (
         <>
-          <div
-            className={clsx(
-              "timeline-template-info-card",
-              infoCardCollapse && "my-collapse"
-            )}
-          >
-            <CardComponent
-              timeline={timeline}
-              onManage={props.onManage}
-              onMember={props.onMember}
-              syncStatus={syncStatus}
-              collapse={infoCardCollapse}
-              toggleCollapse={() => {
-                const newState = !infoCardCollapse;
-                setInfoCardCollapse(newState);
-                if (timeline != null) {
-                  window.localStorage.setItem(
-                    genCardCollapseLocalStorageKey(timeline.uniqueId),
-                    newState.toString()
-                  );
-                }
-              }}
-            />
-          </div>
+          <TimelineTop>
+            <div
+              className={clsx(
+                "timeline-template-card-container",
+                cardCollapse || "my-expand"
+              )}
+            >
+              <CollapseCard
+                visible={cardCollapse}
+                syncStatus={syncStatus}
+                toggleCollapse={toggleCardCollapse}
+              />
+              <CardComponent
+                className={clsx(
+                  "timeline-template-card",
+                  cardCollapse && "d-none"
+                )}
+                timeline={timeline}
+                onManage={props.onManage}
+                onMember={props.onMember}
+                syncStatus={syncStatus}
+                toggleCollapse={toggleCardCollapse}
+              />
+            </div>
+          </TimelineTop>
           {timelineBody}
         </>
       );

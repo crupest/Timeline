@@ -3,6 +3,7 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "arcanis.vscode-zipfs",
-    "syler.sass-indented"
+    "syler.sass-indented",
+    "editorconfig.editorconfig"
   ]
 }

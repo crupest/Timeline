@@ -70,6 +70,13 @@ $timeline-line-color-current: #36c2e6
     animation: 1s infinite alternate
     animation-name: timeline-line-node-noncurrent
 
+.timeline-top
+  display: flex
+  justify-content: space-between
+
+  .timeline-line-segment
+    flex: 1 1 auto
+
 .current
   .timeline-line
     &-segment
@@ -84,7 +91,7 @@ $timeline-line-color-current: #36c2e6
       animation-name: timeline-line-node-current
 
 .timeline-content-area
-  padding-top: 18px
+  padding: 10px 0
   flex-grow: 1
 
 .timeline-item-delete-button
@@ -124,17 +131,15 @@ $timeline-line-color-current: #36c2e6
   vertical-align: middle
   margin-right: 0.6em
 
-.timeline-template-info-card
+.timeline-template-card-container
   position: sticky
   z-index: 1
   top: 56px
-  padding: 0.5em
+  margin: 0.5em
 
-  @include media-breakpoint-down(sm)
-    padding-bottom: 0
-
-    &.my-collapse
-      float: right
-
-  @include media-breakpoint-up(sm)
-    float: right
+.timeline-template-card
+  width: 360px
+  max-width: calc(100vw - 1em)
+  position: absolute
+  top: 0
+  right: 0
