@@ -2437,13 +2437,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/crypto-js@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "@types/crypto-js@npm:4.0.1"
-  checksum: 6b81c4d064931ef697a8896f09e1290cfb2e59420522f7f6ce443646f768d25a767e15763853007eae8abfb298c6853bdb17fb2c894ed7ddf651337912526d7a
-  languageName: node
-  linkType: hard
-
 "@types/emscripten@npm:^1.38.0":
   version: 1.39.4
   resolution: "@types/emscripten@npm:1.39.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Femscripten%2Fdownload%2F%40types%2Femscripten-1.39.4.tgz"
@@ -4847,13 +4840,6 @@ __metadata:
     shebang-command: ^2.0.0
     which: ^2.0.1
   checksum: 51f10036f5f1de781be98f4738d58b50c6d44f4f471069b8ab075b21605893ba1548654880f7310a29a732d6fc7cd481da6026169b9f0831cab0148a62fb397a
-  languageName: node
-  linkType: hard
-
-"crypto-js@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "crypto-js@npm:4.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcrypto-js%2Fdownload%2Fcrypto-js-4.0.0.tgz"
-  checksum: fdd1415b9e4b317f6ac7f055a00495dabea6aa93ab82ccd63866b0a76d2da9587942764816a8a7976cb23b8bbfd7eea23ccb852b3fef218d166cc5db8c008ab3
   languageName: node
   linkType: hard
 
@@ -11830,7 +11816,6 @@ fsevents@~2.1.2:
     "@babel/preset-typescript": ^7.12.1
     "@hot-loader/react-dom": ^17.0.0
     "@types/classnames": ^2.2.10
-    "@types/crypto-js": ^4.0.1
     "@types/lodash": ^4.14.162
     "@types/node": ^14.14.5
     "@types/react": ^16.9.53
@@ -11854,7 +11839,6 @@ fsevents@~2.1.2:
     clsx: ^1.1.1
     copy-webpack-plugin: ^6.2.1
     core-js: ^3.6.5
-    crypto-js: ^4.0.0
     css-loader: ^5.0.0
     eslint: ^7.12.1
     eslint-config-prettier: ^6.14.0

@@ -49,12 +49,4 @@ config.devServer
 
 config.plugin("hot").use(webpack.HotModuleReplacementPlugin);
 
-module.exports = (env) => {
-  if (env && env.TIMELINE_USE_MOCK_BACKEND) {
-    config
-      .entry("index")
-      .add(path.join(__dirname, "src/app/http/mock/install.ts"));
-  }
-
-  return config.toConfig();
-};
+module.exports = config.toConfig();

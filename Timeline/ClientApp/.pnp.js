@@ -74,10 +74,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:2.2.10::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fclassnames%2Fdownload%2F%40types%2Fclassnames-2.2.10.tgz"
       ],
       [
-        "@types/crypto-js",
-        "npm:4.0.1"
-      ],
-      [
         "@types/lodash",
         "npm:4.14.162"
       ],
@@ -168,10 +164,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "core-js",
         "npm:3.6.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcore-js%2Fdownload%2Fcore-js-3.6.5.tgz"
-      ],
-      [
-        "crypto-js",
-        "npm:4.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcrypto-js%2Fdownload%2Fcrypto-js-4.0.0.tgz"
       ],
       [
         "css-loader",
@@ -384,7 +376,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-typescript", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:7.12.1"],
             ["@hot-loader/react-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:17.0.0"],
             ["@types/classnames", "npm:2.2.10::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fclassnames%2Fdownload%2F%40types%2Fclassnames-2.2.10.tgz"],
-            ["@types/crypto-js", "npm:4.0.1"],
             ["@types/lodash", "npm:4.14.162"],
             ["@types/node", "npm:14.14.5"],
             ["@types/react", "npm:16.9.53"],
@@ -408,7 +399,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["clsx", "npm:1.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fclsx%2Fdownload%2Fclsx-1.1.1.tgz"],
             ["copy-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.1"],
             ["core-js", "npm:3.6.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcore-js%2Fdownload%2Fcore-js-3.6.5.tgz"],
-            ["crypto-js", "npm:4.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcrypto-js%2Fdownload%2Fcrypto-js-4.0.0.tgz"],
             ["css-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.0.0"],
             ["eslint", "npm:7.12.1"],
             ["eslint-config-prettier", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.14.0"],
@@ -3388,15 +3378,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["@types/crypto-js", [
-        ["npm:4.0.1", {
-          "packageLocation": "./.yarn/cache/@types-crypto-js-npm-4.0.1-4f7dc14813-6b81c4d064.zip/node_modules/@types/crypto-js/",
-          "packageDependencies": [
-            ["@types/crypto-js", "npm:4.0.1"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["@types/emscripten", [
         ["npm:1.39.4::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Femscripten%2Fdownload%2F%40types%2Femscripten-1.39.4.tgz", {
           "packageLocation": "./.yarn/cache/@types-emscripten-npm-1.39.4-9fa9d5794b-b848421e25.zip/node_modules/@types/emscripten/",
@@ -6102,15 +6083,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["path-key", "npm:3.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fpath-key%2Fdownload%2Fpath-key-3.1.1.tgz"],
             ["shebang-command", "npm:2.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fshebang-command%2Fdownload%2Fshebang-command-2.0.0.tgz"],
             ["which", "npm:2.0.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fwhich%2Fdownload%2Fwhich-2.0.2.tgz"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["crypto-js", [
-        ["npm:4.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcrypto-js%2Fdownload%2Fcrypto-js-4.0.0.tgz", {
-          "packageLocation": "./.yarn/cache/crypto-js-npm-4.0.0-1dd4e6fa8d-fdd1415b9e.zip/node_modules/crypto-js/",
-          "packageDependencies": [
-            ["crypto-js", "npm:4.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcrypto-js%2Fdownload%2Fcrypto-js-4.0.0.tgz"]
           ],
           "linkType": "HARD",
         }]
@@ -13813,7 +13785,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-typescript", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:7.12.1"],
             ["@hot-loader/react-dom", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:17.0.0"],
             ["@types/classnames", "npm:2.2.10::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fclassnames%2Fdownload%2F%40types%2Fclassnames-2.2.10.tgz"],
-            ["@types/crypto-js", "npm:4.0.1"],
             ["@types/lodash", "npm:4.14.162"],
             ["@types/node", "npm:14.14.5"],
             ["@types/react", "npm:16.9.53"],
@@ -13837,7 +13808,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["clsx", "npm:1.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fclsx%2Fdownload%2Fclsx-1.1.1.tgz"],
             ["copy-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.1"],
             ["core-js", "npm:3.6.5::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcore-js%2Fdownload%2Fcore-js-3.6.5.tgz"],
-            ["crypto-js", "npm:4.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fcrypto-js%2Fdownload%2Fcrypto-js-4.0.0.tgz"],
             ["css-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.0.0"],
             ["eslint", "npm:7.12.1"],
             ["eslint-config-prettier", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.14.0"],
