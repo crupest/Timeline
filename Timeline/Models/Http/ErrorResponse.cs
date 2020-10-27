@@ -1,15 +1,11 @@
-﻿
-using static Timeline.Resources.Messages;
+﻿using static Timeline.Resources.Messages;
 
 namespace Timeline.Models.Http
 {
-
     public static class ErrorResponse
     {
-
         public static class Common
         {
-
             public static CommonResponse InvalidModel(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.Common.InvalidModel, string.Format(Common_InvalidModel, formatArgs));
@@ -42,7 +38,6 @@ namespace Timeline.Models.Http
 
             public static class Header
             {
-
                 public static CommonResponse IfNonMatch_BadFormat(params object?[] formatArgs)
                 {
                     return new CommonResponse(ErrorCodes.Common.Header.IfNonMatch_BadFormat, string.Format(Common_Header_IfNonMatch_BadFormat, formatArgs));
@@ -57,7 +52,6 @@ namespace Timeline.Models.Http
 
             public static class Content
             {
-
                 public static CommonResponse TooBig(params object?[] formatArgs)
                 {
                     return new CommonResponse(ErrorCodes.Common.Content.TooBig, string.Format(Common_Content_TooBig, formatArgs));
@@ -74,7 +68,6 @@ namespace Timeline.Models.Http
 
         public static class UserCommon
         {
-
             public static CommonResponse NotExist(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.UserCommon.NotExist, string.Format(UserCommon_NotExist, formatArgs));
@@ -89,7 +82,6 @@ namespace Timeline.Models.Http
 
         public static class TokenController
         {
-
             public static CommonResponse Create_BadCredential(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.TokenController.Create_BadCredential, string.Format(TokenController_Create_BadCredential, formatArgs));
@@ -144,7 +136,6 @@ namespace Timeline.Models.Http
 
         public static class UserController
         {
-
             public static CommonResponse UsernameConflict(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.UserController.UsernameConflict, string.Format(UserController_UsernameConflict, formatArgs));
@@ -169,7 +160,6 @@ namespace Timeline.Models.Http
 
         public static class UserAvatar
         {
-
             public static CommonResponse BadFormat_CantDecode(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.UserAvatar.BadFormat_CantDecode, string.Format(UserAvatar_BadFormat_CantDecode, formatArgs));
@@ -204,7 +194,6 @@ namespace Timeline.Models.Http
 
         public static class TimelineController
         {
-
             public static CommonResponse NameConflict(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.TimelineController.NameConflict, string.Format(TimelineController_NameConflict, formatArgs));
