@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Timeline": {
+    "Development": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
@@ -8,7 +8,7 @@
         "ASPNETCORE_WORKDIR": "D:\\timeline-development"
       }
     },
-    "Timeline-MockFrontEnd": {
+    "Development-Mock": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
@@ -16,7 +16,7 @@
         "ASPNETCORE_WORKDIR": "D:\\timeline-development"
       }
     },
-    "Timeline-Staging": {
+    "Staging": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging",

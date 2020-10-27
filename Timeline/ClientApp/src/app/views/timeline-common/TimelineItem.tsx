@@ -105,7 +105,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             <Svg
               src={chevronDownIcon}
               className="text-info icon-button"
-              onClick={(e: Event) => {
+              onClick={(e) => {
                 more.toggle();
                 e.stopPropagation();
               }}
@@ -148,7 +148,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             <Svg
               src={trashIcon}
               className="text-danger icon-button large"
-              onClick={(e: Event) => {
+              onClick={(e) => {
                 toggleDeleteDialog();
                 e.stopPropagation();
               }}
