@@ -124,7 +124,7 @@ const LoginPage: React.FC = (_) => {
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => {
-              setRememberMe(e.target.checked);
+              setRememberMe(e.currentTarget.checked);
             }}
             label={t("user.rememberMe")}
           />

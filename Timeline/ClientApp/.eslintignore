@@ -3,3 +3,4 @@ node_modules
 dist
 webpack.*.js
 .eslintrc.js
+postcss.config.js

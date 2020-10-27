@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const PnpWebpackPlugin = require("pnp-webpack-plugin");
 const postcssPresetEnv = require("postcss-preset-env");
 const Config = require("webpack-chain");
 
@@ -37,9 +36,6 @@ config.module
   .end()
   .use("postcss")
   .loader("postcss-loader")
-  .options({
-    plugins: () => [postcssPresetEnv(/* pluginOptions */)],
-  })
   .end();
 
 config.module
@@ -50,9 +46,6 @@ config.module
   .end()
   .use("postcss")
   .loader("postcss-loader")
-  .options({
-    plugins: () => [postcssPresetEnv(/* pluginOptions */)],
-  })
   .end()
   .use("sass")
   .loader("sass-loader")
@@ -73,18 +66,14 @@ config.resolve.extensions
   .add(".jsx")
   .add(".ts")
   .add(".tsx")
-  .end()
-  .plugin("pnp")
-  .use(PnpWebpackPlugin);
+  .end();
 
 config.resolve.alias.set("@", path.resolve(__dirname, "src/app"));
 
-config.resolveLoader.plugin("pnp").use(PnpWebpackPlugin.moduleLoader(module));
-
 config.output
   .path(path.resolve(__dirname, "dist/"))
-  .filename("[name].[hash].js")
-  .chunkFilename("[name].[hash].js")
+  .filename("[name].[contenthash].js")
+  .chunkFilename("[name].[contenthash].js")
   .publicPath("/");
 
 config.plugin("html").use(HtmlWebpackPlugin, [
