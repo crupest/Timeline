@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { hot } from "react-hot-loader/root";
 
 import AppBar from "./views/common/AppBar";
 import LoadingPage from "./views/common/LoadingPage";
@@ -81,4 +80,4 @@ const App: React.FC = () => {
   }
 };
 
-export default hot(App);
+export default App;

@@ -18,18 +18,10 @@ const backend: BackendModule = {
     }
 
     if (language === "en") {
-      const res = (
-        await import(
-          /* webpackChunkName: "locales-en" */ "./locales/en/translation"
-        )
-      ).default;
+      const res = (await import("./locales/en/translation")).default;
       success(res);
     } else if (language === "zh-cn" || language === "zh") {
-      const res = (
-        await import(
-          /* webpackChunkName: "locales-zh" */ "./locales/zh/translation"
-        )
-      ).default;
+      const res = (await import("./locales/zh/translation")).default;
       success(res);
     } else {
       error(`Language ${language} is not supported.`);

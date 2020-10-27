@@ -1,24 +1,23 @@
 const path = require("path");
 const webpack = require("webpack");
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const config = require("./webpack.common");
 
 config.mode("development");
 
-config.entry("index").add("react-hot-loader/patch");
-
 config.module
   .rule("ts")
   .use("babel")
   .options({
-    plugins: ["react-hot-loader/babel"],
+    plugins: ["react-refresh/babel"],
   });
 
 config.module
   .rule("js")
   .use("babel")
   .options({
-    plugins: ["react-hot-loader/babel"],
+    plugins: ["react-refresh/babel"],
   });
 
 config.module
@@ -37,16 +36,18 @@ config.module
 
 config.devtool("eval-cheap-module-source-map");
 
-config.resolve.alias.set("react-dom", "@hot-loader/react-dom");
+config.resolve.set("fallback", {
+  querystring: require.resolve("querystring-es3"),
+});
 
 config.devServer
   .contentBase(path.resolve(__dirname, "public/"))
   .host("0.0.0.0")
   .port(3000)
   .historyApiFallback(true)
-  .hotOnly(true)
-  .allowedHosts.add(".myide.io");
+  .hotOnly(true);
 
 config.plugin("hot").use(webpack.HotModuleReplacementPlugin);
+config.plugin("react-refresh").use(new ReactRefreshWebpackPlugin());
 
 module.exports = config.toConfig();

@@ -2261,19 +2261,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hot-loader/react-dom@npm:^17.0.0":
-  version: 17.0.0
-  resolution: "@hot-loader/react-dom@npm:17.0.0"
-  dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-    scheduler: ^0.20.0
-  peerDependencies:
-    react: 17.0.0
-  checksum: 9d2b060e884d085345a9a73116fe9aee1fbdd0872b6fd1ccb02bd81dc411bcb644e202270e9e0f8ae57957dc67a96f503ed21362b4a3802a0aaa50b86e0a27e0
-  languageName: node
-  linkType: hard
-
 "@nodelib/fs.scandir@npm:2.1.3":
   version: 2.1.3
   resolution: "@nodelib/fs.scandir@npm:2.1.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40nodelib%2Ffs.scandir%2Fdownload%2F%40nodelib%2Ffs.scandir-2.1.3.tgz"
@@ -2307,6 +2294,42 @@ __metadata:
   dependencies:
     mkdirp: ^1.0.4
   checksum: ed2cb75eefe218113794416fae43b5307f7c30476506942ed6c6c51f702713323842f81102ae1327f9134130bec0360312e6f858ddef143c21d9e269e90737ac
+  languageName: node
+  linkType: hard
+
+"@pmmmwh/react-refresh-webpack-plugin@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "@pmmmwh/react-refresh-webpack-plugin@npm:0.4.2"
+  dependencies:
+    ansi-html: ^0.0.7
+    error-stack-parser: ^2.0.6
+    html-entities: ^1.2.1
+    native-url: ^0.2.6
+    schema-utils: ^2.6.5
+    source-map: ^0.7.3
+  peerDependencies:
+    "@types/webpack": 4.x
+    react-refresh: ^0.8.3
+    sockjs-client: ^1.4.0
+    type-fest: ^0.13.1
+    webpack: ">=4.43.0 <6.0.0"
+    webpack-dev-server: 3.x
+    webpack-hot-middleware: 2.x
+    webpack-plugin-serve: 0.x || 1.x
+  peerDependenciesMeta:
+    "@types/webpack":
+      optional: true
+    sockjs-client:
+      optional: true
+    type-fest:
+      optional: true
+    webpack-dev-server:
+      optional: true
+    webpack-hot-middleware:
+      optional: true
+    webpack-plugin-serve:
+      optional: true
+  checksum: cd70f32552ba053dbeefe605027c8fd97e435c0ff6d4cddb5e367d02444e3ed04f1d7fb9dca516780788c2cb17c640dcd353f0ec60412cd774f1bf0ce2d34f8a
   languageName: node
   linkType: hard
 
@@ -3429,9 +3452,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-html@npm:0.0.7":
+"ansi-html@npm:0.0.7, ansi-html@npm:^0.0.7":
   version: 0.0.7
-  resolution: "ansi-html@npm:0.0.7::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fansi-html%2Fdownload%2Fansi-html-0.0.7.tgz"
+  resolution: "ansi-html@npm:0.0.7"
   bin:
     ansi-html: ./bin/ansi-html
   checksum: 1178680548785b6557e67c197c343411ee1a334606058ebcfb4a3c79accddaa43edb511b0dcb79c15a18041fe0e8d1063bbbad95be8b5b1d56934b9a51d88c83
@@ -5282,13 +5305,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dom-walk@npm:^0.1.0":
-  version: 0.1.2
-  resolution: "dom-walk@npm:0.1.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdom-walk%2Fdownload%2Fdom-walk-0.1.2.tgz"
-  checksum: 948c7527f3798cae9d7039cc0e5dc9f013ebd701d7d99478bac79d7d9eb8b81e7b6e836526e21ed9b156466b268e30ea0f2d5b72df955fabec3ce2aa7dc0086e
-  languageName: node
-  linkType: hard
-
 "domelementtype@npm:1, domelementtype@npm:^1.3.1":
   version: 1.3.1
   resolution: "domelementtype@npm:1.3.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdomelementtype%2Fdownload%2Fdomelementtype-1.3.1.tgz"
@@ -5451,7 +5467,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.3.0":
+"enhanced-resolve@npm:^5.3.1":
   version: 5.3.1
   resolution: "enhanced-resolve@npm:5.3.1"
   dependencies:
@@ -5526,6 +5542,15 @@ __metadata:
   dependencies:
     is-arrayish: ^0.2.1
   checksum: 6c6c9187429ae867d145bc64c682c7c137b1f8373a406dc3b605c0d92f15b85bfcea02b461dc55ae11b10d013377e1eaf3d469d2861b2f94703c743620a9c08c
+  languageName: node
+  linkType: hard
+
+"error-stack-parser@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "error-stack-parser@npm:2.0.6"
+  dependencies:
+    stackframe: ^1.1.1
+  checksum: 7abf762c20054310d33f0c0a34a2ea38f93a1b0169f5289feb96cf94d7b30d277a0df09567469be79ccfcfa49df37cddc8c59e0bc5b682a1e7e3c234e67b25c8
   languageName: node
   linkType: hard
 
@@ -6541,16 +6566,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"global@npm:^4.3.0":
-  version: 4.4.0
-  resolution: "global@npm:4.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fglobal%2Fdownload%2Fglobal-4.4.0.tgz"
-  dependencies:
-    min-document: ^2.19.0
-    process: ^0.11.10
-  checksum: da0cf92ef034b63cf4d0fe5e14cb71bc4c748b8c1bbeabe4061443562ba8e9027774f8074e66543fa98f0d965da6d11e0861e3bf8c628b7ab19220e8ee18cc71
-  languageName: node
-  linkType: hard
-
 "globals@npm:^11.1.0":
   version: 11.12.0
   resolution: "globals@npm:11.12.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fglobals%2Fdownload%2Fglobals-11.12.0.tgz"
@@ -6780,7 +6795,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"hoist-non-react-statics@npm:^3.1.0, hoist-non-react-statics@npm:^3.3.0":
+"hoist-non-react-statics@npm:^3.1.0":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhoist-non-react-statics%2Fdownload%2Fhoist-non-react-statics-3.3.2.tgz"
   dependencies:
@@ -6805,6 +6820,13 @@ fsevents@~2.1.2:
     readable-stream: ^2.0.1
     wbuf: ^1.1.0
   checksum: a22a28aa318167f29d65994ac28a238356142a3dcbcdcf20b0a87f14a746af7017596c91a895933d79ee68edf0303a4de5e629a2141cb1dbddb2cd9cad07418b
+  languageName: node
+  linkType: hard
+
+"html-entities@npm:^1.2.1":
+  version: 1.3.1
+  resolution: "html-entities@npm:1.3.1"
+  checksum: 53d37e5161230ad7f2c16dd2b54945069d84b5167113eac55e39a8fffed357378afc022d5dc66045b132ea46232cab41aee86e79dd5cd0618e0b78776b9085b5
   languageName: node
   linkType: hard
 
@@ -7942,7 +7964,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"loader-utils@npm:^1.0.2, loader-utils@npm:^1.1.0, loader-utils@npm:^1.2.3, loader-utils@npm:^1.4.0":
+"loader-utils@npm:^1.0.2, loader-utils@npm:^1.2.3, loader-utils@npm:^1.4.0":
   version: 1.4.0
   resolution: "loader-utils@npm:1.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Floader-utils%2Fdownload%2Floader-utils-1.4.0.tgz"
   dependencies:
@@ -8304,15 +8326,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"min-document@npm:^2.19.0":
-  version: 2.19.0
-  resolution: "min-document@npm:2.19.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fmin-document%2Fdownload%2Fmin-document-2.19.0.tgz"
-  dependencies:
-    dom-walk: ^0.1.0
-  checksum: 8da883996e00a53729e867dad45a358c6d8b3b55f2473a20768c1a2b4642d0983bc61827cf29eb98c53d7290c2a1a74a5cba60873857da416bdfae09bf73bb21
-  languageName: node
-  linkType: hard
-
 "mini-create-react-context@npm:^0.4.0":
   version: 0.4.0
   resolution: "mini-create-react-context@npm:0.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fmini-create-react-context%2Fdownload%2Fmini-create-react-context-0.4.0.tgz"
@@ -8512,6 +8525,15 @@ fsevents@~2.1.2:
     snapdragon: ^0.8.1
     to-regex: ^3.0.1
   checksum: 2e1440c5705f0192b9d9b46bb682a1832052974dad359ed473b9f555abb5c55a08b3d5ba45d7d37c53a83f64b7f93866292824d3086a150ff7980e71874feb3b
+  languageName: node
+  linkType: hard
+
+"native-url@npm:^0.2.6":
+  version: 0.2.6
+  resolution: "native-url@npm:0.2.6"
+  dependencies:
+    querystring: ^0.2.0
+  checksum: 064e580759f06060740636184ba8dbd8cf21a1237c769625591f8a0e956714ea27d58d601fe84c4b9600dfabc88edfb3bf51fc7a579764b5d60e0d9392aec9df
   languageName: node
   linkType: hard
 
@@ -9865,13 +9887,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"process@npm:^0.11.10":
-  version: 0.11.10
-  resolution: "process@npm:0.11.10::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprocess%2Fdownload%2Fprocess-0.11.10.tgz"
-  checksum: ed93a85e9185b40fb01788c588a87c1a9da0eb925ef7cebebbe1b8bbf0eba1802130366603a29e3b689c116969d4fe018de6aed3474bbeb5aefb3716b85d6449
-  languageName: node
-  linkType: hard
-
 "progress@npm:^2.0.0":
   version: 2.0.3
   resolution: "progress@npm:2.0.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fprogress%2Fdownload%2Fprogress-2.0.3.tgz"
@@ -10006,9 +10021,16 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"querystring@npm:0.2.0":
+"querystring-es3@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "querystring-es3@npm:0.2.1"
+  checksum: 3c388906aa5644e55cdbede78f99a4d05a6e36a45b06929ad8713a2020a5cefeb6ec23adaa27584d968cf658e5d237b5e216f5e48930d040cd6b810679714741
+  languageName: node
+  linkType: hard
+
+"querystring@npm:0.2.0, querystring@npm:^0.2.0":
   version: 0.2.0
-  resolution: "querystring@npm:0.2.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fquerystring%2Fdownload%2Fquerystring-0.2.0.tgz"
+  resolution: "querystring@npm:0.2.0"
   checksum: 1e76c51462f0ffb148e0b2fdeb811f61377800298605229d32efcdaaaf0a8fd4314a4b4405e1fbf130a5ca421c0e51f926fab5bb9f8b9b3b8c394f4e2d33d3d1
   languageName: node
   linkType: hard
@@ -10106,29 +10128,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-hot-loader@npm:^4.13.0":
-  version: 4.13.0
-  resolution: "react-hot-loader@npm:4.13.0"
-  dependencies:
-    fast-levenshtein: ^2.0.6
-    global: ^4.3.0
-    hoist-non-react-statics: ^3.3.0
-    loader-utils: ^1.1.0
-    prop-types: ^15.6.1
-    react-lifecycles-compat: ^3.0.4
-    shallowequal: ^1.1.0
-    source-map: ^0.7.3
-  peerDependencies:
-    "@types/react": "^15.0.0 || ^16.0.0 || ^17.0.0 "
-    react: "^15.0.0 || ^16.0.0 || ^17.0.0 "
-    react-dom: "^15.0.0 || ^16.0.0 || ^17.0.0 "
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: f1df03e93206b379b605f3da983f700d5c8a16e3ebedf25ca1311067f4dc95cf968206af44d0b734a5505619958f2da5efe9df4bf749ed6a4989e1f6ea5d2915
-  languageName: node
-  linkType: hard
-
 "react-i18next@npm:^11.7.3":
   version: 11.7.3
   resolution: "react-i18next@npm:11.7.3"
@@ -10184,6 +10183,13 @@ fsevents@~2.1.2:
     react: ">=16.3.0"
     react-dom: ">=16.3.0"
   checksum: 64d46694be7969885c8aa60b671b2a5e9e2fa30431efdd554f12793bc730d045a084a3e245f65e61cb5bcf94884e16f850fa3e870438b463f914556455ac1261
+  languageName: node
+  linkType: hard
+
+"react-refresh@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "react-refresh@npm:0.9.0"
+  checksum: 300dc431389f4c532bdfec08d5bc59b591c8c440486a7d5770c8954adf3afe62501b659c5acbdb7831751e8be506eb90a6f72491fab40352f3b3fba16897acf6
   languageName: node
   linkType: hard
 
@@ -10860,7 +10866,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"scheduler@npm:^0.20.0, scheduler@npm:^0.20.1":
+"scheduler@npm:^0.20.1":
   version: 0.20.1
   resolution: "scheduler@npm:0.20.1"
   dependencies:
@@ -11065,13 +11071,6 @@ fsevents@~2.1.2:
   version: 1.2.1
   resolution: "shallow-equal@npm:1.2.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fshallow-equal%2Fdownload%2Fshallow-equal-1.2.1.tgz"
   checksum: 5002ac4a3639e35782d3cb21073d48e1e4f85321cc54608f48b2331f6db6d54e4f4b44ed81ec4d75385ebe893e8286752b1e29595381e6adad72dd836f001b7f
-  languageName: node
-  linkType: hard
-
-"shallowequal@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "shallowequal@npm:1.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fshallowequal%2Fdownload%2Fshallowequal-1.1.0.tgz"
-  checksum: 15820dd544ce15521565c366940a46dcbe0f093c1336f6259c7b3e2490ca10135645ee262778f555d3ccc38283207f2f0a41e9a0f26888b5d5159f2904c4ac68
   languageName: node
   linkType: hard
 
@@ -11403,6 +11402,13 @@ fsevents@~2.1.2:
   dependencies:
     minipass: ^3.1.1
   checksum: 97964745a80846b4a50d4506b10b08d35384c3cec482d687cae5f4b7c842afe239c8c368d620f5d7d92642ab75379b409aa809072c2b8e94ec15d9c70d843da5
+  languageName: node
+  linkType: hard
+
+"stackframe@npm:^1.1.1":
+  version: 1.2.0
+  resolution: "stackframe@npm:1.2.0"
+  checksum: 71e2868a529123e9ca1cf510192a7de879b8d92b5829c7f58d5576e1500cbedf22b5d9cc86589c547b6842abcf01cea13979ab8301b51e85bdb6267a6f9288f2
   languageName: node
   linkType: hard
 
@@ -11814,7 +11820,7 @@ fsevents@~2.1.2:
     "@babel/preset-env": ^7.12.1
     "@babel/preset-react": ^7.12.1
     "@babel/preset-typescript": ^7.12.1
-    "@hot-loader/react-dom": ^17.0.0
+    "@pmmmwh/react-refresh-webpack-plugin": ^0.4.2
     "@types/classnames": ^2.2.10
     "@types/lodash": ^4.14.162
     "@types/node": ^14.14.5
@@ -11859,12 +11865,13 @@ fsevents@~2.1.2:
     postcss-loader: ^4.0.4
     postcss-preset-env: ^6.7.0
     prettier: ^2.1.2
+    querystring-es3: ^0.2.1
     react: ^17.0.1
     react-bootstrap: ^1.4.0
     react-dom: ^17.0.1
-    react-hot-loader: ^4.13.0
     react-i18next: ^11.7.3
     react-inlinesvg: ^2.1.1
+    react-refresh: ^0.9.0
     react-responsive: ^8.1.0
     react-router: ^5.2.0
     react-router-bootstrap: ^0.25.0
@@ -11875,9 +11882,10 @@ fsevents@~2.1.2:
     sass-loader: ^10.0.4
     style-loader: ^2.0.0
     ts-loader: ^8.0.7
+    type-fest: ^0.18.0
     typescript: ^4.0.5
     url-loader: ^4.1.1
-    webpack: ^5.2.0
+    webpack: ^5.2.1
     webpack-chain: ^6.5.1
     webpack-cli: ^4.1.0
     webpack-dev-server: ^3.11.0
@@ -12063,6 +12071,13 @@ fsevents@~2.1.2:
   version: 0.11.0
   resolution: "type-fest@npm:0.11.0"
   checksum: 02e5cadf13590a5724cacf8d9133320efd173f6fb1b695fcb29e56551a315bf0f07ca988a780a1999b7b55bb3eaaa7f37223615207236d393af17bba6749dc95
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:^0.18.0":
+  version: 0.18.0
+  resolution: "type-fest@npm:0.18.0"
+  checksum: 22f7fb528bf187ef3964e718a4cad2c669bf47989486ae8f66a140954f555760f7220fe5028f30df816d62a741c4748499ebc3ffcf37c8bbfb9f5a47d2c9a0d0
   languageName: node
   linkType: hard
 
@@ -12600,7 +12615,7 @@ typescript@^4.0.5:
   languageName: node
   linkType: hard
 
-"webpack-sources@npm:^2.0.1":
+"webpack-sources@npm:^2.1.0":
   version: 2.1.0
   resolution: "webpack-sources@npm:2.1.0"
   dependencies:
@@ -12610,9 +12625,9 @@ typescript@^4.0.5:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "webpack@npm:5.2.0"
+"webpack@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "webpack@npm:5.2.1"
   dependencies:
     "@types/eslint-scope": ^3.7.0
     "@types/estree": ^0.0.45
@@ -12623,7 +12638,7 @@ typescript@^4.0.5:
     acorn: ^8.0.4
     browserslist: ^4.14.5
     chrome-trace-event: ^1.0.2
-    enhanced-resolve: ^5.3.0
+    enhanced-resolve: ^5.3.1
     eslint-scope: ^5.1.1
     events: ^3.2.0
     glob-to-regexp: ^0.4.1
@@ -12637,7 +12652,7 @@ typescript@^4.0.5:
     tapable: ^2.0.0
     terser-webpack-plugin: ^5.0.0
     watchpack: ^2.0.0
-    webpack-sources: ^2.0.1
+    webpack-sources: ^2.1.0
   peerDependencies:
     webpack-cli: "*"
   peerDependenciesMeta:
@@ -12645,7 +12660,7 @@ typescript@^4.0.5:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 1f91563c2512e9068c9d76f45479fd3c6d9652f490c428d36ce9f5311979609e363e58b0cf8f23019185cd335e72d00a48911a9c1da1b34f0d7a6265eab7e5c4
+  checksum: 1503203935b40b7a746e078a8653f7154347c76a0250d8ea7b6827059d53b54df6ddbdddae785c9e17d5da23a48edfe3dc3da859b25a58f54bcf45781dedb4eb
   languageName: node
   linkType: hard
 
