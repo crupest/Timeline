@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace ErrorResponseCodeGenerator
+namespace Timeline.ErrorCodes.CodeGenerator
 {
     class Program
     {
@@ -58,7 +58,7 @@ $
 
             Console.WriteLine(code);
 
-            TextCopy.Clipboard.SetText(code);
+            TextCopy.ClipboardService.SetText(code);
             var oldColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Code has copied to clipboard!");
