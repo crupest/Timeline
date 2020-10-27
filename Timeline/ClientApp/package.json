@@ -37,7 +37,6 @@
   },
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.config.dev.js",
-    "start:mock": "webpack-dev-server --config ./webpack.config.dev.js --env.TIMELINE_USE_MOCK_BACKEND",
     "build": "webpack --config ./webpack.config.prod.js",
     "lint": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx"
   },
@@ -65,7 +64,6 @@
     "@babel/preset-typescript": "^7.12.1",
     "@hot-loader/react-dom": "^17.0.0",
     "@types/classnames": "^2.2.10",
-    "@types/crypto-js": "^4.0.1",
     "@types/lodash": "^4.14.162",
     "@types/node": "^14.14.5",
     "@types/react": "^16.9.53",
@@ -83,7 +81,6 @@
     "babel-plugin-transform-builtin-extend": "^1.1.2",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.2.1",
-    "crypto-js": "^4.0.0",
     "css-loader": "^5.0.0",
     "eslint": "^7.12.1",
     "eslint-config-prettier": "^6.14.0",
