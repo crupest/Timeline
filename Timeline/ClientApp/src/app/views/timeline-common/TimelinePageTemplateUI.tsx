@@ -31,7 +31,6 @@ export interface TimelineCardComponentProps<TManageItems> {
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
-  avatarKey?: string | number;
   timeline?: TimelineInfo;
   postListState?: TimelinePostsWithSyncState;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
