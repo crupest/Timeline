@@ -137,7 +137,7 @@ namespace Timeline
                 {
                     services.AddSpaStaticFiles(config =>
                     {
-                        config.RootPath = "ClientApp/dist";
+                        config.RootPath = "ClientApp";
                     });
                 }
             }
@@ -174,8 +174,6 @@ namespace Timeline
             {
                 app.UseSpa(spa =>
                 {
-                    spa.Options.SourcePath = useMockFrontEnd ? "MockClientApp" : "ClientApp";
-
                     if (!useMockFrontEnd && (Configuration.GetValue<bool?>(ApplicationConfiguration.UseProxyFrontEndKey) ?? false))
                     {
                         spa.UseProxyToSpaDevelopmentServer(new UriBuilder("http", "localhost", 3000).Uri);
