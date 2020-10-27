@@ -145,7 +145,7 @@ type RawTimelinePostContent =
 
 interface RawTimelinePostInfo {
   id: number;
-  content: HttpTimelinePostContent;
+  content: RawTimelinePostContent;
   time: string;
   lastUpdated: string;
   author: HttpUser;
