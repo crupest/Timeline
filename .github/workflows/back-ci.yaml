@@ -3,17 +3,21 @@ name: Back End CI
 on:
   push:
     branches: [master]
-    paths-ignore:
-      - "Timeline/ClientApp/**"
+    paths:
+      - "BackEnd/**"
   pull_request:
     branches: [master]
-    paths-ignore:
-      - "Timeline/ClientApp/**"
+    paths:
+      - "BackEnd/**"
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: BackEnd
     env:
       ASPNETCORE_ENVIRONMENT: "Development"
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -25,7 +29,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.NUGET_PACKAGES }}
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('BackEnd/**/packages.lock.json') }}
           restore-keys: |
             nuget-${{ runner.os }}-
 
@@ -42,4 +46,4 @@ jobs:
         if: ${{ success() || failure() }}
         with:
           name: test-result
-          path: Timeline.Tests/TestResults/
+          path: BackEnd/Timeline.Tests/TestResults/
