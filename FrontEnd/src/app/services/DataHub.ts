@@ -22,7 +22,7 @@ export class DataLine<TData> {
     }
   ) {
     if (config.disableInitSync !== true) {
-      setImmediate(() => void this.sync());
+      setTimeout(() => void this.sync());
     }
   }
 
