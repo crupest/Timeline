@@ -1,0 +1,27 @@
+{
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_USEPROXYFRONTEND": "true",
+        "ASPNETCORE_WORKDIR": "D:\\timeline-development"
+      }
+    },
+    "Development-Mock": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_USEMOCKFRONTEND": "true",
+        "ASPNETCORE_WORKDIR": "D:\\timeline-development"
+      }
+    },
+    "Staging": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "ASPNETCORE_WORKDIR": "D:\\timeline-development"
+      }
+    }
+  }
+}

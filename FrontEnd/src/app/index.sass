@@ -1,0 +1,66 @@
+@import '~bootstrap/scss/bootstrap'
+
+@import './views/common/common'
+@import './views/common/alert/alert'
+@import './views/home/home'
+@import './views/about/about'
+@import './views/login/login'
+@import './views/timeline-common/timeline-common'
+@import './views/timeline/timeline'
+@import './views/user/user'
+
+body
+  margin: 0
+
+small
+  line-height: 1.2
+
+.flex-fix-length
+  flex-grow: 0
+  flex-shrink: 0
+
+.position-lt
+  left: 0
+  top: 0
+
+.avatar
+  width: 60px
+  &.large
+    width: 100px
+  &.small
+    width: 40px
+
+.mt-appbar
+  margin-top: 56px
+
+.icon-button
+  font-size: 1.4em
+  &.large
+    font-size: 1.6em
+
+.cursor-pointer
+  cursor: pointer
+
+textarea
+  resize: none
+
+.white-space-no-wrap
+  white-space: nowrap
+
+.cru-card
+  @extend .shadow
+  @extend .border
+  @extend .border-primary
+  @extend .rounded
+  @extend .bg-light
+
+.full-viewport-center-child
+  position: fixed
+  width: 100vw
+  height: 100vh
+  display: flex
+  justify-content: center
+  align-items: center
+
+.text-orange
+  color: $orange
