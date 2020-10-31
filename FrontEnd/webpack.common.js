@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const postcssPresetEnv = require("postcss-preset-env");
 const Config = require("webpack-chain");
 
 const config = new Config();
