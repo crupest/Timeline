@@ -70,6 +70,7 @@ const translation: TranslationResource = {
     },
     dialogChangeProperty: {
       title: "修改时间线属性",
+      titleField: "标题",
       visibility: "可见性",
       description: "描述",
     },

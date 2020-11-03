@@ -74,6 +74,7 @@ const translation: TranslationResource = {
     },
     dialogChangeProperty: {
       title: "Change Timeline Properties",
+      titleField: "Title",
       visibility: "Visibility",
       description: "Description",
     },

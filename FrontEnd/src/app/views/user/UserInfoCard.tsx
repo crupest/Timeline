@@ -35,8 +35,12 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
       collapse={collapse}
       toggleCollapse={toggleCollapse}
     >
-      <div>
-        <BlobImage blob={avatar} className="avatar" />
+      <h3 className="text-primary mx-3 d-inline-block align-middle">
+        {timeline.title}
+        <small className="ml-3 text-secondary">{timeline.name}</small>
+      </h3>
+      <div className="align-middle">
+        <BlobImage blob={avatar} className="avatar small rounded-circle mr-3" />
         {timeline.owner.nickname}
         <small className="ml-3 text-secondary">
           @{timeline.owner.username}
