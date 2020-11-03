@@ -48,20 +48,21 @@ const TimelineBoard: React.FC<TimelineBoardProps> = (props) => {
           );
         } else {
           return timelines.map((timeline) => {
-            const { name } = timeline;
+            const { name, title } = timeline;
             const isPersonal = name.startsWith("@");
             const url = isPersonal
               ? `/users/${timeline.owner.username}`
               : `/timelines/${name}`;
             return (
-              <div key={name} className="timeline-board-item">
+              <Link key={name} to={url} className="timeline-board-item">
                 {isPersonal ? (
                   <UserTimelineLogo className="icon" />
                 ) : (
                   <TimelineLogo className="icon" />
                 )}
-                <Link to={url}>{name}</Link>
-              </div>
+                {title}
+                <small className="ml-2 text-secondary">{name}</small>
+              </Link>
             );
           });
         }

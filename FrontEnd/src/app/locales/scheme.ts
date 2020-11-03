@@ -65,6 +65,7 @@ export default interface TranslationResource {
     };
     dialogChangeProperty: {
       title: string;
+      titleField: string;
       visibility: string;
       description: string;
     };

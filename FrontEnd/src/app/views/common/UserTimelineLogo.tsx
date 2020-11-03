@@ -15,7 +15,7 @@ const UserTimelineLogo: React.FC<UserTimelineLogoProps> = (props) => {
         <circle cx="50" cy="50" r="22" />
         <line x1="50" x2="50" y1="75" y2="100" />
       </g>
-      <g fill={color}>
+      <g fill={coercedColor}>
         <circle cx="85" cy="75" r="10" />
         <path d="m70,100c0,0 15,-30 30,0.25" />
       </g>
