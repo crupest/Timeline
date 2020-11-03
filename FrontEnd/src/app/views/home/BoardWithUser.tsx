@@ -62,9 +62,9 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
   }, [user, joinTimelines]);
 
   return (
-    <Row className="my-2 justify-content-center">
+    <Row className="my-3 justify-content-center">
       {ownTimelines === "offline" && joinTimelines === "offline" ? (
-        <Col className="py-2" sm="8" lg="6">
+        <Col sm="8" lg="6">
           <OfflineBoard
             onReload={() => {
               setOwnTimelines("loading");
@@ -74,7 +74,7 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
         </Col>
       ) : (
         <>
-          <Col sm="6" lg="5" className="py-2">
+          <Col sm="6" lg="5" className="mb-3 mb-sm-0">
             <TimelineBoard
               title={t("home.ownTimeline")}
               timelines={ownTimelines}
@@ -83,7 +83,7 @@ const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
               }}
             />
           </Col>
-          <Col sm="6" lg="5" className="py-2">
+          <Col sm="6" lg="5">
             <TimelineBoard
               title={t("home.joinTimeline")}
               timelines={joinTimelines}

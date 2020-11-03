@@ -36,7 +36,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   );
 
   return (
-    <Form inline className={clsx("my-2", props.className)}>
+    <Form inline className={clsx(" flex-sm-nowrap", props.className)}>
       <Form.Control
         className="mr-sm-2 flex-grow-1"
         value={props.value}
@@ -44,10 +44,12 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
         onKeyPress={onInputKeyPress}
         placeholder={props.placeholder}
       />
-      <div className="mt-2 mt-sm-0 order-sm-last ml-sm-3">
-        {props.additionalButton}
-      </div>
-      <div className="mt-2 mt-sm-0 ml-auto ml-sm-0">
+      {props.additionalButton ? (
+        <div className="mt-2 mt-sm-0 flex-shrink-0 order-sm-last ml-sm-2">
+          {props.additionalButton}
+        </div>
+      ) : null}
+      <div className="mt-2 mt-sm-0 flex-shrink-0 ml-auto ml-sm-0">
         {props.loading ? (
           <Spinner variant="primary" animation="border" />
         ) : (
