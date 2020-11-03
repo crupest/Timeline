@@ -23,6 +23,7 @@ export type TimelineVisibility = typeof kTimelineVisibilities[number];
 
 export interface HttpTimelineInfo {
   uniqueId: string;
+  title: string;
   name: string;
   description: string;
   owner: HttpUser;
@@ -95,6 +96,7 @@ export interface HttpTimelinePostPostRequest {
 }
 
 export interface HttpTimelinePatchRequest {
+  title?: string;
   visibility?: TimelineVisibility;
   description?: string;
 }
@@ -121,6 +123,7 @@ export class HttpTimelineNameConflictError extends Error {
 
 interface RawTimelineInfo {
   uniqueId: string;
+  title: string;
   name: string;
   description: string;
   owner: HttpUser;
