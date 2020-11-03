@@ -11,6 +11,7 @@ import OperationDialog, {
 } from "../common/OperationDialog";
 
 export interface TimelinePropertyInfo {
+  title: string;
   visibility: TimelineVisibility;
   description: string;
 }
@@ -37,6 +38,11 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
       titleColor="default"
       inputScheme={[
         {
+          type: "text",
+          label: "timeline.dialogChangeProperty.titleField",
+          initValue: props.oldInfo.title,
+        },
+        {
           type: "select",
           label: "timeline.dialogChangeProperty.visibility",
           options: kTimelineVisibilities.map<OperationSelectInputInfoOption>(
@@ -55,8 +61,11 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
       ]}
       open={props.open}
       close={props.close}
-      onProcess={([newVisibility, newDescription]) => {
+      onProcess={([newTitle, newVisibility, newDescription]) => {
         const req: TimelineChangePropertyRequest = {};
+        if (newTitle !== props.oldInfo.title) {
+          req.title = newTitle as string;
+        }
         if (newVisibility !== props.oldInfo.visibility) {
           req.visibility = newVisibility as TimelineVisibility;
         }

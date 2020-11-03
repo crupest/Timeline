@@ -6,6 +6,8 @@ const config = require("./webpack.common");
 
 config.mode("development");
 
+config.target('web'); // Remove this after https://github.com/webpack/webpack-dev-server/issues/2758 is fixed.
+
 config.module
   .rule("ts")
   .use("babel")
@@ -42,12 +44,10 @@ config.resolve.set("fallback", {
 
 config.devServer
   .contentBase(path.resolve(__dirname, "public/"))
-  .host("0.0.0.0")
   .port(3000)
   .historyApiFallback(true)
-  .hotOnly(true);
+  .hot(true);
 
-config.plugin("hot").use(webpack.HotModuleReplacementPlugin);
 config.plugin("react-refresh").use(new ReactRefreshWebpackPlugin());
 
 module.exports = config.toConfig();

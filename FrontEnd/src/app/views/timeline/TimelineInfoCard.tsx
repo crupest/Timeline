@@ -37,10 +37,11 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
       toggleCollapse={toggleCollapse}
     >
       <h3 className="text-primary mx-3 d-inline-block align-middle">
-        {timeline.name}
+        {timeline.title}
+        <small className="ml-3 text-secondary">{timeline.name}</small>
       </h3>
-      <div className="d-inline-block align-middle">
-        <BlobImage blob={avatar} className="avatar small rounded-circle" />
+      <div className="align-middle">
+        <BlobImage blob={avatar} className="avatar small rounded-circle mr-3" />
         {timeline.owner.nickname}
         <small className="ml-3 text-secondary">
           @{timeline.owner.username}

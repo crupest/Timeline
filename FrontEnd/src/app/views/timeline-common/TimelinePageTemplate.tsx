@@ -76,6 +76,7 @@ export default function TimelinePageTemplate<TManageItem>(
         open
         close={closeDialog}
         oldInfo={{
+          title: timeline.title,
           visibility: timeline.visibility,
           description: timeline.description,
         }}
