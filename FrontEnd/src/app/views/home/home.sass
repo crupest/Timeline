@@ -1,13 +1,18 @@
-.timeline-board-item
-  font-size: 1.1em
-  @extend .my-2
-  .icon
-    height: 1.3em
-    @extend .mr-2
-
 .timeline-board
   @extend .cru-card
   @extend .d-flex
   @extend .flex-column
-  @extend .p-3
+  @extend .py-3
   min-height: 200px
+
+.timeline-board-item
+  font-size: 1.1em
+  @extend .px-3
+  @extend .py-2
+  transition: background 0.3s
+  .icon
+    height: 1.3em
+    color: black
+    @extend .mr-2
+  &:hover
+    background: $gray-300
