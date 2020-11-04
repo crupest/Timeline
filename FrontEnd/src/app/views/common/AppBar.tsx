@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { LinkContainer } from "react-router-bootstrap";
 import { Navbar, Nav } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
 
 import { useUser, useAvatar } from "@/services/user";
 
@@ -28,18 +29,17 @@ const AppBar: React.FC = (_) => {
       <Navbar.Toggle />
       <Navbar.Collapse>
         <Nav className="mr-auto">
-          <LinkContainer to="/settings">
-            <Nav.Link>{t("nav.settings")}</Nav.Link>
-          </LinkContainer>
-
-          <LinkContainer to="/about">
-            <Nav.Link>{t("nav.about")}</Nav.Link>
-          </LinkContainer>
+          <NavLink to="/settings" className="nav-link" activeClassName="active">
+            {t("nav.settings")}
+          </NavLink>
+          <NavLink to="/about" className="nav-link" activeClassName="active">
+            {t("nav.about")}
+          </NavLink>
 
           {isAdministrator && (
-            <LinkContainer to="/admin">
-              <Nav.Link>Administration</Nav.Link>
-            </LinkContainer>
+            <NavLink to="/admin" className="nav-link" activeClassName="active">
+              Administration
+            </NavLink>
           )}
         </Nav>
         <Nav className="ml-auto mr-2">
@@ -51,9 +51,9 @@ const AppBar: React.FC = (_) => {
               />
             </LinkContainer>
           ) : (
-            <LinkContainer to="/login">
-              <Nav.Link>{t("nav.login")}</Nav.Link>
-            </LinkContainer>
+            <NavLink to="/login" className="nav-link" activeClassName="active">
+              {t("nav.login")}
+            </NavLink>
           )}
         </Nav>
       </Navbar.Collapse>
