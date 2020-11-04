@@ -41,11 +41,10 @@ $timeline-line-color-current: #36c2e6
     padding-right: 5px
     z-index: 1
 
-    flex: 0 0 auto
-
+    top: 0em
+    bottom: 0em
     left: 0.5em
     width: 60px
-    height: 100%
 
   &-area
     display: flex
@@ -58,14 +57,14 @@ $timeline-line-color-current: #36c2e6
     background: $timeline-line-color
 
     &.start
-      height: 14px
+      height: 1.4em
       flex: 0 0 auto
 
     &.end
       flex: 1 1 auto
 
     &.current-end
-      height: 20px
+      height: 2em
       flex: 0 0 auto
       background: linear-gradient($timeline-line-color-current, transparent)
 
@@ -88,14 +87,16 @@ $timeline-line-color-current: #36c2e6
     animation-name: timeline-line-node-noncurrent
 
 .timeline-top
-  display: flex
-  justify-content: space-between
+  position: relative
+  text-align: right
 
   .timeline-line-segment
     flex: 1 1 auto
 
 .current
   .timeline-line
+    &-area-container
+      bottom: -2em
     &-segment
 
       &.start
@@ -136,9 +137,6 @@ $timeline-line-color-current: #36c2e6
 .mask
   background: change-color($color: white, $alpha: 0.8)
   z-index: 100
-
-.timeline-page-top-space
-  transition: height 0.5s
 
 .timeline-sync-state-badge
   font-size: 0.8em
