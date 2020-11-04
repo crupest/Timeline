@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Form, Container, Row, Col, Button, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
 import OperationDialog from "../common/OperationDialog";
@@ -105,62 +105,61 @@ const SettingsPage: React.FC = (_) => {
   const language = i18n.language.slice(0, 2);
 
   return (
-    <Container fluid>
+    <>
       {user ? (
-        <>
-          <Row className="border-bottom p-3 cursor-pointer">
-            <Col xs="12">
-              <h5
-                onClick={() => {
-                  history.push(`/users/${user.username}`);
-                }}
-              >
-                {t("settings.gotoSelf")}
-              </h5>
-            </Col>
-          </Row>
-          <Row className="border-bottom p-3 cursor-pointer">
-            <Col xs="12">
-              <h5
-                className="text-danger"
-                onClick={() => setDialog("changepassword")}
-              >
-                {t("settings.changePassword")}
-              </h5>
-            </Col>
-          </Row>
-          <Row className="border-bottom p-3 cursor-pointer">
-            <Col xs="12">
-              <h5
-                className="text-danger"
-                onClick={() => {
-                  setDialog("logout");
-                }}
-              >
-                {t("settings.logout")}
-              </h5>
-            </Col>
-          </Row>
-        </>
-      ) : null}
-      <Row className="align-items-center border-bottom p-3">
-        <Col xs="12" sm="auto">
-          <h5>{t("settings.languagePrimary")}</h5>
-          <p>{t("settings.languageSecondary")}</p>
-        </Col>
-        <Col xs="auto" className="ml-auto">
-          <Form.Control
-            as="select"
-            value={language}
-            onChange={(e) => {
-              void i18n.changeLanguage(e.target.value);
+        <div className="cru-card m-3 py-3">
+          <h3 className="px-3 mb-3 text-primary">
+            {t("settings.subheaders.account")}
+          </h3>
+          <div
+            className="settings-item clickable first"
+            onClick={() => {
+              history.push(`/users/${user.username}`);
             }}
           >
-            <option value="zh">中文</option>
-            <option value="en">English</option>
-          </Form.Control>
-        </Col>
-      </Row>
+            {t("settings.gotoSelf")}
+          </div>
+          <div
+            className="settings-item clickable text-danger"
+            onClick={() => setDialog("changepassword")}
+          >
+            {t("settings.changePassword")}
+          </div>
+          <div
+            className="settings-item clickable text-danger"
+            onClick={() => {
+              setDialog("logout");
+            }}
+          >
+            {t("settings.logout")}
+          </div>
+        </div>
+      ) : null}
+      <div className="cru-card m-3 py-3">
+        <h3 className="px-3 mb-3 text-primary">
+          {t("settings.subheaders.customization")}
+        </h3>
+        <Row className="settings-item first mx-0">
+          <Col xs="12" sm="auto">
+            <div>{t("settings.languagePrimary")}</div>
+            <small className="d-block text-secondary">
+              {t("settings.languageSecondary")}
+            </small>
+          </Col>
+          <Col xs="auto" className="ml-auto">
+            <Form.Control
+              as="select"
+              value={language}
+              onChange={(e) => {
+                void i18n.changeLanguage(e.target.value);
+              }}
+            >
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </Form.Control>
+          </Col>
+        </Row>
+      </div>
       {(() => {
         switch (dialog) {
           case "changepassword":
@@ -187,7 +186,7 @@ const SettingsPage: React.FC = (_) => {
             return null;
         }
       })()}
-    </Container>
+    </>
   );
 };
 
