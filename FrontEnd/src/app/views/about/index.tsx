@@ -74,7 +74,7 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="px-2 mb-4">
-      <div className="container mt-4 py-3 shadow border border-primary rounded bg-light">
+      <div className="container mt-4 py-3 cru-card">
         <h4 id="author-info">{t("about.author.title")}</h4>
         <div>
           <div className="d-flex">
@@ -109,7 +109,7 @@ const AboutPage: React.FC = () => {
           </p>
         </div>
       </div>
-      <div className="container mt-4 py-3 shadow border border-primary rounded bg-light">
+      <div className="container mt-4 py-3 cru-card">
         <h4>{t("about.site.title")}</h4>
         <p>
           <Trans i18nKey="about.site.content">
@@ -127,7 +127,7 @@ const AboutPage: React.FC = () => {
           </a>
         </p>
       </div>
-      <div className="container mt-4 py-3 shadow border border-primary rounded bg-light">
+      <div className="container mt-4 py-3 cru-card">
         <h4>{t("about.credits.title")}</h4>
         <p>{t("about.credits.content")}</p>
         <p>{t("about.credits.frontend")}</p>
