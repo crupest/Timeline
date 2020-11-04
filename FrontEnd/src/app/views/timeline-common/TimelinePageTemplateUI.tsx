@@ -16,7 +16,6 @@ import Timeline, {
   TimelinePostInfoEx,
   TimelineDeleteCallback,
 } from "./Timeline";
-import TimelineTop from "./TimelineTop";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 import { TimelineSyncStatus } from "./SyncStatusBadge";
 
@@ -226,7 +225,6 @@ export default function TimelinePageTemplateUI<TManageItems>(
             collapse={cardCollapse}
             toggleCollapse={toggleCardCollapse}
           />
-          <TimelineTop height="56px" />
           {timelineBody}
         </>
       );
