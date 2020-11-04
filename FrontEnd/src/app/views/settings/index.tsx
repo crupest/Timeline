@@ -4,9 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Form, Container, Row, Col, Button, Modal } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
-import OperationDialog, {
-  OperationInputErrorInfo,
-} from "../common/OperationDialog";
+import OperationDialog from "../common/OperationDialog";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -15,60 +13,47 @@ interface ChangePasswordDialogProps {
 
 const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
   const history = useHistory();
-  const { t } = useTranslation();
 
   const [redirect, setRedirect] = useState<boolean>(false);
 
   return (
     <OperationDialog
       open={props.open}
-      title={t("settings.dialogChangePassword.title")}
+      title="settings.dialogChangePassword.title"
       titleColor="dangerous"
-      inputPrompt={t("settings.dialogChangePassword.prompt")}
+      inputPrompt="settings.dialogChangePassword.prompt"
       inputScheme={[
         {
           type: "text",
-          label: t("settings.dialogChangePassword.inputOldPassword"),
+          label: "settings.dialogChangePassword.inputOldPassword",
           password: true,
-          validator: (v) =>
-            v === ""
-              ? "settings.dialogChangePassword.errorEmptyOldPassword"
-              : null,
         },
         {
           type: "text",
-          label: t("settings.dialogChangePassword.inputNewPassword"),
+          label: "settings.dialogChangePassword.inputNewPassword",
           password: true,
-          validator: (v, values) => {
-            const error: OperationInputErrorInfo = {};
-            error[1] =
-              v === ""
-                ? "settings.dialogChangePassword.errorEmptyNewPassword"
-                : null;
-            if (v === values[2]) {
-              error[2] = null;
-            } else {
-              if (values[2] !== "") {
-                error[2] = "settings.dialogChangePassword.errorRetypeNotMatch";
-              }
-            }
-            return error;
-          },
         },
         {
           type: "text",
-          label: t("settings.dialogChangePassword.inputRetypeNewPassword"),
+          label: "settings.dialogChangePassword.inputRetypeNewPassword",
           password: true,
-          validator: (v, values) =>
-            v !== values[1]
-              ? "settings.dialogChangePassword.errorRetypeNotMatch"
-              : null,
         },
       ]}
+      inputValidator={([oldPassword, newPassword, retypedNewPassword]) => {
+        const result: Record<number, string> = {};
+        if (oldPassword === "") {
+          result[0] = "settings.dialogChangePassword.errorEmptyOldPassword";
+        }
+        if (newPassword === "") {
+          result[1] = "settings.dialogChangePassword.errorEmptyNewPassword";
+        }
+        if (retypedNewPassword !== newPassword) {
+          result[2] = "settings.dialogChangePassword.errorRetypeNotMatch";
+        }
+        return result;
+      }}
       onProcess={async ([oldPassword, newPassword]) => {
-        await userService
-          .changePassword(oldPassword as string, newPassword as string)
-          .toPromise();
+        await userService.changePassword(oldPassword, newPassword).toPromise();
         await userService.logout();
         setRedirect(true);
       }}

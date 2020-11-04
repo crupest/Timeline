@@ -1,5 +1,6 @@
 import React from "react";
 import { Observable, Subject } from "rxjs";
+import { TFunction } from "i18next";
 
 // This error is thrown when ui goes wrong with bad logic.
 // Such as a variable should not be null, but it does.
@@ -41,4 +42,29 @@ export function useValueEventEmiiter<T>(): [
     };
     return [getter, trigger];
   }, []);
+}
+
+export type I18nText =
+  | string
+  | { type: "custom"; value: string }
+  | { type: "i18n"; value: string };
+
+export function convertI18nText(text: I18nText, t: TFunction): string;
+export function convertI18nText(
+  text: I18nText | null | undefined,
+  t: TFunction
+): string | null;
+export function convertI18nText(
+  text: I18nText | null | undefined,
+  t: TFunction
+): string | null {
+  if (text == null) {
+    return null;
+  } else if (typeof text === "string") {
+    return t(text);
+  } else if (text.type === "i18n") {
+    return t(text.value);
+  } else {
+    return text.value;
+  }
 }
