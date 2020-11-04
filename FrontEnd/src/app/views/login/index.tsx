@@ -34,7 +34,7 @@ const LoginPage: React.FC = (_) => {
     return (
       <>
         <AppBar />
-        <p className="mt-appbar">{t("login.alreadyLogin")}</p>
+        <p>{t("login.alreadyLogin")}</p>
       </>
     );
   }
