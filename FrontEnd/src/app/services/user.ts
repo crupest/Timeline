@@ -239,12 +239,16 @@ export class UserInfoService {
     return users.forEach((user) => this.saveUser(user));
   }
 
-  private getCachedUser(username: string): Promise<User | null> {
+  private _getCachedUser(username: string): Promise<User | null> {
     return dataStorage.getItem<HttpUser | null>(`user.${username}`);
   }
 
   private doSaveUser(user: HttpUser): Promise<void> {
     return dataStorage.setItem<HttpUser>(`user.${user.username}`, user).then();
+  }
+
+  getCachedUser(username: string): Promise<User | null> {
+    return this._getCachedUser(username);
   }
 
   syncUser(username: string): Promise<void> {
@@ -258,7 +262,7 @@ export class UserInfoService {
   >({
     sync: async (key, line) => {
       if (line.value == undefined) {
-        const cache = await this.getCachedUser(key);
+        const cache = await this._getCachedUser(key);
         if (cache != null) {
           line.next({ user: cache, type: "cache" });
         }
@@ -272,7 +276,7 @@ export class UserInfoService {
         if (e instanceof HttpUserNotExistError) {
           line.next({ type: "notexist" });
         } else {
-          const cache = await this.getCachedUser(key);
+          const cache = await this._getCachedUser(key);
           line.next({ user: cache ?? undefined, type: "offline" });
           throwIfNotNetworkError(e);
         }
@@ -287,7 +291,7 @@ export class UserInfoService {
     );
   }
 
-  private getCachedAvatar(username: string): Promise<BlobWithEtag | null> {
+  private _getCachedAvatar(username: string): Promise<BlobWithEtag | null> {
     return dataStorage.getItem<BlobWithEtag | null>(`user.${username}.avatar`);
   }
 
@@ -295,6 +299,10 @@ export class UserInfoService {
     return dataStorage
       .setItem<BlobWithEtag>(`user.${username}.avatar`, data)
       .then();
+  }
+
+  getCachedAvatar(username: string): Promise<Blob | null> {
+    return this._getCachedAvatar(username).then((d) => d?.data ?? null);
   }
 
   syncAvatar(username: string): Promise<void> {
@@ -307,7 +315,7 @@ export class UserInfoService {
     | { data?: undefined; type: "notexist" | "offline" }
   >({
     sync: async (key, line) => {
-      const cache = await this.getCachedAvatar(key);
+      const cache = await this._getCachedAvatar(key);
       if (line.value == null) {
         if (cache != null) {
           line.next({ data: cache.data, type: "cache" });
