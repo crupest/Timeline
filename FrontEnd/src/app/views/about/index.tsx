@@ -73,7 +73,7 @@ const AboutPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="mt-appbar px-2 mb-4">
+    <div className="px-2 mb-4">
       <div className="container mt-4 py-3 shadow border border-primary rounded bg-light">
         <h4 id="author-info">{t("about.author.title")}</h4>
         <div>
