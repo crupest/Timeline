@@ -8,8 +8,6 @@ The [front-end](https://github.com/crupest/Timeline/tree/master/FrontEnd), is wr
 
 The [back-end](https://github.com/crupest/Timeline/tree/master/BackEnd) is written in C# and built with [ASP.NET Core](https://github.com/dotnet/aspnetcore).
 
-The final product is hosting on my [Tencent Cloud](https://cloud.tencent.com/) Cloud Virtual Machine on https://crupest.xyz .
-
 Feel free to comment by opening an issue.
 
 ## Build Status
