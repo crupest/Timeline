@@ -93,12 +93,12 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           {current && <div className="timeline-line-segment current-end" />}
         </div>
       </div>
-      <div className="timeline-content-area">
+      <div className="timeline-item-card">
         <div>
           <span className="mr-2">
-            <span className="text-primary white-space-no-wrap mr-2">
+            <small className="text-secondary white-space-no-wrap mr-2">
               {props.post.time.toLocaleString(i18n.languages)}
-            </span>
+            </small>
             <small className="text-dark">{props.post.author.nickname}</small>
           </span>
           {more != null ? (
@@ -138,33 +138,33 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             }
           })()}
         </div>
+        {more != null && more.isOpen ? (
+          <>
+            <div
+              className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
+              onClick={more.toggle}
+            >
+              <Svg
+                src={trashIcon}
+                className="text-danger icon-button large"
+                onClick={(e) => {
+                  toggleDeleteDialog();
+                  e.stopPropagation();
+                }}
+              />
+            </div>
+            {deleteDialog ? (
+              <TimelinePostDeleteConfirmDialog
+                toggle={() => {
+                  toggleDeleteDialog();
+                  more.toggle();
+                }}
+                onConfirm={more.onDelete}
+              />
+            ) : null}
+          </>
+        ) : null}
       </div>
-      {more != null && more.isOpen ? (
-        <>
-          <div
-            className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
-            onClick={more.toggle}
-          >
-            <Svg
-              src={trashIcon}
-              className="text-danger icon-button large"
-              onClick={(e) => {
-                toggleDeleteDialog();
-                e.stopPropagation();
-              }}
-            />
-          </div>
-          {deleteDialog ? (
-            <TimelinePostDeleteConfirmDialog
-              toggle={() => {
-                toggleDeleteDialog();
-                more.toggle();
-              }}
-              onConfirm={more.onDelete}
-            />
-          ) : null}
-        </>
-      ) : null}
     </div>
   );
 };

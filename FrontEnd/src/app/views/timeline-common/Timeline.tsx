@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { TimelinePostInfo } from "@/services/timeline";
 
 import TimelineItem from "./TimelineItem";
+import TimelineTop from "./TimelineTop";
 
 export interface TimelinePostInfoEx extends TimelinePostInfo {
   deletable: boolean;
@@ -52,6 +53,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
 
   return (
     <div ref={props.containerRef} className={clsx("timeline", props.className)}>
+      <TimelineTop height="56px" />
       {(() => {
         const length = posts.length;
         return posts.map((post, i) => {

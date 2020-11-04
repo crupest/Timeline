@@ -4,8 +4,13 @@
   z-index: 0
   position: relative
 
+  background-image: url("views/timeline-common/timeline-background.svg")
+  background-size: 100% auto
+  background-repeat: no-repeat repeat
+
   &-item
-    display: flex
+    position: relative
+    padding: 0.5em
 
 $timeline-line-width: 7px
 $timeline-line-node-radius: 18px
@@ -30,12 +35,17 @@ $timeline-line-color-current: #36c2e6
 
 .timeline-line
   &-area-container
+    position: absolute
     display: flex
     justify-content: flex-end
     padding-right: 5px
+    z-index: 1
 
     flex: 0 0 auto
+
+    left: 0.5em
     width: 60px
+    height: 100%
 
   &-area
     display: flex
@@ -97,9 +107,11 @@ $timeline-line-color-current: #36c2e6
     &-node
       animation-name: timeline-line-node-current
 
-.timeline-content-area
-  padding: 10px 0
-  flex-grow: 1
+.timeline-item-card
+  @extend .cru-card
+  @extend .clearfix
+  position: relative
+  padding: 0.5em 2em 0.5em 60px
 
 .timeline-item-delete-button
   position: absolute
