@@ -22,6 +22,8 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
 
   const { t } = useTranslation();
 
+  const timerTag = React.useRef<number | null>(null);
+
   React.useEffect(() => {
     const tag =
       dismissTime === "never"
@@ -29,6 +31,7 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
         : typeof dismissTime === "number"
         ? window.setTimeout(props.close, dismissTime)
         : window.setTimeout(props.close, 5000);
+    timerTag.current = tag;
     return () => {
       if (tag != null) {
         window.clearTimeout(tag);
@@ -40,6 +43,12 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
     <Alert
       className="m-3"
       variant={alert.type ?? "primary"}
+      onClick={() => {
+        const { current: tag } = timerTag;
+        if (tag != null) {
+          window.clearTimeout(tag);
+        }
+      }}
       onClose={props.close}
       dismissible
     >
