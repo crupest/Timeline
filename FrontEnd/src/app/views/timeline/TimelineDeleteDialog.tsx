@@ -33,15 +33,15 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
       inputScheme={[
         {
           type: "text",
-          validator: (value) => {
-            if (value !== name) {
-              return "timeline.deleteDialog.notMatch";
-            } else {
-              return null;
-            }
-          },
         },
       ]}
+      inputValidator={([value]) => {
+        if (value !== name) {
+          return { 0: "timeline.deleteDialog.notMatch" };
+        } else {
+          return null;
+        }
+      }}
       onProcess={() => {
         return timelineService.deleteTimeline(name).toPromise();
       }}

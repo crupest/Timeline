@@ -34,7 +34,7 @@ const BoardWithoutUser: React.FC = () => {
   }, [publicTimelines]);
 
   return (
-    <Row className="my-2 justify-content-center">
+    <Row className="my-3 justify-content-center">
       {publicTimelines === "offline" ? (
         <Col sm="8" lg="6">
           <OfflineBoard
