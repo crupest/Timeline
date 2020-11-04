@@ -46,7 +46,7 @@ const AppBar: React.FC = (_) => {
           {user != null ? (
             <LinkContainer to={`/users/${user.username}`}>
               <BlobImage
-                className="avatar small rounded-circle bg-white"
+                className="avatar small rounded-circle bg-white cursor-pointer"
                 blob={avatar}
               />
             </LinkContainer>
