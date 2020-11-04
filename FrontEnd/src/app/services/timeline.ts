@@ -1,7 +1,7 @@
 import React from "react";
 import XRegExp from "xregexp";
 import { Observable, from, combineLatest, of } from "rxjs";
-import { map, switchMap, startWith } from "rxjs/operators";
+import { map, switchMap, startWith, filter } from "rxjs/operators";
 import { uniqBy } from "lodash";
 
 import { convertError } from "@/utilities/rxjs";
@@ -28,7 +28,13 @@ export type { TimelineVisibility } from "@/http/timeline";
 
 import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from "./common";
 import { DataHub, WithSyncStatus } from "./DataHub";
-import { UserAuthInfo, checkLogin, userService, userInfoService } from "./user";
+import {
+  UserAuthInfo,
+  checkLogin,
+  userService,
+  userInfoService,
+  User,
+} from "./user";
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -195,7 +201,11 @@ export class TimelineService {
         if (timeline != null) {
           return combineLatest(
             [timeline.owner, ...timeline.members].map((u) =>
-              userInfoService.getUser$(u)
+              state.type === "cache"
+                ? from(userInfoService.getCachedUser(u)).pipe(
+                    filter((u): u is User => u != null)
+                  )
+                : userInfoService.getUser$(u)
             )
           ).pipe(
             map((users) => {
@@ -428,12 +438,20 @@ export class TimelineService {
 
         return combineLatest([
           combineLatest(
-            state.posts.map((post) => userInfoService.getUser$(post.author))
+            state.posts.map((post) =>
+              state.type === "cache"
+                ? from(userInfoService.getCachedUser(post.author)).pipe(
+                    filter((u): u is User => u != null)
+                  )
+                : userInfoService.getUser$(post.author)
+            )
           ),
           combineLatest(
             state.posts.map((post) => {
               if (post.content.type === "image") {
-                return this.getPostData$(timelineName, post.id);
+                return state.type === "cache"
+                  ? from(this.getCachedPostData(timelineName, post.id))
+                  : this.getPostData$(timelineName, post.id);
               } else {
                 return of(null);
               }
@@ -466,7 +484,7 @@ export class TimelineService {
     );
   }
 
-  private getCachedPostData(key: {
+  private _getCachedPostData(key: {
     timelineName: string;
     postId: number;
   }): Promise<BlobWithEtag | null> {
@@ -504,7 +522,7 @@ export class TimelineService {
   >({
     keyToString: (key) => `${key.timelineName}.${key.postId}`,
     sync: async (key, line) => {
-      const cache = await this.getCachedPostData(key);
+      const cache = await this._getCachedPostData(key);
       if (line.value == null) {
         if (cache != null) {
           line.next({ type: "cache", data: cache.data });
@@ -543,6 +561,15 @@ export class TimelineService {
       }
     },
   });
+
+  getCachedPostData(
+    timelineName: string,
+    postId: number
+  ): Promise<Blob | null> {
+    return this._getCachedPostData({ timelineName, postId }).then(
+      (d) => d?.data ?? null
+    );
+  }
 
   getPostData$(timelineName: string, postId: number): Observable<BlobOrStatus> {
     return this._postDataHub.getObservable({ timelineName, postId }).pipe(
