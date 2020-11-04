@@ -152,16 +152,18 @@ const CreateUserDialog: React.FC<CreateUserDialogProps> = (props) => {
       title="Create"
       titleColor="create"
       inputPrompt="You are creating a new user."
-      inputScheme={[
-        { type: "text", label: "Username" },
-        { type: "text", label: "Password" },
-        { type: "bool", label: "Administrator" },
-      ]}
+      inputScheme={
+        [
+          { type: "text", label: "Username" },
+          { type: "text", label: "Password" },
+          { type: "bool", label: "Administrator" },
+        ] as const
+      }
       onProcess={([username, password, administrator]) =>
         props.process({
-          username: username as string,
-          password: password as string,
-          administrator: administrator as boolean,
+          username: username,
+          password: password,
+          administrator: administrator,
         })
       }
       close={props.close}
@@ -221,7 +223,7 @@ const UserChangeUsernameDialog: React.FC<UserModifyDialogProps<string>> = (
       )}
       inputScheme={[{ type: "text", label: "New Username" }]}
       onProcess={([newUsername]) => {
-        return props.process(newUsername as string);
+        return props.process(newUsername);
       }}
     />
   );
@@ -245,7 +247,7 @@ const UserChangePasswordDialog: React.FC<UserModifyDialogProps<string>> = (
       )}
       inputScheme={[{ type: "text", label: "New Password" }]}
       onProcess={([newPassword]) => {
-        return props.process(newPassword as string);
+        return props.process(newPassword);
       }}
     />
   );

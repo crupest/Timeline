@@ -36,7 +36,7 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
       collapse={collapse}
       toggleCollapse={toggleCollapse}
     >
-      <h3 className="text-primary mx-3 d-inline-block align-middle">
+      <h3 className="text-primary d-inline-block align-middle">
         {timeline.title}
         <small className="ml-3 text-secondary">{timeline.name}</small>
       </h3>

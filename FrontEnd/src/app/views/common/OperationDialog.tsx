@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Modal } from "react-bootstrap";
 
-import { UiLogicError } from "@/common";
+import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
 import LoadingButton from "./LoadingButton";
 
@@ -27,45 +27,33 @@ const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = (props) => {
   return result;
 };
 
-export type OperationInputOptionalError = undefined | null | string;
-
-export interface OperationInputErrorInfo {
-  [index: number]: OperationInputOptionalError;
-}
-
-export type OperationInputValidator<TValue> = (
-  value: TValue,
-  values: (string | boolean)[]
-) => OperationInputOptionalError | OperationInputErrorInfo;
-
 export interface OperationTextInputInfo {
   type: "text";
+  label?: I18nText;
   password?: boolean;
-  label?: string;
   initValue?: string;
   textFieldProps?: Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
     "type" | "value" | "onChange" | "aria-relevant"
   >;
   helperText?: string;
-  validator?: OperationInputValidator<string>;
 }
 
 export interface OperationBoolInputInfo {
   type: "bool";
-  label: string;
+  label: I18nText;
   initValue?: boolean;
 }
 
 export interface OperationSelectInputInfoOption {
   value: string;
-  label: string;
+  label: I18nText;
   icon?: React.ReactElement;
 }
 
 export interface OperationSelectInputInfo {
   type: "select";
-  label: string;
+  label: I18nText;
   options: OperationSelectInputInfoOption[];
   initValue?: string;
 }
@@ -75,27 +63,67 @@ export type OperationInputInfo =
   | OperationBoolInputInfo
   | OperationSelectInputInfo;
 
+type MapOperationInputInfoValueType<T> = T extends OperationTextInputInfo
+  ? string
+  : T extends OperationBoolInputInfo
+  ? boolean
+  : T extends OperationSelectInputInfo
+  ? string
+  : never;
+
+type MapOperationInputInfoValueTypeList<
+  Tuple extends readonly OperationInputInfo[]
+> = {
+  [Index in keyof Tuple]: MapOperationInputInfoValueType<Tuple[Index]>;
+} & { length: Tuple["length"] };
+
 interface OperationResult {
   type: "success" | "failure";
   data: unknown;
 }
 
-interface OperationDialogProps {
+export type OperationInputError =
+  | {
+      [index: number]: I18nText | null | undefined;
+    }
+  | null
+  | undefined;
+
+const isNoError = (error: OperationInputError): boolean => {
+  if (error == null) return true;
+  for (const key in error) {
+    if (error[key] != null) return false;
+  }
+  return true;
+};
+
+export interface OperationDialogProps<
+  OperationInputInfoList extends readonly OperationInputInfo[]
+> {
   open: boolean;
   close: () => void;
-  title: React.ReactNode;
+  title: I18nText | (() => React.ReactNode);
   titleColor?: "default" | "dangerous" | "create" | string;
-  onProcess: (inputs: (string | boolean)[]) => Promise<unknown>;
-  inputScheme?: OperationInputInfo[];
-  inputPrompt?: string | (() => React.ReactNode);
+  onProcess: (
+    inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
+  ) => Promise<unknown>;
+  inputScheme?: OperationInputInfoList;
+  inputValidator?: (
+    inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
+  ) => OperationInputError;
+  inputPrompt?: I18nText | (() => React.ReactNode);
   processPrompt?: () => React.ReactNode;
   successPrompt?: (data: unknown) => React.ReactNode;
   failurePrompt?: (error: unknown) => React.ReactNode;
   onSuccessAndClose?: () => void;
 }
 
-const OperationDialog: React.FC<OperationDialogProps> = (props) => {
-  const inputScheme = props.inputScheme ?? [];
+const OperationDialog = <
+  OperationInputInfoList extends readonly OperationInputInfo[]
+>(
+  props: OperationDialogProps<OperationInputInfoList>
+): React.ReactElement => {
+  const inputScheme = props.inputScheme as readonly OperationInputInfo[];
 
   const { t } = useTranslation();
 
@@ -112,7 +140,10 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
       }
     })
   );
-  const [inputError, setInputError] = useState<OperationInputErrorInfo>({});
+  const [dirtyList, setDirtyList] = useState<boolean[]>(() =>
+    inputScheme.map(() => false)
+  );
+  const [inputError, setInputError] = useState<OperationInputError>();
 
   const close = (): void => {
     if (step !== "process") {
@@ -131,20 +162,26 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
 
   const onConfirm = (): void => {
     setStep("process");
-    props.onProcess(values).then(
-      (d: unknown) => {
-        setStep({
-          type: "success",
-          data: d,
-        });
-      },
-      (e: unknown) => {
-        setStep({
-          type: "failure",
-          data: e,
-        });
-      }
-    );
+    props
+      .onProcess(
+        (values as unknown) as MapOperationInputInfoValueTypeList<
+          OperationInputInfoList
+        >
+      )
+      .then(
+        (d: unknown) => {
+          setStep({
+            type: "success",
+            data: d,
+          });
+        },
+        (e: unknown) => {
+          setStep({
+            type: "failure",
+            data: e,
+          });
+        }
+      );
   };
 
   let body: React.ReactNode;
@@ -154,65 +191,37 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
     let inputPrompt =
       typeof props.inputPrompt === "function"
         ? props.inputPrompt()
-        : props.inputPrompt;
+        : convertI18nText(props.inputPrompt, t);
     inputPrompt = <h6>{inputPrompt}</h6>;
 
-    const updateValue = (
-      index: number,
-      newValue: string | boolean
-    ): (string | boolean)[] => {
+    const validate = (values: (string | boolean)[]): boolean => {
+      const { inputValidator } = props;
+      if (inputValidator != null) {
+        const result = inputValidator(
+          (values as unknown) as MapOperationInputInfoValueTypeList<
+            OperationInputInfoList
+          >
+        );
+        setInputError(result);
+        return isNoError(result);
+      }
+      return true;
+    };
+
+    const updateValue = (index: number, newValue: string | boolean): void => {
       const oldValues = values;
       const newValues = oldValues.slice();
       newValues[index] = newValue;
       setValues(newValues);
-      return newValues;
+      if (dirtyList[index] === false) {
+        const newDirtyList = dirtyList.slice();
+        newDirtyList[index] = true;
+        setDirtyList(newDirtyList);
+      }
+      validate(newValues);
     };
 
-    const testErrorInfo = (errorInfo: OperationInputErrorInfo): boolean => {
-      for (let i = 0; i < inputScheme.length; i++) {
-        if (inputScheme[i].type === "text" && errorInfo[i] != null) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const calculateError = (
-      oldError: OperationInputErrorInfo,
-      index: number,
-      newError: OperationInputOptionalError | OperationInputErrorInfo
-    ): OperationInputErrorInfo => {
-      if (newError === undefined) {
-        return oldError;
-      } else if (newError === null || typeof newError === "string") {
-        return { ...oldError, [index]: newError };
-      } else {
-        const newInputError: OperationInputErrorInfo = { ...oldError };
-        for (const [index, error] of Object.entries(newError)) {
-          if (error !== undefined) {
-            newInputError[+index] = error as OperationInputOptionalError;
-          }
-        }
-        return newInputError;
-      }
-    };
-
-    const validateAll = (): boolean => {
-      let newInputError = inputError;
-      for (let i = 0; i < inputScheme.length; i++) {
-        const item = inputScheme[i];
-        if (item.type === "text") {
-          newInputError = calculateError(
-            newInputError,
-            i,
-            item.validator?.(values[i] as string, values)
-          );
-        }
-      }
-      const result = !testErrorInfo(newInputError);
-      setInputError(newInputError);
-      return result;
-    };
+    const canProcess = isNoError(inputError);
 
     body = (
       <>
@@ -220,26 +229,23 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
           {inputPrompt}
           {inputScheme.map((item, index) => {
             const value = values[index];
-            const error: string | undefined = ((e) =>
-              typeof e === "string" ? t(e) : undefined)(inputError?.[index]);
+            const error: string | null =
+              dirtyList[index] && inputError != null
+                ? convertI18nText(inputError[index], t)
+                : null;
 
             if (item.type === "text") {
               return (
                 <Form.Group key={index}>
-                  {item.label && <Form.Label>{t(item.label)}</Form.Label>}
+                  {item.label && (
+                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
+                  )}
                   <Form.Control
                     type={item.password === true ? "password" : "text"}
                     value={value as string}
                     onChange={(e) => {
                       const v = e.target.value;
-                      const newValues = updateValue(index, v);
-                      setInputError(
-                        calculateError(
-                          inputError,
-                          index,
-                          item.validator?.(v, newValues)
-                        )
-                      );
+                      updateValue(index, v);
                     }}
                     isInvalid={error != null}
                     disabled={process}
@@ -263,7 +269,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                     onChange={(event) => {
                       updateValue(index, event.currentTarget.checked);
                     }}
-                    label={t(item.label)}
+                    label={convertI18nText(item.label, t)}
                     disabled={process}
                   />
                 </Form.Group>
@@ -271,7 +277,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
             } else if (item.type === "select") {
               return (
                 <Form.Group key={index}>
-                  <Form.Label>{t(item.label)}</Form.Label>
+                  <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
                   <Form.Control
                     as="select"
                     value={value as string}
@@ -284,7 +290,7 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
                       return (
                         <option value={option.value} key={i}>
                           {option.icon}
-                          {t(option.label)}
+                          {convertI18nText(option.label, t)}
                         </option>
                       );
                     })}
@@ -301,9 +307,10 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
           <LoadingButton
             variant="primary"
             loading={process}
-            disabled={testErrorInfo(inputError)}
+            disabled={!canProcess}
             onClick={() => {
-              if (validateAll()) {
+              setDirtyList(inputScheme.map(() => true));
+              if (validate(values)) {
                 onConfirm();
               }
             }}
@@ -338,7 +345,10 @@ const OperationDialog: React.FC<OperationDialogProps> = (props) => {
     );
   }
 
-  const title = typeof props.title === "string" ? t(props.title) : props.title;
+  const title =
+    typeof props.title === "function"
+      ? props.title()
+      : convertI18nText(props.title, t);
 
   return (
     <Modal show={props.open} onHide={close}>

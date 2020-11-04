@@ -18,7 +18,7 @@ const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
         { type: "text", label: "userPage.dialogChangeNickname.inputLabel" },
       ]}
       onProcess={([newNickname]) => {
-        return props.onProcess(newNickname as string);
+        return props.onProcess(newNickname);
       }}
       close={props.close}
     />

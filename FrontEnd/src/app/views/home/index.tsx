@@ -34,8 +34,8 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Container fluid>
-        <Row className="justify-content-center">
-          <Col xs={12} sm={10} md={8} lg={6}>
+        <Row className="my-3 justify-content-center">
+          <Col xs={12} sm={8} lg={6}>
             <SearchInput
               className="justify-content-center"
               value={navText}

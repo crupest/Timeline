@@ -16,7 +16,6 @@ import Timeline, {
   TimelinePostInfoEx,
   TimelineDeleteCallback,
 } from "./Timeline";
-import TimelineTop from "./TimelineTop";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 import { TimelineSyncStatus } from "./SyncStatusBadge";
 
@@ -48,13 +47,10 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
   const { t } = useTranslation();
 
-  const bottomSpaceRef = React.useRef<HTMLDivElement | null>(null);
+  const [bottomSpaceHeight, setBottomSpaceHeight] = React.useState<number>(0);
 
   const onPostEditHeightChange = React.useCallback((height: number): void => {
-    const { current: bottomSpaceDiv } = bottomSpaceRef;
-    if (bottomSpaceDiv != null) {
-      bottomSpaceDiv.style.height = `${height}px`;
-    }
+    setBottomSpaceHeight(height);
     if (height === 0) {
       const alertHost = getAlertHost();
       if (alertHost != null) {
@@ -178,6 +174,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
           timelineBody = (
             <Timeline
+              style={{
+                minHeight: `calc(100vh - 56px - ${bottomSpaceHeight}px)`,
+              }}
               containerRef={timelineRef}
               posts={posts}
               onDelete={props.onDelete}
@@ -188,7 +187,10 @@ export default function TimelinePageTemplateUI<TManageItems>(
             timelineBody = (
               <>
                 {timelineBody}
-                <div ref={bottomSpaceRef} className="flex-fix-length" />
+                <div
+                  style={{ height: bottomSpaceHeight }}
+                  className="flex-fix-length"
+                />
                 <TimelinePostEdit
                   className="fixed-bottom"
                   onPost={props.onPost}
@@ -226,7 +228,6 @@ export default function TimelinePageTemplateUI<TManageItems>(
             collapse={cardCollapse}
             toggleCollapse={toggleCardCollapse}
           />
-          <TimelineTop height="56px" />
           {timelineBody}
         </>
       );
