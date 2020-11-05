@@ -24,33 +24,7 @@ export interface TimelineProps {
 const Timeline: React.FC<TimelineProps> = (props) => {
   const { posts, onDelete, onResize } = props;
 
-  const [indexShowDeleteButton, setIndexShowDeleteButton] = React.useState<
-    number
-  >(-1);
-
-  const onItemClick = React.useCallback(() => {
-    setIndexShowDeleteButton(-1);
-  }, []);
-
-  const onToggleDelete = React.useMemo(() => {
-    return posts.map((post, i) => {
-      return post.deletable
-        ? () => {
-            setIndexShowDeleteButton((oldIndexShowDeleteButton) => {
-              return oldIndexShowDeleteButton !== i ? i : -1;
-            });
-          }
-        : undefined;
-    });
-  }, [posts]);
-
-  const onItemDelete = React.useMemo(() => {
-    return posts.map((post, i) => {
-      return () => {
-        onDelete(i, post.id);
-      };
-    });
-  }, [posts, onDelete]);
+  const [showMoreIndex, setShowMoreIndex] = React.useState<number>(-1);
 
   return (
     <div
@@ -61,24 +35,23 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       <TimelineTop height="56px" />
       {(() => {
         const length = posts.length;
-        return posts.map((post, i) => {
-          const toggleMore = onToggleDelete[i];
-
+        return posts.map((post, index) => {
           return (
             <TimelineItem
               post={post}
               key={post.id}
-              current={length - 1 === i}
+              current={length - 1 === index}
               more={
-                toggleMore
+                post.deletable
                   ? {
-                      isOpen: indexShowDeleteButton === i,
-                      toggle: toggleMore,
-                      onDelete: onItemDelete[i],
+                      isOpen: showMoreIndex === index,
+                      toggle: () =>
+                        setShowMoreIndex((old) => (old === index ? -1 : index)),
+                      onDelete: () => onDelete(index, post.id),
                     }
                   : undefined
               }
-              onClick={onItemClick}
+              onClick={() => setShowMoreIndex(-1)}
               onResize={onResize}
             />
           );
