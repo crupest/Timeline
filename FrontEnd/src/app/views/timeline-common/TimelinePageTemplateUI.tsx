@@ -174,9 +174,6 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
           timelineBody = (
             <Timeline
-              style={{
-                minHeight: `calc(100vh - 56px - ${bottomSpaceHeight}px)`,
-              }}
               containerRef={timelineRef}
               posts={posts}
               onDelete={props.onDelete}
@@ -219,6 +216,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
       body = (
         <>
+          <div className="timeline-background" />
           <CardComponent
             className="timeline-template-card"
             timeline={timeline}
