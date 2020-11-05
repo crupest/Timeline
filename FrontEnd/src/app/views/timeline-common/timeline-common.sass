@@ -4,10 +4,6 @@
   z-index: 0
   position: relative
 
-  background-image: url("views/timeline-common/timeline-background.svg")
-  background-size: 100% auto
-  background-repeat: no-repeat repeat
-
   &-item
     position: relative
     padding: 0.5em
@@ -166,3 +162,15 @@ $timeline-line-color-current: #36c2e6
   top: 56px
   right: 0
   margin: 0.5em
+
+.timeline-background
+  position: fixed
+  z-index: -1
+
+  left: 0
+  right: 0
+  top: 0
+  bottom: 0
+  background-image: url("views/timeline-common/timeline-background.svg")
+  background-size: 100% auto
+  background-repeat: no-repeat repeat
