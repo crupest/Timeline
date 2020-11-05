@@ -66,24 +66,6 @@ const HomePage: React.FC = () => {
           }
         })()}
       </Container>
-      <footer className="text-right">
-        <a
-          className="mx-3 text-muted"
-          href="http://beian.miit.gov.cn/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <small>鄂ICP备18030913号-1</small>
-        </a>
-        <a
-          className="mx-3 text-muted"
-          href="http://www.beian.gov.cn/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <small className="white-space-no-wrap">公安备案 42112102000124</small>
-        </a>
-      </footer>
       {dialog === "create" && (
         <TimelineCreateDialog
           open
