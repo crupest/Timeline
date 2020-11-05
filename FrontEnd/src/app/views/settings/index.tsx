@@ -68,13 +68,13 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
 };
 
 const ConfirmLogoutDialog: React.FC<{
-  toggle: () => void;
+  onClose: () => void;
   onConfirm: () => void;
-}> = ({ toggle, onConfirm }) => {
+}> = ({ onClose, onConfirm }) => {
   const { t } = useTranslation();
 
   return (
-    <Modal show centered onHide={toggle}>
+    <Modal show centered onHide={onClose}>
       <Modal.Header>
         <Modal.Title className="text-danger">
           {t("settings.dialogConfirmLogout.title")}
@@ -82,7 +82,7 @@ const ConfirmLogoutDialog: React.FC<{
       </Modal.Header>
       <Modal.Body>{t("settings.dialogConfirmLogout.prompt")}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={toggle}>
+        <Button variant="secondary" onClick={onClose}>
           {t("operationDialog.cancel")}
         </Button>
         <Button variant="danger" onClick={onConfirm}>
@@ -174,7 +174,7 @@ const SettingsPage: React.FC = (_) => {
           case "logout":
             return (
               <ConfirmLogoutDialog
-                toggle={() => setDialog(null)}
+                onClose={() => setDialog(null)}
                 onConfirm={() => {
                   void userService.logout().then(() => {
                     history.push("/");
