@@ -1607,16 +1607,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-react-jsx-development@npm:^7.12.1":
-  version: 7.12.1
-  resolution: "@babel/plugin-transform-react-jsx-development@npm:7.12.1"
+"@babel/plugin-transform-react-jsx-development@npm:^7.12.5":
+  version: 7.12.5
+  resolution: "@babel/plugin-transform-react-jsx-development@npm:7.12.5"
   dependencies:
     "@babel/helper-builder-react-jsx-experimental": ^7.12.1
     "@babel/helper-plugin-utils": ^7.10.4
     "@babel/plugin-syntax-jsx": ^7.12.1
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 2af1228b5e259f44e474439605ebe875df1c87bbd0f2ce7ba15be1d4e204edeb34b0334d3d8ae93cb47255cab3ade7be9f6cfc1a7a8f6a3099355587caf675b5
+  checksum: fec194e2f4dfbee97c6c18c2af6fd037b97bfe6024df2548d4453074fd687239bc2d452d9ef1ecc20fb63d2074178994c2c659ffb630ca4d45d4e9462ba643b6
   languageName: node
   linkType: hard
 
@@ -1642,9 +1642,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-react-jsx@npm:^7.12.1":
-  version: 7.12.1
-  resolution: "@babel/plugin-transform-react-jsx@npm:7.12.1"
+"@babel/plugin-transform-react-jsx@npm:^7.12.5":
+  version: 7.12.5
+  resolution: "@babel/plugin-transform-react-jsx@npm:7.12.5"
   dependencies:
     "@babel/helper-builder-react-jsx": ^7.10.4
     "@babel/helper-builder-react-jsx-experimental": ^7.12.1
@@ -1652,7 +1652,7 @@ __metadata:
     "@babel/plugin-syntax-jsx": ^7.12.1
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 58dbb169e2a97a7cba0a6b204c8288827be7d8a5aa895240c0228eae9c889e9ec991ee84b32fc8be665709822febc4356e7ddff02168c24ccafa16641c5bab25
+  checksum: 254ddc1097fe88acb3c25f01a439f97df0124bf08a73a3e27418029f4bb47cd761d0430615713380afba02f0ca5ce26c44351228d084214ecb024852bff0d473
   languageName: node
   linkType: hard
 
@@ -2050,20 +2050,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-react@npm:^7.12.1":
-  version: 7.12.1
-  resolution: "@babel/preset-react@npm:7.12.1"
+"@babel/preset-react@npm:^7.12.5":
+  version: 7.12.5
+  resolution: "@babel/preset-react@npm:7.12.5"
   dependencies:
     "@babel/helper-plugin-utils": ^7.10.4
     "@babel/plugin-transform-react-display-name": ^7.12.1
-    "@babel/plugin-transform-react-jsx": ^7.12.1
-    "@babel/plugin-transform-react-jsx-development": ^7.12.1
+    "@babel/plugin-transform-react-jsx": ^7.12.5
+    "@babel/plugin-transform-react-jsx-development": ^7.12.5
     "@babel/plugin-transform-react-jsx-self": ^7.12.1
     "@babel/plugin-transform-react-jsx-source": ^7.12.1
     "@babel/plugin-transform-react-pure-annotations": ^7.12.1
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 67219d33110be1e6cb64b7a5470589cc4a0ada14fa80a86e676adf0baa3b3180c3586964e989509509b659b8c7744abb57d4a5513130fc40fca12fbc16aa6669
+  checksum: 1083243ebf652f0895f407b2f8f74c602e602056f225b5c9e9f181019e76d6d475130749b4c543437ca78ee84fa54b3552bcd5a7bb2f40de26cdd3adffe7222a
   languageName: node
   linkType: hard
 
@@ -3117,27 +3117,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@webpack-cli/info@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@webpack-cli/info@npm:1.0.2"
+"@webpack-cli/info@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@webpack-cli/info@npm:1.1.0"
   dependencies:
     envinfo: ^7.7.3
   peerDependencies:
     webpack-cli: 4.x.x
-  checksum: a961e982fbb4d6f0c25e328215c157775236b0bd19ea699ce46963e692b21abbc002f68f753f8d80e935757070b656aa5edeab4f3692346b308a3bc39ad52528
+  checksum: 798cbdfd549b4b5c0427e69993555899688ac071624cf9397eaf98a68b3bee5b15c4ae6ad4e3133a214cd991735f080ec2ed6e4b9aa91bd0cfce814b42ee80b7
   languageName: node
   linkType: hard
 
-"@webpack-cli/serve@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@webpack-cli/serve@npm:1.0.1"
+"@webpack-cli/serve@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@webpack-cli/serve@npm:1.1.0"
   peerDependencies:
     webpack-cli: 4.x.x
     webpack-dev-server: "*"
   peerDependenciesMeta:
     webpack-dev-server:
       optional: true
-  checksum: d1dd4fb204a1937a7a2340d466b0e45ab0370fbf933244caa662627bc991893678755779b6d8e8c0775827c9dfb2b58274f58c948799f8c5efa80c83b4eb17b7
+  checksum: 7684766d7dc46d7855442b3f7f6dc8c533030d0d92c318d887e504d41cb4f5aafe5f65233e74123cbbec04d5479c423d526a55b989c74c811dee1c170d4c79b8
   languageName: node
   linkType: hard
 
@@ -3456,15 +3456,6 @@ __metadata:
   version: 4.1.1
   resolution: "ansi-colors@npm:4.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fansi-colors%2Fdownload%2Fansi-colors-4.1.1.tgz"
   checksum: 50d8dfbce25602caea1b170ecf4c71c4c9c58d2d1e3186fb5712848c0610d05fe60b8bb6a9eaebd9b54f1db3baf6f603e04214cce597cc7799bc9f47fd9a797a
-  languageName: node
-  linkType: hard
-
-"ansi-escapes@npm:^4.3.1":
-  version: 4.3.1
-  resolution: "ansi-escapes@npm:4.3.1"
-  dependencies:
-    type-fest: ^0.11.0
-  checksum: bcb39e57bd32af0236c4ded96aaf8ef5d86c5a4683762b0be998c68cd11d5afd93296f4b5e087a3557da82a899b7c4d081483d603a4d4647e6a6613bf1aded8a
   languageName: node
   linkType: hard
 
@@ -4314,10 +4305,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"camelcase@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "camelcase@npm:6.1.0"
-  checksum: 3e968d5efba3c08410437c097b6706aa2a3f1ff34c3ee11940cca932397d99e44693a314545e2d00cb36c1c05d8463ca6f3dabb005e9ce2b615edb7ef274b6c3
+"camelcase@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "camelcase@npm:6.2.0"
+  checksum: 654700600a80cb1f06ab85b3e2fe80333f94b441884d40826becdac549774f51b0317c6dcb6040416df26241fa9481eb58d0c1659d4d6d5627dcd4259be61beb
   languageName: node
   linkType: hard
 
@@ -4637,7 +4628,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^6.0.0":
+"commander@npm:^6.2.0":
   version: 6.2.0
   resolution: "commander@npm:6.2.0"
   checksum: c78501cd98e6ad66839004adc27940f5fc1a0102b306fbbc177965101d586cf6dd2e01bdffd64f99f2d4862101f24e602e3e4baa641b6f6a11c01ec5c900e412
@@ -4775,9 +4766,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"copy-webpack-plugin@npm:^6.2.1":
-  version: 6.2.1
-  resolution: "copy-webpack-plugin@npm:6.2.1"
+"copy-webpack-plugin@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "copy-webpack-plugin@npm:6.3.0"
   dependencies:
     cacache: ^15.0.5
     fast-glob: ^3.2.4
@@ -4792,7 +4783,7 @@ __metadata:
     webpack-sources: ^1.4.3
   peerDependencies:
     webpack: ^4.37.0 || ^5.0.0
-  checksum: 99ef83b4237b51e95618365ad2e62775b640fe1cae0d39d3ab03bcb09c9026a00ab0fb1c03f72d164c1457482114ddf959e7a03ab409704f34686e0a64ee4a31
+  checksum: edca6ec5cd079eb6bdb16ff0c0d964951396fdbd5af2970110119dafaf9f98843af7738f8b68ef87383b3917a16c397a2162f2a66940dc0b2e08f041e128ffc9
   languageName: node
   linkType: hard
 
@@ -4919,15 +4910,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-loader@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "css-loader@npm:5.0.0"
+"css-loader@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "css-loader@npm:5.0.1"
   dependencies:
-    camelcase: ^6.1.0
+    camelcase: ^6.2.0
     cssesc: ^3.0.0
     icss-utils: ^5.0.0
     loader-utils: ^2.0.0
-    postcss: ^8.1.1
+    postcss: ^8.1.4
     postcss-modules-extract-imports: ^3.0.0
     postcss-modules-local-by-default: ^4.0.0
     postcss-modules-scope: ^3.0.0
@@ -4937,7 +4928,7 @@ __metadata:
     semver: ^7.3.2
   peerDependencies:
     webpack: ^4.27.0 || ^5.0.0
-  checksum: 8b0d45e2011d09ba91fd6d200f07ee7206104e676a84c7a01f9c7d6b7515e9b882b44a290f44002d4624d8252d9b06303f0a5c0e1885c43238ad84482e5efb51
+  checksum: 5c257ac08dcc8c3b52175d4fbd3154c331c5784a48b24c2d432505daf5ee9a10504ef85171bc41f32fe1c3f491e9c4f60949927cbb8ed0ebcd3c5d67161484e4
   languageName: node
   linkType: hard
 
@@ -5518,18 +5509,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enquirer@npm:^2.3.4":
+"enquirer@npm:^2.3.5":
   version: 2.3.6
-  resolution: "enquirer@npm:2.3.6"
+  resolution: "enquirer@npm:2.3.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fenquirer%2Fdownload%2Fenquirer-2.3.6.tgz"
   dependencies:
     ansi-colors: ^4.1.1
   checksum: e249bb97bf7d5a91d51081547ea5aa1d849604e5de74feff2c48f7174fc6c9dfcfeea42ef5536e9a3be58964a248c322d6897269ae7bba3e1b6d24f152d9d685
   languageName: node
   linkType: hard
 
-"enquirer@npm:^2.3.5":
+"enquirer@npm:^2.3.6":
   version: 2.3.6
-  resolution: "enquirer@npm:2.3.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fenquirer%2Fdownload%2Fenquirer-2.3.6.tgz"
+  resolution: "enquirer@npm:2.3.6"
   dependencies:
     ansi-colors: ^4.1.1
   checksum: e249bb97bf7d5a91d51081547ea5aa1d849604e5de74feff2c48f7174fc6c9dfcfeea42ef5536e9a3be58964a248c322d6897269ae7bba3e1b6d24f152d9d685
@@ -5996,9 +5987,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"execa@npm:^4.0.0":
-  version: 4.0.3
-  resolution: "execa@npm:4.0.3"
+"execa@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "execa@npm:4.1.0"
   dependencies:
     cross-spawn: ^7.0.0
     get-stream: ^5.0.0
@@ -6009,7 +6000,7 @@ __metadata:
     onetime: ^5.1.0
     signal-exit: ^3.0.2
     strip-final-newline: ^2.0.0
-  checksum: 65b237d178b468045ee57af6aa4e4124807b28aec9573d9b3b16b02a7e41bd65996236e0c5575d053d3888585ffc795cbed38847c6c9669e9c8481fc44ac05e4
+  checksum: 79bd736acd63aa7c0afb32cc99af21cfd70db696580686c7cd56c177857b93b78bc0b9bb2b4410f377f46c71c566c8e723987e71ef0bc9b23791bfbced02f75c
   languageName: node
   linkType: hard
 
@@ -7260,7 +7251,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"interpret@npm:^2.0.0":
+"interpret@npm:^2.2.0":
   version: 2.2.0
   resolution: "interpret@npm:2.2.0"
   checksum: c89b6aa67f6957ab57e3f12c406043ea6a8a00bfd4b36bdb914080a973574bee40e25afc0b162bcab9793e39744c90cc03e23150a79ad6a4b9ea31291a23ced4
@@ -9930,7 +9921,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.1.1, postcss@npm:^8.1.4":
+"postcss@npm:^8.1.4":
   version: 8.1.4
   resolution: "postcss@npm:8.1.4"
   dependencies:
@@ -11009,14 +11000,14 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.28.0":
-  version: 1.28.0
-  resolution: "sass@npm:1.28.0"
+"sass@npm:^1.29.0":
+  version: 1.29.0
+  resolution: "sass@npm:1.29.0"
   dependencies:
     chokidar: ">=2.0.0 <4.0.0"
   bin:
     sass: sass.js
-  checksum: b4d718512e6eb05d44a2f679dcf593ff72f12b168851fc3bd37add5e142e7e36f04d98a908ed8f9e196f6aef1db09c6d3e6e5e947819c74df56bb24dd584c7b9
+  checksum: 8114e0c4e73be695d25030f51bff8da0151f335b135869e926d39e21688cd81a6be0368a332caec40425e64df499bd34962aa4ca59926a6bd0e11aa43ac306d9
   languageName: node
   linkType: hard
 
@@ -12015,7 +12006,7 @@ fsevents@~2.1.2:
     "@babel/plugin-proposal-optional-chaining": ^7.12.1
     "@babel/plugin-syntax-dynamic-import": ^7.8.3
     "@babel/preset-env": ^7.12.1
-    "@babel/preset-react": ^7.12.1
+    "@babel/preset-react": ^7.12.5
     "@babel/preset-typescript": ^7.12.1
     "@pmmmwh/react-refresh-webpack-plugin": ^0.4.3
     "@types/classnames": ^2.2.11
@@ -12040,9 +12031,9 @@ fsevents@~2.1.2:
     classnames: ^2.2.6
     clean-webpack-plugin: ^3.0.0
     clsx: ^1.1.1
-    copy-webpack-plugin: ^6.2.1
+    copy-webpack-plugin: ^6.3.0
     core-js: ^3.6.5
-    css-loader: ^5.0.0
+    css-loader: ^5.0.1
     eslint: ^7.12.1
     eslint-config-prettier: ^6.15.0
     eslint-plugin-import: ^2.22.1
@@ -12075,16 +12066,16 @@ fsevents@~2.1.2:
     react-router-dom: ^5.2.0
     regenerator-runtime: ^0.13.7
     rxjs: ^6.6.3
-    sass: ^1.28.0
+    sass: ^1.29.0
     sass-loader: ^10.0.5
     style-loader: ^2.0.0
-    ts-loader: ^8.0.7
+    ts-loader: ^8.0.9
     type-fest: ^0.18.0
     typescript: ^4.0.5
     url-loader: ^4.1.1
-    webpack: ^5.3.2
+    webpack: ^5.4.0
     webpack-chain: ^6.5.1
-    webpack-cli: ^4.1.0
+    webpack-cli: ^4.2.0
     webpack-dev-server: ^3.11.0
     workbox-precaching: ^5.1.4
     workbox-routing: ^5.1.4
@@ -12187,9 +12178,9 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"ts-loader@npm:^8.0.7":
-  version: 8.0.7
-  resolution: "ts-loader@npm:8.0.7"
+"ts-loader@npm:^8.0.9":
+  version: 8.0.9
+  resolution: "ts-loader@npm:8.0.9"
   dependencies:
     chalk: ^2.3.0
     enhanced-resolve: ^4.0.0
@@ -12198,7 +12189,7 @@ fsevents@~2.1.2:
     semver: ^6.0.0
   peerDependencies:
     typescript: "*"
-  checksum: 062143ef35d5ee064244fb5de934d3db8460737168dbf88d19655498cc39cad8bac742c785ec5ed16600c21d2fa9e6acbba28032cdeae469992444fd8e3fa96c
+  checksum: 20dcf7547a2c6d887170659eca2419901a347080861886b5ddd50e79ec5f710cb72cd277ff9901ad2d08ce8e540967d58addcef5e7cf8c658af3176335e30ec3
   languageName: node
   linkType: hard
 
@@ -12261,13 +12252,6 @@ fsevents@~2.1.2:
   dependencies:
     prelude-ls: ^1.2.1
   checksum: 6c2e1ce339567e122504f0c729cfa35d877fb2da293b99110f0819eca81e6ed8d3ba9bb36c0bc0ee4904d5340dbe678f8642a395c1c67b1d0f69f081efb47f4a
-  languageName: node
-  linkType: hard
-
-"type-fest@npm:^0.11.0":
-  version: 0.11.0
-  resolution: "type-fest@npm:0.11.0"
-  checksum: 02e5cadf13590a5724cacf8d9133320efd173f6fb1b695fcb29e56551a315bf0f07ca988a780a1999b7b55bb3eaaa7f37223615207236d393af17bba6749dc95
   languageName: node
   linkType: hard
 
@@ -12604,10 +12588,10 @@ typescript@^4.0.5:
   languageName: node
   linkType: hard
 
-"v8-compile-cache@npm:^2.1.0":
-  version: 2.1.1
-  resolution: "v8-compile-cache@npm:2.1.1"
-  checksum: 1290922fe1501a732155206f2d516f91bdfd7acf318542ffe2813ff06465cf49051fae7e1a40f3e0a56cf78b41f799473f6e389fec0534e4ecc62eb4105cf22f
+"v8-compile-cache@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "v8-compile-cache@npm:2.2.0"
+  checksum: 1efc9946401fcad7a67619b520d8d12e31c7138090ffd9f98af9b919461fa23d947ecef0eab89cca4037c01d29d25a389ab6c0fac70ee4ed030443b08cdf6cff
   languageName: node
   linkType: hard
 
@@ -12691,22 +12675,22 @@ typescript@^4.0.5:
   languageName: node
   linkType: hard
 
-"webpack-cli@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "webpack-cli@npm:4.1.0"
+"webpack-cli@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "webpack-cli@npm:4.2.0"
   dependencies:
-    "@webpack-cli/info": ^1.0.2
-    "@webpack-cli/serve": ^1.0.1
-    ansi-escapes: ^4.3.1
+    "@webpack-cli/info": ^1.1.0
+    "@webpack-cli/serve": ^1.1.0
     colorette: ^1.2.1
     command-line-usage: ^6.1.0
-    commander: ^6.0.0
-    enquirer: ^2.3.4
-    execa: ^4.0.0
+    commander: ^6.2.0
+    enquirer: ^2.3.6
+    execa: ^4.1.0
     import-local: ^3.0.2
-    interpret: ^2.0.0
+    interpret: ^2.2.0
+    leven: ^3.1.0
     rechoir: ^0.7.0
-    v8-compile-cache: ^2.1.0
+    v8-compile-cache: ^2.2.0
     webpack-merge: ^4.2.2
   peerDependencies:
     "@webpack-cli/generate-loader": "*"
@@ -12731,7 +12715,7 @@ typescript@^4.0.5:
       optional: true
   bin:
     webpack-cli: bin/cli.js
-  checksum: 70402fe84abd9efe24db5ee5d2f053f4e8d96bb76e61111bbeb89b50af031c5f52bef91d3c5f006da9f90cdda9e0e0aeb599b7ec4f28811917c3bad79880fd37
+  checksum: eb2f12e13a7ca99f65e7b48305b2a28a4df685304b36c742e3358f8a8f3c0d6e5d1631750eaf31deedbeca26460dd8fc7c36f99175f6fd08282e7debf176ef17
   languageName: node
   linkType: hard
 
@@ -12838,9 +12822,9 @@ typescript@^4.0.5:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.3.2":
-  version: 5.3.2
-  resolution: "webpack@npm:5.3.2"
+"webpack@npm:^5.4.0":
+  version: 5.4.0
+  resolution: "webpack@npm:5.4.0"
   dependencies:
     "@types/eslint-scope": ^3.7.0
     "@types/estree": ^0.0.45
@@ -12873,7 +12857,7 @@ typescript@^4.0.5:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 334a24989d164e4652f6afd2ca2302ecd7d3fd5a963164f60e368ca812b5036fff9b1b6bdbf0257b94a4bbe401ccc0d2922b262631011ec2bcbcc810bcae88a3
+  checksum: 1da5d7f1f0ec1f8f0a0ef2ef4b374805a9abd9a1a30e8834ab4b2f7793ce43251ea5c50b0132884666bd5189711f2049c66bb06ca6c381bfb022355619dc93bc
   languageName: node
   linkType: hard
 
