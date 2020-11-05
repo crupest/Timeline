@@ -13,13 +13,13 @@ import { TimelinePostInfo } from "@/services/timeline";
 import BlobImage from "../common/BlobImage";
 
 const TimelinePostDeleteConfirmDialog: React.FC<{
-  toggle: () => void;
+  onClose: () => void;
   onConfirm: () => void;
-}> = ({ toggle, onConfirm }) => {
+}> = ({ onClose, onConfirm }) => {
   const { t } = useTranslation();
 
   return (
-    <Modal toggle={toggle} isOpen centered>
+    <Modal onHide={onClose} show centered>
       <Modal.Header>
         <Modal.Title className="text-danger">
           {t("timeline.post.deleteDialog.title")}
@@ -27,14 +27,14 @@ const TimelinePostDeleteConfirmDialog: React.FC<{
       </Modal.Header>
       <Modal.Body>{t("timeline.post.deleteDialog.prompt")}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={toggle}>
+        <Button variant="secondary" onClick={onClose}>
           {t("operationDialog.cancel")}
         </Button>
         <Button
           variant="danger"
           onClick={() => {
             onConfirm();
-            toggle();
+            onClose();
           }}
         >
           {t("operationDialog.confirm")}
@@ -68,10 +68,6 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
   const avatar = useAvatar(props.post.author.username);
 
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
-  const toggleDeleteDialog = React.useCallback(
-    () => setDeleteDialog((old) => !old),
-    []
-  );
 
   return (
     <div
@@ -139,32 +135,30 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           })()}
         </div>
         {more != null && more.isOpen ? (
-          <>
-            <div
-              className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
-              onClick={more.toggle}
-            >
-              <Svg
-                src={trashIcon}
-                className="text-danger icon-button large"
-                onClick={(e) => {
-                  toggleDeleteDialog();
-                  e.stopPropagation();
-                }}
-              />
-            </div>
-            {deleteDialog ? (
-              <TimelinePostDeleteConfirmDialog
-                toggle={() => {
-                  toggleDeleteDialog();
-                  more.toggle();
-                }}
-                onConfirm={more.onDelete}
-              />
-            ) : null}
-          </>
+          <div
+            className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
+            onClick={more.toggle}
+          >
+            <Svg
+              src={trashIcon}
+              className="text-danger icon-button large"
+              onClick={(e) => {
+                setDeleteDialog(true);
+                e.stopPropagation();
+              }}
+            />
+          </div>
         ) : null}
       </div>
+      {deleteDialog && more != null ? (
+        <TimelinePostDeleteConfirmDialog
+          onClose={() => {
+            setDeleteDialog(false);
+            more.toggle();
+          }}
+          onConfirm={more.onDelete}
+        />
+      ) : null}
     </div>
   );
 };
