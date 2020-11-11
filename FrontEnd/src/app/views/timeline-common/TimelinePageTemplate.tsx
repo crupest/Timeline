@@ -12,11 +12,12 @@ import {
   useTimelineInfo,
 } from "@/services/timeline";
 
-import { TimelineDeleteCallback } from "./Timeline";
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import { TimelinePageTemplateUIProps } from "./TimelinePageTemplateUI";
 import { TimelinePostSendCallback } from "./TimelinePostEdit";
+import { TimelineSyncStatus } from "./SyncStatusBadge";
+import { TimelinePostInfoEx } from "./Timeline";
 
 export interface TimelinePageTemplateProps<TManageItem> {
   name: string;
@@ -43,19 +44,101 @@ export default function TimelinePageTemplate<TManageItem>(
   );
 
   const timelineState = useTimelineInfo(name);
-
-  const timeline = timelineState?.timeline;
-
   const postListState = usePostList(name);
 
-  const error: string | undefined = (() => {
-    if (timelineState != null) {
+  const onPost: TimelinePostSendCallback = React.useCallback(
+    (req) => {
+      return service.createPost(name, req).toPromise().then();
+    },
+    [service, name]
+  );
+
+  const onManageProp = props.onManage;
+
+  const onManage = React.useCallback(
+    (item: "property" | TManageItem) => {
+      if (item === "property") {
+        setDialog(item);
+      } else {
+        onManageProp(item);
+      }
+    },
+    [onManageProp]
+  );
+
+  const childProps = ((): [
+    data: TimelinePageTemplateUIProps<TManageItem>["data"],
+    syncStatus: TimelineSyncStatus
+  ] => {
+    if (timelineState == null) {
+      return [undefined, "syncing"];
+    } else {
       const { type, timeline } = timelineState;
-      if (type === "offline" && timeline == null) return "Network Error";
-      if (type === "synced" && timeline == null)
-        return t(props.notFoundI18nKey);
+      if (timeline == null) {
+        if (type === "offline") {
+          return [{ type: "custom", value: "Network Error" }, "offline"];
+        } else if (type === "synced") {
+          return [props.notFoundI18nKey, "synced"];
+        } else {
+          return [undefined, "syncing"];
+        }
+      } else {
+        if (postListState != null && postListState.type === "notexist") {
+          return [props.notFoundI18nKey, "synced"];
+        }
+        if (postListState != null && postListState.type === "forbid") {
+          return ["timeline.messageCantSee", "synced"];
+        }
+
+        const posts:
+          | TimelinePostInfoEx[]
+          | undefined = postListState?.posts?.map((post) => ({
+          ...post,
+          onDelete: service.hasModifyPostPermission(user, timeline, post)
+            ? () => {
+                service.deletePost(name, post.id).subscribe({
+                  error: () => {
+                    pushAlert({
+                      type: "danger",
+                      message: t("timeline.deletePostFailed"),
+                    });
+                  },
+                });
+              }
+            : undefined,
+        }));
+
+        const others = {
+          onPost: service.hasPostPermission(user, timeline)
+            ? onPost
+            : undefined,
+          onManage: service.hasManagePermission(user, timeline)
+            ? onManage
+            : undefined,
+          onMember: () => setDialog("member"),
+        };
+
+        if (type === "cache") {
+          return [{ timeline, posts, ...others }, "syncing"];
+        } else if (type === "offline") {
+          return [{ timeline, posts, ...others }, "offline"];
+        } else {
+          if (postListState == null) {
+            return [{ timeline, posts, ...others }, "syncing"];
+          } else {
+            const { type: postListType } = postListState;
+            if (postListType === "synced") {
+              return [{ timeline, posts, ...others }, "synced"];
+            } else if (postListType === "cache") {
+              return [{ timeline, posts, ...others }, "syncing"];
+            } else if (postListType === "offline") {
+              return [{ timeline, posts, ...others }, "offline"];
+            }
+          }
+        }
+      }
     }
-    return undefined;
+    throw new UiLogicError("Failed to calculate TimelinePageUITemplate props.");
   })();
 
   const closeDialog = React.useCallback((): void => {
@@ -63,6 +146,8 @@ export default function TimelinePageTemplate<TManageItem>(
   }, []);
 
   let dialogElement: React.ReactElement | undefined;
+
+  const timeline = timelineState?.timeline;
 
   if (dialog === "property") {
     if (timeline == null) {
@@ -129,57 +214,9 @@ export default function TimelinePageTemplate<TManageItem>(
 
   const { UiComponent } = props;
 
-  const onDelete: TimelineDeleteCallback = React.useCallback(
-    (index, id) => {
-      service.deletePost(name, id).subscribe(null, () => {
-        pushAlert({
-          type: "danger",
-          message: t("timeline.deletePostFailed"),
-        });
-      });
-    },
-    [service, name, t]
-  );
-
-  const onPost: TimelinePostSendCallback = React.useCallback(
-    (req) => {
-      return service.createPost(name, req).toPromise().then();
-    },
-    [service, name]
-  );
-
-  const onManageProp = props.onManage;
-
-  const onManage = React.useCallback(
-    (item: "property" | TManageItem) => {
-      if (item === "property") {
-        setDialog(item);
-      } else {
-        onManageProp(item);
-      }
-    },
-    [onManageProp]
-  );
-
   return (
     <>
-      <UiComponent
-        error={error}
-        timeline={timeline ?? undefined}
-        postListState={postListState}
-        onDelete={onDelete}
-        onPost={
-          timeline != null && service.hasPostPermission(user, timeline)
-            ? onPost
-            : undefined
-        }
-        onManage={
-          timeline != null && service.hasManagePermission(user, timeline)
-            ? onManage
-            : undefined
-        }
-        onMember={() => setDialog("member")}
-      />
+      <UiComponent data={childProps[0]} syncStatus={childProps[1]} />
       {dialogElement}
     </>
   );

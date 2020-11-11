@@ -7,7 +7,7 @@ import TimelineItem from "./TimelineItem";
 import TimelineTop from "./TimelineTop";
 
 export interface TimelinePostInfoEx extends TimelinePostInfo {
-  deletable: boolean;
+  onDelete?: () => void;
 }
 
 export type TimelineDeleteCallback = (index: number, id: number) => void;
@@ -16,13 +16,12 @@ export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
   posts: TimelinePostInfoEx[];
-  onDelete: TimelineDeleteCallback;
   onResize?: () => void;
   containerRef?: React.Ref<HTMLDivElement>;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { posts, onDelete, onResize } = props;
+  const { posts, onResize } = props;
 
   const [showMoreIndex, setShowMoreIndex] = React.useState<number>(-1);
 
@@ -42,12 +41,12 @@ const Timeline: React.FC<TimelineProps> = (props) => {
               key={post.id}
               current={length - 1 === index}
               more={
-                post.deletable
+                post.onDelete != null
                   ? {
                       isOpen: showMoreIndex === index,
                       toggle: () =>
                         setShowMoreIndex((old) => (old === index ? -1 : index)),
-                      onDelete: () => onDelete(index, post.id),
+                      onDelete: post.onDelete,
                     }
                   : undefined
               }

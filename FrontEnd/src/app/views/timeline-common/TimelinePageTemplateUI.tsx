@@ -4,18 +4,10 @@ import { fromEvent } from "rxjs";
 import { Spinner } from "react-bootstrap";
 
 import { getAlertHost } from "@/services/alert";
-import { useEventEmiiter, UiLogicError } from "@/common";
-import {
-  TimelineInfo,
-  TimelinePostsWithSyncState,
-  timelineService,
-} from "@/services/timeline";
-import { userService } from "@/services/user";
+import { useEventEmiiter, I18nText, convertI18nText } from "@/common";
+import { TimelineInfo } from "@/services/timeline";
 
-import Timeline, {
-  TimelinePostInfoEx,
-  TimelineDeleteCallback,
-} from "./Timeline";
+import Timeline, { TimelinePostInfoEx } from "./Timeline";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 import { TimelineSyncStatus } from "./SyncStatusBadge";
 
@@ -30,20 +22,23 @@ export interface TimelineCardComponentProps<TManageItems> {
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
-  timeline?: TimelineInfo;
-  postListState?: TimelinePostsWithSyncState;
+  data?:
+    | {
+        timeline: TimelineInfo;
+        posts?: TimelinePostInfoEx[];
+        onManage?: (item: TManageItems | "property") => void;
+        onMember: () => void;
+        onPost?: TimelinePostSendCallback;
+      }
+    | I18nText;
+  syncStatus: TimelineSyncStatus;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
-  onMember: () => void;
-  onManage?: (item: TManageItems | "property") => void;
-  onPost?: TimelinePostSendCallback;
-  onDelete: TimelineDeleteCallback;
-  error?: string;
 }
 
 export default function TimelinePageTemplateUI<TManageItems>(
   props: TimelinePageTemplateUIProps<TManageItems>
 ): React.ReactElement | null {
-  const { timeline, postListState } = props;
+  const { data, syncStatus, CardComponent } = props;
 
   const { t } = useTranslation();
 
@@ -67,6 +62,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
   const timelineRef = React.useRef<HTMLDivElement | null>(null);
 
   const [getResizeEvent, triggerResizeEvent] = useEventEmiiter();
+
+  const timelineName: string | null =
+    typeof data === "object" && "timeline" in data ? data.timeline.name : null;
 
   React.useEffect(() => {
     const { current: timelineElement } = timelineRef;
@@ -115,13 +113,10 @@ export default function TimelinePageTemplateUI<TManageItems>(
         subscriptions.forEach((s) => s.unsubscribe());
       };
     }
-  }, [getResizeEvent, triggerResizeEvent, timeline, postListState]);
-
-  const genCardCollapseLocalStorageKey = (uniqueId: string): string =>
-    `timeline.${uniqueId}.cardCollapse`;
+  }, [getResizeEvent, triggerResizeEvent, timelineName]);
 
   const cardCollapseLocalStorageKey =
-    timeline != null ? genCardCollapseLocalStorageKey(timeline.uniqueId) : null;
+    timelineName != null ? `timeline.${timelineName}.cardCollapse` : null;
 
   const [cardCollapse, setCardCollapse] = React.useState<boolean>(true);
   React.useEffect(() => {
@@ -135,9 +130,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
   const toggleCardCollapse = (): void => {
     const newState = !cardCollapse;
     setCardCollapse(newState);
-    if (timeline != null) {
+    if (cardCollapseLocalStorageKey != null) {
       window.localStorage.setItem(
-        genCardCollapseLocalStorageKey(timeline.uniqueId),
+        cardCollapseLocalStorageKey,
         newState.toString()
       );
     }
@@ -145,98 +140,51 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
   let body: React.ReactElement;
 
-  if (props.error != null) {
-    body = <p className="text-danger">{t(props.error)}</p>;
+  if (data != null && (typeof data === "string" || "type" in data)) {
+    body = <p className="text-danger">{convertI18nText(data, t)}</p>;
   } else {
-    if (timeline != null) {
-      let timelineBody: React.ReactElement;
-      if (postListState != null) {
-        if (postListState.type === "notexist") {
-          throw new UiLogicError(
-            "Timeline is not null but post list state is notexist."
-          );
-        }
-        if (postListState.type === "forbid") {
-          timelineBody = (
-            <p className="text-danger">{t("timeline.messageCantSee")}</p>
-          );
-        } else {
-          const posts: TimelinePostInfoEx[] = postListState.posts.map(
-            (post) => ({
-              ...post,
-              deletable: timelineService.hasModifyPostPermission(
-                userService.currentUser,
-                timeline,
-                post
-              ),
-            })
-          );
+    const posts = data?.posts;
 
-          timelineBody = (
-            <Timeline
-              containerRef={timelineRef}
-              posts={posts}
-              onDelete={props.onDelete}
-              onResize={triggerResizeEvent}
-            />
-          );
-          if (props.onPost != null) {
-            timelineBody = (
-              <>
-                {timelineBody}
-                <div
-                  style={{ height: bottomSpaceHeight }}
-                  className="flex-fix-length"
-                />
-                <TimelinePostEdit
-                  className="fixed-bottom"
-                  onPost={props.onPost}
-                  onHeightChange={onPostEditHeightChange}
-                  timelineUniqueId={timeline.uniqueId}
-                />
-              </>
-            );
-          }
-        }
-      } else {
-        timelineBody = (
-          <div className="full-viewport-center-child">
-            <Spinner variant="primary" animation="grow" />
-          </div>
-        );
-      }
-
-      const { CardComponent } = props;
-      const syncStatus: TimelineSyncStatus =
-        postListState == null || postListState.syncing
-          ? "syncing"
-          : postListState.type === "synced"
-          ? "synced"
-          : "offline";
-
-      body = (
-        <>
-          <div className="timeline-background" />
+    body = (
+      <div className="timeline-background">
+        {data != null ? (
           <CardComponent
             className="timeline-template-card"
-            timeline={timeline}
-            onManage={props.onManage}
-            onMember={props.onMember}
+            timeline={data.timeline}
+            onManage={data.onManage}
+            onMember={data.onMember}
             syncStatus={syncStatus}
             collapse={cardCollapse}
             toggleCollapse={toggleCardCollapse}
           />
-          {timelineBody}
-        </>
-      );
-    } else {
-      body = (
-        <div className="full-viewport-center-child">
-          <Spinner variant="primary" animation="grow" />
-        </div>
-      );
-    }
+        ) : null}
+        {posts != null ? (
+          <Timeline
+            containerRef={timelineRef}
+            posts={posts}
+            onResize={triggerResizeEvent}
+          />
+        ) : (
+          <div className="full-viewport-center-child">
+            <Spinner variant="primary" animation="grow" />
+          </div>
+        )}
+        {data != null && data.onPost != null ? (
+          <>
+            <div
+              style={{ height: bottomSpaceHeight }}
+              className="flex-fix-length"
+            />
+            <TimelinePostEdit
+              className="fixed-bottom"
+              onPost={data.onPost}
+              onHeightChange={onPostEditHeightChange}
+              timelineUniqueId={data.timeline.uniqueId}
+            />
+          </>
+        ) : null}
+      </div>
+    );
   }
-
   return body;
 }
