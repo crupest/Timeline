@@ -65,6 +65,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 {
                     using var content = new ByteArrayContent(new[] { (byte)0x00 });
+                    content.Headers.ContentLength = null;
                     content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
                     var res = await client.PutAsync("users/user1/avatar", content);
                     res.Should().BeInvalidModel();
