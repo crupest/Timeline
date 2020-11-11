@@ -146,10 +146,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
     const posts = data?.posts;
 
     body = (
-      <div
-        className="timeline-container"
-        style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
-      >
+      <>
         {data != null ? (
           <CardComponent
             className="timeline-template-card"
@@ -162,11 +159,16 @@ export default function TimelinePageTemplateUI<TManageItems>(
           />
         ) : null}
         {posts != null ? (
-          <Timeline
-            containerRef={timelineRef}
-            posts={posts}
-            onResize={triggerResizeEvent}
-          />
+          <div
+            className="timeline-container"
+            style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
+          >
+            <Timeline
+              containerRef={timelineRef}
+              posts={posts}
+              onResize={triggerResizeEvent}
+            />
+          </div>
         ) : (
           <div className="full-viewport-center-child">
             <Spinner variant="primary" animation="grow" />
@@ -186,7 +188,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             />
           </>
         ) : null}
-      </div>
+      </>
     );
   }
   return body;
