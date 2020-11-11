@@ -13,18 +13,30 @@ const backend: BackendModule = {
       callback(null, result);
     }
 
-    if (namespace !== "translation") {
-      error("Namespace must be 'translation'.");
-    }
+    const promise = (() => {
+      if (namespace === "translation") {
+        if (language === "en") {
+          return import("./locales/en/translation.json");
+        } else if (language === "zh") {
+          return import("./locales/zh/translation.json");
+        } else {
+          error(`Language ${language} is not supported.`);
+        }
+      } else if (namespace === "admin") {
+        if (language === "en") {
+          return import("./locales/en/admin.json");
+        } else if (language === "zh") {
+          return import("./locales/zh/admin.json");
+        } else {
+          error(`Language ${language} is not supported.`);
+        }
+      } else {
+        error(`Namespace ${namespace} is not supported.`);
+      }
+    })();
 
-    if (language === "en") {
-      const res = (await import("./locales/en/translation.json")).default;
-      success(res);
-    } else if (language === "zh") {
-      const res = (await import("./locales/zh/translation.json")).default;
-      success(res);
-    } else {
-      error(`Language ${language} is not supported.`);
+    if (promise) {
+      success((await promise).default);
     }
   },
   init() {}, // eslint-disable-line @typescript-eslint/no-empty-function
@@ -61,7 +73,12 @@ export const i18nPromise = i18n
 
 if (module.hot) {
   module.hot.accept(
-    ["./locales/en/translation.json", "./locales/zh/translation.json"],
+    [
+      "./locales/en/translation.json",
+      "./locales/zh/translation.json",
+      "./locales/en/admin.json",
+      "./locales/zh/admin.json",
+    ],
     () => {
       void i18n.reloadResources();
     }
