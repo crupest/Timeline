@@ -18,10 +18,10 @@ const backend: BackendModule = {
     }
 
     if (language === "en") {
-      const res = (await import("./locales/en/translation")).default;
+      const res = (await import("./locales/en/translation.json")).default;
       success(res);
-    } else if (language === "zh-cn" || language === "zh") {
-      const res = (await import("./locales/zh/translation")).default;
+    } else if (language === "zh") {
+      const res = (await import("./locales/zh/translation.json")).default;
       success(res);
     } else {
       error(`Language ${language} is not supported.`);
@@ -61,7 +61,7 @@ export const i18nPromise = i18n
 
 if (module.hot) {
   module.hot.accept(
-    ["./locales/en/translation", "./locales/zh/translation"],
+    ["./locales/en/translation.json", "./locales/zh/translation.json"],
     () => {
       void i18n.reloadResources();
     }
