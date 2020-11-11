@@ -33,10 +33,10 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      - name: Use .Net Core 3.1.x
+      - name: Use .Net Core 5.0.x
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "3.1.x"
+          dotnet-version: "5.0.x"
 
       - name: Build And Test
         run: dotnet test --logger html --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
