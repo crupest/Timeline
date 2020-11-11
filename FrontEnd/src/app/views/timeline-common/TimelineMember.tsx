@@ -84,8 +84,8 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
   const members = props.members;
 
   return (
-    <Container className="px-4">
-      <ListGroup className="my-3">
+    <Container className="px-4 py-3">
+      <ListGroup>
         {members.map((member, index) => (
           <TimelineMemberItem
             key={member.username}
@@ -101,6 +101,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
           return (
             <>
               <SearchInput
+                className="mt-3"
                 value={userSearchText}
                 onChange={(v) => {
                   setUserSearchText(v);

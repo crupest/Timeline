@@ -30,6 +30,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
     (event: React.KeyboardEvent<HTMLInputElement>): void => {
       if (event.key === "Enter") {
         onButtonClick();
+        event.preventDefault();
       }
     },
     [onButtonClick]
