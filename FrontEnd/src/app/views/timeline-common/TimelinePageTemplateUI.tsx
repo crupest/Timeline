@@ -146,7 +146,10 @@ export default function TimelinePageTemplateUI<TManageItems>(
     const posts = data?.posts;
 
     body = (
-      <div className="timeline-background">
+      <div
+        className="timeline-container"
+        style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
+      >
         {data != null ? (
           <CardComponent
             className="timeline-template-card"

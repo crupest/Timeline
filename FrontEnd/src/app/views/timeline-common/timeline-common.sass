@@ -163,12 +163,11 @@ $timeline-line-color-current: #36c2e6
   right: 0
   margin: 0.5em
 
-.timeline-background
-  position: fixed
-  z-index: -1
+.timeline-container
+  background: #fff9e9
+  display: flex
+  justify-content: center
 
-  left: 0
-  right: 0
-  top: 0
-  bottom: 0
-  background: #fff1cc
+  .timeline
+    max-width: 100em
+    flex-grow: 1
