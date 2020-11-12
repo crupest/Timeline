@@ -26,19 +26,23 @@ namespace Timeline.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IUserPermissionService _userPermissionService;
         private readonly IUserDeleteService _userDeleteService;
         private readonly IMapper _mapper;
 
         /// <summary></summary>
-        public UserController(ILogger<UserController> logger, IUserService userService, IUserDeleteService userDeleteService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _userPermissionService = userPermissionService;
             _userDeleteService = userDeleteService;
             _mapper = mapper;
         }
 
         private UserInfo ConvertToUserInfo(User user) => _mapper.Map<UserInfo>(user);
+
+        private bool UserHasUserManagementPermission => this.UserHasPermission(UserPermission.UserManagement);
 
         /// <summary>
         /// Get all users.
@@ -90,7 +94,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserInfo>> Patch([FromBody] UserPatchRequest body, [FromRoute][Username] string username)
         {
-            if (this.UserHasPermission(UserPermission.UserManagement))
+            if (UserHasUserManagementPermission)
             {
                 try
                 {
@@ -188,6 +192,46 @@ namespace Timeline.Controllers
                 return BadRequest(ErrorResponse.UserController.ChangePassword_BadOldPassword());
             }
             // User can't be non-existent or the token is bad.
+        }
+
+        [HttpPut("users/{username}/permissions/{permission}"), PermissionAuthorize(UserPermission.UserManagement)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> PutUserPermission([FromRoute] string username, [FromRoute] UserPermission permission)
+        {
+            try
+            {
+                var id = await _userService.GetUserIdByUsername(username);
+                await _userPermissionService.AddPermissionToUserAsync(id, permission);
+                return Ok();
+            }
+            catch (UserNotExistException)
+            {
+                return NotFound(ErrorResponse.UserCommon.NotExist());
+            }
+        }
+
+        [HttpDelete("users/{username}/permissions/{permission}"), PermissionAuthorize(UserPermission.UserManagement)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteUserPermission([FromRoute] string username, [FromRoute] UserPermission permission)
+        {
+            try
+            {
+                var id = await _userService.GetUserIdByUsername(username);
+                await _userPermissionService.RemovePermissionFromUserAsync(id, permission);
+                return Ok();
+            }
+            catch (UserNotExistException)
+            {
+                return NotFound(ErrorResponse.UserCommon.NotExist());
+            }
         }
     }
 }
