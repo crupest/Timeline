@@ -17,7 +17,12 @@ namespace Timeline.Services
     /// <summary>
     /// Null means not change.
     /// </summary>
-    public record ModifyUserParams(string? Username = null, string? Password = null, string? Nickname = null);
+    public record ModifyUserParams
+    {
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public string? Nickname { get; set; }
+    }
 
     public interface IUserService
     {
