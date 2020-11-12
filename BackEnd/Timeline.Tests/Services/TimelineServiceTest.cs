@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Services;
 using Timeline.Services.Exceptions;
@@ -13,12 +12,8 @@ using Xunit;
 
 namespace Timeline.Tests.Services
 {
-    public class TimelineServiceTest : IAsyncLifetime, IDisposable
+    public class TimelineServiceTest : DatabaseBasedTest, IDisposable
     {
-        private readonly TestDatabase _testDatabase = new TestDatabase();
-
-        private DatabaseContext _databaseContext;
-
         private readonly PasswordService _passwordService = new PasswordService();
 
         private readonly ETagGenerator _eTagGenerator = new ETagGenerator();
@@ -39,20 +34,12 @@ namespace Timeline.Tests.Services
         {
         }
 
-        public async Task InitializeAsync()
+        protected override void OnDatabaseCreated()
         {
-            await _testDatabase.InitializeAsync();
-            _databaseContext = _testDatabase.CreateContext();
-            _dataManager = new DataManager(_databaseContext, _eTagGenerator);
-            _userService = new UserService(NullLogger<UserService>.Instance, _databaseContext, _passwordService, _clock);
-            _timelineService = new TimelineService(NullLogger<TimelineService>.Instance, _databaseContext, _dataManager, _userService, _imageValidator, _clock);
-            _userDeleteService = new UserDeleteService(NullLogger<UserDeleteService>.Instance, _databaseContext, _timelineService);
-        }
-
-        public async Task DisposeAsync()
-        {
-            await _testDatabase.DisposeAsync();
-            await _databaseContext.DisposeAsync();
+            _dataManager = new DataManager(Database, _eTagGenerator);
+            _userService = new UserService(NullLogger<UserService>.Instance, Database, _passwordService, _clock);
+            _timelineService = new TimelineService(NullLogger<TimelineService>.Instance, Database, _dataManager, _userService, _imageValidator, _clock);
+            _userDeleteService = new UserDeleteService(NullLogger<UserDeleteService>.Instance, Database, _timelineService);
         }
 
         public void Dispose()
