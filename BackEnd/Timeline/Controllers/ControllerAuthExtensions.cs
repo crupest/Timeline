@@ -2,15 +2,16 @@
 using System;
 using System.Security.Claims;
 using Timeline.Auth;
+using Timeline.Services;
 using static Timeline.Resources.Controllers.ControllerAuthExtensions;
 
 namespace Timeline.Controllers
 {
     public static class ControllerAuthExtensions
     {
-        public static bool IsAdministrator(this ControllerBase controller)
+        public static bool UserHasPermission(this ControllerBase controller, UserPermission permission)
         {
-            return controller.User != null && controller.User.IsAdministrator();
+            return controller.User != null && controller.User.HasPermission(permission);
         }
 
         public static long GetUserId(this ControllerBase controller)

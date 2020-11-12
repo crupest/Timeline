@@ -2,6 +2,7 @@ using AutoMapper;
 using System.ComponentModel.DataAnnotations;
 using Timeline.Controllers;
 using Timeline.Models.Validation;
+using Timeline.Services;
 
 namespace Timeline.Models.Http
 {
@@ -27,11 +28,6 @@ namespace Timeline.Models.Http
         /// </summary>
         [Nickname]
         public string? Nickname { get; set; }
-
-        /// <summary>
-        /// Whether to be administrator. Null if not change. Need to be administrator.
-        /// </summary>
-        public bool? Administrator { get; set; }
     }
 
     /// <summary>
@@ -50,18 +46,6 @@ namespace Timeline.Models.Http
         /// </summary>
         [Required, MinLength(1)]
         public string Password { get; set; } = default!;
-
-        /// <summary>
-        /// Whether the new user is administrator.
-        /// </summary>
-        [Required]
-        public bool? Administrator { get; set; }
-
-        /// <summary>
-        /// Nickname of the new user.
-        /// </summary>
-        [Nickname]
-        public string? Nickname { get; set; }
     }
 
     /// <summary>
@@ -86,8 +70,7 @@ namespace Timeline.Models.Http
     {
         public UserControllerAutoMapperProfile()
         {
-            CreateMap<UserPatchRequest, User>(MemberList.Source);
-            CreateMap<CreateUserRequest, User>(MemberList.Source);
+            CreateMap<UserPatchRequest, ModifyUserParams>();
         }
     }
 }
