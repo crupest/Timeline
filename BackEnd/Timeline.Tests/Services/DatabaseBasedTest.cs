@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Tests.Helpers;
 using Xunit;
@@ -10,8 +7,13 @@ namespace Timeline.Tests.Services
 {
     public abstract class DatabaseBasedTest : IAsyncLifetime
     {
-        protected TestDatabase TestDatabase { get; } = new TestDatabase();
+        protected TestDatabase TestDatabase { get; }
         protected DatabaseContext Database { get; private set; }
+
+        protected DatabaseBasedTest(bool databaseCreateUsers = true)
+        {
+            TestDatabase = new TestDatabase(databaseCreateUsers);
+        }
 
         public async Task InitializeAsync()
         {

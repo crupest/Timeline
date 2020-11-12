@@ -126,9 +126,8 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="userId">The id of the user.</param>
         /// <param name="permission">The new permission.</param>
-        /// <param name="checkUserExistence">Whether check the user's existence.</param>
-        /// <exception cref="UserNotExistException">Thrown when <paramref name="checkUserExistence"/> is true and user does not exist.</exception>
-        Task AddPermissionToUserAsync(long userId, UserPermission permission, bool checkUserExistence = true);
+        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        Task AddPermissionToUserAsync(long userId, UserPermission permission);
 
         /// <summary>
         /// Remove a permission from user.
@@ -175,15 +174,15 @@ namespace Timeline.Services
             return UserPermissions.FromStringList(permissionNameList);
         }
 
-        public async Task AddPermissionToUserAsync(long userId, UserPermission permission, bool checkUserExistence)
+        public async Task AddPermissionToUserAsync(long userId, UserPermission permission)
         {
             if (userId == 1) // The init administrator account.
                 return;
 
-            await CheckUserExistence(userId, checkUserExistence);
+            await CheckUserExistence(userId, true);
 
             var alreadyHas = await _database.UserPermission
-                .AnyAsync(e => e.UserId == userId && e.Permission.Equals(permission.ToString(), StringComparison.InvariantCultureIgnoreCase));
+                .AnyAsync(e => e.UserId == userId && e.Permission == permission.ToString());
 
             if (alreadyHas) return;
 
@@ -192,7 +191,7 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
         }
 
-        public async Task RemovePermissionFromUserAsync(long userId, UserPermission permission, bool checkUserExistence)
+        public async Task RemovePermissionFromUserAsync(long userId, UserPermission permission, bool checkUserExistence = true)
         {
             if (userId == 1) // The init administrator account.
                 return;
@@ -200,7 +199,7 @@ namespace Timeline.Services
             await CheckUserExistence(userId, checkUserExistence);
 
             var entity = await _database.UserPermission
-                .Where(e => e.UserId == userId && e.Permission.Equals(permission.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                .Where(e => e.UserId == userId && e.Permission == permission.ToString())
                 .SingleOrDefaultAsync();
 
             if (entity == null) return;
