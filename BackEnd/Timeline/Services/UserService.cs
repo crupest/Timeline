@@ -17,7 +17,7 @@ namespace Timeline.Services
     /// <summary>
     /// Null means not change.
     /// </summary>
-    public record ModifyUserParams(string? Username, string? Password, string? Nickname);
+    public record ModifyUserParams(string? Username = null, string? Password = null, string? Nickname = null);
 
     public interface IUserService
     {
@@ -74,7 +74,7 @@ namespace Timeline.Services
         /// <param name="id">The id of the user.</param>
         /// <param name="param">The new information.</param>
         /// <returns>The new user info.</returns>
-        /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="info"/> is bad.</exception>
+        /// <exception cref="ArgumentException">Thrown when some fields in <paramref name="param"/> is bad.</exception>
         /// <exception cref="UserNotExistException">Thrown when user with given id does not exist.</exception>
         /// <remarks>
         /// Version will increase if password is changed.

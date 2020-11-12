@@ -24,6 +24,8 @@ namespace Timeline.Tests.Services
 
         private DataManager _dataManager;
 
+        private UserPermissionService _userPermissionService;
+
         private UserService _userService;
 
         private TimelineService _timelineService;
@@ -37,7 +39,8 @@ namespace Timeline.Tests.Services
         protected override void OnDatabaseCreated()
         {
             _dataManager = new DataManager(Database, _eTagGenerator);
-            _userService = new UserService(NullLogger<UserService>.Instance, Database, _passwordService, _clock);
+            _userPermissionService = new UserPermissionService(Database);
+            _userService = new UserService(NullLogger<UserService>.Instance, Database, _passwordService, _clock, _userPermissionService);
             _timelineService = new TimelineService(NullLogger<TimelineService>.Instance, Database, _dataManager, _userService, _imageValidator, _clock);
             _userDeleteService = new UserDeleteService(NullLogger<UserDeleteService>.Instance, Database, _timelineService);
         }
@@ -207,13 +210,13 @@ namespace Timeline.Tests.Services
             }
 
             {
-                await _userService.ModifyUser(userId, new User { Nickname = "haha" });
+                await _userService.ModifyUser(userId, new ModifyUserParams { Nickname = "haha" });
                 var posts = await _timelineService.GetPosts(timelineName, time2);
                 posts.Should().HaveCount(0);
             }
 
             {
-                await _userService.ModifyUser(userId, new User { Username = "haha" });
+                await _userService.ModifyUser(userId, new ModifyUserParams { Username = "haha" });
                 var posts = await _timelineService.GetPosts(timelineName, time2);
                 posts.Should().HaveCount(4);
             }

@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Timeline.Models;
 using Timeline.Models.Converters;
 using Timeline.Models.Http;
 using Timeline.Services;
@@ -60,26 +59,14 @@ namespace Timeline.Tests.IntegratedTests
 
             using (var scope = TestApp.Host.Services.CreateScope())
             {
-                var users = new List<User>()
+                var users = new List<(string username, string password, string nickname)>()
                 {
-                    new User
-                    {
-                        Username = "admin",
-                        Password = "adminpw",
-                        Administrator = true,
-                        Nickname = "administrator"
-                    }
+                    ("admin", "adminpw", "administrator")
                 };
 
                 for (int i = 1; i <= _userCount; i++)
                 {
-                    users.Add(new User
-                    {
-                        Username = $"user{i}",
-                        Password = $"user{i}pw",
-                        Administrator = false,
-                        Nickname = $"imuser{i}"
-                    });
+                    users.Add(($"user{i}", $"user{i}pw", $"imuser{i}"));
                 }
 
                 var userInfoList = new List<UserInfo>();
@@ -87,7 +74,9 @@ namespace Timeline.Tests.IntegratedTests
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                 foreach (var user in users)
                 {
-                    await userService.CreateUser(user);
+                    var (username, password, nickname) = user;
+                    var u = await userService.CreateUser(username, password);
+                    await userService.ModifyUser(u.Id, new ModifyUserParams() { Nickname = nickname });
                 }
 
                 using var client = await CreateDefaultClient();
@@ -99,7 +88,7 @@ namespace Timeline.Tests.IntegratedTests
                 options.Converters.Add(new JsonDateTimeConverter());
                 foreach (var user in users)
                 {
-                    var s = await client.GetStringAsync($"users/{user.Username}");
+                    var s = await client.GetStringAsync($"users/{user.username}");
                     userInfoList.Add(JsonSerializer.Deserialize<UserInfo>(s, options));
                 }
 
