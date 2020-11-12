@@ -66,7 +66,7 @@ namespace Timeline.Services
                 throw new ArgumentNullException(nameof(password));
 
             var user = await _userService.VerifyCredential(username, password);
-            var token = _userTokenService.GenerateToken(new UserTokenInfo { Id = user.Id!.Value, Version = user.Version!.Value, ExpireAt = expireAt });
+            var token = _userTokenService.GenerateToken(new UserTokenInfo { Id = user.Id, Version = user.Version, ExpireAt = expireAt });
 
             return new UserTokenCreateResult { Token = token, User = user };
         }
@@ -86,10 +86,10 @@ namespace Timeline.Services
                     throw new UserTokenTimeExpireException(token, tokenInfo.ExpireAt.Value, currentTime);
             }
 
-            var user = await _userService.GetUserById(tokenInfo.Id);
+            var user = await _userService.GetUser(tokenInfo.Id);
 
             if (tokenInfo.Version < user.Version)
-                throw new UserTokenBadVersionException(token, tokenInfo.Version, user.Version.Value);
+                throw new UserTokenBadVersionException(token, tokenInfo.Version, user.Version);
 
             return user;
         }
