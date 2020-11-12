@@ -1,13 +1,15 @@
-﻿using System.Security.Principal;
-using Timeline.Entities;
+﻿using System;
+using System.Security.Claims;
+using Timeline.Services;
 
 namespace Timeline.Auth
 {
     internal static class PrincipalExtensions
     {
-        internal static bool IsAdministrator(this IPrincipal principal)
+        internal static bool HasPermission(this ClaimsPrincipal principal, UserPermission permission)
         {
-            return principal.IsInRole(UserRoles.Admin);
+            return principal.HasClaim(
+                claim => claim.Type == AuthenticationConstants.PermissionClaimName && string.Equals(claim.Value, permission.ToString(), StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

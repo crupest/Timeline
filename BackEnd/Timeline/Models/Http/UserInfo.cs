@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using System.Collections.Generic;
 using Timeline.Controllers;
+using Timeline.Services;
 
 namespace Timeline.Models.Http
 {
@@ -27,6 +29,12 @@ namespace Timeline.Models.Http
         /// True if the user is a administrator.
         /// </summary>
         public bool? Administrator { get; set; } = default!;
+#pragma warning disable CA2227 // Collection properties should be read only
+        /// <summary>
+        /// The permissions of the user.
+        /// </summary>
+        public List<string> Permissions { get; set; } = default!;
+#pragma warning restore CA2227 // Collection properties should be read only
 #pragma warning disable CA1707 // Identifiers should not contain underscores
         /// <summary>
         /// Related links.
@@ -52,6 +60,14 @@ namespace Timeline.Models.Http
         /// Personal timeline url.
         /// </summary>
         public string Timeline { get; set; } = default!;
+    }
+
+    public class UserPermissionsValueConverter : ITypeConverter<UserPermissions, List<string>>
+    {
+        public List<string> Convert(UserPermissions source, List<string> destination, ResolutionContext context)
+        {
+            return source.ToStringList();
+        }
     }
 
     public class UserInfoLinksValueResolver : IValueResolver<User, UserInfo, UserInfoLinks>
@@ -84,7 +100,10 @@ namespace Timeline.Models.Http
     {
         public UserInfoAutoMapperProfile()
         {
-            CreateMap<User, UserInfo>().ForMember(u => u._links, opt => opt.MapFrom<UserInfoLinksValueResolver>());
+            CreateMap<UserPermissions, List<string>>()
+                .ConvertUsing<UserPermissionsValueConverter>();
+            CreateMap<User, UserInfo>()
+                .ForMember(u => u._links, opt => opt.MapFrom<UserInfoLinksValueResolver>());
         }
     }
 }
