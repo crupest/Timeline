@@ -1,21 +1,23 @@
 ﻿using System;
+using Timeline.Services;
 
 namespace Timeline.Models
 {
-    public class User
+    public record User
     {
-        public string? UniqueId { get; set; }
-        public string? Username { get; set; }
-        public string? Nickname { get; set; }
-        public bool? Administrator { get; set; }
+        public long Id { get; set; }
+        public string UniqueId { get; set; } = default!;
 
-        #region secret
-        public long? Id { get; set; }
-        public string? Password { get; set; }
-        public long? Version { get; set; }
-        public DateTime? UsernameChangeTime { get; set; }
-        public DateTime? CreateTime { get; set; }
-        public DateTime? LastModified { get; set; }
-        #endregion secret
+        public string Username { get; set; } = default!;
+        public string Nickname { get; set; } = default!;
+
+        [Obsolete("Use permissions instead.")]
+        public bool Administrator { get; set; }
+        public UserPermissions Permissions { get; set; } = default!;
+
+        public DateTime UsernameChangeTime { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime LastModified { get; set; }
+        public long Version { get; set; }
     }
 }

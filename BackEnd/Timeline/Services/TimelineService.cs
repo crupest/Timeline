@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
@@ -414,12 +413,12 @@ namespace Timeline.Services
         /// Remember to include Members when query.
         private async Task<Models.Timeline> MapTimelineFromEntity(TimelineEntity entity)
         {
-            var owner = await _userService.GetUserById(entity.OwnerId);
+            var owner = await _userService.GetUser(entity.OwnerId);
 
             var members = new List<User>();
             foreach (var memberEntity in entity.Members)
             {
-                members.Add(await _userService.GetUserById(memberEntity.UserId));
+                members.Add(await _userService.GetUser(memberEntity.UserId));
             }
 
             var name = entity.Name ?? ("@" + owner.Username);
@@ -441,7 +440,7 @@ namespace Timeline.Services
 
         private async Task<TimelinePost> MapTimelinePostFromEntity(TimelinePostEntity entity, string timelineName)
         {
-            User? author = entity.AuthorId.HasValue ? await _userService.GetUserById(entity.AuthorId.Value) : null;
+            User? author = entity.AuthorId.HasValue ? await _userService.GetUser(entity.AuthorId.Value) : null;
 
             ITimelinePostContent? content = null;
 
@@ -699,7 +698,7 @@ namespace Timeline.Services
             var timelineId = await FindTimelineId(timelineName);
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
-            var author = await _userService.GetUserById(authorId);
+            var author = await _userService.GetUser(authorId);
 
             var currentTime = _clock.GetCurrentTime();
             var finalTime = time ?? currentTime;
@@ -742,7 +741,7 @@ namespace Timeline.Services
             var timelineId = await FindTimelineId(timelineName);
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
 
-            var author = await _userService.GetUserById(authorId);
+            var author = await _userService.GetUser(authorId);
 
             var imageFormat = await _imageValidator.Validate(data);
 
@@ -1098,14 +1097,14 @@ namespace Timeline.Services
 
             ValidateTimelineName(name, nameof(name));
 
-            var user = await _userService.GetUserById(owner);
+            var user = await _userService.GetUser(owner);
 
             var conflict = await _database.Timelines.AnyAsync(t => t.Name == name);
 
             if (conflict)
                 throw new EntityAlreadyExistException(EntityNames.Timeline, null, ExceptionTimelineNameConflict);
 
-            var newEntity = CreateNewTimelineEntity(name, user.Id!.Value);
+            var newEntity = CreateNewTimelineEntity(name, user.Id);
 
             _database.Timelines.Add(newEntity);
             await _database.SaveChangesAsync();

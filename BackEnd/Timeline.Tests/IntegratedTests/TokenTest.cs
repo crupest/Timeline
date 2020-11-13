@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
@@ -103,7 +102,8 @@ namespace Timeline.Tests.IntegratedTests
             {
                 // create a user for test
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                await userService.ModifyUser("user1", new User { Password = "user1pw" });
+                var id = await userService.GetUserIdByUsername("user1");
+                await userService.ModifyUser(id, new ModifyUserParams { Password = "user1pw" });
             }
 
             (await client.PostAsJsonAsync(VerifyTokenUrl,
