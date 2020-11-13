@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
-using Timeline.Auth;
 using Timeline.Filters;
 using Timeline.Helpers;
 using Timeline.Models;

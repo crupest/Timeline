@@ -1,12 +1,10 @@
 ﻿using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Timeline.Models.Http;
 
 namespace Timeline.Swagger
