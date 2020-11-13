@@ -6,9 +6,11 @@ using System;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Timeline.Models.Converters;
 using Timeline.Models.Http;
 
@@ -27,27 +29,7 @@ namespace Timeline.Tests.Helpers
             string padding = new string('\t', context.Depth);
 
             var res = (HttpResponseMessage)value;
-
-            var builder = new StringBuilder();
-            builder.Append($"{newline}{padding} Status Code: {res.StatusCode} ; Body: ");
-
-            try
-            {
-                var task = res.Content.ReadAsStringAsync();
-                task.Wait();
-                var body = task.Result;
-                if (body.Length > 40)
-                {
-                    body = body[0..40] + " ...";
-                }
-                builder.Append(body);
-            }
-            catch (AggregateException)
-            {
-                builder.Append("NOT A STRING.");
-            }
-
-            return builder.ToString();
+            return $"{newline}{padding} Status Code: {res.StatusCode}";
         }
     }
 
@@ -79,41 +61,17 @@ namespace Timeline.Tests.Helpers
             return new AndConstraint<HttpResponseMessageAssertions>(this);
         }
 
-        public AndWhichConstraint<HttpResponseMessageAssertions, T> HaveJsonBody<T>(string because = "", params object[] becauseArgs)
+        public async Task<T> HaveAndGetJsonBodyAsync<T>(string because = "", params object[] becauseArgs)
         {
             var a = Execute.Assertion.BecauseOf(because, becauseArgs);
-            string body;
-            try
-            {
-                var task = Subject.Content.ReadAsStringAsync();
-                task.Wait();
-                body = task.Result;
-            }
-            catch (AggregateException e)
-            {
-                a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string{reason}, but failed to read it or it was not a string. Exception is {0}.", e.InnerExceptions);
-                return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, null);
-            }
 
-
-            try
+            var body = await Subject.ReadBodyAsJsonAsync<T>();
+            if (body == null)
             {
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-                options.Converters.Add(new JsonStringEnumConverter());
-                options.Converters.Add(new JsonDateTimeConverter());
-
-                var result = JsonSerializer.Deserialize<T>(body, options);
-
-                return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, result);
+                a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string of type {0}{reason}, but failed to read it or it was not a valid json string.", typeof(T).FullName);
+                return default!;
             }
-            catch (JsonException e)
-            {
-                a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string{reason}, but failed to deserialize it. Exception is {0}.", e);
-                return new AndWhichConstraint<HttpResponseMessageAssertions, T>(this, null);
-            }
+            return body;
         }
     }
 
@@ -124,47 +82,45 @@ namespace Timeline.Tests.Helpers
             return new HttpResponseMessageAssertions(instance);
         }
 
-        public static AndWhichConstraint<HttpResponseMessageAssertions, CommonResponse> HaveCommonBody(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static Task<CommonResponse> HaveAndGetCommonBodyAsync(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
-            return assertions.HaveJsonBody<CommonResponse>(because, becauseArgs);
+            return assertions.HaveAndGetJsonBodyAsync<CommonResponse>(because, becauseArgs);
         }
 
-        public static void HaveCommonBody(this HttpResponseMessageAssertions assertions, int code, string message = null, params object[] messageArgs)
+        public static async Task HaveCommonBodyWithCodeAsync(this HttpResponseMessageAssertions assertions, int code, string? message = null, params object[] messageArgs)
         {
             message = string.IsNullOrEmpty(message) ? "" : ", " + string.Format(CultureInfo.CurrentCulture, message, messageArgs);
-            var body = assertions.HaveCommonBody("Response body should be CommonResponse{0}", message).Which;
+            var body = await assertions.HaveAndGetCommonBodyAsync("Response body should be CommonResponse{0}", message);
             body.Code.Should().Be(code, "Response body code is not the specified one{0}", message);
         }
 
-        public static AndWhichConstraint<HttpResponseMessageAssertions, CommonDataResponse<TData>> HaveCommonDataBody<TData>(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
+        public static Task<CommonDataResponse<TData>> HaveAndGetCommonDataBodyAsync<TData>(this HttpResponseMessageAssertions assertions, string because = "", params object[] becauseArgs)
         {
-            return assertions.HaveJsonBody<CommonDataResponse<TData>>(because, becauseArgs);
+            return assertions.HaveAndGetJsonBodyAsync<CommonDataResponse<TData>>(because, becauseArgs);
         }
 
-        public static void BePut(this HttpResponseMessageAssertions assertions, bool create, string because = "", params object[] becauseArgs)
+        public static async Task BePutAsync(this HttpResponseMessageAssertions assertions, bool create, string because = "", params object[] becauseArgs)
         {
-            var body = assertions.HaveStatusCode(create ? 201 : 200, because, becauseArgs)
-                .And.HaveJsonBody<CommonPutResponse>(because, becauseArgs)
-                .Which;
+            var body = await assertions.HaveStatusCode(create ? 201 : 200, because, becauseArgs)
+                .And.HaveAndGetJsonBodyAsync<CommonPutResponse>(because, becauseArgs);
             body.Code.Should().Be(0);
             body.Data.Create.Should().Be(create);
         }
 
-        public static void BeDelete(this HttpResponseMessageAssertions assertions, bool delete, string because = "", params object[] becauseArgs)
+        public static async Task BeDeleteAsync(this HttpResponseMessageAssertions assertions, bool delete, string because = "", params object[] becauseArgs)
         {
-            var body = assertions.HaveStatusCode(200, because, becauseArgs)
-                .And.HaveJsonBody<CommonDeleteResponse>(because, becauseArgs)
-                .Which;
+            var body = await assertions.HaveStatusCode(200, because, becauseArgs)
+                .And.HaveAndGetJsonBodyAsync<CommonDeleteResponse>(because, becauseArgs);
             body.Code.Should().Be(0);
             body.Data.Delete.Should().Be(delete);
         }
 
-        public static void BeInvalidModel(this HttpResponseMessageAssertions assertions, string message = null)
+        public static async Task BeInvalidModelAsync(this HttpResponseMessageAssertions assertions, string message = null)
         {
             message = string.IsNullOrEmpty(message) ? "" : ", " + message;
-            assertions.HaveStatusCode(400, "Invalid Model Error must have 400 status code{0}", message)
-                .And.HaveCommonBody("Invalid Model Error must have CommonResponse body{0}", message)
-                .Which.Code.Should().Be(ErrorCodes.Common.InvalidModel,
+            var body = await assertions.HaveStatusCode(400, "Invalid Model Error must have 400 status code{0}", message)
+                .And.HaveAndGetCommonBodyAsync("Invalid Model Error must have CommonResponse body{0}", message);
+            body.Code.Should().Be(ErrorCodes.Common.InvalidModel,
                 "Invalid Model Error must have code {0} in body{1}",
                 ErrorCodes.Common.InvalidModel, message);
         }

@@ -55,22 +55,17 @@ namespace Timeline.Tests.IntegratedTests
             await CreateTestTimelines();
         }
 
-        private List<TimelineInfo> _testTimelines;
-
         private async Task CreateTestTimelines()
         {
-            _testTimelines = new List<TimelineInfo>();
             for (int i = 0; i <= 3; i++)
             {
                 var client = await CreateClientAs(i);
                 var res = await client.PostAsJsonAsync("timelines", new TimelineCreateRequest { Name = $"t{i}" });
-                var timelineInfo = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>().Which;
-                _testTimelines.Add(timelineInfo);
+                res.Should().HaveStatusCode(200);
             }
         }
 
-        private static string CalculateUrlTail(string subpath, ICollection<KeyValuePair<string, string>> query)
+        private static string CalculateUrlTail(string? subpath, ICollection<KeyValuePair<string, string>>? query)
         {
             StringBuilder result = new StringBuilder();
             if (subpath != null)
@@ -96,12 +91,12 @@ namespace Timeline.Tests.IntegratedTests
             return result.ToString();
         }
 
-        private static string GeneratePersonalTimelineUrl(int id, string subpath = null, ICollection<KeyValuePair<string, string>> query = null)
+        private static string GeneratePersonalTimelineUrl(int id, string? subpath = null, ICollection<KeyValuePair<string, string>>? query = null)
         {
             return $"timelines/@{(id == 0 ? "admin" : ("user" + id))}{CalculateUrlTail(subpath, query)}";
         }
 
-        private static string GenerateOrdinaryTimelineUrl(int id, string subpath = null, ICollection<KeyValuePair<string, string>> query = null)
+        private static string GenerateOrdinaryTimelineUrl(int id, string? subpath = null, ICollection<KeyValuePair<string, string>>? query = null)
         {
             return $"timelines/t{id}{CalculateUrlTail(subpath, query)}";
         }
@@ -114,12 +109,12 @@ namespace Timeline.Tests.IntegratedTests
             yield return new[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl) };
         }
 
-        private static string GeneratePersonalTimelineUrlByName(string name, string subpath = null)
+        private static string GeneratePersonalTimelineUrlByName(string name, string? subpath = null)
         {
             return $"timelines/@{name}{(subpath == null ? "" : "/" + subpath)}";
         }
 
-        private static string GenerateOrdinaryTimelineUrlByName(string name, string subpath = null)
+        private static string GenerateOrdinaryTimelineUrlByName(string name, string? subpath = null)
         {
             return $"timelines/{name}{(subpath == null ? "" : "/" + subpath)}";
         }
@@ -136,9 +131,9 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             {
                 var res = await client.GetAsync("timelines/@user1");
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>().Which;
-                body.Owner.Should().BeEquivalentTo(UserInfos[1]);
+                var body = await res.Should().HaveStatusCode(200)
+                    .And.HaveAndGetJsonBodyAsync<TimelineInfo>();
+                body.Owner.Should().;
                 body.Visibility.Should().Be(TimelineVisibility.Register);
                 body.Description.Should().Be("");
                 body.Members.Should().NotBeNull().And.BeEmpty();

@@ -29,7 +29,7 @@ namespace Timeline.Tests
                     .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(int)))
                 {
                     var name = type.FullName + "." + field.Name;
-                    var value = (int)field.GetRawConstantValue();
+                    var value = (int)field.GetRawConstantValue()!;
                     _output.WriteLine($"Find error code {name} , value is {value}.");
 
                     value.Should().BeInRange(1000_0000, 9999_9999, "Error code should have exactly 8 digits.");

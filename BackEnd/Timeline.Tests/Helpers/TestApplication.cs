@@ -17,9 +17,9 @@ namespace Timeline.Tests.Helpers
     {
         public TestDatabase Database { get; }
 
-        public IHost Host { get; private set; }
+        public IHost Host { get; private set; } = default!;
 
-        public string WorkDir { get; private set; }
+        public string WorkDir { get; private set; } = default!;
 
         public TestApplication()
         {
