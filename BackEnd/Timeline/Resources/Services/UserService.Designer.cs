@@ -70,7 +70,7 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nickname is of bad format, because {}..
+        ///   Looks up a localized string similar to Nickname is of bad format, because {0}..
         /// </summary>
         internal static string ExceptionNicknameBadFormat {
             get {
@@ -106,7 +106,7 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Username is of bad format, because {}..
+        ///   Looks up a localized string similar to Username is of bad format, because {0}..
         /// </summary>
         internal static string ExceptionUsernameBadFormat {
             get {
