@@ -23,9 +23,6 @@ namespace Timeline.Entities
         [Column("password"), Required]
         public string Password { get; set; } = default!;
 
-        [Column("roles"), Required]
-        public string Roles { get; set; } = default!;
-
         [Column("version"), Required]
         public long Version { get; set; }
 
