@@ -45,7 +45,7 @@ namespace Timeline.Auth
         {
             // check the authorization header
             string header = Request.Headers[HeaderNames.Authorization];
-            if (!string.IsNullOrEmpty(header) && header.StartsWith("Bearer ", StringComparison.InvariantCultureIgnoreCase))
+            if (!string.IsNullOrEmpty(header) && header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 var token = header.Substring("Bearer ".Length).Trim();
                 _logger.LogInformation(LogTokenFoundInHeader, token);
