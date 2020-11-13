@@ -17,6 +17,7 @@ namespace Timeline.Auth
     {
         public const string Scheme = "Bearer";
         public const string DisplayName = "My Jwt Auth Scheme";
+        public const string PermissionClaimName = "Permission";
     }
 
     public class MyAuthenticationOptions : AuthenticationSchemeOptions
@@ -78,12 +79,12 @@ namespace Timeline.Auth
 
             try
             {
-                var userInfo = await _userTokenManager.VerifyToken(token);
+                var user = await _userTokenManager.VerifyToken(token);
 
                 var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
-                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userInfo.Id!.Value.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
-                identity.AddClaim(new Claim(identity.NameClaimType, userInfo.Username, ClaimValueTypes.String));
-                identity.AddClaims(UserRoleConvert.ToArray(userInfo.Administrator!.Value).Select(role => new Claim(identity.RoleClaimType, role, ClaimValueTypes.String)));
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
+                identity.AddClaim(new Claim(identity.NameClaimType, user.Username, ClaimValueTypes.String));
+                identity.AddClaims(user.Permissions.Select(permission => new Claim(AuthenticationConstants.PermissionClaimName, permission.ToString(), ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
                 principal.AddIdentity(identity);

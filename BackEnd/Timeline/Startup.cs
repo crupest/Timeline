@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -72,6 +73,8 @@ namespace Timeline
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
 
+            services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+
             services.AddSingleton<IPathProvider, PathProvider>();
 
             services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
@@ -85,6 +88,7 @@ namespace Timeline
             services.AddScoped<IUserDeleteService, UserDeleteService>();
             services.AddScoped<IUserTokenService, JwtUserTokenService>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
+            services.AddScoped<IUserPermissionService, UserPermissionService>();
 
             services.AddScoped<IETagGenerator, ETagGenerator>();
             services.AddScoped<IDataManager, DataManager>();

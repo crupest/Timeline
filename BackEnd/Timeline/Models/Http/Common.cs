@@ -94,13 +94,13 @@ namespace Timeline.Models.Http
             public bool Delete { get; set; }
         }
 
-            /// <summary></summary>
+        /// <summary></summary>
         public CommonDeleteResponse()
         {
 
         }
 
-            /// <summary></summary>
+        /// <summary></summary>
         public CommonDeleteResponse(int code, string message, bool delete)
             : base(code, message, new ResponseData(delete))
         {

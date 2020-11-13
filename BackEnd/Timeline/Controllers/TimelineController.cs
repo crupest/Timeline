@@ -43,6 +43,8 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
+        private bool UserHasAllTimelineManagementPermission => this.UserHasPermission(UserPermission.AllTimelineManagement);
+
         /// <summary>
         /// List all timelines.
         /// </summary>
@@ -180,7 +182,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<TimelinePostInfo>>> PostListGet([FromRoute][GeneralTimelineName] string name, [FromQuery] DateTime? modifiedSince, [FromQuery] bool? includeDeleted)
         {
-            if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -208,7 +210,7 @@ namespace Timeline.Controllers
         public async Task<IActionResult> PostDataGet([FromRoute][GeneralTimelineName] string name, [FromRoute] long id, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
         {
             _ = ifNoneMatch;
-            if (!this.IsAdministrator() && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _service.HasReadPermission(name, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -246,7 +248,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<TimelinePostInfo>> PostPost([FromRoute][GeneralTimelineName] string name, [FromBody] TimelinePostCreateRequest body)
         {
             var id = this.GetUserId();
-            if (!this.IsAdministrator() && !await _service.IsMemberOf(name, id))
+            if (!UserHasAllTimelineManagementPermission && !await _service.IsMemberOf(name, id))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -313,7 +315,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
         {
-            if (!this.IsAdministrator() && !await _service.HasPostModifyPermission(name, id, this.GetUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _service.HasPostModifyPermission(name, id, this.GetUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -342,7 +344,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<TimelineInfo>> TimelinePatch([FromRoute][GeneralTimelineName] string name, [FromBody] TimelinePatchRequest body)
         {
-            if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(name, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -365,7 +367,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> TimelineMemberPut([FromRoute][GeneralTimelineName] string name, [FromRoute][Username] string member)
         {
-            if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(name, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -393,7 +395,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> TimelineMemberDelete([FromRoute][GeneralTimelineName] string name, [FromRoute][Username] string member)
         {
-            if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(name, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -448,7 +450,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> TimelineDelete([FromRoute][TimelineName] string name)
         {
-            if (!this.IsAdministrator() && !(await _service.HasManagePermission(name, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(name, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -472,7 +474,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<TimelineInfo>> TimelineOpChangeName([FromBody] TimelineChangeNameRequest body)
         {
-            if (!this.IsAdministrator() && !(await _service.HasManagePermission(body.OldName, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(body.OldName, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }

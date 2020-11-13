@@ -5,13 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Timeline.Entities
 {
-    public static class UserRoles
-    {
-        public const string Admin = "admin";
-        public const string User = "user";
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is an entity class.")]
     [Table("users")]
     public class UserEntity
     {
@@ -30,9 +23,6 @@ namespace Timeline.Entities
         [Column("password"), Required]
         public string Password { get; set; } = default!;
 
-        [Column("roles"), Required]
-        public string Roles { get; set; } = default!;
-
         [Column("version"), Required]
         public long Version { get; set; }
 
@@ -47,10 +37,14 @@ namespace Timeline.Entities
 
         public UserAvatarEntity? Avatar { get; set; }
 
+#pragma warning disable CA2227 // Collection properties should be read only
+        public List<UserPermissionEntity> Permissions { get; set; } = default!;
+
         public List<TimelineEntity> Timelines { get; set; } = default!;
 
         public List<TimelinePostEntity> TimelinePosts { get; set; } = default!;
 
         public List<TimelineMemberEntity> TimelinesJoined { get; set; } = default!;
+#pragma warning restore CA2227 // Collection properties should be read only
     }
 }

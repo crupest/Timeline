@@ -2,6 +2,7 @@ using FluentAssertions;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
@@ -129,13 +130,11 @@ namespace Timeline.Tests.IntegratedTests
                     {
                         Username = "newuser",
                         Password = "newpw",
-                        Administrator = true,
                         Nickname = "aaa"
                     });
                 var body = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<UserInfo>()
                     .Which;
-                body.Administrator.Should().Be(true);
                 body.Nickname.Should().Be("aaa");
             }
 
@@ -144,14 +143,14 @@ namespace Timeline.Tests.IntegratedTests
                 var body = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<UserInfo>()
                     .Which;
-                body.Administrator.Should().Be(true);
                 body.Nickname.Should().Be("aaa");
             }
 
             {
+                var token = userClient.DefaultRequestHeaders.Authorization.Parameter;
                 // Token should expire.
-                var res = await userClient.GetAsync("testing/auth/Authorize");
-                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+                var res = await userClient.PostAsJsonAsync<VerifyTokenRequest>("token/verify", new() { Token = token });
+                res.Should().HaveStatusCode(HttpStatusCode.BadRequest);
             }
 
             {
@@ -236,14 +235,6 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task Patch_Administrator_Forbid()
-        {
-            using var client = await CreateClientAsUser();
-            var res = await client.PatchAsJsonAsync("users/user1", new UserPatchRequest { Administrator = true });
-            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
-        }
-
-        [Fact]
         public async Task Delete_Deleted()
         {
             using var client = await CreateClientAsAdministrator();
@@ -301,22 +292,16 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     Username = "aaa",
                     Password = "bbb",
-                    Administrator = true,
-                    Nickname = "ccc"
                 });
                 var body = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<UserInfo>().Which;
                 body.Username.Should().Be("aaa");
-                body.Nickname.Should().Be("ccc");
-                body.Administrator.Should().BeTrue();
             }
             {
                 var res = await client.GetAsync("users/aaa");
                 var body = res.Should().HaveStatusCode(200)
                     .And.HaveJsonBody<UserInfo>().Which;
                 body.Username.Should().Be("aaa");
-                body.Nickname.Should().Be("ccc");
-                body.Administrator.Should().BeTrue();
             }
             {
                 // Test password.
@@ -326,12 +311,10 @@ namespace Timeline.Tests.IntegratedTests
 
         public static IEnumerable<object[]> Op_CreateUser_InvalidModel_Data()
         {
-            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "bbb" } };
-            yield return new[] { new CreateUserRequest { Username = "aaa", Administrator = true } };
-            yield return new[] { new CreateUserRequest { Password = "bbb", Administrator = true } };
-            yield return new[] { new CreateUserRequest { Username = "a!a", Password = "bbb", Administrator = true } };
-            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "", Administrator = true } };
-            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "bbb", Administrator = true, Nickname = new string('a', 40) } };
+            yield return new[] { new CreateUserRequest { Username = "aaa" } };
+            yield return new[] { new CreateUserRequest { Password = "bbb" } };
+            yield return new[] { new CreateUserRequest { Username = "a!a", Password = "bbb" } };
+            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "" } };
         }
 
         [Theory]
@@ -354,7 +337,6 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     Username = "user1",
                     Password = "bbb",
-                    Administrator = false
                 });
                 res.Should().HaveStatusCode(400)
                     .And.HaveCommonBody(ErrorCodes.UserController.UsernameConflict);
@@ -370,7 +352,6 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     Username = "aaa",
                     Password = "bbb",
-                    Administrator = false
                 });
                 res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
             }
@@ -385,7 +366,6 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     Username = "aaa",
                     Password = "bbb",
-                    Administrator = false
                 });
                 res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
             }

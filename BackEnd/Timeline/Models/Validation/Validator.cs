@@ -111,12 +111,12 @@ namespace Timeline.Models.Validation
             }
         }
 
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
         {
             var (result, message) = _validator.Validate(value);
             if (result)
             {
-                return ValidationResult.Success;
+                return ValidationResult.Success!;
             }
             else
             {

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
-using Timeline.Auth;
 using Timeline.Filters;
 using Timeline.Helpers;
 using Timeline.Models;
@@ -86,7 +85,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Put([FromRoute][Username] string username, [FromBody] ByteData body)
         {
-            if (!User.IsAdministrator() && User.Identity.Name != username)
+            if (!this.UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
             {
                 _logger.LogInformation(Log.Format(LogPutForbid,
                     ("Operator Username", User.Identity.Name), ("Username To Put Avatar", username)));
@@ -149,10 +148,10 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute][Username] string username)
         {
-            if (!User.IsAdministrator() && User.Identity.Name != username)
+            if (!this.UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
             {
                 _logger.LogInformation(Log.Format(LogDeleteForbid,
-                    ("Operator Username", User.Identity.Name), ("Username To Delete Avatar", username)));
+                    ("Operator Username", User.Identity!.Name), ("Username To Delete Avatar", username)));
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 

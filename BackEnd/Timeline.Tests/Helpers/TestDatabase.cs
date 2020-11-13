@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Migrations;
-using Timeline.Models;
 using Timeline.Services;
 using Xunit;
 
@@ -36,23 +35,13 @@ namespace Timeline.Tests.Helpers
                 if (_createUser)
                 {
                     var passwordService = new PasswordService();
-                    var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new Clock());
+                    var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new Clock(), new UserPermissionService(context));
 
-                    await userService.CreateUser(new User
-                    {
-                        Username = "admin",
-                        Password = "adminpw",
-                        Administrator = true,
-                        Nickname = "administrator"
-                    });
+                    var admin = await userService.CreateUser("admin", "adminpw");
+                    await userService.ModifyUser(admin.Id, new ModifyUserParams() { Nickname = "administrator" });
 
-                    await userService.CreateUser(new User
-                    {
-                        Username = "user",
-                        Password = "userpw",
-                        Administrator = false,
-                        Nickname = "imuser"
-                    });
+                    var user = await userService.CreateUser("user", "userpw");
+                    await userService.ModifyUser(user.Id, new ModifyUserParams() { Nickname = "imuser" });
                 }
             }
         }
