@@ -21,15 +21,10 @@ namespace Timeline.Tests.Helpers
             JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
         }
 
-        public static async Task<T> ReadBodyAsJsonAsync<T>(this HttpResponseMessage response)
+        public static async Task<T?> ReadBodyAsJsonAsync<T>(this HttpResponseMessage response)
         {
             var stream = await response.Content.ReadAsStreamAsync();
             return await JsonSerializer.DeserializeAsync<T>(stream, JsonSerializerOptions);
-        }
-
-        public static Task<CommonResponse> ReadBodyAsCommonResponseAsync(this HttpResponseMessage response)
-        {
-            return response.ReadBodyAsJsonAsync<CommonResponse>();
         }
     }
 }

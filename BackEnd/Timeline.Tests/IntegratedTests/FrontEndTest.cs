@@ -14,7 +14,9 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient(false);
             var res = await client.GetAsync("index.html");
             res.Should().HaveStatusCode(200);
-            res.Content.Headers.ContentType.MediaType.Should().Be(MediaTypeNames.Text.Html);
+            var contentTypeHeader = res.Content.Headers.ContentType;
+            contentTypeHeader.Should().NotBeNull();
+            contentTypeHeader!.MediaType.Should().Be(MediaTypeNames.Text.Html);
         }
 
         [Fact]
@@ -23,7 +25,9 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient(false);
             var res = await client.GetAsync("aaaaaaaaaaaaaaa");
             res.Should().HaveStatusCode(200);
-            res.Content.Headers.ContentType.MediaType.Should().Be(MediaTypeNames.Text.Html);
+            var contentTypeHeader = res.Content.Headers.ContentType;
+            contentTypeHeader.Should().NotBeNull();
+            contentTypeHeader!.MediaType.Should().Be(MediaTypeNames.Text.Html);
         }
     }
 }
