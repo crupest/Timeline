@@ -70,7 +70,7 @@ namespace Timeline.Services
         /// <returns>A string list.</returns>
         public List<string> ToStringList()
         {
-            return _permissions.Select(p => p.ToString().ToUpperInvariant()).ToList();
+            return _permissions.Select(p => p.ToString()).ToList();
         }
 
         /// <summary>

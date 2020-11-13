@@ -200,7 +200,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> PutUserPermission([FromRoute] string username, [FromRoute] UserPermission permission)
+        public async Task<ActionResult> PutUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
         {
             try
             {
@@ -220,7 +220,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteUserPermission([FromRoute] string username, [FromRoute] UserPermission permission)
+        public async Task<ActionResult> DeleteUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
         {
             try
             {
