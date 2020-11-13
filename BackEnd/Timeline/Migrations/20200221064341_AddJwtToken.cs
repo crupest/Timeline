@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Timeline.Migrations
 {

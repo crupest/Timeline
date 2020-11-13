@@ -10,7 +10,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services;
