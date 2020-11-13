@@ -9,7 +9,7 @@ namespace Timeline.Auth
         internal static bool HasPermission(this ClaimsPrincipal principal, UserPermission permission)
         {
             return principal.HasClaim(
-                claim => claim.Type == AuthenticationConstants.PermissionClaimName && string.Equals(claim.Value, permission.ToString(), StringComparison.InvariantCultureIgnoreCase));
+                claim => claim.Type == AuthenticationConstants.PermissionClaimName && string.Equals(claim.Value, permission.ToString(), StringComparison.OrdinalIgnoreCase));
         }
     }
 }
