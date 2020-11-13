@@ -6,15 +6,10 @@ using System;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Timeline.Models.Converters;
 using Timeline.Models.Http;
 
-namespace Timeline.Tests.Helpers
+namespace Timeline.Tests.IntegratedTests
 {
     public class HttpResponseMessageValueFormatter : IValueFormatter
     {
@@ -73,6 +68,19 @@ namespace Timeline.Tests.Helpers
             }
             return body;
         }
+
+        public async Task<AndWhichConstraint<HttpResponseMessage, T>> HaveJsonBodyAsync<T>(string because = "", params object[] becauseArgs)
+        {
+            var a = Execute.Assertion.BecauseOf(because, becauseArgs);
+
+            var body = await Subject.ReadBodyAsJsonAsync<T>();
+            if (body == null)
+            {
+                a.FailWith("Expected response body of {context:HttpResponseMessage} to be json string of type {0}{reason}, but failed to read it or it was not a valid json string.", typeof(T).FullName);
+                return new(Subject, null);
+            }
+            return new(Subject, body);
+        }
     }
 
     public static class AssertionResponseExtensions
@@ -115,7 +123,7 @@ namespace Timeline.Tests.Helpers
             body.Data.Delete.Should().Be(delete);
         }
 
-        public static async Task BeInvalidModelAsync(this HttpResponseMessageAssertions assertions, string message = null)
+        public static async Task BeInvalidModelAsync(this HttpResponseMessageAssertions assertions, string? message = null)
         {
             message = string.IsNullOrEmpty(message) ? "" : ", " + message;
             var body = await assertions.HaveStatusCode(400, "Invalid Model Error must have 400 status code{0}", message)

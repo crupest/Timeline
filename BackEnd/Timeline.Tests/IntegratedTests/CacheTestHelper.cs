@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 
-namespace Timeline.Tests.Helpers
+namespace Timeline.Tests.IntegratedTests
 {
     public static class CacheTestHelper
     {

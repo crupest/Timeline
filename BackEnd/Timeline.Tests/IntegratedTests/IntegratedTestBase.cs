@@ -4,10 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Timeline.Models.Converters;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
@@ -19,7 +16,7 @@ namespace Timeline.Tests.IntegratedTests
     {
         protected TestApplication TestApp { get; }
 
-        private readonly int _userCount;
+        protected int TestUserCount { get; }
 
         public IntegratedTestBase() : this(1)
         {
@@ -31,7 +28,7 @@ namespace Timeline.Tests.IntegratedTests
             if (userCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(userCount), userCount, "User count can't be negative.");
 
-            _userCount = userCount;
+            TestUserCount = userCount;
 
             TestApp = new TestApplication();
         }
@@ -65,7 +62,7 @@ namespace Timeline.Tests.IntegratedTests
                     ("admin", "adminpw", "administrator")
                 };
 
-            for (int i = 1; i <= _userCount; i++)
+            for (int i = 1; i <= TestUserCount; i++)
             {
                 users.Add(($"user{i}", $"user{i}pw", $"imuser{i}"));
             }
