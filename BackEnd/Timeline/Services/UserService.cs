@@ -242,7 +242,6 @@ namespace Timeline.Services
             {
                 Username = username,
                 Password = _passwordService.HashPassword(password),
-                Roles = "",
                 Version = 1
             };
             _databaseContext.Users.Add(newEntity);
