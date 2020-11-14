@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
+using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
@@ -13,7 +13,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateDefaultClient(false);
             var res = await client.GetAsync("index.html");
-            res.Should().HaveStatusCode(200);
+            res.StatusCode.Should().Be(HttpStatusCode.OK);
             var contentTypeHeader = res.Content.Headers.ContentType;
             contentTypeHeader.Should().NotBeNull();
             contentTypeHeader!.MediaType.Should().Be(MediaTypeNames.Text.Html);
@@ -24,7 +24,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateDefaultClient(false);
             var res = await client.GetAsync("aaaaaaaaaaaaaaa");
-            res.Should().HaveStatusCode(200);
+            res.StatusCode.Should().Be(HttpStatusCode.OK);
             var contentTypeHeader = res.Content.Headers.ContentType;
             contentTypeHeader.Should().NotBeNull();
             contentTypeHeader!.MediaType.Should().Be(MediaTypeNames.Text.Html);
