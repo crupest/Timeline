@@ -12,10 +12,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task UnknownEndpoint()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.GetAsync("unknownEndpoint");
-            res.Should().HaveStatusCode(400)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.Common.UnknownEndpoint);
+            await client.TestGetAssertErrorAsync("unknownEndpoint", errorCode: ErrorCodes.Common.UnknownEndpoint);
         }
     }
 }
