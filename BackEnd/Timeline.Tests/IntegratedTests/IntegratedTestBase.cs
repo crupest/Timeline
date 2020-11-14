@@ -104,10 +104,9 @@ namespace Timeline.Tests.IntegratedTests
         public async Task<HttpClient> CreateClientWithCredential(string username, string password, bool setApiBase = true)
         {
             var client = await CreateDefaultClient(setApiBase);
-            var response = await client.PostAsJsonAsync("token/create",
+            var res = await client.TestPostAsync<CreateTokenResponse>("token/create",
                 new CreateTokenRequest { Username = username, Password = password });
-            var token = (await response.Should().HaveStatusCode(200)
-                .And.HaveAndGetJsonBodyAsync<CreateTokenResponse>()).Token;
+            var token = res.Token;
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
             return client;
         }

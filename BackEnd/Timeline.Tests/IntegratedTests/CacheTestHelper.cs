@@ -13,9 +13,10 @@ namespace Timeline.Tests.IntegratedTests
         public static async Task TestCache(HttpClient client, string getUrl)
         {
             EntityTagHeaderValue eTag;
+
             {
                 var res = await client.GetAsync(getUrl);
-                res.Should().HaveStatusCode(200);
+                res.StatusCode.Should().Be(HttpStatusCode.OK);
                 var cacheControlHeader = res.Headers.CacheControl;
                 cacheControlHeader.Should().NotBeNull();
                 cacheControlHeader!.NoCache.Should().BeTrue();
@@ -28,39 +29,27 @@ namespace Timeline.Tests.IntegratedTests
                 eTag = res.Headers.ETag!;
             }
 
-            {
-                using var request = new HttpRequestMessage()
+            await client.TestSendAssertErrorAsync(HttpMethod.Get, getUrl,
+                expectedStatusCode: HttpStatusCode.BadRequest,
+                errorCode: ErrorCodes.Common.Header.IfNonMatch_BadFormat,
+                headerSetup: static (headers, _) =>
                 {
-                    RequestUri = new Uri(client.BaseAddress!, getUrl),
-                    Method = HttpMethod.Get,
-                };
-                request.Headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
-                var res = await client.SendAsync(request);
-                await res.Should().HaveStatusCode(HttpStatusCode.BadRequest)
-                    .And.HaveCommonBodyWithCodeAsync(ErrorCodes.Common.Header.IfNonMatch_BadFormat);
-            }
+                    headers.TryAddWithoutValidation("If-None-Match", "\"dsdfd");
+                });
 
-            {
-                using var request = new HttpRequestMessage()
+            await client.TestSendAsync(HttpMethod.Get, getUrl,
+                expectedStatusCode: HttpStatusCode.OK,
+                headerSetup: static (headers, _) =>
                 {
-                    RequestUri = new Uri(client.BaseAddress!, getUrl),
-                    Method = HttpMethod.Get,
-                };
-                request.Headers.TryAddWithoutValidation("If-None-Match", "\"aaa\"");
-                var res = await client.SendAsync(request);
-                res.Should().HaveStatusCode(HttpStatusCode.OK);
-            }
+                    headers.TryAddWithoutValidation("If-None-Match", "\"aaa\"");
+                });
 
-            {
-                using var request = new HttpRequestMessage()
+            await client.TestSendAsync(HttpMethod.Get, getUrl,
+                expectedStatusCode: HttpStatusCode.NotModified,
+                headerSetup: (headers, _) =>
                 {
-                    RequestUri = new Uri(client.BaseAddress!, getUrl),
-                    Method = HttpMethod.Get,
-                };
-                request.Headers.Add("If-None-Match", eTag.ToString());
-                var res = await client.SendAsync(request);
-                res.Should().HaveStatusCode(HttpStatusCode.NotModified);
-            }
+                    headers.Add("If-None-Match", eTag.ToString());
+                });
         }
     }
 }

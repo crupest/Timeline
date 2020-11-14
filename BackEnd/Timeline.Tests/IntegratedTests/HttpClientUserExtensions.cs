@@ -7,11 +7,7 @@ namespace Timeline.Tests.IntegratedTests
 {
     public static class HttpClientUserExtensions
     {
-        public static async Task<UserInfo> GetUserAsync(this HttpClient client, string username)
-        {
-            var res = await client.GetAsync($"users/{username}");
-            res.Should().HaveStatusCode(HttpStatusCode.OK);
-            return await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
-        }
+        public static Task<UserInfo> GetUserAsync(this HttpClient client, string username)
+            => client.TestGetAsync<UserInfo>($"users/{username}");
     }
 }

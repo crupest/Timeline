@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -15,7 +14,6 @@ using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
-using Timeline.Tests.IntegratedTests;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
@@ -61,8 +59,7 @@ namespace Timeline.Tests.IntegratedTests
             for (int i = 0; i <= 3; i++)
             {
                 using var client = await CreateClientAs(i);
-                var res = await client.PostAsJsonAsync("timelines", new TimelineCreateRequest { Name = $"t{i}" });
-                res.Should().HaveStatusCode(200);
+                await client.TestPostAsync("timelines", new TimelineCreateRequest { Name = $"t{i}" });
             }
         }
 
@@ -71,20 +68,12 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateDefaultClient();
 
-            {
-                var res = await client.GetAsync("timelines/@!!!");
-                await res.Should().BeInvalidModelAsync();
-            }
+            await client.TestGetAssertInvalidModelAsync("timelines/@!!!");
+            await client.TestGetAssertInvalidModelAsync("timelines/!!!");
+
 
             {
-                var res = await client.GetAsync("timelines/!!!");
-                await res.Should().BeInvalidModelAsync();
-            }
-
-            {
-                var res = await client.GetAsync("timelines/@user1");
-                var body = await res.Should().HaveStatusCode(200)
-                    .And.HaveAndGetJsonBodyAsync<TimelineInfo>();
+                var body = await client.TestGetAsync<TimelineInfo>("timelines/@user1");
                 body.Owner.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
                 body.Visibility.Should().Be(TimelineVisibility.Register);
                 body.Description.Should().Be("");
@@ -96,9 +85,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                var res = await client.GetAsync("timelines/t1");
-                var body = await res.Should().HaveStatusCode(200)
-                    .And.HaveAndGetJsonBodyAsync<TimelineInfo>();
+                var body = await client.TestGetAsync<TimelineInfo>("timelines/t1");
                 body.Owner.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
                 body.Visibility.Should().Be(TimelineVisibility.Register);
                 body.Description.Should().Be("");
@@ -126,10 +113,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
 
-            var res = await client.GetAsync("timelines");
-            var body = res.Should().HaveStatusCode(200)
-                .And.HaveAndGetJsonBodyAsync<List<TimelineInfo>>();
-
+            var body = await client.TestGetAsync<List<TimelineInfo>>("timelines");
             body.Should().BeEquivalentTo(result);
         }
 
@@ -139,15 +123,9 @@ namespace Timeline.Tests.IntegratedTests
             {
                 using var client = await CreateDefaultClient();
 
-                async Task TestAgainst(string url)
-                {
-                    var res = await client.GetAsync(url);
-                    await res.Should().BeInvalidModelAsync();
-                }
-
-                await TestAgainst("timelines?relate=us!!");
-                await TestAgainst("timelines?relateType=aaa");
-                await TestAgainst("timelines?visibility=aaa");
+                await client.TestGetAssertInvalidModelAsync("timelines?relate=us!!");
+                await client.TestGetAssertInvalidModelAsync("timelines?relateType=aaa");
+                await client.TestGetAssertInvalidModelAsync("timelines?visibility=aaa");
             }
 
             var testResultRelate = new List<TimelineInfo>();
@@ -231,9 +209,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 async Task TestAgainst(string url, List<TimelineInfo> against)
                 {
-                    var res = await client.GetAsync(url);
-                    var body = await res.Should().HaveStatusCode(200)
-                        .And.HaveAndGetJsonBodyAsync<List<TimelineInfo>>();
+                    var body = await client.TestGetAsync<List<TimelineInfo>>(url);
                     body.Should().BeEquivalentTo(against);
                 }
 
@@ -252,30 +228,20 @@ namespace Timeline.Tests.IntegratedTests
         {
             {
                 using var client = await CreateDefaultClient();
-                var res = await client.PostAsJsonAsync("timelines", new TimelineCreateRequest { Name = "aaa" });
-                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+                await client.TestPostAssertUnauthorizedAsync("timelines", new TimelineCreateRequest { Name = "aaa" });
             }
 
             {
                 using var client = await CreateClientAsUser();
 
-                {
-                    var res = await client.PostAsJsonAsync("timelines", new TimelineCreateRequest { Name = "!!!" });
-                    await res.Should().BeInvalidModelAsync();
-                }
+                await client.TestPostAssertInvalidModelAsync("timelines", new TimelineCreateRequest { Name = "!!!" });
 
                 {
-                    var res = await client.PostAsJsonAsync("timelines", new TimelineCreateRequest { Name = "aaa" });
-                    var body = await res.Should().HaveStatusCode(200)
-                        .And.HaveAndGetJsonBodyAsync<TimelineInfo>();
+                    var body = await client.TestPostAsync<TimelineInfo>("timelines", new TimelineCreateRequest { Name = "aaa" });
                     body.Should().BeEquivalentTo(await client.GetTimelineAsync("aaa"));
                 }
 
-                {
-                    var res = await client.PostAsJsonAsync("timelines", new TimelineCreateRequest { Name = "aaa" });
-                    await res.Should().HaveStatusCode(400)
-                        .And.HaveCommonBodyWithCodeAsync(ErrorCodes.TimelineController.NameConflict);
-                }
+                await client.TestPostAssertErrorAsync("timelines", new TimelineCreateRequest { Name = "aaa" }, errorCode: ErrorCodes.TimelineController.NameConflict);
             }
         }
 
@@ -284,61 +250,49 @@ namespace Timeline.Tests.IntegratedTests
         {
             {
                 using var client = await CreateDefaultClient();
-                var res = await client.DeleteAsync("timelines/t1");
-                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+                await client.TestDeleteAssertUnauthorizedAsync("timelines/t1");
             }
 
             {
                 using var client = await CreateClientAs(2);
-                var res = await client.DeleteAsync("timelines/t1");
-                res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+                await client.TestDeleteAssertForbiddenAsync("timelines/t1");
             }
 
             {
                 using var client = await CreateClientAsAdministrator();
 
-                {
-                    var res = await client.DeleteAsync("timelines/!!!");
-                    await res.Should().BeInvalidModelAsync();
-                }
-
-                {
-                    var res = await client.DeleteAsync("timelines/t2");
-                    await res.Should().BeDeleteAsync(true);
-                }
-
-                {
-                    var res = await client.DeleteAsync("timelines/t2");
-                    await res.Should().BeDeleteAsync(false);
-                }
+                await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
+                await client.TestDeleteAsync("timelines/t2", true);
+                await client.TestDeleteAsync("timelines/t2", false);
             }
 
             {
                 using var client = await CreateClientAs(1);
 
-                {
-                    var res = await client.DeleteAsync("timelines/!!!");
-                    await res.Should().BeInvalidModelAsync();
-                }
-
-                {
-                    var res = await client.DeleteAsync("timelines/t1");
-                    await res.Should().BeDeleteAsync(true);
-                }
-
-                {
-                    var res = await client.DeleteAsync("timelines/t1");
-                    res.Should().HaveStatusCode(400);
-                }
+                await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
+                await client.TestDeleteAsync("timelines/t1", true);
+                await client.TestDeleteAssertErrorAsync("timelines/t1");
             }
         }
 
-        [Theory]
-        [InlineData("@user1")]
-        [InlineData("t1")]
-        public async Task TimelineDescription_Should_Work(string timelineName)
+        public static string CreatePersonalTimelineName(int i) => i == 0 ? "@admin" : $"@user{i}";
+        public static string CreateOrdinaryTimelineName(int i) => $"t{i}";
+        public delegate string TimelineNameGenerator(int i);
+
+        public static IEnumerable<object[]> TimelineNameGeneratorTestData()
         {
+            yield return new object[] { new TimelineNameGenerator(CreatePersonalTimelineName) };
+            yield return new object[] { new TimelineNameGenerator(CreateOrdinaryTimelineName) };
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task TimelineDescription_Should_Work(TimelineNameGenerator generator)
+        {
+            // TODO! Permission tests.
+
             using var client = await CreateClientAsUser();
+            var timelineName = generator(1);
 
             {
                 var timeline = await client.GetTimelineAsync(timelineName);
@@ -379,309 +333,185 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Member_Should_Work(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Member_Should_Work(TimelineNameGenerator generator)
         {
-            var getUrl = generator(1, null);
+            // TODO! Invalid model tests.
+            // TODO! Permission tests.
+
             using var client = await CreateClientAsUser();
 
-            async Task AssertMembers(IList<UserInfo> members)
+            var timelineName = generator(1);
+
+            async Task AssertMembers(List<UserInfo> members)
             {
-                var res = await client.GetAsync(getUrl);
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.Members.Should().NotBeNull().And.BeEquivalentTo(members);
+                var body = await client.GetTimelineAsync(timelineName);
+                body.Members.Should().NotBeNull().And.BeEquivalentTo(members);
             }
 
             async Task AssertEmptyMembers()
             {
-                var res = await client.GetAsync(getUrl);
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.Members.Should().NotBeNull().And.BeEmpty();
+                var body = await client.GetTimelineAsync(timelineName);
+                body.Members.Should().NotBeNull().And.BeEmpty();
             }
 
             await AssertEmptyMembers();
-            {
-                var res = await client.PutAsync(generator(1, "members/usernotexist"), null);
-                res.Should().HaveStatusCode(400)
-                    .And.HaveCommonBody(ErrorCodes.TimelineController.MemberPut_NotExist);
-            }
+            await client.TestPutAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.TimelineController.MemberPut_NotExist);
             await AssertEmptyMembers();
-            {
-                var res = await client.PutAsync(generator(1, "members/user2"), null);
-                res.Should().HaveStatusCode(200);
-            }
-            await AssertMembers(new List<UserInfo> { UserInfos[2] });
-            {
-                var res = await client.DeleteAsync(generator(1, "members/user2"));
-                res.Should().BeDelete(true);
-            }
+            await client.PutTimelineMemberAsync(timelineName, "user2");
+            await AssertMembers(new List<UserInfo> { await client.GetUserAsync("user2") });
+            await client.DeleteTimelineMemberAsync(timelineName, "user2", true);
             await AssertEmptyMembers();
-            {
-                var res = await client.DeleteAsync(generator(1, "members/aaa"));
-                res.Should().BeDelete(false);
-            }
+            await client.DeleteTimelineMemberAsync(timelineName, "aaa", false);
             await AssertEmptyMembers();
-        }
-
-        public static IEnumerable<object[]> Permission_Timeline_Data()
-        {
-            yield return new object[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl), -1, 200, 401, 401, 401, 401 };
-            yield return new object[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl), 1, 200, 200, 403, 200, 403 };
-            yield return new object[] { new TimelineUrlGenerator(GenerateOrdinaryTimelineUrl), 0, 200, 200, 200, 200, 200 };
-            yield return new object[] { new TimelineUrlGenerator(GeneratePersonalTimelineUrl), -1, 200, 401, 401, 401, 401 };
-            yield return new object[] { new TimelineUrlGenerator(GeneratePersonalTimelineUrl), 1, 200, 200, 403, 200, 403 };
-            yield return new object[] { new TimelineUrlGenerator(GeneratePersonalTimelineUrl), 0, 200, 200, 200, 200, 200 };
         }
 
         [Theory]
-        [MemberData(nameof(Permission_Timeline_Data))]
-        public async Task Permission_Timeline(TimelineUrlGenerator generator, int userNumber, int get, int opPatchUser, int opPatchAdmin, int opMemberUser, int opMemberAdmin)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task GetPostsAndVisibility_Should_Work(TimelineNameGenerator generator)
         {
-            using var client = await CreateClientAs(userNumber);
-            {
-                var res = await client.GetAsync("timelines/t1");
-                res.Should().HaveStatusCode(get);
-            }
-
-            {
-                var res = await client.PatchAsJsonAsync(generator(1, null), new TimelinePatchRequest { Description = "hahaha" });
-                res.Should().HaveStatusCode(opPatchUser);
-            }
-
-            {
-                var res = await client.PatchAsJsonAsync(generator(0, null), new TimelinePatchRequest { Description = "hahaha" });
-                res.Should().HaveStatusCode(opPatchAdmin);
-            }
-
-            {
-                var res = await client.PutAsync(generator(1, "members/user2"), null);
-                res.Should().HaveStatusCode(opMemberUser);
-            }
-
-            {
-                var res = await client.DeleteAsync(generator(1, "members/user2"));
-                res.Should().HaveStatusCode(opMemberUser);
-            }
-
-            {
-                var res = await client.PutAsync(generator(0, "members/user2"), null);
-                res.Should().HaveStatusCode(opMemberAdmin);
-            }
-
-            {
-                var res = await client.DeleteAsync(generator(0, "members/user2"));
-                res.Should().HaveStatusCode(opMemberAdmin);
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Visibility_Test(TimelineUrlGenerator generator)
-        {
-            var userUrl = generator(1, "posts");
-            var adminUrl = generator(0, "posts");
-            {
-
-                using var client = await CreateClientAsUser();
-                using var content = new StringContent(@"{""visibility"":""abcdefg""}", System.Text.Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
-                var res = await client.PatchAsync(generator(1, null), content);
-                res.Should().BeInvalidModel();
-            }
             { // default visibility is registered
                 {
                     using var client = await CreateDefaultClient();
-                    var res = await client.GetAsync(userUrl);
-                    res.Should().HaveStatusCode(403);
+                    await client.TestGetAssertForbiddenAsync($"timelines/{generator(1)}/posts");
                 }
 
                 {
                     using var client = await CreateClientAsUser();
-                    var res = await client.GetAsync(adminUrl);
-                    res.Should().HaveStatusCode(200);
+                    await client.TestGetAsync($"timelines/{generator(0)}/posts");
                 }
             }
 
             { // change visibility to public
                 {
                     using var client = await CreateClientAsUser();
-                    var res = await client.PatchAsJsonAsync(generator(1, null),
-                        new TimelinePatchRequest { Visibility = TimelineVisibility.Public });
-                    res.Should().HaveStatusCode(200);
+                    await client.PatchTimelineAsync(generator(1), new() { Visibility = TimelineVisibility.Public });
                 }
+
                 {
                     using var client = await CreateDefaultClient();
-                    var res = await client.GetAsync(userUrl);
-                    res.Should().HaveStatusCode(200);
+                    await client.TestGetAsync($"timelines/{generator(1)}/posts");
                 }
             }
 
             { // change visibility to private
                 {
                     using var client = await CreateClientAsAdministrator();
-                    {
-                        var res = await client.PatchAsJsonAsync(generator(1, null),
-                        new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
-                        res.Should().HaveStatusCode(200);
-                    }
-                    {
-                        var res = await client.PatchAsJsonAsync(generator(0, null),
-                            new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
-                        res.Should().HaveStatusCode(200);
-                    }
+                    await client.PatchTimelineAsync(generator(1), new() { Visibility = TimelineVisibility.Private });
+                    await client.PatchTimelineAsync(generator(0), new() { Visibility = TimelineVisibility.Private });
                 }
                 {
                     using var client = await CreateDefaultClient();
-                    var res = await client.GetAsync(userUrl);
-                    res.Should().HaveStatusCode(403);
+                    await client.TestGetAssertForbiddenAsync($"timelines/{generator(1)}/posts");
                 }
                 { // user can't read admin's
                     using var client = await CreateClientAsUser();
-                    var res = await client.GetAsync(adminUrl);
-                    res.Should().HaveStatusCode(403);
+                    await client.TestGetAssertForbiddenAsync($"timelines/{generator(0)}/posts");
                 }
                 { // admin can read user's
                     using var client = await CreateClientAsAdministrator();
-                    var res = await client.GetAsync(userUrl);
-                    res.Should().HaveStatusCode(200);
+                    await client.TestGetAsync($"timelines/{generator(1)}/posts");
                 }
                 { // add member
                     using var client = await CreateClientAsAdministrator();
-                    var res = await client.PutAsync(generator(0, "members/user1"), null);
-                    res.Should().HaveStatusCode(200);
+                    await client.PutTimelineMemberAsync(generator(0), "user1");
                 }
                 { // now user can read admin's
                     using var client = await CreateClientAsUser();
-                    var res = await client.GetAsync(adminUrl);
-                    res.Should().HaveStatusCode(200);
+                    await client.TestGetAsync($"timelines/{generator(0)}/posts");
                 }
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Permission_Post_Create(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task CreatePostPermission_Should_Work(TimelineNameGenerator generator)
         {
             using (var client = await CreateClientAsUser())
             {
-                var res = await client.PutAsync(generator(1, "members/user2"), null);
-                res.Should().HaveStatusCode(200);
+                await client.PutTimelineMemberAsync(generator(1), "user2");
             }
 
             using (var client = await CreateDefaultClient())
-            {
-                { // no auth should get 401
-                    var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                        TimelineHelper.TextPostCreateRequest("aaa"));
-                    res.Should().HaveStatusCode(401);
-                }
+            { // no auth should get 401
+                await client.TestPostAssertUnauthorizedAsync($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
             }
 
             using (var client = await CreateClientAsUser())
             {
-                { // post self's
-                    var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                        TimelineHelper.TextPostCreateRequest("aaa"));
-                    res.Should().HaveStatusCode(200);
-                }
-                { // post other not as a member should get 403
-                    var res = await client.PostAsJsonAsync(generator(0, "posts"),
-                        TimelineHelper.TextPostCreateRequest("aaa"));
-                    res.Should().HaveStatusCode(403);
-                }
+                // post self's
+                await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
+                // post other not as a member should get 403
+                await client.TestPostAssertForbiddenAsync($"timelines/{generator(0)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
             }
 
             using (var client = await CreateClientAsAdministrator())
-            {
-                { // post as admin
-                    var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                        TimelineHelper.TextPostCreateRequest("aaa"));
-                    res.Should().HaveStatusCode(200);
-                }
+            { // post as admin
+                await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
             }
 
             using (var client = await CreateClientAs(2))
-            {
-                { // post as member
-                    var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                        TimelineHelper.TextPostCreateRequest("aaa"));
-                    res.Should().HaveStatusCode(200);
-                }
+            { // post as member
+                await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Permission_Post_Delete(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task DeletePostPermission_Should_Work(TimelineNameGenerator generator)
         {
             async Task<long> CreatePost(int userNumber)
             {
                 using var client = await CreateClientAs(userNumber);
-                var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                    TimelineHelper.TextPostCreateRequest("aaa"));
-                return res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo>()
-                    .Which.Id;
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
+                return body.Id;
             }
 
             using (var client = await CreateClientAsUser())
             {
-                {
-                    var res = await client.PutAsync(generator(1, "members/user2"), null);
-                    res.Should().HaveStatusCode(200);
-                }
-                {
-                    var res = await client.PutAsync(generator(1, "members/user3"), null);
-                    res.Should().HaveStatusCode(200);
-                }
+                await client.PutTimelineMemberAsync(generator(1), "user2");
+                await client.PutTimelineMemberAsync(generator(1), "user3");
             }
 
             { // no auth should get 401
                 using var client = await CreateDefaultClient();
-                var res = await client.DeleteAsync(generator(1, "posts/12"));
-                res.Should().HaveStatusCode(401);
+                await client.TestDeleteAssertUnauthorizedAsync($"timelines/{generator(1)}/posts/12");
             }
 
             { // self can delete self
                 var postId = await CreatePost(1);
                 using var client = await CreateClientAsUser();
-                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
-                res.Should().HaveStatusCode(200);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}");
             }
 
             { // admin can delete any
                 var postId = await CreatePost(1);
                 using var client = await CreateClientAsAdministrator();
-                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
-                res.Should().HaveStatusCode(200);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}");
             }
 
             { // owner can delete other
                 var postId = await CreatePost(2);
                 using var client = await CreateClientAsUser();
-                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
-                res.Should().HaveStatusCode(200);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}");
             }
 
             { // author can delete self
                 var postId = await CreatePost(2);
                 using var client = await CreateClientAs(2);
-                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
-                res.Should().HaveStatusCode(200);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}");
             }
 
             { // otherwise is forbidden
                 var postId = await CreatePost(2);
                 using var client = await CreateClientAs(3);
-                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
-                res.Should().HaveStatusCode(403);
+                await client.TestDeleteAssertForbiddenAsync($"timelines/{generator(1)}/posts/{postId}");
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task TextPost_ShouldWork(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task TextPost_Should_Work(TimelineNameGenerator generator)
         {
             {
                 using var client = await CreateClientAsUser();
