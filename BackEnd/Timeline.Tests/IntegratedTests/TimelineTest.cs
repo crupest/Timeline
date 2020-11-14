@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -513,95 +514,63 @@ namespace Timeline.Tests.IntegratedTests
         [MemberData(nameof(TimelineNameGeneratorTestData))]
         public async Task TextPost_Should_Work(TimelineNameGenerator generator)
         {
+            using var client = await CreateClientAsUser();
+
             {
-                using var client = await CreateClientAsUser();
-                {
-                    var res = await client.GetAsync(generator(1, "posts"));
-                    res.Should().HaveStatusCode(200)
-                        .And.HaveJsonBody<TimelinePostInfo[]>()
-                        .Which.Should().NotBeNull().And.BeEmpty();
-                }
-                {
-                    var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                        TimelineHelper.TextPostCreateRequest(null));
-                    res.Should().BeInvalidModel();
-                }
-                const string mockContent = "aaa";
-                TimelinePostInfo createRes;
-                {
-                    var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                        TimelineHelper.TextPostCreateRequest(mockContent));
-                    var body = res.Should().HaveStatusCode(200)
-                        .And.HaveJsonBody<TimelinePostInfo>()
-                        .Which;
-                    body.Should().NotBeNull();
-                    body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent));
-                    body.Author.Should().BeEquivalentTo(UserInfos[1]);
-                    body.Deleted.Should().BeFalse();
-                    createRes = body;
-                }
-                {
-                    var res = await client.GetAsync(generator(1, "posts"));
-                    res.Should().HaveStatusCode(200)
-                        .And.HaveJsonBody<TimelinePostInfo[]>()
-                        .Which.Should().NotBeNull().And.BeEquivalentTo(createRes);
-                }
-                const string mockContent2 = "bbb";
-                var mockTime2 = DateTime.UtcNow.AddDays(-1);
-                TimelinePostInfo createRes2;
-                {
-                    var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                        TimelineHelper.TextPostCreateRequest(mockContent2, mockTime2));
-                    var body = res.Should().HaveStatusCode(200)
-                        .And.HaveJsonBody<TimelinePostInfo>()
-                        .Which;
-                    body.Should().NotBeNull();
-                    body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent2));
-                    body.Author.Should().BeEquivalentTo(UserInfos[1]);
-                    body.Time.Should().BeCloseTo(mockTime2, 1000);
-                    body.Deleted.Should().BeFalse();
-                    createRes2 = body;
-                }
-                {
-                    var res = await client.GetAsync(generator(1, "posts"));
-                    res.Should().HaveStatusCode(200)
-                        .And.HaveJsonBody<TimelinePostInfo[]>()
-                        .Which.Should().NotBeNull().And.BeEquivalentTo(createRes, createRes2);
-                }
-                {
-                    var res = await client.DeleteAsync(generator(1, $"posts/{createRes.Id}"));
-                    res.Should().BeDelete(true);
-                }
-                {
-                    var res = await client.DeleteAsync(generator(1, $"posts/{createRes.Id}"));
-                    res.Should().BeDelete(false);
-                }
-                {
-                    var res = await client.DeleteAsync(generator(1, "posts/30000"));
-                    res.Should().BeDelete(false);
-                }
-                {
-                    var res = await client.GetAsync(generator(1, "posts"));
-                    res.Should().HaveStatusCode(200)
-                        .And.HaveJsonBody<TimelinePostInfo[]>()
-                        .Which.Should().NotBeNull().And.BeEquivalentTo(createRes2);
-                }
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                body.Should().BeEmpty();
+            }
+
+            const string mockContent = "aaa";
+            TimelinePostInfo createRes;
+            {
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest(mockContent));
+                body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent));
+                body.Author.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
+                body.Deleted.Should().BeFalse();
+                createRes = body;
+            }
+            {
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                body.Should().BeEquivalentTo(createRes);
+            }
+            const string mockContent2 = "bbb";
+            var mockTime2 = DateTime.UtcNow.AddDays(-1);
+            TimelinePostInfo createRes2;
+            {
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest(mockContent2, mockTime2));
+                body.Should().NotBeNull();
+                body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent2));
+                body.Author.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
+                body.Time.Should().BeCloseTo(mockTime2, 1000);
+                body.Deleted.Should().BeFalse();
+                createRes2 = body;
+            }
+            {
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                body.Should().BeEquivalentTo(createRes, createRes2);
+            }
+            {
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{createRes.Id}", true);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{createRes.Id}", false);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/30000", false);
+            }
+            {
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                body.Should().BeEquivalentTo(createRes2);
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task GetPost_Should_Ordered(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task GetPost_Should_Ordered(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
             async Task<long> CreatePost(DateTime time)
             {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                    TimelineHelper.TextPostCreateRequest("aaa", time));
-                return res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo>()
-                    .Which.Id;
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa", time));
+                return body.Id;
             }
 
             var now = DateTime.UtcNow;
@@ -610,60 +579,31 @@ namespace Timeline.Tests.IntegratedTests
             var id2 = await CreatePost(now);
 
             {
-                var res = await client.GetAsync(generator(1, "posts"));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo[]>()
-                    .Which.Select(p => p.Id).Should().Equal(id1, id2, id0);
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                body.Select(p => p.Id).Should().Equal(id1, id2, id0);
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task CreatePost_InvalidModel(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task CreatePost_InvalidModel(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
-
-            {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = null });
-                res.Should().BeInvalidModel();
-            }
-
-            {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = null } });
-                res.Should().BeInvalidModel();
-            }
-
-            {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "hahaha" } });
-                res.Should().BeInvalidModel();
-            }
-
-            {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "text", Text = null } });
-                res.Should().BeInvalidModel();
-            }
-
-            {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = null } });
-                res.Should().BeInvalidModel();
-            }
-
-            {
-                // image not base64
-                var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = "!!!" } });
-                res.Should().BeInvalidModel();
-            }
-
-            {
-                // image base64 not image
-                var res = await client.PostAsJsonAsync(generator(1, "posts"), new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = Convert.ToBase64String(new byte[] { 0x01, 0x02, 0x03 }) } });
-                res.Should().BeInvalidModel();
-            }
+            var postUrl = $"timelines/{generator(1)}/posts";
+            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = null! });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = null! } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "hahaha" } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "text", Text = null } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = null } });
+            // image not base64
+            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = "!!!" } });
+            // image base64 not image
+            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = Convert.ToBase64String(new byte[] { 0x01, 0x02, 0x03 }) } });
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task ImagePost_ShouldWork(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task ImagePost_ShouldWork(TimelineNameGenerator generator)
         {
             var imageData = ImageHelper.CreatePngWithSize(100, 200);
 
@@ -673,14 +613,14 @@ namespace Timeline.Tests.IntegratedTests
             void AssertPostContent(TimelinePostContentInfo content)
             {
                 content.Type.Should().Be(TimelinePostContentTypes.Image);
-                content.Url.Should().EndWith(generator(1, $"posts/{postId}/data"));
+                content.Url.Should().EndWith($"timelines/{generator(1)}/posts/{postId}/data");
                 content.Text.Should().Be(null);
             }
 
             using var client = await CreateClientAsUser();
 
             {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"),
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
                     new TimelinePostCreateRequest
                     {
                         Content = new TimelinePostCreateRequestContent
@@ -689,26 +629,22 @@ namespace Timeline.Tests.IntegratedTests
                             Data = Convert.ToBase64String(imageData)
                         }
                     });
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo>().Which;
                 postId = body.Id;
-                postImageUrl = body.Content.Url;
+                postImageUrl = body.Content!.Url!;
                 AssertPostContent(body.Content);
             }
 
             {
-                var res = await client.GetAsync(generator(1, "posts"));
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo[]>().Which;
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
                 body.Should().HaveCount(1);
                 var post = body[0];
                 post.Id.Should().Be(postId);
-                AssertPostContent(post.Content);
+                AssertPostContent(post.Content!);
             }
 
             {
-                var res = await client.GetAsync(generator(1, $"posts/{postId}/data"));
-                res.Content.Headers.ContentType.MediaType.Should().Be("image/png");
+                var res = await client.GetAsync($"timelines/{generator(1)}/posts/{postId}/data");
+                res.Content.Headers.ContentType!.MediaType.Should().Be("image/png");
                 var data = await res.Content.ReadAsByteArrayAsync();
                 var image = Image.Load(data, out var format);
                 image.Width.Should().Be(100);
@@ -716,25 +652,13 @@ namespace Timeline.Tests.IntegratedTests
                 format.Name.Should().Be(PngFormat.Instance.Name);
             }
 
-            {
-                await CacheTestHelper.TestCache(client, generator(1, $"posts/{postId}/data"));
-            }
+            await CacheTestHelper.TestCache(client, $"timelines/{generator(1)}/posts/{postId}/data");
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}/data", true);
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}/data", false);
 
             {
-                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
-                res.Should().BeDelete(true);
-            }
-
-            {
-                var res = await client.DeleteAsync(generator(1, $"posts/{postId}"));
-                res.Should().BeDelete(false);
-            }
-
-            {
-                var res = await client.GetAsync(generator(1, "posts"));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo[]>()
-                    .Which.Should().BeEmpty();
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts/{postId}/data");
+                body.Should().BeEmpty();
             }
 
             {
@@ -746,83 +670,60 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task ImagePost_400(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task ImagePost_400(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
-            {
-                var res = await client.GetAsync(generator(1, "posts/11234/data"));
-                res.Should().HaveStatusCode(404)
-                    .And.HaveCommonBody(ErrorCodes.TimelineController.PostNotExist);
-            }
+            await client.TestGetAssertErrorAsync($"timelines/{generator(1)}/posts/11234/data", errorCode: ErrorCodes.TimelineController.PostNotExist);
 
             long postId;
             {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"),
-                    TimelineHelper.TextPostCreateRequest("aaa"));
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo>()
-                    .Which;
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
                 postId = body.Id;
             }
 
-            {
-                var res = await client.GetAsync(generator(1, $"posts/{postId}/data"));
-                res.Should().HaveStatusCode(400)
-                    .And.HaveCommonBody(ErrorCodes.TimelineController.PostNoData);
-            }
+            await client.TestGetAssertErrorAsync($"timelines/{generator(1)}/posts/{postId}/data", errorCode: ErrorCodes.TimelineController.PostNoData);
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Timeline_LastModified(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Timeline_LastModified(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
             DateTime lastModified;
 
             {
-                var res = await client.GetAsync(generator(1));
-                lastModified = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.LastModified;
+                var body = await client.GetTimelineAsync(generator(1));
+                lastModified = body.LastModified;
             }
 
             await Task.Delay(1000);
 
             {
-                var res = await client.PatchAsJsonAsync(generator(1), new TimelinePatchRequest { Description = "123" });
-                lastModified = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.LastModified.Should().BeAfter(lastModified).And.Subject.Value;
+                var body = await client.PatchTimelineAsync(generator(1), new() { Description = "123" });
+                lastModified = body.LastModified.Should().BeAfter(lastModified).And.Subject!.Value;
             }
 
             {
-                var res = await client.GetAsync(generator(1));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.LastModified.Should().Be(lastModified);
+                var body = await client.GetTimelineAsync(generator(1));
+                body.LastModified.Should().Be(lastModified);
             }
 
             await Task.Delay(1000);
 
-            {
-                var res = await client.PutAsync(generator(1, "members/user2"), null);
-                res.Should().HaveStatusCode(200);
-            }
+            await client.PutTimelineMemberAsync(generator(1), "user2");
 
             {
-                var res = await client.GetAsync(generator(1));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.LastModified.Should().BeAfter(lastModified);
+                var body = await client.GetTimelineAsync(generator(1));
+                body.LastModified.Should().BeAfter(lastModified);
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Post_ModifiedSince(TimelineUrlGenerator generator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Post_ModifiedSince(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -831,32 +732,24 @@ namespace Timeline.Tests.IntegratedTests
 
             foreach (var content in postContentList)
             {
-                var res = await client.PostAsJsonAsync(generator(1, "posts"),
+                var post = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
                     new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
-                var post = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo>().Which;
                 posts.Add(post);
                 await Task.Delay(1000);
             }
 
-            {
-                var res = await client.DeleteAsync(generator(1, $"posts/{posts[2].Id}"));
-                res.Should().BeDelete(true);
-            }
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}", true);
 
             {
-                var res = await client.GetAsync(generator(1, "posts",
-                    new Dictionary<string, string> { { "modifiedSince", posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) } }));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<List<TimelinePostInfo>>()
-                    .Which.Should().HaveCount(2)
-                    .And.Subject.Select(p => p.Content.Text).Should().Equal("b", "d");
+                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) }");
+                body.Should().HaveCount(2)
+                    .And.Subject.Select(p => p.Content!.Text).Should().Equal("b", "d");
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task PostList_IncludeDeleted(TimelineUrlGenerator urlGenerator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task PostList_IncludeDeleted(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -865,23 +758,18 @@ namespace Timeline.Tests.IntegratedTests
 
             foreach (var content in postContentList)
             {
-                var res = await client.PostAsJsonAsync(urlGenerator(1, "posts"),
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
                     new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
-                posts.Add(res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo>().Which);
+                posts.Add(body);
             }
 
             foreach (var id in new long[] { posts[0].Id, posts[2].Id })
             {
-                var res = await client.DeleteAsync(urlGenerator(1, $"posts/{id}"));
-                res.Should().BeDelete(true);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{id}", true);
             }
 
             {
-                var res = await client.GetAsync(urlGenerator(1, "posts", new Dictionary<string, string> { ["includeDeleted"] = "true" }));
-                posts = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<List<TimelinePostInfo>>()
-                    .Which;
+                posts = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts?includeDeleted=true");
                 posts.Should().HaveCount(4);
                 posts.Select(p => p.Deleted).Should().Equal(true, false, true, false);
                 posts.Select(p => p.Content == null).Should().Equal(true, false, true, false);
@@ -889,8 +777,8 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Post_ModifiedSince_And_IncludeDeleted(TimelineUrlGenerator urlGenerator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Post_ModifiedSince_And_IncludeDeleted(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -899,29 +787,17 @@ namespace Timeline.Tests.IntegratedTests
 
             foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
             {
-                var res = await client.PostAsJsonAsync(urlGenerator(1, "posts"),
+                var post = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
                     new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
-                var post = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelinePostInfo>().Which;
                 posts.Add(post);
                 await Task.Delay(1000);
             }
 
-            {
-                var res = await client.DeleteAsync(urlGenerator(1, $"posts/{posts[2].Id}"));
-                res.Should().BeDelete(true);
-            }
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}", true);
 
             {
 
-                var res = await client.GetAsync(urlGenerator(1, "posts",
-                    new Dictionary<string, string> {
-                        { "modifiedSince", posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) },
-                        { "includeDeleted", "true" }
-                    }));
-                posts = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<List<TimelinePostInfo>>()
-                    .Which;
+                posts = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture)}&includeDeleted=true");
                 posts.Should().HaveCount(3);
                 posts.Select(p => p.Deleted).Should().Equal(false, true, false);
                 posts.Select(p => p.Content == null).Should().Equal(false, true, false);
@@ -929,8 +805,8 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Timeline_Get_IfModifiedSince_And_CheckUniqueId(TimelineUrlGenerator urlGenerator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Timeline_Get_IfModifiedSince_And_CheckUniqueId(TimelineNameGenerator urlGenerator)
         {
             using var client = await CreateClientAsUser();
 
@@ -939,96 +815,71 @@ namespace Timeline.Tests.IntegratedTests
             string uniqueId;
 
             {
-                var res = await client.GetAsync(urlGenerator(1));
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>().Which;
+                var body = await client.GetTimelineAsync(urlGenerator(1));
                 timeline = body;
                 lastModifiedTime = body.LastModified;
                 uniqueId = body.UniqueId;
             }
 
             {
-                using var req = new HttpRequestMessage
-                {
-                    RequestUri = new Uri(client.BaseAddress, urlGenerator(1)),
-                    Method = HttpMethod.Get,
-                };
-                req.Headers.IfModifiedSince = lastModifiedTime.AddSeconds(1);
-                var res = await client.SendAsync(req);
-                res.Should().HaveStatusCode(304);
+                await client.TestGetAsync($"timelines/{urlGenerator(1)}",
+                    expectedStatusCode: HttpStatusCode.NotModified,
+                    headerSetup: (headers, _) =>
+                    {
+                        headers.IfModifiedSince = lastModifiedTime.AddSeconds(1);
+                    });
             }
 
             {
-                using var req = new HttpRequestMessage
-                {
-                    RequestUri = new Uri(client.BaseAddress, urlGenerator(1)),
-                    Method = HttpMethod.Get,
-                };
-                req.Headers.IfModifiedSince = lastModifiedTime.AddSeconds(-1);
-                var res = await client.SendAsync(req);
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.Should().BeEquivalentTo(timeline);
+
+                var body = await client.TestGetAsync<TimelineInfo>($"timelines/{urlGenerator(1)}",
+                    expectedStatusCode: HttpStatusCode.NotModified,
+                    headerSetup: (headers, _) =>
+                    {
+                        headers.IfModifiedSince = lastModifiedTime.AddSeconds(-1);
+                    });
+                body.Should().BeEquivalentTo(timeline);
             }
 
             {
-                var res = await client.GetAsync(urlGenerator(1, null,
-                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) } }));
-                res.Should().HaveStatusCode(304);
+                await client.TestGetAsync($"timelines/{urlGenerator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }", expectedStatusCode: HttpStatusCode.NotModified);
             }
 
             {
-                var res = await client.GetAsync(urlGenerator(1, null,
-                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(-1).ToString("s", CultureInfo.InvariantCulture) } }));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.Should().BeEquivalentTo(timeline);
+                var body = await client.TestGetAsync<TimelineInfo>($"timelines/{urlGenerator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(-1).ToString("s", CultureInfo.InvariantCulture) }");
+                body.Should().BeEquivalentTo(timeline);
             }
 
             {
-                var res = await client.GetAsync(urlGenerator(1, null,
-                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) },
-                        {"checkUniqueId", uniqueId } }));
-                res.Should().HaveStatusCode(304);
+                await client.TestGetAsync($"timelines/{urlGenerator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }&checkUniqueId={uniqueId}", expectedStatusCode: HttpStatusCode.NotModified);
             }
 
             {
                 var testUniqueId = (uniqueId[0] == 'a' ? "b" : "a") + uniqueId[1..];
-                var res = await client.GetAsync(urlGenerator(1, null,
-                    new Dictionary<string, string> { { "ifModifiedSince", lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) },
-                        {"checkUniqueId", testUniqueId } }));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.Should().BeEquivalentTo(timeline);
+                var body = await client.TestGetAsync<TimelineInfo>($"timelines/{urlGenerator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }&checkUniqueId={testUniqueId}", expectedStatusCode: HttpStatusCode.NotModified);
+                body.Should().BeEquivalentTo(timeline);
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task Title(TimelineUrlGenerator urlGenerator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Title(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
             {
-                var res = await client.GetAsync(urlGenerator(1));
-                var timeline = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which;
-                timeline.Title.Should().Be(timeline.Name);
+                var body = await client.GetTimelineAsync(generator(1));
+                body.Title.Should().Be(body.Name);
             }
 
             {
-                var res = await client.PatchAsJsonAsync(urlGenerator(1), new TimelinePatchRequest { Title = "atitle" });
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.Title.Should().Be("atitle");
+                var body = await client.PatchTimelineAsync(generator(1), new TimelinePatchRequest { Title = "atitle" });
+                body.Title.Should().Be("atitle");
             }
 
             {
-                var res = await client.GetAsync(urlGenerator(1));
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<TimelineInfo>()
-                    .Which.Title.Should().Be("atitle");
+                var body = await client.GetTimelineAsync(generator(1));
+                body.Title.Should().Be("atitle");
             }
         }
 
@@ -1037,53 +888,35 @@ namespace Timeline.Tests.IntegratedTests
         {
             {
                 using var client = await CreateDefaultClient();
-                var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
-                res.Should().HaveStatusCode(401);
+                await client.TestPostAssertUnauthorizedAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
             }
 
             {
                 using var client = await CreateClientAs(2);
-                var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
-                res.Should().HaveStatusCode(403);
+                await client.TestPostAssertForbiddenAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
             }
 
             using (var client = await CreateClientAsUser())
             {
-                {
-                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "!!!", NewName = "tttttttt" });
-                    res.Should().BeInvalidModel();
-                }
+                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "!!!", NewName = "tttttttt" });
+
+                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttt", NewName = "!!!!" });
+
+                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttttt", NewName = "tttttttt" });
+                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "newt" });
+
+                await client.TestGetAsync("timelines/t1", expectedStatusCode: HttpStatusCode.NotFound);
 
                 {
-                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttt", NewName = "!!!!" });
-                    res.Should().BeInvalidModel();
-                }
-
-                {
-                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttttt", NewName = "tttttttt" });
-                    res.Should().HaveStatusCode(400).And.HaveCommonBody().Which.Code.Should().Be(ErrorCodes.TimelineController.NotExist);
-                }
-
-                {
-                    var res = await client.PostAsJsonAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "newt" });
-                    res.Should().HaveStatusCode(200).And.HaveJsonBody<TimelineInfo>().Which.Name.Should().Be("newt");
-                }
-
-                {
-                    var res = await client.GetAsync("timelines/t1");
-                    res.Should().HaveStatusCode(404);
-                }
-
-                {
-                    var res = await client.GetAsync("timelines/newt");
-                    res.Should().HaveStatusCode(200).And.HaveJsonBody<TimelineInfo>().Which.Name.Should().Be("newt");
+                    var body = await client.TestGetAsync<TimelineInfo>("timelines/newt");
+                    body.Name.Should().Be("newt");
                 }
             }
         }
 
         [Theory]
-        [MemberData(nameof(TimelineUrlGeneratorData))]
-        public async Task PostDataETag(TimelineUrlGenerator urlGenerator)
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task PostDataETag(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
 
@@ -1091,7 +924,7 @@ namespace Timeline.Tests.IntegratedTests
             string etag;
 
             {
-                var res = await client.PostAsJsonAsync(urlGenerator(1, "posts"), new TimelinePostCreateRequest
+                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", new TimelinePostCreateRequest
                 {
                     Content = new TimelinePostCreateRequestContent
                     {
@@ -1099,19 +932,17 @@ namespace Timeline.Tests.IntegratedTests
                         Data = Convert.ToBase64String(ImageHelper.CreatePngWithSize(100, 50))
                     }
                 });
-                res.Should().HaveStatusCode(200);
-                var body = await res.ReadBodyAsJsonAsync<TimelinePostInfo>();
-                body.Content.ETag.Should().NotBeNullOrEmpty();
+                body.Content!.ETag.Should().NotBeNullOrEmpty();
 
                 id = body.Id;
-                etag = body.Content.ETag;
+                etag = body.Content.ETag!;
             }
 
             {
-                var res = await client.GetAsync(urlGenerator(1, $"posts/{id}/data"));
-                res.Should().HaveStatusCode(200);
+                var res = await client.GetAsync($"timelines/{generator(1)}/posts{id}/data");
+                res.StatusCode.Should().Be(HttpStatusCode.OK);
                 res.Headers.ETag.Should().NotBeNull();
-                res.Headers.ETag.ToString().Should().Be(etag);
+                res.Headers.ETag!.ToString().Should().Be(etag);
             }
         }
     }

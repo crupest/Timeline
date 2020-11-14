@@ -48,14 +48,14 @@ namespace Timeline.Tests.IntegratedTests
             return resBody;
         }
 
-        public static async Task TestGetAsync(this HttpClient client, string url, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+        public static async Task TestGetAsync(this HttpClient client, string url, HttpStatusCode expectedStatusCode = HttpStatusCode.OK, HeaderSetup? headerSetup = null)
         {
-            await client.TestJsonSendAsync(HttpMethod.Get, url, expectedStatusCode: expectedStatusCode);
+            await client.TestJsonSendAsync(HttpMethod.Get, url, expectedStatusCode: expectedStatusCode, headerSetup: headerSetup);
         }
 
-        public static async Task<T> TestGetAsync<T>(this HttpClient client, string url, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+        public static async Task<T> TestGetAsync<T>(this HttpClient client, string url, HttpStatusCode expectedStatusCode = HttpStatusCode.OK, HeaderSetup? headerSetup = null)
         {
-            return await client.TestJsonSendAsync<T>(HttpMethod.Get, url, expectedStatusCode: expectedStatusCode);
+            return await client.TestJsonSendAsync<T>(HttpMethod.Get, url, expectedStatusCode: expectedStatusCode, headerSetup: headerSetup);
         }
 
         public static async Task TestPostAsync(this HttpClient client, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
@@ -104,6 +104,11 @@ namespace Timeline.Tests.IntegratedTests
         {
             using JsonContent? reqContent = jsonBody == null ? null : JsonContent.Create(jsonBody, options: CommonJsonSerializeOptions.Options);
             await client.TestSendAssertErrorAsync(method, url, reqContent, expectedStatusCode, errorCode, headerSetup);
+        }
+
+        public static async Task TestGetAssertErrorAsync(this HttpClient client, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertErrorAsync(HttpMethod.Get, url, jsonBody, expectedStatusCode, errorCode, headerSetup);
         }
 
         public static async Task TestPostAssertErrorAsync(this HttpClient client, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest, int? errorCode = null, HeaderSetup? headerSetup = null)
