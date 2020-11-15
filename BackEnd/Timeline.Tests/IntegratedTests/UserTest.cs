@@ -13,89 +13,41 @@ namespace Timeline.Tests.IntegratedTests
     public class UserTest : IntegratedTestBase
     {
         [Fact]
-        public void UserListShouldHaveUniqueId()
+        public async Task UserListShouldHaveUniqueId()
         {
-            foreach (var user in UserInfos)
+            using var client = await CreateDefaultClient();
+            foreach (var user in await client.TestGetAsync<List<UserInfo>>("users"))
             {
                 user.UniqueId.Should().NotBeNullOrWhiteSpace();
             }
         }
 
         [Fact]
-        public async Task GetList_NoAuth()
+        public async Task GetList()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.GetAsync("users");
-            res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo[]>()
-                .Which.Should().BeEquivalentTo(UserInfos);
+            await client.TestGetAsync<List<UserInfo>>("users");
         }
 
         [Fact]
-        public async Task GetList_User()
-        {
-            using var client = await CreateClientAsUser();
-            var res = await client.GetAsync("users");
-            res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo[]>()
-                .Which.Should().BeEquivalentTo(UserInfos);
-        }
-
-        [Fact]
-        public async Task GetList_Admin()
-        {
-            using var client = await CreateClientAsAdministrator();
-            var res = await client.GetAsync("users");
-            res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo[]>()
-                .Which.Should().BeEquivalentTo(UserInfos);
-        }
-
-        [Fact]
-        public async Task Get_NoAuth()
+        public async Task Get()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.GetAsync($"users/admin");
-            res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo>()
-                .Which.Should().BeEquivalentTo(UserInfos[0]);
-        }
-
-        [Fact]
-        public async Task Get_User()
-        {
-            using var client = await CreateClientAsUser();
-            var res = await client.GetAsync($"users/admin");
-            res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo>()
-                .Which.Should().BeEquivalentTo(UserInfos[0]);
-        }
-
-        [Fact]
-        public async Task Get_Admin()
-        {
-            using var client = await CreateClientAsAdministrator();
-            var res = await client.GetAsync($"users/user1");
-            res.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<UserInfo>()
-                .Which.Should().BeEquivalentTo(UserInfos[1]);
+            await client.TestGetAsync<UserInfo>($"users/admin");
         }
 
         [Fact]
         public async Task Get_InvalidModel()
         {
-            using var client = await CreateClientAsUser();
-            var res = await client.GetAsync("users/aaa!a");
-            res.Should().BeInvalidModel();
+            using var client = await CreateDefaultClient();
+            await client.TestGetAssertInvalidModelAsync("users/aaa!a");
         }
 
         [Fact]
         public async Task Get_404()
         {
-            using var client = await CreateClientAsUser();
-            var res = await client.GetAsync("users/usernotexist");
-            res.Should().HaveStatusCode(404)
-                .And.HaveCommonBody(ErrorCodes.UserCommon.NotExist);
+            using var client = await CreateDefaultClient();
+            await client.TestGetAssertNotFoundAsync("users/usernotexist", errorCode: ErrorCodes.UserCommon.NotExist);
         }
 
         [Fact]
@@ -103,18 +55,14 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsUser();
             {
-                var res = await client.PatchAsJsonAsync("users/user1",
+                var body = await client.TestPatchAsync<UserInfo>("users/user1",
                     new UserPatchRequest { Nickname = "aaa" });
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfo>()
-                    .Which.Nickname.Should().Be("aaa");
+                body.Nickname.Should().Be("aaa");
             }
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfo>()
-                    .Which.Nickname.Should().Be("aaa");
+                var body = await client.GetUserAsync("user1");
+                body.Nickname.Should().Be("aaa");
             }
         }
 
@@ -125,32 +73,25 @@ namespace Timeline.Tests.IntegratedTests
             using var userClient = await CreateClientAsUser();
 
             {
-                var res = await client.PatchAsJsonAsync("users/user1",
+                var body = await client.TestPatchAsync<UserInfo>("users/user1",
                     new UserPatchRequest
                     {
                         Username = "newuser",
                         Password = "newpw",
                         Nickname = "aaa"
                     });
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfo>()
-                    .Which;
                 body.Nickname.Should().Be("aaa");
             }
 
             {
-                var res = await client.GetAsync("users/newuser");
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfo>()
-                    .Which;
+                var body = await client.GetUserAsync("users/newuser");
                 body.Nickname.Should().Be("aaa");
             }
 
             {
-                var token = userClient.DefaultRequestHeaders.Authorization.Parameter;
+                var token = userClient.DefaultRequestHeaders.Authorization!.Parameter!;
                 // Token should expire.
-                var res = await userClient.PostAsJsonAsync<VerifyTokenRequest>("token/verify", new() { Token = token });
-                res.Should().HaveStatusCode(HttpStatusCode.BadRequest);
+                await userClient.TestPostAssertErrorAsync("token/verify", new VerifyTokenRequest() { Token = token });
             }
 
             {
@@ -163,18 +104,14 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Patch_NotExist()
         {
             using var client = await CreateClientAsAdministrator();
-            var res = await client.PatchAsJsonAsync("users/usernotexist", new UserPatchRequest { });
-            res.Should().HaveStatusCode(404)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
+            await client.TestPatchAssertNotFoundAsync("users/usernotexist", new UserPatchRequest { }, errorCode: ErrorCodes.UserCommon.NotExist);
         }
 
         [Fact]
         public async Task Patch_InvalidModel()
         {
             using var client = await CreateClientAsAdministrator();
-            var res = await client.PatchAsJsonAsync("users/aaa!a", new UserPatchRequest { });
-            res.Should().BeInvalidModel();
+            await client.TestPatchAssertInvalidModelAsync("users/aaa!a", new UserPatchRequest { });
         }
 
         public static IEnumerable<object[]> Patch_InvalidModel_Body_Data()
@@ -189,96 +126,78 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Patch_InvalidModel_Body(UserPatchRequest body)
         {
             using var client = await CreateClientAsAdministrator();
-            var res = await client.PatchAsJsonAsync("users/user1", body);
-            res.Should().BeInvalidModel();
+            await client.TestPatchAssertInvalidModelAsync("users/user1", body);
         }
 
         [Fact]
         public async Task Patch_UsernameConflict()
         {
             using var client = await CreateClientAsAdministrator();
-            var res = await client.PatchAsJsonAsync("users/user1", new UserPatchRequest { Username = "admin" });
-            res.Should().HaveStatusCode(400)
-                .And.HaveCommonBody(ErrorCodes.UserController.UsernameConflict);
+            await client.TestPatchAssertErrorAsync("users/user1", new UserPatchRequest { Username = "admin" }, errorCode: ErrorCodes.UserController.UsernameConflict);
         }
 
         [Fact]
         public async Task Patch_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.PatchAsJsonAsync("users/user1", new UserPatchRequest { Nickname = "aaa" });
-            res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+            await client.TestPatchAssertUnauthorizedAsync("users/user1", new UserPatchRequest { Nickname = "aaa" });
         }
 
         [Fact]
         public async Task Patch_User_Forbid()
         {
             using var client = await CreateClientAsUser();
-            var res = await client.PatchAsJsonAsync("users/admin", new UserPatchRequest { Nickname = "aaa" });
-            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+            await client.TestPatchAssertForbiddenAsync("users/admin", new UserPatchRequest { Nickname = "aaa" });
         }
 
         [Fact]
         public async Task Patch_Username_Forbid()
         {
             using var client = await CreateClientAsUser();
-            var res = await client.PatchAsJsonAsync("users/user1", new UserPatchRequest { Username = "aaa" });
-            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+            await client.TestPatchAssertForbiddenAsync("users/user1", new UserPatchRequest { Username = "aaa" });
         }
 
         [Fact]
         public async Task Patch_Password_Forbid()
         {
             using var client = await CreateClientAsUser();
-            var res = await client.PatchAsJsonAsync("users/user1", new UserPatchRequest { Password = "aaa" });
-            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+            await client.TestPatchAssertForbiddenAsync("users/user1", new UserPatchRequest { Password = "aaa" });
         }
 
         [Fact]
         public async Task Delete_Deleted()
         {
             using var client = await CreateClientAsAdministrator();
-            {
-                var res = await client.DeleteAsync("users/user1");
-                res.Should().BeDelete(true);
-            }
-
-            {
-                var res = await client.GetAsync("users/user1");
-                res.Should().HaveStatusCode(404);
-            }
+            await client.TestDeleteAsync("users/user1", true);
+            await client.TestGetAssertNotFoundAsync("users/user1");
         }
 
         [Fact]
         public async Task Delete_NotExist()
         {
             using var client = await CreateClientAsAdministrator();
-            var res = await client.DeleteAsync("users/usernotexist");
-            res.Should().BeDelete(false);
+            await client.TestDeleteAsync("users/usernotexist", false);
         }
 
         [Fact]
         public async Task Delete_InvalidModel()
         {
             using var client = await CreateClientAsAdministrator();
-            var res = await client.DeleteAsync("users/aaa!a");
-            res.Should().BeInvalidModel();
+            await client.TestDeleteAssertInvalidModelAsync("users/aaa!a");
         }
 
         [Fact]
         public async Task Delete_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.DeleteAsync("users/aaa!a");
-            res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+            await client.TestDeleteAssertUnauthorizedAsync("users/aaa!a");
         }
 
         [Fact]
         public async Task Delete_User_Forbid()
         {
             using var client = await CreateClientAsUser();
-            var res = await client.DeleteAsync("users/aaa!a");
-            res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
+            await client.TestDeleteAssertForbiddenAsync("users/aaa!a");
         }
 
         private const string createUserUrl = "userop/createuser";
@@ -288,19 +207,15 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
             {
-                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
+                var body = await client.TestPostAsync<UserInfo>(createUserUrl, new CreateUserRequest
                 {
                     Username = "aaa",
                     Password = "bbb",
                 });
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfo>().Which;
                 body.Username.Should().Be("aaa");
             }
             {
-                var res = await client.GetAsync("users/aaa");
-                var body = res.Should().HaveStatusCode(200)
-                    .And.HaveJsonBody<UserInfo>().Which;
+                var body = await client.GetUserAsync("users/aaa");
                 body.Username.Should().Be("aaa");
             }
             {
@@ -322,53 +237,40 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_CreateUser_InvalidModel(CreateUserRequest body)
         {
             using var client = await CreateClientAsAdministrator();
-            {
-                var res = await client.PostAsJsonAsync(createUserUrl, body);
-                res.Should().BeInvalidModel();
-            }
+            await client.TestPostAssertInvalidModelAsync(createUserUrl, body);
         }
 
         [Fact]
         public async Task Op_CreateUser_UsernameConflict()
         {
             using var client = await CreateClientAsAdministrator();
+            await client.TestPostAssertErrorAsync(createUserUrl, new CreateUserRequest
             {
-                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
-                {
-                    Username = "user1",
-                    Password = "bbb",
-                });
-                res.Should().HaveStatusCode(400)
-                    .And.HaveCommonBody(ErrorCodes.UserController.UsernameConflict);
-            }
+                Username = "user1",
+                Password = "bbb",
+            }, errorCode: ErrorCodes.UserController.UsernameConflict);
         }
 
         [Fact]
         public async Task Op_CreateUser_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
+            await client.TestPostAssertUnauthorizedAsync(createUserUrl, new CreateUserRequest
             {
-                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
-                {
-                    Username = "aaa",
-                    Password = "bbb",
-                });
-                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
-            }
+                Username = "aaa",
+                Password = "bbb",
+            });
         }
 
         [Fact]
         public async Task Op_CreateUser_User_Forbid()
         {
             using var client = await CreateClientAsUser();
+            await client.TestPostAssertForbiddenAsync(createUserUrl, new CreateUserRequest
             {
-                var res = await client.PostAsJsonAsync(createUserUrl, new CreateUserRequest
-                {
-                    Username = "aaa",
-                    Password = "bbb",
-                });
-                res.Should().HaveStatusCode(HttpStatusCode.Forbidden);
-            }
+                Username = "aaa",
+                Password = "bbb",
+            });
         }
 
         private const string changePasswordUrl = "userop/changepassword";
@@ -377,21 +279,12 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_ChangePassword()
         {
             using var client = await CreateClientAsUser();
-            {
-                var res = await client.PostAsJsonAsync(changePasswordUrl,
-                    new ChangePasswordRequest { OldPassword = "user1pw", NewPassword = "newpw" });
-                res.Should().HaveStatusCode(200);
-            }
-            {
-                var res = await client.PatchAsJsonAsync("users/user1", new UserPatchRequest { });
-                res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
-            }
-            {
-                (await CreateClientWithCredential("user1", "newpw")).Dispose();
-            }
+            await client.TestPostAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "user1pw", NewPassword = "newpw" });
+            await client.TestPatchAssertUnauthorizedAsync("users/user1", new UserPatchRequest { });
+            (await CreateClientWithCredential("user1", "newpw")).Dispose();
         }
 
-        public static IEnumerable<object[]> Op_ChangePassword_InvalidModel_Data()
+        public static IEnumerable<object?[]> Op_ChangePassword_InvalidModel_Data()
         {
             yield return new[] { null, "ppp" };
             yield return new[] { "ppp", null };
@@ -402,26 +295,22 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_ChangePassword_InvalidModel(string oldPassword, string newPassword)
         {
             using var client = await CreateClientAsUser();
-            var res = await client.PostAsJsonAsync(changePasswordUrl,
+            await client.TestPostAssertInvalidModelAsync(changePasswordUrl,
                 new ChangePasswordRequest { OldPassword = oldPassword, NewPassword = newPassword });
-            res.Should().BeInvalidModel();
         }
 
         [Fact]
         public async Task Op_ChangePassword_BadOldPassword()
         {
             using var client = await CreateClientAsUser();
-            var res = await client.PostAsJsonAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
-            res.Should().HaveStatusCode(400)
-                .And.HaveCommonBody(ErrorCodes.UserController.ChangePassword_BadOldPassword);
+            await client.TestPostAssertErrorAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" }, errorCode: ErrorCodes.UserController.ChangePassword_BadOldPassword);
         }
 
         [Fact]
         public async Task Op_ChangePassword_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.PostAsJsonAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
-            res.Should().HaveStatusCode(HttpStatusCode.Unauthorized);
+            await client.TestPostAssertUnauthorizedAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
         }
     }
 }
