@@ -144,7 +144,7 @@ namespace Timeline.Tests.IntegratedTests
             var createTokenResult = await CreateUserTokenAsync(client, "user1", "user1pw");
             var body = await client.TestPostAsync<VerifyTokenResponse>(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = createTokenResult.Token });
-            body.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
+            body.User.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
         }
     }
 }

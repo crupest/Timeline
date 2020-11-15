@@ -9,7 +9,7 @@ namespace Timeline.Tests.Services
 {
     public class UserPermissionServiceTest : DatabaseBasedTest
     {
-        private UserPermissionService _service;
+        private UserPermissionService _service = default!;
 
         public UserPermissionServiceTest()
         {

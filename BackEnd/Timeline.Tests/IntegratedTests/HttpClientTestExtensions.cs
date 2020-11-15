@@ -85,9 +85,15 @@ namespace Timeline.Tests.IntegratedTests
 
         public static async Task TestDeleteAsync(this HttpClient client, string url, bool? delete = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
-            var body = await client.TestJsonSendAsync<CommonDeleteResponse>(HttpMethod.Delete, url, expectedStatusCode: expectedStatusCode);
             if (delete.HasValue)
+            {
+                var body = await client.TestJsonSendAsync<CommonDeleteResponse>(HttpMethod.Delete, url, expectedStatusCode: expectedStatusCode);
                 body.Data.Delete.Should().Be(delete.Value);
+            }
+            else
+            {
+                await client.TestJsonSendAsync(HttpMethod.Delete, url, expectedStatusCode: expectedStatusCode);
+            }
         }
 
         public static async Task TestSendAssertErrorAsync(this HttpClient client, HttpMethod method, string url, HttpContent? body = null, HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest, int? errorCode = null, HeaderSetup? headerSetup = null)
