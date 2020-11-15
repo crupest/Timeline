@@ -1,7 +1,5 @@
-﻿using FluentAssertions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Timeline.Models.Http;
-using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests

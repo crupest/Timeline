@@ -1,11 +1,7 @@
 using FluentAssertions;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
-using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
