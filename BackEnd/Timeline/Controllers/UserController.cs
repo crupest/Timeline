@@ -138,15 +138,23 @@ namespace Timeline.Controllers
         /// <returns>Info of deletion.</returns>
         [HttpDelete("users/{username}"), PermissionAuthorize(UserPermission.UserManagement)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute][Username] string username)
         {
-            var delete = await _userDeleteService.DeleteUser(username);
-            if (delete)
-                return Ok(CommonDeleteResponse.Delete());
-            else
-                return Ok(CommonDeleteResponse.NotExist());
+            try
+            {
+                var delete = await _userDeleteService.DeleteUser(username);
+                if (delete)
+                    return Ok(CommonDeleteResponse.Delete());
+                else
+                    return Ok(CommonDeleteResponse.NotExist());
+            }
+            catch (InvalidOperationOnRootUserException)
+            {
+                return BadRequest(ErrorResponse.UserController.Delete_RootUser());
+            }
         }
 
         /// <summary>

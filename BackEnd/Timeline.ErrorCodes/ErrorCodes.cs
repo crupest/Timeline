@@ -44,6 +44,7 @@
             public const int UsernameConflict = 1_102_01_01;
             public const int ChangePassword_BadOldPassword = 1_102_02_01;
             public const int ChangePermission_RootUser = 1_102_03_01;
+            public const int Delete_RootUser = 1_102_04_01;
         }
 
         public static class UserAvatar

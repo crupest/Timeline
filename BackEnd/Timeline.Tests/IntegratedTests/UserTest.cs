@@ -176,6 +176,13 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
+        public async Task DeleteRootUser_Should_Error()
+        {
+            using var client = await CreateClientAsAdministrator();
+            await client.TestDeleteAssertErrorAsync("users/admin", errorCode: ErrorCodes.UserController.Delete_RootUser);
+        }
+
+        [Fact]
         public async Task Delete_InvalidModel()
         {
             using var client = await CreateClientAsAdministrator();

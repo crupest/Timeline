@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
 using Timeline.Models.Validation;
+using Timeline.Services.Exceptions;
 using static Timeline.Resources.Services.UserService;
 
 namespace Timeline.Services
@@ -20,6 +21,7 @@ namespace Timeline.Services
         /// <returns>True if user is deleted, false if user not exist.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
+        /// <exception cref="InvalidOperationOnRootUserException">Thrown when deleting root user.</exception>
         Task<bool> DeleteUser(string username);
     }
 
@@ -53,6 +55,9 @@ namespace Timeline.Services
             var user = await _databaseContext.Users.Where(u => u.Username == username).SingleOrDefaultAsync();
             if (user == null)
                 return false;
+
+            if (user.Id == 1)
+                throw new InvalidOperationOnRootUserException("Can't delete root user.");
 
             await _timelineService.DeleteAllPostsOfUser(user.Id);
 

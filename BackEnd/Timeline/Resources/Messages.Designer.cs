@@ -367,6 +367,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t delete root user..
+        /// </summary>
+        internal static string UserController_Delete_RootUser {
+            get {
+                return ResourceManager.GetString("UserController_Delete_RootUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You can&apos;t set permission unless you are administrator..
         /// </summary>
         internal static string UserController_Patch_Forbid_Administrator {
