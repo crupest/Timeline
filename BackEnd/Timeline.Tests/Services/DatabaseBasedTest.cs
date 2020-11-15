@@ -8,7 +8,7 @@ namespace Timeline.Tests.Services
     public abstract class DatabaseBasedTest : IAsyncLifetime
     {
         protected TestDatabase TestDatabase { get; }
-        protected DatabaseContext Database { get; private set; }
+        protected DatabaseContext Database { get; private set; } = default!;
 
         protected DatabaseBasedTest(bool databaseCreateUsers = true)
         {

@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services;
-using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
@@ -17,12 +16,10 @@ namespace Timeline.Tests.IntegratedTests
 
         private static async Task<CreateTokenResponse> CreateUserTokenAsync(HttpClient client, string username, string password, int? expireOffset = null)
         {
-            var response = await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, Expire = expireOffset });
-            return response.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<CreateTokenResponse>().Which;
+            return await client.TestPostAsync<CreateTokenResponse>(CreateTokenUrl, new CreateTokenRequest { Username = username, Password = password, Expire = expireOffset });
         }
 
-        public static IEnumerable<object[]> CreateToken_InvalidModel_Data()
+        public static IEnumerable<object?[]> CreateToken_InvalidModel_Data()
         {
             yield return new[] { null, "p", null };
             yield return new[] { "u", null, null };
@@ -35,12 +32,12 @@ namespace Timeline.Tests.IntegratedTests
         public async Task CreateToken_InvalidModel(string username, string password, int expire)
         {
             using var client = await CreateDefaultClient();
-            (await client.PostAsJsonAsync(CreateTokenUrl, new CreateTokenRequest
+            await client.TestPostAssertInvalidModelAsync(CreateTokenUrl, new CreateTokenRequest
             {
                 Username = username,
                 Password = password,
                 Expire = expire
-            })).Should().BeInvalidModel();
+            });
         }
 
         public static IEnumerable<object[]> CreateToken_UserCredential_Data()
@@ -54,42 +51,35 @@ namespace Timeline.Tests.IntegratedTests
         public async void CreateToken_UserCredential(string username, string password)
         {
             using var client = await CreateDefaultClient();
-            var response = await client.PostAsJsonAsync(CreateTokenUrl,
-                new CreateTokenRequest { Username = username, Password = password });
-            response.Should().HaveStatusCode(400)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.TokenController.Create_BadCredential);
+            await client.TestPostAssertErrorAsync(CreateTokenUrl,
+                new CreateTokenRequest { Username = username, Password = password },
+                errorCode: ErrorCodes.TokenController.Create_BadCredential);
         }
 
         [Fact]
         public async Task CreateToken_Success()
         {
             using var client = await CreateDefaultClient();
-            var response = await client.PostAsJsonAsync(CreateTokenUrl,
+            var body = await client.TestPostAsync<CreateTokenResponse>(CreateTokenUrl,
                 new CreateTokenRequest { Username = "user1", Password = "user1pw" });
-            var body = response.Should().HaveStatusCode(200)
-               .And.HaveJsonBody<CreateTokenResponse>().Which;
             body.Token.Should().NotBeNullOrWhiteSpace();
-            body.User.Should().BeEquivalentTo(UserInfos[1]);
+            body.User.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
         }
 
         [Fact]
         public async Task VerifyToken_InvalidModel()
         {
             using var client = await CreateDefaultClient();
-            (await client.PostAsJsonAsync(VerifyTokenUrl,
-                new VerifyTokenRequest { Token = null })).Should().BeInvalidModel();
+            await client.TestPostAssertInvalidModelAsync(VerifyTokenUrl, new VerifyTokenRequest { Token = null! });
         }
 
         [Fact]
         public async Task VerifyToken_BadFormat()
         {
             using var client = await CreateDefaultClient();
-            var response = await client.PostAsJsonAsync(VerifyTokenUrl,
-                new VerifyTokenRequest { Token = "bad token hahaha" });
-            response.Should().HaveStatusCode(400)
-                 .And.HaveCommonBody()
-                 .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_BadFormat);
+            await client.TestPostAssertErrorAsync(VerifyTokenUrl,
+                new VerifyTokenRequest { Token = "bad token hahaha" },
+                errorCode: ErrorCodes.TokenController.Verify_BadFormat);
         }
 
         [Fact]
@@ -106,11 +96,9 @@ namespace Timeline.Tests.IntegratedTests
                 await userService.ModifyUser(id, new ModifyUserParams { Password = "user1pw" });
             }
 
-            (await client.PostAsJsonAsync(VerifyTokenUrl,
-                new VerifyTokenRequest { Token = token }))
-                .Should().HaveStatusCode(400)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_OldVersion);
+            await client.TestPostAssertErrorAsync(VerifyTokenUrl,
+                new VerifyTokenRequest { Token = token },
+                errorCode: ErrorCodes.TokenController.Verify_OldVersion);
         }
 
         [Fact]
@@ -125,11 +113,9 @@ namespace Timeline.Tests.IntegratedTests
                 await userService.DeleteUser("user1");
             }
 
-            (await client.PostAsJsonAsync(VerifyTokenUrl,
-                new VerifyTokenRequest { Token = token }))
-                .Should().HaveStatusCode(400)
-                .And.HaveCommonBody()
-                .Which.Code.Should().Be(ErrorCodes.TokenController.Verify_UserNotExist);
+            await client.TestPostAssertErrorAsync(VerifyTokenUrl,
+                new VerifyTokenRequest { Token = token },
+                errorCode: ErrorCodes.TokenController.Verify_UserNotExist);
         }
 
         //[Fact]
@@ -155,11 +141,9 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateDefaultClient();
             var createTokenResult = await CreateUserTokenAsync(client, "user1", "user1pw");
-            var response = await client.PostAsJsonAsync(VerifyTokenUrl,
+            var body = await client.TestPostAsync<VerifyTokenResponse>(VerifyTokenUrl,
                 new VerifyTokenRequest { Token = createTokenResult.Token });
-            response.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<VerifyTokenResponse>()
-                .Which.User.Should().BeEquivalentTo(UserInfos[1]);
+            body.User.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
         }
     }
 }
