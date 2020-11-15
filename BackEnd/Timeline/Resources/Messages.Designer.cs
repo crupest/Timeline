@@ -358,6 +358,15 @@ namespace Timeline.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can&apos;t change permission of root user..
+        /// </summary>
+        internal static string UserController_ChangePermission_RootUser {
+            get {
+                return ResourceManager.GetString("UserController_ChangePermission_RootUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You can&apos;t set permission unless you are administrator..
         /// </summary>
         internal static string UserController_Patch_Forbid_Administrator {

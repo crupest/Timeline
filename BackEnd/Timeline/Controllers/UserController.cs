@@ -212,6 +212,10 @@ namespace Timeline.Controllers
             {
                 return NotFound(ErrorResponse.UserCommon.NotExist());
             }
+            catch (InvalidOperationOnRootUserException)
+            {
+                return BadRequest(ErrorResponse.UserController.ChangePermission_RootUser());
+            }
         }
 
         [HttpDelete("users/{username}/permissions/{permission}"), PermissionAuthorize(UserPermission.UserManagement)]
@@ -231,6 +235,10 @@ namespace Timeline.Controllers
             catch (UserNotExistException)
             {
                 return NotFound(ErrorResponse.UserCommon.NotExist());
+            }
+            catch (InvalidOperationOnRootUserException)
+            {
+                return BadRequest(ErrorResponse.UserController.ChangePermission_RootUser());
             }
         }
     }

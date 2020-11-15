@@ -216,6 +216,9 @@
   <data name="UserController_ChangePassword_BadOldPassword" xml:space="preserve">
     <value>Old password is wrong.</value>
   </data>
+  <data name="UserController_ChangePermission_RootUser" xml:space="preserve">
+    <value>You can't change permission of root user.</value>
+  </data>
   <data name="UserController_Patch_Forbid_Administrator" xml:space="preserve">
     <value>You can't set permission unless you are administrator.</value>
   </data>
