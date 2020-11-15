@@ -14,10 +14,14 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 const networkOnly = new NetworkOnly();
 
+const networkOnlyPaths = ["/api", "/swagger"];
+
 setDefaultHandler((options) => {
   const { request, url } = options;
-  if (url && url.pathname.startsWith("/api/")) {
-    return networkOnly.handle(options);
+  if (url) {
+    for (const p of networkOnlyPaths) {
+      if (url.pathname.startsWith(p)) return networkOnly.handle(options);
+    }
   }
 
   if (request instanceof Request && request.destination === "document")
