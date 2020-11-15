@@ -36,23 +36,15 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(EveryPermissionTestData))]
-        public async Task ModifyRootUserPermissionShouldHaveNoEffect(UserPermission permission)
+        public async Task ModifyRootUserPermission_Should_Error(UserPermission permission)
         {
             using var client = await CreateClientAsAdministrator();
 
-            await client.TestDeleteAsync($"users/admin/permissions/{permission}");
+            await client.TestPutAssertErrorAsync($"users/admin/permissions/{permission}",
+                errorCode: ErrorCodes.UserController.ChangePermission_RootUser);
 
-            {
-                var body = await client.GetUserAsync("admin");
-                body.Permissions.Should().BeEquivalentTo(Enum.GetNames<UserPermission>());
-            }
-
-            await client.TestPutAsync($"users/admin/permissions/{permission}");
-
-            {
-                var body = await client.GetUserAsync("admin");
-                body.Permissions.Should().BeEquivalentTo(Enum.GetNames<UserPermission>());
-            }
+            await client.TestDeleteAssertErrorAsync($"users/admin/permissions/{permission}",
+                errorCode: ErrorCodes.UserController.ChangePermission_RootUser);
         }
 
         [Theory]

@@ -127,6 +127,7 @@ namespace Timeline.Services
         /// <param name="userId">The id of the user.</param>
         /// <param name="permission">The new permission.</param>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        /// <exception cref="InvalidOperationOnRootUserException">Thrown when change root user's permission.</exception>
         Task AddPermissionToUserAsync(long userId, UserPermission permission);
 
         /// <summary>
@@ -136,6 +137,7 @@ namespace Timeline.Services
         /// <param name="permission">The permission.</param>
         /// <param name="checkUserExistence">Whether check the user's existence.</param>
         /// <exception cref="UserNotExistException">Thrown when <paramref name="checkUserExistence"/> is true and user does not exist.</exception>
+        /// <exception cref="InvalidOperationOnRootUserException">Thrown when change root user's permission.</exception>
         Task RemovePermissionFromUserAsync(long userId, UserPermission permission, bool checkUserExistence = true);
     }
 
@@ -176,8 +178,8 @@ namespace Timeline.Services
 
         public async Task AddPermissionToUserAsync(long userId, UserPermission permission)
         {
-            if (userId == 1) // The init administrator account.
-                return;
+            if (userId == 1)
+                throw new InvalidOperationOnRootUserException("Can't change root user's permission.");
 
             await CheckUserExistence(userId, true);
 
@@ -193,8 +195,8 @@ namespace Timeline.Services
 
         public async Task RemovePermissionFromUserAsync(long userId, UserPermission permission, bool checkUserExistence = true)
         {
-            if (userId == 1) // The init administrator account.
-                return;
+            if (userId == 1)
+                throw new InvalidOperationOnRootUserException("Can't change root user's permission.");
 
             await CheckUserExistence(userId, checkUserExistence);
 

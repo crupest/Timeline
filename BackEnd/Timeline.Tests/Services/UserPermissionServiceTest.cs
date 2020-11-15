@@ -48,18 +48,10 @@ namespace Timeline.Tests.Services
         }
 
         [Fact]
-        public async Task ModifyPermissionOnRootUserShouldHaveNoEffect()
+        public async Task ModifyPermissionOnRootUser_Should_Throw()
         {
-            await _service.AddPermissionToUserAsync(1, UserPermission.AllTimelineManagement);
-            {
-                var permission = await _service.GetPermissionsOfUserAsync(1);
-                permission.Should().BeEquivalentTo(Enum.GetValues<UserPermission>());
-            }
-            await _service.RemovePermissionFromUserAsync(1, UserPermission.AllTimelineManagement);
-            {
-                var permission = await _service.GetPermissionsOfUserAsync(1);
-                permission.Should().BeEquivalentTo(Enum.GetValues<UserPermission>());
-            }
+            await _service.Awaiting(s => s.AddPermissionToUserAsync(1, UserPermission.AllTimelineManagement)).Should().ThrowAsync<InvalidOperationOnRootUserException>();
+            await _service.Awaiting(s => s.RemovePermissionFromUserAsync(1, UserPermission.AllTimelineManagement)).Should().ThrowAsync<InvalidOperationOnRootUserException>();
         }
 
         [Fact]
