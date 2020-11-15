@@ -166,6 +166,16 @@ namespace Timeline.Models.Http
                 return new CommonResponse(ErrorCodes.UserController.ChangePermission_RootUser, string.Format(message, formatArgs));
             }
 
+            public static CommonResponse Delete_RootUser(params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.UserController.Delete_RootUser, string.Format(UserController_Delete_RootUser, formatArgs));
+            }
+
+            public static CommonResponse CustomMessage_Delete_RootUser(string message, params object?[] formatArgs)
+            {
+                return new CommonResponse(ErrorCodes.UserController.Delete_RootUser, string.Format(message, formatArgs));
+            }
+
         }
 
         public static class UserAvatar

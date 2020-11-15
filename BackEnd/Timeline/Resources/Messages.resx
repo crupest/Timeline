@@ -219,6 +219,9 @@
   <data name="UserController_ChangePermission_RootUser" xml:space="preserve">
     <value>You can't change permission of root user.</value>
   </data>
+  <data name="UserController_Delete_RootUser" xml:space="preserve">
+    <value>You can't delete root user.</value>
+  </data>
   <data name="UserController_Patch_Forbid_Administrator" xml:space="preserve">
     <value>You can't set permission unless you are administrator.</value>
   </data>
