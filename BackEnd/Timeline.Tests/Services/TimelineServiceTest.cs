@@ -22,19 +22,15 @@ namespace Timeline.Tests.Services
 
         private readonly TestClock _clock = new TestClock();
 
-        private DataManager _dataManager;
+        private DataManager _dataManager = default!;
 
-        private UserPermissionService _userPermissionService;
+        private UserPermissionService _userPermissionService = default!;
 
-        private UserService _userService;
+        private UserService _userService = default!;
 
-        private TimelineService _timelineService;
+        private TimelineService _timelineService = default!;
 
-        private UserDeleteService _userDeleteService;
-
-        public TimelineServiceTest()
-        {
-        }
+        private UserDeleteService _userDeleteService = default!;
 
         protected override void OnDatabaseCreated()
         {
@@ -140,7 +136,7 @@ namespace Timeline.Tests.Services
 
             var posts = await _timelineService.GetPosts(timelineName, testPoint);
             posts.Should().HaveCount(3)
-                .And.Subject.Select(p => (p.Content as TextTimelinePostContent).Text).Should().Equal(postContentList.Skip(1));
+                .And.Subject.Select(p => ((TextTimelinePostContent)p.Content!).Text).Should().Equal(postContentList.Skip(1));
         }
 
         [Theory]
@@ -164,7 +160,7 @@ namespace Timeline.Tests.Services
             var posts = await _timelineService.GetPosts(timelineName);
             posts.Should().HaveCount(4);
             posts.Select(p => p.Deleted).Should().Equal(Enumerable.Repeat(false, posts.Count));
-            posts.Select(p => ((TextTimelinePostContent)p.Content).Text).Should().Equal(postContentList);
+            posts.Select(p => ((TextTimelinePostContent)p.Content!).Text).Should().Equal(postContentList);
 
             foreach (var id in new long[] { posts[0].Id, posts[2].Id })
             {
@@ -174,12 +170,12 @@ namespace Timeline.Tests.Services
             posts = await _timelineService.GetPosts(timelineName);
             posts.Should().HaveCount(2);
             posts.Select(p => p.Deleted).Should().Equal(Enumerable.Repeat(false, posts.Count));
-            posts.Select(p => ((TextTimelinePostContent)p.Content).Text).Should().Equal(new string[] { "b", "d" });
+            posts.Select(p => ((TextTimelinePostContent)p.Content!).Text).Should().Equal(new string[] { "b", "d" });
 
             posts = await _timelineService.GetPosts(timelineName, includeDeleted: true);
             posts.Should().HaveCount(4);
             posts.Select(p => p.Deleted).Should().Equal(new bool[] { true, false, true, false });
-            posts.Where(p => !p.Deleted).Select(p => ((TextTimelinePostContent)p.Content).Text).Should().Equal(new string[] { "b", "d" });
+            posts.Where(p => !p.Deleted).Select(p => ((TextTimelinePostContent)p.Content!).Text).Should().Equal(new string[] { "b", "d" });
         }
 
         [Theory]

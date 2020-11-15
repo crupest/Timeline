@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Timeline.Models.Validation;
-using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests

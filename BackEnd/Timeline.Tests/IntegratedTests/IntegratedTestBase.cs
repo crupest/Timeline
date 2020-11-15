@@ -1,13 +1,9 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.TestHost;
+﻿using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Timeline.Models.Converters;
 using Timeline.Models.Http;
 using Timeline.Services;
 using Timeline.Tests.Helpers;
@@ -19,9 +15,7 @@ namespace Timeline.Tests.IntegratedTests
     {
         protected TestApplication TestApp { get; }
 
-        public IReadOnlyList<UserInfo> UserInfos { get; private set; }
-
-        private readonly int _userCount;
+        protected int TestUserCount { get; }
 
         public IntegratedTestBase() : this(1)
         {
@@ -33,7 +27,7 @@ namespace Timeline.Tests.IntegratedTests
             if (userCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(userCount), userCount, "User count can't be negative.");
 
-            _userCount = userCount;
+            TestUserCount = userCount;
 
             TestApp = new TestApplication();
         }
@@ -48,54 +42,45 @@ namespace Timeline.Tests.IntegratedTests
             return Task.CompletedTask;
         }
 
+        protected virtual void OnInitialize()
+        {
+
+        }
+
         protected virtual void OnDispose()
         {
 
         }
 
-        public async Task InitializeAsync()
+        private async Task CreateUsers()
         {
-            await TestApp.InitializeAsync();
+            using var scope = TestApp.Host.Services.CreateScope();
 
-            using (var scope = TestApp.Host.Services.CreateScope())
-            {
-                var users = new List<(string username, string password, string nickname)>()
+            var users = new List<(string username, string password, string nickname)>()
                 {
                     ("admin", "adminpw", "administrator")
                 };
 
-                for (int i = 1; i <= _userCount; i++)
-                {
-                    users.Add(($"user{i}", $"user{i}pw", $"imuser{i}"));
-                }
-
-                var userInfoList = new List<UserInfo>();
-
-                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                foreach (var user in users)
-                {
-                    var (username, password, nickname) = user;
-                    var u = await userService.CreateUser(username, password);
-                    await userService.ModifyUser(u.Id, new ModifyUserParams() { Nickname = nickname });
-                }
-
-                using var client = await CreateDefaultClient();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-                options.Converters.Add(new JsonStringEnumConverter());
-                options.Converters.Add(new JsonDateTimeConverter());
-                foreach (var user in users)
-                {
-                    var s = await client.GetStringAsync($"users/{user.username}");
-                    userInfoList.Add(JsonSerializer.Deserialize<UserInfo>(s, options));
-                }
-
-                UserInfos = userInfoList;
+            for (int i = 1; i <= TestUserCount; i++)
+            {
+                users.Add(($"user{i}", $"user{i}pw", $"imuser{i}"));
             }
 
+            var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+            foreach (var user in users)
+            {
+                var (username, password, nickname) = user;
+                var u = await userService.CreateUser(username, password);
+                await userService.ModifyUser(u.Id, new ModifyUserParams() { Nickname = nickname });
+            }
+        }
+
+        public async Task InitializeAsync()
+        {
+            await TestApp.InitializeAsync();
+            await CreateUsers();
             await OnInitializeAsync();
+            OnInitialize();
         }
 
         public async Task DisposeAsync()
@@ -110,22 +95,17 @@ namespace Timeline.Tests.IntegratedTests
             var client = TestApp.Host.GetTestServer().CreateClient();
             if (setApiBase)
             {
-                client.BaseAddress = new Uri(client.BaseAddress, "api/");
+                client.BaseAddress = new Uri(client.BaseAddress!, "api/");
             }
             return Task.FromResult(client);
         }
 
         public async Task<HttpClient> CreateClientWithCredential(string username, string password, bool setApiBase = true)
         {
-            var client = TestApp.Host.GetTestServer().CreateClient();
-            if (setApiBase)
-            {
-                client.BaseAddress = new Uri(client.BaseAddress, "api/");
-            }
-            var response = await client.PostAsJsonAsync("token/create",
+            var client = await CreateDefaultClient(setApiBase);
+            var res = await client.TestPostAsync<CreateTokenResponse>("token/create",
                 new CreateTokenRequest { Username = username, Password = password });
-            var token = response.Should().HaveStatusCode(200)
-                .And.HaveJsonBody<CreateTokenResponse>().Which.Token;
+            var token = res.Token;
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
             return client;
         }
