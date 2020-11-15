@@ -121,6 +121,11 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertErrorAsync(HttpMethod.Put, url, jsonBody, expectedStatusCode, errorCode, headerSetup);
         }
 
+        public static async Task TestPatchAssertErrorAsync(this HttpClient client, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertErrorAsync(HttpMethod.Patch, url, jsonBody, expectedStatusCode, errorCode, headerSetup);
+        }
+
         public static async Task TestDeleteAssertErrorAsync(this HttpClient client, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest, int? errorCode = null, HeaderSetup? headerSetup = null)
         {
             await client.TestJsonSendAssertErrorAsync(HttpMethod.Delete, url, jsonBody, expectedStatusCode, errorCode, headerSetup);
@@ -151,6 +156,11 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertInvalidModelAsync(HttpMethod.Put, url, jsonBody);
         }
 
+        public static async Task TestPatchAssertInvalidModelAsync(this HttpClient client, string url, object? jsonBody = null)
+        {
+            await client.TestJsonSendAssertInvalidModelAsync(HttpMethod.Patch, url, jsonBody);
+        }
+
         public static async Task TestDeleteAssertInvalidModelAsync(this HttpClient client, string url, object? jsonBody = null)
         {
             await client.TestJsonSendAssertInvalidModelAsync(HttpMethod.Delete, url, jsonBody);
@@ -169,6 +179,11 @@ namespace Timeline.Tests.IntegratedTests
         public static async Task TestPostAssertUnauthorizedAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
         {
             await client.TestJsonSendAssertUnauthorizedAsync(HttpMethod.Post, url, jsonBody, errorCode, headerSetup);
+        }
+
+        public static async Task TestPatchAssertUnauthorizedAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertUnauthorizedAsync(HttpMethod.Patch, url, jsonBody, errorCode, headerSetup);
         }
 
         public static async Task TestDeleteAssertUnauthorizedAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
@@ -191,6 +206,11 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertForbiddenAsync(HttpMethod.Post, url, jsonBody, errorCode, headerSetup);
         }
 
+        public static async Task TestPatchAssertForbiddenAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertForbiddenAsync(HttpMethod.Patch, url, jsonBody, errorCode, headerSetup);
+        }
+
         public static async Task TestDeleteAssertForbiddenAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
         {
             await client.TestJsonSendAssertForbiddenAsync(HttpMethod.Delete, url, jsonBody, errorCode, headerSetup);
@@ -209,6 +229,11 @@ namespace Timeline.Tests.IntegratedTests
         public static async Task TestPutAssertNotFoundAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
         {
             await client.TestJsonSendAssertNotFoundAsync(HttpMethod.Put, url, jsonBody, errorCode, headerSetup);
+        }
+
+        public static async Task TestPatchAssertNotFoundAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertNotFoundAsync(HttpMethod.Patch, url, jsonBody, errorCode, headerSetup);
         }
 
         public static async Task TestDeleteAssertNotFoundAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
