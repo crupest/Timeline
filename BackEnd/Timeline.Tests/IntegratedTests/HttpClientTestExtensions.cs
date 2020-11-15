@@ -126,6 +126,11 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertErrorAsync(HttpMethod.Delete, url, jsonBody, expectedStatusCode, errorCode, headerSetup);
         }
 
+        public static async Task TestSendAssertInvalidModelAsync(this HttpClient client, HttpMethod method, string url, HttpContent? body = null)
+        {
+            await client.TestSendAssertErrorAsync(method, url, body, expectedStatusCode: HttpStatusCode.BadRequest, errorCode: ErrorCodes.Common.InvalidModel);
+        }
+
         public static async Task TestJsonSendAssertInvalidModelAsync(this HttpClient client, HttpMethod method, string url, object? jsonBody = null)
         {
             await client.TestJsonSendAssertErrorAsync(method, url, jsonBody, expectedStatusCode: HttpStatusCode.BadRequest, errorCode: ErrorCodes.Common.InvalidModel);
@@ -186,12 +191,37 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertForbiddenAsync(HttpMethod.Delete, url, jsonBody, errorCode, headerSetup);
         }
 
+        public static async Task TestJsonSendAssertNotFoundAsync(this HttpClient client, HttpMethod method, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertErrorAsync(method, url, jsonBody, HttpStatusCode.NotFound, errorCode, headerSetup);
+        }
+
+        public static async Task TestGetAssertNotFoundAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertNotFoundAsync(HttpMethod.Get, url, jsonBody, errorCode, headerSetup);
+        }
+
         public static async Task<HttpResponseMessage> TestPutByteArrayAsync(this HttpClient client, string url, byte[] body, string mimeType, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             using var content = new ByteArrayContent(body);
             content.Headers.ContentLength = body.Length;
             content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
-            return await client.TestSendAsync(HttpMethod.Put, url, content);
+            return await client.TestSendAsync(HttpMethod.Put, url, content, expectedStatusCode);
+        }
+
+        public static async Task TestPutByteArrayAssertErrorAsync(this HttpClient client, string url, byte[] body, string mimeType, HttpStatusCode expectedStatusCode = HttpStatusCode.BadRequest, int? errorCode = null)
+        {
+            var res = await client.TestPutByteArrayAsync(url, body, mimeType, expectedStatusCode);
+            if (errorCode.HasValue)
+            {
+                var resBody = await AssertJsonBodyAsync<CommonResponse>(res);
+                resBody.Code.Should().Be(errorCode.Value);
+            }
+        }
+
+        public static async Task TestPutByteArrayAssertInvalidModelAsync(this HttpClient client, string url, byte[] body, string mimeType)
+        {
+            await client.TestPutByteArrayAssertErrorAsync(url, body, mimeType, errorCode: ErrorCodes.Common.InvalidModel);
         }
     }
 }
