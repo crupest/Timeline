@@ -50,7 +50,7 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestPutAsync($"users/admin/permissions/{permission}");
 
             {
-                var body = await client.GetUserAsync("users/admin");
+                var body = await client.GetUserAsync("admin");
                 body.Permissions.Should().BeEquivalentTo(Enum.GetNames<UserPermission>());
             }
         }

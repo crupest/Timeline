@@ -84,7 +84,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                var body = await client.GetUserAsync("users/newuser");
+                var body = await client.GetUserAsync("newuser");
                 body.Nickname.Should().Be("aaa");
             }
 
@@ -215,7 +215,7 @@ namespace Timeline.Tests.IntegratedTests
                 body.Username.Should().Be("aaa");
             }
             {
-                var body = await client.GetUserAsync("users/aaa");
+                var body = await client.GetUserAsync("aaa");
                 body.Username.Should().Be("aaa");
             }
             {

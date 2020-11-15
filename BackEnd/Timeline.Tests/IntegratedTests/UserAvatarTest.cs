@@ -101,7 +101,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 {
                     await client.TestPutByteArrayAssertErrorAsync("users/user1/avatar", new[] { (byte)0x00 }, "image/png", errorCode: ErrorCodes.UserAvatar.BadFormat_CantDecode);
-                    await client.TestPutByteArrayAssertErrorAsync("users/user1/avatar", mockAvatar.Data, "image/png", errorCode: ErrorCodes.UserAvatar.BadFormat_UnmatchedFormat);
+                    await client.TestPutByteArrayAssertErrorAsync("users/user1/avatar", mockAvatar.Data, "image/jpeg", errorCode: ErrorCodes.UserAvatar.BadFormat_UnmatchedFormat);
                     await client.TestPutByteArrayAssertErrorAsync("users/user1/avatar", ImageHelper.CreatePngWithSize(100, 200), "image/png", errorCode: ErrorCodes.UserAvatar.BadFormat_BadSize);
                 }
 
