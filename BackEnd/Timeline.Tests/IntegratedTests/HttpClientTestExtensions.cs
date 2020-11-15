@@ -146,6 +146,11 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertInvalidModelAsync(HttpMethod.Post, url, jsonBody);
         }
 
+        public static async Task TestPutAssertInvalidModelAsync(this HttpClient client, string url, object? jsonBody = null)
+        {
+            await client.TestJsonSendAssertInvalidModelAsync(HttpMethod.Put, url, jsonBody);
+        }
+
         public static async Task TestDeleteAssertInvalidModelAsync(this HttpClient client, string url, object? jsonBody = null)
         {
             await client.TestJsonSendAssertInvalidModelAsync(HttpMethod.Delete, url, jsonBody);
@@ -199,6 +204,16 @@ namespace Timeline.Tests.IntegratedTests
         public static async Task TestGetAssertNotFoundAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
         {
             await client.TestJsonSendAssertNotFoundAsync(HttpMethod.Get, url, jsonBody, errorCode, headerSetup);
+        }
+
+        public static async Task TestPutAssertNotFoundAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertNotFoundAsync(HttpMethod.Put, url, jsonBody, errorCode, headerSetup);
+        }
+
+        public static async Task TestDeleteAssertNotFoundAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertNotFoundAsync(HttpMethod.Delete, url, jsonBody, errorCode, headerSetup);
         }
 
         public static async Task<HttpResponseMessage> TestPutByteArrayAsync(this HttpClient client, string url, byte[] body, string mimeType, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)

@@ -2,11 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services;
-using Timeline.Tests.Helpers;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
@@ -19,9 +17,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task RootUserShouldReturnAllPermissions()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.GetAsync("users/admin");
-            res.StatusCode.Should().Be(HttpStatusCode.OK);
-            var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+            var body = await client.GetUserAsync("admin");
             body.Permissions.Should().BeEquivalentTo(Enum.GetNames<UserPermission>());
         }
 
@@ -29,9 +25,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task NonRootUserShouldReturnNonPermissions()
         {
             using var client = await CreateDefaultClient();
-            var res = await client.GetAsync("users/user1");
-            res.StatusCode.Should().Be(HttpStatusCode.OK);
-            var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+            var body = await client.GetUserAsync("user1");
             body.Permissions.Should().BeEmpty();
         }
 
@@ -46,27 +40,17 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
 
-            {
-                var res = await client.DeleteAsync($"users/admin/permissions/{permission}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestDeleteAsync($"users/admin/permissions/{permission}");
 
             {
-                var res = await client.GetAsync("users/admin");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("admin");
                 body.Permissions.Should().BeEquivalentTo(Enum.GetNames<UserPermission>());
             }
 
-            {
-                var res = await client.PutAsync($"users/admin/permissions/{permission}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/admin/permissions/{permission}");
 
             {
-                var res = await client.GetAsync("users/admin");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("users/admin");
                 body.Permissions.Should().BeEquivalentTo(Enum.GetNames<UserPermission>());
             }
         }
@@ -77,27 +61,17 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
 
-            {
-                var res = await client.PutAsync($"users/user1/permissions/{permission}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/user1/permissions/{permission}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(permission.ToString());
             }
 
-            {
-                var res = await client.DeleteAsync($"users/user1/permissions/{permission}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestDeleteAsync($"users/user1/permissions/{permission}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEmpty();
             }
         }
@@ -108,27 +82,17 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
 
-            {
-                var res = await client.PutAsync($"users/user1/permissions/{permission}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/user1/permissions/{permission}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(permission.ToString());
             }
 
-            {
-                var res = await client.PutAsync($"users/user1/permissions/{permission}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/user1/permissions/{permission}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(permission.ToString());
             }
         }
@@ -139,15 +103,10 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
 
-            {
-                var res = await client.DeleteAsync($"users/user1/permissions/{permission}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestDeleteAsync($"users/user1/permissions/{permission}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEmpty();
             }
         }
@@ -157,106 +116,66 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
 
-            {
-                var res = await client.PutAsync($"users/user1/permissions/{UserPermission.AllTimelineManagement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/user1/permissions/{UserPermission.AllTimelineManagement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(UserPermission.AllTimelineManagement.ToString());
             }
 
-            {
-                var res = await client.PutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(UserPermission.AllTimelineManagement.ToString(),
                     UserPermission.HighlightTimelineManangement.ToString());
             }
 
-            {
-                var res = await client.PutAsync($"users/user1/permissions/{UserPermission.UserManagement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/user1/permissions/{UserPermission.UserManagement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(
                     UserPermission.AllTimelineManagement.ToString(),
                     UserPermission.HighlightTimelineManangement.ToString(),
                     UserPermission.UserManagement.ToString());
             }
 
-            {
-                var res = await client.DeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(
                     UserPermission.AllTimelineManagement.ToString(),
                     UserPermission.UserManagement.ToString());
             }
 
-            {
-                var res = await client.DeleteAsync($"users/user1/permissions/{UserPermission.AllTimelineManagement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.AllTimelineManagement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(UserPermission.UserManagement.ToString());
             }
 
-            {
-                var res = await client.PutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestPutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(
                     UserPermission.HighlightTimelineManangement.ToString(), UserPermission.UserManagement.ToString());
             }
 
-            {
-                var res = await client.DeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(UserPermission.UserManagement.ToString());
             }
 
-            {
-                var res = await client.DeleteAsync($"users/user1/permissions/{UserPermission.UserManagement}");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-            }
+            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.UserManagement}");
 
             {
-                var res = await client.GetAsync("users/user1");
-                res.StatusCode.Should().Be(HttpStatusCode.OK);
-                var body = await res.Should().HaveAndGetJsonBodyAsync<UserInfo>();
+                var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEmpty();
             }
         }
@@ -268,19 +187,8 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
 
-            {
-                var res = await client.PutAsync(url);
-                res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                var body = await res.Should().HaveAndGetCommonBodyAsync();
-                body.Code.Should().Be(ErrorCodes.Common.InvalidModel);
-            }
-
-            {
-                var res = await client.DeleteAsync(url);
-                res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                var body = await res.Should().HaveAndGetCommonBodyAsync();
-                body.Code.Should().Be(ErrorCodes.Common.InvalidModel);
-            }
+            await client.TestPutAssertInvalidModelAsync(url);
+            await client.TestDeleteAssertInvalidModelAsync(url);
         }
 
         [Fact]
@@ -290,19 +198,8 @@ namespace Timeline.Tests.IntegratedTests
 
             const string url = "users/user123/permissions/UserManagement";
 
-            {
-                var res = await client.PutAsync(url);
-                res.StatusCode.Should().Be(HttpStatusCode.NotFound);
-                var body = await res.Should().HaveAndGetCommonBodyAsync();
-                body.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
-            }
-
-            {
-                var res = await client.DeleteAsync(url);
-                res.StatusCode.Should().Be(HttpStatusCode.NotFound);
-                var body = await res.Should().HaveAndGetCommonBodyAsync();
-                body.Code.Should().Be(ErrorCodes.UserCommon.NotExist);
-            }
+            await client.TestPutAssertNotFoundAsync(url, errorCode: ErrorCodes.UserCommon.NotExist);
+            await client.TestDeleteAssertNotFoundAsync(url, errorCode: ErrorCodes.UserCommon.NotExist);
         }
     }
 }
