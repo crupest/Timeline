@@ -15,13 +15,7 @@ import { dataStorage } from "./services/common";
 import { userService, useRawUser } from "./services/user";
 
 const NoMatch: React.FC = () => {
-  return (
-    <>
-      <AppBar />
-      <div style={{ height: 56 }} />
-      <div>Ah-oh, 404!</div>
-    </>
-  );
+  return <div>Ah-oh, 404!</div>;
 };
 
 const LazyAdmin = React.lazy(
