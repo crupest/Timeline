@@ -10,19 +10,16 @@ import {
 } from "react-bootstrap";
 
 import OperationDialog from "../common/OperationDialog";
+import AdminSubPage from "./AdminSubPage";
+
 import { User, AuthUser } from "@/services/user";
+import { getHttpUserClient } from "@/http/user";
 
 const apiBaseUrl = "/api";
-
-async function fetchUserList(_token: string): Promise<User[]> {
-  const res = await axios.get<User[]>(`${apiBaseUrl}/users`);
-  return res.data;
-}
 
 interface CreateUserInfo {
   username: string;
   password: string;
-  administrator: boolean;
 }
 
 async function createUser(user: CreateUserInfo, token: string): Promise<User> {
@@ -54,16 +51,6 @@ function changePassword(
 ): Promise<void> {
   return axios.patch(`${apiBaseUrl}/users/${username}?token=${token}`, {
     password: newPassword,
-  });
-}
-
-function changePermission(
-  username: string,
-  newPermission: boolean,
-  token: string
-): Promise<void> {
-  return axios.patch(`${apiBaseUrl}/users/${username}?token=${token}`, {
-    administrator: newPermission,
   });
 }
 
@@ -103,9 +90,9 @@ const UserItem: React.FC<UserCardProps> = (props) => {
         <Col>
           <p className="mb-0 text-primary">{user.username}</p>
           <small
-            className={user.administrator ? "text-danger" : "text-secondary"}
+            className={user.permissions ? "text-danger" : "text-secondary"}
           >
-            {user.administrator ? "administrator" : "user"}
+            {user.permissions ? "administrator" : "user"}
           </small>
         </Col>
         <Col className="col-auto">
@@ -156,14 +143,12 @@ const CreateUserDialog: React.FC<CreateUserDialogProps> = (props) => {
         [
           { type: "text", label: "Username" },
           { type: "text", label: "Password" },
-          { type: "bool", label: "Administrator" },
         ] as const
       }
-      onProcess={([username, password, administrator]) =>
+      onProcess={([username, password]) =>
         props.process({
           username: username,
           password: password,
-          administrator: administrator,
         })
       }
       close={props.close}
@@ -316,15 +301,17 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
 
   useEffect(() => {
     let subscribe = true;
-    void fetchUserList(props.user.token).then((us) => {
-      if (subscribe) {
-        setUsers(us);
-      }
-    });
+    void getHttpUserClient()
+      .list()
+      .then((us) => {
+        if (subscribe) {
+          setUsers(us);
+        }
+      });
     return () => {
       subscribe = false;
     };
-  }, [props.user]);
+  }, []);
 
   let dialogNode: React.ReactNode;
   if (dialog)
@@ -389,26 +376,6 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
         );
         break;
       case kChangePermission: {
-        const newPermission = dialog.newPermission;
-        dialogNode = (
-          <UserChangePermissionDialog
-            open
-            close={() => setDialog(null)}
-            username={dialog.username}
-            newPermission={newPermission}
-            process={async () => {
-              await changePermission(dialog.username, newPermission, token);
-              setUsers((oldUsers) => {
-                const users = (oldUsers ?? []).slice();
-                const findedUser = users.find(
-                  (u) => u.username === dialog.username
-                );
-                if (findedUser) findedUser.administrator = newPermission;
-                return users;
-              });
-            }}
-          />
-        );
         break;
       }
     }
@@ -419,26 +386,13 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
         <UserItem
           key={user.username}
           user={user}
-          onContextMenu={(item) => {
-            setDialog(
-              item === kChangePermission
-                ? {
-                    type: kChangePermission,
-                    username: user.username,
-                    newPermission: !user.administrator,
-                  }
-                : {
-                    type: item,
-                    username: user.username,
-                  }
-            );
-          }}
+          onContextMenu={(item) => {}}
         />
       );
     });
 
     return (
-      <>
+      <AdminSubPage>
         <Button
           variant="success"
           onClick={() =>
@@ -452,7 +406,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
         </Button>
         {userComponents}
         {dialogNode}
-      </>
+      </AdminSubPage>
     );
   } else {
     return <Spinner animation="border" />;
