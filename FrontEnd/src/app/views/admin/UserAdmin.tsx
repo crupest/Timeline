@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 
 import OperationDialog from "../common/OperationDialog";
-import { User, UserWithToken } from "@/services/user";
+import { User, AuthUser } from "@/services/user";
 
 const apiBaseUrl = "/api";
 
@@ -285,7 +285,7 @@ const UserChangePermissionDialog: React.FC<UserChangePermissionDialogProps> = (
 };
 
 interface UserAdminProps {
-  user: UserWithToken;
+  user: AuthUser;
 }
 
 const UserAdmin: React.FC<UserAdminProps> = (props) => {

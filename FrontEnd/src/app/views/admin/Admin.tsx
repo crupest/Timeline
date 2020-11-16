@@ -8,12 +8,12 @@ import {
 } from "react-router";
 import { Nav } from "react-bootstrap";
 
-import { UserWithToken } from "@/services/user";
+import { AuthUser } from "@/services/user";
 
 import UserAdmin from "./UserAdmin";
 
 interface AdminProps {
-  user: UserWithToken;
+  user: AuthUser;
 }
 
 const Admin: React.FC<AdminProps> = (props) => {
