@@ -49,6 +49,7 @@ export class HttpChangePasswordBadCredentialError extends Error {
 }
 
 export interface IHttpUserClient {
+  list(): Promise<HttpUser[]>;
   get(username: string): Promise<HttpUser>;
   patch(
     username: string,
@@ -75,6 +76,13 @@ export interface IHttpUserClient {
 }
 
 export class HttpUserClient implements IHttpUserClient {
+  list(): Promise<HttpUser[]> {
+    return axios
+      .get<HttpUser[]>(`${apiBaseUrl}/users`)
+      .then(extractResponseData)
+      .catch(convertToNetworkError);
+  }
+
   get(username: string): Promise<HttpUser> {
     return axios
       .get<HttpUser>(`${apiBaseUrl}/users/${username}`)
