@@ -12,10 +12,18 @@ import {
   convertToNotModified,
 } from "./common";
 
+export const kUserPermissionList = [
+  "UserManagement",
+  "AllTimelineManagement",
+  "HighlightTimelineManagement",
+] as const;
+
+export type UserPermission = typeof kUserPermissionList[number];
+
 export interface HttpUser {
   uniqueId: string;
   username: string;
-  administrator: boolean;
+  permissions: UserPermission[];
   nickname: string;
 }
 
@@ -54,6 +62,16 @@ export interface IHttpUserClient {
   ): Promise<BlobWithEtag | NotModified>;
   putAvatar(username: string, data: Blob, token: string): Promise<void>;
   changePassword(req: HttpChangePasswordRequest, token: string): Promise<void>;
+  putUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void>;
+  deleteUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void>;
 }
 
 export class HttpUserClient implements IHttpUserClient {
@@ -115,6 +133,32 @@ export class HttpUserClient implements IHttpUserClient {
       .post(`${apiBaseUrl}/userop/changepassword?token=${token}`, req)
       .catch(
         convertToIfErrorCodeIs(11020201, HttpChangePasswordBadCredentialError)
+      )
+      .catch(convertToNetworkError)
+      .then();
+  }
+
+  putUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void> {
+    return axios
+      .put(
+        `${apiBaseUrl}/users/${username}/permissions/${permission}?token=${token}`
+      )
+      .catch(convertToNetworkError)
+      .then();
+  }
+
+  deleteUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void> {
+    return axios
+      .delete(
+        `${apiBaseUrl}/users/${username}/permissions/${permission}?token=${token}`
       )
       .catch(convertToNetworkError)
       .then();

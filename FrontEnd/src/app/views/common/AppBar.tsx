@@ -15,7 +15,7 @@ const AppBar: React.FC = (_) => {
 
   const { t } = useTranslation();
 
-  const isAdministrator = user && user.administrator;
+  const hasAdministrationPermission = user && user.hasAdministrationPermission;
 
   const [expand, setExpand] = React.useState<boolean>(false);
   const collapse = (): void => setExpand(false);
@@ -56,7 +56,7 @@ const AppBar: React.FC = (_) => {
             {t("nav.about")}
           </NavLink>
 
-          {isAdministrator && (
+          {hasAdministrationPermission && (
             <NavLink
               to="/admin"
               className="nav-link"
