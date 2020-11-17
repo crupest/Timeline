@@ -29,30 +29,29 @@ interface UserCardProps {
 
 const UserItem: React.FC<UserCardProps> = ({ user, on }) => {
   return (
-    <ListGroup.Item className="container">
-      <Row className="align-items-center">
-        <Col>
-          <p className="mb-0 text-primary">{user.username}</p>
-          <small
-            className={user.permissions ? "text-danger" : "text-secondary"}
-          >
-            {user.permissions ? "administrator" : "user"}
-          </small>
-        </Col>
-        <Col className="col-auto">
-          <Dropdown>
-            <Dropdown.Toggle variant="warning" className="text-light">
-              Manage
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={on["modify"]}>Modify</Dropdown.Item>
-              <Dropdown.Item className="text-danger" onClick={on["delete"]}>
-                Delete
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </Col>
-      </Row>
+    <ListGroup.Item>
+      <div>
+        <span className="text-primary">@{user.username + " "}</span>
+        <small className="ml-2 text-secondary">{user.nickname}</small>
+      </div>
+      <div>
+        {user.permissions.map((permission) => {
+          return (
+            <small key={permission} className="text-danger">
+              {permission + " "}
+            </small>
+          );
+        })}
+      </div>
+      <Dropdown className="text-right">
+        <Dropdown.Toggle variant="outline-primary">Manage</Dropdown.Toggle>
+        <Dropdown.Menu>
+          <Dropdown.Item onClick={on["modify"]}>Modify</Dropdown.Item>
+          <Dropdown.Item className="text-danger" onClick={on["delete"]}>
+            Delete
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
     </ListGroup.Item>
   );
 };
@@ -271,14 +270,14 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
         <Row className="justify-content-end my-2">
           <Col xs="auto">
             <Button
-              variant="success"
+              variant="outline-success"
               onClick={() =>
                 setDialog({
                   type: "create",
                 })
               }
             >
-              Create User
+              Create
             </Button>
           </Col>
         </Row>
