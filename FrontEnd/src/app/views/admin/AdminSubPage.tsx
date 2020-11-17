@@ -1,5 +1,5 @@
 import React from "react";
-import { Nav } from "react-bootstrap";
+import { Container, Nav } from "react-bootstrap";
 import { useHistory, useRouteMatch } from "react-router";
 
 const AdminSubPage: React.FC = ({ children }) => {
@@ -13,8 +13,8 @@ const AdminSubPage: React.FC = ({ children }) => {
   }
 
   return (
-    <>
-      <Nav variant="tabs">
+    <Container>
+      <Nav variant="tabs" className="my-2">
         <Nav.Item>
           <Nav.Link
             active={name === "users"}
@@ -25,19 +25,9 @@ const AdminSubPage: React.FC = ({ children }) => {
             Users
           </Nav.Link>
         </Nav.Item>
-        <Nav.Item>
-          <Nav.Link
-            active={name === "more"}
-            onClick={() => {
-              toggle("more");
-            }}
-          >
-            More
-          </Nav.Link>
-        </Nav.Item>
       </Nav>
       {children}
-    </>
+    </Container>
   );
 };
 

@@ -28,12 +28,19 @@ export interface HttpUser {
 }
 
 export interface HttpUserPatchRequest {
+  username?: string;
+  password?: string;
   nickname?: string;
 }
 
 export interface HttpChangePasswordRequest {
   oldPassword: string;
   newPassword: string;
+}
+
+export interface HttpCreateUserRequest {
+  username: string;
+  password: string;
 }
 
 export class HttpUserNotExistError extends Error {
@@ -56,6 +63,7 @@ export interface IHttpUserClient {
     req: HttpUserPatchRequest,
     token: string
   ): Promise<HttpUser>;
+  delete(username: string, token: string): Promise<void>;
   getAvatar(username: string): Promise<BlobWithEtag>;
   getAvatar(
     username: string,
@@ -73,6 +81,8 @@ export interface IHttpUserClient {
     permission: UserPermission,
     token: string
   ): Promise<void>;
+
+  createUser(req: HttpCreateUserRequest, token: string): Promise<HttpUser>;
 }
 
 export class HttpUserClient implements IHttpUserClient {
@@ -100,6 +110,13 @@ export class HttpUserClient implements IHttpUserClient {
       .patch<HttpUser>(`${apiBaseUrl}/users/${username}?token=${token}`, req)
       .then(extractResponseData)
       .catch(convertToNetworkError);
+  }
+
+  delete(username: string, token: string): Promise<void> {
+    return axios
+      .delete(`${apiBaseUrl}/users/${username}?token=${token}`)
+      .catch(convertToNetworkError)
+      .then();
   }
 
   getAvatar(username: string): Promise<BlobWithEtag>;
@@ -168,6 +185,14 @@ export class HttpUserClient implements IHttpUserClient {
       .delete(
         `${apiBaseUrl}/users/${username}/permissions/${permission}?token=${token}`
       )
+      .catch(convertToNetworkError)
+      .then();
+  }
+
+  createUser(req: HttpCreateUserRequest, token: string): Promise<HttpUser> {
+    return axios
+      .post<HttpUser>(`${apiBaseUrl}/userop/createuser?token=${token}`, req)
+      .then(extractResponseData)
       .catch(convertToNetworkError)
       .then();
   }
