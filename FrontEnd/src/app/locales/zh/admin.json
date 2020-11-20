@@ -5,11 +5,31 @@
   },
   "create": "创建",
   "user": {
+    "username": "用户名：",
+    "password": "密码：",
     "nickname": "昵称：",
     "uniqueId": "唯一ID：",
     "permissions": "权限：",
     "modify": "修改",
     "modifyPermissions": "修改权限",
-    "delete": "删除"
+    "delete": "删除",
+    "dialog": {
+      "create": {
+        "title": "创建用户",
+        "prompt": "您正在创建一个新用户。"
+      },
+      "delete": {
+        "title": "删除用户",
+        "prompt": "您正在删除用户 <1>username</1> 。注意：此操作不可撤销。"
+      },
+      "modify": {
+        "title": "修改用户",
+        "prompt": "您正在修改用户 <1>username</1> 。"
+      },
+      "modifyPermissions": {
+        "title": "修改用户权限",
+        "prompt": "您正在修改用户 <1>username</1> 的权限。"
+      }
+    }
   }
 }

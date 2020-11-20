@@ -5,11 +5,31 @@
   },
   "create": "Create",
   "user": {
+    "username": "Username: ",
+    "password": "Password: ",
     "nickname": "Nickname: ",
     "uniqueId": "Unique ID: ",
     "permissions": "Permissions: ",
     "modify": "Modify",
     "modifyPermissions": "Modify Permissions",
-    "delete": "Delete"
+    "delete": "Delete",
+    "dialog": {
+      "create": {
+        "title": "Create User",
+        "prompt": "You are creating a new user."
+      },
+      "delete": {
+        "title": "Delete user",
+        "prompt": "You are deleting <1>username</1> . Caution: This can't be undo."
+      },
+      "modify": {
+        "title": "Modify User",
+        "prompt": "You are modifying user <1>username</1> ."
+      },
+      "modifyPermissions": {
+        "title": "Modify User Permissions",
+        "prompt": "You are modifying permissions of user <1>username</1> ."
+      }
+    }
   }
 }

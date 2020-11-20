@@ -120,7 +120,8 @@ const OperationDialog = <
 >(
   props: OperationDialogProps<TData, OperationInputInfoList>
 ): React.ReactElement => {
-  const inputScheme = props.inputScheme as readonly OperationInputInfo[];
+  const inputScheme = (props.inputScheme ??
+    []) as readonly OperationInputInfo[];
 
   const { t } = useTranslation();
 
