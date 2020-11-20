@@ -9,7 +9,6 @@ import {
 } from "react-bootstrap";
 
 import OperationDialog from "../common/OperationDialog";
-import AdminSubPage from "./AdminSubPage";
 
 import { User, AuthUser } from "@/services/user";
 import { getHttpUserClient, HttpUser } from "@/http/user";
@@ -266,7 +265,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
     });
 
     return (
-      <AdminSubPage>
+      <>
         <Row className="justify-content-end my-2">
           <Col xs="auto">
             <Button
@@ -283,7 +282,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
         </Row>
         {userComponents}
         {dialogNode}
-      </AdminSubPage>
+      </>
     );
   } else {
     return <Spinner animation="border" />;
