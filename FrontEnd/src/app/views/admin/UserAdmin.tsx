@@ -15,7 +15,7 @@ import {
   kUserPermissionList,
   UserPermission,
 } from "@/http/user";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
@@ -33,13 +33,13 @@ const CreateUserDialog: React.FC<DialogProps<undefined, HttpUser>> = ({
 }) => {
   return (
     <OperationDialog
-      title="Create"
+      title="admin:user.dialog.create.title"
       titleColor="create"
-      inputPrompt="You are creating a new user."
+      inputPrompt="admin:user.dialog.create.prompt"
       inputScheme={
         [
-          { type: "text", label: "Username" },
-          { type: "text", label: "Password" },
+          { type: "text", label: "admin:user.username" },
+          { type: "text", label: "admin:user.password" },
         ] as const
       }
       onProcess={([username, password]) =>
@@ -70,12 +70,12 @@ const UserDeleteDialog: React.FC<DialogProps<
     <OperationDialog
       open={open}
       close={close}
-      title="Dangerous"
+      title="admin:user.dialog.delete.title"
       titleColor="dangerous"
       inputPrompt={() => (
-        <>
-          You are deleting user <UsernameLabel>{username}</UsernameLabel> !
-        </>
+        <Trans i18nKey="admin:user.dialog.delete.prompt">
+          0<UsernameLabel>{username}</UsernameLabel>2
+        </Trans>
       )}
       onProcess={() => getHttpUserClient().delete(username, token)}
       onSuccessAndClose={onSuccess}
@@ -93,19 +93,26 @@ const UserModifyDialog: React.FC<DialogProps<
     <OperationDialog
       open={open}
       close={close}
-      title="Caution"
+      title="admin:user.dialog.modify.title"
       titleColor="dangerous"
       inputPrompt={() => (
-        <>
-          You are change the password of user
-          <UsernameLabel>{oldUser.username}</UsernameLabel> !
-        </>
+        <Trans i18nKey="admin:user.dialog.modify.prompt">
+          0<UsernameLabel>{oldUser.username}</UsernameLabel>2
+        </Trans>
       )}
       inputScheme={
         [
-          { type: "text", label: "New Username", initValue: oldUser.username },
-          { type: "text", label: "New Password" },
-          { type: "text", label: "New Nickname", initValue: oldUser.nickname },
+          {
+            type: "text",
+            label: "admin:user.username",
+            initValue: oldUser.username,
+          },
+          { type: "text", label: "admin:user.password" },
+          {
+            type: "text",
+            label: "admin:user.nickname",
+            initValue: oldUser.nickname,
+          },
         ] as const
       }
       onProcess={([username, password, nickname]) =>
@@ -139,13 +146,12 @@ const UserPermissionModifyDialog: React.FC<DialogProps<
     <OperationDialog
       open={open}
       close={close}
-      title="Caution"
+      title="admin:user.dialog.modifyPermissions.title"
       titleColor="dangerous"
       inputPrompt={() => (
-        <>
-          You are modify permission of user
-          <UsernameLabel>{username}</UsernameLabel> !
-        </>
+        <Trans i18nKey="admin:user.dialog.modifyPermissions.prompt">
+          0<UsernameLabel>{username}</UsernameLabel>2
+        </Trans>
       )}
       inputScheme={kUserPermissionList.map<OperationBoolInputInfo>(
         (permission, index) => ({
