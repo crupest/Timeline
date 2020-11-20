@@ -1,10 +1,13 @@
 import React from "react";
 import { Nav } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useHistory, useRouteMatch } from "react-router";
 
 const AdminNav: React.FC = () => {
   const match = useRouteMatch<{ name: string }>();
   const history = useHistory();
+
+  const { t } = useTranslation();
 
   const name = match.params.name;
 
@@ -21,7 +24,7 @@ const AdminNav: React.FC = () => {
             toggle("users");
           }}
         >
-          Users
+          {t("admin:nav.users")}
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>
@@ -31,7 +34,7 @@ const AdminNav: React.FC = () => {
             toggle("highlighttimelines");
           }}
         >
-          Highlight Timelines
+          {t("admin:nav.highlightTimelines")}
         </Nav.Link>
       </Nav.Item>
     </Nav>

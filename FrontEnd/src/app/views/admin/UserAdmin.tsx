@@ -15,6 +15,7 @@ import {
   kUserPermissionList,
   UserPermission,
 } from "@/http/user";
+import { useTranslation } from "react-i18next";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
@@ -204,6 +205,8 @@ interface UserItemProps {
 }
 
 const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
+  const { t } = useTranslation();
+
   const [editMaskVisible, setEditMaskVisible] = React.useState<boolean>(false);
 
   return (
@@ -214,10 +217,16 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
         onClick={() => setEditMaskVisible(true)}
       />
       <h4 className="text-primary">{user.username}</h4>
-      <div className="text-secondary">nickname: {user.nickname}</div>
-      <div className="text-secondary">unique id: {user.uniqueId}</div>
       <div className="text-secondary">
-        permissions:{" "}
+        {t("admin:user.nickname")}
+        {user.nickname}
+      </div>
+      <div className="text-secondary">
+        {t("admin:user.uniqueId")}
+        {user.uniqueId}
+      </div>
+      <div className="text-secondary">
+        {t("admin:user.permissions")}
         {user.permissions.map((permission) => {
           return (
             <span key={permission} className="text-danger">
@@ -231,13 +240,13 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
         onClick={() => setEditMaskVisible(false)}
       >
         <button className="text-button primary" onClick={on[kModify]}>
-          Modify
+          {t("admin:user.modify")}
         </button>
         <button className="text-button primary" onClick={on[kModifyPermission]}>
-          Modify Permission
+          {t("admin:user.modifyPermissions")}
         </button>
         <button className="text-button danger" onClick={on[kDelete]}>
-          Delete
+          {t("admin:user.delete")}
         </button>
       </div>
     </ListGroup.Item>
@@ -249,6 +258,8 @@ interface UserAdminProps {
 }
 
 const UserAdmin: React.FC<UserAdminProps> = (props) => {
+  const { t } = useTranslation();
+
   type DialogInfo =
     | null
     | {
@@ -384,7 +395,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
                 })
               }
             >
-              Create
+              {t("admin:create")}
             </Button>
           </Col>
         </Row>

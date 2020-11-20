@@ -63,7 +63,7 @@ const AppBar: React.FC = (_) => {
               activeClassName="active"
               onClick={collapse}
             >
-              Administration
+              {t("nav.administration")}
             </NavLink>
           )}
         </Nav>

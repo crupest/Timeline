@@ -4,9 +4,13 @@ import { Container } from "react-bootstrap";
 
 import { AuthUser } from "@/services/user";
 
+import i18n from "@/i18n";
+
 import AdminNav from "./AdminNav";
 import UserAdmin from "./UserAdmin";
 import HighlightTimelineAdmin from "./HighlightTimelineAdmin";
+
+void i18n.loadNamespaces("admin");
 
 interface AdminProps {
   user: AuthUser;

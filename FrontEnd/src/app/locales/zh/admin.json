@@ -1,1 +1,15 @@
-{}
+{
+  "nav": {
+    "users": "用户",
+    "highlightTimelines": "高光时间线"
+  },
+  "create": "创建",
+  "user": {
+    "nickname": "昵称：",
+    "uniqueId": "唯一ID：",
+    "permissions": "权限：",
+    "modify": "修改",
+    "modifyPermissions": "修改权限",
+    "delete": "删除"
+  }
+}
