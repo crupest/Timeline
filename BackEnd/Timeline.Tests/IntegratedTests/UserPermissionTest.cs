@@ -115,12 +115,12 @@ namespace Timeline.Tests.IntegratedTests
                 body.Permissions.Should().BeEquivalentTo(UserPermission.AllTimelineManagement.ToString());
             }
 
-            await client.TestPutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
+            await client.TestPutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManagement}");
 
             {
                 var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(UserPermission.AllTimelineManagement.ToString(),
-                    UserPermission.HighlightTimelineManangement.ToString());
+                    UserPermission.HighlightTimelineManagement.ToString());
             }
 
             await client.TestPutAsync($"users/user1/permissions/{UserPermission.UserManagement}");
@@ -129,11 +129,11 @@ namespace Timeline.Tests.IntegratedTests
                 var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(
                     UserPermission.AllTimelineManagement.ToString(),
-                    UserPermission.HighlightTimelineManangement.ToString(),
+                    UserPermission.HighlightTimelineManagement.ToString(),
                     UserPermission.UserManagement.ToString());
             }
 
-            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
+            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManagement}");
 
             {
                 var body = await client.GetUserAsync("user1");
@@ -149,15 +149,15 @@ namespace Timeline.Tests.IntegratedTests
                 body.Permissions.Should().BeEquivalentTo(UserPermission.UserManagement.ToString());
             }
 
-            await client.TestPutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
+            await client.TestPutAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManagement}");
 
             {
                 var body = await client.GetUserAsync("user1");
                 body.Permissions.Should().BeEquivalentTo(
-                    UserPermission.HighlightTimelineManangement.ToString(), UserPermission.UserManagement.ToString());
+                    UserPermission.HighlightTimelineManagement.ToString(), UserPermission.UserManagement.ToString());
             }
 
-            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManangement}");
+            await client.TestDeleteAsync($"users/user1/permissions/{UserPermission.HighlightTimelineManagement}");
 
             {
                 var body = await client.GetUserAsync("user1");
