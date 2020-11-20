@@ -29,7 +29,11 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Get()
         {
             using var client = await CreateDefaultClient();
-            await client.TestGetAsync<UserInfo>($"users/admin");
+            var user = await client.TestGetAsync<UserInfo>($"users/admin");
+            user.Username.Should().Be("admin");
+            user.Nickname.Should().Be("administrator");
+            user.UniqueId.Should().NotBeNullOrEmpty();
+            user.Permissions.Should().NotBeNull();
         }
 
         [Fact]
