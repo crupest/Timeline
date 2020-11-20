@@ -1,1 +1,15 @@
-{}
+{
+  "nav": {
+    "users": "Users",
+    "highlightTimelines": "Highlight Timelines"
+  },
+  "create": "Create",
+  "user": {
+    "nickname": "Nickname: ",
+    "uniqueId": "Unique ID: ",
+    "permissions": "Permissions: ",
+    "modify": "Modify",
+    "modifyPermissions": "Modify Permissions",
+    "delete": "Delete"
+  }
+}
