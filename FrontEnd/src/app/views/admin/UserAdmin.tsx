@@ -34,7 +34,7 @@ const CreateUserDialog: React.FC<DialogProps<undefined, HttpUser>> = ({
   return (
     <OperationDialog
       title="admin:user.dialog.create.title"
-      titleColor="create"
+      themeColor="success"
       inputPrompt="admin:user.dialog.create.prompt"
       inputScheme={
         [
@@ -71,7 +71,7 @@ const UserDeleteDialog: React.FC<DialogProps<
       open={open}
       close={close}
       title="admin:user.dialog.delete.title"
-      titleColor="dangerous"
+      themeColor="danger"
       inputPrompt={() => (
         <Trans i18nKey="admin:user.dialog.delete.prompt">
           0<UsernameLabel>{username}</UsernameLabel>2
@@ -94,7 +94,7 @@ const UserModifyDialog: React.FC<DialogProps<
       open={open}
       close={close}
       title="admin:user.dialog.modify.title"
-      titleColor="dangerous"
+      themeColor="danger"
       inputPrompt={() => (
         <Trans i18nKey="admin:user.dialog.modify.prompt">
           0<UsernameLabel>{oldUser.username}</UsernameLabel>2
@@ -147,7 +147,7 @@ const UserPermissionModifyDialog: React.FC<DialogProps<
       open={open}
       close={close}
       title="admin:user.dialog.modifyPermissions.title"
-      titleColor="dangerous"
+      themeColor="danger"
       inputPrompt={() => (
         <Trans i18nKey="admin:user.dialog.modifyPermissions.prompt">
           0<UsernameLabel>{username}</UsernameLabel>2
