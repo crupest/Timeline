@@ -1,64 +1,20 @@
 import React, { useState, useEffect } from "react";
+import clsx from "clsx";
 import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
 import InlineSVG from "react-inlinesvg";
 import PencilSquareIcon from "bootstrap-icons/icons/pencil-square.svg";
 
-import OperationDialog from "../common/OperationDialog";
+import OperationDialog, {
+  OperationBoolInputInfo,
+} from "../common/OperationDialog";
 
 import { User, AuthUser } from "@/services/user";
-import { getHttpUserClient, HttpUser } from "@/http/user";
-import clsx from "clsx";
-
-const kModify = "modify";
-const kDelete = "delete";
-
-type TModify = typeof kModify;
-type TDelete = typeof kDelete;
-
-type ContextMenuItem = TModify | TDelete;
-
-interface UserCardProps {
-  on: { [key in ContextMenuItem]: () => void };
-  user: User;
-}
-
-const UserItem: React.FC<UserCardProps> = ({ user, on }) => {
-  const [editMaskVisible, setEditMaskVisible] = React.useState<boolean>(false);
-
-  return (
-    <ListGroup.Item className="admin-user-item">
-      <InlineSVG
-        src={PencilSquareIcon}
-        className="float-right icon-button text-warning"
-        onClick={() => setEditMaskVisible(true)}
-      />
-      <h4 className="text-primary">{user.username}</h4>
-      <div className="text-secondary">nickname: {user.nickname}</div>
-      <div className="text-secondary">unique id: {user.uniqueId}</div>
-      <div className="text-secondary">
-        permissions:{" "}
-        {user.permissions.map((permission) => {
-          return (
-            <span key={permission} className="text-danger">
-              {permission}{" "}
-            </span>
-          );
-        })}
-      </div>
-      <div
-        className={clsx("edit-mask", !editMaskVisible && "d-none")}
-        onClick={() => setEditMaskVisible(false)}
-      >
-        <button className="text-button primary" onClick={on["modify"]}>
-          Modify
-        </button>
-        <button className="text-button danger" onClick={on["delete"]}>
-          Delete
-        </button>
-      </div>
-    </ListGroup.Item>
-  );
-};
+import {
+  getHttpUserClient,
+  HttpUser,
+  kUserPermissionList,
+  UserPermission,
+} from "@/http/user";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
@@ -167,6 +123,127 @@ const UserModifyDialog: React.FC<DialogProps<
   );
 };
 
+const UserPermissionModifyDialog: React.FC<DialogProps<
+  {
+    username: string;
+    permissions: UserPermission[];
+  },
+  UserPermission[]
+>> = ({ open, close, token, data: { username, permissions }, onSuccess }) => {
+  const oldPermissionBoolList: boolean[] = kUserPermissionList.map(
+    (permission) => permissions.includes(permission)
+  );
+
+  return (
+    <OperationDialog
+      open={open}
+      close={close}
+      title="Caution"
+      titleColor="dangerous"
+      inputPrompt={() => (
+        <>
+          You are modify permission of user
+          <UsernameLabel>{username}</UsernameLabel> !
+        </>
+      )}
+      inputScheme={kUserPermissionList.map<OperationBoolInputInfo>(
+        (permission, index) => ({
+          type: "bool",
+          label: permission,
+          initValue: oldPermissionBoolList[index],
+        })
+      )}
+      onProcess={async (newPermissionBoolList): Promise<boolean[]> => {
+        for (let index = 0; index < kUserPermissionList.length; index++) {
+          const oldValue = oldPermissionBoolList[index];
+          const newValue = newPermissionBoolList[index];
+          const permission = kUserPermissionList[index];
+          if (oldValue === newValue) continue;
+          if (newValue) {
+            await getHttpUserClient().putUserPermission(
+              username,
+              permission,
+              token
+            );
+          } else {
+            await getHttpUserClient().deleteUserPermission(
+              username,
+              permission,
+              token
+            );
+          }
+        }
+        return newPermissionBoolList;
+      }}
+      onSuccessAndClose={(newPermissionBoolList: boolean[]) => {
+        const permissions: UserPermission[] = [];
+        for (let index = 0; index < kUserPermissionList.length; index++) {
+          if (newPermissionBoolList[index]) {
+            permissions.push(kUserPermissionList[index]);
+          }
+        }
+        onSuccess(permissions);
+      }}
+    />
+  );
+};
+
+const kModify = "modify";
+const kModifyPermission = "permission";
+const kDelete = "delete";
+
+type TModify = typeof kModify;
+type TModifyPermission = typeof kModifyPermission;
+type TDelete = typeof kDelete;
+
+type ContextMenuItem = TModify | TModifyPermission | TDelete;
+
+interface UserItemProps {
+  on: { [key in ContextMenuItem]: () => void };
+  user: User;
+}
+
+const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
+  const [editMaskVisible, setEditMaskVisible] = React.useState<boolean>(false);
+
+  return (
+    <ListGroup.Item className="admin-user-item">
+      <InlineSVG
+        src={PencilSquareIcon}
+        className="float-right icon-button text-warning"
+        onClick={() => setEditMaskVisible(true)}
+      />
+      <h4 className="text-primary">{user.username}</h4>
+      <div className="text-secondary">nickname: {user.nickname}</div>
+      <div className="text-secondary">unique id: {user.uniqueId}</div>
+      <div className="text-secondary">
+        permissions:{" "}
+        {user.permissions.map((permission) => {
+          return (
+            <span key={permission} className="text-danger">
+              {permission}{" "}
+            </span>
+          );
+        })}
+      </div>
+      <div
+        className={clsx("edit-mask", !editMaskVisible && "d-none")}
+        onClick={() => setEditMaskVisible(false)}
+      >
+        <button className="text-button primary" onClick={on[kModify]}>
+          Modify
+        </button>
+        <button className="text-button primary" onClick={on[kModifyPermission]}>
+          Modify Permission
+        </button>
+        <button className="text-button danger" onClick={on[kDelete]}>
+          Delete
+        </button>
+      </div>
+    </ListGroup.Item>
+  );
+};
+
 interface UserAdminProps {
   user: AuthUser;
 }
@@ -180,6 +257,11 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
     | {
         type: TModify;
         user: HttpUser;
+      }
+    | {
+        type: TModifyPermission;
+        username: string;
+        permissions: UserPermission[];
       }
     | { type: TDelete; username: string };
 
@@ -220,7 +302,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           />
         );
         break;
-      case "delete":
+      case kDelete:
         dialogNode = (
           <UserDeleteDialog
             open
@@ -242,6 +324,20 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           />
         );
         break;
+      case kModifyPermission:
+        dialogNode = (
+          <UserPermissionModifyDialog
+            open
+            close={() => setDialog(null)}
+            token={token}
+            data={{
+              username: dialog.username,
+              permissions: dialog.permissions,
+            }}
+            onSuccess={updateUsers}
+          />
+        );
+        break;
     }
   }
 
@@ -256,6 +352,13 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
               setDialog({
                 type: "modify",
                 user,
+              });
+            },
+            permission: () => {
+              setDialog({
+                type: kModifyPermission,
+                username: user.username,
+                permissions: user.permissions,
               });
             },
             delete: () => {

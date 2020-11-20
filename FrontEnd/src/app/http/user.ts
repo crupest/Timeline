@@ -12,10 +12,14 @@ import {
   convertToNotModified,
 } from "./common";
 
+export const kUserManagement = "UserManagement";
+export const kAllTimelineManagement = "AllTimelineManagement";
+export const kHighlightTimelineManagement = "HighlightTimelineManagement";
+
 export const kUserPermissionList = [
-  "UserManagement",
-  "AllTimelineManagement",
-  "HighlightTimelineManagement",
+  kUserManagement,
+  kAllTimelineManagement,
+  kHighlightTimelineManagement,
 ] as const;
 
 export type UserPermission = typeof kUserPermissionList[number];
