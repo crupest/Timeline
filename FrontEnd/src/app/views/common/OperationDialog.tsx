@@ -99,7 +99,7 @@ export interface OperationDialogProps<
   open: boolean;
   close: () => void;
   title: I18nText | (() => React.ReactNode);
-  titleColor?: "default" | "dangerous" | "create" | string;
+  themeColor?: "danger" | "success" | string;
   onProcess: (
     inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
   ) => Promise<TData>;
@@ -313,7 +313,7 @@ const OperationDialog = <
             {t("operationDialog.cancel")}
           </Button>
           <LoadingButton
-            variant="primary"
+            variant={props.themeColor}
             loading={process}
             disabled={!canProcess}
             onClick={() => {
@@ -362,14 +362,7 @@ const OperationDialog = <
     <Modal show={props.open} onHide={close}>
       <Modal.Header
         className={
-          props.titleColor != null
-            ? "text-" +
-              (props.titleColor === "create"
-                ? "success"
-                : props.titleColor === "dangerous"
-                ? "danger"
-                : props.titleColor)
-            : undefined
+          props.themeColor != null ? "text-" + props.themeColor : undefined
         }
       >
         {title}
