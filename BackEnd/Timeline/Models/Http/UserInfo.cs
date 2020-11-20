@@ -25,10 +25,6 @@ namespace Timeline.Models.Http
         /// Nickname.
         /// </summary>
         public string Nickname { get; set; } = default!;
-        /// <summary>
-        /// True if the user is a administrator.
-        /// </summary>
-        public bool? Administrator { get; set; } = default!;
 #pragma warning disable CA2227 // Collection properties should be read only
         /// <summary>
         /// The permissions of the user.

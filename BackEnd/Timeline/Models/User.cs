@@ -11,8 +11,6 @@ namespace Timeline.Models
         public string Username { get; set; } = default!;
         public string Nickname { get; set; } = default!;
 
-        [Obsolete("Use permissions instead.")]
-        public bool Administrator { get; set; }
         public UserPermissions Permissions { get; set; } = default!;
 
         public DateTime UsernameChangeTime { get; set; }
