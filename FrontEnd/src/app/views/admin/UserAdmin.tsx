@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {
-  ListGroup,
-  Row,
-  Col,
-  Dropdown,
-  Spinner,
-  Button,
-} from "react-bootstrap";
+import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
+import InlineSVG from "react-inlinesvg";
+import PencilSquareIcon from "bootstrap-icons/icons/pencil-square.svg";
 
 import OperationDialog from "../common/OperationDialog";
 
 import { User, AuthUser } from "@/services/user";
 import { getHttpUserClient, HttpUser } from "@/http/user";
+import clsx from "clsx";
 
 const kModify = "modify";
 const kDelete = "delete";
@@ -27,30 +23,39 @@ interface UserCardProps {
 }
 
 const UserItem: React.FC<UserCardProps> = ({ user, on }) => {
+  const [editMaskVisible, setEditMaskVisible] = React.useState<boolean>(false);
+
   return (
-    <ListGroup.Item>
-      <div>
-        <span className="text-primary">@{user.username + " "}</span>
-        <small className="ml-2 text-secondary">{user.nickname}</small>
-      </div>
-      <div>
+    <ListGroup.Item className="admin-user-item">
+      <InlineSVG
+        src={PencilSquareIcon}
+        className="float-right icon-button text-warning"
+        onClick={() => setEditMaskVisible(true)}
+      />
+      <h4 className="text-primary">{user.username}</h4>
+      <div className="text-secondary">nickname: {user.nickname}</div>
+      <div className="text-secondary">unique id: {user.uniqueId}</div>
+      <div className="text-secondary">
+        permissions:{" "}
         {user.permissions.map((permission) => {
           return (
-            <small key={permission} className="text-danger">
-              {permission + " "}
-            </small>
+            <span key={permission} className="text-danger">
+              {permission}{" "}
+            </span>
           );
         })}
       </div>
-      <Dropdown className="text-right">
-        <Dropdown.Toggle variant="outline-primary">Manage</Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item onClick={on["modify"]}>Modify</Dropdown.Item>
-          <Dropdown.Item className="text-danger" onClick={on["delete"]}>
-            Delete
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+      <div
+        className={clsx("edit-mask", !editMaskVisible && "d-none")}
+        onClick={() => setEditMaskVisible(false)}
+      >
+        <button className="text-button primary" onClick={on["modify"]}>
+          Modify
+        </button>
+        <button className="text-button danger" onClick={on["delete"]}>
+          Delete
+        </button>
+      </div>
     </ListGroup.Item>
   );
 };
