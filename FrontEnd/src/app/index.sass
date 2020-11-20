@@ -65,3 +65,12 @@ textarea
 
 .text-orange
   color: $orange
+
+@each $color, $value in $theme-colors
+  .text-button
+    background: transparent
+    border: none
+    &.#{$color}
+      color: $value
+      &:hover
+        color: adjust-color($value, $lightness: +15%)
