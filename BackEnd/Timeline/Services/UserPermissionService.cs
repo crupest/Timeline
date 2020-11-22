@@ -22,7 +22,7 @@ namespace Timeline.Services
         /// <summary>
         /// This permission allow to add or remove highlight timelines.
         /// </summary>
-        HighlightTimelineManangement
+        HighlightTimelineManagement
     }
 
     /// <summary>

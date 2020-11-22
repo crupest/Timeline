@@ -14,6 +14,7 @@ import {
   getHttpUserClient,
   HttpUserNotExistError,
   HttpUser,
+  UserPermission,
 } from "@/http/user";
 
 import { dataStorage, throwIfNotNetworkError } from "./common";
@@ -22,13 +23,26 @@ import { pushAlert } from "./alert";
 
 export type User = HttpUser;
 
-export interface UserAuthInfo {
-  username: string;
-  administrator: boolean;
-}
+export class AuthUser implements User {
+  constructor(user: User, public token: string) {
+    this.uniqueId = user.uniqueId;
+    this.username = user.username;
+    this.permissions = user.permissions;
+    this.nickname = user.nickname;
+  }
 
-export interface UserWithToken extends User {
-  token: string;
+  uniqueId: string;
+  username: string;
+  permissions: UserPermission[];
+  nickname: string;
+
+  get hasAdministrationPermission(): boolean {
+    return this.permissions.length !== 0;
+  }
+
+  get hasAllTimelineAdministrationPermission(): boolean {
+    return this.permissions.includes("AllTimelineManagement");
+  }
 }
 
 export interface LoginCredentials {
@@ -43,24 +57,24 @@ export class BadCredentialError {
 const USER_STORAGE_KEY = "currentuser";
 
 export class UserService {
-  private userSubject = new BehaviorSubject<UserWithToken | null | undefined>(
+  private userSubject = new BehaviorSubject<AuthUser | null | undefined>(
     undefined
   );
 
-  get user$(): Observable<UserWithToken | null | undefined> {
+  get user$(): Observable<AuthUser | null | undefined> {
     return this.userSubject;
   }
 
-  get currentUser(): UserWithToken | null | undefined {
+  get currentUser(): AuthUser | null | undefined {
     return this.userSubject.value;
   }
 
-  async checkLoginState(): Promise<UserWithToken | null> {
+  async checkLoginState(): Promise<AuthUser | null> {
     if (this.currentUser !== undefined) {
       console.warn("Already checked user. Can't check twice.");
     }
 
-    const savedUser = await dataStorage.getItem<UserWithToken | null>(
+    const savedUser = await dataStorage.getItem<AuthUser | null>(
       USER_STORAGE_KEY
     );
 
@@ -74,8 +88,8 @@ export class UserService {
     const savedToken = savedUser.token;
     try {
       const res = await getHttpTokenClient().verify({ token: savedToken });
-      const user: UserWithToken = { ...res.user, token: savedToken };
-      await dataStorage.setItem<UserWithToken>(USER_STORAGE_KEY, user);
+      const user = new AuthUser(res.user, savedToken);
+      await dataStorage.setItem<AuthUser>(USER_STORAGE_KEY, user);
       this.userSubject.next(user);
       pushAlert({
         type: "success",
@@ -116,12 +130,9 @@ export class UserService {
         ...credentials,
         expire: 30,
       });
-      const user: UserWithToken = {
-        ...res.user,
-        token: res.token,
-      };
+      const user = new AuthUser(res.user, res.token);
       if (rememberMe) {
-        await dataStorage.setItem<UserWithToken>(USER_STORAGE_KEY, user);
+        await dataStorage.setItem<AuthUser>(USER_STORAGE_KEY, user);
       }
       this.userSubject.next(user);
     } catch (e) {
@@ -169,8 +180,8 @@ export class UserService {
 
 export const userService = new UserService();
 
-export function useRawUser(): UserWithToken | null | undefined {
-  const [user, setUser] = useState<UserWithToken | null | undefined>(
+export function useRawUser(): AuthUser | null | undefined {
+  const [user, setUser] = useState<AuthUser | null | undefined>(
     userService.currentUser
   );
   useEffect(() => {
@@ -182,8 +193,8 @@ export function useRawUser(): UserWithToken | null | undefined {
   return user;
 }
 
-export function useUser(): UserWithToken | null {
-  const [user, setUser] = useState<UserWithToken | null>(() => {
+export function useUser(): AuthUser | null {
+  const [user, setUser] = useState<AuthUser | null>(() => {
     const initUser = userService.currentUser;
     if (initUser === undefined) {
       throw new UiLogicError(
@@ -208,7 +219,7 @@ export function useUser(): UserWithToken | null {
   return user;
 }
 
-export function useUserLoggedIn(): UserWithToken {
+export function useUserLoggedIn(): AuthUser {
   const user = useUser();
   if (user == null) {
     throw new UiLogicError("You assert user has logged in but actually not.");
@@ -216,7 +227,7 @@ export function useUserLoggedIn(): UserWithToken {
   return user;
 }
 
-export function checkLogin(): UserWithToken {
+export function checkLogin(): AuthUser {
   const user = userService.currentUser;
   if (user == null) {
     throw new UiLogicError("You must login to perform the operation.");

@@ -157,7 +157,6 @@ namespace Timeline.Services
             {
                 UniqueId = entity.UniqueId,
                 Username = entity.Username,
-                Administrator = permission.Contains(UserPermission.UserManagement),
                 Permissions = permission,
                 Nickname = string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
                 Id = entity.Id,

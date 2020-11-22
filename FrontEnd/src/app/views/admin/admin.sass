@@ -1,0 +1,22 @@
+.admin-user-item
+  position: relative
+
+  .edit-mask
+    position: absolute
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+
+    background: #ffffffc5
+    position: absolute
+
+    display: flex
+    justify-content: center
+    align-items: center
+
+    @include media-breakpoint-down(xs)
+      flex-direction: column
+
+    button
+      margin: 0.5em 2em

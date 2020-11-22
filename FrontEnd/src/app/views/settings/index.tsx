@@ -20,7 +20,7 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
     <OperationDialog
       open={props.open}
       title="settings.dialogChangePassword.title"
-      titleColor="dangerous"
+      themeColor="danger"
       inputPrompt="settings.dialogChangePassword.prompt"
       inputScheme={[
         {

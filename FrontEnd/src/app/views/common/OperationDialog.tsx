@@ -77,11 +77,6 @@ type MapOperationInputInfoValueTypeList<
   [Index in keyof Tuple]: MapOperationInputInfoValueType<Tuple[Index]>;
 } & { length: Tuple["length"] };
 
-interface OperationResult {
-  type: "success" | "failure";
-  data: unknown;
-}
-
 export type OperationInputError =
   | {
       [index: number]: I18nText | null | undefined;
@@ -98,36 +93,49 @@ const isNoError = (error: OperationInputError): boolean => {
 };
 
 export interface OperationDialogProps<
+  TData,
   OperationInputInfoList extends readonly OperationInputInfo[]
 > {
   open: boolean;
   close: () => void;
   title: I18nText | (() => React.ReactNode);
-  titleColor?: "default" | "dangerous" | "create" | string;
+  themeColor?: "danger" | "success" | string;
   onProcess: (
     inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
-  ) => Promise<unknown>;
+  ) => Promise<TData>;
   inputScheme?: OperationInputInfoList;
   inputValidator?: (
     inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
   ) => OperationInputError;
   inputPrompt?: I18nText | (() => React.ReactNode);
   processPrompt?: () => React.ReactNode;
-  successPrompt?: (data: unknown) => React.ReactNode;
+  successPrompt?: (data: TData) => React.ReactNode;
   failurePrompt?: (error: unknown) => React.ReactNode;
-  onSuccessAndClose?: () => void;
+  onSuccessAndClose?: (data: TData) => void;
 }
 
 const OperationDialog = <
+  TData,
   OperationInputInfoList extends readonly OperationInputInfo[]
 >(
-  props: OperationDialogProps<OperationInputInfoList>
+  props: OperationDialogProps<TData, OperationInputInfoList>
 ): React.ReactElement => {
-  const inputScheme = props.inputScheme as readonly OperationInputInfo[];
+  const inputScheme = (props.inputScheme ??
+    []) as readonly OperationInputInfo[];
 
   const { t } = useTranslation();
 
-  type Step = "input" | "process" | OperationResult;
+  type Step =
+    | "input"
+    | "process"
+    | {
+        type: "success";
+        data: TData;
+      }
+    | {
+        type: "failure";
+        data: unknown;
+      };
   const [step, setStep] = useState<Step>("input");
   const [values, setValues] = useState<(boolean | string)[]>(
     inputScheme.map((i) => {
@@ -153,7 +161,7 @@ const OperationDialog = <
         step.type === "success" &&
         props.onSuccessAndClose
       ) {
-        props.onSuccessAndClose();
+        props.onSuccessAndClose(step.data);
       }
     } else {
       console.log("Attempt to close modal when processing.");
@@ -169,7 +177,7 @@ const OperationDialog = <
         >
       )
       .then(
-        (d: unknown) => {
+        (d) => {
           setStep({
             type: "success",
             data: d,
@@ -305,7 +313,7 @@ const OperationDialog = <
             {t("operationDialog.cancel")}
           </Button>
           <LoadingButton
-            variant="primary"
+            variant={props.themeColor}
             loading={process}
             disabled={!canProcess}
             onClick={() => {
@@ -354,14 +362,7 @@ const OperationDialog = <
     <Modal show={props.open} onHide={close}>
       <Modal.Header
         className={
-          props.titleColor != null
-            ? "text-" +
-              (props.titleColor === "create"
-                ? "success"
-                : props.titleColor === "dangerous"
-                ? "danger"
-                : props.titleColor)
-            : undefined
+          props.themeColor != null ? "text-" + props.themeColor : undefined
         }
       >
         {title}

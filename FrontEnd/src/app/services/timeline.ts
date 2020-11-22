@@ -29,11 +29,11 @@ export type { TimelineVisibility } from "@/http/timeline";
 import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from "./common";
 import { DataHub, WithSyncStatus } from "./DataHub";
 import {
-  UserAuthInfo,
   checkLogin,
   userService,
   userInfoService,
   User,
+  AuthUser,
 } from "./user";
 
 export type TimelineInfo = HttpTimelineInfo;
@@ -608,10 +608,11 @@ export class TimelineService {
   }
 
   hasReadPermission(
-    user: UserAuthInfo | null | undefined,
+    user: AuthUser | null | undefined,
     timeline: TimelineInfo
   ): boolean {
-    if (user != null && user.administrator) return true;
+    if (user != null && user.hasAllTimelineAdministrationPermission)
+      return true;
 
     const { visibility } = timeline;
     if (visibility === "Public") {
@@ -631,10 +632,11 @@ export class TimelineService {
   }
 
   hasPostPermission(
-    user: UserAuthInfo | null | undefined,
+    user: AuthUser | null | undefined,
     timeline: TimelineInfo
   ): boolean {
-    if (user != null && user.administrator) return true;
+    if (user != null && user.hasAllTimelineAdministrationPermission)
+      return true;
 
     return (
       user != null &&
@@ -644,20 +646,22 @@ export class TimelineService {
   }
 
   hasManagePermission(
-    user: UserAuthInfo | null | undefined,
+    user: AuthUser | null | undefined,
     timeline: TimelineInfo
   ): boolean {
-    if (user != null && user.administrator) return true;
+    if (user != null && user.hasAllTimelineAdministrationPermission)
+      return true;
 
     return user != null && user.username == timeline.owner.username;
   }
 
   hasModifyPostPermission(
-    user: UserAuthInfo | null | undefined,
+    user: AuthUser | null | undefined,
     timeline: TimelineInfo,
     post: TimelinePostInfo
   ): boolean {
-    if (user != null && user.administrator) return true;
+    if (user != null && user.hasAllTimelineAdministrationPermission)
+      return true;
 
     return (
       user != null &&

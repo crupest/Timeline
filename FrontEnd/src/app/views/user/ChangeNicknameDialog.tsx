@@ -13,7 +13,6 @@ const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
     <OperationDialog
       open={props.open}
       title="userPage.dialogChangeNickname.title"
-      titleColor="default"
       inputScheme={[
         { type: "text", label: "userPage.dialogChangeNickname.inputLabel" },
       ]}

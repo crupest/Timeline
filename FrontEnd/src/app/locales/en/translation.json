@@ -13,7 +13,8 @@
   "nav": {
     "settings": "Settings",
     "login": "Login",
-    "about": "About"
+    "about": "About",
+    "administration": "Administration"
   },
   "chooseImage": "Choose a image",
   "loadImageError": "Failed to load image.",
