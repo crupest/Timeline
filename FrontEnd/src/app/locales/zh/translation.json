@@ -13,7 +13,8 @@
   "nav": {
     "settings": "设置",
     "login": "登陆",
-    "about": "关于"
+    "about": "关于",
+    "administration": "管理"
   },
   "chooseImage": "选择一个图片",
   "loadImageError": "加载图片失败",

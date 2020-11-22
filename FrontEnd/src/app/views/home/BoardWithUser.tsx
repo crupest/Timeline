@@ -2,14 +2,14 @@ import React from "react";
 import { Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import { UserWithToken } from "@/services/user";
+import { AuthUser } from "@/services/user";
 import { TimelineInfo } from "@/services/timeline";
 import { getHttpTimelineClient } from "@/http/timeline";
 
 import TimelineBoard from "./TimelineBoard";
 import OfflineBoard from "./OfflineBoard";
 
-const BoardWithUser: React.FC<{ user: UserWithToken }> = ({ user }) => {
+const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
   const { t } = useTranslation();
 
   const [ownTimelines, setOwnTimelines] = React.useState<

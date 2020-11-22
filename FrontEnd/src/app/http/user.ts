@@ -12,20 +12,39 @@ import {
   convertToNotModified,
 } from "./common";
 
+export const kUserManagement = "UserManagement";
+export const kAllTimelineManagement = "AllTimelineManagement";
+export const kHighlightTimelineManagement = "HighlightTimelineManagement";
+
+export const kUserPermissionList = [
+  kUserManagement,
+  kAllTimelineManagement,
+  kHighlightTimelineManagement,
+] as const;
+
+export type UserPermission = typeof kUserPermissionList[number];
+
 export interface HttpUser {
   uniqueId: string;
   username: string;
-  administrator: boolean;
+  permissions: UserPermission[];
   nickname: string;
 }
 
 export interface HttpUserPatchRequest {
+  username?: string;
+  password?: string;
   nickname?: string;
 }
 
 export interface HttpChangePasswordRequest {
   oldPassword: string;
   newPassword: string;
+}
+
+export interface HttpCreateUserRequest {
+  username: string;
+  password: string;
 }
 
 export class HttpUserNotExistError extends Error {
@@ -41,12 +60,14 @@ export class HttpChangePasswordBadCredentialError extends Error {
 }
 
 export interface IHttpUserClient {
+  list(): Promise<HttpUser[]>;
   get(username: string): Promise<HttpUser>;
   patch(
     username: string,
     req: HttpUserPatchRequest,
     token: string
   ): Promise<HttpUser>;
+  delete(username: string, token: string): Promise<void>;
   getAvatar(username: string): Promise<BlobWithEtag>;
   getAvatar(
     username: string,
@@ -54,9 +75,28 @@ export interface IHttpUserClient {
   ): Promise<BlobWithEtag | NotModified>;
   putAvatar(username: string, data: Blob, token: string): Promise<void>;
   changePassword(req: HttpChangePasswordRequest, token: string): Promise<void>;
+  putUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void>;
+  deleteUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void>;
+
+  createUser(req: HttpCreateUserRequest, token: string): Promise<HttpUser>;
 }
 
 export class HttpUserClient implements IHttpUserClient {
+  list(): Promise<HttpUser[]> {
+    return axios
+      .get<HttpUser[]>(`${apiBaseUrl}/users`)
+      .then(extractResponseData)
+      .catch(convertToNetworkError);
+  }
+
   get(username: string): Promise<HttpUser> {
     return axios
       .get<HttpUser>(`${apiBaseUrl}/users/${username}`)
@@ -74,6 +114,13 @@ export class HttpUserClient implements IHttpUserClient {
       .patch<HttpUser>(`${apiBaseUrl}/users/${username}?token=${token}`, req)
       .then(extractResponseData)
       .catch(convertToNetworkError);
+  }
+
+  delete(username: string, token: string): Promise<void> {
+    return axios
+      .delete(`${apiBaseUrl}/users/${username}?token=${token}`)
+      .catch(convertToNetworkError)
+      .then();
   }
 
   getAvatar(username: string): Promise<BlobWithEtag>;
@@ -116,6 +163,40 @@ export class HttpUserClient implements IHttpUserClient {
       .catch(
         convertToIfErrorCodeIs(11020201, HttpChangePasswordBadCredentialError)
       )
+      .catch(convertToNetworkError)
+      .then();
+  }
+
+  putUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void> {
+    return axios
+      .put(
+        `${apiBaseUrl}/users/${username}/permissions/${permission}?token=${token}`
+      )
+      .catch(convertToNetworkError)
+      .then();
+  }
+
+  deleteUserPermission(
+    username: string,
+    permission: UserPermission,
+    token: string
+  ): Promise<void> {
+    return axios
+      .delete(
+        `${apiBaseUrl}/users/${username}/permissions/${permission}?token=${token}`
+      )
+      .catch(convertToNetworkError)
+      .then();
+  }
+
+  createUser(req: HttpCreateUserRequest, token: string): Promise<HttpUser> {
+    return axios
+      .post<HttpUser>(`${apiBaseUrl}/userop/createuser?token=${token}`, req)
+      .then(extractResponseData)
       .catch(convertToNetworkError)
       .then();
   }

@@ -22,7 +22,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
       open={props.open}
       close={props.close}
       title="timeline.deleteDialog.title"
-      titleColor="danger"
+      themeColor="danger"
       inputPrompt={() => {
         return (
           <Trans i18nKey="timeline.deleteDialog.inputPrompt">

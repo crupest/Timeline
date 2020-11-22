@@ -58,7 +58,7 @@ const App: React.FC = () => {
             <Route path="/users/:username">
               <User />
             </Route>
-            {user && user.administrator && (
+            {user && user.hasAdministrationPermission && (
               <Route path="/admin">
                 <LazyAdmin user={user} />
               </Route>

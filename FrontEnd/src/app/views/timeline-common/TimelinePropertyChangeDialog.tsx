@@ -33,7 +33,6 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
   return (
     <OperationDialog
       title={"timeline.dialogChangeProperty.title"}
-      titleColor="default"
       inputScheme={[
         {
           type: "text",
