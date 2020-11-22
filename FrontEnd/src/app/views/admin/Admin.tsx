@@ -1,22 +1,21 @@
 import React, { Fragment } from "react";
 import { Redirect, Route, Switch, useRouteMatch, match } from "react-router";
 import { Container } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 import { AuthUser } from "@/services/user";
-
-import i18n from "@/i18n";
 
 import AdminNav from "./AdminNav";
 import UserAdmin from "./UserAdmin";
 import HighlightTimelineAdmin from "./HighlightTimelineAdmin";
-
-void i18n.loadNamespaces("admin");
 
 interface AdminProps {
   user: AuthUser;
 }
 
 const Admin: React.FC<AdminProps> = ({ user }) => {
+  useTranslation("admin");
+
   const match = useRouteMatch();
 
   return (
