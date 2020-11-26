@@ -67,7 +67,7 @@ namespace Timeline.Tests.Services
         {
             var initTime = _clock.ForwardCurrentTime();
 
-            void Check(Models.Timeline timeline)
+            void Check(TimelineInfo timeline)
             {
                 timeline.NameLastModified.Should().Be(initTime);
                 timeline.LastModified.Should().Be(_clock.GetCurrentTime());

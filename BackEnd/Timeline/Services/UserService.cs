@@ -32,13 +32,13 @@ namespace Timeline.Services
         /// <param name="id">The id of the user.</param>
         /// <returns>The user info.</returns>
         /// <exception cref="UserNotExistException">Thrown when the user with given id does not exist.</exception>
-        Task<User> GetUser(long id);
+        Task<UserInfo> GetUser(long id);
 
         /// <summary>
         /// List all users.
         /// </summary>
         /// <returns>The user info of users.</returns>
-        Task<List<User>> GetUsers();
+        Task<List<UserInfo>> GetUsers();
 
         /// <summary>
         /// Create a user with given info.
@@ -49,7 +49,7 @@ namespace Timeline.Services
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> or <paramref name="password"/> is of bad format.</exception>
         /// <exception cref="EntityAlreadyExistException">Thrown when a user with given username already exists.</exception>
-        Task<User> CreateUser(string username, string password);
+        Task<UserInfo> CreateUser(string username, string password);
 
         /// <summary>
         /// Modify a user.
@@ -62,7 +62,7 @@ namespace Timeline.Services
         /// <remarks>
         /// Version will increase if password is changed.
         /// </remarks>
-        Task<User> ModifyUser(long id, ModifyUserParams? param);
+        Task<UserInfo> ModifyUser(long id, ModifyUserParams? param);
     }
 
     public class UserService : BasicUserService, IUserService
@@ -116,26 +116,23 @@ namespace Timeline.Services
             throw new EntityAlreadyExistException(EntityNames.User, ExceptionUsernameConflict);
         }
 
-        private async Task<User> CreateUserFromEntity(UserEntity entity)
+        private async Task<UserInfo> CreateUserFromEntity(UserEntity entity)
         {
             var permission = await _userPermissionService.GetPermissionsOfUserAsync(entity.Id);
-            return new User
-            {
-                UniqueId = entity.UniqueId,
-                Username = entity.Username,
-                Permissions = permission,
-                Nickname = string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
-                Id = entity.Id,
-                Version = entity.Version,
-                CreateTime = entity.CreateTime,
-                UsernameChangeTime = entity.UsernameChangeTime,
-                LastModified = entity.LastModified
-            };
+            return new UserInfo(
+                entity.Id,
+                entity.UniqueId,
+                entity.Username,
+                string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
+                permission,
+                entity.UsernameChangeTime,
+                entity.CreateTime,
+                entity.LastModified,
+                entity.Version
+            );
         }
 
-
-
-        public async Task<User> GetUser(long id)
+        public async Task<UserInfo> GetUser(long id)
         {
             var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
@@ -145,9 +142,9 @@ namespace Timeline.Services
             return await CreateUserFromEntity(user);
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<List<UserInfo>> GetUsers()
         {
-            List<User> result = new();
+            List<UserInfo> result = new();
             foreach (var entity in await _databaseContext.Users.ToArrayAsync())
             {
                 result.Add(await CreateUserFromEntity(entity));
@@ -155,7 +152,7 @@ namespace Timeline.Services
             return result;
         }
 
-        public async Task<User> CreateUser(string username, string password)
+        public async Task<UserInfo> CreateUser(string username, string password)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -183,7 +180,7 @@ namespace Timeline.Services
             return await CreateUserFromEntity(newEntity);
         }
 
-        public async Task<User> ModifyUser(long id, ModifyUserParams? param)
+        public async Task<UserInfo> ModifyUser(long id, ModifyUserParams? param)
         {
             if (param != null)
             {

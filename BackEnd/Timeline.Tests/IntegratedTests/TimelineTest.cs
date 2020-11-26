@@ -19,20 +19,20 @@ namespace Timeline.Tests.IntegratedTests
 {
     public static class TimelineHelper
     {
-        public static TimelinePostContentInfo TextPostContent(string text)
+        public static HttpTimelinePostContent TextPostContent(string text)
         {
-            return new TimelinePostContentInfo
+            return new HttpTimelinePostContent
             {
                 Type = "text",
                 Text = text
             };
         }
 
-        public static TimelinePostCreateRequest TextPostCreateRequest(string text, DateTime? time = null)
+        public static HttpTimelinePostCreateRequest TextPostCreateRequest(string text, DateTime? time = null)
         {
-            return new TimelinePostCreateRequest
+            return new HttpTimelinePostCreateRequest
             {
-                Content = new TimelinePostCreateRequestContent
+                Content = new HttpTimelinePostCreateRequestContent
                 {
                     Type = "text",
                     Text = text
@@ -72,7 +72,7 @@ namespace Timeline.Tests.IntegratedTests
 
 
             {
-                var body = await client.TestGetAsync<TimelineInfo>("timelines/@user1");
+                var body = await client.TestGetAsync<HttpTimeline>("timelines/@user1");
                 body.Owner.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
                 body.Visibility.Should().Be(TimelineVisibility.Register);
                 body.Description.Should().Be("");
@@ -84,7 +84,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                var body = await client.TestGetAsync<TimelineInfo>("timelines/t1");
+                var body = await client.TestGetAsync<HttpTimeline>("timelines/t1");
                 body.Owner.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
                 body.Visibility.Should().Be(TimelineVisibility.Register);
                 body.Description.Should().Be("");
@@ -101,7 +101,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateDefaultClient();
 
-            var result = new List<TimelineInfo>
+            var result = new List<HttpTimeline>
             {
                 await client.GetTimelineAsync("@user1")
             };
@@ -112,7 +112,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
 
-            var body = await client.TestGetAsync<List<TimelineInfo>>("timelines");
+            var body = await client.TestGetAsync<List<HttpTimeline>>("timelines");
             body.Should().BeEquivalentTo(result);
         }
 
@@ -127,14 +127,14 @@ namespace Timeline.Tests.IntegratedTests
                 await client.TestGetAssertInvalidModelAsync("timelines?visibility=aaa");
             }
 
-            var testResultRelate = new List<TimelineInfo>();
-            var testResultOwn = new List<TimelineInfo>();
-            var testResultJoin = new List<TimelineInfo>();
-            var testResultOwnPrivate = new List<TimelineInfo>();
-            var testResultRelatePublic = new List<TimelineInfo>();
-            var testResultRelateRegister = new List<TimelineInfo>();
-            var testResultJoinPrivate = new List<TimelineInfo>();
-            var testResultPublic = new List<TimelineInfo>();
+            var testResultRelate = new List<HttpTimeline>();
+            var testResultOwn = new List<HttpTimeline>();
+            var testResultJoin = new List<HttpTimeline>();
+            var testResultOwnPrivate = new List<HttpTimeline>();
+            var testResultRelatePublic = new List<HttpTimeline>();
+            var testResultRelateRegister = new List<HttpTimeline>();
+            var testResultJoinPrivate = new List<HttpTimeline>();
+            var testResultPublic = new List<HttpTimeline>();
 
             {
                 using var client = await CreateClientAsUser();
@@ -185,8 +185,8 @@ namespace Timeline.Tests.IntegratedTests
 
             {
                 using var client = await CreateClientAs(3);
-                await client.PatchTimelineAsync("@user3", new TimelinePatchRequest { Visibility = TimelineVisibility.Private });
-                await client.PatchTimelineAsync("t3", new TimelinePatchRequest { Visibility = TimelineVisibility.Register });
+                await client.PatchTimelineAsync("@user3", new HttpTimelinePatchRequest { Visibility = TimelineVisibility.Private });
+                await client.PatchTimelineAsync("t3", new HttpTimelinePatchRequest { Visibility = TimelineVisibility.Register });
 
                 {
                     var timeline = await client.GetTimelineAsync("@user3");
@@ -206,9 +206,9 @@ namespace Timeline.Tests.IntegratedTests
             {
                 using var client = await CreateDefaultClient();
 
-                async Task TestAgainst(string url, List<TimelineInfo> against)
+                async Task TestAgainst(string url, List<HttpTimeline> against)
                 {
-                    var body = await client.TestGetAsync<List<TimelineInfo>>(url);
+                    var body = await client.TestGetAsync<List<HttpTimeline>>(url);
                     body.Should().BeEquivalentTo(against);
                 }
 
@@ -236,7 +236,7 @@ namespace Timeline.Tests.IntegratedTests
                 await client.TestPostAssertInvalidModelAsync("timelines", new TimelineCreateRequest { Name = "!!!" });
 
                 {
-                    var body = await client.TestPostAsync<TimelineInfo>("timelines", new TimelineCreateRequest { Name = "aaa" });
+                    var body = await client.TestPostAsync<HttpTimeline>("timelines", new TimelineCreateRequest { Name = "aaa" });
                     body.Should().BeEquivalentTo(await client.GetTimelineAsync("aaa"));
                 }
 
@@ -342,7 +342,7 @@ namespace Timeline.Tests.IntegratedTests
 
             var timelineName = generator(1);
 
-            async Task AssertMembers(List<UserInfo> members)
+            async Task AssertMembers(List<HttpUser> members)
             {
                 var body = await client.GetTimelineAsync(timelineName);
                 body.Members.Should().NotBeNull().And.BeEquivalentTo(members);
@@ -358,7 +358,7 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestPutAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.TimelineController.MemberPut_NotExist);
             await AssertEmptyMembers();
             await client.PutTimelineMemberAsync(timelineName, "user2");
-            await AssertMembers(new List<UserInfo> { await client.GetUserAsync("user2") });
+            await AssertMembers(new List<HttpUser> { await client.GetUserAsync("user2") });
             await client.DeleteTimelineMemberAsync(timelineName, "user2", true);
             await AssertEmptyMembers();
             await client.DeleteTimelineMemberAsync(timelineName, "aaa", false);
@@ -462,7 +462,7 @@ namespace Timeline.Tests.IntegratedTests
             async Task<long> CreatePost(int userNumber)
             {
                 using var client = await CreateClientAs(userNumber);
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
                 return body.Id;
             }
 
@@ -515,28 +515,28 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
                 body.Should().BeEmpty();
             }
 
             const string mockContent = "aaa";
-            TimelinePostInfo createRes;
+            HttpTimelinePost createRes;
             {
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest(mockContent));
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest(mockContent));
                 body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent));
                 body.Author.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
                 body.Deleted.Should().BeFalse();
                 createRes = body;
             }
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
                 body.Should().BeEquivalentTo(createRes);
             }
             const string mockContent2 = "bbb";
             var mockTime2 = DateTime.UtcNow.AddDays(-1);
-            TimelinePostInfo createRes2;
+            HttpTimelinePost createRes2;
             {
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest(mockContent2, mockTime2));
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest(mockContent2, mockTime2));
                 body.Should().NotBeNull();
                 body.Content.Should().BeEquivalentTo(TimelineHelper.TextPostContent(mockContent2));
                 body.Author.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
@@ -545,7 +545,7 @@ namespace Timeline.Tests.IntegratedTests
                 createRes2 = body;
             }
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
                 body.Should().BeEquivalentTo(createRes, createRes2);
             }
             {
@@ -554,7 +554,7 @@ namespace Timeline.Tests.IntegratedTests
                 await client.TestDeleteAsync($"timelines/{generator(1)}/posts/30000", false);
             }
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
                 body.Should().BeEquivalentTo(createRes2);
             }
         }
@@ -567,7 +567,7 @@ namespace Timeline.Tests.IntegratedTests
 
             async Task<long> CreatePost(DateTime time)
             {
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa", time));
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa", time));
                 return body.Id;
             }
 
@@ -577,7 +577,7 @@ namespace Timeline.Tests.IntegratedTests
             var id2 = await CreatePost(now);
 
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
                 body.Select(p => p.Id).Should().Equal(id1, id2, id0);
             }
         }
@@ -588,15 +588,15 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsUser();
             var postUrl = $"timelines/{generator(1)}/posts";
-            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = null! });
-            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = null! } });
-            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "hahaha" } });
-            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "text", Text = null } });
-            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = null } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new HttpTimelinePostCreateRequest { Content = null! });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Type = null! } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Type = "hahaha" } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Type = "text", Text = null } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Type = "image", Data = null } });
             // image not base64
-            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = "!!!" } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Type = "image", Data = "!!!" } });
             // image base64 not image
-            await client.TestPostAssertInvalidModelAsync(postUrl, new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Type = "image", Data = Convert.ToBase64String(new byte[] { 0x01, 0x02, 0x03 }) } });
+            await client.TestPostAssertInvalidModelAsync(postUrl, new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Type = "image", Data = Convert.ToBase64String(new byte[] { 0x01, 0x02, 0x03 }) } });
         }
 
         [Theory]
@@ -608,7 +608,7 @@ namespace Timeline.Tests.IntegratedTests
             long postId;
             string postImageUrl;
 
-            void AssertPostContent(TimelinePostContentInfo content)
+            void AssertPostContent(HttpTimelinePostContent content)
             {
                 content.Type.Should().Be(TimelinePostContentTypes.Image);
                 content.Url.Should().EndWith($"timelines/{generator(1)}/posts/{postId}/data");
@@ -618,10 +618,10 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             {
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
-                    new TimelinePostCreateRequest
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
+                    new HttpTimelinePostCreateRequest
                     {
-                        Content = new TimelinePostCreateRequestContent
+                        Content = new HttpTimelinePostCreateRequestContent
                         {
                             Type = TimelinePostContentTypes.Image,
                             Data = Convert.ToBase64String(imageData)
@@ -633,7 +633,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
                 body.Should().HaveCount(1);
                 var post = body[0];
                 post.Id.Should().Be(postId);
@@ -655,7 +655,7 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}", false);
 
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
                 body.Should().BeEmpty();
             }
 
@@ -677,7 +677,7 @@ namespace Timeline.Tests.IntegratedTests
 
             long postId;
             {
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", TimelineHelper.TextPostCreateRequest("aaa"));
                 postId = body.Id;
             }
 
@@ -726,12 +726,12 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             var postContentList = new List<string> { "a", "b", "c", "d" };
-            var posts = new List<TimelinePostInfo>();
+            var posts = new List<HttpTimelinePost>();
 
             foreach (var content in postContentList)
             {
-                var post = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
-                    new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
+                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
                 posts.Add(post);
                 await Task.Delay(1000);
             }
@@ -739,7 +739,7 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}", true);
 
             {
-                var body = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) }");
+                var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) }");
                 body.Should().HaveCount(2)
                     .And.Subject.Select(p => p.Content!.Text).Should().Equal("b", "d");
             }
@@ -752,12 +752,12 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             var postContentList = new List<string> { "a", "b", "c", "d" };
-            var posts = new List<TimelinePostInfo>();
+            var posts = new List<HttpTimelinePost>();
 
             foreach (var content in postContentList)
             {
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
-                    new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
+                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
                 posts.Add(body);
             }
 
@@ -767,7 +767,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                posts = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts?includeDeleted=true");
+                posts = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts?includeDeleted=true");
                 posts.Should().HaveCount(4);
                 posts.Select(p => p.Deleted).Should().Equal(true, false, true, false);
                 posts.Select(p => p.Content == null).Should().Equal(true, false, true, false);
@@ -781,12 +781,12 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             var postContentList = new List<string> { "a", "b", "c", "d" };
-            var posts = new List<TimelinePostInfo>();
+            var posts = new List<HttpTimelinePost>();
 
             foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
             {
-                var post = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts",
-                    new TimelinePostCreateRequest { Content = new TimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
+                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
                 posts.Add(post);
                 await Task.Delay(1000);
             }
@@ -795,7 +795,7 @@ namespace Timeline.Tests.IntegratedTests
 
             {
 
-                posts = await client.TestGetAsync<List<TimelinePostInfo>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture)}&includeDeleted=true");
+                posts = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture)}&includeDeleted=true");
                 posts.Should().HaveCount(3);
                 posts.Select(p => p.Deleted).Should().Equal(false, true, false);
                 posts.Select(p => p.Content == null).Should().Equal(false, true, false);
@@ -809,7 +809,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             DateTime lastModifiedTime;
-            TimelineInfo timeline;
+            HttpTimeline timeline;
             string uniqueId;
 
             {
@@ -830,7 +830,7 @@ namespace Timeline.Tests.IntegratedTests
 
             {
 
-                var body = await client.TestGetAsync<TimelineInfo>($"timelines/{generator(1)}",
+                var body = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}",
                     headerSetup: (headers, _) =>
                     {
                         headers.IfModifiedSince = lastModifiedTime.AddSeconds(-1);
@@ -843,7 +843,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                var body = await client.TestGetAsync<TimelineInfo>($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(-1).ToString("s", CultureInfo.InvariantCulture) }");
+                var body = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(-1).ToString("s", CultureInfo.InvariantCulture) }");
                 body.Should().BeEquivalentTo(timeline);
             }
 
@@ -853,7 +853,7 @@ namespace Timeline.Tests.IntegratedTests
 
             {
                 var testUniqueId = (uniqueId[0] == 'a' ? "b" : "a") + uniqueId[1..];
-                var body = await client.TestGetAsync<TimelineInfo>($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }&checkUniqueId={testUniqueId}");
+                var body = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }&checkUniqueId={testUniqueId}");
                 body.Should().BeEquivalentTo(timeline);
             }
         }
@@ -870,7 +870,7 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             {
-                var body = await client.PatchTimelineAsync(generator(1), new TimelinePatchRequest { Title = "atitle" });
+                var body = await client.PatchTimelineAsync(generator(1), new HttpTimelinePatchRequest { Title = "atitle" });
                 body.Title.Should().Be("atitle");
             }
 
@@ -885,26 +885,26 @@ namespace Timeline.Tests.IntegratedTests
         {
             {
                 using var client = await CreateDefaultClient();
-                await client.TestPostAssertUnauthorizedAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
+                await client.TestPostAssertUnauthorizedAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
             }
 
             {
                 using var client = await CreateClientAs(2);
-                await client.TestPostAssertForbiddenAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
+                await client.TestPostAssertForbiddenAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
             }
 
             using (var client = await CreateClientAsUser())
             {
-                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "!!!", NewName = "tttttttt" });
-                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttt", NewName = "!!!!" });
-                await client.TestPostAssertErrorAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "ttttt", NewName = "tttttttt" }, errorCode: ErrorCodes.TimelineController.NotExist);
+                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "!!!", NewName = "tttttttt" });
+                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "ttt", NewName = "!!!!" });
+                await client.TestPostAssertErrorAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "ttttt", NewName = "tttttttt" }, errorCode: ErrorCodes.TimelineController.NotExist);
 
-                await client.TestPostAsync("timelineop/changename", new TimelineChangeNameRequest { OldName = "t1", NewName = "newt" });
+                await client.TestPostAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "t1", NewName = "newt" });
 
                 await client.TestGetAsync("timelines/t1", expectedStatusCode: HttpStatusCode.NotFound);
 
                 {
-                    var body = await client.TestGetAsync<TimelineInfo>("timelines/newt");
+                    var body = await client.TestGetAsync<HttpTimeline>("timelines/newt");
                     body.Name.Should().Be("newt");
                 }
             }
@@ -920,9 +920,9 @@ namespace Timeline.Tests.IntegratedTests
             string etag;
 
             {
-                var body = await client.TestPostAsync<TimelinePostInfo>($"timelines/{generator(1)}/posts", new TimelinePostCreateRequest
+                var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", new HttpTimelinePostCreateRequest
                 {
-                    Content = new TimelinePostCreateRequestContent
+                    Content = new HttpTimelinePostCreateRequestContent
                     {
                         Type = TimelinePostContentTypes.Image,
                         Data = Convert.ToBase64String(ImageHelper.CreatePngWithSize(100, 50))

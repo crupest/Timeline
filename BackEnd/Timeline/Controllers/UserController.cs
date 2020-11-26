@@ -42,7 +42,7 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
-        private UserInfo ConvertToUserInfo(User user) => _mapper.Map<UserInfo>(user);
+        private HttpUser ConvertToUserInfo(UserInfo user) => _mapper.Map<HttpUser>(user);
 
         private bool UserHasUserManagementPermission => this.UserHasPermission(UserPermission.UserManagement);
 
@@ -52,7 +52,7 @@ namespace Timeline.Controllers
         /// <returns>All user list.</returns>
         [HttpGet("users")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<UserInfo[]>> List()
+        public async Task<ActionResult<HttpUser[]>> List()
         {
             var users = await _userService.GetUsers();
             var result = users.Select(u => ConvertToUserInfo(u)).ToArray();
@@ -67,7 +67,7 @@ namespace Timeline.Controllers
         [HttpGet("users/{username}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserInfo>> Get([FromRoute][Username] string username)
+        public async Task<ActionResult<HttpUser>> Get([FromRoute][Username] string username)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserInfo>> Patch([FromBody] UserPatchRequest body, [FromRoute][Username] string username)
+        public async Task<ActionResult<HttpUser>> Patch([FromBody] HttpUserPatchRequest body, [FromRoute][Username] string username)
         {
             if (UserHasUserManagementPermission)
             {
@@ -168,7 +168,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<UserInfo>> CreateUser([FromBody] CreateUserRequest body)
+        public async Task<ActionResult<HttpUser>> CreateUser([FromBody] HttpCreateUserRequest body)
         {
             try
             {
@@ -188,7 +188,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        public async Task<ActionResult> ChangePassword([FromBody] HttpChangePasswordRequest request)
         {
             try
             {

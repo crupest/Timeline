@@ -90,7 +90,7 @@ namespace Timeline.Services
         /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
-        Task<Models.Timeline> GetTimeline(string timelineName);
+        Task<TimelineInfo> GetTimeline(string timelineName);
 
         /// <summary>
         /// Get timeline by id.
@@ -98,7 +98,7 @@ namespace Timeline.Services
         /// <param name="id">Id of timeline.</param>
         /// <returns>The timeline.</returns>
         /// <exception cref="TimelineNotExistException">Thrown when timeline with given id does not exist.</exception>
-        Task<Models.Timeline> GetTimelineById(long id);
+        Task<TimelineInfo> GetTimelineById(long id);
 
         /// <summary>
         /// Set the properties of a timeline. 
@@ -112,8 +112,6 @@ namespace Timeline.Services
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
         Task ChangeProperty(string timelineName, TimelineChangePropertyRequest newProperties);
-
-
 
         /// <summary>
         /// Change member of timeline.
@@ -174,7 +172,6 @@ namespace Timeline.Services
         /// </remarks>
         Task<bool> HasReadPermission(string timelineName, long? visitorId);
 
-
         /// <summary>
         /// Verify whether a user is member of a timeline.
         /// </summary>
@@ -202,7 +199,7 @@ namespace Timeline.Services
         /// <remarks>
         /// If user with related user id does not exist, empty list will be returned.
         /// </remarks>
-        Task<List<Models.Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null);
+        Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null);
 
         /// <summary>
         /// Create a timeline.
@@ -214,7 +211,7 @@ namespace Timeline.Services
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="EntityAlreadyExistException">Thrown when the timeline already exists.</exception>
         /// <exception cref="UserNotExistException">Thrown when the owner user does not exist.</exception>
-        Task<Models.Timeline> CreateTimeline(string timelineName, long ownerId);
+        Task<TimelineInfo> CreateTimeline(string timelineName, long ownerId);
 
         /// <summary>
         /// Delete a timeline.
@@ -238,7 +235,7 @@ namespace Timeline.Services
         /// <remarks>
         /// You can only change name of general timeline.
         /// </remarks>
-        Task<Models.Timeline> ChangeTimelineName(string oldTimelineName, string newTimelineName);
+        Task<TimelineInfo> ChangeTimelineName(string oldTimelineName, string newTimelineName);
     }
 
     public class TimelineService : BasicTimelineService, ITimelineService
@@ -270,11 +267,11 @@ namespace Timeline.Services
         }
 
         /// Remember to include Members when query.
-        private async Task<Models.Timeline> MapTimelineFromEntity(TimelineEntity entity)
+        private async Task<TimelineInfo> MapTimelineFromEntity(TimelineEntity entity)
         {
             var owner = await _userService.GetUser(entity.OwnerId);
 
-            var members = new List<User>();
+            var members = new List<UserInfo>();
             foreach (var memberEntity in entity.Members)
             {
                 members.Add(await _userService.GetUser(memberEntity.UserId));
@@ -282,19 +279,18 @@ namespace Timeline.Services
 
             var name = entity.Name ?? ("@" + owner.Username);
 
-            return new Models.Timeline
-            {
-                UniqueID = entity.UniqueId,
-                Name = name,
-                NameLastModified = entity.NameLastModified,
-                Title = string.IsNullOrEmpty(entity.Title) ? name : entity.Title,
-                Description = entity.Description ?? "",
-                Owner = owner,
-                Visibility = entity.Visibility,
-                Members = members,
-                CreateTime = entity.CreateTime,
-                LastModified = entity.LastModified
-            };
+            return new TimelineInfo(
+                entity.UniqueId,
+                 name,
+                entity.NameLastModified,
+                string.IsNullOrEmpty(entity.Title) ? name : entity.Title,
+                entity.Description ?? "",
+                owner,
+                entity.Visibility,
+                members,
+                entity.CreateTime,
+                entity.LastModified
+            );
         }
 
         public async Task<DateTime> GetTimelineLastModifiedTime(string timelineName)
@@ -321,7 +317,7 @@ namespace Timeline.Services
             return timelineEntity.UniqueId;
         }
 
-        public async Task<Models.Timeline> GetTimeline(string timelineName)
+        public async Task<TimelineInfo> GetTimeline(string timelineName)
         {
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
@@ -333,7 +329,7 @@ namespace Timeline.Services
             return await MapTimelineFromEntity(timelineEntity);
         }
 
-        public async Task<Models.Timeline> GetTimelineById(long id)
+        public async Task<TimelineInfo> GetTimelineById(long id)
         {
             var timelineEntity = await _database.Timelines.Where(t => t.Id == id).Include(t => t.Members).SingleOrDefaultAsync();
 
@@ -522,7 +518,7 @@ namespace Timeline.Services
             return await _database.TimelineMembers.AnyAsync(m => m.TimelineId == timelineId && m.UserId == userId);
         }
 
-        public async Task<List<Models.Timeline>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
+        public async Task<List<TimelineInfo>> GetTimelines(TimelineUserRelationship? relate = null, List<TimelineVisibility>? visibility = null)
         {
             List<TimelineEntity> entities;
 
@@ -556,7 +552,7 @@ namespace Timeline.Services
                 }
             }
 
-            var result = new List<Models.Timeline>();
+            var result = new List<TimelineInfo>();
 
             foreach (var entity in entities)
             {
@@ -566,7 +562,7 @@ namespace Timeline.Services
             return result;
         }
 
-        public async Task<Models.Timeline> CreateTimeline(string name, long owner)
+        public async Task<TimelineInfo> CreateTimeline(string name, long owner)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -604,7 +600,7 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
         }
 
-        public async Task<Models.Timeline> ChangeTimelineName(string oldTimelineName, string newTimelineName)
+        public async Task<TimelineInfo> ChangeTimelineName(string oldTimelineName, string newTimelineName)
         {
             if (oldTimelineName == null)
                 throw new ArgumentNullException(nameof(oldTimelineName));

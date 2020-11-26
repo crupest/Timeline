@@ -11,7 +11,7 @@ namespace Timeline.Models.Http
     /// <summary>
     /// Info of post content.
     /// </summary>
-    public class TimelinePostContentInfo
+    public class HttpTimelinePostContent
     {
         /// <summary>
         /// Type of the post content.
@@ -34,7 +34,7 @@ namespace Timeline.Models.Http
     /// <summary>
     /// Info of a post.
     /// </summary>
-    public class TimelinePostInfo
+    public class HttpTimelinePost
     {
         /// <summary>
         /// Post id.
@@ -43,7 +43,7 @@ namespace Timeline.Models.Http
         /// <summary>
         /// Content of the post. May be null if post is deleted.
         /// </summary>
-        public TimelinePostContentInfo? Content { get; set; }
+        public HttpTimelinePostContent? Content { get; set; }
         /// <summary>
         /// True if post is deleted.
         /// </summary>
@@ -55,7 +55,7 @@ namespace Timeline.Models.Http
         /// <summary>
         /// The author. May be null if the user has been deleted.
         /// </summary>
-        public UserInfo? Author { get; set; } = default!;
+        public HttpUser? Author { get; set; } = default!;
         /// <summary>
         /// Last updated time.
         /// </summary>
@@ -65,7 +65,7 @@ namespace Timeline.Models.Http
     /// <summary>
     /// Info of a timeline.
     /// </summary>
-    public class TimelineInfo
+    public class HttpTimeline
     {
         /// <summary>
         /// Unique id.
@@ -90,7 +90,7 @@ namespace Timeline.Models.Http
         /// <summary>
         /// Owner of the timeline.
         /// </summary>
-        public UserInfo Owner { get; set; } = default!;
+        public HttpUser Owner { get; set; } = default!;
         /// <summary>
         /// Visibility of the timeline.
         /// </summary>
@@ -99,7 +99,7 @@ namespace Timeline.Models.Http
         /// <summary>
         /// Members of timeline.
         /// </summary>
-        public List<UserInfo> Members { get; set; } = default!;
+        public List<HttpUser> Members { get; set; } = default!;
 #pragma warning restore CA2227 // Collection properties should be read only
         /// <summary>
         /// Create time of timeline.
@@ -114,14 +114,14 @@ namespace Timeline.Models.Http
         /// <summary>
         /// Related links.
         /// </summary>
-        public TimelineInfoLinks _links { get; set; } = default!;
+        public HttpTimelineLinks _links { get; set; } = default!;
 #pragma warning restore CA1707 // Identifiers should not contain underscores
     }
 
     /// <summary>
     /// Related links for timeline.
     /// </summary>
-    public class TimelineInfoLinks
+    public class HttpTimelineLinks
     {
         /// <summary>
         /// Self.
@@ -133,23 +133,23 @@ namespace Timeline.Models.Http
         public string Posts { get; set; } = default!;
     }
 
-    public class TimelineInfoLinksValueResolver : IValueResolver<Timeline, TimelineInfo, TimelineInfoLinks>
+    public class HttpTimelineLinksValueResolver : IValueResolver<TimelineInfo, HttpTimeline, HttpTimelineLinks>
     {
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
 
-        public TimelineInfoLinksValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
+        public HttpTimelineLinksValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
         {
             _actionContextAccessor = actionContextAccessor;
             _urlHelperFactory = urlHelperFactory;
         }
 
-        public TimelineInfoLinks Resolve(Timeline source, TimelineInfo destination, TimelineInfoLinks destMember, ResolutionContext context)
+        public HttpTimelineLinks Resolve(TimelineInfo source, HttpTimeline destination, HttpTimelineLinks destMember, ResolutionContext context)
         {
             var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
             var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
-            return new TimelineInfoLinks
+            return new HttpTimelineLinks
             {
                 Self = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { source.Name }),
                 Posts = urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { source.Name })
@@ -157,18 +157,18 @@ namespace Timeline.Models.Http
         }
     }
 
-    public class TimelinePostContentResolver : IValueResolver<TimelinePost, TimelinePostInfo, TimelinePostContentInfo?>
+    public class HttpTimelinePostContentResolver : IValueResolver<TimelinePostInfo, HttpTimelinePost, HttpTimelinePostContent?>
     {
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
 
-        public TimelinePostContentResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
+        public HttpTimelinePostContentResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
         {
             _actionContextAccessor = actionContextAccessor;
             _urlHelperFactory = urlHelperFactory;
         }
 
-        public TimelinePostContentInfo? Resolve(TimelinePost source, TimelinePostInfo destination, TimelinePostContentInfo? destMember, ResolutionContext context)
+        public HttpTimelinePostContent? Resolve(TimelinePostInfo source, HttpTimelinePost destination, HttpTimelinePostContent? destMember, ResolutionContext context)
         {
             var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
             var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
@@ -182,7 +182,7 @@ namespace Timeline.Models.Http
 
             if (sourceContent is TextTimelinePostContent textContent)
             {
-                return new TimelinePostContentInfo
+                return new HttpTimelinePostContent
                 {
                     Type = TimelinePostContentTypes.Text,
                     Text = textContent.Text
@@ -190,7 +190,7 @@ namespace Timeline.Models.Http
             }
             else if (sourceContent is ImageTimelinePostContent imageContent)
             {
-                return new TimelinePostContentInfo
+                return new HttpTimelinePostContent
                 {
                     Type = TimelinePostContentTypes.Image,
                     Url = urlHelper.ActionLink(
@@ -207,13 +207,12 @@ namespace Timeline.Models.Http
         }
     }
 
-    public class TimelineInfoAutoMapperProfile : Profile
+    public class HttpTimelineAutoMapperProfile : Profile
     {
-        public TimelineInfoAutoMapperProfile()
+        public HttpTimelineAutoMapperProfile()
         {
-            CreateMap<Timeline, TimelineInfo>().ForMember(u => u._links, opt => opt.MapFrom<TimelineInfoLinksValueResolver>());
-            CreateMap<TimelinePost, TimelinePostInfo>().ForMember(p => p.Content, opt => opt.MapFrom<TimelinePostContentResolver>());
-            CreateMap<TimelinePatchRequest, TimelineChangePropertyRequest>();
+            CreateMap<TimelineInfo, HttpTimeline>().ForMember(u => u._links, opt => opt.MapFrom<HttpTimelineLinksValueResolver>());
+            CreateMap<TimelinePostInfo, HttpTimelinePost>().ForMember(p => p.Content, opt => opt.MapFrom<HttpTimelinePostContentResolver>());
         }
     }
 }
