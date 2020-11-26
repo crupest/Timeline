@@ -27,26 +27,12 @@ namespace Timeline.Services
     public interface IUserService : IBasicUserService
     {
         /// <summary>
-        /// Try to verify the given username and password.
-        /// </summary>
-        /// <param name="username">The username of the user to verify.</param>
-        /// <param name="password">The password of the user to verify.</param>
-        /// <returns>The user info and auth info.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format or <paramref name="password"/> is empty.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
-        /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
-        Task<User> VerifyCredential(string username, string password);
-
-
-        /// <summary>
         /// Try to get a user by id.
         /// </summary>
         /// <param name="id">The id of the user.</param>
         /// <returns>The user info.</returns>
         /// <exception cref="UserNotExistException">Thrown when the user with given id does not exist.</exception>
         Task<User> GetUser(long id);
-
 
         /// <summary>
         /// List all users.
@@ -77,18 +63,6 @@ namespace Timeline.Services
         /// Version will increase if password is changed.
         /// </remarks>
         Task<User> ModifyUser(long id, ModifyUserParams? param);
-
-        /// <summary>
-        /// Try to change a user's password with old password.
-        /// </summary>
-        /// <param name="id">The id of user to change password of.</param>
-        /// <param name="oldPassword">Old password.</param>
-        /// <param name="newPassword">New password.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="oldPassword"/> or <paramref name="newPassword"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown if <paramref name="oldPassword"/> or <paramref name="newPassword"/> is empty.</exception>
-        /// <exception cref="UserNotExistException">Thrown if the user with given username does not exist.</exception>
-        /// <exception cref="BadPasswordException">Thrown if the old password is wrong.</exception>
-        Task ChangePassword(long id, string oldPassword, string newPassword);
     }
 
     public class UserService : BasicUserService, IUserService
@@ -159,26 +133,7 @@ namespace Timeline.Services
             };
         }
 
-        public async Task<User> VerifyCredential(string username, string password)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-            if (password == null)
-                throw new ArgumentNullException(nameof(password));
 
-            CheckUsernameFormat(username, nameof(username));
-            CheckPasswordFormat(password, nameof(password));
-
-            var entity = await _databaseContext.Users.Where(u => u.Username == username).SingleOrDefaultAsync();
-
-            if (entity == null)
-                throw new UserNotExistException(username);
-
-            if (!_passwordService.VerifyPassword(entity.Password, password))
-                throw new BadPasswordException(password);
-
-            return await CreateUserFromEntity(entity);
-        }
 
         public async Task<User> GetUser(long id)
         {
@@ -287,29 +242,6 @@ namespace Timeline.Services
             }
 
             return await CreateUserFromEntity(entity);
-        }
-
-        public async Task ChangePassword(long id, string oldPassword, string newPassword)
-        {
-            if (oldPassword == null)
-                throw new ArgumentNullException(nameof(oldPassword));
-            if (newPassword == null)
-                throw new ArgumentNullException(nameof(newPassword));
-            CheckPasswordFormat(oldPassword, nameof(oldPassword));
-            CheckPasswordFormat(newPassword, nameof(newPassword));
-
-            var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
-
-            if (entity == null)
-                throw new UserNotExistException(id);
-
-            if (!_passwordService.VerifyPassword(entity.Password, oldPassword))
-                throw new BadPasswordException(oldPassword);
-
-            entity.Password = _passwordService.HashPassword(newPassword);
-            entity.Version += 1;
-            await _databaseContext.SaveChangesAsync();
-            _logger.LogInformation(Log.Format(LogDatabaseUpdate, ("Id", id), ("Operation", "Change password")));
         }
     }
 }

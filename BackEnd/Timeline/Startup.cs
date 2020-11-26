@@ -90,6 +90,7 @@ namespace Timeline
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddScoped<IBasicUserService, BasicUserService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserCredentialService, UserCredentialService>();
             services.AddScoped<IUserDeleteService, UserDeleteService>();
             services.AddScoped<IUserTokenService, JwtUserTokenService>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
@@ -99,7 +100,6 @@ namespace Timeline
             services.AddScoped<IBasicTimelineService, BasicTimelineService>();
             services.AddScoped<ITimelineService, TimelineService>();
             services.AddScoped<ITimelinePostService, TimelinePostService>();
-
 
             services.AddDbContext<DatabaseContext>((services, options) =>
             {
