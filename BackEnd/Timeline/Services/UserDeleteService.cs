@@ -31,15 +31,15 @@ namespace Timeline.Services
 
         private readonly DatabaseContext _databaseContext;
 
-        private readonly ITimelineService _timelineService;
+        private readonly ITimelinePostService _timelinePostService;
 
         private readonly UsernameValidator _usernameValidator = new UsernameValidator();
 
-        public UserDeleteService(ILogger<UserDeleteService> logger, DatabaseContext databaseContext, ITimelineService timelineService)
+        public UserDeleteService(ILogger<UserDeleteService> logger, DatabaseContext databaseContext, ITimelinePostService timelinePostService)
         {
             _logger = logger;
             _databaseContext = databaseContext;
-            _timelineService = timelineService;
+            _timelinePostService = timelinePostService;
         }
 
         public async Task<bool> DeleteUser(string username)
@@ -59,7 +59,7 @@ namespace Timeline.Services
             if (user.Id == 1)
                 throw new InvalidOperationOnRootUserException("Can't delete root user.");
 
-            await _timelineService.DeleteAllPostsOfUser(user.Id);
+            await _timelinePostService.DeleteAllPostsOfUser(user.Id);
 
             _databaseContext.Users.Remove(user);
 

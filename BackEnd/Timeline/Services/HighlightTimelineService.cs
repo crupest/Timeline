@@ -43,10 +43,10 @@ namespace Timeline.Services
     public class HighlightTimelineService : IHighlightTimelineService
     {
         private readonly DatabaseContext _database;
-        private readonly IUserService _userService;
+        private readonly IBasicUserService _userService;
         private readonly ITimelineService _timelineService;
 
-        public HighlightTimelineService(DatabaseContext database, IUserService userService, ITimelineService timelineService)
+        public HighlightTimelineService(DatabaseContext database, IBasicUserService userService, ITimelineService timelineService)
         {
             _database = database;
             _userService = userService;

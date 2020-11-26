@@ -24,7 +24,7 @@ namespace Timeline.Services
         public string? Nickname { get; set; }
     }
 
-    public interface IUserService
+    public interface IUserService : IBasicUserService
     {
         /// <summary>
         /// Try to verify the given username and password.
@@ -38,12 +38,6 @@ namespace Timeline.Services
         /// <exception cref="BadPasswordException">Thrown when password is wrong.</exception>
         Task<User> VerifyCredential(string username, string password);
 
-        /// <summary>
-        /// Check if a user exists.
-        /// </summary>
-        /// <param name="id">The id of the user.</param>
-        /// <returns>True if exists. Otherwise false.</returns>
-        Task<bool> CheckUserExistence(long id);
 
         /// <summary>
         /// Try to get a user by id.
@@ -53,15 +47,6 @@ namespace Timeline.Services
         /// <exception cref="UserNotExistException">Thrown when the user with given id does not exist.</exception>
         Task<User> GetUser(long id);
 
-        /// <summary>
-        /// Get the user id of given username.
-        /// </summary>
-        /// <param name="username">Username of the user.</param>
-        /// <returns>The id of the user.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
-        Task<long> GetUserIdByUsername(string username);
 
         /// <summary>
         /// List all users.
@@ -106,7 +91,7 @@ namespace Timeline.Services
         Task ChangePassword(long id, string oldPassword, string newPassword);
     }
 
-    public class UserService : IUserService
+    public class UserService : BasicUserService, IUserService
     {
         private readonly ILogger<UserService> _logger;
         private readonly IClock _clock;
@@ -119,7 +104,7 @@ namespace Timeline.Services
         private readonly UsernameValidator _usernameValidator = new UsernameValidator();
         private readonly NicknameValidator _nicknameValidator = new NicknameValidator();
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IClock clock, IUserPermissionService userPermissionService)
+        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IClock clock, IUserPermissionService userPermissionService) : base(databaseContext)
         {
             _logger = logger;
             _clock = clock;
@@ -195,11 +180,6 @@ namespace Timeline.Services
             return await CreateUserFromEntity(entity);
         }
 
-        public async Task<bool> CheckUserExistence(long id)
-        {
-            return await _databaseContext.Users.AnyAsync(u => u.Id == id);
-        }
-
         public async Task<User> GetUser(long id)
         {
             var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
@@ -208,21 +188,6 @@ namespace Timeline.Services
                 throw new UserNotExistException(id);
 
             return await CreateUserFromEntity(user);
-        }
-
-        public async Task<long> GetUserIdByUsername(string username)
-        {
-            if (username == null)
-                throw new ArgumentNullException(nameof(username));
-
-            CheckUsernameFormat(username, nameof(username));
-
-            var entity = await _databaseContext.Users.Where(user => user.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
-
-            if (entity == null)
-                throw new UserNotExistException(username);
-
-            return entity.Id;
         }
 
         public async Task<List<User>> GetUsers()
