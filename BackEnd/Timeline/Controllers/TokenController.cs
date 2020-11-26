@@ -22,6 +22,7 @@ namespace Timeline.Controllers
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TokenController : Controller
     {
+        private readonly IUserCredentialService _userCredentialService;
         private readonly IUserTokenManager _userTokenManager;
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
@@ -29,8 +30,9 @@ namespace Timeline.Controllers
         private readonly IMapper _mapper;
 
         /// <summary></summary>
-        public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
+        public TokenController(IUserCredentialService userCredentialService, IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
         {
+            _userCredentialService = userCredentialService;
             _userTokenManager = userTokenManager;
             _logger = logger;
             _clock = clock;

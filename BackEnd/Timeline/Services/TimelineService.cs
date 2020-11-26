@@ -1,13 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Models.Validation;
 using Timeline.Services.Exceptions;

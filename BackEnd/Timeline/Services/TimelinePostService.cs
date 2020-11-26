@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,9 +10,7 @@ using Timeline.Entities;
 using Timeline.Helpers;
 using Timeline.Models;
 using Timeline.Services.Exceptions;
-using SixLabors.ImageSharp;
 using static Timeline.Resources.Services.TimelineService;
-using Microsoft.Extensions.Logging;
 
 namespace Timeline.Services
 {

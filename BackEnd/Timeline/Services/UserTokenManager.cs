@@ -45,13 +45,15 @@ namespace Timeline.Services
     {
         private readonly ILogger<UserTokenManager> _logger;
         private readonly IUserService _userService;
+        private readonly IUserCredentialService _userCredentialService;
         private readonly IUserTokenService _userTokenService;
         private readonly IClock _clock;
 
-        public UserTokenManager(ILogger<UserTokenManager> logger, IUserService userService, IUserTokenService userTokenService, IClock clock)
+        public UserTokenManager(ILogger<UserTokenManager> logger, IUserService userService, IUserCredentialService userCredentialService, IUserTokenService userTokenService, IClock clock)
         {
             _logger = logger;
             _userService = userService;
+            _userCredentialService = userCredentialService;
             _userTokenService = userTokenService;
             _clock = clock;
         }
@@ -65,7 +67,8 @@ namespace Timeline.Services
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
 
-            var user = await _userService.VerifyCredential(username, password);
+            var userId = await _userCredentialService.VerifyCredential(username, password);
+            var user = await _userService.GetUser(userId);
             var token = _userTokenService.GenerateToken(new UserTokenInfo { Id = user.Id, Version = user.Version, ExpireAt = expireAt });
 
             return new UserTokenCreateResult { Token = token, User = user };

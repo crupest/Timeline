@@ -26,15 +26,17 @@ namespace Timeline.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IUserCredentialService _userCredentialService;
         private readonly IUserPermissionService _userPermissionService;
         private readonly IUserDeleteService _userDeleteService;
         private readonly IMapper _mapper;
 
         /// <summary></summary>
-        public UserController(ILogger<UserController> logger, IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IUserCredentialService userCredentialService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _userCredentialService = userCredentialService;
             _userPermissionService = userPermissionService;
             _userDeleteService = userDeleteService;
             _mapper = mapper;
@@ -190,7 +192,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                await _userService.ChangePassword(this.GetUserId(), request.OldPassword, request.NewPassword);
+                await _userCredentialService.ChangePassword(this.GetUserId(), request.OldPassword, request.NewPassword);
                 return Ok();
             }
             catch (BadPasswordException e)
