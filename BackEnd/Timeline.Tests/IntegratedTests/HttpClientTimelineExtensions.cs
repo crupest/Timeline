@@ -6,11 +6,11 @@ namespace Timeline.Tests.IntegratedTests
 {
     public static class HttpClientTimelineExtensions
     {
-        public static Task<TimelineInfo> GetTimelineAsync(this HttpClient client, string timelineName)
-            => client.TestGetAsync<TimelineInfo>($"timelines/{timelineName}");
+        public static Task<HttpTimeline> GetTimelineAsync(this HttpClient client, string timelineName)
+            => client.TestGetAsync<HttpTimeline>($"timelines/{timelineName}");
 
-        public static Task<TimelineInfo> PatchTimelineAsync(this HttpClient client, string timelineName, TimelinePatchRequest body)
-            => client.TestPatchAsync<TimelineInfo>($"timelines/{timelineName}", body);
+        public static Task<HttpTimeline> PatchTimelineAsync(this HttpClient client, string timelineName, HttpTimelinePatchRequest body)
+            => client.TestPatchAsync<HttpTimeline>($"timelines/{timelineName}", body);
 
         public static Task PutTimelineMemberAsync(this HttpClient client, string timelineName, string memberUsername)
             => client.TestPutAsync($"timelines/{timelineName}/members/{memberUsername}");

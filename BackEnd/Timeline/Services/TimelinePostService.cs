@@ -39,7 +39,7 @@ namespace Timeline.Services
         /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
-        Task<List<TimelinePost>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false);
+        Task<List<TimelinePostInfo>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false);
 
         /// <summary>
         /// Get the etag of data of a post.
@@ -90,7 +90,7 @@ namespace Timeline.Services
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
         /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
-        Task<TimelinePost> CreateTextPost(string timelineName, long authorId, string text, DateTime? time);
+        Task<TimelinePostInfo> CreateTextPost(string timelineName, long authorId, string text, DateTime? time);
 
         /// <summary>
         /// Create a new image post in timeline.
@@ -108,7 +108,7 @@ namespace Timeline.Services
         /// </exception>
         /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
         /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
-        Task<TimelinePost> CreateImagePost(string timelineName, long authorId, byte[] imageData, DateTime? time);
+        Task<TimelinePostInfo> CreateImagePost(string timelineName, long authorId, byte[] imageData, DateTime? time);
 
         /// <summary>
         /// Delete a post.
@@ -179,9 +179,9 @@ namespace Timeline.Services
             _clock = clock;
         }
 
-        private async Task<TimelinePost> MapTimelinePostFromEntity(TimelinePostEntity entity, string timelineName)
+        private async Task<TimelinePostInfo> MapTimelinePostFromEntity(TimelinePostEntity entity, string timelineName)
         {
-            User? author = entity.AuthorId.HasValue ? await _userService.GetUser(entity.AuthorId.Value) : null;
+            UserInfo? author = entity.AuthorId.HasValue ? await _userService.GetUser(entity.AuthorId.Value) : null;
 
             ITimelinePostContent? content = null;
 
@@ -197,7 +197,7 @@ namespace Timeline.Services
                 };
             }
 
-            return new TimelinePost(
+            return new TimelinePostInfo(
                     id: entity.LocalId,
                     author: author,
                     content: content,
@@ -207,7 +207,7 @@ namespace Timeline.Services
                 );
         }
 
-        public async Task<List<TimelinePost>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false)
+        public async Task<List<TimelinePostInfo>> GetPosts(string timelineName, DateTime? modifiedSince = null, bool includeDeleted = false)
         {
             modifiedSince = modifiedSince?.MyToUtc();
 
@@ -231,7 +231,7 @@ namespace Timeline.Services
 
             var postEntities = await query.ToListAsync();
 
-            var posts = new List<TimelinePost>();
+            var posts = new List<TimelinePostInfo>();
             foreach (var entity in postEntities)
             {
                 posts.Add(await MapTimelinePostFromEntity(entity, timelineName));
@@ -309,7 +309,7 @@ namespace Timeline.Services
             };
         }
 
-        public async Task<TimelinePost> CreateTextPost(string timelineName, long authorId, string text, DateTime? time)
+        public async Task<TimelinePostInfo> CreateTextPost(string timelineName, long authorId, string text, DateTime? time)
         {
             time = time?.MyToUtc();
 
@@ -342,7 +342,7 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
 
 
-            return new TimelinePost(
+            return new TimelinePostInfo(
                 id: postEntity.LocalId,
                 content: new TextTimelinePostContent(text),
                 time: finalTime,
@@ -352,7 +352,7 @@ namespace Timeline.Services
             );
         }
 
-        public async Task<TimelinePost> CreateImagePost(string timelineName, long authorId, byte[] data, DateTime? time)
+        public async Task<TimelinePostInfo> CreateImagePost(string timelineName, long authorId, byte[] data, DateTime? time)
         {
             time = time?.MyToUtc();
 
@@ -391,7 +391,7 @@ namespace Timeline.Services
             _database.TimelinePosts.Add(postEntity);
             await _database.SaveChangesAsync();
 
-            return new TimelinePost(
+            return new TimelinePostInfo(
                 id: postEntity.LocalId,
                 content: new ImageTimelinePostContent(tag),
                 time: finalTime,

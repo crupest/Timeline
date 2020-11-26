@@ -50,9 +50,14 @@ namespace Timeline.Models
         public string DataTag { get; set; }
     }
 
-    public class TimelinePost
+    public record TimelinePostInfo
     {
-        public TimelinePost(long id, ITimelinePostContent? content, DateTime time, User? author, DateTime lastUpdated, string timelineName)
+        public TimelinePostInfo()
+        {
+
+        }
+
+        public TimelinePostInfo(long id, ITimelinePostContent? content, DateTime time, UserInfo? author, DateTime lastUpdated, string timelineName)
         {
             Id = id;
             Content = content;
@@ -66,24 +71,51 @@ namespace Timeline.Models
         public ITimelinePostContent? Content { get; set; }
         public bool Deleted => Content == null;
         public DateTime Time { get; set; }
-        public User? Author { get; set; }
+        public UserInfo? Author { get; set; }
         public DateTime LastUpdated { get; set; }
-        public string TimelineName { get; set; }
+        public string TimelineName { get; set; } = default!;
     }
 
-#pragma warning disable CA1724 // Type names should not match namespaces
-    public class Timeline
-#pragma warning restore CA1724 // Type names should not match namespaces
+    public record TimelineInfo
     {
-        public string UniqueID { get; set; } = default!;
+        public TimelineInfo()
+        {
+
+        }
+
+        public TimelineInfo(
+            string uniqueId,
+            string name,
+            DateTime nameLastModified,
+            string title,
+            string description,
+            UserInfo owner,
+            TimelineVisibility visibility,
+            List<UserInfo> members,
+            DateTime createTime,
+            DateTime lastModified)
+        {
+            UniqueId = uniqueId;
+            Name = name;
+            NameLastModified = nameLastModified;
+            Title = title;
+            Description = description;
+            Owner = owner;
+            Visibility = visibility;
+            Members = members;
+            CreateTime = createTime;
+            LastModified = lastModified;
+        }
+
+        public string UniqueId { get; set; } = default!;
         public string Name { get; set; } = default!;
         public DateTime NameLastModified { get; set; } = default!;
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public User Owner { get; set; } = default!;
+        public UserInfo Owner { get; set; } = default!;
         public TimelineVisibility Visibility { get; set; }
 #pragma warning disable CA2227 // Collection properties should be read only
-        public List<User> Members { get; set; } = default!;
+        public List<UserInfo> Members { get; set; } = default!;
 #pragma warning restore CA2227 // Collection properties should be read only
         public DateTime CreateTime { get; set; } = default!;
         public DateTime LastModified { get; set; } = default!;

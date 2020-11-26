@@ -7,9 +7,9 @@ using Timeline.Services;
 namespace Timeline.Models.Http
 {
     /// <summary>
-    /// Request model for <see cref="UserController.Patch(UserPatchRequest, string)"/>.
+    /// Request model for <see cref="UserController.Patch(HttpUserPatchRequest, string)"/>.
     /// </summary>
-    public class UserPatchRequest
+    public class HttpUserPatchRequest
     {
         /// <summary>
         /// New username. Null if not change. Need to be administrator.
@@ -31,9 +31,9 @@ namespace Timeline.Models.Http
     }
 
     /// <summary>
-    /// Request model for <see cref="UserController.CreateUser(CreateUserRequest)"/>.
+    /// Request model for <see cref="UserController.CreateUser(HttpCreateUserRequest)"/>.
     /// </summary>
-    public class CreateUserRequest
+    public class HttpCreateUserRequest
     {
         /// <summary>
         /// Username of the new user.
@@ -49,9 +49,9 @@ namespace Timeline.Models.Http
     }
 
     /// <summary>
-    /// Request model for <see cref="UserController.ChangePassword(ChangePasswordRequest)"/>.
+    /// Request model for <see cref="UserController.ChangePassword(HttpChangePasswordRequest)"/>.
     /// </summary>
-    public class ChangePasswordRequest
+    public class HttpChangePasswordRequest
     {
         /// <summary>
         /// Old password.
@@ -66,11 +66,11 @@ namespace Timeline.Models.Http
         public string NewPassword { get; set; } = default!;
     }
 
-    public class UserControllerAutoMapperProfile : Profile
+    public class HttpUserControllerModelAutoMapperProfile : Profile
     {
-        public UserControllerAutoMapperProfile()
+        public HttpUserControllerModelAutoMapperProfile()
         {
-            CreateMap<UserPatchRequest, ModifyUserParams>();
+            CreateMap<HttpUserPatchRequest, ModifyUserParams>();
         }
     }
 }

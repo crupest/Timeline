@@ -12,7 +12,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task UserListShouldHaveUniqueId()
         {
             using var client = await CreateDefaultClient();
-            foreach (var user in await client.TestGetAsync<List<UserInfo>>("users"))
+            foreach (var user in await client.TestGetAsync<List<HttpUser>>("users"))
             {
                 user.UniqueId.Should().NotBeNullOrWhiteSpace();
             }
@@ -22,14 +22,14 @@ namespace Timeline.Tests.IntegratedTests
         public async Task GetList()
         {
             using var client = await CreateDefaultClient();
-            await client.TestGetAsync<List<UserInfo>>("users");
+            await client.TestGetAsync<List<HttpUser>>("users");
         }
 
         [Fact]
         public async Task Get()
         {
             using var client = await CreateDefaultClient();
-            var user = await client.TestGetAsync<UserInfo>($"users/admin");
+            var user = await client.TestGetAsync<HttpUser>($"users/admin");
             user.Username.Should().Be("admin");
             user.Nickname.Should().Be("administrator");
             user.UniqueId.Should().NotBeNullOrEmpty();
@@ -55,8 +55,8 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsUser();
             {
-                var body = await client.TestPatchAsync<UserInfo>("users/user1",
-                    new UserPatchRequest { Nickname = "aaa" });
+                var body = await client.TestPatchAsync<HttpUser>("users/user1",
+                    new HttpUserPatchRequest { Nickname = "aaa" });
                 body.Nickname.Should().Be("aaa");
             }
 
@@ -73,8 +73,8 @@ namespace Timeline.Tests.IntegratedTests
             using var userClient = await CreateClientAsUser();
 
             {
-                var body = await client.TestPatchAsync<UserInfo>("users/user1",
-                    new UserPatchRequest
+                var body = await client.TestPatchAsync<HttpUser>("users/user1",
+                    new HttpUserPatchRequest
                     {
                         Username = "newuser",
                         Password = "newpw",
@@ -91,7 +91,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var token = userClient.DefaultRequestHeaders.Authorization!.Parameter!;
                 // Token should expire.
-                await userClient.TestPostAssertErrorAsync("token/verify", new VerifyTokenRequest() { Token = token });
+                await userClient.TestPostAssertErrorAsync("token/verify", new HttpVerifyTokenRequest() { Token = token });
             }
 
             {
@@ -104,26 +104,26 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Patch_NotExist()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPatchAssertNotFoundAsync("users/usernotexist", new UserPatchRequest { }, errorCode: ErrorCodes.UserCommon.NotExist);
+            await client.TestPatchAssertNotFoundAsync("users/usernotexist", new HttpUserPatchRequest { }, errorCode: ErrorCodes.UserCommon.NotExist);
         }
 
         [Fact]
         public async Task Patch_InvalidModel()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPatchAssertInvalidModelAsync("users/aaa!a", new UserPatchRequest { });
+            await client.TestPatchAssertInvalidModelAsync("users/aaa!a", new HttpUserPatchRequest { });
         }
 
         public static IEnumerable<object[]> Patch_InvalidModel_Body_Data()
         {
-            yield return new[] { new UserPatchRequest { Username = "aaa!a" } };
-            yield return new[] { new UserPatchRequest { Password = "" } };
-            yield return new[] { new UserPatchRequest { Nickname = new string('a', 50) } };
+            yield return new[] { new HttpUserPatchRequest { Username = "aaa!a" } };
+            yield return new[] { new HttpUserPatchRequest { Password = "" } };
+            yield return new[] { new HttpUserPatchRequest { Nickname = new string('a', 50) } };
         }
 
         [Theory]
         [MemberData(nameof(Patch_InvalidModel_Body_Data))]
-        public async Task Patch_InvalidModel_Body(UserPatchRequest body)
+        public async Task Patch_InvalidModel_Body(HttpUserPatchRequest body)
         {
             using var client = await CreateClientAsAdministrator();
             await client.TestPatchAssertInvalidModelAsync("users/user1", body);
@@ -133,35 +133,35 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Patch_UsernameConflict()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPatchAssertErrorAsync("users/user1", new UserPatchRequest { Username = "admin" }, errorCode: ErrorCodes.UserController.UsernameConflict);
+            await client.TestPatchAssertErrorAsync("users/user1", new HttpUserPatchRequest { Username = "admin" }, errorCode: ErrorCodes.UserController.UsernameConflict);
         }
 
         [Fact]
         public async Task Patch_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
-            await client.TestPatchAssertUnauthorizedAsync("users/user1", new UserPatchRequest { Nickname = "aaa" });
+            await client.TestPatchAssertUnauthorizedAsync("users/user1", new HttpUserPatchRequest { Nickname = "aaa" });
         }
 
         [Fact]
         public async Task Patch_User_Forbid()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPatchAssertForbiddenAsync("users/admin", new UserPatchRequest { Nickname = "aaa" });
+            await client.TestPatchAssertForbiddenAsync("users/admin", new HttpUserPatchRequest { Nickname = "aaa" });
         }
 
         [Fact]
         public async Task Patch_Username_Forbid()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPatchAssertForbiddenAsync("users/user1", new UserPatchRequest { Username = "aaa" });
+            await client.TestPatchAssertForbiddenAsync("users/user1", new HttpUserPatchRequest { Username = "aaa" });
         }
 
         [Fact]
         public async Task Patch_Password_Forbid()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPatchAssertForbiddenAsync("users/user1", new UserPatchRequest { Password = "aaa" });
+            await client.TestPatchAssertForbiddenAsync("users/user1", new HttpUserPatchRequest { Password = "aaa" });
         }
 
         [Fact]
@@ -214,7 +214,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
             {
-                var body = await client.TestPostAsync<UserInfo>(createUserUrl, new CreateUserRequest
+                var body = await client.TestPostAsync<HttpUser>(createUserUrl, new HttpCreateUserRequest
                 {
                     Username = "aaa",
                     Password = "bbb",
@@ -233,15 +233,15 @@ namespace Timeline.Tests.IntegratedTests
 
         public static IEnumerable<object[]> Op_CreateUser_InvalidModel_Data()
         {
-            yield return new[] { new CreateUserRequest { Username = "aaa" } };
-            yield return new[] { new CreateUserRequest { Password = "bbb" } };
-            yield return new[] { new CreateUserRequest { Username = "a!a", Password = "bbb" } };
-            yield return new[] { new CreateUserRequest { Username = "aaa", Password = "" } };
+            yield return new[] { new HttpCreateUserRequest { Username = "aaa" } };
+            yield return new[] { new HttpCreateUserRequest { Password = "bbb" } };
+            yield return new[] { new HttpCreateUserRequest { Username = "a!a", Password = "bbb" } };
+            yield return new[] { new HttpCreateUserRequest { Username = "aaa", Password = "" } };
         }
 
         [Theory]
         [MemberData(nameof(Op_CreateUser_InvalidModel_Data))]
-        public async Task Op_CreateUser_InvalidModel(CreateUserRequest body)
+        public async Task Op_CreateUser_InvalidModel(HttpCreateUserRequest body)
         {
             using var client = await CreateClientAsAdministrator();
             await client.TestPostAssertInvalidModelAsync(createUserUrl, body);
@@ -251,7 +251,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_CreateUser_UsernameConflict()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPostAssertErrorAsync(createUserUrl, new CreateUserRequest
+            await client.TestPostAssertErrorAsync(createUserUrl, new HttpCreateUserRequest
             {
                 Username = "user1",
                 Password = "bbb",
@@ -262,7 +262,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_CreateUser_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
-            await client.TestPostAssertUnauthorizedAsync(createUserUrl, new CreateUserRequest
+            await client.TestPostAssertUnauthorizedAsync(createUserUrl, new HttpCreateUserRequest
             {
                 Username = "aaa",
                 Password = "bbb",
@@ -273,7 +273,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_CreateUser_User_Forbid()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPostAssertForbiddenAsync(createUserUrl, new CreateUserRequest
+            await client.TestPostAssertForbiddenAsync(createUserUrl, new HttpCreateUserRequest
             {
                 Username = "aaa",
                 Password = "bbb",
@@ -286,8 +286,8 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_ChangePassword()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPostAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "user1pw", NewPassword = "newpw" });
-            await client.TestPatchAssertUnauthorizedAsync("users/user1", new UserPatchRequest { });
+            await client.TestPostAsync(changePasswordUrl, new HttpChangePasswordRequest { OldPassword = "user1pw", NewPassword = "newpw" });
+            await client.TestPatchAssertUnauthorizedAsync("users/user1", new HttpUserPatchRequest { });
             (await CreateClientWithCredential("user1", "newpw")).Dispose();
         }
 
@@ -303,21 +303,21 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsUser();
             await client.TestPostAssertInvalidModelAsync(changePasswordUrl,
-                new ChangePasswordRequest { OldPassword = oldPassword, NewPassword = newPassword });
+                new HttpChangePasswordRequest { OldPassword = oldPassword, NewPassword = newPassword });
         }
 
         [Fact]
         public async Task Op_ChangePassword_BadOldPassword()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPostAssertErrorAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" }, errorCode: ErrorCodes.UserController.ChangePassword_BadOldPassword);
+            await client.TestPostAssertErrorAsync(changePasswordUrl, new HttpChangePasswordRequest { OldPassword = "???", NewPassword = "???" }, errorCode: ErrorCodes.UserController.ChangePassword_BadOldPassword);
         }
 
         [Fact]
         public async Task Op_ChangePassword_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
-            await client.TestPostAssertUnauthorizedAsync(changePasswordUrl, new ChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
+            await client.TestPostAssertUnauthorizedAsync(changePasswordUrl, new HttpChangePasswordRequest { OldPassword = "???", NewPassword = "???" });
         }
     }
 }

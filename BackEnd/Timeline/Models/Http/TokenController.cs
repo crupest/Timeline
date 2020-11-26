@@ -4,9 +4,9 @@ using Timeline.Controllers;
 namespace Timeline.Models.Http
 {
     /// <summary>
-    /// Request model for <see cref="TokenController.Create(CreateTokenRequest)"/>.
+    /// Request model for <see cref="TokenController.Create(HttpCreateTokenRequest)"/>.
     /// </summary>
-    public class CreateTokenRequest
+    public class HttpCreateTokenRequest
     {
         /// <summary>
         /// The username.
@@ -24,9 +24,9 @@ namespace Timeline.Models.Http
     }
 
     /// <summary>
-    /// Response model for <see cref="TokenController.Create(CreateTokenRequest)"/>.
+    /// Response model for <see cref="TokenController.Create(HttpCreateTokenRequest)"/>.
     /// </summary>
-    public class CreateTokenResponse
+    public class HttpCreateTokenResponse
     {
         /// <summary>
         /// The token created.
@@ -35,13 +35,13 @@ namespace Timeline.Models.Http
         /// <summary>
         /// The user owning the token.
         /// </summary>
-        public UserInfo User { get; set; } = default!;
+        public HttpUser User { get; set; } = default!;
     }
 
     /// <summary>
-    /// Request model for <see cref="TokenController.Verify(VerifyTokenRequest)"/>.
+    /// Request model for <see cref="TokenController.Verify(HttpVerifyTokenRequest)"/>.
     /// </summary>
-    public class VerifyTokenRequest
+    public class HttpVerifyTokenRequest
     {
         /// <summary>
         /// The token to verify.
@@ -50,13 +50,13 @@ namespace Timeline.Models.Http
     }
 
     /// <summary>
-    /// Response model for <see cref="TokenController.Verify(VerifyTokenRequest)"/>.
+    /// Response model for <see cref="TokenController.Verify(HttpVerifyTokenRequest)"/>.
     /// </summary>
-    public class VerifyTokenResponse
+    public class HttpVerifyTokenResponse
     {
         /// <summary>
         /// The user owning the token.
         /// </summary>
-        public UserInfo User { get; set; } = default!;
+        public HttpUser User { get; set; } = default!;
     }
 }

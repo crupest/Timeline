@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Models;
 using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
@@ -14,7 +15,7 @@ namespace Timeline.Services
         /// Get all highlight timelines.
         /// </summary>
         /// <returns>A list of all highlight timelines.</returns>
-        Task<List<Models.Timeline>> GetHighlightTimelines();
+        Task<List<TimelineInfo>> GetHighlightTimelines();
 
         /// <summary>
         /// Add a timeline to highlight list.
@@ -73,11 +74,11 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
         }
 
-        public async Task<List<Models.Timeline>> GetHighlightTimelines()
+        public async Task<List<TimelineInfo>> GetHighlightTimelines()
         {
             var entities = await _database.HighlightTimelines.Select(t => new { t.Id }).ToListAsync();
 
-            var result = new List<Models.Timeline>();
+            var result = new List<TimelineInfo>();
 
             foreach (var entity in entities)
             {
