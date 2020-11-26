@@ -3,7 +3,7 @@ using Timeline.Services;
 
 namespace Timeline.Models
 {
-    public record UserInfo
+    public class UserInfo
     {
         public UserInfo()
         {

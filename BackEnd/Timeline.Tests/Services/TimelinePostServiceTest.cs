@@ -36,7 +36,7 @@ namespace Timeline.Tests.Services
         {
             _dataManager = new DataManager(Database, _eTagGenerator);
             _userPermissionService = new UserPermissionService(Database);
-            _userService = new UserService(NullLogger<UserService>.Instance, Database, _passwordService, _clock, _userPermissionService);
+            _userService = new UserService(NullLogger<UserService>.Instance, Database, _passwordService, _userPermissionService, _clock);
             _timelineService = new TimelineService(Database, _userService, _clock);
             _timelinePostService = new TimelinePostService(NullLogger<TimelinePostService>.Instance, Database, _timelineService, _userService, _dataManager, _imageValidator, _clock);
             _userDeleteService = new UserDeleteService(NullLogger<UserDeleteService>.Instance, Database, _timelinePostService);

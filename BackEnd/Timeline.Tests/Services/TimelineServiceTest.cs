@@ -26,7 +26,7 @@ namespace Timeline.Tests.Services
         protected override void OnDatabaseCreated()
         {
             _userPermissionService = new UserPermissionService(Database);
-            _userService = new UserService(NullLogger<UserService>.Instance, Database, _passwordService, _clock, _userPermissionService);
+            _userService = new UserService(NullLogger<UserService>.Instance, Database, _passwordService, _userPermissionService, _clock);
             _timelineService = new TimelineService(Database, _userService, _clock);
         }
 

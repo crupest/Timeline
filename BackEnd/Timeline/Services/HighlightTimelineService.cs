@@ -46,12 +46,14 @@ namespace Timeline.Services
         private readonly DatabaseContext _database;
         private readonly IBasicUserService _userService;
         private readonly ITimelineService _timelineService;
+        private readonly IClock _clock;
 
-        public HighlightTimelineService(DatabaseContext database, IBasicUserService userService, ITimelineService timelineService)
+        public HighlightTimelineService(DatabaseContext database, IBasicUserService userService, ITimelineService timelineService, IClock clock)
         {
             _database = database;
             _userService = userService;
             _timelineService = timelineService;
+            _clock = clock;
         }
 
         public async Task AddHighlightTimeline(string timelineName, long? operatorId)
@@ -70,7 +72,7 @@ namespace Timeline.Services
 
             if (alreadyIs) return;
 
-            _database.HighlightTimelines.Add(new HighlightTimelineEntity { TimelineId = timelineId, OperatorId = operatorId });
+            _database.HighlightTimelines.Add(new HighlightTimelineEntity { TimelineId = timelineId, OperatorId = operatorId, AddTime = _clock.GetCurrentTime() });
             await _database.SaveChangesAsync();
         }
 

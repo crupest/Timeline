@@ -50,7 +50,7 @@ namespace Timeline.Models
         public string DataTag { get; set; }
     }
 
-    public record TimelinePostInfo
+    public class TimelinePostInfo
     {
         public TimelinePostInfo()
         {
@@ -76,7 +76,7 @@ namespace Timeline.Models
         public string TimelineName { get; set; } = default!;
     }
 
-    public record TimelineInfo
+    public class TimelineInfo
     {
         public TimelineInfo()
         {

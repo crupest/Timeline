@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Timeline.Entities
 {
     [Table("highlight_timelines")]
-    public record HighlightTimelineEntity
+    public class HighlightTimelineEntity
     {
         [Key, Column("id"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
@@ -20,5 +21,8 @@ namespace Timeline.Entities
 
         [ForeignKey(nameof(OperatorId))]
         public UserEntity? Operator { get; set; }
+
+        [Column("add_time")]
+        public DateTime AddTime { get; set; }
     }
 }
