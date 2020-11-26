@@ -29,17 +29,19 @@ namespace Timeline.Controllers
 
         private readonly IUserService _userService;
         private readonly ITimelineService _service;
+        private readonly ITimelinePostService _postService;
 
         private readonly IMapper _mapper;
 
         /// <summary>
         /// 
         /// </summary>
-        public TimelineController(ILogger<TimelineController> logger, IUserService userService, ITimelineService service, IMapper mapper)
+        public TimelineController(ILogger<TimelineController> logger, IUserService userService, ITimelineService service, ITimelinePostService timelinePostService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
             _service = service;
+            _postService = timelinePostService;
             _mapper = mapper;
         }
 
@@ -187,7 +189,7 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            List<TimelinePost> posts = await _service.GetPosts(name, modifiedSince, includeDeleted ?? false);
+            List<TimelinePost> posts = await _postService.GetPosts(name, modifiedSince, includeDeleted ?? false);
 
             var result = _mapper.Map<List<TimelinePostInfo>>(posts);
             return result;
@@ -217,9 +219,9 @@ namespace Timeline.Controllers
 
             try
             {
-                return await DataCacheHelper.GenerateActionResult(this, () => _service.GetPostDataETag(name, id), async () =>
+                return await DataCacheHelper.GenerateActionResult(this, () => _postService.GetPostDataETag(name, id), async () =>
                 {
-                    var data = await _service.GetPostData(name, id);
+                    var data = await _postService.GetPostData(name, id);
                     return data;
                 });
             }
@@ -264,7 +266,7 @@ namespace Timeline.Controllers
                 {
                     return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
                 }
-                post = await _service.CreateTextPost(name, id, text, body.Time);
+                post = await _postService.CreateTextPost(name, id, text, body.Time);
             }
             else if (content.Type == TimelinePostContentTypes.Image)
             {
@@ -285,7 +287,7 @@ namespace Timeline.Controllers
 
                 try
                 {
-                    post = await _service.CreateImagePost(name, id, data, body.Time);
+                    post = await _postService.CreateImagePost(name, id, data, body.Time);
                 }
                 catch (ImageException)
                 {
@@ -315,13 +317,13 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonDeleteResponse>> PostDelete([FromRoute][GeneralTimelineName] string name, [FromRoute] long id)
         {
-            if (!UserHasAllTimelineManagementPermission && !await _service.HasPostModifyPermission(name, id, this.GetUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(name, id, this.GetUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
             try
             {
-                await _service.DeletePost(name, id);
+                await _postService.DeletePost(name, id);
                 return CommonDeleteResponse.Delete();
             }
             catch (TimelinePostNotExistException)
