@@ -80,6 +80,19 @@ namespace Timeline.Services
         Task<DateTime> GetTimelineLastModifiedTime(string timelineName);
 
         /// <summary>
+        /// Get the timeline id by name.
+        /// </summary>
+        /// <param name="timelineName">Timeline name.</param>
+        /// <returns>Id of the timeline.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
+        /// <exception cref="TimelineNotExistException">
+        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
+        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
+        /// </exception>
+        Task<long> GetTimelineIdByName(string timelineName);
+
+        /// <summary>
         /// Get the timeline unique id.
         /// </summary>
         /// <param name="timelineName">The name of the timeline.</param>
@@ -104,6 +117,14 @@ namespace Timeline.Services
         /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
         /// </exception>
         Task<Models.Timeline> GetTimeline(string timelineName);
+
+        /// <summary>
+        /// Get timeline by id.
+        /// </summary>
+        /// <param name="id">Id of timeline.</param>
+        /// <returns>The timeline.</returns>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline with given id does not exist.</exception>
+        Task<Models.Timeline> GetTimelineById(long id);
 
         /// <summary>
         /// Set the properties of a timeline. 
@@ -572,6 +593,18 @@ namespace Timeline.Services
             return timelineEntity.UniqueId;
         }
 
+        public async Task<long> GetTimelineIdByName(string timelineName)
+        {
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
+
+            var timelineId = await FindTimelineId(timelineName);
+
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.Id }).SingleAsync();
+
+            return timelineEntity.Id;
+        }
+
         public async Task<Models.Timeline> GetTimeline(string timelineName)
         {
             if (timelineName == null)
@@ -580,6 +613,16 @@ namespace Timeline.Services
             var timelineId = await FindTimelineId(timelineName);
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Include(t => t.Members).SingleAsync();
+
+            return await MapTimelineFromEntity(timelineEntity);
+        }
+
+        public async Task<Models.Timeline> GetTimelineById(long id)
+        {
+            var timelineEntity = await _database.Timelines.Where(t => t.Id == id).Include(t => t.Members).SingleOrDefaultAsync();
+
+            if (timelineEntity is null)
+                throw new TimelineNotExistException(id);
 
             return await MapTimelineFromEntity(timelineEntity);
         }
