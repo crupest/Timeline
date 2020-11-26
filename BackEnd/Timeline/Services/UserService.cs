@@ -17,7 +17,7 @@ namespace Timeline.Services
     /// <summary>
     /// Null means not change.
     /// </summary>
-    public record ModifyUserParams
+    public class ModifyUserParams
     {
         public string? Username { get; set; }
         public string? Password { get; set; }
@@ -78,13 +78,13 @@ namespace Timeline.Services
         private readonly UsernameValidator _usernameValidator = new UsernameValidator();
         private readonly NicknameValidator _nicknameValidator = new NicknameValidator();
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IClock clock, IUserPermissionService userPermissionService) : base(databaseContext)
+        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IUserPermissionService userPermissionService, IClock clock) : base(databaseContext)
         {
             _logger = logger;
-            _clock = clock;
             _databaseContext = databaseContext;
             _passwordService = passwordService;
             _userPermissionService = userPermissionService;
+            _clock = clock;
         }
 
         private void CheckUsernameFormat(string username, string? paramName)

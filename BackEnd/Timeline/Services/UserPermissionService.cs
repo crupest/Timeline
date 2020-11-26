@@ -28,7 +28,7 @@ namespace Timeline.Services
     /// <summary>
     /// Represents a user's permissions.
     /// </summary>
-    public class UserPermissions : IEnumerable<UserPermission>
+    public class UserPermissions : IEnumerable<UserPermission>, IEquatable<UserPermissions>
     {
         public static UserPermissions AllPermissions { get; } = new UserPermissions(Enum.GetValues<UserPermission>());
 
@@ -49,10 +49,10 @@ namespace Timeline.Services
         public UserPermissions(IEnumerable<UserPermission> permissions)
         {
             if (permissions == null) throw new ArgumentNullException(nameof(permissions));
-            _permissions = new HashSet<UserPermission>(permissions);
+            _permissions = new SortedSet<UserPermission>(permissions);
         }
 
-        private readonly HashSet<UserPermission> _permissions = new();
+        private readonly SortedSet<UserPermission> _permissions = new();
 
         /// <summary>
         /// Check if a permission is contained in the list.
@@ -107,6 +107,33 @@ namespace Timeline.Services
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)_permissions).GetEnumerator();
+        }
+
+        public bool Equals(UserPermissions? other)
+        {
+            if (other == null)
+                return false;
+
+            return _permissions.SequenceEqual(other._permissions);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as UserPermissions);
+        }
+
+        public override int GetHashCode()
+        {
+            int result = 0;
+            foreach (var permission in Enum.GetValues<UserPermission>())
+            {
+                if (_permissions.Contains(permission))
+                {
+                    result += 1;
+                }
+                result <<= 1;
+            }
+            return result;
         }
     }
 

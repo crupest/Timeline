@@ -35,7 +35,7 @@ namespace Timeline.Tests.Helpers
                 if (_createUser)
                 {
                     var passwordService = new PasswordService();
-                    var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new Clock(), new UserPermissionService(context));
+                    var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new UserPermissionService(context), new Clock());
 
                     var admin = await userService.CreateUser("admin", "adminpw");
                     await userService.ModifyUser(admin.Id, new ModifyUserParams() { Nickname = "administrator" });
