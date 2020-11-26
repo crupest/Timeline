@@ -39,6 +39,13 @@ namespace Timeline.Services
         Task<User> VerifyCredential(string username, string password);
 
         /// <summary>
+        /// Check if a user exists.
+        /// </summary>
+        /// <param name="id">The id of the user.</param>
+        /// <returns>True if exists. Otherwise false.</returns>
+        Task<bool> CheckUserExistence(long id);
+
+        /// <summary>
         /// Try to get a user by id.
         /// </summary>
         /// <param name="id">The id of the user.</param>
@@ -186,6 +193,11 @@ namespace Timeline.Services
                 throw new BadPasswordException(password);
 
             return await CreateUserFromEntity(entity);
+        }
+
+        public async Task<bool> CheckUserExistence(long id)
+        {
+            return await _databaseContext.Users.AnyAsync(u => u.Id == id);
         }
 
         public async Task<User> GetUser(long id)
