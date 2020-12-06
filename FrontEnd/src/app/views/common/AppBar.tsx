@@ -67,7 +67,7 @@ const AppBar: React.FC = (_) => {
             </NavLink>
           )}
         </Nav>
-        <Nav className="ml-auto mr-2">
+        <Nav className="ml-auto mr-2 align-items-center">
           {user != null ? (
             <LinkContainer to={`/users/${user.username}`}>
               <BlobImage
