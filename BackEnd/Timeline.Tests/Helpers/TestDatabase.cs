@@ -1,11 +1,14 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using System;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Migrations;
 using Timeline.Services;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.Helpers
 {
@@ -54,12 +57,14 @@ namespace Timeline.Tests.Helpers
 
         public SqliteConnection Connection { get; }
 
-        public DatabaseContext CreateContext()
+        public DatabaseContext CreateContext(ITestOutputHelper? testOutputHelper = null)
         {
-            var options = new DbContextOptionsBuilder<DatabaseContext>()
-                .UseSqlite(Connection).Options;
+            var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseSqlite(Connection);
 
-            return new DatabaseContext(options);
+            if (testOutputHelper != null) optionsBuilder.LogTo(testOutputHelper.WriteLine).EnableDetailedErrors().EnableSensitiveDataLogging();
+
+            return new DatabaseContext(optionsBuilder.Options);
         }
     }
 }
