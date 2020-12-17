@@ -101,6 +101,8 @@ namespace Timeline
             services.AddScoped<ITimelineService, TimelineService>();
             services.AddScoped<ITimelinePostService, TimelinePostService>();
 
+            services.AddScoped<IHighlightTimelineService, HighlightTimelineService>();
+
             services.AddDbContext<DatabaseContext>((services, options) =>
             {
                 var pathProvider = services.GetRequiredService<IPathProvider>();
