@@ -63,6 +63,11 @@
             public const int PostNotExist = 1_104_05_01;
             public const int PostNoData = 1_104_05_02;
         }
+
+        public static class HighlightTimelineController
+        {
+            public const int NonHighlight = 1_105_01_01;
+        }
     }
 }
 
