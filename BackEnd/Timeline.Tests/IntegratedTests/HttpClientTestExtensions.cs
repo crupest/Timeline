@@ -212,6 +212,11 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertForbiddenAsync(HttpMethod.Post, url, jsonBody, errorCode, headerSetup);
         }
 
+        public static async Task TestPutAssertForbiddenAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertForbiddenAsync(HttpMethod.Put, url, jsonBody, errorCode, headerSetup);
+        }
+
         public static async Task TestPatchAssertForbiddenAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
         {
             await client.TestJsonSendAssertForbiddenAsync(HttpMethod.Patch, url, jsonBody, errorCode, headerSetup);

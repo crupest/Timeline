@@ -108,13 +108,13 @@ namespace Timeline.Services
 
         public async Task<List<TimelineInfo>> GetHighlightTimelines()
         {
-            var entities = await _database.HighlightTimelines.OrderBy(t => t.Order).Select(t => new { t.Id }).ToListAsync();
+            var entities = await _database.HighlightTimelines.OrderBy(t => t.Order).Select(t => new { t.TimelineId }).ToListAsync();
 
             var result = new List<TimelineInfo>();
 
             foreach (var entity in entities)
             {
-                result.Add(await _timelineService.GetTimelineById(entity.Id));
+                result.Add(await _timelineService.GetTimelineById(entity.TimelineId));
             }
 
             return result;
