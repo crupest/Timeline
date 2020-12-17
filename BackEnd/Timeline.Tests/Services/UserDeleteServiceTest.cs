@@ -10,12 +10,12 @@ namespace Timeline.Tests.Services
 {
     public class UserDeleteServiceTest : DatabaseBasedTest
     {
-        private readonly Mock<ITimelineService> _mockTimelineService = new Mock<ITimelineService>();
+        private readonly Mock<ITimelinePostService> _mockTimelinePostService = new Mock<ITimelinePostService>();
         private UserDeleteService _service = default!;
 
         protected override void OnDatabaseCreated()
         {
-            _service = new UserDeleteService(NullLogger<UserDeleteService>.Instance, Database, _mockTimelineService.Object);
+            _service = new UserDeleteService(NullLogger<UserDeleteService>.Instance, Database, _mockTimelinePostService.Object);
         }
 
         [Fact]

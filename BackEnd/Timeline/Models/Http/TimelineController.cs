@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.ComponentModel.DataAnnotations;
 using Timeline.Models.Validation;
 
@@ -7,7 +8,7 @@ namespace Timeline.Models.Http
     /// <summary>
     /// Content of post create request.
     /// </summary>
-    public class TimelinePostCreateRequestContent
+    public class HttpTimelinePostCreateRequestContent
     {
         /// <summary>
         /// Type of post content.
@@ -24,13 +25,13 @@ namespace Timeline.Models.Http
         public string? Data { get; set; }
     }
 
-    public class TimelinePostCreateRequest
+    public class HttpTimelinePostCreateRequest
     {
         /// <summary>
         /// Content of the new post.
         /// </summary>
         [Required]
-        public TimelinePostCreateRequestContent Content { get; set; } = default!;
+        public HttpTimelinePostCreateRequestContent Content { get; set; } = default!;
 
         /// <summary>
         /// Time of the post. If not set, current time will be used.
@@ -54,7 +55,7 @@ namespace Timeline.Models.Http
     /// <summary>
     /// Patch timeline request model.
     /// </summary>
-    public class TimelinePatchRequest
+    public class HttpTimelinePatchRequest
     {
         /// <summary>
         /// New title. Null for not change.
@@ -75,7 +76,7 @@ namespace Timeline.Models.Http
     /// <summary>
     /// Change timeline name request model.
     /// </summary>
-    public class TimelineChangeNameRequest
+    public class HttpTimelineChangeNameRequest
     {
         /// <summary>
         /// Old name of timeline.
@@ -89,5 +90,13 @@ namespace Timeline.Models.Http
         [Required]
         [TimelineName]
         public string NewName { get; set; } = default!;
+    }
+
+    public class HttpTimelineControllerAutoMapperProfile : Profile
+    {
+        public HttpTimelineControllerAutoMapperProfile()
+        {
+            CreateMap<HttpTimelinePatchRequest, TimelineChangePropertyRequest>();
+        }
     }
 }
