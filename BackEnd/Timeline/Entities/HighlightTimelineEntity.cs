@@ -24,5 +24,8 @@ namespace Timeline.Entities
 
         [Column("add_time")]
         public DateTime AddTime { get; set; }
+
+        [Column("order")]
+        public long Order { get; set; }
     }
 }
