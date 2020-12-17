@@ -15,7 +15,6 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    [Route("highlights")]
     public class HighlightTimelineController : Controller
     {
         private readonly IHighlightTimelineService _service;
@@ -31,7 +30,7 @@ namespace Timeline.Controllers
         /// Get all highlight timelines.
         /// </summary>
         /// <returns>Highlight timeline list.</returns>
-        [HttpGet]
+        [HttpGet("highlights")]
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
@@ -42,8 +41,8 @@ namespace Timeline.Controllers
         /// <summary>
         /// Add a timeline to highlight list.
         /// </summary>
-        /// <param name="timeline"></param>
-        [HttpPut("{timeline}")]
+        /// <param name="timeline">The timeline name.</param>
+        [HttpPut("highlights/{timeline}")]
         [PermissionAuthorize(UserPermission.HighlightTimelineManagement)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -57,6 +56,51 @@ namespace Timeline.Controllers
             catch (TimelineNotExistException)
             {
                 return BadRequest(ErrorResponse.TimelineController.NotExist());
+            }
+        }
+
+        /// <summary>
+        /// Remove a timeline from highlight list.
+        /// </summary>
+        /// <param name="timeline">Timeline name.</param>
+        [HttpDelete("highlights/{timeline}")]
+        [PermissionAuthorize(UserPermission.HighlightTimelineManagement)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> Delete([GeneralTimelineName] string timeline)
+        {
+            try
+            {
+                await _service.RemoveHighlightTimeline(timeline, this.GetUserId());
+                return Ok();
+            }
+            catch (TimelineNotExistException)
+            {
+                return BadRequest(ErrorResponse.TimelineController.NotExist());
+            }
+        }
+
+        /// <summary>
+        /// Move a highlight position.
+        /// </summary>
+        [HttpPost("highlightop/move")]
+        [PermissionAuthorize(UserPermission.HighlightTimelineManagement)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> Move([FromBody] HttpHighlightTimelineMoveRequest body)
+        {
+            try
+            {
+                await _service.MoveHighlightTimeline(body.Timeline, body.NewPosition!.Value);
+                return Ok();
+            }
+            catch (TimelineNotExistException)
+            {
+                return BadRequest(ErrorResponse.TimelineController.NotExist());
+            }
+            catch (InvalidHighlightTimelineException)
+            {
+                return BadRequest(new CommonResponse(ErrorCodes.HighlightTimelineController.NonHighlight, "Can't move a non-highlight timeline."));
             }
         }
     }
