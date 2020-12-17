@@ -22,6 +22,7 @@ namespace Timeline.Controllers
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TokenController : Controller
     {
+        private readonly IUserCredentialService _userCredentialService;
         private readonly IUserTokenManager _userTokenManager;
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
@@ -29,8 +30,9 @@ namespace Timeline.Controllers
         private readonly IMapper _mapper;
 
         /// <summary></summary>
-        public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
+        public TokenController(IUserCredentialService userCredentialService, IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
         {
+            _userCredentialService = userCredentialService;
             _userTokenManager = userTokenManager;
             _logger = logger;
             _clock = clock;
@@ -45,7 +47,7 @@ namespace Timeline.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateTokenResponse>> Create([FromBody] CreateTokenRequest request)
+        public async Task<ActionResult<HttpCreateTokenResponse>> Create([FromBody] HttpCreateTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null)
             {
@@ -69,10 +71,10 @@ namespace Timeline.Controllers
                     ("Username", request.Username),
                     ("Expire At", expireTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat) ?? "default")
                 ));
-                return Ok(new CreateTokenResponse
+                return Ok(new HttpCreateTokenResponse
                 {
                     Token = result.Token,
-                    User = _mapper.Map<UserInfo>(result.User)
+                    User = _mapper.Map<HttpUser>(result.User)
                 });
             }
             catch (UserNotExistException e)
@@ -95,7 +97,7 @@ namespace Timeline.Controllers
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<VerifyTokenResponse>> Verify([FromBody] VerifyTokenRequest request)
+        public async Task<ActionResult<HttpVerifyTokenResponse>> Verify([FromBody] HttpVerifyTokenRequest request)
         {
             void LogFailure(string reason, Exception? e = null, params (string, object?)[] otherProperties)
             {
@@ -111,9 +113,9 @@ namespace Timeline.Controllers
                 var result = await _userTokenManager.VerifyToken(request.Token);
                 _logger.LogInformation(Log.Format(LogVerifySuccess,
                     ("Username", result.Username), ("Token", request.Token)));
-                return Ok(new VerifyTokenResponse
+                return Ok(new HttpVerifyTokenResponse
                 {
-                    User = _mapper.Map<UserInfo>(result)
+                    User = _mapper.Map<HttpUser>(result)
                 });
             }
             catch (UserTokenTimeExpireException e)

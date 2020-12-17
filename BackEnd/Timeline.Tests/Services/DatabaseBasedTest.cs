@@ -2,6 +2,7 @@
 using Timeline.Entities;
 using Timeline.Tests.Helpers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.Services
 {
@@ -10,15 +11,20 @@ namespace Timeline.Tests.Services
         protected TestDatabase TestDatabase { get; }
         protected DatabaseContext Database { get; private set; } = default!;
 
-        protected DatabaseBasedTest(bool databaseCreateUsers = true)
+        private readonly ITestOutputHelper? _testOutputHelper;
+
+        protected DatabaseBasedTest(bool databaseCreateUsers = true, ITestOutputHelper? testOutputHelper = null)
         {
+            _testOutputHelper = testOutputHelper;
             TestDatabase = new TestDatabase(databaseCreateUsers);
         }
+
+        protected DatabaseBasedTest(ITestOutputHelper? testOutputHelper) : this(true, testOutputHelper) { }
 
         public async Task InitializeAsync()
         {
             await TestDatabase.InitializeAsync();
-            Database = TestDatabase.CreateContext();
+            Database = TestDatabase.CreateContext(_testOutputHelper);
             await OnDatabaseCreatedAsync();
             OnDatabaseCreated();
         }

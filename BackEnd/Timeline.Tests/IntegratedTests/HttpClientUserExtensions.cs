@@ -6,7 +6,7 @@ namespace Timeline.Tests.IntegratedTests
 {
     public static class HttpClientUserExtensions
     {
-        public static Task<UserInfo> GetUserAsync(this HttpClient client, string username)
-            => client.TestGetAsync<UserInfo>($"users/{username}");
+        public static Task<HttpUser> GetUserAsync(this HttpClient client, string username)
+            => client.TestGetAsync<HttpUser>($"users/{username}");
     }
 }

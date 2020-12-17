@@ -87,28 +87,28 @@
       },
       "NSwag.AspNetCore": {
         "type": "Direct",
-        "requested": "[13.8.2, )",
-        "resolved": "13.8.2",
-        "contentHash": "SNGlVSZoMyywBWueZBxl3B/nfaIM0fAcuNhTD/cfMKUn3Cn/Oi8d45HZY5vAPqczvppTbk4cZXyVwWDOfgiPbA==",
+        "requested": "[13.9.4, )",
+        "resolved": "13.9.4",
+        "contentHash": "2+QqWsUMfwOy1pFsacA4hjVW0tmKrcGG4O1JCVhM93q7QfqbG/ndt002a/GGGyaMsuK7HRKmYJ8nmo5tzOE1tg==",
         "dependencies": {
           "Microsoft.AspNetCore.Mvc.Core": "1.0.4",
           "Microsoft.AspNetCore.Mvc.Formatters.Json": "1.0.4",
           "Microsoft.AspNetCore.StaticFiles": "1.0.4",
           "Microsoft.Extensions.ApiDescription.Server": "3.0.0",
           "Microsoft.Extensions.FileProviders.Embedded": "1.0.1",
-          "NSwag.Annotations": "13.8.2",
-          "NSwag.Core": "13.8.2",
-          "NSwag.Generation": "13.8.2",
-          "NSwag.Generation.AspNetCore": "13.8.2",
+          "NSwag.Annotations": "13.9.4",
+          "NSwag.Core": "13.9.4",
+          "NSwag.Generation": "13.9.4",
+          "NSwag.Generation.AspNetCore": "13.9.4",
           "System.IO.FileSystem": "4.3.0",
           "System.Xml.XPath.XDocument": "4.0.1"
         }
       },
       "SixLabors.ImageSharp": {
         "type": "Direct",
-        "requested": "[1.0.1, )",
-        "resolved": "1.0.1",
-        "contentHash": "DjLoFNdUfsDP7RhPpr5hcUhl1XiejqBML9uDWuOUwCkc0Y+sG9IJLLbqSOi9XeoWqPviwdcDm1F8nKdF0qTYIQ=="
+        "requested": "[1.0.2, )",
+        "resolved": "1.0.2",
+        "contentHash": "iZJ37Iss3pUkFl961x1aka85QuvgY9oNZabHijzVnHs4QTz6EMNx3zjJDyvK/0+Ryj6JPv/PC7GVIJXLHtu2nQ=="
       },
       "System.IdentityModel.Tokens.Jwt": {
         "type": "Direct",
@@ -648,8 +648,8 @@
       },
       "NJsonSchema": {
         "type": "Transitive",
-        "resolved": "10.2.1",
-        "contentHash": "/BtWbYTusyoSgQkCB4eYijMfZotB/rfASDsl1k9evlkm5vlOP4s4Y09TOzBChU77d/qUABVYL1Xf+TB8E0Wfpw==",
+        "resolved": "10.3.1",
+        "contentHash": "k5ptrRSxMy1lZXxU7dXW2Gy9Q7uPufSGtb609tfuFdo+w45UMHdBolvbWeEq482BPXhYfoBZ2uNzjJgcny2o3g==",
         "dependencies": {
           "Namotion.Reflection": "1.0.14",
           "Newtonsoft.Json": "9.0.1"
@@ -657,38 +657,38 @@
       },
       "NSwag.Annotations": {
         "type": "Transitive",
-        "resolved": "13.8.2",
-        "contentHash": "/GO+35CjPYQTPS5/Q8udM5JAMEWVo8JsrkV2Uw3OW4/AJU9iOS7t6WJid6ZlkpLMjnW7oex9mvJ2EZNE4eOG/Q=="
+        "resolved": "13.9.4",
+        "contentHash": "qsOYnNMUJJ5VpgYmQsyNkDKbJnMaRo4lGBgkaBlZsHsWGG+HizNkx+HuHkRtI0ks28jqZXpVDxDmnuyq/SwFnw=="
       },
       "NSwag.Core": {
         "type": "Transitive",
-        "resolved": "13.8.2",
-        "contentHash": "Hm6pU9qFJuXLo3b27+JTXztfeuI/15Ob1sDsfUu4rchN0+bMogtn8Lia8KVbcalw/M+hXc0rWTFp5ueP23e+iA==",
+        "resolved": "13.9.4",
+        "contentHash": "iNhgBGWT5yEYL3uV6Xhla+VspVaN3NfDi+rjDugWLErU+A7uxV71D1i9OQkW37rdOFKiaixJAXPaLA6JA8c8hw==",
         "dependencies": {
-          "NJsonSchema": "10.2.1",
+          "NJsonSchema": "10.3.1",
           "Newtonsoft.Json": "9.0.1"
         }
       },
       "NSwag.Generation": {
         "type": "Transitive",
-        "resolved": "13.8.2",
-        "contentHash": "LBIrpHFRZeMMbqL1hdyGb7r8v+T52aOCARxwfAmzE+MlOHVpjsIxyNSXht9EzBFMbSH0tj7CK2Ugo7bm+zUssg==",
+        "resolved": "13.9.4",
+        "contentHash": "Y6qqOYUEoYZRL5nYshzYn0b7Nz9Rzr6qCdVkah6mQq39Pom/XQgygaV6JR3t0dacDYg/XmVsMn++bdLPQs9rAw==",
         "dependencies": {
-          "NJsonSchema": "10.2.1",
-          "NSwag.Core": "13.8.2",
+          "NJsonSchema": "10.3.1",
+          "NSwag.Core": "13.9.4",
           "Newtonsoft.Json": "9.0.1"
         }
       },
       "NSwag.Generation.AspNetCore": {
         "type": "Transitive",
-        "resolved": "13.8.2",
-        "contentHash": "0ydVv6OidspZ/MS6qmU8hswGtXwq5YZPg+2a2PHGD6jNp2Fef4j1wC3xa3hplDAq7cK+BgpyDKtvj9+X01+P5g==",
+        "resolved": "13.9.4",
+        "contentHash": "N0HGoPJsK67GAtNnPln0MLPnmv9wVp9Ev5sfEuWQIa/VHMkXQL6IyvItXiigDLb8VHXnqUbggU7WBg9Ay6h8oQ==",
         "dependencies": {
           "Microsoft.AspNetCore.Mvc.ApiExplorer": "1.0.4",
           "Microsoft.AspNetCore.Mvc.Core": "1.0.4",
           "Microsoft.AspNetCore.Mvc.Formatters.Json": "1.0.4",
-          "NJsonSchema": "10.2.1",
-          "NSwag.Generation": "13.8.2"
+          "NJsonSchema": "10.3.1",
+          "NSwag.Generation": "13.9.4"
         }
       },
       "runtime.native.System": {

@@ -72,34 +72,36 @@ namespace Timeline
             services.AddAuthentication(AuthenticationConstants.Scheme)
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
-
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
-            services.AddSingleton<IPathProvider, PathProvider>();
+            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
+            services.AddSingleton<IPathProvider, PathProvider>();
             services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
 
             services.AddAutoMapper(GetType().Assembly);
 
             services.AddTransient<IClock, Clock>();
 
+            services.AddScoped<IETagGenerator, ETagGenerator>();
+            services.AddScoped<IDataManager, DataManager>();
+            services.AddScoped<IImageValidator, ImageValidator>();
+
             services.AddTransient<IPasswordService, PasswordService>();
+            services.AddScoped<IBasicUserService, BasicUserService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserCredentialService, UserCredentialService>();
             services.AddScoped<IUserDeleteService, UserDeleteService>();
             services.AddScoped<IUserTokenService, JwtUserTokenService>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
             services.AddScoped<IUserPermissionService, UserPermissionService>();
-
-            services.AddScoped<IETagGenerator, ETagGenerator>();
-            services.AddScoped<IDataManager, DataManager>();
-
-            services.AddScoped<IImageValidator, ImageValidator>();
-
             services.AddUserAvatarService();
 
+            services.AddScoped<IBasicTimelineService, BasicTimelineService>();
             services.AddScoped<ITimelineService, TimelineService>();
+            services.AddScoped<ITimelinePostService, TimelinePostService>();
 
-            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddScoped<IHighlightTimelineService, HighlightTimelineService>();
 
             services.AddDbContext<DatabaseContext>((services, options) =>
             {
