@@ -109,7 +109,7 @@ namespace Timeline.Services
             if (!await _userService.CheckUserExistence(userId))
                 throw new UserNotExistException(userId);
 
-            var entities = await _database.BookmarkTimelines.Where(t => t.UserId == userId).Select(t => new { t.TimelineId }).ToListAsync();
+            var entities = await _database.BookmarkTimelines.Where(t => t.UserId == userId).OrderBy(t => t.Rank).Select(t => new { t.TimelineId }).ToListAsync();
 
             List<TimelineInfo> result = new();
 
@@ -140,7 +140,7 @@ namespace Timeline.Services
             }
             else
             {
-                var totalCount = await _database.HighlightTimelines.CountAsync();
+                var totalCount = await _database.BookmarkTimelines.CountAsync(t => t.UserId == userId);
                 if (newPosition > totalCount) newPosition = totalCount;
             }
 
