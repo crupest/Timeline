@@ -11,9 +11,7 @@ import InfoCardTemplate from "../timeline-common/InfoCardTemplate";
 
 export type OrdinaryTimelineManageItem = "delete";
 
-export type TimelineInfoCardProps = TimelineCardComponentProps<
-  OrdinaryTimelineManageItem
->;
+export type TimelineInfoCardProps = TimelineCardComponentProps<OrdinaryTimelineManageItem>;
 
 const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
   const {

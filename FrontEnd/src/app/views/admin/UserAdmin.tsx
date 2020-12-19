@@ -62,10 +62,9 @@ const UsernameLabel: React.FC = (props) => {
   return <span style={{ color: "blue" }}>{props.children}</span>;
 };
 
-const UserDeleteDialog: React.FC<DialogProps<
-  { username: string },
-  unknown
->> = ({ open, close, token, data: { username }, onSuccess }) => {
+const UserDeleteDialog: React.FC<
+  DialogProps<{ username: string }, unknown>
+> = ({ open, close, token, data: { username }, onSuccess }) => {
   return (
     <OperationDialog
       open={open}
@@ -83,12 +82,14 @@ const UserDeleteDialog: React.FC<DialogProps<
   );
 };
 
-const UserModifyDialog: React.FC<DialogProps<
-  {
-    oldUser: HttpUser;
-  },
-  HttpUser
->> = ({ open, close, token, data: { oldUser }, onSuccess }) => {
+const UserModifyDialog: React.FC<
+  DialogProps<
+    {
+      oldUser: HttpUser;
+    },
+    HttpUser
+  >
+> = ({ open, close, token, data: { oldUser }, onSuccess }) => {
   return (
     <OperationDialog
       open={open}
@@ -131,13 +132,15 @@ const UserModifyDialog: React.FC<DialogProps<
   );
 };
 
-const UserPermissionModifyDialog: React.FC<DialogProps<
-  {
-    username: string;
-    permissions: UserPermission[];
-  },
-  UserPermission[]
->> = ({ open, close, token, data: { username, permissions }, onSuccess }) => {
+const UserPermissionModifyDialog: React.FC<
+  DialogProps<
+    {
+      username: string;
+      permissions: UserPermission[];
+    },
+    UserPermission[]
+  >
+> = ({ open, close, token, data: { username, permissions }, onSuccess }) => {
   const oldPermissionBoolList: boolean[] = kUserPermissionList.map(
     (permission) => permissions.includes(permission)
   );
