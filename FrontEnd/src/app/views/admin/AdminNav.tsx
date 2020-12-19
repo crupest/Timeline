@@ -29,12 +29,12 @@ const AdminNav: React.FC = () => {
       </Nav.Item>
       <Nav.Item>
         <Nav.Link
-          active={name === "highlighttimelines"}
+          active={name === "more"}
           onClick={() => {
-            toggle("highlighttimelines");
+            toggle("more");
           }}
         >
-          {t("admin:nav.highlightTimelines")}
+          {t("admin:nav.more")}
         </Nav.Link>
       </Nav.Item>
     </Nav>
