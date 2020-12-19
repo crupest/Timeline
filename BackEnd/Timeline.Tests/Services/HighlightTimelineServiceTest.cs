@@ -68,6 +68,10 @@ namespace Timeline.Tests.Services
         public async Task Multiple_Should_Work()
         {
             var userId = await _userService.GetUserIdByUsername("user");
+
+            // make timeline id not same as entity id.
+            await _timelineService.CreateTimeline("t0", userId);
+
             await _timelineService.CreateTimeline("t1", userId);
             await _service.AddHighlightTimeline("t1", userId);
 
