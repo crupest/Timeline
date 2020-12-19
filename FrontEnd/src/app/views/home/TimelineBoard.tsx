@@ -8,14 +8,14 @@ import { TimelineInfo } from "@/services/timeline";
 import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
 
-export interface TimelineBoardProps {
+interface TimelineBoardUIProps {
   title?: string;
   timelines: TimelineInfo[] | "offline" | "loading";
   onReload: () => void;
   className?: string;
 }
 
-const TimelineBoard: React.FC<TimelineBoardProps> = (props) => {
+const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
   const { title, timelines, className } = props;
 
   return (
@@ -68,6 +68,52 @@ const TimelineBoard: React.FC<TimelineBoardProps> = (props) => {
         }
       })()}
     </div>
+  );
+};
+
+export interface TimelineBoardProps {
+  title?: string;
+  className?: string;
+  load: () => Promise<TimelineInfo[]>;
+}
+
+const TimelineBoard: React.FC<TimelineBoardProps> = ({
+  className,
+  title,
+  load,
+}) => {
+  const [timelines, setTimelines] = React.useState<
+    TimelineInfo[] | "offline" | "loading"
+  >("loading");
+
+  React.useEffect(() => {
+    let subscribe = true;
+    if (timelines === "loading") {
+      void load().then(
+        (timelines) => {
+          if (subscribe) {
+            setTimelines(timelines);
+          }
+        },
+        () => {
+          setTimelines("offline");
+        }
+      );
+    }
+    return () => {
+      subscribe = false;
+    };
+  }, [load, timelines]);
+
+  return (
+    <TimelineBoardUI
+      title={title}
+      className={className}
+      timelines={timelines}
+      onReload={() => {
+        setTimelines("loading");
+      }}
+    />
   );
 };
 
