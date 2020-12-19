@@ -1,58 +1,31 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
-import { TimelineInfo } from "@/services/timeline";
+import { getHttpHighlightClient } from "@/http/highlight";
 import { getHttpTimelineClient } from "@/http/timeline";
 
 import TimelineBoard from "./TimelineBoard";
-import OfflineBoard from "./OfflineBoard";
 
 const BoardWithoutUser: React.FC = () => {
-  const [publicTimelines, setPublicTimelines] = React.useState<
-    TimelineInfo[] | "offline" | "loading"
-  >("loading");
-
-  React.useEffect(() => {
-    let subscribe = true;
-    if (publicTimelines === "loading") {
-      void getHttpTimelineClient()
-        .listTimeline({ visibility: "Public" })
-        .then(
-          (timelines) => {
-            if (subscribe) {
-              setPublicTimelines(timelines);
-            }
-          },
-          () => {
-            setPublicTimelines("offline");
-          }
-        );
-    }
-    return () => {
-      subscribe = false;
-    };
-  }, [publicTimelines]);
+  const { t } = useTranslation();
 
   return (
     <Row className="my-3 justify-content-center">
-      {publicTimelines === "offline" ? (
-        <Col sm="8" lg="6">
-          <OfflineBoard
-            onReload={() => {
-              setPublicTimelines("loading");
-            }}
-          />
-        </Col>
-      ) : (
-        <Col sm="8" lg="6">
-          <TimelineBoard
-            timelines={publicTimelines}
-            onReload={() => {
-              setPublicTimelines("loading");
-            }}
-          />
-        </Col>
-      )}
+      <Col sm="6" lg="5">
+        <TimelineBoard
+          title={t("home.highlightTimeline")}
+          load={() => getHttpHighlightClient().list()}
+        />
+      </Col>
+      <Col sm="8" lg="6">
+        <TimelineBoard
+          title={t("home.publicTimeline")}
+          load={() =>
+            getHttpTimelineClient().listTimeline({ visibility: "Public" })
+          }
+        />
+      </Col>
     </Row>
   );
 };

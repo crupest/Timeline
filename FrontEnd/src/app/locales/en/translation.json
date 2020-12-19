@@ -20,10 +20,9 @@
   "loadImageError": "Failed to load image.",
   "home": {
     "go": "Go!",
-    "allTimeline": "All Timelines",
+    "highlightTimeline": "Highlight Timelines",
     "relatedTimeline": "Timelines Related To You",
-    "joinTimeline": "Joined Timelines",
-    "ownTimeline": "Owned Timelines",
+    "publicTimeline": "Public Timelines",
     "offlinePrompt": "Oh oh, it seems you are offline. Here list some timelines cached locally. You can view them or click <1>here</1> to refresh.",
     "createButton": "Create Timeline",
     "createDialog": {
