@@ -21,6 +21,7 @@
   "home": {
     "go": "Go!",
     "allTimeline": "All Timelines",
+    "relatedTimeline": "Timelines Related To You",
     "joinTimeline": "Joined Timelines",
     "ownTimeline": "Owned Timelines",
     "offlinePrompt": "Oh oh, it seems you are offline. Here list some timelines cached locally. You can view them or click <1>here</1> to refresh.",
