@@ -28,6 +28,7 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestPutAssertInvalidModelAsync("highlights/!!!");
             await client.TestDeleteAssertInvalidModelAsync("highlights/!!!");
             await client.TestPostAssertInvalidModelAsync("highlightop/move", new HttpHighlightTimelineMoveRequest { Timeline = null!, NewPosition = 1 });
+            await client.TestPostAssertInvalidModelAsync("highlightop/move", new HttpHighlightTimelineMoveRequest { Timeline = "!!!", NewPosition = 1 });
             await client.TestPostAssertInvalidModelAsync("highlightop/move", new HttpHighlightTimelineMoveRequest { Timeline = "aaa", NewPosition = null });
         }
 

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Auth;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
@@ -11,48 +11,50 @@ using Timeline.Services.Exceptions;
 namespace Timeline.Controllers
 {
     /// <summary>
-    /// Api related to highlight timeline.
+    /// Api related to timeline bookmarks.
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class HighlightTimelineController : Controller
+    public class BookmarkTimelineController : Controller
     {
-        private readonly IHighlightTimelineService _service;
+        private readonly IBookmarkTimelineService _service;
+
         private readonly IMapper _mapper;
 
-        public HighlightTimelineController(IHighlightTimelineService service, IMapper mapper)
+        public BookmarkTimelineController(IBookmarkTimelineService service, IMapper mapper)
         {
             _service = service;
             _mapper = mapper;
         }
 
         /// <summary>
-        /// Get all highlight timelines.
+        /// Get bookmark list in order.
         /// </summary>
-        /// <returns>Highlight timeline list.</returns>
-        [HttpGet("highlights")]
+        /// <returns>Bookmarks.</returns>
+        [HttpGet("bookmarks")]
+        [Authorize]
         [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
-            var t = await _service.GetHighlightTimelines();
-            return _mapper.Map<List<HttpTimeline>>(t);
+            var bookmarks = await _service.GetBookmarks(this.GetUserId());
+            return Ok(_mapper.Map<List<HttpTimeline>>(bookmarks));
         }
 
         /// <summary>
-        /// Add a timeline to highlight list.
+        /// Add a bookmark.
         /// </summary>
-        /// <param name="timeline">The timeline name.</param>
-        [HttpPut("highlights/{timeline}")]
-        [PermissionAuthorize(UserPermission.HighlightTimelineManagement)]
+        /// <param name="timeline">Timeline name.</param>
+        [HttpPut("bookmarks/{timeline}")]
+        [Authorize]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(403)]
         public async Task<ActionResult> Put([GeneralTimelineName] string timeline)
         {
             try
             {
-                await _service.AddHighlightTimeline(timeline, this.GetUserId());
+                await _service.AddBookmark(this.GetUserId(), timeline);
                 return Ok();
             }
             catch (TimelineNotExistException)
@@ -62,20 +64,19 @@ namespace Timeline.Controllers
         }
 
         /// <summary>
-        /// Remove a timeline from highlight list.
+        /// Remove a bookmark.
         /// </summary>
         /// <param name="timeline">Timeline name.</param>
-        [HttpDelete("highlights/{timeline}")]
-        [PermissionAuthorize(UserPermission.HighlightTimelineManagement)]
+        [HttpDelete("bookmarks/{timeline}")]
+        [Authorize]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(403)]
         public async Task<ActionResult> Delete([GeneralTimelineName] string timeline)
         {
             try
             {
-                await _service.RemoveHighlightTimeline(timeline, this.GetUserId());
+                await _service.RemoveBookmark(this.GetUserId(), timeline);
                 return Ok();
             }
             catch (TimelineNotExistException)
@@ -85,28 +86,28 @@ namespace Timeline.Controllers
         }
 
         /// <summary>
-        /// Move a highlight to new position.
+        /// Move a bookmark to new posisition.
         /// </summary>
-        [HttpPost("highlightop/move")]
-        [PermissionAuthorize(UserPermission.HighlightTimelineManagement)]
+        /// <param name="request">Request body.</param>
+        [HttpPost("bookmarkop/move")]
+        [Authorize]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(403)]
-        public async Task<ActionResult> Move([FromBody] HttpHighlightTimelineMoveRequest body)
+        public async Task<ActionResult> Move([FromBody] HttpBookmarkTimelineMoveRequest request)
         {
             try
             {
-                await _service.MoveHighlightTimeline(body.Timeline, body.NewPosition!.Value);
+                await _service.MoveBookmark(this.GetUserId(), request.Timeline, request.NewPosition!.Value);
                 return Ok();
             }
             catch (TimelineNotExistException)
             {
                 return BadRequest(ErrorResponse.TimelineController.NotExist());
             }
-            catch (InvalidHighlightTimelineException)
+            catch (InvalidBookmarkException)
             {
-                return BadRequest(new CommonResponse(ErrorCodes.HighlightTimelineController.NonHighlight, "Can't move a non-highlight timeline."));
+                return BadRequest(new CommonResponse(ErrorCodes.BookmarkTimelineController.NonBookmark, "You can't move a non-bookmark timeline."));
             }
         }
     }
