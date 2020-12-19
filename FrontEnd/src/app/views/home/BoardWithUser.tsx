@@ -13,13 +13,13 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
 
   return (
     <Row className="my-3 justify-content-center">
-      <Col sm="6" lg="5">
+      <Col xs="12" md="6">
         <TimelineBoard
           title={t("home.highlightTimeline")}
           load={() => getHttpHighlightClient().list()}
         />
       </Col>
-      <Col sm="6" lg="5">
+      <Col xs="12" md="6" className="my-3 my-md-0">
         <TimelineBoard
           title={t("home.relatedTimeline")}
           load={() =>
