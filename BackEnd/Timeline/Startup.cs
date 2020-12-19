@@ -102,6 +102,7 @@ namespace Timeline
             services.AddScoped<ITimelinePostService, TimelinePostService>();
 
             services.AddScoped<IHighlightTimelineService, HighlightTimelineService>();
+            services.AddScoped<IBookmarkTimelineService, BookmarkTimelineService>();
 
             services.AddDbContext<DatabaseContext>((services, options) =>
             {

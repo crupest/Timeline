@@ -68,6 +68,11 @@
         {
             public const int NonHighlight = 1_105_01_01;
         }
+
+        public static class BookmarkTimelineController
+        {
+            public const int NonBookmark = 1_106_01_01;
+        }
     }
 }
 

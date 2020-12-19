@@ -4,9 +4,9 @@ using Timeline.Models.Validation;
 namespace Timeline.Models.Http
 {
     /// <summary>
-    /// Move highlight timeline request body model.
+    /// Move bookmark timeline request body model.
     /// </summary>
-    public class HttpHighlightTimelineMoveRequest
+    public class HttpBookmarkTimelineMoveRequest
     {
         /// <summary>
         /// Timeline name.

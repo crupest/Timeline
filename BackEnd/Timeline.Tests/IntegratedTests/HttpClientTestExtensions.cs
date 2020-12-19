@@ -192,6 +192,11 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestJsonSendAssertUnauthorizedAsync(HttpMethod.Patch, url, jsonBody, errorCode, headerSetup);
         }
 
+        public static async Task TestPutAssertUnauthorizedAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
+        {
+            await client.TestJsonSendAssertUnauthorizedAsync(HttpMethod.Put, url, jsonBody, errorCode, headerSetup);
+        }
+
         public static async Task TestDeleteAssertUnauthorizedAsync(this HttpClient client, string url, object? jsonBody = null, int? errorCode = null, HeaderSetup? headerSetup = null)
         {
             await client.TestJsonSendAssertUnauthorizedAsync(HttpMethod.Delete, url, jsonBody, errorCode, headerSetup);
