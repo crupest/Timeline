@@ -50,10 +50,13 @@ textarea
 
 .cru-card
   @extend .shadow
-  @extend .border
   @extend .rounded
+  border: 1px solid
   border-color: $gray-200
-  background: $light
+  background: $gray-100
+  transition: all 0.3s
+  &:hover
+    border-color: $primary
 
 .full-viewport-center-child
   position: fixed
