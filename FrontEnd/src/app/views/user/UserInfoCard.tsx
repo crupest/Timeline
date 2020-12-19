@@ -11,9 +11,7 @@ import InfoCardTemplate from "../timeline-common/InfoCardTemplate";
 
 export type PersonalTimelineManageItem = "avatar" | "nickname";
 
-export type UserInfoCardProps = TimelineCardComponentProps<
-  PersonalTimelineManageItem
->;
+export type UserInfoCardProps = TimelineCardComponentProps<PersonalTimelineManageItem>;
 
 const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
   const {
