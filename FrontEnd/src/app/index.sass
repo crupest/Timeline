@@ -34,10 +34,12 @@ small
     width: 40px
 
 .icon-button
-  font-size: 1.4em
+  width: 1.4em
+  height: 1.4em
   cursor: pointer
   &.large
-    font-size: 1.6em
+    width: 1.6em
+    height: 1.6em
 
 .cursor-pointer
   cursor: pointer
@@ -68,6 +70,9 @@ textarea
 
 .text-orange
   color: $orange
+
+.text-yellow
+  color: $yellow
 
 @each $color, $value in $theme-colors
   .text-button

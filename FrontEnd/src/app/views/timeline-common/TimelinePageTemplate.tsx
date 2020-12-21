@@ -11,6 +11,7 @@ import {
   usePostList,
   useTimelineInfo,
 } from "@/services/timeline";
+import { getHttpBookmarkClient } from "@/http/bookmark";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
@@ -116,6 +117,19 @@ export default function TimelinePageTemplate<TManageItem>(
             ? onManage
             : undefined,
           onMember: () => setDialog("member"),
+          onBookmark:
+            user != null
+              ? () => {
+                  void getHttpBookmarkClient()
+                    .put(name, user.token)
+                    .then(() => {
+                      pushAlert({
+                        message: "Succeeded to add bookmark!", //TODO: i18n
+                        type: "success",
+                      });
+                    });
+                }
+              : undefined,
         };
 
         if (type === "cache") {

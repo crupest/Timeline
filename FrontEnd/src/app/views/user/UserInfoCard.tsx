@@ -1,6 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Dropdown, Button } from "react-bootstrap";
+import Svg from "react-inlinesvg";
+import bookmarkIcon from "bootstrap-icons/icons/bookmark.svg";
 
 import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
 import { useAvatar } from "@/services/user";
@@ -19,6 +21,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
     collapse,
     onMember,
     onManage,
+    onBookmark,
     syncStatus,
     toggleCollapse,
   } = props;
@@ -46,8 +49,15 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
         {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
       </small>
       <div className="text-right mt-2">
+        {onBookmark != null ? (
+          <Svg
+            src={bookmarkIcon}
+            className="icon-button text-yellow mr-3"
+            onClick={onBookmark}
+          />
+        ) : null}
         {onManage != null ? (
-          <Dropdown>
+          <Dropdown className="d-inline-block">
             <Dropdown.Toggle variant="outline-primary">
               {t("timeline.manage")}
             </Dropdown.Toggle>
