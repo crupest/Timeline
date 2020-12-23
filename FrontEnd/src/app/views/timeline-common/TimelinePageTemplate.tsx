@@ -12,6 +12,7 @@ import {
   useTimelineInfo,
 } from "@/services/timeline";
 import { getHttpBookmarkClient } from "@/http/bookmark";
+import { getHttpHighlightClient } from "@/http/highlight";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
@@ -124,7 +125,20 @@ export default function TimelinePageTemplate<TManageItem>(
                     .put(name, user.token)
                     .then(() => {
                       pushAlert({
-                        message: "Succeeded to add bookmark!", //TODO: i18n
+                        message: "Succeeded to add bookmark!", // TODO: i18n
+                        type: "success",
+                      });
+                    });
+                }
+              : undefined,
+          onHighlight:
+            user != null && user.hasHighlightTimelineAdministrationPermission
+              ? () => {
+                  void getHttpHighlightClient()
+                    .put(name, user.token)
+                    .then(() => {
+                      pushAlert({
+                        message: "Succeeded to add highlight!", // TODO: i18n
                         type: "success",
                       });
                     });

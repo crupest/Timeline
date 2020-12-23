@@ -43,6 +43,10 @@ export class AuthUser implements User {
   get hasAllTimelineAdministrationPermission(): boolean {
     return this.permissions.includes("AllTimelineManagement");
   }
+
+  get hasHighlightTimelineAdministrationPermission(): boolean {
+    return this.permissions.includes("HighlightTimelineManagement");
+  }
 }
 
 export interface LoginCredentials {
