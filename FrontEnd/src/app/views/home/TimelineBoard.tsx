@@ -7,20 +7,90 @@ import { Spinner } from "react-bootstrap";
 import { TimelineInfo } from "@/services/timeline";
 import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
+import { HttpTimelineInfo } from "@/http/timeline";
+
+interface TimelineBoardItemProps {
+  timeline: HttpTimelineInfo;
+  // If not null, will disable navigation on click.
+  actions?: {
+    onDelete: () => void;
+    onMove: (e: React.MouseEvent) => void;
+  };
+}
+
+const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
+  timeline,
+  actions,
+}) => {
+  const { name, title } = timeline;
+  const isPersonal = name.startsWith("@");
+  const url = isPersonal
+    ? `/users/${timeline.owner.username}`
+    : `/timelines/${name}`;
+
+  const content = (
+    <>
+      {isPersonal ? (
+        <UserTimelineLogo className="icon" />
+      ) : (
+        <TimelineLogo className="icon" />
+      )}
+      {title}
+      <small className="ml-2 text-secondary">{name}</small>
+    </>
+  );
+
+  return actions == null ? (
+    <Link to={url} className="timeline-board-item">
+      {content}
+    </Link>
+  ) : (
+    <div className="timeline-board-item">{content}</div>
+  );
+};
 
 interface TimelineBoardUIProps {
   title?: string;
   timelines: TimelineInfo[] | "offline" | "loading";
   onReload: () => void;
   className?: string;
+  editHandler?: {
+    onDelete: (timeline: string) => Promise<void>;
+  };
 }
 
 const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
-  const { title, timelines, className } = props;
+  const { title, timelines, className, editHandler } = props;
+
+  const editable = editHandler != null;
+
+  const [editing, setEditing] = React.useState<boolean>(false);
 
   return (
     <div className={clsx("timeline-board", className)}>
-      {title != null && <h3 className="text-center">{title}</h3>}
+      <div>
+        {title != null && <h3 className="text-center">{title}</h3>}
+        {
+          editable &&
+            (editing ? (
+              <div
+                onClick={() => {
+                  setEditing(false);
+                }}
+              >
+                Done
+              </div>
+            ) : (
+              <div
+                onClick={() => {
+                  setEditing(true);
+                }}
+              >
+                Edit
+              </div>
+            )) // TODO: i18n
+        }
+      </div>
       {(() => {
         if (timelines === "loading") {
           return (
@@ -48,21 +118,8 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
           );
         } else {
           return timelines.map((timeline) => {
-            const { name, title } = timeline;
-            const isPersonal = name.startsWith("@");
-            const url = isPersonal
-              ? `/users/${timeline.owner.username}`
-              : `/timelines/${name}`;
             return (
-              <Link key={name} to={url} className="timeline-board-item">
-                {isPersonal ? (
-                  <UserTimelineLogo className="icon" />
-                ) : (
-                  <TimelineLogo className="icon" />
-                )}
-                {title}
-                <small className="ml-2 text-secondary">{name}</small>
-              </Link>
+              <TimelineBoardItem key={timeline.name} timeline={timeline} />
             );
           });
         }
