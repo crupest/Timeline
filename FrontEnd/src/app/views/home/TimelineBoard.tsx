@@ -11,15 +11,23 @@ import { HttpTimelineInfo } from "@/http/timeline";
 
 interface TimelineBoardItemProps {
   timeline: HttpTimelineInfo;
+  // In height.
+  offset?: number;
+  // In px.
+  arbitraryOffset?: number;
   // If not null, will disable navigation on click.
   actions?: {
     onDelete: () => void;
-    onMove: (e: React.PointerEvent) => void;
+    onMoveStart: (e: React.PointerEvent) => void;
+    onMoving: (e: React.PointerEvent) => void;
+    onMoveEnd: (e: React.PointerEvent) => void;
   };
 }
 
 const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
   timeline,
+  arbitraryOffset,
+  offset,
   actions,
 }) => {
   const { name, title } = timeline;
@@ -42,18 +50,36 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
       {actions != null ? (
         <div>
           <i className="bi-trash icon-button text-danger px-2" />
-          <i className="bi-grip-vertical icon-button text-gray px-2" />
+          <i
+            className="bi-grip-vertical icon-button text-gray px-2"
+            onPointerDown={actions.onMoveStart}
+            onPointerUp={actions.onMoveEnd}
+            onPointerMove={actions.onMoving}
+          />
         </div>
       ) : null}
     </>
   );
+
+  const offsetStyle: React.CSSProperties = {
+    translate:
+      arbitraryOffset != null
+        ? `0 ${arbitraryOffset}px`
+        : offset != null
+        ? `0 ${offset * 100}%`
+        : undefined,
+    transition:
+      arbitraryOffset == null && offset != null ? "translate 0.5s" : undefined,
+  };
 
   return actions == null ? (
     <Link to={url} className="timeline-board-item">
       {content}
     </Link>
   ) : (
-    <div className="timeline-board-item">{content}</div>
+    <div style={offsetStyle} className="timeline-board-item">
+      {content}
+    </div>
   );
 };
 
@@ -73,6 +99,11 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
   const editable = editHandler != null;
 
   const [editing, setEditing] = React.useState<boolean>(false);
+
+  const [moveState, setMoveState] = React.useState<null | {
+    index: number;
+    offset: number;
+  }>(null);
 
   return (
     <div className={clsx("timeline-board", className)}>
@@ -138,7 +169,13 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
                         onDelete: () => {
                           //TODO: Implement this.
                         },
-                        onMove: () => {
+                        onMoveStart: () => {
+                          //TODO: Implement this.
+                        },
+                        onMoving: () => {
+                          //TODO: Implement this.
+                        },
+                        onMoveEnd: () => {
                           //TODO: Implement this.
                         },
                       }
