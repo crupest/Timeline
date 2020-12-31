@@ -1,8 +1,5 @@
 import React from "react";
 import clsx from "clsx";
-import Svg from "react-inlinesvg";
-import arrowsAngleContractIcon from "bootstrap-icons/icons/arrows-angle-contract.svg";
-import arrowsAngleExpandIcon from "bootstrap-icons/icons/arrows-angle-expand.svg";
 
 const CollapseButton: React.FC<{
   collapse: boolean;
@@ -11,10 +8,13 @@ const CollapseButton: React.FC<{
   style?: React.CSSProperties;
 }> = ({ collapse, onClick, className, style }) => {
   return (
-    <Svg
-      src={collapse ? arrowsAngleExpandIcon : arrowsAngleContractIcon}
+    <i
       onClick={onClick}
-      className={clsx("text-primary icon-button", className)}
+      className={clsx(
+        collapse ? "bi-arrows-angle-expand" : "bi-arrows-angle-contract",
+        "text-primary icon-button",
+        className
+      )}
       style={style}
     />
   );

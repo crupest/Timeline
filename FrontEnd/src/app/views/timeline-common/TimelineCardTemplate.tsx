@@ -2,9 +2,6 @@ import React from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { Dropdown, Button } from "react-bootstrap";
-import Svg from "react-inlinesvg";
-import starIcon from "bootstrap-icons/icons/star.svg";
-import bookmarkIcon from "bootstrap-icons/icons/bookmark.svg";
 
 import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
 
@@ -58,16 +55,14 @@ function TimelineCardTemplate({
         </small>
         <div className="text-right mt-2">
           {onHighlight != null ? (
-            <Svg
-              src={starIcon}
-              className="icon-button text-yellow mr-3"
+            <i
+              className="bi-star icon-button text-yellow mr-3"
               onClick={onHighlight}
             />
           ) : null}
           {onBookmark != null ? (
-            <Svg
-              src={bookmarkIcon}
-              className="icon-button text-yellow mr-3"
+            <i
+              className="bi-bookmark icon-button text-yellow mr-3"
               onClick={onBookmark}
             />
           ) : null}
