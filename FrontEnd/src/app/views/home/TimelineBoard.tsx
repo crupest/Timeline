@@ -30,13 +30,21 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
 
   const content = (
     <>
-      {isPersonal ? (
-        <UserTimelineLogo className="icon" />
-      ) : (
-        <TimelineLogo className="icon" />
-      )}
-      {title}
-      <small className="ml-2 text-secondary">{name}</small>
+      <div>
+        {isPersonal ? (
+          <UserTimelineLogo className="icon" />
+        ) : (
+          <TimelineLogo className="icon" />
+        )}
+        {title}
+        <small className="ml-2 text-secondary">{name}</small>
+      </div>
+      {actions != null ? (
+        <div>
+          <i className="bi-trash icon-button text-danger" />
+          <i className="bi-grip-vertical icon-button text-danger" />
+        </div>
+      ) : null}
     </>
   );
 
@@ -49,7 +57,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
   );
 };
 
-interface TimelineBoardUIProps {
+export interface TimelineBoardUIProps {
   title?: string;
   timelines: TimelineInfo[] | "offline" | "loading";
   onReload: () => void;
@@ -68,8 +76,8 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
 
   return (
     <div className={clsx("timeline-board", className)}>
-      <div>
-        {title != null && <h3 className="text-center">{title}</h3>}
+      <div className="timeline-board-header">
+        {title != null && <h3>{title}</h3>}
         {
           editable &&
             (editing ? (
@@ -132,12 +140,16 @@ export interface TimelineBoardProps {
   title?: string;
   className?: string;
   load: () => Promise<TimelineInfo[]>;
+  editHandler?: {
+    onDelete: (timeline: string) => Promise<void>;
+  };
 }
 
 const TimelineBoard: React.FC<TimelineBoardProps> = ({
   className,
   title,
   load,
+  editHandler,
 }) => {
   const [timelines, setTimelines] = React.useState<
     TimelineInfo[] | "offline" | "loading"
@@ -170,6 +182,7 @@ const TimelineBoard: React.FC<TimelineBoardProps> = ({
       onReload={() => {
         setTimelines("loading");
       }}
+      editHandler={editHandler}
     />
   );
 };
