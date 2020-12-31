@@ -14,7 +14,7 @@ interface TimelineBoardItemProps {
   // If not null, will disable navigation on click.
   actions?: {
     onDelete: () => void;
-    onMove: (e: React.MouseEvent) => void;
+    onMove: (e: React.PointerEvent) => void;
   };
 }
 
@@ -41,8 +41,8 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
       </div>
       {actions != null ? (
         <div>
-          <i className="bi-trash icon-button text-danger" />
-          <i className="bi-grip-vertical icon-button text-danger" />
+          <i className="bi-trash icon-button text-danger px-2" />
+          <i className="bi-grip-vertical icon-button text-gray px-2" />
         </div>
       ) : null}
     </>
@@ -82,6 +82,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
           editable &&
             (editing ? (
               <div
+                className="flat-button text-primary"
                 onClick={() => {
                   setEditing(false);
                 }}
@@ -90,6 +91,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
               </div>
             ) : (
               <div
+                className="flat-button text-primary"
                 onClick={() => {
                   setEditing(true);
                 }}
@@ -127,7 +129,22 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
         } else {
           return timelines.map((timeline) => {
             return (
-              <TimelineBoardItem key={timeline.name} timeline={timeline} />
+              <TimelineBoardItem
+                key={timeline.name}
+                timeline={timeline}
+                actions={
+                  editHandler != null && editing
+                    ? {
+                        onDelete: () => {
+                          //TODO: Implement this.
+                        },
+                        onMove: () => {
+                          //TODO: Implement this.
+                        },
+                      }
+                    : undefined
+                }
+              />
             );
           });
         }

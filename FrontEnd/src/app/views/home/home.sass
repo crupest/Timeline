@@ -3,18 +3,21 @@
   @extend .d-flex
   @extend .flex-column
   @extend .py-3
-  @extend .px-3
   min-height: 200px
 
 .timeline-board-header
+  @extend .px-3
   display: flex
+  align-items: center
   justify-content: space-between
 
 .timeline-board-item
   font-size: 1.1em
+  @extend .px-3
   @extend .py-2
   transition: background 0.3s
   display: flex
+  align-items: center
   justify-content: space-between
   .icon
     height: 1.3em
