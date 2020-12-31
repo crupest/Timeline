@@ -78,6 +78,7 @@ function TimelineCardTemplate({
                   } else {
                     return (
                       <Dropdown.Item
+                        key={index}
                         onClick={item.onClick}
                         className={
                           item.color != null ? "text-" + item.color : undefined
