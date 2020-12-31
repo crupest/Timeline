@@ -17,6 +17,16 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
         <TimelineBoard
           title={t("home.highlightTimeline")}
           load={() => getHttpHighlightClient().list()}
+          editHandler={
+            user.hasHighlightTimelineAdministrationPermission
+              ? {
+                  onDelete: () => {
+                    // TODO: Implement this.
+                    return Promise.resolve();
+                  },
+                }
+              : undefined
+          }
         />
       </Col>
       <Col xs="12" md="6" className="my-3 my-md-0">

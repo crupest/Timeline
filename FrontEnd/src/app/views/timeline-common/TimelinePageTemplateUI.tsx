@@ -31,6 +31,7 @@ export interface TimelinePageTemplateUIProps<TManageItems> {
         onManage?: (item: TManageItems | "property") => void;
         onMember: () => void;
         onBookmark?: () => void;
+        onHighlight?: () => void;
         onPost?: TimelinePostSendCallback;
       }
     | I18nText;
@@ -157,6 +158,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             onManage={data.onManage}
             onMember={data.onMember}
             onBookmark={data.onBookmark}
+            onHighlight={data.onHighlight}
             syncStatus={syncStatus}
             collapse={cardCollapse}
             toggleCollapse={toggleCardCollapse}
