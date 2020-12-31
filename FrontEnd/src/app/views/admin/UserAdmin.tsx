@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
-import InlineSVG from "react-inlinesvg";
-import PencilSquareIcon from "bootstrap-icons/icons/pencil-square.svg";
 
 import OperationDialog, {
   OperationBoolInputInfo,
@@ -220,9 +218,8 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
 
   return (
     <ListGroup.Item className="admin-user-item">
-      <InlineSVG
-        src={PencilSquareIcon}
-        className="float-right icon-button text-warning"
+      <i
+        className="bi-pencil-square float-right icon-button text-warning"
         onClick={() => setEditMaskVisible(true)}
       />
       <h4 className="text-primary">{user.username}</h4>

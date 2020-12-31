@@ -1,10 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
-import Svg from "react-inlinesvg";
 import { Button, Spinner, Row, Col, Form } from "react-bootstrap";
-import textIcon from "bootstrap-icons/icons/card-text.svg";
-import imageIcon from "bootstrap-icons/icons/image.svg";
 
 import { UiLogicError } from "@/common";
 
@@ -212,10 +209,12 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
               return (
                 <>
                   <div className="d-block text-center mt-1 mb-2">
-                    <Svg
+                    <i
                       onLoad={notifyHeightChange}
-                      src={kind === "text" ? imageIcon : textIcon}
-                      className="icon-button"
+                      className={clsx(
+                        kind === "text" ? "bi-image" : "bi-card-text",
+                        "icon-button"
+                      )}
                       onClick={toggleKind}
                     />
                   </div>
