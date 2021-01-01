@@ -1,7 +1,11 @@
 import React from "react";
 import { useHistory } from "react-router";
 
-import { validateTimelineName, timelineService } from "@/services/timeline";
+import {
+  validateTimelineName,
+  timelineService,
+  TimelineInfo,
+} from "@/services/timeline";
 import OperationDialog from "../common/OperationDialog";
 
 interface TimelineCreateDialogProps {
@@ -11,8 +15,6 @@ interface TimelineCreateDialogProps {
 
 const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
   const history = useHistory();
-
-  let nameSaved: string;
 
   return (
     <OperationDialog
@@ -40,11 +42,11 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
           return null;
         }
       }}
-      onProcess={([name]) => {
+      onProcess={([name]): Promise<TimelineInfo> => {
         return timelineService.createTimeline(name).toPromise();
       }}
-      onSuccessAndClose={() => {
-        history.push(`timelines/${nameSaved}`);
+      onSuccessAndClose={(timeline: TimelineInfo) => {
+        history.push(`timelines/${timeline.name}`);
       }}
       failurePrompt={(e) => `${e as string}`}
     />
