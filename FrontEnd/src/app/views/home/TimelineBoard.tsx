@@ -52,8 +52,14 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
           <i className="bi-trash icon-button text-danger px-2" />
           <i
             className="bi-grip-vertical icon-button text-gray px-2"
-            onPointerDown={actions.onMoveStart}
-            onPointerUp={actions.onMoveEnd}
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
+              actions.onMoveStart(e);
+            }}
+            onPointerUp={(e) => {
+              actions.onMoveEnd(e);
+              e.currentTarget.releasePointerCapture(e.pointerId);
+            }}
             onPointerMove={actions.onMoving}
           />
         </div>
@@ -176,6 +182,8 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
                     index <= moveState.index + offsetCount
                   ) {
                     offset = -1;
+                  } else {
+                    offset = 0;
                   }
                 } else {
                   const offsetCount = Math.round(-moveState.offset / height);
@@ -184,6 +192,8 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
                     index >= moveState.index - offsetCount
                   ) {
                     offset = 1;
+                  } else {
+                    offset = 0;
                   }
                 }
               }
