@@ -24,6 +24,10 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
                     // TODO: Implement this.
                     return Promise.resolve();
                   },
+                  onMove: () => {
+                    // TODO: Implement this.
+                    return Promise.resolve();
+                  },
                 }
               : undefined
           }
