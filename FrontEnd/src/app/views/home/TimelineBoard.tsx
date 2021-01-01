@@ -38,17 +38,16 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
 
   const content = (
     <>
-      <div>
-        {isPersonal ? (
-          <UserTimelineLogo className="icon" />
-        ) : (
-          <TimelineLogo className="icon" />
-        )}
-        {title}
-        <small className="ml-2 text-secondary">{name}</small>
-      </div>
+      {isPersonal ? (
+        <UserTimelineLogo className="icon" />
+      ) : (
+        <TimelineLogo className="icon" />
+      )}
+      <span className="title">{title}</span>
+      <small className="ml-2 text-secondary">{name}</small>
+      <span className="flex-grow-1"></span>
       {actions != null ? (
-        <div>
+        <div className="right">
           <i className="bi-trash icon-button text-danger px-2" />
           <i
             className="bi-grip-vertical icon-button text-gray px-2"
@@ -58,7 +57,11 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
             }}
             onPointerUp={(e) => {
               actions.onMoveEnd(e);
-              e.currentTarget.releasePointerCapture(e.pointerId);
+              try {
+                e.currentTarget.releasePointerCapture(e.pointerId);
+              } catch (_) {
+                void null;
+              }
             }}
             onPointerMove={actions.onMoving}
           />
