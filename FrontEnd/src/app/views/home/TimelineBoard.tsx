@@ -100,6 +100,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
 interface TimelineBoardItemContainerProps {
   timelines: TimelineInfo[];
   editHandler?: {
+    // offset may exceed index range plusing index.
     onMove: (timeline: string, index: number, offset: number) => void;
     onDelete: (timeline: string) => void;
   };
@@ -277,7 +278,21 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
           return (
             <TimelineBoardItemContainer
               timelines={timelines}
-              editHandler={editHandler && editing ? editHandler : undefined}
+              editHandler={
+                editHandler && editing
+                  ? {
+                      onDelete: editHandler.onDelete,
+                      onMove: (timeline, index, offset) => {
+                        if (index + offset >= timelines.length) {
+                          offset = timelines.length - index - 1;
+                        } else if (index + offset < 0) {
+                          offset = -index;
+                        }
+                        editHandler.onMove(timeline, index, offset);
+                      },
+                    }
+                  : undefined
+              }
             />
           );
         }
