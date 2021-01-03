@@ -11,6 +11,8 @@ import {
   usePostList,
   useTimelineInfo,
 } from "@/services/timeline";
+import { getHttpBookmarkClient } from "@/http/bookmark";
+import { getHttpHighlightClient } from "@/http/highlight";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
@@ -116,6 +118,38 @@ export default function TimelinePageTemplate<TManageItem>(
             ? onManage
             : undefined,
           onMember: () => setDialog("member"),
+          onBookmark:
+            user != null
+              ? () => {
+                  void getHttpBookmarkClient()
+                    .put(name, user.token)
+                    .then(() => {
+                      pushAlert({
+                        message: {
+                          type: "i18n",
+                          key: "timeline.addBookmarkSuccess",
+                        },
+                        type: "success",
+                      });
+                    });
+                }
+              : undefined,
+          onHighlight:
+            user != null && user.hasHighlightTimelineAdministrationPermission
+              ? () => {
+                  void getHttpHighlightClient()
+                    .put(name, user.token)
+                    .then(() => {
+                      pushAlert({
+                        message: {
+                          type: "i18n",
+                          key: "timeline.addHighlightSuccess",
+                        },
+                        type: "success",
+                      });
+                    });
+                }
+              : undefined,
         };
 
         if (type === "cache") {

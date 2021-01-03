@@ -1,4 +1,5 @@
 @import '~bootstrap/scss/bootstrap'
+@import '~bootstrap-icons/font/bootstrap-icons.css'
 
 @import './views/common/common'
 @import './views/common/alert/alert'
@@ -11,9 +12,6 @@
 @import './views/user/user'
 
 @import './views/admin/admin'
-
-body
-  margin: 0
 
 small
   line-height: 1.2
@@ -34,10 +32,17 @@ small
     width: 40px
 
 .icon-button
-  font-size: 1.4em
+  font-size: 1.4rem
   cursor: pointer
   &.large
-    font-size: 1.6em
+    font-size: 1.6rem
+
+.flat-button
+  cursor: pointer
+  padding: 0.2em 0.5em
+  border-radius: 0.2em
+  &:hover
+    background-color: $gray-200
 
 .cursor-pointer
   cursor: pointer
@@ -50,10 +55,13 @@ textarea
 
 .cru-card
   @extend .shadow
-  @extend .border
   @extend .rounded
+  border: 1px solid
   border-color: $gray-200
-  background: $light
+  background: $gray-100
+  transition: all 0.3s
+  &:hover
+    border-color: $primary
 
 .full-viewport-center-child
   position: fixed
@@ -66,6 +74,9 @@ textarea
 .text-orange
   color: $orange
 
+.text-yellow
+  color: $yellow
+
 @each $color, $value in $theme-colors
   .text-button
     background: transparent
@@ -74,3 +85,6 @@ textarea
       color: $value
       &:hover
         color: adjust-color($value, $lightness: +15%)
+
+.touch-action-none
+  touch-action: none

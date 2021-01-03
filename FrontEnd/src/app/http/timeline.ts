@@ -121,7 +121,7 @@ export class HttpTimelineNameConflictError extends Error {
 
 //-------------------- begin: internal model --------------------
 
-interface RawTimelineInfo {
+export interface RawHttpTimelineInfo {
   uniqueId: string;
   title: string;
   name: string;
@@ -188,7 +188,9 @@ interface RawTimelinePostPostRequest {
 
 //-------------------- end: internal model --------------------
 
-function processRawTimelineInfo(raw: RawTimelineInfo): HttpTimelineInfo {
+export function processRawTimelineInfo(
+  raw: RawHttpTimelineInfo
+): HttpTimelineInfo {
   return {
     ...raw,
     lastModified: new Date(raw.lastModified),
@@ -293,7 +295,7 @@ export interface IHttpTimelineClient {
 export class HttpTimelineClient implements IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]> {
     return axios
-      .get<RawTimelineInfo[]>(
+      .get<RawHttpTimelineInfo[]>(
         applyQueryParameters(`${apiBaseUrl}/timelines`, query)
       )
       .then(extractResponseData)
@@ -323,7 +325,7 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     }
   ): Promise<HttpTimelineInfo | NotModified> {
     return axios
-      .get<RawTimelineInfo>(
+      .get<RawHttpTimelineInfo>(
         applyQueryParameters(`${apiBaseUrl}/timelines/${timelineName}`, query)
       )
       .then((res) => {
@@ -342,7 +344,7 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     token: string
   ): Promise<HttpTimelineInfo> {
     return axios
-      .post<RawTimelineInfo>(`${apiBaseUrl}/timelines?token=${token}`, req)
+      .post<RawHttpTimelineInfo>(`${apiBaseUrl}/timelines?token=${token}`, req)
       .then(extractResponseData)
       .then(processRawTimelineInfo)
       .catch(convertToIfErrorCodeIs(11040101, HttpTimelineNameConflictError))
@@ -355,7 +357,7 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     token: string
   ): Promise<HttpTimelineInfo> {
     return axios
-      .patch<RawTimelineInfo>(
+      .patch<RawHttpTimelineInfo>(
         `${apiBaseUrl}/timelines/${timelineName}?token=${token}`,
         req
       )

@@ -7,7 +7,7 @@ import { AuthUser } from "@/services/user";
 
 import AdminNav from "./AdminNav";
 import UserAdmin from "./UserAdmin";
-import HighlightTimelineAdmin from "./HighlightTimelineAdmin";
+import MoreAdmin from "./MoreAdmin";
 
 interface AdminProps {
   user: AuthUser;
@@ -32,8 +32,8 @@ const Admin: React.FC<AdminProps> = ({ user }) => {
                 {(() => {
                   if (name === "users") {
                     return <UserAdmin user={user} />;
-                  } else if (name === "highlighttimelines") {
-                    return <HighlightTimelineAdmin user={user} />;
+                  } else if (name === "more") {
+                    return <MoreAdmin user={user} />;
                   }
                 })()}
               </Container>

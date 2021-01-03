@@ -70,7 +70,9 @@ if ("serviceWorker" in navigator) {
       }
     });
 
-    const showSkipWaitingPrompt = (): void => {
+    // Add an event listener to detect when the registered
+    // service worker has installed but is waiting to activate.
+    wb.addEventListener("waiting", (): void => {
       const upgrade = (): void => {
         isThisTriggerUpgrade = true;
         if (registration && registration.waiting) {
@@ -99,12 +101,7 @@ if ("serviceWorker" in navigator) {
         dismissTime: "never",
         type: "success",
       });
-    };
-
-    // Add an event listener to detect when the registered
-    // service worker has installed but is waiting to activate.
-    wb.addEventListener("waiting", showSkipWaitingPrompt);
-    wb.addEventListener("externalwaiting", showSkipWaitingPrompt);
+    });
 
     void wb.register().then((reg) => {
       registration = reg;

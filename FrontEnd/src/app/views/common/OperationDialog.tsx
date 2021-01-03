@@ -172,9 +172,7 @@ const OperationDialog = <
     setStep("process");
     props
       .onProcess(
-        (values as unknown) as MapOperationInputInfoValueTypeList<
-          OperationInputInfoList
-        >
+        (values as unknown) as MapOperationInputInfoValueTypeList<OperationInputInfoList>
       )
       .then(
         (d) => {
@@ -206,9 +204,7 @@ const OperationDialog = <
       const { inputValidator } = props;
       if (inputValidator != null) {
         const result = inputValidator(
-          (values as unknown) as MapOperationInputInfoValueTypeList<
-            OperationInputInfoList
-          >
+          (values as unknown) as MapOperationInputInfoValueTypeList<OperationInputInfoList>
         );
         setInputError(result);
         return isNoError(result);
