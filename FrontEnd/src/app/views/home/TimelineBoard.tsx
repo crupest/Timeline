@@ -18,9 +18,11 @@ interface TimelineBoardItemProps {
   // If not null, will disable navigation on click.
   actions?: {
     onDelete: () => void;
-    onMoveStart: (e: React.PointerEvent) => void;
-    onMoving: (e: React.PointerEvent) => void;
-    onMoveEnd: (e: React.PointerEvent) => void;
+    onMove: {
+      start: (e: React.PointerEvent) => void;
+      moving: (e: React.PointerEvent) => void;
+      end: (e: React.PointerEvent) => void;
+    };
   };
 }
 
@@ -48,22 +50,25 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
       <span className="flex-grow-1"></span>
       {actions != null ? (
         <div className="right">
-          <i className="bi-trash icon-button text-danger px-2" />
+          <i
+            className="bi-trash icon-button text-danger px-2"
+            onClick={actions.onDelete}
+          />
           <i
             className="bi-grip-vertical icon-button text-gray px-2"
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture(e.pointerId);
-              actions.onMoveStart(e);
+              actions.onMove.start(e);
             }}
             onPointerUp={(e) => {
-              actions.onMoveEnd(e);
+              actions.onMove.end(e);
               try {
                 e.currentTarget.releasePointerCapture(e.pointerId);
               } catch (_) {
                 void null;
               }
             }}
-            onPointerMove={actions.onMoving}
+            onPointerMove={actions.onMove.moving}
           />
         </div>
       ) : null}
@@ -92,7 +97,113 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
   );
 };
 
-export interface TimelineBoardUIProps {
+interface TimelineBoardItemContainerProps {
+  timelines: TimelineInfo[];
+  editHandler?: {
+    onMove: (timeline: string, index: number, offset: number) => void;
+    onDelete: (timeline: string) => void;
+  };
+}
+
+const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
+  timelines,
+  editHandler,
+}) => {
+  const [moveState, setMoveState] = React.useState<null | {
+    index: number;
+    offset: number;
+    startPointY: number;
+  }>(null);
+
+  return (
+    <>
+      {timelines.map((timeline, index) => {
+        const height = 48;
+
+        let offset: number | undefined = undefined;
+        let arbitraryOffset: number | undefined = undefined;
+        if (moveState != null) {
+          if (index === moveState.index) {
+            arbitraryOffset = moveState.offset;
+          } else {
+            if (moveState.offset >= 0) {
+              const offsetCount = Math.round(moveState.offset / height);
+              if (
+                index > moveState.index &&
+                index <= moveState.index + offsetCount
+              ) {
+                offset = -1;
+              } else {
+                offset = 0;
+              }
+            } else {
+              const offsetCount = Math.round(-moveState.offset / height);
+              if (
+                index < moveState.index &&
+                index >= moveState.index - offsetCount
+              ) {
+                offset = 1;
+              } else {
+                offset = 0;
+              }
+            }
+          }
+        }
+
+        return (
+          <TimelineBoardItem
+            key={timeline.name}
+            timeline={timeline}
+            offset={offset}
+            arbitraryOffset={arbitraryOffset}
+            actions={
+              editHandler != null
+                ? {
+                    onDelete: () => {
+                      editHandler.onDelete(timeline.name);
+                    },
+                    onMove: {
+                      start: (e) => {
+                        if (moveState != null) return;
+                        setMoveState({
+                          index,
+                          offset: 0,
+                          startPointY: e.clientY,
+                        });
+                      },
+                      moving: (e) => {
+                        if (moveState == null) return;
+                        setMoveState({
+                          index,
+                          offset: e.clientY - moveState.startPointY,
+                          startPointY: moveState.startPointY,
+                        });
+                      },
+                      end: () => {
+                        if (moveState != null) {
+                          const offsetCount = Math.round(
+                            moveState.offset / height
+                          );
+                          editHandler.onMove(
+                            timeline.name,
+                            moveState.index,
+                            offsetCount
+                          );
+                        }
+                        setMoveState(null);
+                      },
+                    },
+                  }
+                : undefined
+            }
+          />
+        );
+      })}
+    </>
+  );
+};
+
+interface TimelineBoardUIProps {
   title?: string;
   timelines: TimelineInfo[] | "offline" | "loading";
   onReload: () => void;
@@ -109,12 +220,6 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
   const editable = editHandler != null;
 
   const [editing, setEditing] = React.useState<boolean>(false);
-
-  const [moveState, setMoveState] = React.useState<null | {
-    index: number;
-    offset: number;
-    startPointY: number;
-  }>(null);
 
   return (
     <div className={clsx("timeline-board", className)}>
@@ -169,86 +274,12 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
             </div>
           );
         } else {
-          return timelines.map((timeline, index) => {
-            const height = 48;
-
-            let offset: number | undefined = undefined;
-            let arbitraryOffset: number | undefined = undefined;
-            if (moveState != null) {
-              if (index === moveState.index) {
-                arbitraryOffset = moveState.offset;
-              } else {
-                if (moveState.offset >= 0) {
-                  const offsetCount = Math.round(moveState.offset / height);
-                  if (
-                    index > moveState.index &&
-                    index <= moveState.index + offsetCount
-                  ) {
-                    offset = -1;
-                  } else {
-                    offset = 0;
-                  }
-                } else {
-                  const offsetCount = Math.round(-moveState.offset / height);
-                  if (
-                    index < moveState.index &&
-                    index >= moveState.index - offsetCount
-                  ) {
-                    offset = 1;
-                  } else {
-                    offset = 0;
-                  }
-                }
-              }
-            }
-
-            return (
-              <TimelineBoardItem
-                key={timeline.name}
-                timeline={timeline}
-                offset={offset}
-                arbitraryOffset={arbitraryOffset}
-                actions={
-                  editHandler != null && editing
-                    ? {
-                        onDelete: () => {
-                          editHandler.onDelete(timeline.name);
-                        },
-                        onMoveStart: (e) => {
-                          if (moveState != null) return;
-                          setMoveState({
-                            index,
-                            offset: 0,
-                            startPointY: e.clientY,
-                          });
-                        },
-                        onMoving: (e) => {
-                          if (moveState == null) return;
-                          setMoveState({
-                            index,
-                            offset: e.clientY - moveState.startPointY,
-                            startPointY: moveState.startPointY,
-                          });
-                        },
-                        onMoveEnd: () => {
-                          if (moveState != null) {
-                            const offsetCount = Math.round(
-                              moveState.offset / height
-                            );
-                            editHandler.onMove(
-                              timeline.name,
-                              moveState.index,
-                              offsetCount
-                            );
-                          }
-                          setMoveState(null);
-                        },
-                      }
-                    : undefined
-                }
-              />
-            );
-          });
+          return (
+            <TimelineBoardItemContainer
+              timelines={timelines}
+              editHandler={editHandler && editing ? editHandler : undefined}
+            />
+          );
         }
       })()}
     </div>
