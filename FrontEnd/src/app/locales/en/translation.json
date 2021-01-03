@@ -106,7 +106,9 @@
         "title": "Confirm Delete",
         "prompt": "Are you sure to delete the post? This operation is not recoverable."
       }
-    }
+    },
+    "addHighlightSuccess": "Succeeded to add highlight.",
+    "addBookmarkSuccess": "Succeeded to add bookmark."
   },
   "user": {
     "username": "username",

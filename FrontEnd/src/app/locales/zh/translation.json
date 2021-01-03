@@ -106,7 +106,9 @@
         "title": "确认删除",
         "prompt": "确定删除这个消息？这个操作不可撤销。"
       }
-    }
+    },
+    "addHighlightSuccess": "成功添加高光。",
+    "addBookmarkSuccess": "成功添加书签。"
   },
   "user": {
     "username": "用户名",
