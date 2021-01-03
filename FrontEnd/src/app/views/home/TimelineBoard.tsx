@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { Spinner } from "react-bootstrap";
 
 import { TimelineInfo } from "@/services/timeline";
@@ -218,6 +218,8 @@ interface TimelineBoardUIProps {
 const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
   const { title, timelines, className, editHandler } = props;
 
+  const { t } = useTranslation();
+
   const editable = editHandler != null;
 
   const [editing, setEditing] = React.useState<boolean>(false);
@@ -226,28 +228,26 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
     <div className={clsx("timeline-board", className)}>
       <div className="timeline-board-header">
         {title != null && <h3>{title}</h3>}
-        {
-          editable &&
-            (editing ? (
-              <div
-                className="flat-button text-primary"
-                onClick={() => {
-                  setEditing(false);
-                }}
-              >
-                Done
-              </div>
-            ) : (
-              <div
-                className="flat-button text-primary"
-                onClick={() => {
-                  setEditing(true);
-                }}
-              >
-                Edit
-              </div>
-            )) // TODO: i18n
-        }
+        {editable &&
+          (editing ? (
+            <div
+              className="flat-button text-primary"
+              onClick={() => {
+                setEditing(false);
+              }}
+            >
+              {t("done")}
+            </div>
+          ) : (
+            <div
+              className="flat-button text-primary"
+              onClick={() => {
+                setEditing(true);
+              }}
+            >
+              {t("edit")}
+            </div>
+          ))}
       </div>
       {(() => {
         if (timelines === "loading") {

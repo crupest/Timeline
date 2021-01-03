@@ -1,6 +1,8 @@
 {
   "welcome": "Welcome!",
   "search": "Search",
+  "edit": "Edit",
+  "done": "Done",
   "loadFailReload": "Load failed, click <1>here</1> to reload.",
   "serviceWorker": {
     "availableOffline": "Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉",
@@ -23,6 +25,7 @@
     "highlightTimeline": "Highlight Timelines",
     "relatedTimeline": "Timelines Related To You",
     "publicTimeline": "Public Timelines",
+    "bookmarkTimeline": "Bookmark Timelines",
     "offlinePrompt": "Oh oh, it seems you are offline. Here list some timelines cached locally. You can view them or click <1>here</1> to refresh.",
     "createButton": "Create Timeline",
     "createDialog": {
