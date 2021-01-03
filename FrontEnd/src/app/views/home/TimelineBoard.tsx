@@ -55,7 +55,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
             onClick={actions.onDelete}
           />
           <i
-            className="bi-grip-vertical icon-button text-gray px-2"
+            className="bi-grip-vertical icon-button text-gray px-2 touch-action-none"
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture(e.pointerId);
               actions.onMove.start(e);
