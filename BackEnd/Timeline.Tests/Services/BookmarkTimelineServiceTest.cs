@@ -85,5 +85,18 @@ namespace Timeline.Tests.Services
             await _service.RemoveBookmark(userId, "t3");
             (await _service.GetBookmarks(userId)).Should().BeEmpty();
         }
+
+        [Fact]
+        public async Task AddExist_Should_DoNothing()
+        {
+            var userId = await _userService.GetUserIdByUsername("user");
+
+            await _timelineService.CreateTimeline("t", userId);
+
+            await _service.AddBookmark(userId, "t");
+            await _service.AddBookmark(userId, "t");
+
+            (await _service.GetBookmarks(userId)).Should().HaveCount(1);
+        }
     }
 }
