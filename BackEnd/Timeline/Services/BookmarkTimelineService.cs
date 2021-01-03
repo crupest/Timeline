@@ -94,6 +94,11 @@ namespace Timeline.Services
 
             var timelineId = await _timelineService.GetTimelineIdByName(timelineName);
 
+            if (await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId) is not null)
+            {
+                return;
+            }
+
             _database.BookmarkTimelines.Add(new BookmarkTimelineEntity
             {
                 TimelineId = timelineId,
