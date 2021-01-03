@@ -3,6 +3,8 @@ import { Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { AuthUser } from "@/services/user";
+import { pushAlert } from "@/services/alert";
+
 import { getHttpHighlightClient } from "@/http/highlight";
 import { getHttpTimelineClient } from "@/http/timeline";
 import { getHttpBookmarkClient } from "@/http/bookmark";
@@ -20,13 +22,36 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
             title={t("home.bookmarkTimeline")}
             load={() => getHttpBookmarkClient().list(user.token)}
             editHandler={{
-              onDelete: () => {
-                // TODO: Implement this.
-                return Promise.resolve();
+              onDelete: (timeline) => {
+                return getHttpBookmarkClient()
+                  .delete(timeline, user.token)
+                  .catch((e) => {
+                    pushAlert({
+                      message: {
+                        type: "i18n",
+                        key: "home.message.deleteBookmarkFail",
+                      },
+                      type: "danger",
+                    });
+                    throw e;
+                  });
               },
-              onMove: () => {
-                // TODO: Implement this.
-                return Promise.resolve();
+              onMove: (timeline, index, offset) => {
+                return getHttpBookmarkClient()
+                  .move(
+                    { timeline, newPosition: index + offset + 1 }, // +1 because backend contract: index starts at 1
+                    user.token
+                  )
+                  .catch((e) => {
+                    pushAlert({
+                      message: {
+                        type: "i18n",
+                        key: "home.message.moveBookmarkFail",
+                      },
+                      type: "danger",
+                    });
+                    throw e;
+                  });
               },
             }}
           />
@@ -48,13 +73,36 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
             editHandler={
               user.hasHighlightTimelineAdministrationPermission
                 ? {
-                    onDelete: () => {
-                      // TODO: Implement this.
-                      return Promise.resolve();
+                    onDelete: (timeline) => {
+                      return getHttpHighlightClient()
+                        .delete(timeline, user.token)
+                        .catch((e) => {
+                          pushAlert({
+                            message: {
+                              type: "i18n",
+                              key: "home.message.deleteHighlightFail",
+                            },
+                            type: "danger",
+                          });
+                          throw e;
+                        });
                     },
-                    onMove: () => {
-                      // TODO: Implement this.
-                      return Promise.resolve();
+                    onMove: (timeline, index, offset) => {
+                      return getHttpHighlightClient()
+                        .move(
+                          { timeline, newPosition: index + offset + 1 }, // +1 because backend contract: index starts at 1
+                          user.token
+                        )
+                        .catch((e) => {
+                          pushAlert({
+                            message: {
+                              type: "i18n",
+                              key: "home.message.moveHighlightFail",
+                            },
+                            type: "danger",
+                          });
+                          throw e;
+                        });
                     },
                   }
                 : undefined
