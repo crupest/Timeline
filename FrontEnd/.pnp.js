@@ -79,7 +79,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-react", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:7.22.0"],
             ["eslint-plugin-react-hooks", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.2.0"],
             ["file-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.0"],
-            ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.5.0"],
+            ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.0.0-beta.2"],
             ["http-server", "npm:0.12.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhttp-server%2Fdownload%2Fhttp-server-0.12.3.tgz"],
             ["i18next", "npm:19.8.4"],
             ["i18next-browser-languagedetector", "npm:6.0.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fi18next-browser-languagedetector%2Fdownload%2Fi18next-browser-languagedetector-6.0.1.tgz"],
@@ -8201,29 +8201,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["html-webpack-plugin", [
-        ["npm:4.5.0", {
-          "packageLocation": "./.yarn/cache/html-webpack-plugin-npm-4.5.0-a74a71941d-df4dd38bd8.zip/node_modules/html-webpack-plugin/",
+        ["npm:5.0.0-beta.2", {
+          "packageLocation": "./.yarn/cache/html-webpack-plugin-npm-5.0.0-beta.2-eee0c2c6f4-028abbdedf.zip/node_modules/html-webpack-plugin/",
           "packageDependencies": [
-            ["html-webpack-plugin", "npm:4.5.0"]
+            ["html-webpack-plugin", "npm:5.0.0-beta.2"]
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.5.0", {
-          "packageLocation": "./.yarn/$$virtual/html-webpack-plugin-virtual-2b27d71d56/0/cache/html-webpack-plugin-npm-4.5.0-a74a71941d-df4dd38bd8.zip/node_modules/html-webpack-plugin/",
+        ["virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.0.0-beta.2", {
+          "packageLocation": "./.yarn/$$virtual/html-webpack-plugin-virtual-ac2869c51e/0/cache/html-webpack-plugin-npm-5.0.0-beta.2-eee0c2c6f4-028abbdedf.zip/node_modules/html-webpack-plugin/",
           "packageDependencies": [
-            ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.5.0"],
+            ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.0.0-beta.2"],
             ["@types/html-minifier-terser", "npm:5.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fhtml-minifier-terser%2Fdownload%2F%40types%2Fhtml-minifier-terser-5.1.0.tgz"],
-            ["@types/tapable", "npm:1.0.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Ftapable%2Fdownload%2F%40types%2Ftapable-1.0.6.tgz"],
-            ["@types/webpack", "npm:4.41.21::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwebpack%2Fdownload%2F%40types%2Fwebpack-4.41.21.tgz"],
+            ["@types/webpack", null],
             ["html-minifier-terser", "npm:5.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhtml-minifier-terser%2Fdownload%2Fhtml-minifier-terser-5.1.1.tgz"],
-            ["loader-utils", "npm:1.4.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Floader-utils%2Fdownload%2Floader-utils-1.4.0.tgz"],
-            ["lodash", "npm:4.17.19::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash%2Fdownload%2Flodash-4.17.19.tgz"],
+            ["loader-utils", "npm:2.0.0"],
+            ["lodash", "npm:4.17.20::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash%2Fdownload%2Flodash-4.17.20.tgz"],
             ["pretty-error", "npm:2.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fpretty-error%2Fdownload%2Fpretty-error-2.1.1.tgz"],
-            ["tapable", "npm:1.1.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Ftapable%2Fdownload%2Ftapable-1.1.3.tgz"],
-            ["util.promisify", "npm:1.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Futil.promisify%2Fdownload%2Futil.promisify-1.0.0.tgz"],
+            ["tapable", "npm:2.0.0"],
             ["webpack", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.11.1"]
           ],
           "packagePeers": [
+            "@types/webpack",
             "webpack"
           ],
           "linkType": "HARD",
@@ -9460,6 +9459,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/loader-utils-npm-2.0.0-cf7d5aadbf-a1c2e48781.zip/node_modules/loader-utils/",
+          "packageDependencies": [
+            ["loader-utils", "npm:2.0.0"],
+            ["big.js", "npm:5.2.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fbig.js%2Fdownload%2Fbig.js-5.2.2.tgz"],
+            ["emojis-list", "npm:3.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Femojis-list%2Fdownload%2Femojis-list-3.0.0.tgz"],
+            ["json5", "npm:2.1.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fjson5%2Fdownload%2Fjson5-2.1.3.tgz"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:2.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Floader-utils%2Fdownload%2Floader-utils-2.0.0.tgz", {
           "packageLocation": "./.yarn/cache/loader-utils-npm-2.0.0-bb7bf40a1d-a1c2e48781.zip/node_modules/loader-utils/",
           "packageDependencies": [
@@ -10452,17 +10461,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["es-abstract", "npm:1.17.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fes-abstract%2Fdownload%2Fes-abstract-1.17.6.tgz"],
             ["function-bind", "npm:1.1.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Ffunction-bind%2Fdownload%2Ffunction-bind-1.1.1.tgz"],
             ["has", "npm:1.0.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhas%2Fdownload%2Fhas-1.0.3.tgz"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["object.getownpropertydescriptors", [
-        ["npm:2.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fobject.getownpropertydescriptors%2Fdownload%2Fobject.getownpropertydescriptors-2.1.0.tgz", {
-          "packageLocation": "./.yarn/cache/object.getownpropertydescriptors-npm-2.1.0-ec838cd170-c33dcc3061.zip/node_modules/object.getownpropertydescriptors/",
-          "packageDependencies": [
-            ["object.getownpropertydescriptors", "npm:2.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fobject.getownpropertydescriptors%2Fdownload%2Fobject.getownpropertydescriptors-2.1.0.tgz"],
-            ["define-properties", "npm:1.1.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdefine-properties%2Fdownload%2Fdefine-properties-1.1.3.tgz"],
-            ["es-abstract", "npm:1.17.6::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fes-abstract%2Fdownload%2Fes-abstract-1.17.6.tgz"]
           ],
           "linkType": "HARD",
         }]
@@ -14041,7 +14039,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-react", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:7.22.0"],
             ["eslint-plugin-react-hooks", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.2.0"],
             ["file-loader", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:6.2.0"],
-            ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:4.5.0"],
+            ["html-webpack-plugin", "virtual:71f98ed0939a4e8e7ea376e302a494701bc5b6aa7a7eb81870139ee3950a7c417a3d13b346b5b526d93952a598dffe628a0fac2148047debade23536cb3d7957#npm:5.0.0-beta.2"],
             ["http-server", "npm:0.12.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fhttp-server%2Fdownload%2Fhttp-server-0.12.3.tgz"],
             ["i18next", "npm:19.8.4"],
             ["i18next-browser-languagedetector", "npm:6.0.1::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fi18next-browser-languagedetector%2Fdownload%2Fi18next-browser-languagedetector-6.0.1.tgz"],
@@ -14620,17 +14618,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/util-deprecate-npm-1.0.2-77cb133271-73c2b1cf02.zip/node_modules/util-deprecate/",
           "packageDependencies": [
             ["util-deprecate", "npm:1.0.2::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Futil-deprecate%2Fdownload%2Futil-deprecate-1.0.2.tgz"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["util.promisify", [
-        ["npm:1.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Futil.promisify%2Fdownload%2Futil.promisify-1.0.0.tgz", {
-          "packageLocation": "./.yarn/cache/util.promisify-npm-1.0.0-5303b5a40d-0dffbe1af6.zip/node_modules/util.promisify/",
-          "packageDependencies": [
-            ["util.promisify", "npm:1.0.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Futil.promisify%2Fdownload%2Futil.promisify-1.0.0.tgz"],
-            ["define-properties", "npm:1.1.3::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fdefine-properties%2Fdownload%2Fdefine-properties-1.1.3.tgz"],
-            ["object.getownpropertydescriptors", "npm:2.1.0::__archiveUrl=https%3A%2F%2Fregistry.npm.taobao.org%2Fobject.getownpropertydescriptors%2Fdownload%2Fobject.getownpropertydescriptors-2.1.0.tgz"]
           ],
           "linkType": "HARD",
         }]
