@@ -125,7 +125,10 @@ export default function TimelinePageTemplate<TManageItem>(
                     .put(name, user.token)
                     .then(() => {
                       pushAlert({
-                        message: "Succeeded to add bookmark!", // TODO: i18n
+                        message: {
+                          type: "i18n",
+                          key: "timeline.addBookmarkSuccess",
+                        },
                         type: "success",
                       });
                     });
@@ -138,7 +141,10 @@ export default function TimelinePageTemplate<TManageItem>(
                     .put(name, user.token)
                     .then(() => {
                       pushAlert({
-                        message: "Succeeded to add highlight!", // TODO: i18n
+                        message: {
+                          type: "i18n",
+                          key: "timeline.addHighlightSuccess",
+                        },
                         type: "success",
                       });
                     });
