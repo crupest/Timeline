@@ -1,6 +1,8 @@
 {
   "welcome": "Welcome!",
   "search": "Search",
+  "edit": "Edit",
+  "done": "Done",
   "loadFailReload": "Load failed, click <1>here</1> to reload.",
   "serviceWorker": {
     "availableOffline": "Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉",
@@ -20,10 +22,17 @@
   "loadImageError": "Failed to load image.",
   "home": {
     "go": "Go!",
-    "allTimeline": "All Timelines",
-    "joinTimeline": "Joined Timelines",
-    "ownTimeline": "Owned Timelines",
+    "highlightTimeline": "Highlight Timelines",
+    "relatedTimeline": "Timelines Related To You",
+    "publicTimeline": "Public Timelines",
+    "bookmarkTimeline": "Bookmark Timelines",
     "offlinePrompt": "Oh oh, it seems you are offline. Here list some timelines cached locally. You can view them or click <1>here</1> to refresh.",
+    "message": {
+      "moveHighlightFail": "Failed to move highlight timeline.",
+      "deleteHighlightFail": "Failed to delete highlight timeline.",
+      "moveBookmarkFail": "Failed to move bookmark timeline.",
+      "deleteBookmarkFail": "Failed to delete bookmark timeline."
+    },
     "createButton": "Create Timeline",
     "createDialog": {
       "title": "Create Timeline!",
@@ -97,7 +106,9 @@
         "title": "Confirm Delete",
         "prompt": "Are you sure to delete the post? This operation is not recoverable."
       }
-    }
+    },
+    "addHighlightSuccess": "Succeeded to add highlight.",
+    "addBookmarkSuccess": "Succeeded to add bookmark."
   },
   "user": {
     "username": "username",

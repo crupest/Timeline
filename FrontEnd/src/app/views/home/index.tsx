@@ -33,7 +33,7 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <Container fluid>
+      <Container>
         <Row className="my-3 justify-content-center">
           <Col xs={12} sm={8} lg={6}>
             <SearchInput

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
-import InlineSVG from "react-inlinesvg";
-import PencilSquareIcon from "bootstrap-icons/icons/pencil-square.svg";
 
 import OperationDialog, {
   OperationBoolInputInfo,
@@ -62,10 +60,9 @@ const UsernameLabel: React.FC = (props) => {
   return <span style={{ color: "blue" }}>{props.children}</span>;
 };
 
-const UserDeleteDialog: React.FC<DialogProps<
-  { username: string },
-  unknown
->> = ({ open, close, token, data: { username }, onSuccess }) => {
+const UserDeleteDialog: React.FC<
+  DialogProps<{ username: string }, unknown>
+> = ({ open, close, token, data: { username }, onSuccess }) => {
   return (
     <OperationDialog
       open={open}
@@ -83,12 +80,14 @@ const UserDeleteDialog: React.FC<DialogProps<
   );
 };
 
-const UserModifyDialog: React.FC<DialogProps<
-  {
-    oldUser: HttpUser;
-  },
-  HttpUser
->> = ({ open, close, token, data: { oldUser }, onSuccess }) => {
+const UserModifyDialog: React.FC<
+  DialogProps<
+    {
+      oldUser: HttpUser;
+    },
+    HttpUser
+  >
+> = ({ open, close, token, data: { oldUser }, onSuccess }) => {
   return (
     <OperationDialog
       open={open}
@@ -131,13 +130,15 @@ const UserModifyDialog: React.FC<DialogProps<
   );
 };
 
-const UserPermissionModifyDialog: React.FC<DialogProps<
-  {
-    username: string;
-    permissions: UserPermission[];
-  },
-  UserPermission[]
->> = ({ open, close, token, data: { username, permissions }, onSuccess }) => {
+const UserPermissionModifyDialog: React.FC<
+  DialogProps<
+    {
+      username: string;
+      permissions: UserPermission[];
+    },
+    UserPermission[]
+  >
+> = ({ open, close, token, data: { username, permissions }, onSuccess }) => {
   const oldPermissionBoolList: boolean[] = kUserPermissionList.map(
     (permission) => permissions.includes(permission)
   );
@@ -217,9 +218,8 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
 
   return (
     <ListGroup.Item className="admin-user-item">
-      <InlineSVG
-        src={PencilSquareIcon}
-        className="float-right icon-button text-warning"
+      <i
+        className="bi-pencil-square float-right icon-button text-warning"
         onClick={() => setEditMaskVisible(true)}
       />
       <h4 className="text-primary">{user.username}</h4>

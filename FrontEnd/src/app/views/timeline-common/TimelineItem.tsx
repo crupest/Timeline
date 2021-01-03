@@ -2,9 +2,6 @@ import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import Svg from "react-inlinesvg";
-import chevronDownIcon from "bootstrap-icons/icons/chevron-down.svg";
-import trashIcon from "bootstrap-icons/icons/trash.svg";
 import { Modal, Button } from "react-bootstrap";
 
 import { useAvatar } from "@/services/user";
@@ -98,9 +95,8 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             <small className="text-dark">{props.post.author.nickname}</small>
           </span>
           {more != null ? (
-            <Svg
-              src={chevronDownIcon}
-              className="text-info icon-button"
+            <i
+              className="bi-chevron-down text-info icon-button"
               onClick={(e) => {
                 more.toggle();
                 e.stopPropagation();
@@ -139,9 +135,8 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
             onClick={more.toggle}
           >
-            <Svg
-              src={trashIcon}
-              className="text-danger icon-button large"
+            <i
+              className="bi-trash text-danger icon-button large"
               onClick={(e) => {
                 setDeleteDialog(true);
                 e.stopPropagation();
