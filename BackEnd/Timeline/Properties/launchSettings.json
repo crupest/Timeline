@@ -1,19 +1,19 @@
 {
   "profiles": {
-    "Development": {
+    "Dev": {
       "commandName": "Project",
       "applicationUrl": "http://0.0.0.0:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_USEPROXYFRONTEND": "true",
+        "ASPNETCORE_FRONTEND": "Proxy",
         "ASPNETCORE_WORKDIR": "D:\\timeline-development"
       }
     },
-    "Development-Mock": {
+    "Dev-Mock": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_USEMOCKFRONTEND": "true",
+        "ASPNETCORE_FRONTEND": "Mock",
         "ASPNETCORE_WORKDIR": "D:\\timeline-development"
       }
     },
