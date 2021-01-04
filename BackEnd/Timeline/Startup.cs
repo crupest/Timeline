@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using System;
@@ -29,16 +28,27 @@ namespace Timeline
 {
     public class Startup
     {
-        private readonly bool disableFrontEnd;
-        private readonly bool useMockFrontEnd;
+        private readonly FrontEndMode _frontEndMode;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Environment = environment;
             Configuration = configuration;
 
-            disableFrontEnd = Configuration.GetValue<bool?>(ApplicationConfiguration.DisableFrontEndKey) ?? false;
-            useMockFrontEnd = Configuration.GetValue<bool?>(ApplicationConfiguration.UseMockFrontEndKey) ?? false;
+            var frontEndModeString = Configuration.GetValue<string?>(ApplicationConfiguration.FrontEndKey);
+
+            if (frontEndModeString is null)
+            {
+                _frontEndMode = FrontEndMode.Normal;
+            }
+            else
+            {
+                if (!Enum.TryParse(frontEndModeString, true, out _frontEndMode))
+                {
+                    _frontEndMode = FrontEndMode.Normal;
+                    Console.WriteLine("Unknown FrontEnd configuaration value '{0}', fallback to normal.", frontEndModeString);
+                }
+            }
         }
 
         public IWebHostEnvironment Environment { get; }
@@ -130,23 +140,20 @@ namespace Timeline
                 document.OperationProcessors.Add(new ByteDataRequestOperationProcessor());
             });
 
-            if (!disableFrontEnd)
+            if (_frontEndMode == FrontEndMode.Mock)
             {
-                if (useMockFrontEnd)
+                services.AddSpaStaticFiles(config =>
                 {
-                    services.AddSpaStaticFiles(config =>
-                    {
-                        config.RootPath = "MockClientApp";
-                    });
+                    config.RootPath = "MockClientApp";
+                });
 
-                }
-                else if (!Environment.IsDevelopment()) // In development, we don't want to serve dist. Or it will take precedence than front end dev server.
+            }
+            else if (_frontEndMode == FrontEndMode.Normal)
+            {
+                services.AddSpaStaticFiles(config =>
                 {
-                    services.AddSpaStaticFiles(config =>
-                    {
-                        config.RootPath = "ClientApp";
-                    });
-                }
+                    config.RootPath = "ClientApp";
+                });
             }
         }
 
@@ -156,7 +163,7 @@ namespace Timeline
         {
             app.UseRouting();
 
-            if (!disableFrontEnd && (useMockFrontEnd || !Environment.IsDevelopment()))
+            if (_frontEndMode == FrontEndMode.Mock || _frontEndMode == FrontEndMode.Normal)
             {
                 app.UseSpaStaticFiles(new StaticFileOptions
                 {
@@ -177,11 +184,11 @@ namespace Timeline
 
             UnknownEndpointMiddleware.Attach(app);
 
-            if (!disableFrontEnd)
+            if (_frontEndMode != FrontEndMode.Disable)
             {
                 app.UseSpa(spa =>
                 {
-                    if (!useMockFrontEnd && (Configuration.GetValue<bool?>(ApplicationConfiguration.UseProxyFrontEndKey) ?? false))
+                    if (_frontEndMode == FrontEndMode.Proxy)
                     {
                         spa.UseProxyToSpaDevelopmentServer(new UriBuilder("http", "localhost", 3000).Uri);
                     }
