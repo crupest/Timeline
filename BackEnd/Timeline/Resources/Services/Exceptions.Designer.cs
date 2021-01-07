@@ -160,7 +160,7 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request timeline name is &quot;{0}&quot;.  Request timeline post id is &quot;{1}&quot;..
+        ///   Looks up a localized string similar to Request timeline id is &quot;{0}&quot;.  Request timeline post id is &quot;{1}&quot;..
         /// </summary>
         internal static string TimelinePostNotExistException {
             get {
@@ -169,7 +169,7 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request timeline name is &quot;{0}&quot;.  Request timeline post id is &quot;{1}&quot;. The post does not exist because it is deleted..
+        ///   Looks up a localized string similar to Request timeline id is &quot;{0}&quot;.  Request timeline post id is &quot;{1}&quot;. The post does not exist because it is deleted..
         /// </summary>
         internal static string TimelinePostNotExistExceptionDeleted {
             get {

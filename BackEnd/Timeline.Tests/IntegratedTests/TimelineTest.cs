@@ -21,11 +21,7 @@ namespace Timeline.Tests.IntegratedTests
     {
         public static HttpTimelinePostContent TextPostContent(string text)
         {
-            return new HttpTimelinePostContent
-            {
-                Type = "text",
-                Text = text
-            };
+            return new HttpTimelinePostContent("text", text, null, null);
         }
 
         public static HttpTimelinePostCreateRequest TextPostCreateRequest(string text, DateTime? time = null)
@@ -261,15 +257,15 @@ namespace Timeline.Tests.IntegratedTests
                 using var client = await CreateClientAsAdministrator();
 
                 await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
-                await client.TestDeleteAsync("timelines/t2", true);
-                await client.TestDeleteAsync("timelines/t2", false);
+                await client.TestDeleteAsync("timelines/t2");
+                await client.TestDeleteAssertErrorAsync("timelines/t2");
             }
 
             {
                 using var client = await CreateClientAs(1);
 
                 await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
-                await client.TestDeleteAsync("timelines/t1", true);
+                await client.TestDeleteAsync("timelines/t1");
                 await client.TestDeleteAssertErrorAsync("timelines/t1");
             }
         }
@@ -355,13 +351,13 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             await AssertEmptyMembers();
-            await client.TestPutAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.TimelineController.MemberPut_NotExist);
+            await client.TestPutAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.UserCommon.NotExist);
             await AssertEmptyMembers();
             await client.PutTimelineMemberAsync(timelineName, "user2");
             await AssertMembers(new List<HttpUser> { await client.GetUserAsync("user2") });
             await client.DeleteTimelineMemberAsync(timelineName, "user2", true);
             await AssertEmptyMembers();
-            await client.DeleteTimelineMemberAsync(timelineName, "aaa", false);
+            await client.TestDeleteAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.UserCommon.NotExist);
             await AssertEmptyMembers();
         }
 
@@ -549,9 +545,9 @@ namespace Timeline.Tests.IntegratedTests
                 body.Should().BeEquivalentTo(createRes, createRes2);
             }
             {
-                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{createRes.Id}", true);
-                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{createRes.Id}", false);
-                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/30000", false);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{createRes.Id}");
+                await client.TestDeleteAssertErrorAsync($"timelines/{generator(1)}/posts/{createRes.Id}");
+                await client.TestDeleteAssertErrorAsync($"timelines/{generator(1)}/posts/30000");
             }
             {
                 var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
@@ -651,8 +647,8 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             await CacheTestHelper.TestCache(client, $"timelines/{generator(1)}/posts/{postId}/data");
-            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}", true);
-            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}", false);
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{postId}");
+            await client.TestDeleteAssertErrorAsync($"timelines/{generator(1)}/posts/{postId}");
 
             {
                 var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts");
@@ -736,7 +732,7 @@ namespace Timeline.Tests.IntegratedTests
                 await Task.Delay(1000);
             }
 
-            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}", true);
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}");
 
             {
                 var body = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture) }");
@@ -763,7 +759,7 @@ namespace Timeline.Tests.IntegratedTests
 
             foreach (var id in new long[] { posts[0].Id, posts[2].Id })
             {
-                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{id}", true);
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{id}");
             }
 
             {
@@ -791,7 +787,7 @@ namespace Timeline.Tests.IntegratedTests
                 await Task.Delay(1000);
             }
 
-            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}", true);
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}");
 
             {
 

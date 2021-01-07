@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Helpers;
-using Timeline.Models;
 using Timeline.Models.Http;
+using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using Timeline.Services.Exceptions;
@@ -42,8 +41,6 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
-        private HttpUser ConvertToUserInfo(UserInfo user) => _mapper.Map<HttpUser>(user);
-
         private bool UserHasUserManagementPermission => this.UserHasPermission(UserPermission.UserManagement);
 
         /// <summary>
@@ -55,7 +52,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<HttpUser[]>> List()
         {
             var users = await _userService.GetUsers();
-            var result = users.Select(u => ConvertToUserInfo(u)).ToArray();
+            var result = users.MapToHttp(Url);
             return Ok(result);
         }
 
@@ -73,7 +70,7 @@ namespace Timeline.Controllers
             {
                 var id = await _userService.GetUserIdByUsername(username);
                 var user = await _userService.GetUser(id);
-                return Ok(ConvertToUserInfo(user));
+                return Ok(user.MapToHttp(Url));
             }
             catch (UserNotExistException e)
             {
@@ -102,7 +99,7 @@ namespace Timeline.Controllers
                 {
                     var id = await _userService.GetUserIdByUsername(username);
                     var user = await _userService.ModifyUser(id, _mapper.Map<ModifyUserParams>(body));
-                    return Ok(ConvertToUserInfo(user));
+                    return Ok(user.MapToHttp(Url));
                 }
                 catch (UserNotExistException e)
                 {
@@ -129,7 +126,7 @@ namespace Timeline.Controllers
                         ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Password));
 
                 var user = await _userService.ModifyUser(this.GetUserId(), _mapper.Map<ModifyUserParams>(body));
-                return Ok(ConvertToUserInfo(user));
+                return Ok(user.MapToHttp(Url));
             }
         }
 
@@ -173,7 +170,7 @@ namespace Timeline.Controllers
             try
             {
                 var user = await _userService.CreateUser(body.Username, body.Password);
-                return Ok(ConvertToUserInfo(user));
+                return Ok(user.MapToHttp(Url));
             }
             catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
             {
