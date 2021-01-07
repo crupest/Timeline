@@ -115,7 +115,7 @@ namespace Timeline.Services
 
         public async Task<UserEntity> GetUser(long id)
         {
-            var user = await _databaseContext.Users.Where(u => u.Id == id).Include(u => u.Permissions).SingleOrDefaultAsync();
+            var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
             if (user == null)
                 throw new UserNotExistException(id);
@@ -125,7 +125,7 @@ namespace Timeline.Services
 
         public async Task<List<UserEntity>> GetUsers()
         {
-            return await _databaseContext.Users.Include(u => u.Permissions).ToListAsync();
+            return await _databaseContext.Users.ToListAsync();
         }
 
         public async Task<UserEntity> CreateUser(string username, string password)
@@ -153,8 +153,6 @@ namespace Timeline.Services
 
             _logger.LogInformation(Log.Format(LogDatabaseCreate, ("Id", newEntity.Id), ("Username", username)));
 
-            await _databaseContext.Entry(newEntity).Collection(e => e.Permissions).LoadAsync();
-
             return newEntity;
         }
 
@@ -172,7 +170,7 @@ namespace Timeline.Services
                     CheckNicknameFormat(param.Nickname, nameof(param));
             }
 
-            var entity = await _databaseContext.Users.Where(u => u.Id == id).Include(u => u.Permissions).SingleOrDefaultAsync();
+            var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
             if (entity == null)
                 throw new UserNotExistException(id);
 

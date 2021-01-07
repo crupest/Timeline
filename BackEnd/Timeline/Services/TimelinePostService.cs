@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
@@ -166,12 +165,12 @@ namespace Timeline.Services
 
             if (modifiedSince.HasValue)
             {
-                query = query.Include(p => p.Author).Where(p => p.LastUpdated >= modifiedSince || (p.Author != null && p.Author.UsernameChangeTime >= modifiedSince));
+                query = query.Where(p => p.LastUpdated >= modifiedSince || (p.Author != null && p.Author.UsernameChangeTime >= modifiedSince));
             }
 
             query = query.OrderBy(p => p.Time);
 
-            return await query.Include(p => p.Author!.Permissions).ToListAsync();
+            return await query.ToListAsync();
         }
 
         public async Task<string> GetPostDataETag(long timelineId, long postId)
@@ -270,8 +269,6 @@ namespace Timeline.Services
             _database.TimelinePosts.Add(postEntity);
             await _database.SaveChangesAsync();
 
-            await _database.Entry(postEntity).Reference(p => p.Author).Query().Include(a => a.Permissions).LoadAsync();
-
             return postEntity;
         }
 
@@ -312,8 +309,6 @@ namespace Timeline.Services
             };
             _database.TimelinePosts.Add(postEntity);
             await _database.SaveChangesAsync();
-
-            await _database.Entry(postEntity).Reference(p => p.Author).Query().Include(a => a.Permissions).LoadAsync();
 
             return postEntity;
         }

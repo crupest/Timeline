@@ -19,11 +19,13 @@ namespace Timeline.Controllers
     {
         private readonly IBookmarkTimelineService _service;
         private readonly ITimelineService _timelineService;
+        private readonly TimelineMapper _timelineMapper;
 
-        public BookmarkTimelineController(IBookmarkTimelineService service, ITimelineService timelineService)
+        public BookmarkTimelineController(IBookmarkTimelineService service, ITimelineService timelineService, TimelineMapper timelineMapper)
         {
             _service = service;
             _timelineService = timelineService;
+            _timelineMapper = timelineMapper;
         }
 
         /// <summary>
@@ -38,7 +40,7 @@ namespace Timeline.Controllers
         {
             var ids = await _service.GetBookmarks(this.GetUserId());
             var timelines = await _timelineService.GetTimelineList(ids);
-            return Ok(timelines.MapToHttp(Url));
+            return await _timelineMapper.MapToHttp(timelines, Url);
         }
 
         /// <summary>

@@ -30,16 +30,18 @@ namespace Timeline.Controllers
         private readonly ITimelineService _service;
         private readonly ITimelinePostService _postService;
 
+        private readonly TimelineMapper _timelineMapper;
         private readonly IMapper _mapper;
 
         /// <summary>
         /// 
         /// </summary>
-        public TimelineController(IUserService userService, ITimelineService service, ITimelinePostService timelinePostService, IMapper mapper)
+        public TimelineController(IUserService userService, ITimelineService service, ITimelinePostService timelinePostService, TimelineMapper timelineMapper, IMapper mapper)
         {
             _userService = userService;
             _service = service;
             _postService = timelinePostService;
+            _timelineMapper = timelineMapper;
             _mapper = mapper;
         }
 
@@ -107,7 +109,7 @@ namespace Timeline.Controllers
             }
 
             var timelines = await _service.GetTimelines(relationship, visibilityFilter);
-            var result = timelines.MapToHttp(Url);
+            var result = await _timelineMapper.MapToHttp(timelines, Url);
             return result;
         }
 
@@ -166,7 +168,7 @@ namespace Timeline.Controllers
             else
             {
                 var t = await _service.GetTimeline(timelineId);
-                var result = t.MapToHttp(Url);
+                var result = await _timelineMapper.MapToHttp(t, Url);
                 return result;
             }
         }
@@ -193,7 +195,7 @@ namespace Timeline.Controllers
 
             var posts = await _postService.GetPosts(timelineId, modifiedSince, includeDeleted ?? false);
 
-            var result = posts.MapToHttp(timeline, Url);
+            var result = await _timelineMapper.MapToHttp(posts, timeline, Url);
             return result;
         }
 
@@ -304,7 +306,7 @@ namespace Timeline.Controllers
                 return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ContentUnknownType));
             }
 
-            var result = post.MapToHttp(timeline, Url);
+            var result = await _timelineMapper.MapToHttp(post, timeline, Url);
             return result;
         }
 
@@ -361,7 +363,7 @@ namespace Timeline.Controllers
             }
             await _service.ChangeProperty(timelineId, _mapper.Map<TimelineChangePropertyParams>(body));
             var t = await _service.GetTimeline(timelineId);
-            var result = t.MapToHttp(Url);
+            var result = await _timelineMapper.MapToHttp(t, Url);
             return result;
         }
 
@@ -446,7 +448,7 @@ namespace Timeline.Controllers
             try
             {
                 var timeline = await _service.CreateTimeline(body.Name, userId);
-                var result = timeline.MapToHttp(Url);
+                var result = await _timelineMapper.MapToHttp(timeline, Url);
                 return result;
             }
             catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.Timeline)
@@ -505,7 +507,7 @@ namespace Timeline.Controllers
             {
                 await _service.ChangeTimelineName(timelineId, body.NewName);
                 var timeline = await _service.GetTimeline(timelineId);
-                return Ok(timeline.MapToHttp(Url));
+                return await _timelineMapper.MapToHttp(timeline, Url);
             }
             catch (EntityAlreadyExistException)
             {

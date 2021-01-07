@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Timeline.Models.Http
+﻿namespace Timeline.Models.Http
 {
     /// <summary>
     /// All error code constants.

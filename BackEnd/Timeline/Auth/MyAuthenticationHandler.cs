@@ -32,12 +32,14 @@ namespace Timeline.Auth
     {
         private readonly ILogger<MyAuthenticationHandler> _logger;
         private readonly IUserTokenManager _userTokenManager;
+        private readonly IUserPermissionService _userPermissionService;
 
-        public MyAuthenticationHandler(IOptionsMonitor<MyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserTokenManager userTokenManager)
+        public MyAuthenticationHandler(IOptionsMonitor<MyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserTokenManager userTokenManager, IUserPermissionService userPermissionService)
             : base(options, logger, encoder, clock)
         {
             _logger = logger.CreateLogger<MyAuthenticationHandler>();
             _userTokenManager = userTokenManager;
+            _userPermissionService = userPermissionService;
         }
 
         // return null if no token is found
@@ -84,7 +86,9 @@ namespace Timeline.Auth
                 var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
                 identity.AddClaim(new Claim(identity.NameClaimType, user.Username, ClaimValueTypes.String));
-                identity.AddClaims(user.Permissions.Select(permission => new Claim(AuthenticationConstants.PermissionClaimName, permission.Permission, ClaimValueTypes.String)));
+
+                var permissions = await _userPermissionService.GetPermissionsOfUserAsync(user.Id);
+                identity.AddClaims(permissions.Select(permission => new Claim(AuthenticationConstants.PermissionClaimName, permission.ToString(), ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
                 principal.AddIdentity(identity);
