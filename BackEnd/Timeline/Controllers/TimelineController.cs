@@ -109,7 +109,7 @@ namespace Timeline.Controllers
             }
 
             var timelines = await _service.GetTimelines(relationship, visibilityFilter);
-            var result = await _timelineMapper.MapToHttp(timelines, Url);
+            var result = await _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId());
             return result;
         }
 
@@ -168,7 +168,7 @@ namespace Timeline.Controllers
             else
             {
                 var t = await _service.GetTimeline(timelineId);
-                var result = await _timelineMapper.MapToHttp(t, Url);
+                var result = await _timelineMapper.MapToHttp(t, Url, this.GetOptionalUserId());
                 return result;
             }
         }
@@ -363,7 +363,7 @@ namespace Timeline.Controllers
             }
             await _service.ChangeProperty(timelineId, _mapper.Map<TimelineChangePropertyParams>(body));
             var t = await _service.GetTimeline(timelineId);
-            var result = await _timelineMapper.MapToHttp(t, Url);
+            var result = await _timelineMapper.MapToHttp(t, Url, this.GetOptionalUserId());
             return result;
         }
 
@@ -448,7 +448,7 @@ namespace Timeline.Controllers
             try
             {
                 var timeline = await _service.CreateTimeline(body.Name, userId);
-                var result = await _timelineMapper.MapToHttp(timeline, Url);
+                var result = await _timelineMapper.MapToHttp(timeline, Url, this.GetOptionalUserId());
                 return result;
             }
             catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.Timeline)
@@ -507,7 +507,7 @@ namespace Timeline.Controllers
             {
                 await _service.ChangeTimelineName(timelineId, body.NewName);
                 var timeline = await _service.GetTimeline(timelineId);
-                return await _timelineMapper.MapToHttp(timeline, Url);
+                return await _timelineMapper.MapToHttp(timeline, Url, this.GetOptionalUserId());
             }
             catch (EntityAlreadyExistException)
             {
