@@ -8,8 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NSwag;
-using NSwag.Generation.Processors.Security;
 using System;
 using System.ComponentModel;
 using System.Net.Mime;
@@ -99,6 +97,12 @@ namespace Timeline
             services.AddScoped<IDataManager, DataManager>();
             services.AddScoped<IImageValidator, ImageValidator>();
 
+            services.AddDbContext<DatabaseContext>((services, options) =>
+            {
+                var pathProvider = services.GetRequiredService<IPathProvider>();
+                options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
+            });
+
             services.AddTransient<IPasswordService, PasswordService>();
             services.AddScoped<IBasicUserService, BasicUserService>();
             services.AddScoped<IUserService, UserService>();
@@ -116,31 +120,7 @@ namespace Timeline
             services.AddScoped<IHighlightTimelineService, HighlightTimelineService>();
             services.AddScoped<IBookmarkTimelineService, BookmarkTimelineService>();
 
-            services.AddDbContext<DatabaseContext>((services, options) =>
-            {
-                var pathProvider = services.GetRequiredService<IPathProvider>();
-                options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
-            });
-
-            services.AddSwaggerDocument(document =>
-            {
-                document.DocumentName = "Timeline";
-                document.Title = "Timeline REST API Reference";
-                document.Version = typeof(Startup).Assembly.GetName().Version?.ToString() ?? "unknown version";
-                document.DocumentProcessors.Add(new DocumentDescriptionDocumentProcessor());
-                document.DocumentProcessors.Add(
-                    new SecurityDefinitionAppender("JWT",
-                    new OpenApiSecurityScheme
-                    {
-                        Type = OpenApiSecuritySchemeType.ApiKey,
-                        Name = "Authorization",
-                        In = OpenApiSecurityApiKeyLocation.Header,
-                        Description = "Create token via `/api/token/create` ."
-                    }));
-                document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
-                document.OperationProcessors.Add(new DefaultDescriptionOperationProcessor());
-                document.OperationProcessors.Add(new ByteDataRequestOperationProcessor());
-            });
+            services.AddOpenApiDocs();
 
             if (_frontEndMode == FrontEndMode.Mock)
             {
