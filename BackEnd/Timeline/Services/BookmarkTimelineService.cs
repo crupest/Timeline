@@ -34,6 +34,18 @@ namespace Timeline.Services
         Task<List<long>> GetBookmarks(long userId);
 
         /// <summary>
+        /// Check if a timeline is a bookmark.
+        /// </summary>
+        /// <param name="userId">The user id.</param>
+        /// <param name="timelineId">Timeline id.</param>
+        /// <param name="checkUserExistence">If true it will throw when user does not exist.</param>
+        /// <param name="checkTimelineExistence">If true it will throw when timeline does not exist.</param>
+        /// <returns>True if timeline is a bookmark. Otherwise false.</returns>
+        /// <exception cref="UserNotExistException">Throw if user does not exist and <paramref name="checkUserExistence"/> is true.</exception>
+        /// <exception cref="TimelineNotExistException">Thrown if timeline does not exist and <paramref name="checkTimelineExistence"/> is true.</exception>
+        Task<bool> IsBookmark(long userId, long timelineId, bool checkUserExistence = true, bool checkTimelineExistence = true);
+
+        /// <summary>
         /// Add a bookmark to tail to a user.
         /// </summary>
         /// <param name="userId">User id of bookmark owner.</param>
@@ -108,6 +120,17 @@ namespace Timeline.Services
             var entities = await _database.BookmarkTimelines.Where(t => t.UserId == userId).OrderBy(t => t.Rank).Select(t => new { t.TimelineId }).ToListAsync();
 
             return entities.Select(e => e.TimelineId).ToList();
+        }
+
+        public async Task<bool> IsBookmark(long userId, long timelineId, bool checkUserExistence = true, bool checkTimelineExistence = true)
+        {
+            if (checkUserExistence && !await _userService.CheckUserExistence(userId))
+                throw new UserNotExistException(userId);
+
+            if (checkTimelineExistence && !await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
+
+            return await _database.BookmarkTimelines.AnyAsync(b => b.TimelineId == timelineId && b.UserId == userId);
         }
 
         public async Task MoveBookmark(long userId, long timelineId, long newPosition)
