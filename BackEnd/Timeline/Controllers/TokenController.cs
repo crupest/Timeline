@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,14 +25,16 @@ namespace Timeline.Controllers
         private readonly IUserCredentialService _userCredentialService;
         private readonly IUserTokenManager _userTokenManager;
         private readonly ILogger<TokenController> _logger;
+        private readonly UserMapper _userMapper;
         private readonly IClock _clock;
 
         /// <summary></summary>
-        public TokenController(IUserCredentialService userCredentialService, IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock)
+        public TokenController(IUserCredentialService userCredentialService, IUserTokenManager userTokenManager, ILogger<TokenController> logger, UserMapper userMapper, IClock clock)
         {
             _userCredentialService = userCredentialService;
             _userTokenManager = userTokenManager;
             _logger = logger;
+            _userMapper = userMapper;
             _clock = clock;
         }
 
@@ -69,11 +70,11 @@ namespace Timeline.Controllers
                     ("Username", request.Username),
                     ("Expire At", expireTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat) ?? "default")
                 ));
-                return Ok(new HttpCreateTokenResponse
+                return new HttpCreateTokenResponse
                 {
                     Token = result.Token,
-                    User = result.User.MapToHttp(Url)
-                });
+                    User = await _userMapper.MapToHttp(result.User, Url)
+                };
             }
             catch (UserNotExistException e)
             {
@@ -111,10 +112,10 @@ namespace Timeline.Controllers
                 var result = await _userTokenManager.VerifyToken(request.Token);
                 _logger.LogInformation(Log.Format(LogVerifySuccess,
                     ("Username", result.Username), ("Token", request.Token)));
-                return Ok(new HttpVerifyTokenResponse
+                return new HttpVerifyTokenResponse
                 {
-                    User = result.MapToHttp(Url)
-                });
+                    User = await _userMapper.MapToHttp(result, Url)
+                };
             }
             catch (UserTokenTimeExpireException e)
             {

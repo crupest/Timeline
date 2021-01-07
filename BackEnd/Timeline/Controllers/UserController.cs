@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Helpers;
@@ -28,16 +29,18 @@ namespace Timeline.Controllers
         private readonly IUserCredentialService _userCredentialService;
         private readonly IUserPermissionService _userPermissionService;
         private readonly IUserDeleteService _userDeleteService;
+        private readonly UserMapper _userMapper;
         private readonly IMapper _mapper;
 
         /// <summary></summary>
-        public UserController(ILogger<UserController> logger, IUserService userService, IUserCredentialService userCredentialService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IUserCredentialService userCredentialService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, UserMapper userMapper, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
             _userCredentialService = userCredentialService;
             _userPermissionService = userPermissionService;
             _userDeleteService = userDeleteService;
+            _userMapper = userMapper;
             _mapper = mapper;
         }
 
@@ -49,11 +52,11 @@ namespace Timeline.Controllers
         /// <returns>All user list.</returns>
         [HttpGet("users")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<HttpUser[]>> List()
+        public async Task<ActionResult<List<HttpUser>>> List()
         {
             var users = await _userService.GetUsers();
-            var result = users.MapToHttp(Url);
-            return Ok(result);
+            var result = await _userMapper.MapToHttp(users, Url);
+            return result;
         }
 
         /// <summary>
@@ -70,7 +73,7 @@ namespace Timeline.Controllers
             {
                 var id = await _userService.GetUserIdByUsername(username);
                 var user = await _userService.GetUser(id);
-                return Ok(user.MapToHttp(Url));
+                return await _userMapper.MapToHttp(user, Url);
             }
             catch (UserNotExistException e)
             {
@@ -99,7 +102,7 @@ namespace Timeline.Controllers
                 {
                     var id = await _userService.GetUserIdByUsername(username);
                     var user = await _userService.ModifyUser(id, _mapper.Map<ModifyUserParams>(body));
-                    return Ok(user.MapToHttp(Url));
+                    return await _userMapper.MapToHttp(user, Url);
                 }
                 catch (UserNotExistException e)
                 {
@@ -126,7 +129,7 @@ namespace Timeline.Controllers
                         ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Password));
 
                 var user = await _userService.ModifyUser(this.GetUserId(), _mapper.Map<ModifyUserParams>(body));
-                return Ok(user.MapToHttp(Url));
+                return await _userMapper.MapToHttp(user, Url);
             }
         }
 
@@ -170,7 +173,7 @@ namespace Timeline.Controllers
             try
             {
                 var user = await _userService.CreateUser(body.Username, body.Password);
-                return Ok(user.MapToHttp(Url));
+                return await _userMapper.MapToHttp(user, Url);
             }
             catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
             {

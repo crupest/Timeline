@@ -3,7 +3,6 @@ using System;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
-using Timeline.Models;
 using Timeline.Services.Exceptions;
 
 namespace Timeline.Services

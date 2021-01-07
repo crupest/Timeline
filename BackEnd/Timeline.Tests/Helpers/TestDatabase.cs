@@ -1,8 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using System;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Migrations;
@@ -42,9 +40,6 @@ namespace Timeline.Tests.Helpers
                 var admin = await userService.CreateUser("admin", "adminpw");
                 await userService.ModifyUser(admin.Id, new ModifyUserParams() { Nickname = "administrator" });
 
-                admin.Permissions.Add(new UserPermissionEntity { Permission = UserPermission.AllTimelineManagement.ToString() });
-                admin.Permissions.Add(new UserPermissionEntity { Permission = UserPermission.HighlightTimelineManagement.ToString() });
-                admin.Permissions.Add(new UserPermissionEntity { Permission = UserPermission.UserManagement.ToString() });
                 await context.SaveChangesAsync();
 
                 if (_createUser)
