@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Models;
 using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
@@ -29,8 +28,8 @@ namespace Timeline.Services
         /// <summary>
         /// Get all highlight timelines in order.
         /// </summary>
-        /// <returns>A list of all highlight timelines.</returns>
-        Task<List<TimelineInfo>> GetHighlightTimelines();
+        /// <returns>Id list of all highlight timelines.</returns>
+        Task<List<long>> GetHighlightTimelines();
 
         /// <summary>
         /// Add a timeline to highlight list.
@@ -75,10 +74,10 @@ namespace Timeline.Services
     {
         private readonly DatabaseContext _database;
         private readonly IBasicUserService _userService;
-        private readonly ITimelineService _timelineService;
+        private readonly IBasicTimelineService _timelineService;
         private readonly IClock _clock;
 
-        public HighlightTimelineService(DatabaseContext database, IBasicUserService userService, ITimelineService timelineService, IClock clock)
+        public HighlightTimelineService(DatabaseContext database, IBasicUserService userService, IBasicTimelineService timelineService, IClock clock)
         {
             _database = database;
             _userService = userService;
@@ -106,18 +105,11 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
         }
 
-        public async Task<List<TimelineInfo>> GetHighlightTimelines()
+        public async Task<List<long>> GetHighlightTimelines()
         {
             var entities = await _database.HighlightTimelines.OrderBy(t => t.Order).Select(t => new { t.TimelineId }).ToListAsync();
 
-            var result = new List<TimelineInfo>();
-
-            foreach (var entity in entities)
-            {
-                result.Add(await _timelineService.GetTimelineById(entity.TimelineId));
-            }
-
-            return result;
+            return entities.Select(e => e.TimelineId).ToList();
         }
 
         public async Task<bool> RemoveHighlightTimeline(string timelineName, long? operatorId)

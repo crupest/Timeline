@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Models;
 using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
@@ -30,9 +29,9 @@ namespace Timeline.Services
         /// Get bookmarks of a user.
         /// </summary>
         /// <param name="userId">User id of bookmark owner.</param>
-        /// <returns>Bookmarks in order.</returns>
+        /// <returns>Id of Bookmark timelines in order.</returns>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
-        Task<List<TimelineInfo>> GetBookmarks(long userId);
+        Task<List<long>> GetBookmarks(long userId);
 
         /// <summary>
         /// Add a bookmark to tail to a user.
@@ -75,9 +74,9 @@ namespace Timeline.Services
     {
         private readonly DatabaseContext _database;
         private readonly IBasicUserService _userService;
-        private readonly ITimelineService _timelineService;
+        private readonly IBasicTimelineService _timelineService;
 
-        public BookmarkTimelineService(DatabaseContext database, IBasicUserService userService, ITimelineService timelineService)
+        public BookmarkTimelineService(DatabaseContext database, IBasicUserService userService, IBasicTimelineService timelineService)
         {
             _database = database;
             _userService = userService;
@@ -109,21 +108,14 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
         }
 
-        public async Task<List<TimelineInfo>> GetBookmarks(long userId)
+        public async Task<List<long>> GetBookmarks(long userId)
         {
             if (!await _userService.CheckUserExistence(userId))
                 throw new UserNotExistException(userId);
 
             var entities = await _database.BookmarkTimelines.Where(t => t.UserId == userId).OrderBy(t => t.Rank).Select(t => new { t.TimelineId }).ToListAsync();
 
-            List<TimelineInfo> result = new();
-
-            foreach (var entity in entities)
-            {
-                result.Add(await _timelineService.GetTimelineById(entity.TimelineId));
-            }
-
-            return result;
+            return entities.Select(e => e.TimelineId).ToList();
         }
 
         public async Task MoveBookmark(long userId, string timelineName, long newPosition)

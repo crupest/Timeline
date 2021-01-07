@@ -56,10 +56,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var scope = TestApp.Host.Services.CreateScope();
 
-            var users = new List<(string username, string password, string nickname)>()
-                {
-                    ("admin", "adminpw", "administrator")
-                };
+            var users = new List<(string username, string password, string nickname)>();
 
             for (int i = 1; i <= TestUserCount; i++)
             {

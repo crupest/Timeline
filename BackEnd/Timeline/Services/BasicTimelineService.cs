@@ -16,6 +16,13 @@ namespace Timeline.Services
     public interface IBasicTimelineService
     {
         /// <summary>
+        /// Check whether a timeline with given id exists without getting full info.
+        /// </summary>
+        /// <param name="id">The timeline id.</param>
+        /// <returns>True if exist. Otherwise false.</returns>
+        Task<bool> CheckExistence(long id);
+
+        /// <summary>
         /// Get the timeline id by name.
         /// </summary>
         /// <param name="timelineName">Timeline name.</param>
@@ -65,6 +72,11 @@ namespace Timeline.Services
                 CurrentPostLocalId = 0,
                 Members = new List<TimelineMemberEntity>()
             };
+        }
+
+        public async Task<bool> CheckExistence(long id)
+        {
+            return await _database.Timelines.AnyAsync(t => t.Id == id);
         }
 
         public async Task<long> GetTimelineIdByName(string timelineName)

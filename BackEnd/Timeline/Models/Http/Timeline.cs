@@ -1,10 +1,5 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Timeline.Controllers;
 
 namespace Timeline.Models.Http
 {
@@ -13,6 +8,16 @@ namespace Timeline.Models.Http
     /// </summary>
     public class HttpTimelinePostContent
     {
+        public HttpTimelinePostContent() { }
+
+        public HttpTimelinePostContent(string type, string? text, string? url, string? eTag)
+        {
+            Type = type;
+            Text = text;
+            Url = url;
+            ETag = eTag;
+        }
+
         /// <summary>
         /// Type of the post content.
         /// </summary>
@@ -36,6 +41,18 @@ namespace Timeline.Models.Http
     /// </summary>
     public class HttpTimelinePost
     {
+        public HttpTimelinePost() { }
+
+        public HttpTimelinePost(long id, HttpTimelinePostContent? content, bool deleted, DateTime time, HttpUser? author, DateTime lastUpdated)
+        {
+            Id = id;
+            Content = content;
+            Deleted = deleted;
+            Time = time;
+            Author = author;
+            LastUpdated = lastUpdated;
+        }
+
         /// <summary>
         /// Post id.
         /// </summary>
@@ -67,6 +84,23 @@ namespace Timeline.Models.Http
     /// </summary>
     public class HttpTimeline
     {
+        public HttpTimeline() { }
+
+        public HttpTimeline(string uniqueId, string title, string name, DateTime nameLastModifed, string description, HttpUser owner, TimelineVisibility visibility, List<HttpUser> members, DateTime createTime, DateTime lastModified, HttpTimelineLinks links)
+        {
+            UniqueId = uniqueId;
+            Title = title;
+            Name = name;
+            NameLastModifed = nameLastModifed;
+            Description = description;
+            Owner = owner;
+            Visibility = visibility;
+            Members = members;
+            CreateTime = createTime;
+            LastModified = lastModified;
+            _links = links;
+        }
+
         /// <summary>
         /// Unique id.
         /// </summary>
@@ -123,6 +157,14 @@ namespace Timeline.Models.Http
     /// </summary>
     public class HttpTimelineLinks
     {
+        public HttpTimelineLinks() { }
+
+        public HttpTimelineLinks(string self, string posts)
+        {
+            Self = self;
+            Posts = posts;
+        }
+
         /// <summary>
         /// Self.
         /// </summary>
@@ -131,88 +173,5 @@ namespace Timeline.Models.Http
         /// Posts url.
         /// </summary>
         public string Posts { get; set; } = default!;
-    }
-
-    public class HttpTimelineLinksValueResolver : IValueResolver<TimelineInfo, HttpTimeline, HttpTimelineLinks>
-    {
-        private readonly IActionContextAccessor _actionContextAccessor;
-        private readonly IUrlHelperFactory _urlHelperFactory;
-
-        public HttpTimelineLinksValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
-        {
-            _actionContextAccessor = actionContextAccessor;
-            _urlHelperFactory = urlHelperFactory;
-        }
-
-        public HttpTimelineLinks Resolve(TimelineInfo source, HttpTimeline destination, HttpTimelineLinks destMember, ResolutionContext context)
-        {
-            var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
-            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
-
-            return new HttpTimelineLinks
-            {
-                Self = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { source.Name }),
-                Posts = urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { source.Name })
-            };
-        }
-    }
-
-    public class HttpTimelinePostContentResolver : IValueResolver<TimelinePostInfo, HttpTimelinePost, HttpTimelinePostContent?>
-    {
-        private readonly IActionContextAccessor _actionContextAccessor;
-        private readonly IUrlHelperFactory _urlHelperFactory;
-
-        public HttpTimelinePostContentResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
-        {
-            _actionContextAccessor = actionContextAccessor;
-            _urlHelperFactory = urlHelperFactory;
-        }
-
-        public HttpTimelinePostContent? Resolve(TimelinePostInfo source, HttpTimelinePost destination, HttpTimelinePostContent? destMember, ResolutionContext context)
-        {
-            var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
-            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
-
-            var sourceContent = source.Content;
-
-            if (sourceContent == null)
-            {
-                return null;
-            }
-
-            if (sourceContent is TextTimelinePostContent textContent)
-            {
-                return new HttpTimelinePostContent
-                {
-                    Type = TimelinePostContentTypes.Text,
-                    Text = textContent.Text
-                };
-            }
-            else if (sourceContent is ImageTimelinePostContent imageContent)
-            {
-                return new HttpTimelinePostContent
-                {
-                    Type = TimelinePostContentTypes.Image,
-                    Url = urlHelper.ActionLink(
-                        action: nameof(TimelineController.PostDataGet),
-                        controller: nameof(TimelineController)[0..^nameof(Controller).Length],
-                        values: new { Name = source.TimelineName, Id = source.Id }),
-                    ETag = $"\"{imageContent.DataTag}\""
-                };
-            }
-            else
-            {
-                throw new InvalidOperationException(Resources.Models.Http.Exception.UnknownPostContentType);
-            }
-        }
-    }
-
-    public class HttpTimelineAutoMapperProfile : Profile
-    {
-        public HttpTimelineAutoMapperProfile()
-        {
-            CreateMap<TimelineInfo, HttpTimeline>().ForMember(u => u._links, opt => opt.MapFrom<HttpTimelineLinksValueResolver>());
-            CreateMap<TimelinePostInfo, HttpTimelinePost>().ForMember(p => p.Content, opt => opt.MapFrom<HttpTimelinePostContentResolver>());
-        }
     }
 }

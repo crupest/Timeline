@@ -33,16 +33,22 @@ namespace Timeline.Tests.Helpers
                 {
                     Key = JwtTokenGenerateHelper.GenerateKey()
                 });
+
+                await context.SaveChangesAsync();
+
+                var passwordService = new PasswordService();
+                var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new Clock());
+
+                var admin = await userService.CreateUser("admin", "adminpw");
+                await userService.ModifyUser(admin.Id, new ModifyUserParams() { Nickname = "administrator" });
+
+                admin.Permissions.Add(new UserPermissionEntity { Permission = UserPermission.AllTimelineManagement.ToString() });
+                admin.Permissions.Add(new UserPermissionEntity { Permission = UserPermission.HighlightTimelineManagement.ToString() });
+                admin.Permissions.Add(new UserPermissionEntity { Permission = UserPermission.UserManagement.ToString() });
                 await context.SaveChangesAsync();
 
                 if (_createUser)
                 {
-                    var passwordService = new PasswordService();
-                    var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new UserPermissionService(context), new Clock());
-
-                    var admin = await userService.CreateUser("admin", "adminpw");
-                    await userService.ModifyUser(admin.Id, new ModifyUserParams() { Nickname = "administrator" });
-
                     var user = await userService.CreateUser("user", "userpw");
                     await userService.ModifyUser(user.Id, new ModifyUserParams() { Nickname = "imuser" });
                 }

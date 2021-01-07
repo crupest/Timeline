@@ -14,16 +14,21 @@ namespace Timeline.Services.Exceptions
         protected TimelinePostNotExistException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        public TimelinePostNotExistException(string? timelineName, long? id, bool isDelete, string? message = null, Exception? inner = null) : base(EntityNames.TimelinePost, null, MakeMessage(timelineName, id, isDelete).AppendAdditionalMessage(message), inner) { TimelineName = timelineName; Id = id; IsDelete = isDelete; }
-
-        private static string MakeMessage(string? timelineName, long? id, bool isDelete)
+        public TimelinePostNotExistException(long? timelineId, long? postId, bool isDelete, string? message = null, Exception? inner = null)
+            : base(EntityNames.TimelinePost, null, MakeMessage(timelineId, postId, isDelete).AppendAdditionalMessage(message), inner)
         {
-            return string.Format(CultureInfo.InvariantCulture, isDelete ? Resources.Services.Exceptions.TimelinePostNotExistExceptionDeleted : Resources.Services.Exceptions.TimelinePostNotExistException, timelineName ?? "", id);
+            TimelineId = timelineId;
+            PostId = postId;
+            IsDelete = isDelete;
         }
 
-        public string? TimelineName { get; set; }
-        public long? Id { get; set; }
+        private static string MakeMessage(long? timelineId, long? postId, bool isDelete)
+        {
+            return string.Format(CultureInfo.InvariantCulture, isDelete ? Resources.Services.Exceptions.TimelinePostNotExistExceptionDeleted : Resources.Services.Exceptions.TimelinePostNotExistException, timelineId, postId);
+        }
+
+        public long? TimelineId { get; set; }
+        public long? PostId { get; set; }
 
         /// <summary>
         /// True if the post is deleted. False if the post does not exist at all.

@@ -38,7 +38,7 @@ namespace Timeline.Tests.Helpers
                 {
                     config.AddInMemoryCollection(new Dictionary<string, string>
                     {
-                        [ApplicationConfiguration.UseMockFrontEndKey] = "true",
+                        [ApplicationConfiguration.FrontEndKey] = "Mock",
                         ["WorkDir"] = WorkDir
                     });
                 })

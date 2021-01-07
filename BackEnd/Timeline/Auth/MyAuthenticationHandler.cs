@@ -84,7 +84,7 @@ namespace Timeline.Auth
                 var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
                 identity.AddClaim(new Claim(identity.NameClaimType, user.Username, ClaimValueTypes.String));
-                identity.AddClaims(user.Permissions.Select(permission => new Claim(AuthenticationConstants.PermissionClaimName, permission.ToString(), ClaimValueTypes.String)));
+                identity.AddClaims(user.Permissions.Select(permission => new Claim(AuthenticationConstants.PermissionClaimName, permission.Permission, ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
                 principal.AddIdentity(identity);
