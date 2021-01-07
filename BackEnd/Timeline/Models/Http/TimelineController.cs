@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Timeline.Models.Validation;
+using Timeline.Services;
 
 namespace Timeline.Models.Http
 {
@@ -96,7 +97,7 @@ namespace Timeline.Models.Http
     {
         public HttpTimelineControllerAutoMapperProfile()
         {
-            CreateMap<HttpTimelinePatchRequest, TimelineChangePropertyRequest>();
+            CreateMap<HttpTimelinePatchRequest, TimelineChangePropertyParams>();
         }
     }
 }

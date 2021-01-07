@@ -13,3 +13,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Design", "CA1056:Uri properties should not be strings", Justification = "That's unnecessary.")]
 [assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Redundant")]
 [assembly: SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "No localization demand.")]
+[assembly: SuppressMessage("Design", "CA1054:URI-like parameters should not be strings")]
