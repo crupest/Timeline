@@ -32,6 +32,15 @@ namespace Timeline.Services
         Task<List<long>> GetHighlightTimelines();
 
         /// <summary>
+        /// Check if a timeline is highlight timeline.
+        /// </summary>
+        /// <param name="timelineId">Timeline id.</param>
+        /// <param name="checkTimelineExistence">If true it will throw if timeline does not exist.</param>
+        /// <returns>True if timeline is highlight. Otherwise false.</returns>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist and <paramref name="checkTimelineExistence"/> is true.</exception>
+        Task<bool> IsHighlightTimeline(long timelineId, bool checkTimelineExistence = true);
+
+        /// <summary>
         /// Add a timeline to highlight list.
         /// </summary>
         /// <param name="timelineId">The timeline id.</param>
@@ -171,6 +180,14 @@ namespace Timeline.Services
             }
 
             await transaction.CommitAsync();
+        }
+
+        public async Task<bool> IsHighlightTimeline(long timelineId, bool checkTimelineExistence = true)
+        {
+            if (checkTimelineExistence && !await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
+
+            return await _database.HighlightTimelines.AnyAsync(t => t.TimelineId == timelineId);
         }
     }
 }
