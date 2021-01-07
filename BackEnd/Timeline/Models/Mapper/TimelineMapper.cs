@@ -15,14 +15,18 @@ namespace Timeline.Models.Mapper
     {
         private readonly DatabaseContext _database;
         private readonly UserMapper _userMapper;
+        private readonly IHighlightTimelineService _highlightTimelineService;
+        private readonly IBookmarkTimelineService _bookmarkTimelineService;
 
-        public TimelineMapper(DatabaseContext database, UserMapper userMapper)
+        public TimelineMapper(DatabaseContext database, UserMapper userMapper, IHighlightTimelineService highlightTimelineService, IBookmarkTimelineService bookmarkTimelineService)
         {
             _database = database;
             _userMapper = userMapper;
+            _highlightTimelineService = highlightTimelineService;
+            _bookmarkTimelineService = bookmarkTimelineService;
         }
 
-        public async Task<HttpTimeline> MapToHttp(TimelineEntity entity, IUrlHelper urlHelper)
+        public async Task<HttpTimeline> MapToHttp(TimelineEntity entity, IUrlHelper urlHelper, long? userId)
         {
             await _database.Entry(entity).Reference(e => e.Owner).LoadAsync();
             await _database.Entry(entity).Collection(e => e.Members).Query().Include(m => m.User).LoadAsync();
@@ -40,6 +44,8 @@ namespace Timeline.Models.Mapper
                 members: await _userMapper.MapToHttp(entity.Members.Select(m => m.User).ToList(), urlHelper),
                 createTime: entity.CreateTime,
                 lastModified: entity.LastModified,
+                isHighlight: await _highlightTimelineService.IsHighlightTimeline(entity.Id),
+                isBookmark: userId is not null && await _bookmarkTimelineService.IsBookmark(userId.Value, entity.Id, false, false),
                 links: new HttpTimelineLinks(
                     self: urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = timelineName }),
                     posts: urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = timelineName })
@@ -47,12 +53,12 @@ namespace Timeline.Models.Mapper
             );
         }
 
-        public async Task<List<HttpTimeline>> MapToHttp(List<TimelineEntity> entities, IUrlHelper urlHelper)
+        public async Task<List<HttpTimeline>> MapToHttp(List<TimelineEntity> entities, IUrlHelper urlHelper, long? userId)
         {
             var result = new List<HttpTimeline>();
             foreach (var entity in entities)
             {
-                result.Add(await MapToHttp(entity, urlHelper));
+                result.Add(await MapToHttp(entity, urlHelper, userId));
             }
             return result;
         }

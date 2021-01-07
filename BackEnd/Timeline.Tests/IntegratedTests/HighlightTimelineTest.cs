@@ -86,5 +86,38 @@ namespace Timeline.Tests.IntegratedTests
                 h.Should().BeEmpty();
             }
         }
+
+        [Fact]
+        public async Task TimelineGet_IsHighlighField_Should_Work()
+        {
+            using var client = await CreateClientAsAdministrator();
+            await client.TestPostAsync("timelines", new TimelineCreateRequest { Name = "t" });
+
+            {
+                var t = await client.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsHighlight.Should().BeFalse();
+            }
+
+            await client.TestPutAsync("highlights/t");
+
+            {
+                var t = await client.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsHighlight.Should().BeTrue();
+            }
+
+            {
+                var client1 = await CreateDefaultClient();
+                var t = await client1.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsHighlight.Should().BeTrue();
+            }
+
+            await client.TestDeleteAsync("highlights/t");
+
+            {
+                var t = await client.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsHighlight.Should().BeFalse();
+            }
+
+        }
     }
 }

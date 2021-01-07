@@ -83,5 +83,43 @@ namespace Timeline.Tests.IntegratedTests
                 h.Should().BeEmpty();
             }
         }
+
+        [Fact]
+        public async Task TimelineGet_IsBookmarkField_ShouldWork()
+        {
+            using var client = await CreateClientAsUser();
+            await client.TestPostAsync("timelines", new TimelineCreateRequest { Name = "t" });
+
+            {
+                var t = await client.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsBookmark.Should().BeFalse();
+            }
+
+            await client.TestPutAsync("bookmarks/t");
+
+            {
+                var t = await client.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsBookmark.Should().BeTrue();
+            }
+
+            {
+                var client1 = await CreateDefaultClient();
+                var t = await client1.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsBookmark.Should().BeFalse();
+            }
+
+            {
+                var client1 = await CreateClientAsAdministrator();
+                var t = await client1.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsBookmark.Should().BeFalse();
+            }
+
+            await client.TestDeleteAsync("bookmarks/t");
+
+            {
+                var t = await client.TestGetAsync<HttpTimeline>("timelines/t");
+                t.IsBookmark.Should().BeFalse();
+            }
+        }
     }
 }

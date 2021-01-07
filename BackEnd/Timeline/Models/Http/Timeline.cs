@@ -86,7 +86,7 @@ namespace Timeline.Models.Http
     {
         public HttpTimeline() { }
 
-        public HttpTimeline(string uniqueId, string title, string name, DateTime nameLastModifed, string description, HttpUser owner, TimelineVisibility visibility, List<HttpUser> members, DateTime createTime, DateTime lastModified, HttpTimelineLinks links)
+        public HttpTimeline(string uniqueId, string title, string name, DateTime nameLastModifed, string description, HttpUser owner, TimelineVisibility visibility, List<HttpUser> members, DateTime createTime, DateTime lastModified, bool isHighlight, bool isBookmark, HttpTimelineLinks links)
         {
             UniqueId = uniqueId;
             Title = title;
@@ -98,6 +98,8 @@ namespace Timeline.Models.Http
             Members = members;
             CreateTime = createTime;
             LastModified = lastModified;
+            IsHighlight = isHighlight;
+            IsBookmark = isBookmark;
             _links = links;
         }
 
@@ -143,6 +145,10 @@ namespace Timeline.Models.Http
         /// Last modified time of timeline.
         /// </summary>
         public DateTime LastModified { get; set; } = default!;
+
+        public bool IsHighlight { get; set; }
+
+        public bool IsBookmark { get; set; }
 
 #pragma warning disable CA1707 // Identifiers should not contain underscores
         /// <summary>
