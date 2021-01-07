@@ -37,37 +37,32 @@ namespace Timeline.Services
         /// Add a bookmark to tail to a user.
         /// </summary>
         /// <param name="userId">User id of bookmark owner.</param>
-        /// <param name="timelineName">Timeline name.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="timelineName"/> is not a valid name.</exception>
+        /// <param name="timelineId">Timeline id.</param>
+        /// <returns>True if timeline is added to bookmark. False if it already is.</returns>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        Task AddBookmark(long userId, string timelineName);
+        Task<bool> AddBookmark(long userId, long timelineId);
 
         /// <summary>
         /// Remove a bookmark from a user.
         /// </summary>
         /// <param name="userId">User id of bookmark owner.</param>
-        /// <param name="timelineName">Timeline name.</param>
+        /// <param name="timelineId">Timeline id.</param>
         /// <returns>True if deletion is performed. False if bookmark does not exist.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="timelineName"/> is not a valid name.</exception>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        Task<bool> RemoveBookmark(long userId, string timelineName);
+        Task<bool> RemoveBookmark(long userId, long timelineId);
 
         /// <summary>
         /// Move bookmark to a new position.
         /// </summary>
         /// <param name="userId">User id of bookmark owner.</param>
-        /// <param name="timelineName">Timeline name.</param>
+        /// <param name="timelineId">Timeline name.</param>
         /// <param name="newPosition">New position. Starts at 1.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="timelineName"/> is not a valid name.</exception>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="InvalidBookmarkException">Thrown when the timeline is not a bookmark.</exception>
-        Task MoveBookmark(long userId, string timelineName, long newPosition);
+        Task MoveBookmark(long userId, long timelineId, long newPosition);
     }
 
     public class BookmarkTimelineService : IBookmarkTimelineService
@@ -83,20 +78,16 @@ namespace Timeline.Services
             _timelineService = timelineService;
         }
 
-        public async Task AddBookmark(long userId, string timelineName)
+        public async Task<bool> AddBookmark(long userId, long timelineId)
         {
-            if (timelineName is null)
-                throw new ArgumentNullException(nameof(timelineName));
-
             if (!await _userService.CheckUserExistence(userId))
                 throw new UserNotExistException(userId);
 
-            var timelineId = await _timelineService.GetTimelineIdByName(timelineName);
+            if (!await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
 
-            if (await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId) is not null)
-            {
-                return;
-            }
+            if (await _database.BookmarkTimelines.AnyAsync(t => t.TimelineId == timelineId && t.UserId == userId))
+                return false;
 
             _database.BookmarkTimelines.Add(new BookmarkTimelineEntity
             {
@@ -106,6 +97,7 @@ namespace Timeline.Services
             });
 
             await _database.SaveChangesAsync();
+            return true;
         }
 
         public async Task<List<long>> GetBookmarks(long userId)
@@ -118,12 +110,13 @@ namespace Timeline.Services
             return entities.Select(e => e.TimelineId).ToList();
         }
 
-        public async Task MoveBookmark(long userId, string timelineName, long newPosition)
+        public async Task MoveBookmark(long userId, long timelineId, long newPosition)
         {
-            if (timelineName == null)
-                throw new ArgumentNullException(nameof(timelineName));
+            if (!await _userService.CheckUserExistence(userId))
+                throw new UserNotExistException(userId);
 
-            var timelineId = await _timelineService.GetTimelineIdByName(timelineName);
+            if (!await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
 
             var entity = await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId && t.UserId == userId);
 
@@ -159,15 +152,13 @@ namespace Timeline.Services
             await transaction.CommitAsync();
         }
 
-        public async Task<bool> RemoveBookmark(long userId, string timelineName)
+        public async Task<bool> RemoveBookmark(long userId, long timelineId)
         {
-            if (timelineName is null)
-                throw new ArgumentNullException(nameof(timelineName));
-
             if (!await _userService.CheckUserExistence(userId))
                 throw new UserNotExistException(userId);
 
-            var timelineId = await _timelineService.GetTimelineIdByName(timelineName);
+            if (!await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
 
             var entity = await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.UserId == userId && t.TimelineId == timelineId);
 

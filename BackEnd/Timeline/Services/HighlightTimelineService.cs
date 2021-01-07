@@ -34,40 +34,35 @@ namespace Timeline.Services
         /// <summary>
         /// Add a timeline to highlight list.
         /// </summary>
-        /// <param name="timelineName">The timeline name.</param>
+        /// <param name="timelineId">The timeline id.</param>
         /// <param name="operatorId">The user id of operator.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="timelineName"/> is not a valid timeline name.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline with given name does not exist.</exception>
+        /// <returns>True if timeline is actually added to highligh. False if it already is.</returns>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline with given id does not exist.</exception>
         /// <exception cref="UserNotExistException">Thrown when user with given operator id does not exist.</exception>
-        Task AddHighlightTimeline(string timelineName, long? operatorId);
+        Task<bool> AddHighlightTimeline(long timelineId, long? operatorId);
 
         /// <summary>
         /// Remove a timeline from highlight list.
         /// </summary>
-        /// <param name="timelineName">The timeline name.</param>
+        /// <param name="timelineId">The timeline id.</param>
         /// <param name="operatorId">The user id of operator.</param>
         /// <returns>True if deletion is actually performed. Otherwise false (timeline was not in the list).</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="timelineName"/> is not a valid timeline name.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline with given name does not exist.</exception>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline with given id does not exist.</exception>
         /// <exception cref="UserNotExistException">Thrown when user with given operator id does not exist.</exception>
-        Task<bool> RemoveHighlightTimeline(string timelineName, long? operatorId);
+        Task<bool> RemoveHighlightTimeline(long timelineId, long? operatorId);
 
         /// <summary>
         /// Move a highlight timeline to a new position.
         /// </summary>
-        /// <param name="timelineName">The timeline name.</param>
+        /// <param name="timelineId">The timeline name.</param>
         /// <param name="newPosition">The new position. Starts at 1.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="timelineName"/> is not a valid timeline name.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline with given name does not exist.</exception>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline with given id does not exist.</exception>
         /// <exception cref="InvalidHighlightTimelineException">Thrown when given timeline is not a highlight timeline.</exception>
         /// <remarks>
         /// If <paramref name="newPosition"/> is smaller than 1. Then move the timeline to head.
         /// If <paramref name="newPosition"/> is bigger than total count. Then move the timeline to tail.
         /// </remarks>
-        Task MoveHighlightTimeline(string timelineName, long newPosition);
+        Task MoveHighlightTimeline(long timelineId, long newPosition);
     }
 
     public class HighlightTimelineService : IHighlightTimelineService
@@ -85,12 +80,10 @@ namespace Timeline.Services
             _clock = clock;
         }
 
-        public async Task AddHighlightTimeline(string timelineName, long? operatorId)
+        public async Task<bool> AddHighlightTimeline(long timelineId, long? operatorId)
         {
-            if (timelineName == null)
-                throw new ArgumentNullException(nameof(timelineName));
-
-            var timelineId = await _timelineService.GetTimelineIdByName(timelineName);
+            if (!await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
 
             if (operatorId.HasValue && !await _userService.CheckUserExistence(operatorId.Value))
             {
@@ -99,10 +92,11 @@ namespace Timeline.Services
 
             var alreadyIs = await _database.HighlightTimelines.AnyAsync(t => t.TimelineId == timelineId);
 
-            if (alreadyIs) return;
+            if (alreadyIs) return false;
 
             _database.HighlightTimelines.Add(new HighlightTimelineEntity { TimelineId = timelineId, OperatorId = operatorId, AddTime = _clock.GetCurrentTime(), Order = await _database.HighlightTimelines.CountAsync() + 1 });
             await _database.SaveChangesAsync();
+            return true;
         }
 
         public async Task<List<long>> GetHighlightTimelines()
@@ -112,12 +106,10 @@ namespace Timeline.Services
             return entities.Select(e => e.TimelineId).ToList();
         }
 
-        public async Task<bool> RemoveHighlightTimeline(string timelineName, long? operatorId)
+        public async Task<bool> RemoveHighlightTimeline(long timelineId, long? operatorId)
         {
-            if (timelineName == null)
-                throw new ArgumentNullException(nameof(timelineName));
-
-            var timelineId = await _timelineService.GetTimelineIdByName(timelineName);
+            if (!await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
 
             if (operatorId.HasValue && !await _userService.CheckUserExistence(operatorId.Value))
             {
@@ -142,12 +134,10 @@ namespace Timeline.Services
             return true;
         }
 
-        public async Task MoveHighlightTimeline(string timelineName, long newPosition)
+        public async Task MoveHighlightTimeline(long timelineId, long newPosition)
         {
-            if (timelineName == null)
-                throw new ArgumentNullException(nameof(timelineName));
-
-            var timelineId = await _timelineService.GetTimelineIdByName(timelineName);
+            if (!await _timelineService.CheckExistence(timelineId))
+                throw new TimelineNotExistException(timelineId);
 
             var entity = await _database.HighlightTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId);
 

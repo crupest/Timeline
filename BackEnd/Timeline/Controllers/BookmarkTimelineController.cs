@@ -52,12 +52,13 @@ namespace Timeline.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult> Put([GeneralTimelineName] string timeline)
+        public async Task<ActionResult<CommonPutResponse>> Put([GeneralTimelineName] string timeline)
         {
             try
             {
-                await _service.AddBookmark(this.GetUserId(), timeline);
-                return Ok();
+                var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+                var create = await _service.AddBookmark(this.GetUserId(), timelineId);
+                return CommonPutResponse.Create(create);
             }
             catch (TimelineNotExistException)
             {
@@ -74,12 +75,13 @@ namespace Timeline.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult> Delete([GeneralTimelineName] string timeline)
+        public async Task<ActionResult<CommonDeleteResponse>> Delete([GeneralTimelineName] string timeline)
         {
             try
             {
-                await _service.RemoveBookmark(this.GetUserId(), timeline);
-                return Ok();
+                var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+                var delete = await _service.RemoveBookmark(this.GetUserId(), timelineId);
+                return CommonDeleteResponse.Create(delete);
             }
             catch (TimelineNotExistException)
             {
@@ -100,7 +102,8 @@ namespace Timeline.Controllers
         {
             try
             {
-                await _service.MoveBookmark(this.GetUserId(), request.Timeline, request.NewPosition!.Value);
+                var timelineId = await _timelineService.GetTimelineIdByName(request.Timeline);
+                await _service.MoveBookmark(this.GetUserId(), timelineId, request.NewPosition!.Value);
                 return Ok();
             }
             catch (TimelineNotExistException)
