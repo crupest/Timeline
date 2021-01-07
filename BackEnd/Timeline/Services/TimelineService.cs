@@ -244,7 +244,7 @@ namespace Timeline.Services
 
         public async Task<TimelineEntity> GetTimeline(long id)
         {
-            var entity = await _database.Timelines.Where(t => t.Id == id).Include(t => t.Owner).ThenInclude(o => o.Permissions).Include(t => t.Members).ThenInclude(m => m.User).ThenInclude(u => u.Permissions).SingleOrDefaultAsync();
+            var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
 
             if (entity is null)
                 throw new TimelineNotExistException(id);
@@ -397,7 +397,7 @@ namespace Timeline.Services
 
             if (relate == null)
             {
-                entities = await ApplyTimelineVisibilityFilter(_database.Timelines).Include(t => t.Owner).ThenInclude(o => o.Permissions).Include(t => t.Members).ThenInclude(m => m.User).ThenInclude(u => u.Permissions).ToListAsync();
+                entities = await ApplyTimelineVisibilityFilter(_database.Timelines).ToListAsync();
             }
             else
             {
@@ -405,15 +405,14 @@ namespace Timeline.Services
 
                 if ((relate.Type & TimelineUserRelationshipType.Own) != 0)
                 {
-                    entities.AddRange(await ApplyTimelineVisibilityFilter(_database.Timelines.Where(t => t.OwnerId == relate.UserId)).Include(t => t.Owner).ThenInclude(o => o.Permissions).Include(t => t.Members).ThenInclude(m => m.User).ThenInclude(u => u.Permissions).ToListAsync());
+                    entities.AddRange(await ApplyTimelineVisibilityFilter(_database.Timelines.Where(t => t.OwnerId == relate.UserId)).ToListAsync());
                 }
 
                 if ((relate.Type & TimelineUserRelationshipType.Join) != 0)
                 {
-                    entities.AddRange(await ApplyTimelineVisibilityFilter(_database.TimelineMembers.Where(m => m.UserId == relate.UserId).Include(m => m.Timeline).ThenInclude(t => t.Members).ThenInclude(m => m.User).ThenInclude(u => u.Permissions).Include(t => t.Timeline.Owner.Permissions).Select(m => m.Timeline)).ToListAsync());
+                    entities.AddRange(await ApplyTimelineVisibilityFilter(_database.TimelineMembers.Where(m => m.UserId == relate.UserId).Include(m => m.Timeline).Select(m => m.Timeline)).ToListAsync());
                 }
             }
-
 
             return entities;
         }
@@ -434,9 +433,6 @@ namespace Timeline.Services
 
             _database.Timelines.Add(entity);
             await _database.SaveChangesAsync();
-
-            await _database.Entry(entity).Reference(e => e.Owner).Query().Include(o => o.Permissions).LoadAsync();
-            await _database.Entry(entity).Collection(e => e.Members).Query().Include(m => m.User).ThenInclude(u => u.Permissions).LoadAsync();
 
             return entity;
         }

@@ -20,6 +20,7 @@ using Timeline.Entities;
 using Timeline.Formatters;
 using Timeline.Helpers;
 using Timeline.Models.Converters;
+using Timeline.Models.Mapper;
 using Timeline.Routes;
 using Timeline.Services;
 using Timeline.Swagger;
@@ -90,6 +91,7 @@ namespace Timeline
             services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
 
             services.AddAutoMapper(GetType().Assembly);
+            services.AddMappers();
 
             services.AddTransient<IClock, Clock>();
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Timeline.Models
+﻿namespace Timeline.Models
 {
     public enum TimelineVisibility
     {

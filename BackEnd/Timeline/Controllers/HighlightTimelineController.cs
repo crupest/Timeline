@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
@@ -20,11 +19,13 @@ namespace Timeline.Controllers
     {
         private readonly IHighlightTimelineService _service;
         private readonly ITimelineService _timelineService;
+        private readonly TimelineMapper _timelineMapper;
 
-        public HighlightTimelineController(IHighlightTimelineService service, ITimelineService timelineService)
+        public HighlightTimelineController(IHighlightTimelineService service, ITimelineService timelineService, TimelineMapper timelineMapper)
         {
             _service = service;
             _timelineService = timelineService;
+            _timelineMapper = timelineMapper;
         }
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Timeline.Controllers
         {
             var ids = await _service.GetHighlightTimelines();
             var timelines = await _timelineService.GetTimelineList(ids);
-            return timelines.MapToHttp(Url);
+            return await _timelineMapper.MapToHttp(timelines, Url);
         }
 
         /// <summary>
