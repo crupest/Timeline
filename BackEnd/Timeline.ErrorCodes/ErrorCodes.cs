@@ -1,4 +1,6 @@
-﻿namespace Timeline.Models.Http
+﻿using System;
+
+namespace Timeline.Models.Http
 {
     /// <summary>
     /// All error code constants.
@@ -58,7 +60,6 @@
         {
             public const int NameConflict = 1_104_01_01;
             public const int NotExist = 1_104_02_01;
-            public const int MemberPut_NotExist = 1_104_03_01;
             public const int QueryRelateNotExist = 1_104_04_01;
             public const int PostNotExist = 1_104_05_01;
             public const int PostNoData = 1_104_05_02;

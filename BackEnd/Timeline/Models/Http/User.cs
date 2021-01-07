@@ -1,10 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using System.Collections.Generic;
-using Timeline.Controllers;
-using Timeline.Services;
+﻿using System.Collections.Generic;
 
 namespace Timeline.Models.Http
 {
@@ -13,6 +7,17 @@ namespace Timeline.Models.Http
     /// </summary>
     public class HttpUser
     {
+        public HttpUser() { }
+
+        public HttpUser(string uniqueId, string username, string nickname, List<string> permissions, HttpUserLinks links)
+        {
+            UniqueId = uniqueId;
+            Username = username;
+            Nickname = nickname;
+            Permissions = permissions;
+            _links = links;
+        }
+
         /// <summary>
         /// Unique id.
         /// </summary>
@@ -44,6 +49,15 @@ namespace Timeline.Models.Http
     /// </summary>
     public class HttpUserLinks
     {
+        public HttpUserLinks() { }
+
+        public HttpUserLinks(string self, string avatar, string timeline)
+        {
+            Self = self;
+            Avatar = avatar;
+            Timeline = timeline;
+        }
+
         /// <summary>
         /// Self.
         /// </summary>
@@ -56,50 +70,5 @@ namespace Timeline.Models.Http
         /// Personal timeline url.
         /// </summary>
         public string Timeline { get; set; } = default!;
-    }
-
-    public class HttpUserPermissionsValueConverter : ITypeConverter<UserPermissions, List<string>>
-    {
-        public List<string> Convert(UserPermissions source, List<string> destination, ResolutionContext context)
-        {
-            return source.ToStringList();
-        }
-    }
-
-    public class HttpUserLinksValueResolver : IValueResolver<UserInfo, HttpUser, HttpUserLinks>
-    {
-        private readonly IActionContextAccessor _actionContextAccessor;
-        private readonly IUrlHelperFactory _urlHelperFactory;
-
-        public HttpUserLinksValueResolver(IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
-        {
-            _actionContextAccessor = actionContextAccessor;
-            _urlHelperFactory = urlHelperFactory;
-        }
-
-        public HttpUserLinks Resolve(UserInfo source, HttpUser destination, HttpUserLinks destMember, ResolutionContext context)
-        {
-            var actionContext = _actionContextAccessor.AssertActionContextForUrlFill();
-            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
-
-            var result = new HttpUserLinks
-            {
-                Self = urlHelper.ActionLink(nameof(UserController.Get), nameof(UserController)[0..^nameof(Controller).Length], new { destination.Username }),
-                Avatar = urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController)[0..^nameof(Controller).Length], new { destination.Username }),
-                Timeline = urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { Name = "@" + destination.Username })
-            };
-            return result;
-        }
-    }
-
-    public class HttpUserAutoMapperProfile : Profile
-    {
-        public HttpUserAutoMapperProfile()
-        {
-            CreateMap<UserPermissions, List<string>>()
-                .ConvertUsing<HttpUserPermissionsValueConverter>();
-            CreateMap<UserInfo, HttpUser>()
-                .ForMember(u => u._links, opt => opt.MapFrom<HttpUserLinksValueResolver>());
-        }
     }
 }

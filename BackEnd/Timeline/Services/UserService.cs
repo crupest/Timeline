@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
-using Timeline.Models;
 using Timeline.Models.Validation;
 using Timeline.Services.Exceptions;
 using static Timeline.Resources.Services.UserService;
@@ -32,13 +31,13 @@ namespace Timeline.Services
         /// <param name="id">The id of the user.</param>
         /// <returns>The user info.</returns>
         /// <exception cref="UserNotExistException">Thrown when the user with given id does not exist.</exception>
-        Task<UserInfo> GetUser(long id);
+        Task<UserEntity> GetUser(long id);
 
         /// <summary>
         /// List all users.
         /// </summary>
         /// <returns>The user info of users.</returns>
-        Task<List<UserInfo>> GetUsers();
+        Task<List<UserEntity>> GetUsers();
 
         /// <summary>
         /// Create a user with given info.
@@ -49,7 +48,7 @@ namespace Timeline.Services
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> or <paramref name="password"/> is of bad format.</exception>
         /// <exception cref="EntityAlreadyExistException">Thrown when a user with given username already exists.</exception>
-        Task<UserInfo> CreateUser(string username, string password);
+        Task<UserEntity> CreateUser(string username, string password);
 
         /// <summary>
         /// Modify a user.
@@ -62,7 +61,7 @@ namespace Timeline.Services
         /// <remarks>
         /// Version will increase if password is changed.
         /// </remarks>
-        Task<UserInfo> ModifyUser(long id, ModifyUserParams? param);
+        Task<UserEntity> ModifyUser(long id, ModifyUserParams? param);
     }
 
     public class UserService : BasicUserService, IUserService
@@ -73,17 +72,15 @@ namespace Timeline.Services
         private readonly DatabaseContext _databaseContext;
 
         private readonly IPasswordService _passwordService;
-        private readonly IUserPermissionService _userPermissionService;
 
         private readonly UsernameValidator _usernameValidator = new UsernameValidator();
         private readonly NicknameValidator _nicknameValidator = new NicknameValidator();
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IUserPermissionService userPermissionService, IClock clock) : base(databaseContext)
+        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IClock clock) : base(databaseContext)
         {
             _logger = logger;
             _databaseContext = databaseContext;
             _passwordService = passwordService;
-            _userPermissionService = userPermissionService;
             _clock = clock;
         }
 
@@ -116,43 +113,22 @@ namespace Timeline.Services
             throw new EntityAlreadyExistException(EntityNames.User, ExceptionUsernameConflict);
         }
 
-        private async Task<UserInfo> CreateUserFromEntity(UserEntity entity)
+        public async Task<UserEntity> GetUser(long id)
         {
-            var permission = await _userPermissionService.GetPermissionsOfUserAsync(entity.Id);
-            return new UserInfo(
-                entity.Id,
-                entity.UniqueId,
-                entity.Username,
-                string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
-                permission,
-                entity.UsernameChangeTime,
-                entity.CreateTime,
-                entity.LastModified,
-                entity.Version
-            );
-        }
-
-        public async Task<UserInfo> GetUser(long id)
-        {
-            var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+            var user = await _databaseContext.Users.Where(u => u.Id == id).Include(u => u.Permissions).SingleOrDefaultAsync();
 
             if (user == null)
                 throw new UserNotExistException(id);
 
-            return await CreateUserFromEntity(user);
+            return user;
         }
 
-        public async Task<List<UserInfo>> GetUsers()
+        public async Task<List<UserEntity>> GetUsers()
         {
-            List<UserInfo> result = new();
-            foreach (var entity in await _databaseContext.Users.ToArrayAsync())
-            {
-                result.Add(await CreateUserFromEntity(entity));
-            }
-            return result;
+            return await _databaseContext.Users.Include(u => u.Permissions).ToListAsync();
         }
 
-        public async Task<UserInfo> CreateUser(string username, string password)
+        public async Task<UserEntity> CreateUser(string username, string password)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -177,10 +153,12 @@ namespace Timeline.Services
 
             _logger.LogInformation(Log.Format(LogDatabaseCreate, ("Id", newEntity.Id), ("Username", username)));
 
-            return await CreateUserFromEntity(newEntity);
+            await _databaseContext.Entry(newEntity).Collection(e => e.Permissions).LoadAsync();
+
+            return newEntity;
         }
 
-        public async Task<UserInfo> ModifyUser(long id, ModifyUserParams? param)
+        public async Task<UserEntity> ModifyUser(long id, ModifyUserParams? param)
         {
             if (param != null)
             {
@@ -194,7 +172,7 @@ namespace Timeline.Services
                     CheckNicknameFormat(param.Nickname, nameof(param));
             }
 
-            var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+            var entity = await _databaseContext.Users.Where(u => u.Id == id).Include(u => u.Permissions).SingleOrDefaultAsync();
             if (entity == null)
                 throw new UserNotExistException(id);
 
@@ -238,7 +216,7 @@ namespace Timeline.Services
                 _logger.LogInformation(LogDatabaseUpdate, ("Id", id));
             }
 
-            return await CreateUserFromEntity(entity);
+            return entity;
         }
     }
 }

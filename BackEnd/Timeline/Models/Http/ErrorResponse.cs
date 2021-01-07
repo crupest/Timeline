@@ -234,16 +234,6 @@ namespace Timeline.Models.Http
                 return new CommonResponse(ErrorCodes.TimelineController.NotExist, string.Format(message, formatArgs));
             }
 
-            public static CommonResponse MemberPut_NotExist(params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.MemberPut_NotExist, string.Format(TimelineController_MemberPut_NotExist, formatArgs));
-            }
-
-            public static CommonResponse CustomMessage_MemberPut_NotExist(string message, params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.MemberPut_NotExist, string.Format(message, formatArgs));
-            }
-
             public static CommonResponse QueryRelateNotExist(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, string.Format(TimelineController_QueryRelateNotExist, formatArgs));

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Models.Http;
+using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using Timeline.Services.Exceptions;
@@ -18,12 +19,12 @@ namespace Timeline.Controllers
     public class HighlightTimelineController : Controller
     {
         private readonly IHighlightTimelineService _service;
-        private readonly IMapper _mapper;
+        private readonly ITimelineService _timelineService;
 
-        public HighlightTimelineController(IHighlightTimelineService service, IMapper mapper)
+        public HighlightTimelineController(IHighlightTimelineService service, ITimelineService timelineService)
         {
             _service = service;
-            _mapper = mapper;
+            _timelineService = timelineService;
         }
 
         /// <summary>
@@ -34,8 +35,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
-            var t = await _service.GetHighlightTimelines();
-            return _mapper.Map<List<HttpTimeline>>(t);
+            var ids = await _service.GetHighlightTimelines();
+            var timelines = await _timelineService.GetTimelineList(ids);
+            return timelines.MapToHttp(Url);
         }
 
         /// <summary>

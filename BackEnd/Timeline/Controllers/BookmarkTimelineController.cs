@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
+using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using Timeline.Services.Exceptions;
@@ -18,13 +18,12 @@ namespace Timeline.Controllers
     public class BookmarkTimelineController : Controller
     {
         private readonly IBookmarkTimelineService _service;
+        private readonly ITimelineService _timelineService;
 
-        private readonly IMapper _mapper;
-
-        public BookmarkTimelineController(IBookmarkTimelineService service, IMapper mapper)
+        public BookmarkTimelineController(IBookmarkTimelineService service, ITimelineService timelineService)
         {
             _service = service;
-            _mapper = mapper;
+            _timelineService = timelineService;
         }
 
         /// <summary>
@@ -37,8 +36,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
-            var bookmarks = await _service.GetBookmarks(this.GetUserId());
-            return Ok(_mapper.Map<List<HttpTimeline>>(bookmarks));
+            var ids = await _service.GetBookmarks(this.GetUserId());
+            var timelines = await _timelineService.GetTimelineList(ids);
+            return Ok(timelines.MapToHttp(Url));
         }
 
         /// <summary>

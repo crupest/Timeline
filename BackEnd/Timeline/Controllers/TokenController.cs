@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Timeline.Helpers;
 using Timeline.Models.Http;
+using Timeline.Models.Mapper;
 using Timeline.Services;
 using Timeline.Services.Exceptions;
 using static Timeline.Resources.Controllers.TokenController;
@@ -27,16 +28,13 @@ namespace Timeline.Controllers
         private readonly ILogger<TokenController> _logger;
         private readonly IClock _clock;
 
-        private readonly IMapper _mapper;
-
         /// <summary></summary>
-        public TokenController(IUserCredentialService userCredentialService, IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock, IMapper mapper)
+        public TokenController(IUserCredentialService userCredentialService, IUserTokenManager userTokenManager, ILogger<TokenController> logger, IClock clock)
         {
             _userCredentialService = userCredentialService;
             _userTokenManager = userTokenManager;
             _logger = logger;
             _clock = clock;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -74,7 +72,7 @@ namespace Timeline.Controllers
                 return Ok(new HttpCreateTokenResponse
                 {
                     Token = result.Token,
-                    User = _mapper.Map<HttpUser>(result.User)
+                    User = result.User.MapToHttp(Url)
                 });
             }
             catch (UserNotExistException e)
@@ -115,7 +113,7 @@ namespace Timeline.Controllers
                     ("Username", result.Username), ("Token", request.Token)));
                 return Ok(new HttpVerifyTokenResponse
                 {
-                    User = _mapper.Map<HttpUser>(result)
+                    User = result.MapToHttp(Url)
                 });
             }
             catch (UserTokenTimeExpireException e)

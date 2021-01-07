@@ -60,6 +60,11 @@ namespace Timeline.Models.Http
 
         }
 
+        internal static CommonPutResponse Create(bool create)
+        {
+            return new CommonPutResponse(0, MessagePutCreate, create);
+        }
+
         internal static CommonPutResponse Create()
         {
             return new CommonPutResponse(0, MessagePutCreate, true);
@@ -105,6 +110,11 @@ namespace Timeline.Models.Http
             : base(code, message, new ResponseData(delete))
         {
 
+        }
+
+        internal static CommonDeleteResponse Create(bool delete)
+        {
+            return new CommonDeleteResponse(0, MessageDeleteDelete, delete);
         }
 
         internal static CommonDeleteResponse Delete()
