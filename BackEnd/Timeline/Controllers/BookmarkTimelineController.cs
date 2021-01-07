@@ -40,7 +40,7 @@ namespace Timeline.Controllers
         {
             var ids = await _service.GetBookmarks(this.GetUserId());
             var timelines = await _timelineService.GetTimelineList(ids);
-            return await _timelineMapper.MapToHttp(timelines, Url);
+            return await _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId());
         }
 
         /// <summary>

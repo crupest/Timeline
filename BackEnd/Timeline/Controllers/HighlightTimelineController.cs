@@ -38,7 +38,7 @@ namespace Timeline.Controllers
         {
             var ids = await _service.GetHighlightTimelines();
             var timelines = await _timelineService.GetTimelineList(ids);
-            return await _timelineMapper.MapToHttp(timelines, Url);
+            return await _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId());
         }
 
         /// <summary>
