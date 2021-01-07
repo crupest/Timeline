@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Timeline.Controllers;
 using Timeline.Entities;
 using Timeline.Models.Http;
@@ -8,15 +8,24 @@ using Timeline.Services;
 
 namespace Timeline.Models.Mapper
 {
-    public static class UserMapper
+    public class UserMapper
     {
-        public static HttpUser MapToHttp(this UserEntity entity, IUrlHelper urlHelper)
+        private readonly DatabaseContext _database;
+        private readonly IUserPermissionService _userPermissionService;
+
+        public UserMapper(DatabaseContext database, IUserPermissionService userPermissionService)
+        {
+            _database = database;
+            _userPermissionService = userPermissionService;
+        }
+
+        public async Task<HttpUser> MapToHttp(UserEntity entity, IUrlHelper urlHelper)
         {
             return new HttpUser(
                 uniqueId: entity.UniqueId,
                 username: entity.Username,
                 nickname: string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
-                permissions: MapPermission(entity),
+                permissions: (await _userPermissionService.GetPermissionsOfUserAsync(entity.Id, false)).ToStringList(),
                 links: new HttpUserLinks(
                     self: urlHelper.ActionLink(nameof(UserController.Get), nameof(UserController)[0..^nameof(Controller).Length], new { entity.Username }),
                     avatar: urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController)[0..^nameof(Controller).Length], new { entity.Username }),
@@ -25,14 +34,14 @@ namespace Timeline.Models.Mapper
             );
         }
 
-        public static List<HttpUser> MapToHttp(this List<UserEntity> entities, IUrlHelper urlHelper)
+        public async Task<List<HttpUser>> MapToHttp(List<UserEntity> entities, IUrlHelper urlHelper)
         {
-            return entities.Select(e => e.MapToHttp(urlHelper)).ToList();
-        }
-
-        private static List<string> MapPermission(UserEntity entity)
-        {
-            return entity.Permissions.Select(p => p.Permission).ToList();
+            var result = new List<HttpUser>();
+            foreach (var entity in entities)
+            {
+                result.Add(await MapToHttp(entity, urlHelper));
+            }
+            return result;
         }
     }
 }
