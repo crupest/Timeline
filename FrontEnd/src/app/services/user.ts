@@ -5,7 +5,12 @@ import { map, filter } from "rxjs/operators";
 import { UiLogicError } from "@/common";
 import { convertError } from "@/utilities/rxjs";
 
-import { HttpNetworkError, BlobWithEtag, NotModified } from "@/http/common";
+import {
+  HttpNetworkError,
+  BlobWithEtag,
+  NotModified,
+  tokenSubject,
+} from "@/http/common";
 import {
   getHttpTokenClient,
   HttpCreateTokenBadCredentialError,
@@ -61,6 +66,12 @@ export class BadCredentialError {
 const USER_STORAGE_KEY = "currentuser";
 
 export class UserService {
+  constructor() {
+    this.userSubject.subscribe((u) => {
+      tokenSubject.next(u?.token ?? null);
+    });
+  }
+
   private userSubject = new BehaviorSubject<AuthUser | null | undefined>(
     undefined
   );
@@ -167,13 +178,10 @@ export class UserService {
       throw new UiLogicError("Not login or checked now, can't log out.");
     }
     const $ = from(
-      getHttpUserClient().changePassword(
-        {
-          oldPassword,
-          newPassword,
-        },
-        this.currentUser.token
-      )
+      getHttpUserClient().changePassword({
+        oldPassword,
+        newPassword,
+      })
     );
     $.subscribe(() => {
       void this.logout();
@@ -378,15 +386,13 @@ export class UserInfoService {
   }
 
   async setAvatar(username: string, blob: Blob): Promise<void> {
-    const user = checkLogin();
-    await getHttpUserClient().putAvatar(username, blob, user.token);
+    await getHttpUserClient().putAvatar(username, blob);
     this._avatarHub.getLine(username)?.next({ data: blob, type: "synced" });
   }
 
   async setNickname(username: string, nickname: string): Promise<void> {
-    const user = checkLogin();
     return getHttpUserClient()
-      .patch(username, { nickname }, user.token)
+      .patch(username, { nickname })
       .then((user) => {
         this.saveUser(user);
       });

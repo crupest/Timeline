@@ -20,11 +20,11 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
         <Col xs="12" md="6">
           <TimelineBoard
             title={t("home.bookmarkTimeline")}
-            load={() => getHttpBookmarkClient().list(user.token)}
+            load={() => getHttpBookmarkClient().list()}
             editHandler={{
               onDelete: (timeline) => {
                 return getHttpBookmarkClient()
-                  .delete(timeline, user.token)
+                  .delete(timeline)
                   .catch((e) => {
                     pushAlert({
                       message: {
@@ -39,8 +39,7 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
               onMove: (timeline, index, offset) => {
                 return getHttpBookmarkClient()
                   .move(
-                    { timeline, newPosition: index + offset + 1 }, // +1 because backend contract: index starts at 1
-                    user.token
+                    { timeline, newPosition: index + offset + 1 } // +1 because backend contract: index starts at 1
                   )
                   .catch((e) => {
                     pushAlert({
@@ -75,7 +74,7 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
                 ? {
                     onDelete: (timeline) => {
                       return getHttpHighlightClient()
-                        .delete(timeline, user.token)
+                        .delete(timeline)
                         .catch((e) => {
                           pushAlert({
                             message: {
@@ -90,8 +89,7 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
                     onMove: (timeline, index, offset) => {
                       return getHttpHighlightClient()
                         .move(
-                          { timeline, newPosition: index + offset + 1 }, // +1 because backend contract: index starts at 1
-                          user.token
+                          { timeline, newPosition: index + offset + 1 } // +1 because backend contract: index starts at 1
                         )
                         .catch((e) => {
                           pushAlert({
