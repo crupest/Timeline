@@ -45,7 +45,7 @@ export default function TimelinePageTemplate<TManageItem>(
     null
   );
 
-  const timelineState = useTimelineInfo(name);
+  const [timelineState, setTimelineState] = useTimelineInfo(name);
   const postListState = usePostList(name);
 
   const onPost: TimelinePostSendCallback = React.useCallback(
@@ -121,24 +121,64 @@ export default function TimelinePageTemplate<TManageItem>(
           onBookmark:
             user != null
               ? () => {
-                  void getHttpBookmarkClient()
-                    .put(name, user.token)
-                    .then(() => {
-                      pushAlert({
-                        message: {
-                          type: "i18n",
-                          key: "timeline.addBookmarkSuccess",
-                        },
-                        type: "success",
-                      });
+                  if (timeline.isBookmark) {
+                    setTimelineState({
+                      ...timelineState,
+                      timeline: {
+                        ...timeline,
+                        isBookmark: false,
+                      },
                     });
+                    void getHttpBookmarkClient()
+                      .delete(name)
+                      .then(
+                        () => {
+                          void timelineService.syncTimeline(name);
+                        },
+                        () => {
+                          pushAlert({
+                            message: {
+                              type: "i18n",
+                              key: "timeline.removeBookmarkFail",
+                            },
+                            type: "danger",
+                          });
+                          setTimelineState(timelineState);
+                        }
+                      );
+                  } else {
+                    setTimelineState({
+                      ...timelineState,
+                      timeline: {
+                        ...timeline,
+                        isBookmark: true,
+                      },
+                    });
+                    void getHttpBookmarkClient()
+                      .put(name)
+                      .then(
+                        () => {
+                          void timelineService.syncTimeline(name);
+                        },
+                        () => {
+                          pushAlert({
+                            message: {
+                              type: "i18n",
+                              key: "timeline.addBookmarkFail",
+                            },
+                            type: "danger",
+                          });
+                          setTimelineState(timelineState);
+                        }
+                      );
+                  }
                 }
               : undefined,
           onHighlight:
             user != null && user.hasHighlightTimelineAdministrationPermission
               ? () => {
                   void getHttpHighlightClient()
-                    .put(name, user.token)
+                    .put(name)
                     .then(() => {
                       pushAlert({
                         message: {

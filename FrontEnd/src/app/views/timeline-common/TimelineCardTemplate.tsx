@@ -56,13 +56,19 @@ function TimelineCardTemplate({
         <div className="text-right mt-2">
           {onHighlight != null ? (
             <i
-              className="bi-star icon-button text-yellow mr-3"
+              className={clsx(
+                timeline.isHighlight ? "bi-star-fill" : "bi-star",
+                "icon-button text-yellow mr-3"
+              )}
               onClick={onHighlight}
             />
           ) : null}
           {onBookmark != null ? (
             <i
-              className="bi-bookmark icon-button text-yellow mr-3"
+              className={clsx(
+                timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
+                "icon-button text-yellow mr-3"
+              )}
               onClick={onBookmark}
             />
           ) : null}

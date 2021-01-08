@@ -1,6 +1,5 @@
-import axios from "axios";
-
 import {
+  axios,
   apiBaseUrl,
   convertToNetworkError,
   extractResponseData,
@@ -19,9 +18,9 @@ export interface HttpHighlightMoveRequest {
 
 export interface IHttpHighlightClient {
   list(): Promise<HttpTimelineInfo[]>;
-  put(timeline: string, token: string): Promise<void>;
-  delete(timeline: string, token: string): Promise<void>;
-  move(req: HttpHighlightMoveRequest, token: string): Promise<void>;
+  put(timeline: string): Promise<void>;
+  delete(timeline: string): Promise<void>;
+  move(req: HttpHighlightMoveRequest): Promise<void>;
 }
 
 export class HttpHighlightClient implements IHttpHighlightClient {
@@ -33,23 +32,23 @@ export class HttpHighlightClient implements IHttpHighlightClient {
       .catch(convertToNetworkError);
   }
 
-  put(timeline: string, token: string): Promise<void> {
+  put(timeline: string): Promise<void> {
     return axios
-      .put(`${apiBaseUrl}/highlights/${timeline}?token=${token}`)
+      .put(`${apiBaseUrl}/highlights/${timeline}`)
       .catch(convertToNetworkError)
       .then();
   }
 
-  delete(timeline: string, token: string): Promise<void> {
+  delete(timeline: string): Promise<void> {
     return axios
-      .delete(`${apiBaseUrl}/highlights/${timeline}?token=${token}`)
+      .delete(`${apiBaseUrl}/highlights/${timeline}`)
       .catch(convertToNetworkError)
       .then();
   }
 
-  move(req: HttpHighlightMoveRequest, token: string): Promise<void> {
+  move(req: HttpHighlightMoveRequest): Promise<void> {
     return axios
-      .post(`${apiBaseUrl}/highlightop/move?token=${token}`, req)
+      .post(`${apiBaseUrl}/highlightop/move`, req)
       .catch(convertToNetworkError)
       .then();
   }

@@ -28,13 +28,7 @@ export type { TimelineVisibility } from "@/http/timeline";
 
 import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from "./common";
 import { DataHub, WithSyncStatus } from "./DataHub";
-import {
-  checkLogin,
-  userService,
-  userInfoService,
-  User,
-  AuthUser,
-} from "./user";
+import { userInfoService, User, AuthUser } from "./user";
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -227,14 +221,10 @@ export class TimelineService {
   }
 
   createTimeline(timelineName: string): Observable<TimelineInfo> {
-    const user = checkLogin();
     return from(
-      getHttpTimelineClient().postTimeline(
-        {
-          name: timelineName,
-        },
-        user.token
-      )
+      getHttpTimelineClient().postTimeline({
+        name: timelineName,
+      })
     ).pipe(
       convertError(HttpTimelineNameConflictError, TimelineNameConflictError)
     );
@@ -244,10 +234,9 @@ export class TimelineService {
     timelineName: string,
     req: TimelineChangePropertyRequest
   ): Observable<TimelineInfo> {
-    const user = checkLogin();
     return from(
       getHttpTimelineClient()
-        .patchTimeline(timelineName, req, user.token)
+        .patchTimeline(timelineName, req)
         .then((timeline) => {
           void this.syncTimeline(timelineName);
           return timeline;
@@ -256,17 +245,13 @@ export class TimelineService {
   }
 
   deleteTimeline(timelineName: string): Observable<unknown> {
-    const user = checkLogin();
-    return from(
-      getHttpTimelineClient().deleteTimeline(timelineName, user.token)
-    );
+    return from(getHttpTimelineClient().deleteTimeline(timelineName));
   }
 
   addMember(timelineName: string, username: string): Observable<unknown> {
-    const user = checkLogin();
     return from(
       getHttpTimelineClient()
-        .memberPut(timelineName, username, user.token)
+        .memberPut(timelineName, username)
         .then(() => {
           void this.syncTimeline(timelineName);
         })
@@ -274,10 +259,9 @@ export class TimelineService {
   }
 
   removeMember(timelineName: string, username: string): Observable<unknown> {
-    const user = checkLogin();
     return from(
       getHttpTimelineClient()
-        .memberDelete(timelineName, username, user.token)
+        .memberDelete(timelineName, username)
         .then(() => {
           void this.syncTimeline(timelineName);
         })
@@ -344,10 +328,7 @@ export class TimelineService {
 
       try {
         if (lastUpdatedTime == null) {
-          const httpPosts = await getHttpTimelineClient().listPost(
-            key,
-            userService.currentUser?.token
-          );
+          const httpPosts = await getHttpTimelineClient().listPost(key);
 
           userInfoService.saveUsers(
             uniqBy(
@@ -362,14 +343,10 @@ export class TimelineService {
 
           line.next({ type: "synced", posts });
         } else {
-          const httpPosts = await getHttpTimelineClient().listPost(
-            key,
-            userService.currentUser?.token,
-            {
-              modifiedSince: lastUpdatedTime,
-              includeDeleted: true,
-            }
-          );
+          const httpPosts = await getHttpTimelineClient().listPost(key, {
+            modifiedSince: lastUpdatedTime,
+            includeDeleted: true,
+          });
 
           const deletedIds = httpPosts
             .filter((p) => p.deleted)
@@ -582,10 +559,9 @@ export class TimelineService {
     timelineName: string,
     request: TimelineCreatePostRequest
   ): Observable<unknown> {
-    const user = checkLogin();
     return from(
       getHttpTimelineClient()
-        .postPost(timelineName, request, user.token)
+        .postPost(timelineName, request)
         .then(() => {
           void this.syncPosts(timelineName);
         })
@@ -593,10 +569,9 @@ export class TimelineService {
   }
 
   deletePost(timelineName: string, postId: number): Observable<unknown> {
-    const user = checkLogin();
     return from(
       getHttpTimelineClient()
-        .deletePost(timelineName, postId, user.token)
+        .deletePost(timelineName, postId)
         .then(() => {
           void this.syncPosts(timelineName);
         })
@@ -681,7 +656,10 @@ export function validateTimelineName(name: string): boolean {
 
 export function useTimelineInfo(
   timelineName: string
-): TimelineWithSyncStatus | undefined {
+): [
+  TimelineWithSyncStatus | undefined,
+  React.Dispatch<React.SetStateAction<TimelineWithSyncStatus | undefined>>
+] {
   const [state, setState] = React.useState<TimelineWithSyncStatus | undefined>(
     undefined
   );
@@ -695,7 +673,7 @@ export function useTimelineInfo(
       subscription.unsubscribe();
     };
   }, [timelineName]);
-  return state;
+  return [state, setState];
 }
 
 export function usePostList(
