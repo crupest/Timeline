@@ -121,57 +121,35 @@ export default function TimelinePageTemplate<TManageItem>(
           onBookmark:
             user != null
               ? () => {
-                  if (timeline.isBookmark) {
-                    setTimelineState({
-                      ...timelineState,
-                      timeline: {
-                        ...timeline,
-                        isBookmark: false,
-                      },
-                    });
-                    void getHttpBookmarkClient()
-                      .delete(name)
-                      .then(
-                        () => {
-                          void timelineService.syncTimeline(name);
+                  const { isBookmark } = timeline;
+                  setTimelineState({
+                    ...timelineState,
+                    timeline: {
+                      ...timeline,
+                      isBookmark: !isBookmark,
+                    },
+                  });
+                  const client = getHttpBookmarkClient();
+                  const promise = isBookmark
+                    ? client.delete(name)
+                    : client.put(name);
+                  promise.then(
+                    () => {
+                      void timelineService.syncTimeline(name);
+                    },
+                    () => {
+                      pushAlert({
+                        message: {
+                          type: "i18n",
+                          key: isBookmark
+                            ? "timeline.removeBookmarkFail"
+                            : "timeline.addBookmarkFail", // TODO: Add this translation.
                         },
-                        () => {
-                          pushAlert({
-                            message: {
-                              type: "i18n",
-                              key: "timeline.removeBookmarkFail",
-                            },
-                            type: "danger",
-                          });
-                          setTimelineState(timelineState);
-                        }
-                      );
-                  } else {
-                    setTimelineState({
-                      ...timelineState,
-                      timeline: {
-                        ...timeline,
-                        isBookmark: true,
-                      },
-                    });
-                    void getHttpBookmarkClient()
-                      .put(name)
-                      .then(
-                        () => {
-                          void timelineService.syncTimeline(name);
-                        },
-                        () => {
-                          pushAlert({
-                            message: {
-                              type: "i18n",
-                              key: "timeline.addBookmarkFail",
-                            },
-                            type: "danger",
-                          });
-                          setTimelineState(timelineState);
-                        }
-                      );
-                  }
+                        type: "danger",
+                      });
+                      setTimelineState(timelineState);
+                    }
+                  );
                 }
               : undefined,
           onHighlight:
