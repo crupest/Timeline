@@ -107,8 +107,10 @@
         "prompt": "确定删除这个消息？这个操作不可撤销。"
       }
     },
-    "addHighlightSuccess": "成功添加高光。",
-    "addBookmarkSuccess": "成功添加书签。"
+    "addHighlightFail": "添加高光失败。",
+    "removeHighlightFail": "删除高光失败。",
+    "addBookmarkFail": "添加书签失败。",
+    "removeBookmarkFail": "删除书签失败。"
   },
   "user": {
     "username": "用户名",
