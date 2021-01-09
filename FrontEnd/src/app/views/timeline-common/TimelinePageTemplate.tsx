@@ -143,7 +143,7 @@ export default function TimelinePageTemplate<TManageItem>(
                           type: "i18n",
                           key: isBookmark
                             ? "timeline.removeBookmarkFail"
-                            : "timeline.addBookmarkFail", // TODO: Add this translation.
+                            : "timeline.addBookmarkFail",
                         },
                         type: "danger",
                       });
@@ -155,17 +155,35 @@ export default function TimelinePageTemplate<TManageItem>(
           onHighlight:
             user != null && user.hasHighlightTimelineAdministrationPermission
               ? () => {
-                  void getHttpHighlightClient()
-                    .put(name)
-                    .then(() => {
+                  const { isHighlight } = timeline;
+                  setTimelineState({
+                    ...timelineState,
+                    timeline: {
+                      ...timeline,
+                      isHighlight: !isHighlight,
+                    },
+                  });
+                  const client = getHttpHighlightClient();
+                  const promise = isHighlight
+                    ? client.delete(name)
+                    : client.put(name);
+                  promise.then(
+                    () => {
+                      void timelineService.syncTimeline(name);
+                    },
+                    () => {
                       pushAlert({
                         message: {
                           type: "i18n",
-                          key: "timeline.addHighlightSuccess",
+                          key: isHighlight
+                            ? "timeline.removeHighlightFail"
+                            : "timeline.addHighlightFail",
                         },
-                        type: "success",
+                        type: "danger",
                       });
-                    });
+                      setTimelineState(timelineState);
+                    }
+                  );
                 }
               : undefined,
         };
