@@ -110,7 +110,7 @@ export default function TimelinePageTemplate<TManageItem>(
             : undefined,
         }));
 
-        const others = {
+        const operations = {
           onPost: service.hasPostPermission(user, timeline)
             ? onPost
             : undefined,
@@ -189,20 +189,20 @@ export default function TimelinePageTemplate<TManageItem>(
         };
 
         if (type === "cache") {
-          return [{ timeline, posts, ...others }, "syncing"];
+          return [{ timeline, posts, operations }, "syncing"];
         } else if (type === "offline") {
-          return [{ timeline, posts, ...others }, "offline"];
+          return [{ timeline, posts, operations }, "offline"];
         } else {
           if (postListState == null) {
-            return [{ timeline, posts, ...others }, "syncing"];
+            return [{ timeline, posts, operations }, "syncing"];
           } else {
             const { type: postListType } = postListState;
             if (postListType === "synced") {
-              return [{ timeline, posts, ...others }, "synced"];
+              return [{ timeline, posts, operations }, "synced"];
             } else if (postListType === "cache") {
-              return [{ timeline, posts, ...others }, "syncing"];
+              return [{ timeline, posts, operations }, "syncing"];
             } else if (postListType === "offline") {
-              return [{ timeline, posts, ...others }, "offline"];
+              return [{ timeline, posts, operations }, "offline"];
             }
           }
         }

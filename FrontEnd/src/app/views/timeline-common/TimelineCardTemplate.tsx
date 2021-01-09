@@ -10,7 +10,11 @@ import SyncStatusBadge from "../timeline-common/SyncStatusBadge";
 import CollapseButton from "../timeline-common/CollapseButton";
 
 export interface TimelineCardTemplateProps
-  extends Omit<TimelineCardComponentProps<"">, "onManage" | "onMember"> {
+  extends Omit<TimelineCardComponentProps<"">, "operations"> {
+  operations: Pick<
+    TimelineCardComponentProps<"">["operations"],
+    "onHighlight" | "onBookmark"
+  >;
   infoArea: React.ReactElement;
   manageArea:
     | { type: "member"; onMember: () => void }
@@ -33,13 +37,13 @@ function TimelineCardTemplate({
   collapse,
   infoArea,
   manageArea,
-  onBookmark,
-  onHighlight,
+  operations,
   toggleCollapse,
   syncStatus,
   className,
 }: TimelineCardTemplateProps): React.ReactElement | null {
   const { t } = useTranslation();
+  const { onBookmark, onHighlight } = operations;
 
   return (
     <div className={clsx("cru-card p-2 clearfix", className)}>
