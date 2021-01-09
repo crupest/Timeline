@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 
-import { updateQueryString, applyQueryParameters } from "../utilities/url";
+import { applyQueryParameters } from "../utilities/url";
 
 import {
   axios,
@@ -383,26 +383,13 @@ export class HttpTimelineClient implements IHttpTimelineClient {
       includeDeleted?: boolean;
     }
   ): Promise<HttpTimelineGenericPostInfo[]> {
-    let url = `${apiBaseUrl}/timelines/${timelineName}/posts`;
-    if (query != null) {
-      if (query.modifiedSince != null) {
-        url = updateQueryString(
-          "modifiedSince",
-          query.modifiedSince.toISOString(),
-          url
-        );
-      }
-      if (query.includeDeleted != null) {
-        url = updateQueryString(
-          "includeDeleted",
-          query.includeDeleted ? "true" : "false",
-          url
-        );
-      }
-    }
-
     return axios
-      .get<RawTimelineGenericPostInfo[]>(url)
+      .get<RawTimelineGenericPostInfo[]>(
+        applyQueryParameters(
+          `${apiBaseUrl}/timelines/${timelineName}/posts`,
+          query
+        )
+      )
       .then(extractResponseData)
       .catch(convertToIfStatusCodeIs(404, HttpTimelineNotExistError))
       .catch(convertToForbiddenError)
