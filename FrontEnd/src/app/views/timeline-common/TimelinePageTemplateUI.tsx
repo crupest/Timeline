@@ -13,14 +13,16 @@ import { TimelineSyncStatus } from "./SyncStatusBadge";
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
-  onManage?: (item: TManageItems | "property") => void;
-  onMember: () => void;
-  onBookmark?: () => void;
-  onHighlight?: () => void;
-  className?: string;
-  collapse: boolean;
   syncStatus: TimelineSyncStatus;
+  operations: {
+    onManage?: (item: TManageItems | "property") => void;
+    onMember: () => void;
+    onBookmark?: () => void;
+    onHighlight?: () => void;
+  };
+  collapse: boolean;
   toggleCollapse: () => void;
+  className?: string;
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
@@ -28,11 +30,13 @@ export interface TimelinePageTemplateUIProps<TManageItems> {
     | {
         timeline: TimelineInfo;
         posts?: TimelinePostInfoEx[];
-        onManage?: (item: TManageItems | "property") => void;
-        onMember: () => void;
-        onBookmark?: () => void;
-        onHighlight?: () => void;
-        onPost?: TimelinePostSendCallback;
+        operations: {
+          onManage?: (item: TManageItems | "property") => void;
+          onMember: () => void;
+          onBookmark?: () => void;
+          onHighlight?: () => void;
+          onPost?: TimelinePostSendCallback;
+        };
       }
     | I18nText;
   syncStatus: TimelineSyncStatus;
@@ -155,10 +159,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
           <CardComponent
             className="timeline-template-card"
             timeline={data.timeline}
-            onManage={data.onManage}
-            onMember={data.onMember}
-            onBookmark={data.onBookmark}
-            onHighlight={data.onHighlight}
+            operations={data.operations}
             syncStatus={syncStatus}
             collapse={cardCollapse}
             toggleCollapse={toggleCardCollapse}
@@ -180,7 +181,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             <Spinner variant="primary" animation="grow" />
           </div>
         )}
-        {data != null && data.onPost != null ? (
+        {data != null && data.operations.onPost != null ? (
           <>
             <div
               style={{ height: bottomSpaceHeight }}
@@ -188,7 +189,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             />
             <TimelinePostEdit
               className="fixed-bottom"
-              onPost={data.onPost}
+              onPost={data.operations.onPost}
               onHeightChange={onPostEditHeightChange}
               timelineUniqueId={data.timeline.uniqueId}
             />
