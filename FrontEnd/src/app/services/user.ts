@@ -9,7 +9,7 @@ import {
   HttpNetworkError,
   BlobWithEtag,
   NotModified,
-  tokenSubject,
+  setHttpToken,
 } from "@/http/common";
 import {
   getHttpTokenClient,
@@ -68,7 +68,7 @@ const USER_STORAGE_KEY = "currentuser";
 export class UserService {
   constructor() {
     this.userSubject.subscribe((u) => {
-      tokenSubject.next(u?.token ?? null);
+      setHttpToken(u?.token ?? null);
     });
   }
 
