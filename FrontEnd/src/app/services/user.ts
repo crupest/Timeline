@@ -25,6 +25,7 @@ import {
 import { dataStorage, throwIfNotNetworkError } from "./common";
 import { DataHub } from "./DataHub";
 import { pushAlert } from "./alert";
+import { DataHub2 } from "./DataHub2";
 
 export type User = HttpUser;
 
@@ -251,68 +252,42 @@ export class UserNotExistError extends Error {}
 
 export class UserInfoService {
   saveUser(user: HttpUser): void {
-    const key = user.username;
-    void this._userHub.optionalInitLineWithSyncAction(key, async (line) => {
-      await this.doSaveUser(user);
-      line.next({ user, type: "synced" });
-    });
+    this.userHub.getLine(user.username).save(user);
   }
 
   saveUsers(users: HttpUser[]): void {
     return users.forEach((user) => this.saveUser(user));
   }
 
-  private _getCachedUser(username: string): Promise<User | null> {
-    return dataStorage.getItem<HttpUser | null>(`user.${username}`);
+  private generateUserDataStorageKey(username: string): string {
+    return `user.${username}`;
   }
 
-  private doSaveUser(user: HttpUser): Promise<void> {
-    return dataStorage.setItem<HttpUser>(`user.${user.username}`, user).then();
-  }
-
-  getCachedUser(username: string): Promise<User | null> {
-    return this._getCachedUser(username);
-  }
-
-  syncUser(username: string): Promise<void> {
-    return this._userHub.getLineOrCreate(username).sync();
-  }
-
-  private _userHub = new DataHub<
-    string,
-    | { user: User; type: "cache" | "synced" | "offline" }
-    | { user?: undefined; type: "notexist" | "offline" }
-  >({
-    sync: async (key, line) => {
-      if (line.value == undefined) {
-        const cache = await this._getCachedUser(key);
-        if (cache != null) {
-          line.next({ user: cache, type: "cache" });
-        }
-      }
-
+  readonly userHub = new DataHub2<string, HttpUser | "notexist">({
+    saveData: (username, data) => {
+      if (typeof data === "string") return Promise.resolve();
+      return dataStorage
+        .setItem<HttpUser>(this.generateUserDataStorageKey(username), data)
+        .then();
+    },
+    getSavedData: (username) => {
+      return dataStorage.getItem<HttpUser | null>(
+        this.generateUserDataStorageKey(username)
+      );
+    },
+    fetchData: async (username) => {
       try {
-        const res = await getHttpUserClient().get(key);
-        await this.doSaveUser(res);
-        line.next({ user: res, type: "synced" });
+        return await getHttpUserClient().get(username);
       } catch (e) {
         if (e instanceof HttpUserNotExistError) {
-          line.next({ type: "notexist" });
-        } else {
-          const cache = await this._getCachedUser(key);
-          line.next({ user: cache ?? undefined, type: "offline" });
-          throwIfNotNetworkError(e);
+          return "notexist";
+        } else if (e instanceof HttpNetworkError) {
+          return null;
         }
+        throw e;
       }
     },
   });
-
-  getUser$(username: string): Observable<User> {
-    return this._userHub.getObservable(username).pipe(
-      map((state) => state?.user),
-      filter((user): user is User => user != null)
-    );
-  }
 
   private _getCachedAvatar(username: string): Promise<BlobWithEtag | null> {
     return dataStorage.getItem<BlobWithEtag | null>(`user.${username}.avatar`);
