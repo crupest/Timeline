@@ -451,10 +451,7 @@ export function validateTimelineName(name: string): boolean {
 
 export function useTimeline(
   timelineName: string
-): [
-  DataAndStatus<TimelineInfo | "notexist">,
-  React.Dispatch<React.SetStateAction<DataAndStatus<TimelineInfo | "notexist">>>
-] {
+): DataAndStatus<TimelineInfo | "notexist"> {
   const [state, setState] = React.useState<
     DataAndStatus<TimelineInfo | "notexist">
   >({
@@ -472,7 +469,7 @@ export function useTimeline(
       subscription.unsubscribe();
     };
   }, [timelineName]);
-  return [state, setState];
+  return state;
 }
 
 export function usePosts(

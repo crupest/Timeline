@@ -40,7 +40,7 @@ export default function TimelinePageTemplate<TManageItem>(
     null
   );
 
-  const [timelineAndStatus, setTimelineAndStatus] = useTimeline(name);
+  const timelineAndStatus = useTimeline(name);
   const postsAndState = usePosts(name);
 
   const onPost: TimelinePostSendCallback = React.useCallback(
@@ -111,13 +111,6 @@ export default function TimelinePageTemplate<TManageItem>(
           user != null
             ? () => {
                 const { isBookmark } = timeline;
-                setTimelineAndStatus({
-                  ...timelineAndStatus,
-                  data: {
-                    ...timeline,
-                    isBookmark: !isBookmark,
-                  },
-                });
                 const client = getHttpBookmarkClient();
                 const promise = isBookmark
                   ? client.delete(name)
@@ -136,7 +129,6 @@ export default function TimelinePageTemplate<TManageItem>(
                       },
                       type: "danger",
                     });
-                    setTimelineAndStatus(timelineAndStatus);
                   }
                 );
               }
@@ -145,13 +137,6 @@ export default function TimelinePageTemplate<TManageItem>(
           user != null && user.hasHighlightTimelineAdministrationPermission
             ? () => {
                 const { isHighlight } = timeline;
-                setTimelineAndStatus({
-                  ...timelineAndStatus,
-                  data: {
-                    ...timeline,
-                    isHighlight: !isHighlight,
-                  },
-                });
                 const client = getHttpHighlightClient();
                 const promise = isHighlight
                   ? client.delete(name)
@@ -170,7 +155,6 @@ export default function TimelinePageTemplate<TManageItem>(
                       },
                       type: "danger",
                     });
-                    setTimelineAndStatus(timelineAndStatus);
                   }
                 );
               }
