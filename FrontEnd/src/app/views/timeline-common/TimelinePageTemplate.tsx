@@ -7,7 +7,6 @@ import { useUser } from "@/services/user";
 import { timelineService, usePosts, useTimeline } from "@/services/timeline";
 import { getHttpBookmarkClient } from "@/http/bookmark";
 import { getHttpHighlightClient } from "@/http/highlight";
-import { getHttpUserClient, HttpUserNotExistError } from "@/http/user";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
@@ -203,30 +202,8 @@ export default function TimelinePageTemplate<TManageItem>(
       <TimelineMemberDialog
         open
         onClose={closeDialog}
-        members={[timeline.owner, ...timeline.members]}
-        edit={
-          service.hasManagePermission(user, timeline)
-            ? {
-                onCheckUser: (u) => {
-                  return getHttpUserClient()
-                    .get(u)
-                    .catch((e) => {
-                      if (e instanceof HttpUserNotExistError) {
-                        return null;
-                      } else {
-                        throw e;
-                      }
-                    });
-                },
-                onAddUser: (u) => {
-                  return service.addMember(name, u.username).toPromise().then();
-                },
-                onRemoveUser: (u) => {
-                  service.removeMember(name, u);
-                },
-              }
-            : null
-        }
+        timeline={timeline}
+        editable={service.hasManagePermission(user, timeline)}
       />
     );
   }

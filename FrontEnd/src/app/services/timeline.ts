@@ -189,24 +189,20 @@ export class TimelineService {
     return from(getHttpTimelineClient().deleteTimeline(timelineName));
   }
 
-  addMember(timelineName: string, username: string): Observable<unknown> {
-    return from(
-      getHttpTimelineClient()
-        .memberPut(timelineName, username)
-        .then(() => {
-          void this.syncTimeline(timelineName);
-        })
-    );
+  addMember(timelineName: string, username: string): Promise<void> {
+    return getHttpTimelineClient()
+      .memberPut(timelineName, username)
+      .then(() => {
+        void this.syncTimeline(timelineName);
+      });
   }
 
-  removeMember(timelineName: string, username: string): Observable<unknown> {
-    return from(
-      getHttpTimelineClient()
-        .memberDelete(timelineName, username)
-        .then(() => {
-          void this.syncTimeline(timelineName);
-        })
-    );
+  removeMember(timelineName: string, username: string): Promise<void> {
+    return getHttpTimelineClient()
+      .memberDelete(timelineName, username)
+      .then(() => {
+        void this.syncTimeline(timelineName);
+      });
   }
 
   private generatePostsDataStorageKey(timelineName: string): string {
