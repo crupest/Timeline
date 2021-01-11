@@ -62,7 +62,7 @@ const UsernameLabel: React.FC = (props) => {
 
 const UserDeleteDialog: React.FC<
   DialogProps<{ username: string }, unknown>
-> = ({ open, close, token, data: { username }, onSuccess }) => {
+> = ({ open, close, data: { username }, onSuccess }) => {
   return (
     <OperationDialog
       open={open}
@@ -74,7 +74,7 @@ const UserDeleteDialog: React.FC<
           0<UsernameLabel>{username}</UsernameLabel>2
         </Trans>
       )}
-      onProcess={() => getHttpUserClient().delete(username, token)}
+      onProcess={() => getHttpUserClient().delete(username)}
       onSuccessAndClose={onSuccess}
     />
   );
@@ -87,7 +87,7 @@ const UserModifyDialog: React.FC<
     },
     HttpUser
   >
-> = ({ open, close, token, data: { oldUser }, onSuccess }) => {
+> = ({ open, close, data: { oldUser }, onSuccess }) => {
   return (
     <OperationDialog
       open={open}
@@ -115,15 +115,11 @@ const UserModifyDialog: React.FC<
         ] as const
       }
       onProcess={([username, password, nickname]) =>
-        getHttpUserClient().patch(
-          oldUser.username,
-          {
-            username: username !== oldUser.username ? username : undefined,
-            password: password !== "" ? password : undefined,
-            nickname: nickname !== oldUser.nickname ? nickname : undefined,
-          },
-          token
-        )
+        getHttpUserClient().patch(oldUser.username, {
+          username: username !== oldUser.username ? username : undefined,
+          password: password !== "" ? password : undefined,
+          nickname: nickname !== oldUser.nickname ? nickname : undefined,
+        })
       }
       onSuccessAndClose={onSuccess}
     />
@@ -138,7 +134,7 @@ const UserPermissionModifyDialog: React.FC<
     },
     UserPermission[]
   >
-> = ({ open, close, token, data: { username, permissions }, onSuccess }) => {
+> = ({ open, close, data: { username, permissions }, onSuccess }) => {
   const oldPermissionBoolList: boolean[] = kUserPermissionList.map(
     (permission) => permissions.includes(permission)
   );
@@ -168,16 +164,11 @@ const UserPermissionModifyDialog: React.FC<
           const permission = kUserPermissionList[index];
           if (oldValue === newValue) continue;
           if (newValue) {
-            await getHttpUserClient().putUserPermission(
-              username,
-              permission,
-              token
-            );
+            await getHttpUserClient().putUserPermission(username, permission);
           } else {
             await getHttpUserClient().deleteUserPermission(
               username,
-              permission,
-              token
+              permission
             );
           }
         }

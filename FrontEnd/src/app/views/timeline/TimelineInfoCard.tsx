@@ -13,8 +13,8 @@ export type OrdinaryTimelineManageItem = "delete";
 export type TimelineInfoCardProps = TimelineCardComponentProps<OrdinaryTimelineManageItem>;
 
 const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
-  const { onMember, onManage, ...otherProps } = props;
-  const { timeline } = props;
+  const { timeline, operations } = props;
+  const { onManage, onMember } = operations;
 
   const avatar = useAvatar(timeline?.owner?.username);
 
@@ -66,7 +66,7 @@ const TimelineInfoCard: React.FC<TimelineInfoCardProps> = (props) => {
           };
         }
       })()}
-      {...otherProps}
+      {...props}
     />
   );
 };

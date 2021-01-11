@@ -1,3 +1,5 @@
+// Don't use axios in common because it will contains
+// authorization header, which shouldn't be used in token apis.
 import axios, { AxiosError } from "axios";
 
 import {

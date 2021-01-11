@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Container, ListGroup, Modal, Row, Col, Button } from "react-bootstrap";
 
 import { User, useAvatar } from "@/services/user";
+import { TimelineInfo, timelineService } from "@/services/timeline";
+import { getHttpUserClient, HttpUserNotExistError } from "@/http/user";
 
 import SearchInput from "../common/SearchInput";
 import BlobImage from "../common/BlobImage";
@@ -52,15 +54,9 @@ const TimelineMemberItem: React.FC<{
   );
 };
 
-export interface TimelineMemberCallbacks {
-  onCheckUser: (username: string) => Promise<User | null>;
-  onAddUser: (user: User) => Promise<void>;
-  onRemoveUser: (username: string) => void;
-}
-
 export interface TimelineMemberProps {
-  members: User[];
-  edit: TimelineMemberCallbacks | null | undefined;
+  timeline: TimelineInfo;
+  editable: boolean;
 }
 
 const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
@@ -81,7 +77,9 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
     userSearchState.type === "user" ? userSearchState.data.username : undefined
   );
 
-  const members = props.members;
+  const { timeline } = props;
+
+  const members = [timeline.owner, ...timeline.members];
 
   return (
     <Container className="px-4 py-3">
@@ -91,13 +89,21 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
             key={member.username}
             user={member}
             owner={index === 0}
-            onRemove={props.edit?.onRemoveUser}
+            onRemove={
+              props.editable
+                ? () => {
+                    void timelineService.removeMember(
+                      timeline.name,
+                      member.username
+                    );
+                  }
+                : undefined
+            }
           />
         ))}
       </ListGroup>
       {(() => {
-        const edit = props.edit;
-        if (edit != null) {
+        if (props.editable) {
           return (
             <>
               <SearchInput
@@ -115,26 +121,34 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                     });
                     return;
                   }
-
                   setUserSearchState({ type: "loading" });
-                  edit.onCheckUser(userSearchText).then(
-                    (u) => {
-                      if (u == null) {
+                  getHttpUserClient()
+                    .get(userSearchText)
+                    .catch((e) => {
+                      if (e instanceof HttpUserNotExistError) {
+                        return null;
+                      } else {
+                        throw e;
+                      }
+                    })
+                    .then(
+                      (u) => {
+                        if (u == null) {
+                          setUserSearchState({
+                            type: "error",
+                            data: "timeline.userNotExist",
+                          });
+                        } else {
+                          setUserSearchState({ type: "user", data: u });
+                        }
+                      },
+                      (e) => {
                         setUserSearchState({
                           type: "error",
-                          data: "timeline.userNotExist",
+                          data: `${e as string}`,
                         });
-                      } else {
-                        setUserSearchState({ type: "user", data: u });
                       }
-                    },
-                    (e) => {
-                      setUserSearchState({
-                        type: "error",
-                        data: `${e as string}`,
-                      });
-                    }
-                  );
+                    );
                 }}
               />
               {(() => {
@@ -166,10 +180,12 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                             className="align-self-center"
                             disabled={!addable}
                             onClick={() => {
-                              void edit.onAddUser(u).then((_) => {
-                                setUserSearchText("");
-                                setUserSearchState({ type: "init" });
-                              });
+                              void timelineService
+                                .addMember(timeline.name, u.username)
+                                .then(() => {
+                                  setUserSearchText("");
+                                  setUserSearchState({ type: "init" });
+                                });
                             }}
                           >
                             {t("timeline.member.add")}
