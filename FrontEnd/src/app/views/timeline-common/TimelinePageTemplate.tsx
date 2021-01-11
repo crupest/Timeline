@@ -78,9 +78,7 @@ export default function TimelinePageTemplate<TManageItem>(
         const { data: postsInfo } = postsAndState;
         if (postsInfo === "forbid") {
           return "forbid";
-        } else if (postsInfo === "notexist") {
-          return undefined;
-        } else if (postsInfo == null) {
+        } else if (postsInfo == null || postsInfo === "notexist") {
           return undefined;
         } else {
           return postsInfo.posts.map((post) => ({
