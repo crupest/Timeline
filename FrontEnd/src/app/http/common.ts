@@ -179,3 +179,7 @@ export function convertToBlobWithEtag(res: AxiosResponse<Blob>): BlobWithEtag {
     etag: (res.headers as Record<"etag", string>)["etag"],
   };
 }
+
+export function extractEtag(res: AxiosResponse): string {
+  return (res.headers as Record<"etag", string>)["etag"];
+}

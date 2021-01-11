@@ -29,7 +29,7 @@ export interface TimelinePageTemplateUIProps<TManageItems> {
   data?:
     | {
         timeline: TimelineInfo;
-        posts?: TimelinePostInfoEx[];
+        posts?: TimelinePostInfoEx[] | "forbid";
         operations: {
           onManage?: (item: TManageItems | "property") => void;
           onMember: () => void;
@@ -166,16 +166,20 @@ export default function TimelinePageTemplateUI<TManageItems>(
           />
         ) : null}
         {posts != null ? (
-          <div
-            className="timeline-container"
-            style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
-          >
-            <Timeline
-              containerRef={timelineRef}
-              posts={posts}
-              onResize={triggerResizeEvent}
-            />
-          </div>
+          posts === "forbid" ? (
+            <div>{t("timeline.messageCantSee")}</div>
+          ) : (
+            <div
+              className="timeline-container"
+              style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
+            >
+              <Timeline
+                containerRef={timelineRef}
+                posts={posts}
+                onResize={triggerResizeEvent}
+              />
+            </div>
+          )
         ) : (
           <div className="full-viewport-center-child">
             <Spinner variant="primary" animation="grow" />
