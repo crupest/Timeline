@@ -2,6 +2,16 @@ import { Observable } from "rxjs";
 
 export type DataStatus = "syncing" | "synced" | "offline";
 
+export function mergeDataStatus(statusList: DataStatus[]): DataStatus {
+  if (statusList.includes("offline")) {
+    return "offline";
+  } else if (statusList.includes("syncing")) {
+    return "syncing";
+  } else {
+    return "synced";
+  }
+}
+
 export type Subscriber<TData> = (data: TData) => void;
 
 export interface DataAndStatus<TData> {

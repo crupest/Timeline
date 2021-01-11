@@ -1,6 +1,6 @@
 import localforage from "localforage";
 
-import { HttpNetworkError } from "@/http/common";
+const dataVersion = 1;
 
 export const dataStorage = localforage.createInstance({
   name: "data",
@@ -8,16 +8,17 @@ export const dataStorage = localforage.createInstance({
   driver: localforage.INDEXEDDB,
 });
 
+void (async () => {
+  const currentVersion = await dataStorage.getItem<number | null>("version");
+  if (currentVersion !== dataVersion) {
+    console.log("Data storage version has changed. Clear all data.");
+    await dataStorage.clear();
+    await dataStorage.setItem("version", dataVersion);
+  }
+})();
+
 export class ForbiddenError extends Error {
   constructor(message?: string) {
     super(message);
   }
 }
-
-export function throwIfNotNetworkError(e: unknown): void {
-  if (!(e instanceof HttpNetworkError)) {
-    throw e;
-  }
-}
-
-export type BlobOrStatus = Blob | "loading" | "error";

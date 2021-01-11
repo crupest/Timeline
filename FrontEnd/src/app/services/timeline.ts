@@ -1,8 +1,6 @@
 import React from "react";
 import XRegExp from "xregexp";
-import { Observable, from, combineLatest, of } from "rxjs";
-import { map, switchMap, startWith, filter } from "rxjs/operators";
-import { uniqBy } from "lodash";
+import { Observable, from } from "rxjs";
 
 import { convertError } from "@/utilities/rxjs";
 import {
@@ -19,16 +17,15 @@ import {
   HttpTimelineNotExistError,
   HttpTimelineNameConflictError,
 } from "@/http/timeline";
-import { BlobWithEtag, NotModified, HttpForbiddenError } from "@/http/common";
-import { HttpUser } from "@/http/user";
+import { HttpForbiddenError, HttpNetworkError } from "@/http/common";
 
 export { kTimelineVisibilities } from "@/http/timeline";
 
 export type { TimelineVisibility } from "@/http/timeline";
 
-import { dataStorage, throwIfNotNetworkError, BlobOrStatus } from "./common";
-import { DataHub, WithSyncStatus } from "./DataHub";
-import { userInfoService, User, AuthUser } from "./user";
+import { dataStorage } from "./common";
+import { userInfoService, AuthUser } from "./user";
+import { DataAndStatus, DataHub2 } from "./DataHub2";
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -41,19 +38,21 @@ export type TimelinePostTextContent = HttpTimelinePostTextContent;
 
 export interface TimelinePostImageContent {
   type: "image";
-  data: BlobOrStatus;
+  data: Blob;
+  etag: string;
 }
 
 export type TimelinePostContent =
   | TimelinePostTextContent
   | TimelinePostImageContent;
 
-export interface TimelinePostInfo {
-  id: number;
+export type TimelinePostInfo = Omit<HttpTimelinePostInfo, "content"> & {
   content: TimelinePostContent;
-  time: Date;
+};
+
+export interface TimelinePostsInfo {
   lastUpdated: Date;
-  author: HttpUser;
+  posts: TimelinePostInfo[];
 }
 
 export const timelineVisibilityTooltipTranslationMap: Record<
@@ -65,60 +64,32 @@ export const timelineVisibilityTooltipTranslationMap: Record<
   Private: "timeline.visibilityTooltip.private",
 };
 
-export class TimelineNotExistError extends Error {}
 export class TimelineNameConflictError extends Error {}
-
-export type TimelineWithSyncStatus = WithSyncStatus<
-  | {
-      type: "cache";
-      timeline: TimelineInfo;
-    }
-  | {
-      type: "offline" | "synced";
-      timeline: TimelineInfo | null;
-    }
->;
-
-export type TimelinePostsWithSyncState = WithSyncStatus<{
-  type:
-    | "cache"
-    | "offline" // Sync failed and use cache.
-    | "synced" // Sync succeeded.
-    | "forbid" // The list is forbidden to see.
-    | "notexist"; // The timeline does not exist.
-  posts: TimelinePostInfo[];
-}>;
 
 type TimelineData = Omit<HttpTimelineInfo, "owner" | "members"> & {
   owner: string;
   members: string[];
 };
 
-type TimelinePostData = Omit<HttpTimelinePostInfo, "author"> & {
+type TimelinePostData = Omit<TimelinePostInfo, "author"> & {
   author: string;
 };
 
+interface TimelinePostsData {
+  lastUpdated: Date;
+  posts: TimelinePostData[];
+}
+
 export class TimelineService {
-  private getCachedTimeline(
-    timelineName: string
-  ): Promise<TimelineData | null> {
-    return dataStorage.getItem<TimelineData | null>(`timeline.${timelineName}`);
-  }
-
-  private saveTimeline(
-    timelineName: string,
-    data: TimelineData
-  ): Promise<void> {
-    return dataStorage
-      .setItem<TimelineData>(`timeline.${timelineName}`, data)
-      .then();
-  }
-
   private async clearTimelineData(timelineName: string): Promise<void> {
     const keys = (await dataStorage.keys()).filter((k) =>
       k.startsWith(`timeline.${timelineName}`)
     );
     await Promise.all(keys.map((k) => dataStorage.removeItem(k)));
+  }
+
+  private generateTimelineDataStorageKey(timelineName: string): string {
+    return `timeline.${timelineName}`;
   }
 
   private convertHttpTimelineToData(timeline: HttpTimelineInfo): TimelineData {
@@ -129,95 +100,65 @@ export class TimelineService {
     };
   }
 
-  private _timelineHub = new DataHub<
-    string,
-    | {
-        type: "cache";
-        timeline: TimelineData;
-      }
-    | {
-        type: "offline" | "synced";
-        timeline: TimelineData | null;
-      }
-  >({
-    sync: async (key, line) => {
-      const cache = await this.getCachedTimeline(key);
+  readonly timelineHub = new DataHub2<string, HttpTimelineInfo | "notexist">({
+    saveData: async (timelineName, data) => {
+      if (data === "notexist") return;
 
-      if (line.value == undefined) {
-        if (cache != null) {
-          line.next({ type: "cache", timeline: cache });
-        }
-      }
+      userInfoService.saveUser(data.owner);
+      userInfoService.saveUsers(data.members);
 
+      await dataStorage.setItem<TimelineData>(
+        this.generateTimelineDataStorageKey(timelineName),
+        this.convertHttpTimelineToData(data)
+      );
+    },
+    getSavedData: async (timelineName) => {
+      const savedData = await dataStorage.getItem<TimelineData | null>(
+        this.generateTimelineDataStorageKey(timelineName)
+      );
+
+      if (savedData == null) return null;
+
+      const owner = await userInfoService.getCachedUser(savedData.owner);
+      if (owner == null) return null;
+      const members = await userInfoService.getCachedUsers(savedData.members);
+      if (members == null) return null;
+
+      return { ...savedData, owner, members };
+    },
+    fetchData: async (timelineName, savedData) => {
       try {
-        const httpTimeline = await getHttpTimelineClient().getTimeline(key);
+        const timeline = await getHttpTimelineClient().getTimeline(
+          timelineName
+        );
 
-        userInfoService.saveUsers([
-          httpTimeline.owner,
-          ...httpTimeline.members,
-        ]);
-
-        const timeline = this.convertHttpTimelineToData(httpTimeline);
-
-        if (cache != null && timeline.uniqueId !== cache.uniqueId) {
+        if (
+          savedData != null &&
+          savedData !== "notexist" &&
+          savedData.uniqueId !== timeline.uniqueId
+        ) {
           console.log(
-            `Timeline with name ${key} has changed to a new one. Clear old data.`
+            `Timeline with name ${timelineName} has changed to a new one. Clear old data.`
           );
-          await this.clearTimelineData(key); // If timeline has changed, clear all old data.
+
+          void this.clearTimelineData(timelineName); // If timeline has changed, clear all old data.
         }
 
-        await this.saveTimeline(key, timeline);
-
-        line.next({ type: "synced", timeline });
+        return timeline;
       } catch (e) {
         if (e instanceof HttpTimelineNotExistError) {
-          line.next({ type: "synced", timeline: null });
+          return "notexist";
+        } else if (e instanceof HttpNetworkError) {
+          return null;
         } else {
-          if (cache == null) {
-            line.next({ type: "offline", timeline: null });
-          } else {
-            line.next({ type: "offline", timeline: cache });
-          }
-          throwIfNotNetworkError(e);
+          throw e;
         }
       }
     },
   });
 
-  syncTimeline(timelineName: string): Promise<void> {
-    return this._timelineHub.getLineOrCreate(timelineName).sync();
-  }
-
-  getTimeline$(timelineName: string): Observable<TimelineWithSyncStatus> {
-    return this._timelineHub.getDataWithSyncStatusObservable(timelineName).pipe(
-      switchMap((state) => {
-        const { timeline } = state;
-        if (timeline != null) {
-          return combineLatest(
-            [timeline.owner, ...timeline.members].map((u) =>
-              state.type === "cache"
-                ? from(userInfoService.getCachedUser(u)).pipe(
-                    filter((u): u is User => u != null)
-                  )
-                : userInfoService.getUser$(u)
-            )
-          ).pipe(
-            map((users) => {
-              return {
-                ...state,
-                timeline: {
-                  ...timeline,
-                  owner: users[0],
-                  members: users.slice(1),
-                },
-              };
-            })
-          );
-        } else {
-          return of(state as TimelineWithSyncStatus);
-        }
-      })
-    );
+  syncTimeline(timelineName: string): void {
+    this.timelineHub.getLine(timelineName).sync();
   }
 
   createTimeline(timelineName: string): Observable<TimelineInfo> {
@@ -268,291 +209,145 @@ export class TimelineService {
     );
   }
 
-  private convertHttpPostToData(post: HttpTimelinePostInfo): TimelinePostData {
-    return {
-      ...post,
-      author: post.author.username,
-    };
+  private generatePostsDataStorageKey(timelineName: string): string {
+    return `timeline.${timelineName}.posts`;
   }
 
-  private convertHttpPostToDataList(
-    posts: HttpTimelinePostInfo[]
-  ): TimelinePostData[] {
-    return posts.map((post) => this.convertHttpPostToData(post));
-  }
-
-  private getCachedPosts(
-    timelineName: string
-  ): Promise<TimelinePostData[] | null> {
-    return dataStorage.getItem<TimelinePostData[] | null>(
-      `timeline.${timelineName}.posts`
-    );
-  }
-
-  private savePosts(
-    timelineName: string,
-    data: TimelinePostData[]
-  ): Promise<void> {
-    return dataStorage
-      .setItem<TimelinePostData[]>(`timeline.${timelineName}.posts`, data)
-      .then();
-  }
-
-  private syncPosts(timelineName: string): Promise<void> {
-    return this._postsHub.getLineOrCreate(timelineName).sync();
-  }
-
-  private _postsHub = new DataHub<
+  readonly postsHub = new DataHub2<
     string,
-    {
-      type: "cache" | "offline" | "synced" | "forbid" | "notexist";
-      posts: TimelinePostData[];
-    }
+    TimelinePostsInfo | "notexist" | "forbid"
   >({
-    sync: async (key, line) => {
-      // Wait for timeline synced. In case the timeline has changed to another and old data has been cleaned.
-      await this.syncTimeline(key);
+    saveData: async (timelineName, data) => {
+      if (data === "notexist" || data === "forbid") return;
 
-      if (line.value == null) {
-        const cache = await this.getCachedPosts(key);
-        if (cache != null) {
-          line.next({ type: "cache", posts: cache });
+      const savedData: TimelinePostsData = {
+        ...data,
+        posts: data.posts.map((p) => ({ ...p, author: p.author.username })),
+      };
+
+      data.posts.forEach((p) => {
+        userInfoService.saveUser(p.author);
+      });
+
+      await dataStorage.setItem<TimelinePostsData>(
+        this.generatePostsDataStorageKey(timelineName),
+        savedData
+      );
+    },
+    getSavedData: async (timelineName) => {
+      const savedData = await dataStorage.getItem<TimelinePostsData | null>(
+        this.generatePostsDataStorageKey(timelineName)
+      );
+      if (savedData == null) return null;
+
+      const authors = await userInfoService.getCachedUsers(
+        savedData.posts.map((p) => p.author)
+      );
+
+      if (authors == null) return null;
+
+      return {
+        ...savedData,
+        posts: savedData.posts.map((p, index) => ({
+          ...p,
+          author: authors[index],
+        })),
+      };
+    },
+    fetchData: async (timelineName, savedData) => {
+      const convert = async (
+        post: HttpTimelinePostInfo
+      ): Promise<TimelinePostInfo> => {
+        const { content } = post;
+        if (content.type === "text") {
+          return { ...post, content };
+        } else {
+          const data = await getHttpTimelineClient().getPostData(
+            timelineName,
+            post.id
+          );
+          return {
+            ...post,
+            content: {
+              type: "image",
+              data: data.data,
+              etag: data.etag,
+            },
+          };
         }
-      }
+      };
+
+      const convertList = (
+        posts: HttpTimelinePostInfo[]
+      ): Promise<TimelinePostInfo[]> =>
+        Promise.all(posts.map((p) => convert(p)));
 
       const now = new Date();
 
-      const lastUpdatedTime = await dataStorage.getItem<Date | null>(
-        `timeline.${key}.lastUpdated`
-      );
-
       try {
-        if (lastUpdatedTime == null) {
-          const httpPosts = await getHttpTimelineClient().listPost(key);
-
-          userInfoService.saveUsers(
-            uniqBy(
-              httpPosts.map((post) => post.author),
-              "username"
-            )
+        if (
+          savedData == null ||
+          savedData === "forbid" ||
+          savedData === "notexist"
+        ) {
+          const httpPosts = await getHttpTimelineClient().listPost(
+            timelineName
           );
 
-          const posts = this.convertHttpPostToDataList(httpPosts);
-          await this.savePosts(key, posts);
-          await dataStorage.setItem<Date>(`timeline.${key}.lastUpdated`, now);
-
-          line.next({ type: "synced", posts });
+          return {
+            lastUpdated: now,
+            posts: await convertList(httpPosts),
+          };
         } else {
-          const httpPosts = await getHttpTimelineClient().listPost(key, {
-            modifiedSince: lastUpdatedTime,
-            includeDeleted: true,
-          });
+          const httpPosts = await getHttpTimelineClient().listPost(
+            timelineName,
+            {
+              modifiedSince: savedData.lastUpdated,
+              includeDeleted: true,
+            }
+          );
 
           const deletedIds = httpPosts
             .filter((p) => p.deleted)
             .map((p) => p.id);
-          const changed = httpPosts.filter(
-            (p): p is HttpTimelinePostInfo => !p.deleted
+
+          const changed = await convertList(
+            httpPosts.filter((p): p is HttpTimelinePostInfo => !p.deleted)
           );
 
-          userInfoService.saveUsers(
-            uniqBy(
-              httpPosts
-                .map((post) => post.author)
-                .filter((u): u is HttpUser => u != null),
-              "username"
-            )
+          const posts = savedData.posts.filter(
+            (p) => !deletedIds.includes(p.id)
           );
-
-          const cache = (await this.getCachedPosts(key)) ?? [];
-
-          const posts = cache.filter((p) => !deletedIds.includes(p.id));
 
           for (const changedPost of changed) {
             const savedChangedPostIndex = posts.findIndex(
               (p) => p.id === changedPost.id
             );
             if (savedChangedPostIndex === -1) {
-              posts.push(this.convertHttpPostToData(changedPost));
+              posts.push(await convert(changedPost));
             } else {
-              posts[savedChangedPostIndex] = this.convertHttpPostToData(
-                changedPost
-              );
+              posts[savedChangedPostIndex] = await convert(changedPost);
             }
           }
 
-          await this.savePosts(key, posts);
-          await dataStorage.setItem<Date>(`timeline.${key}.lastUpdated`, now);
-          line.next({ type: "synced", posts });
+          return { lastUpdated: now, posts };
         }
       } catch (e) {
         if (e instanceof HttpTimelineNotExistError) {
-          line.next({ type: "notexist", posts: [] });
+          return "notexist";
         } else if (e instanceof HttpForbiddenError) {
-          line.next({ type: "forbid", posts: [] });
+          return "forbid";
+        } else if (e instanceof HttpNetworkError) {
+          return null;
         } else {
-          const cache = await this.getCachedPosts(key);
-          if (cache == null) {
-            line.next({ type: "offline", posts: [] });
-          } else {
-            line.next({ type: "offline", posts: cache });
-          }
-          throwIfNotNetworkError(e);
+          throw e;
         }
       }
     },
   });
 
-  getPosts$(timelineName: string): Observable<TimelinePostsWithSyncState> {
-    return this._postsHub.getDataWithSyncStatusObservable(timelineName).pipe(
-      switchMap((state) => {
-        if (state.posts.length === 0) {
-          return of({
-            ...state,
-            posts: [],
-          });
-        }
-
-        return combineLatest([
-          combineLatest(
-            state.posts.map((post) =>
-              state.type === "cache"
-                ? from(userInfoService.getCachedUser(post.author)).pipe(
-                    filter((u): u is User => u != null)
-                  )
-                : userInfoService.getUser$(post.author)
-            )
-          ),
-          combineLatest(
-            state.posts.map((post) => {
-              if (post.content.type === "image") {
-                return state.type === "cache"
-                  ? from(this.getCachedPostData(timelineName, post.id))
-                  : this.getPostData$(timelineName, post.id);
-              } else {
-                return of(null);
-              }
-            })
-          ),
-        ]).pipe(
-          map(([authors, datas]) => {
-            return {
-              ...state,
-              posts: state.posts.map((post, i) => {
-                const { content } = post;
-
-                return {
-                  ...post,
-                  author: authors[i],
-                  content: (() => {
-                    if (content.type === "text") return content;
-                    else
-                      return {
-                        type: "image",
-                        data: datas[i],
-                      } as TimelinePostImageContent;
-                  })(),
-                };
-              }),
-            };
-          })
-        );
-      })
-    );
-  }
-
-  private _getCachedPostData(key: {
-    timelineName: string;
-    postId: number;
-  }): Promise<BlobWithEtag | null> {
-    return dataStorage.getItem<BlobWithEtag | null>(
-      `timeline.${key.timelineName}.post.${key.postId}.data`
-    );
-  }
-
-  private savePostData(
-    key: {
-      timelineName: string;
-      postId: number;
-    },
-    data: BlobWithEtag
-  ): Promise<void> {
-    return dataStorage
-      .setItem<BlobWithEtag>(
-        `timeline.${key.timelineName}.post.${key.postId}.data`,
-        data
-      )
-      .then();
-  }
-
-  private syncPostData(key: {
-    timelineName: string;
-    postId: number;
-  }): Promise<void> {
-    return this._postDataHub.getLineOrCreate(key).sync();
-  }
-
-  private _postDataHub = new DataHub<
-    { timelineName: string; postId: number },
-    | { data: Blob; type: "cache" | "synced" | "offline" }
-    | { data?: undefined; type: "notexist" | "offline" }
-  >({
-    keyToString: (key) => `${key.timelineName}.${key.postId}`,
-    sync: async (key, line) => {
-      const cache = await this._getCachedPostData(key);
-      if (line.value == null) {
-        if (cache != null) {
-          line.next({ type: "cache", data: cache.data });
-        }
-      }
-
-      if (cache == null) {
-        try {
-          const res = await getHttpTimelineClient().getPostData(
-            key.timelineName,
-            key.postId
-          );
-          await this.savePostData(key, res);
-          line.next({ data: res.data, type: "synced" });
-        } catch (e) {
-          line.next({ type: "offline" });
-          throwIfNotNetworkError(e);
-        }
-      } else {
-        try {
-          const res = await getHttpTimelineClient().getPostData(
-            key.timelineName,
-            key.postId,
-            cache.etag
-          );
-          if (res instanceof NotModified) {
-            line.next({ data: cache.data, type: "synced" });
-          } else {
-            await this.savePostData(key, res);
-            line.next({ data: res.data, type: "synced" });
-          }
-        } catch (e) {
-          line.next({ data: cache.data, type: "offline" });
-          throwIfNotNetworkError(e);
-        }
-      }
-    },
-  });
-
-  getCachedPostData(
-    timelineName: string,
-    postId: number
-  ): Promise<Blob | null> {
-    return this._getCachedPostData({ timelineName, postId }).then(
-      (d) => d?.data ?? null
-    );
-  }
-
-  getPostData$(timelineName: string, postId: number): Observable<BlobOrStatus> {
-    return this._postDataHub.getObservable({ timelineName, postId }).pipe(
-      map((state): BlobOrStatus => state.data ?? "error"),
-      startWith("loading")
-    );
+  syncPosts(timelineName: string): void {
+    this.postsHub.getLine(timelineName).sync();
   }
 
   createPost(
@@ -563,7 +358,7 @@ export class TimelineService {
       getHttpTimelineClient()
         .postPost(timelineName, request)
         .then(() => {
-          void this.syncPosts(timelineName);
+          this.syncPosts(timelineName);
         })
     );
   }
@@ -573,7 +368,7 @@ export class TimelineService {
       getHttpTimelineClient()
         .deletePost(timelineName, postId)
         .then(() => {
-          void this.syncPosts(timelineName);
+          this.syncPosts(timelineName);
         })
     );
   }
@@ -654,18 +449,22 @@ export function validateTimelineName(name: string): boolean {
   return timelineNameReg.test(name);
 }
 
-export function useTimelineInfo(
+export function useTimeline(
   timelineName: string
 ): [
-  TimelineWithSyncStatus | undefined,
-  React.Dispatch<React.SetStateAction<TimelineWithSyncStatus | undefined>>
+  DataAndStatus<TimelineInfo | "notexist">,
+  React.Dispatch<React.SetStateAction<DataAndStatus<TimelineInfo | "notexist">>>
 ] {
-  const [state, setState] = React.useState<TimelineWithSyncStatus | undefined>(
-    undefined
-  );
+  const [state, setState] = React.useState<
+    DataAndStatus<TimelineInfo | "notexist">
+  >({
+    status: "syncing",
+    data: null,
+  });
   React.useEffect(() => {
-    const subscription = timelineService
-      .getTimeline$(timelineName)
+    const subscription = timelineService.timelineHub
+      .getLine(timelineName)
+      .getObservalble()
       .subscribe((data) => {
         setState(data);
       });
@@ -676,20 +475,16 @@ export function useTimelineInfo(
   return [state, setState];
 }
 
-export function usePostList(
-  timelineName: string | null | undefined
-): TimelinePostsWithSyncState | undefined {
+export function usePosts(
+  timelineName: string
+): DataAndStatus<TimelinePostsInfo | "notexist" | "forbid"> {
   const [state, setState] = React.useState<
-    TimelinePostsWithSyncState | undefined
-  >(undefined);
+    DataAndStatus<TimelinePostsInfo | "notexist" | "forbid">
+  >({ status: "syncing", data: null });
   React.useEffect(() => {
-    if (timelineName == null) {
-      setState(undefined);
-      return;
-    }
-
-    const subscription = timelineService
-      .getPosts$(timelineName)
+    const subscription = timelineService.postsHub
+      .getLine(timelineName)
+      .getObservalble()
       .subscribe((data) => {
         setState(data);
       });

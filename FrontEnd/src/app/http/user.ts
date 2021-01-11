@@ -11,6 +11,7 @@ import {
   BlobWithEtag,
   convertToBlobWithEtag,
   convertToNotModified,
+  extractEtag,
 } from "./common";
 
 export const kUserManagement = "UserManagement";
@@ -70,7 +71,8 @@ export interface IHttpUserClient {
     username: string,
     etag: string
   ): Promise<BlobWithEtag | NotModified>;
-  putAvatar(username: string, data: Blob): Promise<void>;
+  // return etag
+  putAvatar(username: string, data: Blob): Promise<string>;
   changePassword(req: HttpChangePasswordRequest): Promise<void>;
   putUserPermission(
     username: string,
@@ -137,7 +139,7 @@ export class HttpUserClient implements IHttpUserClient {
       .catch(convertToNetworkError);
   }
 
-  putAvatar(username: string, data: Blob): Promise<void> {
+  putAvatar(username: string, data: Blob): Promise<string> {
     return axios
       .put(`${apiBaseUrl}/users/${username}/avatar`, data, {
         headers: {
@@ -145,7 +147,7 @@ export class HttpUserClient implements IHttpUserClient {
         },
       })
       .catch(convertToNetworkError)
-      .then();
+      .then(extractEtag);
   }
 
   changePassword(req: HttpChangePasswordRequest): Promise<void> {

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BehaviorSubject, Observable, from } from "rxjs";
-import { map, filter } from "rxjs/operators";
 
 import { UiLogicError } from "@/common";
-import { convertError } from "@/utilities/rxjs";
 
 import {
   HttpNetworkError,
@@ -22,10 +20,9 @@ import {
   UserPermission,
 } from "@/http/user";
 
-import { dataStorage, throwIfNotNetworkError } from "./common";
-import { DataHub } from "./DataHub";
-import { pushAlert } from "./alert";
 import { DataHub2 } from "./DataHub2";
+import { dataStorage } from "./common";
+import { pushAlert } from "./alert";
 
 export type User = HttpUser;
 
@@ -259,6 +256,26 @@ export class UserInfoService {
     return users.forEach((user) => this.saveUser(user));
   }
 
+  async getCachedUser(username: string): Promise<HttpUser | null> {
+    const user = await this.userHub.getLine(username).getSavedData();
+    if (user == null || user === "notexist") return null;
+    return user;
+  }
+
+  async getCachedUsers(usernames: string[]): Promise<HttpUser[] | null> {
+    const users = await Promise.all(
+      usernames.map((username) => this.userHub.getLine(username).getSavedData())
+    );
+
+    for (const u of users) {
+      if (u == null || u === "notexist") {
+        return null;
+      }
+    }
+
+    return users as HttpUser[];
+  }
+
   private generateUserDataStorageKey(username: string): string {
     return `user.${username}`;
   }
@@ -289,80 +306,52 @@ export class UserInfoService {
     },
   });
 
-  private _getCachedAvatar(username: string): Promise<BlobWithEtag | null> {
-    return dataStorage.getItem<BlobWithEtag | null>(`user.${username}.avatar`);
+  private generateAvatarDataStorageKey(username: string): string {
+    return `user.${username}.avatar`;
   }
 
-  private saveAvatar(username: string, data: BlobWithEtag): Promise<void> {
-    return dataStorage
-      .setItem<BlobWithEtag>(`user.${username}.avatar`, data)
-      .then();
-  }
-
-  getCachedAvatar(username: string): Promise<Blob | null> {
-    return this._getCachedAvatar(username).then((d) => d?.data ?? null);
-  }
-
-  syncAvatar(username: string): Promise<void> {
-    return this._avatarHub.getLineOrCreate(username).sync();
-  }
-
-  private _avatarHub = new DataHub<
-    string,
-    | { data: Blob; type: "cache" | "synced" | "offline" }
-    | { data?: undefined; type: "notexist" | "offline" }
-  >({
-    sync: async (key, line) => {
-      const cache = await this._getCachedAvatar(key);
-      if (line.value == null) {
-        if (cache != null) {
-          line.next({ data: cache.data, type: "cache" });
-        }
-      }
-
-      if (cache == null) {
-        try {
-          const avatar = await getHttpUserClient().getAvatar(key);
-          await this.saveAvatar(key, avatar);
-          line.next({ data: avatar.data, type: "synced" });
-        } catch (e) {
-          line.next({ type: "offline" });
-          throwIfNotNetworkError(e);
-        }
-      } else {
-        try {
-          const res = await getHttpUserClient().getAvatar(key, cache.etag);
+  readonly avatarHub = new DataHub2<string, BlobWithEtag | "notexist">({
+    saveData: async (username, data) => {
+      if (typeof data === "string") return;
+      await dataStorage.setItem<BlobWithEtag>(
+        this.generateAvatarDataStorageKey(username),
+        data
+      );
+    },
+    getSavedData: (username) =>
+      dataStorage.getItem<BlobWithEtag | null>(
+        this.generateAvatarDataStorageKey(username)
+      ),
+    fetchData: async (username, savedData) => {
+      try {
+        if (savedData == null || savedData === "notexist") {
+          return await getHttpUserClient().getAvatar(username);
+        } else {
+          const res = await getHttpUserClient().getAvatar(
+            username,
+            savedData.etag
+          );
           if (res instanceof NotModified) {
-            line.next({ data: cache.data, type: "synced" });
+            return savedData;
           } else {
-            const avatar = res;
-            await this.saveAvatar(key, avatar);
-            line.next({ data: avatar.data, type: "synced" });
+            return res;
           }
-        } catch (e) {
-          line.next({ data: cache.data, type: "offline" });
-          throwIfNotNetworkError(e);
+        }
+      } catch (e) {
+        if (e instanceof HttpUserNotExistError) {
+          return "notexist";
+        } else if (e instanceof HttpNetworkError) {
+          return null;
+        } else {
+          throw e;
         }
       }
     },
   });
 
-  getAvatar$(username: string): Observable<Blob> {
-    return this._avatarHub.getObservable(username).pipe(
-      map((state) => state.data),
-      filter((blob): blob is Blob => blob != null)
-    );
-  }
-
-  getUserInfo(username: string): Observable<User> {
-    return from(getHttpUserClient().get(username)).pipe(
-      convertError(HttpUserNotExistError, UserNotExistError)
-    );
-  }
-
   async setAvatar(username: string, blob: Blob): Promise<void> {
-    await getHttpUserClient().putAvatar(username, blob);
-    this._avatarHub.getLine(username)?.next({ data: blob, type: "synced" });
+    const etag = await getHttpUserClient().putAvatar(username, blob);
+    this.avatarHub.getLine(username).save({ data: blob, etag });
   }
 
   async setNickname(username: string, nickname: string): Promise<void> {
@@ -384,14 +373,21 @@ export function useAvatar(username?: string): Blob | undefined {
       return;
     }
 
-    const subscription = userInfoService
-      .getAvatar$(username)
-      .subscribe((blob) => {
-        setState(blob);
+    const subscription = userInfoService.avatarHub
+      .getLine(username)
+      .getObservalble()
+      .subscribe((data) => {
+        if (data.data != null && data.data !== "notexist") {
+          setState(data.data.data);
+        } else {
+          setState(undefined);
+        }
       });
+
     return () => {
       subscription.unsubscribe();
     };
   }, [username]);
+
   return state;
 }
