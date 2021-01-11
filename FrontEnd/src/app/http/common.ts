@@ -1,6 +1,26 @@
-import { AxiosError, AxiosResponse } from "axios";
+import rawAxios, { AxiosError, AxiosResponse } from "axios";
 
 export const apiBaseUrl = "/api";
+
+export const axios = rawAxios.create();
+
+let _token: string | null = null;
+
+export function getHttpToken(): string | null {
+  return _token;
+}
+
+export function setHttpToken(token: string | null): void {
+  _token = token;
+
+  if (token == null) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    delete axios.defaults.headers.common["Authorization"];
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
+}
 
 export function base64(blob: Blob): Promise<string> {
   return new Promise<string>((resolve) => {
@@ -158,4 +178,8 @@ export function convertToBlobWithEtag(res: AxiosResponse<Blob>): BlobWithEtag {
     data: res.data,
     etag: (res.headers as Record<"etag", string>)["etag"],
   };
+}
+
+export function extractEtag(res: AxiosResponse): string {
+  return (res.headers as Record<"etag", string>)["etag"];
 }

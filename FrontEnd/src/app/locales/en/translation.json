@@ -107,8 +107,10 @@
         "prompt": "Are you sure to delete the post? This operation is not recoverable."
       }
     },
-    "addHighlightSuccess": "Succeeded to add highlight.",
-    "addBookmarkSuccess": "Succeeded to add bookmark."
+    "addHighlightFail": "Failed to add highlight.",
+    "removeHighlightFail": "Failed to remove highlight.",
+    "addBookmarkFail": "Failed to add bookmark.",
+    "removeBookmarkFail": "Failed to remove bookmark."
   },
   "user": {
     "username": "username",

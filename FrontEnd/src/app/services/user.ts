@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BehaviorSubject, Observable, from } from "rxjs";
-import { map, filter } from "rxjs/operators";
 
 import { UiLogicError } from "@/common";
-import { convertError } from "@/utilities/rxjs";
 
-import { HttpNetworkError, BlobWithEtag, NotModified } from "@/http/common";
+import {
+  HttpNetworkError,
+  BlobWithEtag,
+  NotModified,
+  setHttpToken,
+} from "@/http/common";
 import {
   getHttpTokenClient,
   HttpCreateTokenBadCredentialError,
@@ -17,8 +20,8 @@ import {
   UserPermission,
 } from "@/http/user";
 
-import { dataStorage, throwIfNotNetworkError } from "./common";
-import { DataHub } from "./DataHub";
+import { DataHub2 } from "./DataHub2";
+import { dataStorage } from "./common";
 import { pushAlert } from "./alert";
 
 export type User = HttpUser;
@@ -61,6 +64,12 @@ export class BadCredentialError {
 const USER_STORAGE_KEY = "currentuser";
 
 export class UserService {
+  constructor() {
+    this.userSubject.subscribe((u) => {
+      setHttpToken(u?.token ?? null);
+    });
+  }
+
   private userSubject = new BehaviorSubject<AuthUser | null | undefined>(
     undefined
   );
@@ -167,13 +176,10 @@ export class UserService {
       throw new UiLogicError("Not login or checked now, can't log out.");
     }
     const $ = from(
-      getHttpUserClient().changePassword(
-        {
-          oldPassword,
-          newPassword,
-        },
-        this.currentUser.token
-      )
+      getHttpUserClient().changePassword({
+        oldPassword,
+        newPassword,
+      })
     );
     $.subscribe(() => {
       void this.logout();
@@ -243,150 +249,114 @@ export class UserNotExistError extends Error {}
 
 export class UserInfoService {
   saveUser(user: HttpUser): void {
-    const key = user.username;
-    void this._userHub.optionalInitLineWithSyncAction(key, async (line) => {
-      await this.doSaveUser(user);
-      line.next({ user, type: "synced" });
-    });
+    this.userHub.getLine(user.username).save(user);
   }
 
   saveUsers(users: HttpUser[]): void {
     return users.forEach((user) => this.saveUser(user));
   }
 
-  private _getCachedUser(username: string): Promise<User | null> {
-    return dataStorage.getItem<HttpUser | null>(`user.${username}`);
+  async getCachedUser(username: string): Promise<HttpUser | null> {
+    const user = await this.userHub.getLine(username).getSavedData();
+    if (user == null || user === "notexist") return null;
+    return user;
   }
 
-  private doSaveUser(user: HttpUser): Promise<void> {
-    return dataStorage.setItem<HttpUser>(`user.${user.username}`, user).then();
-  }
+  async getCachedUsers(usernames: string[]): Promise<HttpUser[] | null> {
+    const users = await Promise.all(
+      usernames.map((username) => this.userHub.getLine(username).getSavedData())
+    );
 
-  getCachedUser(username: string): Promise<User | null> {
-    return this._getCachedUser(username);
-  }
-
-  syncUser(username: string): Promise<void> {
-    return this._userHub.getLineOrCreate(username).sync();
-  }
-
-  private _userHub = new DataHub<
-    string,
-    | { user: User; type: "cache" | "synced" | "offline" }
-    | { user?: undefined; type: "notexist" | "offline" }
-  >({
-    sync: async (key, line) => {
-      if (line.value == undefined) {
-        const cache = await this._getCachedUser(key);
-        if (cache != null) {
-          line.next({ user: cache, type: "cache" });
-        }
+    for (const u of users) {
+      if (u == null || u === "notexist") {
+        return null;
       }
+    }
 
+    return users as HttpUser[];
+  }
+
+  private generateUserDataStorageKey(username: string): string {
+    return `user.${username}`;
+  }
+
+  readonly userHub = new DataHub2<string, HttpUser | "notexist">({
+    saveData: (username, data) => {
+      if (typeof data === "string") return Promise.resolve();
+      return dataStorage
+        .setItem<HttpUser>(this.generateUserDataStorageKey(username), data)
+        .then();
+    },
+    getSavedData: (username) => {
+      return dataStorage.getItem<HttpUser | null>(
+        this.generateUserDataStorageKey(username)
+      );
+    },
+    fetchData: async (username) => {
       try {
-        const res = await getHttpUserClient().get(key);
-        await this.doSaveUser(res);
-        line.next({ user: res, type: "synced" });
+        return await getHttpUserClient().get(username);
       } catch (e) {
         if (e instanceof HttpUserNotExistError) {
-          line.next({ type: "notexist" });
+          return "notexist";
+        } else if (e instanceof HttpNetworkError) {
+          return null;
+        }
+        throw e;
+      }
+    },
+  });
+
+  private generateAvatarDataStorageKey(username: string): string {
+    return `user.${username}.avatar`;
+  }
+
+  readonly avatarHub = new DataHub2<string, BlobWithEtag | "notexist">({
+    saveData: async (username, data) => {
+      if (typeof data === "string") return;
+      await dataStorage.setItem<BlobWithEtag>(
+        this.generateAvatarDataStorageKey(username),
+        data
+      );
+    },
+    getSavedData: (username) =>
+      dataStorage.getItem<BlobWithEtag | null>(
+        this.generateAvatarDataStorageKey(username)
+      ),
+    fetchData: async (username, savedData) => {
+      try {
+        if (savedData == null || savedData === "notexist") {
+          return await getHttpUserClient().getAvatar(username);
         } else {
-          const cache = await this._getCachedUser(key);
-          line.next({ user: cache ?? undefined, type: "offline" });
-          throwIfNotNetworkError(e);
-        }
-      }
-    },
-  });
-
-  getUser$(username: string): Observable<User> {
-    return this._userHub.getObservable(username).pipe(
-      map((state) => state?.user),
-      filter((user): user is User => user != null)
-    );
-  }
-
-  private _getCachedAvatar(username: string): Promise<BlobWithEtag | null> {
-    return dataStorage.getItem<BlobWithEtag | null>(`user.${username}.avatar`);
-  }
-
-  private saveAvatar(username: string, data: BlobWithEtag): Promise<void> {
-    return dataStorage
-      .setItem<BlobWithEtag>(`user.${username}.avatar`, data)
-      .then();
-  }
-
-  getCachedAvatar(username: string): Promise<Blob | null> {
-    return this._getCachedAvatar(username).then((d) => d?.data ?? null);
-  }
-
-  syncAvatar(username: string): Promise<void> {
-    return this._avatarHub.getLineOrCreate(username).sync();
-  }
-
-  private _avatarHub = new DataHub<
-    string,
-    | { data: Blob; type: "cache" | "synced" | "offline" }
-    | { data?: undefined; type: "notexist" | "offline" }
-  >({
-    sync: async (key, line) => {
-      const cache = await this._getCachedAvatar(key);
-      if (line.value == null) {
-        if (cache != null) {
-          line.next({ data: cache.data, type: "cache" });
-        }
-      }
-
-      if (cache == null) {
-        try {
-          const avatar = await getHttpUserClient().getAvatar(key);
-          await this.saveAvatar(key, avatar);
-          line.next({ data: avatar.data, type: "synced" });
-        } catch (e) {
-          line.next({ type: "offline" });
-          throwIfNotNetworkError(e);
-        }
-      } else {
-        try {
-          const res = await getHttpUserClient().getAvatar(key, cache.etag);
+          const res = await getHttpUserClient().getAvatar(
+            username,
+            savedData.etag
+          );
           if (res instanceof NotModified) {
-            line.next({ data: cache.data, type: "synced" });
+            return savedData;
           } else {
-            const avatar = res;
-            await this.saveAvatar(key, avatar);
-            line.next({ data: avatar.data, type: "synced" });
+            return res;
           }
-        } catch (e) {
-          line.next({ data: cache.data, type: "offline" });
-          throwIfNotNetworkError(e);
+        }
+      } catch (e) {
+        if (e instanceof HttpUserNotExistError) {
+          return "notexist";
+        } else if (e instanceof HttpNetworkError) {
+          return null;
+        } else {
+          throw e;
         }
       }
     },
   });
-
-  getAvatar$(username: string): Observable<Blob> {
-    return this._avatarHub.getObservable(username).pipe(
-      map((state) => state.data),
-      filter((blob): blob is Blob => blob != null)
-    );
-  }
-
-  getUserInfo(username: string): Observable<User> {
-    return from(getHttpUserClient().get(username)).pipe(
-      convertError(HttpUserNotExistError, UserNotExistError)
-    );
-  }
 
   async setAvatar(username: string, blob: Blob): Promise<void> {
-    const user = checkLogin();
-    await getHttpUserClient().putAvatar(username, blob, user.token);
-    this._avatarHub.getLine(username)?.next({ data: blob, type: "synced" });
+    const etag = await getHttpUserClient().putAvatar(username, blob);
+    this.avatarHub.getLine(username).save({ data: blob, etag });
   }
 
   async setNickname(username: string, nickname: string): Promise<void> {
-    const user = checkLogin();
     return getHttpUserClient()
-      .patch(username, { nickname }, user.token)
+      .patch(username, { nickname })
       .then((user) => {
         this.saveUser(user);
       });
@@ -403,14 +373,21 @@ export function useAvatar(username?: string): Blob | undefined {
       return;
     }
 
-    const subscription = userInfoService
-      .getAvatar$(username)
-      .subscribe((blob) => {
-        setState(blob);
+    const subscription = userInfoService.avatarHub
+      .getLine(username)
+      .getObservalble()
+      .subscribe((data) => {
+        if (data.data != null && data.data !== "notexist") {
+          setState(data.data.data);
+        } else {
+          setState(undefined);
+        }
       });
+
     return () => {
       subscription.unsubscribe();
     };
   }, [username]);
+
   return state;
 }

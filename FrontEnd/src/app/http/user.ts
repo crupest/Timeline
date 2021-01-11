@@ -1,6 +1,7 @@
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import {
+  axios,
   apiBaseUrl,
   convertToNetworkError,
   extractResponseData,
@@ -10,6 +11,7 @@ import {
   BlobWithEtag,
   convertToBlobWithEtag,
   convertToNotModified,
+  extractEtag,
 } from "./common";
 
 export const kUserManagement = "UserManagement";
@@ -62,28 +64,23 @@ export class HttpChangePasswordBadCredentialError extends Error {
 export interface IHttpUserClient {
   list(): Promise<HttpUser[]>;
   get(username: string): Promise<HttpUser>;
-  patch(
-    username: string,
-    req: HttpUserPatchRequest,
-    token: string
-  ): Promise<HttpUser>;
-  delete(username: string, token: string): Promise<void>;
+  patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser>;
+  delete(username: string): Promise<void>;
   getAvatar(username: string): Promise<BlobWithEtag>;
   getAvatar(
     username: string,
     etag: string
   ): Promise<BlobWithEtag | NotModified>;
-  putAvatar(username: string, data: Blob, token: string): Promise<void>;
-  changePassword(req: HttpChangePasswordRequest, token: string): Promise<void>;
+  // return etag
+  putAvatar(username: string, data: Blob): Promise<string>;
+  changePassword(req: HttpChangePasswordRequest): Promise<void>;
   putUserPermission(
     username: string,
-    permission: UserPermission,
-    token: string
+    permission: UserPermission
   ): Promise<void>;
   deleteUserPermission(
     username: string,
-    permission: UserPermission,
-    token: string
+    permission: UserPermission
   ): Promise<void>;
 
   createUser(req: HttpCreateUserRequest, token: string): Promise<HttpUser>;
@@ -105,20 +102,16 @@ export class HttpUserClient implements IHttpUserClient {
       .catch(convertToNetworkError);
   }
 
-  patch(
-    username: string,
-    req: HttpUserPatchRequest,
-    token: string
-  ): Promise<HttpUser> {
+  patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser> {
     return axios
-      .patch<HttpUser>(`${apiBaseUrl}/users/${username}?token=${token}`, req)
+      .patch<HttpUser>(`${apiBaseUrl}/users/${username}`, req)
       .then(extractResponseData)
       .catch(convertToNetworkError);
   }
 
-  delete(username: string, token: string): Promise<void> {
+  delete(username: string): Promise<void> {
     return axios
-      .delete(`${apiBaseUrl}/users/${username}?token=${token}`)
+      .delete(`${apiBaseUrl}/users/${username}`)
       .catch(convertToNetworkError)
       .then();
   }
@@ -146,20 +139,20 @@ export class HttpUserClient implements IHttpUserClient {
       .catch(convertToNetworkError);
   }
 
-  putAvatar(username: string, data: Blob, token: string): Promise<void> {
+  putAvatar(username: string, data: Blob): Promise<string> {
     return axios
-      .put(`${apiBaseUrl}/users/${username}/avatar?token=${token}`, data, {
+      .put(`${apiBaseUrl}/users/${username}/avatar`, data, {
         headers: {
           "Content-Type": data.type,
         },
       })
       .catch(convertToNetworkError)
-      .then();
+      .then(extractEtag);
   }
 
-  changePassword(req: HttpChangePasswordRequest, token: string): Promise<void> {
+  changePassword(req: HttpChangePasswordRequest): Promise<void> {
     return axios
-      .post(`${apiBaseUrl}/userop/changepassword?token=${token}`, req)
+      .post(`${apiBaseUrl}/userop/changepassword`, req)
       .catch(
         convertToIfErrorCodeIs(11020201, HttpChangePasswordBadCredentialError)
       )
@@ -169,33 +162,27 @@ export class HttpUserClient implements IHttpUserClient {
 
   putUserPermission(
     username: string,
-    permission: UserPermission,
-    token: string
+    permission: UserPermission
   ): Promise<void> {
     return axios
-      .put(
-        `${apiBaseUrl}/users/${username}/permissions/${permission}?token=${token}`
-      )
+      .put(`${apiBaseUrl}/users/${username}/permissions/${permission}`)
       .catch(convertToNetworkError)
       .then();
   }
 
   deleteUserPermission(
     username: string,
-    permission: UserPermission,
-    token: string
+    permission: UserPermission
   ): Promise<void> {
     return axios
-      .delete(
-        `${apiBaseUrl}/users/${username}/permissions/${permission}?token=${token}`
-      )
+      .delete(`${apiBaseUrl}/users/${username}/permissions/${permission}`)
       .catch(convertToNetworkError)
       .then();
   }
 
-  createUser(req: HttpCreateUserRequest, token: string): Promise<HttpUser> {
+  createUser(req: HttpCreateUserRequest): Promise<HttpUser> {
     return axios
-      .post<HttpUser>(`${apiBaseUrl}/userop/createuser?token=${token}`, req)
+      .post<HttpUser>(`${apiBaseUrl}/userop/createuser`, req)
       .then(extractResponseData)
       .catch(convertToNetworkError)
       .then();

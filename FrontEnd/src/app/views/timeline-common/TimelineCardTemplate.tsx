@@ -10,7 +10,11 @@ import SyncStatusBadge from "../timeline-common/SyncStatusBadge";
 import CollapseButton from "../timeline-common/CollapseButton";
 
 export interface TimelineCardTemplateProps
-  extends Omit<TimelineCardComponentProps<"">, "onManage" | "onMember"> {
+  extends Omit<TimelineCardComponentProps<"">, "operations"> {
+  operations: Pick<
+    TimelineCardComponentProps<"">["operations"],
+    "onHighlight" | "onBookmark"
+  >;
   infoArea: React.ReactElement;
   manageArea:
     | { type: "member"; onMember: () => void }
@@ -33,13 +37,13 @@ function TimelineCardTemplate({
   collapse,
   infoArea,
   manageArea,
-  onBookmark,
-  onHighlight,
+  operations,
   toggleCollapse,
   syncStatus,
   className,
 }: TimelineCardTemplateProps): React.ReactElement | null {
   const { t } = useTranslation();
+  const { onBookmark, onHighlight } = operations;
 
   return (
     <div className={clsx("cru-card p-2 clearfix", className)}>
@@ -56,13 +60,19 @@ function TimelineCardTemplate({
         <div className="text-right mt-2">
           {onHighlight != null ? (
             <i
-              className="bi-star icon-button text-yellow mr-3"
+              className={clsx(
+                timeline.isHighlight ? "bi-star-fill" : "bi-star",
+                "icon-button text-yellow mr-3"
+              )}
               onClick={onHighlight}
             />
           ) : null}
           {onBookmark != null ? (
             <i
-              className="bi-bookmark icon-button text-yellow mr-3"
+              className={clsx(
+                timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
+                "icon-button text-yellow mr-3"
+              )}
               onClick={onBookmark}
             />
           ) : null}

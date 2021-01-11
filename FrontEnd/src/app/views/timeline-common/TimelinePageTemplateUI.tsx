@@ -13,26 +13,30 @@ import { TimelineSyncStatus } from "./SyncStatusBadge";
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: TimelineInfo;
-  onManage?: (item: TManageItems | "property") => void;
-  onMember: () => void;
-  onBookmark?: () => void;
-  onHighlight?: () => void;
-  className?: string;
-  collapse: boolean;
   syncStatus: TimelineSyncStatus;
+  operations: {
+    onManage?: (item: TManageItems | "property") => void;
+    onMember: () => void;
+    onBookmark?: () => void;
+    onHighlight?: () => void;
+  };
+  collapse: boolean;
   toggleCollapse: () => void;
+  className?: string;
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
   data?:
     | {
         timeline: TimelineInfo;
-        posts?: TimelinePostInfoEx[];
-        onManage?: (item: TManageItems | "property") => void;
-        onMember: () => void;
-        onBookmark?: () => void;
-        onHighlight?: () => void;
-        onPost?: TimelinePostSendCallback;
+        posts?: TimelinePostInfoEx[] | "forbid";
+        operations: {
+          onManage?: (item: TManageItems | "property") => void;
+          onMember: () => void;
+          onBookmark?: () => void;
+          onHighlight?: () => void;
+          onPost?: TimelinePostSendCallback;
+        };
       }
     | I18nText;
   syncStatus: TimelineSyncStatus;
@@ -155,32 +159,33 @@ export default function TimelinePageTemplateUI<TManageItems>(
           <CardComponent
             className="timeline-template-card"
             timeline={data.timeline}
-            onManage={data.onManage}
-            onMember={data.onMember}
-            onBookmark={data.onBookmark}
-            onHighlight={data.onHighlight}
+            operations={data.operations}
             syncStatus={syncStatus}
             collapse={cardCollapse}
             toggleCollapse={toggleCardCollapse}
           />
         ) : null}
         {posts != null ? (
-          <div
-            className="timeline-container"
-            style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
-          >
-            <Timeline
-              containerRef={timelineRef}
-              posts={posts}
-              onResize={triggerResizeEvent}
-            />
-          </div>
+          posts === "forbid" ? (
+            <div>{t("timeline.messageCantSee")}</div>
+          ) : (
+            <div
+              className="timeline-container"
+              style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
+            >
+              <Timeline
+                containerRef={timelineRef}
+                posts={posts}
+                onResize={triggerResizeEvent}
+              />
+            </div>
+          )
         ) : (
           <div className="full-viewport-center-child">
             <Spinner variant="primary" animation="grow" />
           </div>
         )}
-        {data != null && data.onPost != null ? (
+        {data != null && data.operations.onPost != null ? (
           <>
             <div
               style={{ height: bottomSpaceHeight }}
@@ -188,7 +193,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             />
             <TimelinePostEdit
               className="fixed-bottom"
-              onPost={data.onPost}
+              onPost={data.operations.onPost}
               onHeightChange={onPostEditHeightChange}
               timelineUniqueId={data.timeline.uniqueId}
             />

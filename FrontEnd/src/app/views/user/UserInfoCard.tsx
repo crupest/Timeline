@@ -13,8 +13,8 @@ export type PersonalTimelineManageItem = "avatar" | "nickname";
 export type UserInfoCardProps = TimelineCardComponentProps<PersonalTimelineManageItem>;
 
 const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
-  const { onMember, onManage, ...otherProps } = props;
-  const { timeline } = props;
+  const { timeline, operations } = props;
+  const { onManage, onMember } = operations;
 
   const avatar = useAvatar(timeline?.owner?.username);
 
@@ -66,7 +66,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
           };
         }
       })()}
-      {...otherProps}
+      {...props}
     />
   );
 };
