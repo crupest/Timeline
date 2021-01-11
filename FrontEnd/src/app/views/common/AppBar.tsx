@@ -26,7 +26,7 @@ const AppBar: React.FC = (_) => {
       bg="primary"
       variant="dark"
       expand="md"
-      sticky="top"
+      fixed="top"
       expanded={expand}
     >
       <LinkContainer to="/" onClick={collapse}>

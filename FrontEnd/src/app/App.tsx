@@ -39,6 +39,7 @@ const App: React.FC = () => {
       <React.Suspense fallback={<LoadingPage />}>
         <Router>
           <AppBar />
+          <div style={{ height: 56 }} />
           <Switch>
             <Route exact path="/">
               <Home />
