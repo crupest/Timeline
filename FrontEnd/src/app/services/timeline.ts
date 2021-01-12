@@ -104,8 +104,9 @@ export class TimelineService {
     saveData: async (timelineName, data) => {
       if (data === "notexist") return;
 
-      userInfoService.saveUser(data.owner);
-      userInfoService.saveUsers(data.members);
+      // TODO: Avoid save same user.
+      void userInfoService.saveUser(data.owner);
+      void userInfoService.saveUsers(data.members);
 
       await dataStorage.setItem<TimelineData>(
         this.generateTimelineDataStorageKey(timelineName),
@@ -157,8 +158,8 @@ export class TimelineService {
     },
   });
 
-  syncTimeline(timelineName: string): void {
-    this.timelineHub.getLine(timelineName).sync();
+  syncTimeline(timelineName: string): Promise<void> {
+    return this.timelineHub.getLine(timelineName).sync();
   }
 
   createTimeline(timelineName: string): Observable<TimelineInfo> {
@@ -222,7 +223,7 @@ export class TimelineService {
       };
 
       data.posts.forEach((p) => {
-        userInfoService.saveUser(p.author);
+        void userInfoService.saveUser(p.author);
       });
 
       await dataStorage.setItem<TimelinePostsData>(
@@ -342,8 +343,8 @@ export class TimelineService {
     },
   });
 
-  syncPosts(timelineName: string): void {
-    this.postsHub.getLine(timelineName).sync();
+  syncPosts(timelineName: string): Promise<void> {
+    return this.postsHub.getLine(timelineName).sync();
   }
 
   createPost(
@@ -354,7 +355,7 @@ export class TimelineService {
       getHttpTimelineClient()
         .postPost(timelineName, request)
         .then(() => {
-          this.syncPosts(timelineName);
+          void this.syncPosts(timelineName);
         })
     );
   }
@@ -364,7 +365,7 @@ export class TimelineService {
       getHttpTimelineClient()
         .deletePost(timelineName, postId)
         .then(() => {
-          this.syncPosts(timelineName);
+          void this.syncPosts(timelineName);
         })
     );
   }
