@@ -248,12 +248,12 @@ export function checkLogin(): AuthUser {
 export class UserNotExistError extends Error {}
 
 export class UserInfoService {
-  saveUser(user: HttpUser): void {
-    this.userHub.getLine(user.username).save(user);
+  saveUser(user: HttpUser): Promise<void> {
+    return this.userHub.getLine(user.username).save(user);
   }
 
-  saveUsers(users: HttpUser[]): void {
-    return users.forEach((user) => this.saveUser(user));
+  saveUsers(users: HttpUser[]): Promise<void> {
+    return Promise.all(users.map((user) => this.saveUser(user))).then();
   }
 
   async getCachedUser(username: string): Promise<HttpUser | null> {
@@ -351,15 +351,13 @@ export class UserInfoService {
 
   async setAvatar(username: string, blob: Blob): Promise<void> {
     const etag = await getHttpUserClient().putAvatar(username, blob);
-    this.avatarHub.getLine(username).save({ data: blob, etag });
+    await this.avatarHub.getLine(username).save({ data: blob, etag });
   }
 
   async setNickname(username: string, nickname: string): Promise<void> {
     return getHttpUserClient()
       .patch(username, { nickname })
-      .then((user) => {
-        this.saveUser(user);
-      });
+      .then((user) => this.saveUser(user));
   }
 }
 
