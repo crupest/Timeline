@@ -173,14 +173,8 @@ export default function TimelinePageTemplate<TManageItem>(
       <TimelinePropertyChangeDialog
         open
         close={closeDialog}
-        oldInfo={{
-          title: timeline.title,
-          visibility: timeline.visibility,
-          description: timeline.description,
-        }}
-        onProcess={(req) => {
-          return service.changeTimelineProperty(name, req).toPromise().then();
-        }}
+        timeline={timeline}
+        onProcess={(req) => service.changeTimelineProperty(name, req)}
       />
     );
   } else if (dialog === "member") {
