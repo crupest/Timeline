@@ -26,6 +26,8 @@ export type { TimelineVisibility } from "@/http/timeline";
 import { dataStorage } from "./common";
 import { userInfoService, AuthUser } from "./user";
 import { DataAndStatus, DataHub2 } from "./DataHub2";
+import { getHttpBookmarkClient } from "@/http/bookmark";
+import { getHttpHighlightClient } from "@/http/highlight";
 
 export type TimelineInfo = HttpTimelineInfo;
 export type TimelineChangePropertyRequest = HttpTimelinePatchRequest;
@@ -104,8 +106,9 @@ export class TimelineService {
     saveData: async (timelineName, data) => {
       if (data === "notexist") return;
 
-      userInfoService.saveUser(data.owner);
-      userInfoService.saveUsers(data.members);
+      // TODO: Avoid save same user.
+      void userInfoService.saveUser(data.owner);
+      void userInfoService.saveUsers(data.members);
 
       await dataStorage.setItem<TimelineData>(
         this.generateTimelineDataStorageKey(timelineName),
@@ -157,8 +160,8 @@ export class TimelineService {
     },
   });
 
-  syncTimeline(timelineName: string): void {
-    this.timelineHub.getLine(timelineName).sync();
+  syncTimeline(timelineName: string): Promise<void> {
+    return this.timelineHub.getLine(timelineName).sync();
   }
 
   createTimeline(timelineName: string): Observable<TimelineInfo> {
@@ -174,15 +177,12 @@ export class TimelineService {
   changeTimelineProperty(
     timelineName: string,
     req: TimelineChangePropertyRequest
-  ): Observable<TimelineInfo> {
-    return from(
-      getHttpTimelineClient()
-        .patchTimeline(timelineName, req)
-        .then((timeline) => {
-          void this.syncTimeline(timelineName);
-          return timeline;
-        })
-    );
+  ): Promise<void> {
+    return getHttpTimelineClient()
+      .patchTimeline(timelineName, req)
+      .then(() => {
+        void this.syncTimeline(timelineName);
+      });
   }
 
   deleteTimeline(timelineName: string): Observable<unknown> {
@@ -222,7 +222,7 @@ export class TimelineService {
       };
 
       data.posts.forEach((p) => {
-        userInfoService.saveUser(p.author);
+        void userInfoService.saveUser(p.author);
       });
 
       await dataStorage.setItem<TimelinePostsData>(
@@ -342,31 +342,27 @@ export class TimelineService {
     },
   });
 
-  syncPosts(timelineName: string): void {
-    this.postsHub.getLine(timelineName).sync();
+  syncPosts(timelineName: string): Promise<void> {
+    return this.postsHub.getLine(timelineName).sync();
   }
 
   createPost(
     timelineName: string,
     request: TimelineCreatePostRequest
-  ): Observable<unknown> {
-    return from(
-      getHttpTimelineClient()
-        .postPost(timelineName, request)
-        .then(() => {
-          this.syncPosts(timelineName);
-        })
-    );
+  ): Promise<void> {
+    return getHttpTimelineClient()
+      .postPost(timelineName, request)
+      .then(() => {
+        void this.syncPosts(timelineName);
+      });
   }
 
-  deletePost(timelineName: string, postId: number): Observable<unknown> {
-    return from(
-      getHttpTimelineClient()
-        .deletePost(timelineName, postId)
-        .then(() => {
-          this.syncPosts(timelineName);
-        })
-    );
+  deletePost(timelineName: string, postId: number): Promise<void> {
+    return getHttpTimelineClient()
+      .deletePost(timelineName, postId)
+      .then(() => {
+        void this.syncPosts(timelineName);
+      });
   }
 
   isMemberOf(username: string, timeline: TimelineInfo): boolean {
@@ -434,6 +430,26 @@ export class TimelineService {
       (user.username === timeline.owner.username ||
         user.username === post.author.username)
     );
+  }
+
+  setHighlight(timelineName: string, highlight: boolean): Promise<void> {
+    const client = getHttpHighlightClient();
+    const promise = highlight
+      ? client.put(timelineName)
+      : client.delete(timelineName);
+    return promise.then(() => {
+      void timelineService.syncTimeline(timelineName);
+    });
+  }
+
+  setBookmark(timelineName: string, bookmark: boolean): Promise<void> {
+    const client = getHttpBookmarkClient();
+    const promise = bookmark
+      ? client.put(timelineName)
+      : client.delete(timelineName);
+    return promise.then(() => {
+      void timelineService.syncTimeline(timelineName);
+    });
   }
 }
 

@@ -1,10 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { fromEvent } from "rxjs";
 import { Spinner } from "react-bootstrap";
 
 import { getAlertHost } from "@/services/alert";
-import { useEventEmiiter, I18nText, convertI18nText } from "@/common";
+import { I18nText, convertI18nText } from "@/common";
 import { TimelineInfo } from "@/services/timeline";
 
 import Timeline, { TimelinePostInfoEx } from "./Timeline";
@@ -25,20 +24,20 @@ export interface TimelineCardComponentProps<TManageItems> {
   className?: string;
 }
 
+export interface TimelinePageTemplateData<TManageItems> {
+  timeline: TimelineInfo;
+  posts?: TimelinePostInfoEx[] | "forbid";
+  operations: {
+    onManage?: (item: TManageItems | "property") => void;
+    onMember: () => void;
+    onBookmark?: () => void;
+    onHighlight?: () => void;
+    onPost?: TimelinePostSendCallback;
+  };
+}
+
 export interface TimelinePageTemplateUIProps<TManageItems> {
-  data?:
-    | {
-        timeline: TimelineInfo;
-        posts?: TimelinePostInfoEx[] | "forbid";
-        operations: {
-          onManage?: (item: TManageItems | "property") => void;
-          onMember: () => void;
-          onBookmark?: () => void;
-          onHighlight?: () => void;
-          onPost?: TimelinePostSendCallback;
-        };
-      }
-    | I18nText;
+  data?: TimelinePageTemplateData<TManageItems> | I18nText;
   syncStatus: TimelineSyncStatus;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
 }
@@ -69,59 +68,8 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
   const timelineRef = React.useRef<HTMLDivElement | null>(null);
 
-  const [getResizeEvent, triggerResizeEvent] = useEventEmiiter();
-
   const timelineName: string | null =
     typeof data === "object" && "timeline" in data ? data.timeline.name : null;
-
-  React.useEffect(() => {
-    const { current: timelineElement } = timelineRef;
-    if (timelineElement != null) {
-      let loadingScrollToBottom = true;
-      let pinBottom = false;
-
-      const isAtBottom = (): boolean =>
-        window.innerHeight + window.scrollY + 10 >= document.body.scrollHeight;
-
-      const disableLoadingScrollToBottom = (): void => {
-        loadingScrollToBottom = false;
-        if (isAtBottom()) pinBottom = true;
-      };
-
-      const checkAndScrollToBottom = (): void => {
-        if (loadingScrollToBottom || pinBottom) {
-          window.scrollTo(0, document.body.scrollHeight);
-        }
-      };
-
-      const subscriptions = [
-        fromEvent(timelineElement, "wheel").subscribe(
-          disableLoadingScrollToBottom
-        ),
-        fromEvent(timelineElement, "pointerdown").subscribe(
-          disableLoadingScrollToBottom
-        ),
-        fromEvent(timelineElement, "keydown").subscribe(
-          disableLoadingScrollToBottom
-        ),
-        fromEvent(window, "scroll").subscribe(() => {
-          if (loadingScrollToBottom) return;
-
-          if (isAtBottom()) {
-            pinBottom = true;
-          } else {
-            pinBottom = false;
-          }
-        }),
-        fromEvent(window, "resize").subscribe(checkAndScrollToBottom),
-        getResizeEvent().subscribe(checkAndScrollToBottom),
-      ];
-
-      return () => {
-        subscriptions.forEach((s) => s.unsubscribe());
-      };
-    }
-  }, [getResizeEvent, triggerResizeEvent, timelineName]);
 
   const cardCollapseLocalStorageKey =
     timelineName != null ? `timeline.${timelineName}.cardCollapse` : null;
@@ -173,11 +121,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
               className="timeline-container"
               style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
             >
-              <Timeline
-                containerRef={timelineRef}
-                posts={posts}
-                onResize={triggerResizeEvent}
-              />
+              <Timeline containerRef={timelineRef} posts={posts} />
             </div>
           )
         ) : (
