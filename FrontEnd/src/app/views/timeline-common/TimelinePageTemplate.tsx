@@ -5,6 +5,7 @@ import { UiLogicError } from "@/common";
 import { pushAlert } from "@/services/alert";
 import { useUser } from "@/services/user";
 import { timelineService, usePosts, useTimeline } from "@/services/timeline";
+import { mergeDataStatus } from "@/services/DataHub2";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
@@ -13,7 +14,6 @@ import {
   TimelinePageTemplateUIProps,
 } from "./TimelinePageTemplateUI";
 import { TimelinePostInfoEx } from "./Timeline";
-import { mergeDataStatus } from "@/services/DataHub2";
 
 export interface TimelinePageTemplateProps<TManageItem> {
   name: string;
@@ -39,8 +39,37 @@ export default function TimelinePageTemplate<TManageItem>(
     null
   );
 
+  const [scrollBottomKey, setScrollBottomKey] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    if (scrollBottomKey > 0) {
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+  }, [scrollBottomKey]);
+
   const timelineAndStatus = useTimeline(name);
   const postsAndState = usePosts(name);
+
+  const [
+    scrollToBottomNextSyncKey,
+    setScrollToBottomNextSyncKey,
+  ] = React.useState<number>(0);
+
+  const scrollToBottomNextSync = (): void => {
+    setScrollToBottomNextSyncKey((old) => old + 1);
+  };
+
+  React.useEffect(() => {
+    let subscribe = true;
+    void timelineService.syncPosts(name).then(() => {
+      if (subscribe) {
+        setScrollBottomKey((old) => old + 1);
+      }
+    });
+    return () => {
+      subscribe = false;
+    };
+  }, [name, scrollToBottomNextSyncKey]);
 
   const data = ((): TimelinePageTemplateUIProps<TManageItem>["data"] => {
     const { status, data: timeline } = timelineAndStatus;
@@ -78,7 +107,8 @@ export default function TimelinePageTemplate<TManageItem>(
 
       const operations: TimelinePageTemplateData<TManageItem>["operations"] = {
         onPost: service.hasPostPermission(user, timeline)
-          ? (req) => service.createPost(name, req)
+          ? (req) =>
+              service.createPost(name, req).then(() => scrollToBottomNextSync())
           : undefined,
         onManage: service.hasManagePermission(user, timeline)
           ? (item) => {
