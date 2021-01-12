@@ -132,13 +132,9 @@ export default function TimelinePageTemplate<TManageItem>(
     }
   })();
 
-  const closeDialog = React.useCallback((): void => {
-    setDialog(null);
-  }, []);
-
-  let dialogElement: React.ReactElement | undefined;
-
   const timeline = timelineAndStatus?.data;
+  let dialogElement: React.ReactElement | undefined;
+  const closeDialog = (): void => setDialog(null);
 
   if (dialog === "property") {
     if (timeline == null || timeline === "notexist") {
