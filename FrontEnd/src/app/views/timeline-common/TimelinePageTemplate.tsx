@@ -5,8 +5,6 @@ import { UiLogicError } from "@/common";
 import { pushAlert } from "@/services/alert";
 import { useUser } from "@/services/user";
 import { timelineService, usePosts, useTimeline } from "@/services/timeline";
-import { getHttpBookmarkClient } from "@/http/bookmark";
-import { getHttpHighlightClient } from "@/http/highlight";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
@@ -66,13 +64,11 @@ export default function TimelinePageTemplate<TManageItem>(
             ...post,
             onDelete: service.hasModifyPostPermission(user, timeline, post)
               ? () => {
-                  service.deletePost(name, post.id).subscribe({
-                    error: () => {
-                      pushAlert({
-                        type: "danger",
-                        message: t("timeline.deletePostFailed"),
-                      });
-                    },
+                  service.deletePost(name, post.id).catch(() => {
+                    pushAlert({
+                      type: "danger",
+                      message: t("timeline.deletePostFailed"),
+                    });
                   });
                 }
               : undefined,
@@ -82,9 +78,7 @@ export default function TimelinePageTemplate<TManageItem>(
 
       const operations: TimelinePageTemplateData<TManageItem>["operations"] = {
         onPost: service.hasPostPermission(user, timeline)
-          ? (req) => {
-              return service.createPost(name, req).toPromise().then();
-            }
+          ? (req) => service.createPost(name, req)
           : undefined,
         onManage: service.hasManagePermission(user, timeline)
           ? (item) => {
@@ -99,53 +93,37 @@ export default function TimelinePageTemplate<TManageItem>(
         onBookmark:
           user != null
             ? () => {
-                const { isBookmark } = timeline;
-                const client = getHttpBookmarkClient();
-                const promise = isBookmark
-                  ? client.delete(name)
-                  : client.put(name);
-                promise.then(
-                  () => {
-                    void timelineService.syncTimeline(name);
-                  },
-                  () => {
+                service
+                  .setBookmark(timeline.name, !timeline.isBookmark)
+                  .catch(() => {
                     pushAlert({
                       message: {
                         type: "i18n",
-                        key: isBookmark
+                        key: timeline.isBookmark
                           ? "timeline.removeBookmarkFail"
                           : "timeline.addBookmarkFail",
                       },
                       type: "danger",
                     });
-                  }
-                );
+                  });
               }
             : undefined,
         onHighlight:
           user != null && user.hasHighlightTimelineAdministrationPermission
             ? () => {
-                const { isHighlight } = timeline;
-                const client = getHttpHighlightClient();
-                const promise = isHighlight
-                  ? client.delete(name)
-                  : client.put(name);
-                promise.then(
-                  () => {
-                    void timelineService.syncTimeline(name);
-                  },
-                  () => {
+                service
+                  .setHighlight(timeline.name, !timeline.isHighlight)
+                  .catch(() => {
                     pushAlert({
                       message: {
                         type: "i18n",
-                        key: isHighlight
+                        key: timeline.isHighlight
                           ? "timeline.removeHighlightFail"
                           : "timeline.addHighlightFail",
                       },
                       type: "danger",
                     });
-                  }
-                );
+                  });
               }
             : undefined,
       };
