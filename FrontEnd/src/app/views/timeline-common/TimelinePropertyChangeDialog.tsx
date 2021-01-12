@@ -4,20 +4,15 @@ import {
   TimelineVisibility,
   kTimelineVisibilities,
   TimelineChangePropertyRequest,
+  TimelineInfo,
 } from "@/services/timeline";
 
 import OperationDialog from "../common/OperationDialog";
 
-export interface TimelinePropertyInfo {
-  title: string;
-  visibility: TimelineVisibility;
-  description: string;
-}
-
 export interface TimelinePropertyChangeDialogProps {
   open: boolean;
   close: () => void;
-  oldInfo: TimelinePropertyInfo;
+  timeline: TimelineInfo;
   onProcess: (request: TimelineChangePropertyRequest) => Promise<void>;
 }
 
@@ -30,6 +25,8 @@ const labelMap: { [key in TimelineVisibility]: string } = {
 const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> = (
   props
 ) => {
+  const { timeline } = props;
+
   return (
     <OperationDialog
       title={"timeline.dialogChangeProperty.title"}
@@ -37,7 +34,7 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
         {
           type: "text",
           label: "timeline.dialogChangeProperty.titleField",
-          initValue: props.oldInfo.title,
+          initValue: timeline.title,
         },
         {
           type: "select",
@@ -46,25 +43,25 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
             label: labelMap[v],
             value: v,
           })),
-          initValue: props.oldInfo.visibility,
+          initValue: timeline.visibility,
         },
         {
           type: "text",
           label: "timeline.dialogChangeProperty.description",
-          initValue: props.oldInfo.description,
+          initValue: timeline.description,
         },
       ]}
       open={props.open}
       close={props.close}
       onProcess={([newTitle, newVisibility, newDescription]) => {
         const req: TimelineChangePropertyRequest = {};
-        if (newTitle !== props.oldInfo.title) {
+        if (newTitle !== timeline.title) {
           req.title = newTitle;
         }
-        if (newVisibility !== props.oldInfo.visibility) {
+        if (newVisibility !== timeline.visibility) {
           req.visibility = newVisibility as TimelineVisibility;
         }
-        if (newDescription !== props.oldInfo.description) {
+        if (newDescription !== timeline.description) {
           req.description = newDescription;
         }
         return props.onProcess(req);

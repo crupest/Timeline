@@ -32,6 +32,8 @@ export class DataLine2<TData> {
   private _current: DataAndStatus<TData> | null = null;
   private _observers: Subscriber<DataAndStatus<TData>>[] = [];
 
+  private _syncPromise: Promise<void> | null = null;
+
   get currentData(): DataAndStatus<TData> | null {
     return this._current;
   }
@@ -50,7 +52,7 @@ export class DataLine2<TData> {
   }
 
   subscribe(subsriber: Subscriber<DataAndStatus<TData>>): void {
-    this.sync(); // TODO: Should I sync at this point or let the user sync explicitly.
+    void this.sync(); // TODO: Should I sync at this point or let the user sync explicitly.
     this._observers.push(subsriber);
     const { currentData } = this;
     if (currentData != null) {
@@ -76,36 +78,44 @@ export class DataLine2<TData> {
     });
   }
 
-  sync(): void {
-    const { currentData } = this;
-    if (currentData != null && currentData.status === "syncing") return;
-    this.next({ data: currentData?.data ?? null, status: "syncing" });
-    void this.config.getSavedData().then((savedData) => {
-      if (currentData == null && savedData != null) {
-        this.next({ data: savedData, status: "syncing" });
-      }
-      return this.config.fetchData(savedData).then((data) => {
-        if (data == null) {
-          this.next({
-            data: savedData,
-            status: "offline",
-          });
-        } else {
-          return this.config.saveData(data).then(() => {
-            this.next({ data: data, status: "synced" });
-          });
-        }
-      });
+  private syncWithAction(action: () => Promise<void>): Promise<void> {
+    if (this._syncPromise != null) return this._syncPromise;
+    this._syncPromise = action().then(() => {
+      this._syncPromise = null;
     });
+    return this._syncPromise;
   }
 
-  save(data: TData): void {
+  sync(): Promise<void> {
+    return this.syncWithAction(this.doSync.bind(this));
+  }
+
+  private async doSync(): Promise<void> {
     const { currentData } = this;
-    if (currentData != null && currentData.status === "syncing") return;
     this.next({ data: currentData?.data ?? null, status: "syncing" });
-    void this.config.saveData(data).then(() => {
+    const savedData = await this.config.getSavedData();
+    if (currentData == null && savedData != null) {
+      this.next({ data: savedData, status: "syncing" });
+    }
+    const data = await this.config.fetchData(savedData);
+    if (data == null) {
+      this.next({
+        data: savedData,
+        status: "offline",
+      });
+    } else {
+      await this.config.saveData(data);
       this.next({ data: data, status: "synced" });
-    });
+    }
+  }
+
+  save(data: TData): Promise<void> {
+    return this.syncWithAction(this.doSave.bind(this, data));
+  }
+
+  private async doSave(data: TData): Promise<void> {
+    await this.config.saveData(data);
+    this.next({ data: data, status: "synced" });
   }
 
   getSavedData(): Promise<TData | null> {
