@@ -175,15 +175,12 @@ export class TimelineService {
   changeTimelineProperty(
     timelineName: string,
     req: TimelineChangePropertyRequest
-  ): Observable<TimelineInfo> {
-    return from(
-      getHttpTimelineClient()
-        .patchTimeline(timelineName, req)
-        .then((timeline) => {
-          void this.syncTimeline(timelineName);
-          return timeline;
-        })
-    );
+  ): Promise<void> {
+    return getHttpTimelineClient()
+      .patchTimeline(timelineName, req)
+      .then(() => {
+        void this.syncTimeline(timelineName);
+      });
   }
 
   deleteTimeline(timelineName: string): Observable<unknown> {
