@@ -10,8 +10,10 @@ import { getHttpHighlightClient } from "@/http/highlight";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
-import { TimelinePageTemplateUIProps } from "./TimelinePageTemplateUI";
-import { TimelinePostSendCallback } from "./TimelinePostEdit";
+import {
+  TimelinePageTemplateData,
+  TimelinePageTemplateUIProps,
+} from "./TimelinePageTemplateUI";
 import { TimelinePostInfoEx } from "./Timeline";
 import { mergeDataStatus } from "@/services/DataHub2";
 
@@ -41,26 +43,6 @@ export default function TimelinePageTemplate<TManageItem>(
 
   const timelineAndStatus = useTimeline(name);
   const postsAndState = usePosts(name);
-
-  const onPost: TimelinePostSendCallback = React.useCallback(
-    (req) => {
-      return service.createPost(name, req).toPromise().then();
-    },
-    [service, name]
-  );
-
-  const onManageProp = props.onManage;
-
-  const onManage = React.useCallback(
-    (item: "property" | TManageItem) => {
-      if (item === "property") {
-        setDialog(item);
-      } else {
-        onManageProp(item);
-      }
-    },
-    [onManageProp]
-  );
 
   const data = ((): TimelinePageTemplateUIProps<TManageItem>["data"] => {
     const { status, data: timeline } = timelineAndStatus;
@@ -98,10 +80,20 @@ export default function TimelinePageTemplate<TManageItem>(
         }
       })();
 
-      const operations = {
-        onPost: service.hasPostPermission(user, timeline) ? onPost : undefined,
+      const operations: TimelinePageTemplateData<TManageItem>["operations"] = {
+        onPost: service.hasPostPermission(user, timeline)
+          ? (req) => {
+              return service.createPost(name, req).toPromise().then();
+            }
+          : undefined,
         onManage: service.hasManagePermission(user, timeline)
-          ? onManage
+          ? (item) => {
+              if (item === "property") {
+                setDialog(item);
+              } else {
+                props.onManage(item);
+              }
+            }
           : undefined,
         onMember: () => setDialog("member"),
         onBookmark:
