@@ -16,12 +16,11 @@ export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
   posts: TimelinePostInfoEx[];
-  onResize?: () => void;
   containerRef?: React.Ref<HTMLDivElement>;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { posts, onResize } = props;
+  const { posts } = props;
 
   const [showMoreIndex, setShowMoreIndex] = React.useState<number>(-1);
 
@@ -51,7 +50,6 @@ const Timeline: React.FC<TimelineProps> = (props) => {
                   : undefined
               }
               onClick={() => setShowMoreIndex(-1)}
-              onResize={onResize}
             />
           );
         });
