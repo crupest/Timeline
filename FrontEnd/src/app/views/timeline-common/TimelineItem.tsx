@@ -1,7 +1,6 @@
 import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import { useAvatar } from "@/services/user";
 import { TimelinePostInfo } from "@/services/timeline";
@@ -24,8 +23,6 @@ export interface TimelineItemProps {
 }
 
 const TimelineItem: React.FC<TimelineItemProps> = (props) => {
-  const { i18n } = useTranslation();
-
   const current = props.current === true;
 
   const { more } = props;
@@ -42,6 +39,15 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
     >
       <TimelineLine center="node" current={current} />
       <div className="timeline-item-card">
+        {more != null ? (
+          <i
+            className="bi-chevron-down text-info icon-button float-right"
+            onClick={(e) => {
+              more.toggle();
+              e.stopPropagation();
+            }}
+          />
+        ) : null}
         <div className="timeline-item-header">
           <span className="mr-2">
             <span>
@@ -52,19 +58,10 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
                 {props.post.author.nickname}
               </small>
               <small className="text-secondary white-space-no-wrap">
-                {props.post.time.toLocaleString(i18n.languages)}
+                {props.post.time.toLocaleTimeString()}
               </small>
             </span>
           </span>
-          {more != null ? (
-            <i
-              className="bi-chevron-down text-info icon-button"
-              onClick={(e) => {
-                more.toggle();
-                e.stopPropagation();
-              }}
-            />
-          ) : null}
         </div>
         <div className="timeline-content">
           {(() => {
