@@ -2,44 +2,13 @@ import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Modal, Button } from "react-bootstrap";
 
 import { useAvatar } from "@/services/user";
 import { TimelinePostInfo } from "@/services/timeline";
 
 import BlobImage from "../common/BlobImage";
-
-const TimelinePostDeleteConfirmDialog: React.FC<{
-  onClose: () => void;
-  onConfirm: () => void;
-}> = ({ onClose, onConfirm }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Modal onHide={onClose} show centered>
-      <Modal.Header>
-        <Modal.Title className="text-danger">
-          {t("timeline.post.deleteDialog.title")}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>{t("timeline.post.deleteDialog.prompt")}</Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          {t("operationDialog.cancel")}
-        </Button>
-        <Button
-          variant="danger"
-          onClick={() => {
-            onConfirm();
-            onClose();
-          }}
-        >
-          {t("operationDialog.confirm")}
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
+import TimelineLine from "./TimelineLine";
+import TimelinePostDeleteConfirmDialog from "./TimelinePostDeleteConfirmDialog";
 
 export interface TimelineItemProps {
   post: TimelinePostInfo;
@@ -50,7 +19,6 @@ export interface TimelineItemProps {
     onDelete: () => void;
   };
   onClick?: () => void;
-  onResize?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -60,7 +28,7 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
 
   const current = props.current === true;
 
-  const { more, onResize } = props;
+  const { more } = props;
 
   const avatar = useAvatar(props.post.author.username);
 
@@ -68,31 +36,25 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
 
   return (
     <div
-      className={clsx(
-        "timeline-item position-relative",
-        current && "current",
-        props.className
-      )}
+      className={clsx("timeline-item", current && "current", props.className)}
       onClick={props.onClick}
       style={props.style}
     >
-      <div className="timeline-line-area-container">
-        <div className="timeline-line-area">
-          <div className="timeline-line-segment start"></div>
-          <div className="timeline-line-node-container">
-            <div className="timeline-line-node"></div>
-          </div>
-          <div className="timeline-line-segment end"></div>
-          {current && <div className="timeline-line-segment current-end" />}
-        </div>
-      </div>
+      <TimelineLine center="node" current={current} />
       <div className="timeline-item-card">
-        <div>
+        <div className="timeline-item-header">
           <span className="mr-2">
-            <small className="text-secondary white-space-no-wrap mr-2">
-              {props.post.time.toLocaleString(i18n.languages)}
-            </small>
-            <small className="text-dark">{props.post.author.nickname}</small>
+            <span>
+              <Link to={"/users/" + props.post.author.username}>
+                <BlobImage blob={avatar} className="timeline-avatar mr-1" />
+              </Link>
+              <small className="text-dark mr-2">
+                {props.post.author.nickname}
+              </small>
+              <small className="text-secondary white-space-no-wrap">
+                {props.post.time.toLocaleString(i18n.languages)}
+              </small>
+            </span>
           </span>
           {more != null ? (
             <i
@@ -105,16 +67,6 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           ) : null}
         </div>
         <div className="timeline-content">
-          <Link
-            className="float-left m-2"
-            to={"/users/" + props.post.author.username}
-          >
-            <BlobImage
-              onLoad={onResize}
-              blob={avatar}
-              className="avatar rounded"
-            />
-          </Link>
           {(() => {
             const { content } = props.post;
             if (content.type === "text") {
@@ -122,7 +74,6 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
             } else {
               return (
                 <BlobImage
-                  onLoad={onResize}
                   blob={content.data}
                   className="timeline-content-image"
                 />
