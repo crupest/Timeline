@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Timeline.Tests.Services
 {
-    public class UserPermissionServiceTest : DatabaseBasedTest
+    public class UserPermissionServiceTest : ServiceTestBase
     {
         private UserPermissionService _service = default!;
 
@@ -16,7 +16,7 @@ namespace Timeline.Tests.Services
 
         }
 
-        protected override void OnDatabaseCreated()
+        protected override void OnInitialize()
         {
             _service = new UserPermissionService(Database);
         }

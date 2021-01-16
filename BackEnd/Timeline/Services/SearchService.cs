@@ -39,6 +39,9 @@ namespace Timeline.Services
         /// <returns>Search results.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="query"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="query"/> is empty.</exception>
+        /// <remarks>
+        /// Implementation should promise high score is at first.
+        /// </remarks>
         Task<SearchResult<TimelineEntity>> SearchTimeline(string query);
 
         /// <summary>
@@ -48,6 +51,9 @@ namespace Timeline.Services
         /// <returns>Search results.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="query"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="query"/> is empty.</exception>
+        /// <remarks>
+        /// Implementation should promise high score is at first.
+        /// </remarks>
         Task<SearchResult<UserEntity>> SearchUser(string query);
     }
 
