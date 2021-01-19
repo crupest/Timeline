@@ -43,7 +43,7 @@ namespace Timeline.Models.Http
     /// <summary>
     /// Create timeline request model.
     /// </summary>
-    public class TimelineCreateRequest
+    public class HttpTimelineCreateRequest
     {
         /// <summary>
         /// Name of the new timeline. Must be a valid name.
