@@ -1,11 +1,16 @@
 import React from "react";
 import clsx from "clsx";
 
-import { TimelinePostInfo } from "@/services/timeline";
+import {
+  TimelineInfo,
+  TimelinePostInfo,
+  timelineService,
+} from "@/services/timeline";
 
 import TimelineItem from "./TimelineItem";
 import TimelineTop from "./TimelineTop";
 import TimelineDateItem from "./TimelineDateItem";
+import { useUser } from "@/services/user";
 
 function dateEqual(left: Date, right: Date): boolean {
   return (
@@ -15,30 +20,27 @@ function dateEqual(left: Date, right: Date): boolean {
   );
 }
 
-export interface TimelinePostInfoEx extends TimelinePostInfo {
-  onDelete?: () => void;
-}
-
-export type TimelineDeleteCallback = (index: number, id: number) => void;
-
 export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
-  posts: TimelinePostInfoEx[];
-  containerRef?: React.Ref<HTMLDivElement>;
+  timeline: TimelineInfo;
+  posts: TimelinePostInfo[];
+  onDelete: (post: TimelinePostInfo) => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { posts } = props;
+  const { timeline, posts } = props;
+
+  const user = useUser();
 
   const [showMoreIndex, setShowMoreIndex] = React.useState<number>(-1);
 
   const groupedPosts = React.useMemo<
-    { date: Date; posts: (TimelinePostInfoEx & { index: number })[] }[]
+    { date: Date; posts: (TimelinePostInfo & { index: number })[] }[]
   >(() => {
     const result: {
       date: Date;
-      posts: (TimelinePostInfoEx & { index: number })[];
+      posts: (TimelinePostInfo & { index: number })[];
     }[] = [];
     let index = 0;
     for (const post of posts) {
@@ -59,36 +61,41 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [posts]);
 
   return (
-    <div
-      ref={props.containerRef}
-      style={props.style}
-      className={clsx("timeline", props.className)}
-    >
+    <div style={props.style} className={clsx("timeline", props.className)}>
       <TimelineTop height="56px" />
       {groupedPosts.map((group) => {
         return (
           <>
             <TimelineDateItem date={group.date} />
-            {group.posts.map((post) => (
-              <TimelineItem
-                post={post}
-                key={post.id}
-                current={posts.length - 1 === post.index}
-                more={
-                  post.onDelete != null
-                    ? {
-                        isOpen: showMoreIndex === post.index,
-                        toggle: () =>
-                          setShowMoreIndex((old) =>
-                            old === post.index ? -1 : post.index
-                          ),
-                        onDelete: post.onDelete,
-                      }
-                    : undefined
-                }
-                onClick={() => setShowMoreIndex(-1)}
-              />
-            ))}
+            {group.posts.map((post) => {
+              const deletable = timelineService.hasModifyPostPermission(
+                user,
+                timeline,
+                post
+              );
+              return (
+                <TimelineItem
+                  post={post}
+                  key={post.id}
+                  current={posts.length - 1 === post.index}
+                  more={
+                    deletable
+                      ? {
+                          isOpen: showMoreIndex === post.index,
+                          toggle: () =>
+                            setShowMoreIndex((old) =>
+                              old === post.index ? -1 : post.index
+                            ),
+                          onDelete: () => {
+                            props.onDelete(post);
+                          },
+                        }
+                      : undefined
+                  }
+                  onClick={() => setShowMoreIndex(-1)}
+                />
+              );
+            })}
           </>
         );
       })}
