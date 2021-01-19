@@ -207,7 +207,7 @@ namespace Timeline.Tests.IntegratedTests
             await client.TestDeleteAssertForbiddenAsync("users/aaa!a");
         }
 
-        private const string createUserUrl = "userop/createuser";
+        private const string createUserUrl = "users";
 
         [Fact]
         public async Task Op_CreateUser()

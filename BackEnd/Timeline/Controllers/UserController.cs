@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
@@ -57,6 +58,28 @@ namespace Timeline.Controllers
             var users = await _userService.GetUsers();
             var result = await _userMapper.MapToHttp(users, Url);
             return result;
+        }
+
+        /// <summary>
+        /// Create a new user. You have to be administrator.
+        /// </summary>
+        /// <returns>The new user's info.</returns>
+        [HttpPost("users"), PermissionAuthorize(UserPermission.UserManagement)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<HttpUser>> Post([FromBody] HttpCreateUserRequest body)
+        {
+            try
+            {
+                var user = await _userService.CreateUser(body.Username, body.Password);
+                return await _userMapper.MapToHttp(user, Url);
+            }
+            catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
+            {
+                return BadRequest(ErrorResponse.UserController.UsernameConflict());
+            }
         }
 
         /// <summary>
@@ -168,17 +191,10 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [Obsolete("Use post instead.")]
         public async Task<ActionResult<HttpUser>> CreateUser([FromBody] HttpCreateUserRequest body)
         {
-            try
-            {
-                var user = await _userService.CreateUser(body.Username, body.Password);
-                return await _userMapper.MapToHttp(user, Url);
-            }
-            catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
-            {
-                return BadRequest(ErrorResponse.UserController.UsernameConflict());
-            }
+            return await Post(body);
         }
 
         /// <summary>
