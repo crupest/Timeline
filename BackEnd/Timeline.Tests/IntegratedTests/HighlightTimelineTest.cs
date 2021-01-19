@@ -35,7 +35,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             {
                 using var client1 = await CreateClientAsUser();
-                await client1.TestPostAsync("timelines", new TimelineCreateRequest { Name = "t1" });
+                await client1.TestPostAsync("timelines", new HttpTimelineCreateRequest { Name = "t1" });
             }
 
             using var client = await CreateClientAsAdministrator();
@@ -91,7 +91,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task TimelineGet_IsHighlighField_Should_Work()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPostAsync("timelines", new TimelineCreateRequest { Name = "t" });
+            await client.TestPostAsync("timelines", new HttpTimelineCreateRequest { Name = "t" });
 
             {
                 var t = await client.TestGetAsync<HttpTimeline>("timelines/t");

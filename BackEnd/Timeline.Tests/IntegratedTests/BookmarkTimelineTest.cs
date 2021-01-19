@@ -34,7 +34,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task ShouldWork()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPostAsync("timelines", new TimelineCreateRequest { Name = "t1" });
+            await client.TestPostAsync("timelines", new HttpTimelineCreateRequest { Name = "t1" });
 
 
             {
@@ -88,7 +88,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task TimelineGet_IsBookmarkField_ShouldWork()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPostAsync("timelines", new TimelineCreateRequest { Name = "t" });
+            await client.TestPostAsync("timelines", new HttpTimelineCreateRequest { Name = "t" });
 
             {
                 var t = await client.TestGetAsync<HttpTimeline>("timelines/t");

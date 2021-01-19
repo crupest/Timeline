@@ -120,6 +120,8 @@ namespace Timeline
             services.AddScoped<IHighlightTimelineService, HighlightTimelineService>();
             services.AddScoped<IBookmarkTimelineService, BookmarkTimelineService>();
 
+            services.AddScoped<ISearchService, SearchService>();
+
             services.AddOpenApiDocs();
 
             if (_frontEndMode == FrontEndMode.Mock)
