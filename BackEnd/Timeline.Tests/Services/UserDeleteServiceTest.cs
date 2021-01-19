@@ -8,12 +8,12 @@ using Xunit;
 
 namespace Timeline.Tests.Services
 {
-    public class UserDeleteServiceTest : DatabaseBasedTest
+    public class UserDeleteServiceTest : ServiceTestBase
     {
         private readonly Mock<ITimelinePostService> _mockTimelinePostService = new Mock<ITimelinePostService>();
         private UserDeleteService _service = default!;
 
-        protected override void OnDatabaseCreated()
+        protected override void OnInitialize()
         {
             _service = new UserDeleteService(NullLogger<UserDeleteService>.Instance, Database, _mockTimelinePostService.Object);
         }
