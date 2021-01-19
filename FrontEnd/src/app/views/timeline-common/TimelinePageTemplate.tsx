@@ -4,16 +4,20 @@ import { useTranslation } from "react-i18next";
 import { UiLogicError } from "@/common";
 import { pushAlert } from "@/services/alert";
 import { useUser } from "@/services/user";
-import { timelineService, usePosts, useTimeline } from "@/services/timeline";
+import {
+  TimelinePostInfo,
+  timelineService,
+  usePosts,
+  useTimeline,
+} from "@/services/timeline";
 import { mergeDataStatus } from "@/services/DataHub2";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import {
-  TimelinePageTemplateData,
+  TimelinePageTemplateUIOperations,
   TimelinePageTemplateUIProps,
 } from "./TimelinePageTemplateUI";
-import { TimelinePostInfoEx } from "./Timeline";
 
 export interface TimelinePageTemplateProps<TManageItem> {
   name: string;
@@ -71,41 +75,26 @@ export default function TimelinePageTemplate<TManageItem>(
     };
   }, [name, scrollToBottomNextSyncKey]);
 
-  const data = ((): TimelinePageTemplateUIProps<TManageItem>["data"] => {
+  const uiTimelineProp = ((): TimelinePageTemplateUIProps<TManageItem>["timeline"] => {
     const { status, data: timeline } = timelineAndStatus;
     if (timeline == null) {
       if (status === "offline") {
-        return { type: "custom", value: "Network Error" };
+        return "offline";
       } else {
         return undefined;
       }
     } else if (timeline === "notexist") {
-      return props.notFoundI18nKey;
+      return "notexist";
     } else {
-      const posts = ((): TimelinePostInfoEx[] | "forbid" | undefined => {
-        const { data: postsInfo } = postsAndState;
-        if (postsInfo === "forbid") {
-          return "forbid";
-        } else if (postsInfo == null || postsInfo === "notexist") {
-          return undefined;
-        } else {
-          return postsInfo.posts.map((post) => ({
-            ...post,
-            onDelete: service.hasModifyPostPermission(user, timeline, post)
-              ? () => {
-                  service.deletePost(name, post.id).catch(() => {
-                    pushAlert({
-                      type: "danger",
-                      message: t("timeline.deletePostFailed"),
-                    });
-                  });
-                }
-              : undefined,
-          }));
-        }
-      })();
-
-      const operations: TimelinePageTemplateData<TManageItem>["operations"] = {
+      const operations: TimelinePageTemplateUIOperations<TManageItem> = {
+        onDeletePost: (post) => {
+          service.deletePost(name, post.id).catch(() => {
+            pushAlert({
+              type: "danger",
+              message: t("timeline.deletePostFailed"),
+            });
+          });
+        },
         onPost: service.hasPostPermission(user, timeline)
           ? (req) =>
               service.createPost(name, req).then(() => scrollToBottomNextSync())
@@ -158,7 +147,18 @@ export default function TimelinePageTemplate<TManageItem>(
             : undefined,
       };
 
-      return { timeline, posts, operations };
+      const posts = ((): TimelinePostInfo[] | "forbid" | undefined => {
+        const { data: postsInfo } = postsAndState;
+        if (postsInfo === "forbid") {
+          return "forbid";
+        } else if (postsInfo == null || postsInfo === "notexist") {
+          return undefined;
+        } else {
+          return postsInfo.posts;
+        }
+      })();
+
+      return { ...timeline, operations, posts };
     }
   })();
 
@@ -203,11 +203,12 @@ export default function TimelinePageTemplate<TManageItem>(
   return (
     <>
       <UiComponent
-        data={data}
+        timeline={uiTimelineProp}
         syncStatus={mergeDataStatus([
           timelineAndStatus.status,
           postsAndState.status,
         ])}
+        notExistMessageI18nKey={props.notFoundI18nKey}
       />
       {dialogElement}
     </>

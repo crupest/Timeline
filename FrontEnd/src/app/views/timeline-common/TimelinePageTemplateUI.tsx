@@ -3,10 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Spinner } from "react-bootstrap";
 
 import { getAlertHost } from "@/services/alert";
-import { I18nText, convertI18nText } from "@/common";
-import { TimelineInfo } from "@/services/timeline";
+import { TimelineInfo, TimelinePostInfo } from "@/services/timeline";
 
-import Timeline, { TimelinePostInfoEx } from "./Timeline";
+import Timeline from "./Timeline";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
 import { TimelineSyncStatus } from "./SyncStatusBadge";
 
@@ -24,28 +23,32 @@ export interface TimelineCardComponentProps<TManageItems> {
   className?: string;
 }
 
-export interface TimelinePageTemplateData<TManageItems> {
-  timeline: TimelineInfo;
-  posts?: TimelinePostInfoEx[] | "forbid";
-  operations: {
-    onManage?: (item: TManageItems | "property") => void;
-    onMember: () => void;
-    onBookmark?: () => void;
-    onHighlight?: () => void;
-    onPost?: TimelinePostSendCallback;
-  };
+export interface TimelinePageTemplateUIOperations<TManageItems> {
+  onDeletePost: (post: TimelinePostInfo) => void;
+  onManage?: (item: TManageItems | "property") => void;
+  onMember: () => void;
+  onBookmark?: () => void;
+  onHighlight?: () => void;
+  onPost?: TimelinePostSendCallback;
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
-  data?: TimelinePageTemplateData<TManageItems> | I18nText;
+  timeline?:
+    | (TimelineInfo & {
+        operations: TimelinePageTemplateUIOperations<TManageItems>;
+        posts?: TimelinePostInfo[] | "forbid";
+      })
+    | "notexist"
+    | "offline";
   syncStatus: TimelineSyncStatus;
+  notExistMessageI18nKey: string;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
 }
 
 export default function TimelinePageTemplateUI<TManageItems>(
   props: TimelinePageTemplateUIProps<TManageItems>
 ): React.ReactElement | null {
-  const { data, syncStatus, CardComponent } = props;
+  const { timeline, syncStatus, CardComponent } = props;
 
   const { t } = useTranslation();
 
@@ -66,10 +69,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
     }
   }, []);
 
-  const timelineRef = React.useRef<HTMLDivElement | null>(null);
-
-  const timelineName: string | null =
-    typeof data === "object" && "timeline" in data ? data.timeline.name : null;
+  const timelineName = typeof timeline === "object" ? timeline.name : null;
 
   const cardCollapseLocalStorageKey =
     timelineName != null ? `timeline.${timelineName}.cardCollapse` : null;
@@ -96,32 +96,44 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
   let body: React.ReactElement;
 
-  if (data != null && (typeof data === "string" || "type" in data)) {
-    body = <p className="text-danger">{convertI18nText(data, t)}</p>;
+  if (timeline == null) {
+    body = (
+      <div className="full-viewport-center-child">
+        <Spinner variant="primary" animation="grow" />
+      </div>
+    );
+  } else if (timeline === "offline") {
+    // TODO: i18n
+    body = <p className="text-danger">Offline!</p>;
+  } else if (timeline === "notexist") {
+    body = <p className="text-danger">{t(props.notExistMessageI18nKey)}</p>;
   } else {
-    const posts = data?.posts;
-
+    const { operations, posts } = timeline;
     body = (
       <>
-        {data != null ? (
-          <CardComponent
-            className="timeline-template-card"
-            timeline={data.timeline}
-            operations={data.operations}
-            syncStatus={syncStatus}
-            collapse={cardCollapse}
-            toggleCollapse={toggleCardCollapse}
-          />
-        ) : null}
+        <CardComponent
+          className="timeline-template-card"
+          timeline={timeline}
+          operations={operations}
+          syncStatus={syncStatus}
+          collapse={cardCollapse}
+          toggleCollapse={toggleCardCollapse}
+        />
         {posts != null ? (
           posts === "forbid" ? (
             <div>{t("timeline.messageCantSee")}</div>
           ) : (
             <div
               className="timeline-container"
-              style={{ minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)` }}
+              style={{
+                minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
+              }}
             >
-              <Timeline containerRef={timelineRef} posts={posts} />
+              <Timeline
+                timeline={timeline}
+                posts={posts}
+                onDelete={operations.onDeletePost}
+              />
             </div>
           )
         ) : (
@@ -129,7 +141,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             <Spinner variant="primary" animation="grow" />
           </div>
         )}
-        {data != null && data.operations.onPost != null ? (
+        {operations.onPost != null ? (
           <>
             <div
               style={{ height: bottomSpaceHeight }}
@@ -137,9 +149,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
             />
             <TimelinePostEdit
               className="fixed-bottom"
-              onPost={data.operations.onPost}
+              onPost={operations.onPost}
               onHeightChange={onPostEditHeightChange}
-              timelineUniqueId={data.timeline.uniqueId}
+              timelineUniqueId={timeline.uniqueId}
             />
           </>
         ) : null}
