@@ -28,7 +28,14 @@ namespace Timeline.Controllers
             _userMapper = userMapper;
         }
 
+        /// <summary>
+        /// Search timelines whose name or title contains query string case-insensitively.
+        /// </summary>
+        /// <param name="query">The string to contain.</param>
+        /// <returns>Timelines with most related at first.</returns>
         [HttpGet("timelines")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult<List<HttpTimeline>>> TimelineSearch([FromQuery(Name = "q"), Required(AllowEmptyStrings = false)] string query)
         {
             var searchResult = await _service.SearchTimeline(query);
@@ -36,7 +43,14 @@ namespace Timeline.Controllers
             return await _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId());
         }
 
+        /// <summary>
+        /// Search users whose username or nick contains query string case-insensitively.
+        /// </summary>
+        /// <param name="query">The string to contain.</param>
+        /// <returns>Users with most related at first.</returns>
         [HttpGet("users")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult<List<HttpUser>>> UserSearch([FromQuery(Name = "q"), Required(AllowEmptyStrings = false)] string query)
         {
             var searchResult = await _service.SearchUser(query);

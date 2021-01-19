@@ -179,20 +179,20 @@ namespace Timeline.Tests.IntegratedTests
         {
             {
                 using var client = await CreateDefaultClient();
-                await client.TestPostAssertUnauthorizedAsync("timelines", new TimelineCreateRequest { Name = "aaa" });
+                await client.TestPostAssertUnauthorizedAsync("timelines", new HttpTimelineCreateRequest { Name = "aaa" });
             }
 
             {
                 using var client = await CreateClientAsUser();
 
-                await client.TestPostAssertInvalidModelAsync("timelines", new TimelineCreateRequest { Name = "!!!" });
+                await client.TestPostAssertInvalidModelAsync("timelines", new HttpTimelineCreateRequest { Name = "!!!" });
 
                 {
-                    var body = await client.TestPostAsync<HttpTimeline>("timelines", new TimelineCreateRequest { Name = "aaa" });
+                    var body = await client.TestPostAsync<HttpTimeline>("timelines", new HttpTimelineCreateRequest { Name = "aaa" });
                     body.Should().BeEquivalentTo(await client.GetTimelineAsync("aaa"));
                 }
 
-                await client.TestPostAssertErrorAsync("timelines", new TimelineCreateRequest { Name = "aaa" }, errorCode: ErrorCodes.TimelineController.NameConflict);
+                await client.TestPostAssertErrorAsync("timelines", new HttpTimelineCreateRequest { Name = "aaa" }, errorCode: ErrorCodes.TimelineController.NameConflict);
             }
         }
 

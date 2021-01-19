@@ -78,6 +78,11 @@ namespace Timeline.Tests.IntegratedTests
             return await client.TestJsonSendAsync<T>(HttpMethod.Put, url, jsonBody, expectedStatusCode: expectedStatusCode);
         }
 
+        public static async Task TestPatchAsync(this HttpClient client, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+        {
+            await client.TestJsonSendAsync(HttpMethod.Patch, url, jsonBody, expectedStatusCode: expectedStatusCode);
+        }
+
         public static async Task<T> TestPatchAsync<T>(this HttpClient client, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             return await client.TestJsonSendAsync<T>(HttpMethod.Patch, url, jsonBody, expectedStatusCode: expectedStatusCode);

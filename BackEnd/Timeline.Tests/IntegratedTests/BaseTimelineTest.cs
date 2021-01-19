@@ -15,7 +15,7 @@ namespace Timeline.Tests.IntegratedTests
             for (int i = 0; i <= 3; i++)
             {
                 using var client = await CreateClientAs(i);
-                await client.TestPostAsync("timelines", new TimelineCreateRequest { Name = $"t{i}" });
+                await client.TestPostAsync("timelines", new HttpTimelineCreateRequest { Name = $"t{i}" });
             }
         }
 

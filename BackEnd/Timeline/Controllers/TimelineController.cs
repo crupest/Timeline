@@ -441,7 +441,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<HttpTimeline>> TimelineCreate([FromBody] TimelineCreateRequest body)
+        public async Task<ActionResult<HttpTimeline>> TimelineCreate([FromBody] HttpTimelineCreateRequest body)
         {
             var userId = this.GetUserId();
 
