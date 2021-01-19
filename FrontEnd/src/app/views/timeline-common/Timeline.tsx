@@ -6,11 +6,12 @@ import {
   TimelinePostInfo,
   timelineService,
 } from "@/services/timeline";
+import { useUser } from "@/services/user";
+import { pushAlert } from "@/services/alert";
 
 import TimelineItem from "./TimelineItem";
 import TimelineTop from "./TimelineTop";
 import TimelineDateItem from "./TimelineDateItem";
-import { useUser } from "@/services/user";
 
 function dateEqual(left: Date, right: Date): boolean {
   return (
@@ -25,7 +26,6 @@ export interface TimelineProps {
   style?: React.CSSProperties;
   timeline: TimelineInfo;
   posts: TimelinePostInfo[];
-  onDelete: (post: TimelinePostInfo) => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
@@ -87,7 +87,17 @@ const Timeline: React.FC<TimelineProps> = (props) => {
                               old === post.index ? -1 : post.index
                             ),
                           onDelete: () => {
-                            props.onDelete(post);
+                            timelineService
+                              .deletePost(timeline.name, post.id)
+                              .catch(() => {
+                                pushAlert({
+                                  type: "danger",
+                                  message: {
+                                    type: "i18n",
+                                    key: "timeline.deletePostFailed",
+                                  },
+                                });
+                              });
                           },
                         }
                       : undefined

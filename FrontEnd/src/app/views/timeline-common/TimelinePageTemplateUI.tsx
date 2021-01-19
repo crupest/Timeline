@@ -24,7 +24,6 @@ export interface TimelineCardComponentProps<TManageItems> {
 }
 
 export interface TimelinePageTemplateUIOperations<TManageItems> {
-  onDeletePost: (post: TimelinePostInfo) => void;
   onManage?: (item: TManageItems | "property") => void;
   onMember: () => void;
   onBookmark?: () => void;
@@ -129,11 +128,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
                 minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
               }}
             >
-              <Timeline
-                timeline={timeline}
-                posts={posts}
-                onDelete={operations.onDeletePost}
-              />
+              <Timeline timeline={timeline} posts={posts} />
             </div>
           )
         ) : (
