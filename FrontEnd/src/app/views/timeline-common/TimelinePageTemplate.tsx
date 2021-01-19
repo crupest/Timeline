@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import { UiLogicError } from "@/common";
 import { pushAlert } from "@/services/alert";
@@ -31,8 +30,6 @@ export interface TimelinePageTemplateProps<TManageItem> {
 export default function TimelinePageTemplate<TManageItem>(
   props: TimelinePageTemplateProps<TManageItem>
 ): React.ReactElement | null {
-  const { t } = useTranslation();
-
   const { name } = props;
 
   const service = timelineService;
@@ -87,14 +84,6 @@ export default function TimelinePageTemplate<TManageItem>(
       return "notexist";
     } else {
       const operations: TimelinePageTemplateUIOperations<TManageItem> = {
-        onDeletePost: (post) => {
-          service.deletePost(name, post.id).catch(() => {
-            pushAlert({
-              type: "danger",
-              message: t("timeline.deletePostFailed"),
-            });
-          });
-        },
         onPost: service.hasPostPermission(user, timeline)
           ? (req) =>
               service.createPost(name, req).then(() => scrollToBottomNextSync())
