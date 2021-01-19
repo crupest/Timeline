@@ -3,18 +3,19 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { Dropdown, Button } from "react-bootstrap";
 
-import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
+import {
+  timelineService,
+  timelineVisibilityTooltipTranslationMap,
+} from "@/services/timeline";
 
 import { TimelineCardComponentProps } from "../timeline-common/TimelinePageTemplateUI";
 import SyncStatusBadge from "../timeline-common/SyncStatusBadge";
 import CollapseButton from "../timeline-common/CollapseButton";
+import { useUser } from "@/services/user";
+import { pushAlert } from "@/services/alert";
 
 export interface TimelineCardTemplateProps
   extends Omit<TimelineCardComponentProps<"">, "operations"> {
-  operations: Pick<
-    TimelineCardComponentProps<"">["operations"],
-    "onHighlight" | "onBookmark"
-  >;
   infoArea: React.ReactElement;
   manageArea:
     | { type: "member"; onMember: () => void }
@@ -37,13 +38,13 @@ function TimelineCardTemplate({
   collapse,
   infoArea,
   manageArea,
-  operations,
   toggleCollapse,
   syncStatus,
   className,
 }: TimelineCardTemplateProps): React.ReactElement | null {
   const { t } = useTranslation();
-  const { onBookmark, onHighlight } = operations;
+
+  const user = useUser();
 
   return (
     <div className={clsx("cru-card p-2 clearfix", className)}>
@@ -58,22 +59,52 @@ function TimelineCardTemplate({
           {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
         </small>
         <div className="text-right mt-2">
-          {onHighlight != null ? (
-            <i
-              className={clsx(
-                timeline.isHighlight ? "bi-star-fill" : "bi-star",
-                "icon-button text-yellow mr-3"
-              )}
-              onClick={onHighlight}
-            />
-          ) : null}
-          {onBookmark != null ? (
+          <i
+            className={clsx(
+              timeline.isHighlight ? "bi-star-fill" : "bi-star",
+              "icon-button text-yellow mr-3"
+            )}
+            onClick={
+              user != null && user.hasHighlightTimelineAdministrationPermission
+                ? () => {
+                    timelineService
+                      .setHighlight(timeline.name, !timeline.isHighlight)
+                      .catch(() => {
+                        pushAlert({
+                          message: {
+                            type: "i18n",
+                            key: timeline.isHighlight
+                              ? "timeline.removeHighlightFail"
+                              : "timeline.addHighlightFail",
+                          },
+                          type: "danger",
+                        });
+                      });
+                  }
+                : undefined
+            }
+          />
+          {user != null ? (
             <i
               className={clsx(
                 timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
                 "icon-button text-yellow mr-3"
               )}
-              onClick={onBookmark}
+              onClick={() => {
+                timelineService
+                  .setBookmark(timeline.name, !timeline.isBookmark)
+                  .catch(() => {
+                    pushAlert({
+                      message: {
+                        type: "i18n",
+                        key: timeline.isBookmark
+                          ? "timeline.removeBookmarkFail"
+                          : "timeline.addBookmarkFail",
+                      },
+                      type: "danger",
+                    });
+                  });
+              }}
             />
           ) : null}
           {manageArea.type === "manage" ? (

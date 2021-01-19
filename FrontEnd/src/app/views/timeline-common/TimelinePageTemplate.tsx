@@ -1,7 +1,6 @@
 import React from "react";
 
 import { UiLogicError } from "@/common";
-import { pushAlert } from "@/services/alert";
 import { useUser } from "@/services/user";
 import {
   TimelinePostInfo,
@@ -98,42 +97,6 @@ export default function TimelinePageTemplate<TManageItem>(
             }
           : undefined,
         onMember: () => setDialog("member"),
-        onBookmark:
-          user != null
-            ? () => {
-                service
-                  .setBookmark(timeline.name, !timeline.isBookmark)
-                  .catch(() => {
-                    pushAlert({
-                      message: {
-                        type: "i18n",
-                        key: timeline.isBookmark
-                          ? "timeline.removeBookmarkFail"
-                          : "timeline.addBookmarkFail",
-                      },
-                      type: "danger",
-                    });
-                  });
-              }
-            : undefined,
-        onHighlight:
-          user != null && user.hasHighlightTimelineAdministrationPermission
-            ? () => {
-                service
-                  .setHighlight(timeline.name, !timeline.isHighlight)
-                  .catch(() => {
-                    pushAlert({
-                      message: {
-                        type: "i18n",
-                        key: timeline.isHighlight
-                          ? "timeline.removeHighlightFail"
-                          : "timeline.addHighlightFail",
-                      },
-                      type: "danger",
-                    });
-                  });
-              }
-            : undefined,
       };
 
       const posts = ((): TimelinePostInfo[] | "forbid" | undefined => {

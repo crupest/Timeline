@@ -15,8 +15,6 @@ export interface TimelineCardComponentProps<TManageItems> {
   operations: {
     onManage?: (item: TManageItems | "property") => void;
     onMember: () => void;
-    onBookmark?: () => void;
-    onHighlight?: () => void;
   };
   collapse: boolean;
   toggleCollapse: () => void;
