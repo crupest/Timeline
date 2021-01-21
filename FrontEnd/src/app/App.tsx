@@ -9,6 +9,7 @@ import Settings from "./views/settings";
 import About from "./views/about";
 import User from "./views/user";
 import TimelinePage from "./views/timeline";
+import Search from "./views/search";
 import AlertHost from "./views/common/alert/AlertHost";
 
 import { dataStorage } from "./services/common";
@@ -58,6 +59,9 @@ const App: React.FC = () => {
             </Route>
             <Route path="/users/:username">
               <User />
+            </Route>
+            <Route path="/search">
+              <Search />
             </Route>
             {user && user.hasAdministrationPermission && (
               <Route path="/admin">
