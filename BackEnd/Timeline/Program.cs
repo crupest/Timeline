@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Resources;
@@ -10,34 +11,38 @@ using Timeline.Services;
 
 namespace Timeline
 {
-    public static class Program
+  public static class Program
+  {
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+      var host = CreateWebHostBuilder(args).Build();
+
+      var env = host.Services.GetRequiredService<IWebHostEnvironment>();
+
+      var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
+      databaseBackupService.BackupNow();
+
+      if (env.IsProduction())
+      {
+        using (var scope = host.Services.CreateScope())
         {
-            var host = CreateWebHostBuilder(args).Build();
-
-            var env = host.Services.GetRequiredService<IWebHostEnvironment>();
-
-            var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
-            databaseBackupService.BackupNow();
-
-            if (env.IsProduction())
-            {
-                using (var scope = host.Services.CreateScope())
-                {
-                    var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                    databaseContext.Database.Migrate();
-                }
-            }
-
-            host.Run();
+          var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+          databaseContext.Database.Migrate();
         }
+      }
 
-        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+      host.Run();
     }
+
+    public static IHostBuilder CreateWebHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration(config =>
+            {
+              config.AddEnvironmentVariables("Timeline_");
+            })
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+              webBuilder.UseStartup<Startup>();
+            });
+  }
 }

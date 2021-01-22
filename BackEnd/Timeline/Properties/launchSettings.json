@@ -5,23 +5,20 @@
       "applicationUrl": "http://0.0.0.0:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_FRONTEND": "Proxy",
-        "ASPNETCORE_WORKDIR": "D:\\timeline-development"
+        "ASPNETCORE_FRONTEND": "Proxy"
       }
     },
     "Dev-Mock": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_FRONTEND": "Mock",
-        "ASPNETCORE_WORKDIR": "D:\\timeline-development"
+        "ASPNETCORE_FRONTEND": "Mock"
       }
     },
     "Staging": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Staging",
-        "ASPNETCORE_WORKDIR": "D:\\timeline-development"
+        "ASPNETCORE_ENVIRONMENT": "Staging"
       }
     }
   }
