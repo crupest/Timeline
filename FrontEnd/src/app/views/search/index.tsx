@@ -7,10 +7,9 @@ import { HttpNetworkError } from "@/http/common";
 import { getHttpSearchClient } from "@/http/search";
 
 import { TimelineInfo } from "@/services/timeline";
-import { useAvatar } from "@/services/user";
 
 import SearchInput from "../common/SearchInput";
-import BlobImage from "../common/BlobImage";
+import UserAvatar from "../common/user/UserAvatar";
 
 const TimelineSearchResultItemView: React.FC<{ timeline: TimelineInfo }> = ({
   timeline,
@@ -18,8 +17,6 @@ const TimelineSearchResultItemView: React.FC<{ timeline: TimelineInfo }> = ({
   const link = timeline.name.startsWith("@")
     ? `users/${timeline.owner.username}`
     : `timelines/${timeline.name}`;
-
-  const avatar = useAvatar(timeline.owner.username);
 
   return (
     <div className="timeline-search-result-item my-2 p-3">
@@ -30,8 +27,8 @@ const TimelineSearchResultItemView: React.FC<{ timeline: TimelineInfo }> = ({
         </Link>
       </h4>
       <div>
-        <BlobImage
-          blob={avatar}
+        <UserAvatar
+          username={timeline.owner.username}
           className="timeline-search-result-item-avatar mr-2"
         />
         {timeline.owner.nickname}
