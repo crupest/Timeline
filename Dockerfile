@@ -1,7 +1,7 @@
 FROM node:latest AS front-build
 WORKDIR /timeline-app
 COPY FrontEnd .
-RUN yarn && yarn build
+RUN npm ci && npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS back-build
 WORKDIR /timeline-app

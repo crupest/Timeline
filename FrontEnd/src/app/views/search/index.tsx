@@ -1,14 +1,15 @@
-import { TimelineInfo } from "@/services/timeline";
 import React from "react";
 import { Container, Row } from "react-bootstrap";
 import { useHistory, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 
+import { HttpNetworkError } from "@/http/common";
 import { getHttpSearchClient } from "@/http/search";
 
-import SearchInput from "../common/SearchInput";
-import { HttpNetworkError } from "@/http/common";
+import { TimelineInfo } from "@/services/timeline";
 import { useAvatar } from "@/services/user";
+
+import SearchInput from "../common/SearchInput";
 import BlobImage from "../common/BlobImage";
 
 const TimelineSearchResultItemView: React.FC<{ timeline: TimelineInfo }> = ({
