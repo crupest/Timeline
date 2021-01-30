@@ -2,27 +2,27 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Container, ListGroup, Modal, Row, Col, Button } from "react-bootstrap";
 
-import { User, useAvatar } from "@/services/user";
+import { getHttpSearchClient } from "@/http/search";
+
+import { User } from "@/services/user";
 import { TimelineInfo, timelineService } from "@/services/timeline";
-import { getHttpUserClient, HttpUserNotExistError } from "@/http/user";
 
 import SearchInput from "../common/SearchInput";
-import BlobImage from "../common/BlobImage";
+import UserAvatar from "../common/user/UserAvatar";
+import { convertI18nText, I18nText } from "@/common";
 
 const TimelineMemberItem: React.FC<{
   user: User;
-  owner: boolean;
-  onRemove?: (username: string) => void;
-}> = ({ user, owner, onRemove }) => {
+  add?: boolean;
+  onAction?: (username: string) => void;
+}> = ({ user, add, onAction }) => {
   const { t } = useTranslation();
-
-  const avatar = useAvatar(user.username);
 
   return (
     <ListGroup.Item className="container">
       <Row>
         <Col xs="auto">
-          <BlobImage blob={avatar} className="avatar small" />
+          <UserAvatar username={user.username} className="avatar small" />
         </Col>
         <Col>
           <Row>{user.nickname}</Row>
@@ -30,27 +30,112 @@ const TimelineMemberItem: React.FC<{
             <small>{"@" + user.username}</small>
           </Row>
         </Col>
-        {(() => {
-          if (owner) {
-            return null;
-          }
-          if (onRemove == null) {
-            return null;
-          }
-          return (
-            <Button
-              className="align-self-center"
-              variant="danger"
-              onClick={() => {
-                onRemove(user.username);
-              }}
-            >
-              {t("timeline.member.remove")}
-            </Button>
-          );
-        })()}
+        {onAction ? (
+          <Button
+            className="align-self-center"
+            variant="danger"
+            onClick={() => {
+              onAction(user.username);
+            }}
+          >
+            {t(`timeline.member.${add ? "add" : "remove"}`)}
+          </Button>
+        ) : null}
       </Row>
     </ListGroup.Item>
+  );
+};
+
+const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
+  timeline,
+}) => {
+  const { t } = useTranslation();
+
+  const [userSearchText, setUserSearchText] = useState<string>("");
+  const [userSearchState, setUserSearchState] = useState<
+    | {
+        type: "users";
+        data: User[];
+      }
+    | { type: "error"; data: I18nText }
+    | { type: "loading" }
+    | { type: "init" }
+  >({ type: "init" });
+
+  return (
+    <>
+      <SearchInput
+        className="mt-3"
+        value={userSearchText}
+        onChange={(v) => {
+          setUserSearchText(v);
+        }}
+        loading={userSearchState.type === "loading"}
+        onButtonClick={() => {
+          if (userSearchText === "") {
+            setUserSearchState({
+              type: "error",
+              data: "login.emptyUsername",
+            });
+            return;
+          }
+          setUserSearchState({ type: "loading" });
+          getHttpSearchClient()
+            .searchUsers(userSearchText)
+            .then(
+              (users) => {
+                users = users.filter(
+                  (user) =>
+                    timeline.members.findIndex(
+                      (m) => m.username === user.username
+                    ) === -1
+                );
+                setUserSearchState({ type: "users", data: users });
+              },
+              (e) => {
+                setUserSearchState({
+                  type: "error",
+                  data: { type: "custom", value: String(e) },
+                });
+              }
+            );
+        }}
+      />
+      {(() => {
+        if (userSearchState.type === "users") {
+          const users = userSearchState.data;
+          if (users.length === 0) {
+            return <div>{t("timeline.member.noUserAvailableToAdd")}</div>;
+          } else {
+            return (
+              <ListGroup>
+                {users.map((user) => {
+                  <TimelineMemberItem
+                    key={user.username}
+                    user={user}
+                    add
+                    onAction={() => {
+                      void timelineService
+                        .addMember(timeline.name, user.username)
+                        .then(() => {
+                          setUserSearchText("");
+                          setUserSearchState({ type: "init" });
+                        });
+                    }}
+                  />;
+                })}
+              </ListGroup>
+            );
+          }
+        } else if (userSearchState.type === "error") {
+          return (
+            <div className="text-danger">
+              {convertI18nText(userSearchState.data, t)}
+            </div>
+          );
+        }
+      })()}
+    </>
   );
 };
 
@@ -60,25 +145,7 @@ export interface TimelineMemberProps {
 }
 
 const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
-  const { t } = useTranslation();
-
-  const [userSearchText, setUserSearchText] = useState<string>("");
-  const [userSearchState, setUserSearchState] = useState<
-    | {
-        type: "user";
-        data: User;
-      }
-    | { type: "error"; data: string }
-    | { type: "loading" }
-    | { type: "init" }
-  >({ type: "init" });
-
-  const userSearchAvatar = useAvatar(
-    userSearchState.type === "user" ? userSearchState.data.username : undefined
-  );
-
-  const { timeline } = props;
-
+  const { timeline, editable } = props;
   const members = [timeline.owner, ...timeline.members];
 
   return (
@@ -88,9 +155,8 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
           <TimelineMemberItem
             key={member.username}
             user={member}
-            owner={index === 0}
-            onRemove={
-              props.editable
+            onAction={
+              editable && index !== 0
                 ? () => {
                     void timelineService.removeMember(
                       timeline.name,
@@ -102,110 +168,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
           />
         ))}
       </ListGroup>
-      {(() => {
-        if (props.editable) {
-          return (
-            <>
-              <SearchInput
-                className="mt-3"
-                value={userSearchText}
-                onChange={(v) => {
-                  setUserSearchText(v);
-                }}
-                loading={userSearchState.type === "loading"}
-                onButtonClick={() => {
-                  if (userSearchText === "") {
-                    setUserSearchState({
-                      type: "error",
-                      data: "login.emptyUsername",
-                    });
-                    return;
-                  }
-                  setUserSearchState({ type: "loading" });
-                  getHttpUserClient()
-                    .get(userSearchText)
-                    .catch((e) => {
-                      if (e instanceof HttpUserNotExistError) {
-                        return null;
-                      } else {
-                        throw e;
-                      }
-                    })
-                    .then(
-                      (u) => {
-                        if (u == null) {
-                          setUserSearchState({
-                            type: "error",
-                            data: "timeline.userNotExist",
-                          });
-                        } else {
-                          setUserSearchState({ type: "user", data: u });
-                        }
-                      },
-                      (e) => {
-                        setUserSearchState({
-                          type: "error",
-                          data: `${e as string}`,
-                        });
-                      }
-                    );
-                }}
-              />
-              {(() => {
-                if (userSearchState.type === "user") {
-                  const u = userSearchState.data;
-                  const addable =
-                    members.findIndex((m) => m.username === u.username) === -1;
-                  return (
-                    <>
-                      {!addable ? (
-                        <p>{t("timeline.member.alreadyMember")}</p>
-                      ) : null}
-                      <Container className="mb-3">
-                        <Row>
-                          <Col className="col-auto">
-                            <BlobImage
-                              blob={userSearchAvatar}
-                              className="avatar small"
-                            />
-                          </Col>
-                          <Col>
-                            <Row>{u.nickname}</Row>
-                            <Row>
-                              <small>{"@" + u.username}</small>
-                            </Row>
-                          </Col>
-                          <Button
-                            variant="primary"
-                            className="align-self-center"
-                            disabled={!addable}
-                            onClick={() => {
-                              void timelineService
-                                .addMember(timeline.name, u.username)
-                                .then(() => {
-                                  setUserSearchText("");
-                                  setUserSearchState({ type: "init" });
-                                });
-                            }}
-                          >
-                            {t("timeline.member.add")}
-                          </Button>
-                        </Row>
-                      </Container>
-                    </>
-                  );
-                } else if (userSearchState.type === "error") {
-                  return (
-                    <p className="text-danger">{t(userSearchState.data)}</p>
-                  );
-                }
-              })()}
-            </>
-          );
-        } else {
-          return null;
-        }
-      })()}
+      {editable ? <TimelineMemberUserSearch timeline={timeline} /> : null}
     </Container>
   );
 };

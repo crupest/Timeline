@@ -80,7 +80,7 @@
       "description": "描述"
     },
     "member": {
-      "alreadyMember": "该用户已经是一个成员。",
+      "noUserAvailableToAdd": "搜索结果显示没有可以添加为成员的用户。",
       "add": "添加",
       "remove": "移除"
     },
