@@ -2,10 +2,10 @@ import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 
-import { useAvatar } from "@/services/user";
 import { TimelinePostInfo } from "@/services/timeline";
 
 import BlobImage from "../common/BlobImage";
+import UserAvatar from "../common/user/UserAvatar";
 import TimelineLine from "./TimelineLine";
 import TimelinePostDeleteConfirmDialog from "./TimelinePostDeleteConfirmDialog";
 
@@ -25,9 +25,7 @@ export interface TimelineItemProps {
 const TimelineItem: React.FC<TimelineItemProps> = (props) => {
   const current = props.current === true;
 
-  const { more } = props;
-
-  const avatar = useAvatar(props.post.author.username);
+  const { post, more } = props;
 
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
 
@@ -52,20 +50,21 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           <span className="mr-2">
             <span>
               <Link to={"/users/" + props.post.author.username}>
-                <BlobImage blob={avatar} className="timeline-avatar mr-1" />
+                <UserAvatar
+                  username={post.author.username}
+                  className="timeline-avatar mr-1"
+                />
               </Link>
-              <small className="text-dark mr-2">
-                {props.post.author.nickname}
-              </small>
+              <small className="text-dark mr-2">{post.author.nickname}</small>
               <small className="text-secondary white-space-no-wrap">
-                {props.post.time.toLocaleTimeString()}
+                {post.time.toLocaleTimeString()}
               </small>
             </span>
           </span>
         </div>
         <div className="timeline-content">
           {(() => {
-            const { content } = props.post;
+            const { content } = post;
             if (content.type === "text") {
               return content.text;
             } else {

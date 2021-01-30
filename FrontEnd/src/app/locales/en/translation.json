@@ -80,7 +80,7 @@
       "description": "Description"
     },
     "member": {
-      "alreadyMember": "The user is already a member.",
+      "noUserAvailableToAdd": "Sorry, no user available to be a member in search result.",
       "add": "Add",
       "remove": "Remove"
     },
