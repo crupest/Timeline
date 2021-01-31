@@ -21,16 +21,6 @@ const HomePage: React.FC = () => {
 
   const [dialog, setDialog] = React.useState<"create" | null>(null);
 
-  const goto = React.useCallback((): void => {
-    if (navText === "") {
-      history.push("users/crupest");
-    } else if (navText.startsWith("@")) {
-      history.push(`users/${navText.slice(1)}`);
-    } else {
-      history.push(`timelines/${navText}`);
-    }
-  }, [navText, history]);
-
   return (
     <>
       <Container>
@@ -40,9 +30,9 @@ const HomePage: React.FC = () => {
               className="justify-content-center"
               value={navText}
               onChange={setNavText}
-              onButtonClick={goto}
-              buttonText={t("home.go")}
-              placeholder="@crupest"
+              onButtonClick={() => {
+                history.push(`search?q=${navText}`);
+              }}
               additionalButton={
                 user != null && (
                   <Button
