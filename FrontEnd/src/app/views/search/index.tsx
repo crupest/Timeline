@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Container, Row } from "react-bootstrap";
 import { useHistory, useLocation } from "react-router";
 import { Link } from "react-router-dom";
@@ -41,6 +42,8 @@ const TimelineSearchResultItemView: React.FC<{ timeline: TimelineInfo }> = ({
 };
 
 const SearchPage: React.FC = () => {
+  const { t } = useTranslation();
+
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -51,7 +54,10 @@ const SearchPage: React.FC = () => {
     TimelineInfo[] | "init" | "loading" | "network-error" | "error"
   >("init");
 
+  const [forceResearchKey, setForceResearchKey] = React.useState<number>(0);
+
   React.useEffect(() => {
+    setState("init");
     if (queryParam != null && queryParam.length > 0) {
       setSearchText(queryParam);
       setState("loading");
@@ -70,7 +76,7 @@ const SearchPage: React.FC = () => {
           }
         );
     }
-  }, [queryParam]);
+  }, [queryParam, forceResearchKey]);
 
   return (
     <Container className="my-3">
@@ -81,7 +87,9 @@ const SearchPage: React.FC = () => {
           onChange={setSearchText}
           loading={state === "loading"}
           onButtonClick={() => {
-            if (searchText.length > 0) {
+            if (queryParam === searchText) {
+              setForceResearchKey((old) => old + 1);
+            } else {
               history.push(`/search?q=${searchText}`);
             }
           }}
@@ -90,18 +98,24 @@ const SearchPage: React.FC = () => {
       {(() => {
         switch (state) {
           case "init": {
-            return "Input something and search!";
+            if (queryParam == null || queryParam.length === 0) {
+              return <div>{t("searchPage.input")}</div>;
+            }
+            break;
           }
           case "loading": {
-            return "Loading!";
+            return <div>{t("searchPage.loading")}</div>;
           }
           case "network-error": {
-            return "Network error!";
+            return <div className="text-danger">{t("error.network")}</div>;
           }
           case "error": {
-            return "Unknown error!";
+            return <div className="text-danger">{t("error.unknown")}</div>;
           }
           default: {
+            if (state.length === 0) {
+              return <div>{t("searchPage.noResult")}</div>;
+            }
             return state.map((t) => (
               <TimelineSearchResultItemView key={t.name} timeline={t} />
             ));
