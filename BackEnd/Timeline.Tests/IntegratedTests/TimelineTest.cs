@@ -1,8 +1,6 @@
 ﻿using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Timeline.Models;
@@ -11,7 +9,6 @@ using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
 {
-
     public class TimelineTest : BaseTimelineTest
     {
         [Fact]
@@ -21,7 +18,6 @@ namespace Timeline.Tests.IntegratedTests
 
             await client.TestGetAssertInvalidModelAsync("timelines/@!!!");
             await client.TestGetAssertInvalidModelAsync("timelines/!!!");
-
 
             {
                 var body = await client.TestGetAsync<HttpTimeline>("timelines/@user1");
@@ -345,90 +341,6 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineNameGeneratorTestData))]
-        public async Task Post_ModifiedSince_And_IncludeDeleted(TimelineNameGenerator generator)
-        {
-            using var client = await CreateClientAsUser();
-
-            var postContentList = new List<string> { "a", "b", "c", "d" };
-            var posts = new List<HttpTimelinePost>();
-
-            foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
-            {
-                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
-                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
-                posts.Add(post);
-                await Task.Delay(1000);
-            }
-
-            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}");
-
-            {
-
-                posts = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture)}&includeDeleted=true");
-                posts.Should().HaveCount(3);
-                posts.Select(p => p.Deleted).Should().Equal(false, true, false);
-                posts.Select(p => p.Content == null).Should().Equal(false, true, false);
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(TimelineNameGeneratorTestData))]
-        public async Task Timeline_Get_IfModifiedSince_And_CheckUniqueId(TimelineNameGenerator generator)
-        {
-            using var client = await CreateClientAsUser();
-
-            DateTime lastModifiedTime;
-            HttpTimeline timeline;
-            string uniqueId;
-
-            {
-                var body = await client.GetTimelineAsync(generator(1));
-                timeline = body;
-                lastModifiedTime = body.LastModified;
-                uniqueId = body.UniqueId;
-            }
-
-            {
-                await client.TestGetAsync($"timelines/{generator(1)}",
-                    expectedStatusCode: HttpStatusCode.NotModified,
-                    headerSetup: (headers, _) =>
-                    {
-                        headers.IfModifiedSince = lastModifiedTime.AddSeconds(1);
-                    });
-            }
-
-            {
-
-                var body = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}",
-                    headerSetup: (headers, _) =>
-                    {
-                        headers.IfModifiedSince = lastModifiedTime.AddSeconds(-1);
-                    });
-                body.Should().BeEquivalentTo(timeline);
-            }
-
-            {
-                await client.TestGetAsync($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }", expectedStatusCode: HttpStatusCode.NotModified);
-            }
-
-            {
-                var body = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(-1).ToString("s", CultureInfo.InvariantCulture) }");
-                body.Should().BeEquivalentTo(timeline);
-            }
-
-            {
-                await client.TestGetAsync($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }&checkUniqueId={uniqueId}", expectedStatusCode: HttpStatusCode.NotModified);
-            }
-
-            {
-                var testUniqueId = (uniqueId[0] == 'a' ? "b" : "a") + uniqueId[1..];
-                var body = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}?ifModifiedSince={lastModifiedTime.AddSeconds(1).ToString("s", CultureInfo.InvariantCulture) }&checkUniqueId={testUniqueId}");
-                body.Should().BeEquivalentTo(timeline);
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(TimelineNameGeneratorTestData))]
         public async Task Title(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
@@ -454,21 +366,20 @@ namespace Timeline.Tests.IntegratedTests
         {
             {
                 using var client = await CreateDefaultClient();
-                await client.TestPostAssertUnauthorizedAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
+                await client.TestPatchAssertUnauthorizedAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "tttttttt" });
             }
 
             {
                 using var client = await CreateClientAs(2);
-                await client.TestPostAssertForbiddenAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "t1", NewName = "tttttttt" });
+                await client.TestPatchAssertForbiddenAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "tttttttt" });
             }
 
             using (var client = await CreateClientAsUser())
             {
-                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "!!!", NewName = "tttttttt" });
-                await client.TestPostAssertInvalidModelAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "ttt", NewName = "!!!!" });
-                await client.TestPostAssertErrorAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "ttttt", NewName = "tttttttt" }, errorCode: ErrorCodes.TimelineController.NotExist);
+                await client.TestPatchAssertInvalidModelAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "!!!" });
+                await client.TestPatchAssertErrorAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "t2" }, errorCode: ErrorCodes.TimelineController.NameConflict);
 
-                await client.TestPostAsync("timelineop/changename", new HttpTimelineChangeNameRequest { OldName = "t1", NewName = "newt" });
+                await client.TestPatchAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "newt" });
 
                 await client.TestGetAsync("timelines/t1", expectedStatusCode: HttpStatusCode.NotFound);
 

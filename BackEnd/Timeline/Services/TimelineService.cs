@@ -49,6 +49,7 @@ namespace Timeline.Services
 
     public class TimelineChangePropertyParams
     {
+        public string? Name { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
         public TimelineVisibility? Visibility { get; set; }
@@ -59,22 +60,6 @@ namespace Timeline.Services
     /// </summary>
     public interface ITimelineService : IBasicTimelineService
     {
-        /// <summary>
-        /// Get the timeline last modified time (not include name change).
-        /// </summary>
-        /// <param name="id">The id of the timeline.</param>
-        /// <returns>The timeline modified time.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        Task<DateTime> GetTimelineLastModifiedTime(long id);
-
-        /// <summary>
-        /// Get the timeline unique id.
-        /// </summary>
-        /// <param name="id">The id of the timeline.</param>
-        /// <returns>The timeline unique id.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        Task<string> GetTimelineUniqueId(long id);
-
         /// <summary>
         /// Get the timeline info.
         /// </summary>
@@ -90,6 +75,7 @@ namespace Timeline.Services
         /// <param name="newProperties">The new properties. Null member means not to change.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="newProperties"/> is null.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline with given id does not exist.</exception>
+        /// <exception cref="EntityAlreadyExistException">Thrown when a timeline with new name already exists.</exception>
         Task ChangeProperty(long id, TimelineChangePropertyParams newProperties);
 
         /// <summary>
@@ -180,20 +166,6 @@ namespace Timeline.Services
         /// <param name="id">The id of the timeline to delete.</param>
         /// <exception cref="TimelineNotExistException">Thrown when the timeline does not exist.</exception>
         Task DeleteTimeline(long id);
-
-        /// <summary>
-        /// Change name of a timeline.
-        /// </summary>
-        /// <param name="id">The timeline id.</param>
-        /// <param name="newTimelineName">The new timeline name.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="newTimelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="newTimelineName"/> is of invalid format.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="EntityAlreadyExistException">Thrown when a timeline with new name already exists.</exception>
-        /// <remarks>
-        /// You can only change name of general timeline.
-        /// </remarks>
-        Task ChangeTimelineName(long id, string newTimelineName);
     }
 
     public class TimelineService : BasicTimelineService, ITimelineService
@@ -222,26 +194,6 @@ namespace Timeline.Services
             }
         }
 
-        public async Task<DateTime> GetTimelineLastModifiedTime(long id)
-        {
-            var entity = await _database.Timelines.Where(t => t.Id == id).Select(t => new { t.LastModified }).SingleOrDefaultAsync();
-
-            if (entity is null)
-                throw new TimelineNotExistException(id);
-
-            return entity.LastModified;
-        }
-
-        public async Task<string> GetTimelineUniqueId(long id)
-        {
-            var entity = await _database.Timelines.Where(t => t.Id == id).Select(t => new { t.UniqueId }).SingleOrDefaultAsync();
-
-            if (entity is null)
-                throw new TimelineNotExistException(id);
-
-            return entity.UniqueId;
-        }
-
         public async Task<TimelineEntity> GetTimeline(long id)
         {
             var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
@@ -257,12 +209,29 @@ namespace Timeline.Services
             if (newProperties is null)
                 throw new ArgumentNullException(nameof(newProperties));
 
+            if (newProperties.Name is not null)
+                ValidateTimelineName(newProperties.Name, nameof(newProperties));
+
             var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
 
             if (entity is null)
                 throw new TimelineNotExistException(id);
 
             var changed = false;
+            var nameChanged = false;
+
+            if (newProperties.Name is not null)
+            {
+                var conflict = await _database.Timelines.AnyAsync(t => t.Name == newProperties.Name);
+
+                if (conflict)
+                    throw new EntityAlreadyExistException(EntityNames.Timeline, null, ExceptionTimelineNameConflict);
+
+                entity.Name = newProperties.Name;
+
+                changed = true;
+                nameChanged = true;
+            }
 
             if (newProperties.Title != null)
             {
@@ -286,6 +255,8 @@ namespace Timeline.Services
             {
                 var currentTime = _clock.GetCurrentTime();
                 entity.LastModified = currentTime;
+                if (nameChanged)
+                    entity.NameLastModified = currentTime;
             }
 
             await _database.SaveChangesAsync();
@@ -445,34 +416,6 @@ namespace Timeline.Services
                 throw new TimelineNotExistException(id);
 
             _database.Timelines.Remove(entity);
-            await _database.SaveChangesAsync();
-        }
-
-        public async Task ChangeTimelineName(long id, string newTimelineName)
-        {
-            if (newTimelineName == null)
-                throw new ArgumentNullException(nameof(newTimelineName));
-
-            ValidateTimelineName(newTimelineName, nameof(newTimelineName));
-
-            var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
-
-            if (entity is null)
-                throw new TimelineNotExistException(id);
-
-            if (entity.Name == newTimelineName) return;
-
-            var conflict = await _database.Timelines.AnyAsync(t => t.Name == newTimelineName);
-
-            if (conflict)
-                throw new EntityAlreadyExistException(EntityNames.Timeline, null, ExceptionTimelineNameConflict);
-
-            var now = _clock.GetCurrentTime();
-
-            entity.Name = newTimelineName;
-            entity.NameLastModified = now;
-            entity.LastModified = now;
-
             await _database.SaveChangesAsync();
         }
     }

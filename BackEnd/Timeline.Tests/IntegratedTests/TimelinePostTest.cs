@@ -124,6 +124,34 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Post_ModifiedSince_And_IncludeDeleted(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            var postContentList = new List<string> { "a", "b", "c", "d" };
+            var posts = new List<HttpTimelinePost>();
+
+            foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
+            {
+                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
+                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                posts.Add(post);
+                await Task.Delay(1000);
+            }
+
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{posts[2].Id}");
+
+            {
+
+                posts = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts?modifiedSince={posts[1].LastUpdated.ToString("s", CultureInfo.InvariantCulture)}&includeDeleted=true");
+                posts.Should().HaveCount(3);
+                posts.Select(p => p.Deleted).Should().Equal(false, true, false);
+                posts.Select(p => p.Content == null).Should().Equal(false, true, false);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
         public async Task PostList_IncludeDeleted(TimelineNameGenerator generator)
         {
             using var client = await CreateClientAsUser();
