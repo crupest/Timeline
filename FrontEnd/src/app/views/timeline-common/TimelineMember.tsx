@@ -33,7 +33,7 @@ const TimelineMemberItem: React.FC<{
         {onAction ? (
           <Button
             className="align-self-center"
-            variant="danger"
+            variant={add ? "success" : "danger"}
             onClick={() => {
               onAction(user.username);
             }}
@@ -88,7 +88,7 @@ const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
                   (user) =>
                     timeline.members.findIndex(
                       (m) => m.username === user.username
-                    ) === -1
+                    ) === -1 && timeline.owner.username !== user.username
                 );
                 setUserSearchState({ type: "users", data: users });
               },
@@ -108,8 +108,8 @@ const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
             return <div>{t("timeline.member.noUserAvailableToAdd")}</div>;
           } else {
             return (
-              <ListGroup>
-                {users.map((user) => {
+              <ListGroup className="mt-2">
+                {users.map((user) => (
                   <TimelineMemberItem
                     key={user.username}
                     user={user}
@@ -122,8 +122,8 @@ const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
                           setUserSearchState({ type: "init" });
                         });
                     }}
-                  />;
-                })}
+                  />
+                ))}
               </ListGroup>
             );
           }
