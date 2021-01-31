@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Timeline.Filters;
 using Timeline.Models;
@@ -54,7 +53,7 @@ namespace Timeline.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<HttpTimeline>>> TimelineList([FromQuery][Username] string? relate, [FromQuery][RegularExpression("(own)|(join)")] string? relateType, [FromQuery] string? visibility)
+        public async Task<ActionResult<List<HttpTimeline>>> TimelineList([FromQuery][Username] string? relate, [FromQuery][ValidationSet("own", "join", "default")] string? relateType, [FromQuery] string? visibility)
         {
             List<TimelineVisibility>? visibilityFilter = null;
             if (visibility != null)
@@ -92,12 +91,9 @@ namespace Timeline.Controllers
                 {
                     var relatedUserId = await _userService.GetUserIdByUsername(relate);
 
-                    relationship = new TimelineUserRelationship(relateType switch
-                    {
-                        "own" => TimelineUserRelationshipType.Own,
-                        "join" => TimelineUserRelationshipType.Join,
-                        _ => TimelineUserRelationshipType.Default
-                    }, relatedUserId);
+                    var relationType = relateType is null ? TimelineUserRelationshipType.Default : Enum.Parse<TimelineUserRelationshipType>(relateType, true);
+
+                    relationship = new TimelineUserRelationship(relationType, relatedUserId);
                 }
                 catch (UserNotExistException)
                 {
