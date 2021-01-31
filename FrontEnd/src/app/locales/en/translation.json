@@ -4,6 +4,10 @@
   "edit": "Edit",
   "done": "Done",
   "loadFailReload": "Load failed, click <1>here</1> to reload.",
+  "error": {
+    "network": "Network error.",
+    "unknown": "Unknown error."
+  },
   "serviceWorker": {
     "availableOffline": "Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉",
     "upgradePrompt": "App is getting a new version!",
@@ -110,6 +114,11 @@
     "removeHighlightFail": "Failed to remove highlight.",
     "addBookmarkFail": "Failed to add bookmark.",
     "removeBookmarkFail": "Failed to remove bookmark."
+  },
+  "searchPage": {
+    "loading": "Loading search result...",
+    "input": "Input something and search!",
+    "noResult": "Sorry, there is no satisfied results."
   },
   "user": {
     "username": "username",
