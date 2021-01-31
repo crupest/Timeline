@@ -59,6 +59,12 @@ namespace Timeline.Models.Http
     public class HttpTimelinePatchRequest
     {
         /// <summary>
+        /// New name. Null for not change.
+        /// </summary>
+        [TimelineName]
+        public string? Name { get; set; }
+
+        /// <summary>
         /// New title. Null for not change.
         /// </summary>
         public string? Title { get; set; }
@@ -72,25 +78,6 @@ namespace Timeline.Models.Http
         /// New visibility. Null for not change.
         /// </summary>
         public TimelineVisibility? Visibility { get; set; }
-    }
-
-    /// <summary>
-    /// Change timeline name request model.
-    /// </summary>
-    public class HttpTimelineChangeNameRequest
-    {
-        /// <summary>
-        /// Old name of timeline.
-        /// </summary>
-        [Required]
-        [TimelineName]
-        public string OldName { get; set; } = default!;
-        /// <summary>
-        /// New name of timeline.
-        /// </summary>
-        [Required]
-        [TimelineName]
-        public string NewName { get; set; } = default!;
     }
 
     public class HttpTimelineControllerAutoMapperProfile : Profile

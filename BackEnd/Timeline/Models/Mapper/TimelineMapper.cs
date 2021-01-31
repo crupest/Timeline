@@ -48,7 +48,7 @@ namespace Timeline.Models.Mapper
                 isBookmark: userId is not null && await _bookmarkTimelineService.IsBookmark(userId.Value, entity.Id, false, false),
                 links: new HttpTimelineLinks(
                     self: urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = timelineName }),
-                    posts: urlHelper.ActionLink(nameof(TimelineController.PostListGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = timelineName })
+                    posts: urlHelper.ActionLink(nameof(TimelinePostController.PostList), nameof(TimelinePostController)[0..^nameof(Controller).Length], new { timeline = timelineName })
                 )
             );
         }
@@ -83,7 +83,7 @@ namespace Timeline.Models.Mapper
                     (
                         type: TimelinePostContentTypes.Image,
                         text: null,
-                        url: urlHelper.ActionLink(nameof(TimelineController.PostDataGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = timelineName, post = entity.LocalId }),
+                        url: urlHelper.ActionLink(nameof(TimelinePostController.PostDataGet), nameof(TimelinePostController)[0..^nameof(Controller).Length], new { timeline = timelineName, post = entity.LocalId }),
                         eTag: $"\"{entity.Content}\""
                     ),
                     _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, "Unknown timeline post type {0}.", entity.ContentType))
