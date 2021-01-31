@@ -21,7 +21,6 @@
   "chooseImage": "选择一个图片",
   "loadImageError": "加载图片失败",
   "home": {
-    "go": "冲！",
     "highlightTimeline": "高光时间线",
     "relatedTimeline": "关于你的时间线",
     "publicTimeline": "公开时间线",
