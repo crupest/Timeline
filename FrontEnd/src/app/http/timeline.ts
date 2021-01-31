@@ -99,6 +99,7 @@ export interface HttpTimelinePostPostRequest {
 }
 
 export interface HttpTimelinePatchRequest {
+  name?: string;
   title?: string;
   visibility?: TimelineVisibility;
   description?: string;
@@ -221,19 +222,6 @@ function processRawTimelinePostInfo(
 export interface IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]>;
   getTimeline(timelineName: string): Promise<HttpTimelineInfo>;
-  getTimeline(
-    timelineName: string,
-    query: {
-      checkUniqueId?: string;
-    }
-  ): Promise<HttpTimelineInfo>;
-  getTimeline(
-    timelineName: string,
-    query: {
-      checkUniqueId?: string;
-      ifModifiedSince: Date;
-    }
-  ): Promise<HttpTimelineInfo | NotModified>;
   postTimeline(req: HttpTimelinePostRequest): Promise<HttpTimelineInfo>;
   patchTimeline(
     timelineName: string,
@@ -281,38 +269,11 @@ export class HttpTimelineClient implements IHttpTimelineClient {
       .catch(convertToNetworkError);
   }
 
-  getTimeline(timelineName: string): Promise<HttpTimelineInfo>;
-  getTimeline(
-    timelineName: string,
-    query: {
-      checkUniqueId?: string;
-    }
-  ): Promise<HttpTimelineInfo>;
-  getTimeline(
-    timelineName: string,
-    query: {
-      checkUniqueId?: string;
-      ifModifiedSince: Date;
-    }
-  ): Promise<HttpTimelineInfo | NotModified>;
-  getTimeline(
-    timelineName: string,
-    query?: {
-      checkUniqueId?: string;
-      ifModifiedSince?: Date;
-    }
-  ): Promise<HttpTimelineInfo | NotModified> {
+  getTimeline(timelineName: string): Promise<HttpTimelineInfo> {
     return axios
-      .get<RawHttpTimelineInfo>(
-        applyQueryParameters(`${apiBaseUrl}/timelines/${timelineName}`, query)
-      )
-      .then((res) => {
-        if (res.status === 304) {
-          return new NotModified();
-        } else {
-          return processRawTimelineInfo(res.data);
-        }
-      })
+      .get<RawHttpTimelineInfo>(`${apiBaseUrl}/timelines/${timelineName}`)
+      .then(extractResponseData)
+      .then(processRawTimelineInfo)
       .catch(convertToIfStatusCodeIs(404, HttpTimelineNotExistError))
       .catch(convertToNetworkError);
   }
