@@ -11,38 +11,38 @@ using Timeline.Services;
 
 namespace Timeline
 {
-  public static class Program
-  {
-    public static void Main(string[] args)
+    public static class Program
     {
-      var host = CreateWebHostBuilder(args).Build();
-
-      var env = host.Services.GetRequiredService<IWebHostEnvironment>();
-
-      var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
-      databaseBackupService.BackupNow();
-
-      if (env.IsProduction())
-      {
-        using (var scope = host.Services.CreateScope())
+        public static void Main(string[] args)
         {
-          var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-          databaseContext.Database.Migrate();
+            var host = CreateWebHostBuilder(args).Build();
+
+            var env = host.Services.GetRequiredService<IWebHostEnvironment>();
+
+            var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
+            databaseBackupService.BackupNow();
+
+            if (env.IsProduction())
+            {
+                using (var scope = host.Services.CreateScope())
+                {
+                    var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                    databaseContext.Database.Migrate();
+                }
+            }
+
+            host.Run();
         }
-      }
 
-      host.Run();
+        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(config =>
+                {
+                    config.AddEnvironmentVariables("Timeline_");
+                })
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
-
-    public static IHostBuilder CreateWebHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(config =>
-            {
-              config.AddEnvironmentVariables("Timeline_");
-            })
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-              webBuilder.UseStartup<Startup>();
-            });
-  }
 }
