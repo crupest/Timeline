@@ -34,6 +34,9 @@ namespace Timeline.Entities
         [Column("extra_content")]
         public string? ExtraContent { get; set; }
 
+        [Column("color")]
+        public string? Color { get; set; }
+
         [Column("time")]
         public DateTime Time { get; set; }
 

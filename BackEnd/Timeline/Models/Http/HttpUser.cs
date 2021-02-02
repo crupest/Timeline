@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Timeline.Models.Http
 {
@@ -42,33 +42,5 @@ namespace Timeline.Models.Http
         /// </summary>
         public HttpUserLinks _links { get; set; } = default!;
 #pragma warning restore CA1707 // Identifiers should not contain underscores
-    }
-
-    /// <summary>
-    /// Related links for user.
-    /// </summary>
-    public class HttpUserLinks
-    {
-        public HttpUserLinks() { }
-
-        public HttpUserLinks(string self, string avatar, string timeline)
-        {
-            Self = self;
-            Avatar = avatar;
-            Timeline = timeline;
-        }
-
-        /// <summary>
-        /// Self.
-        /// </summary>
-        public string Self { get; set; } = default!;
-        /// <summary>
-        /// Avatar url.
-        /// </summary>
-        public string Avatar { get; set; } = default!;
-        /// <summary>
-        /// Personal timeline url.
-        /// </summary>
-        public string Timeline { get; set; } = default!;
     }
 }
