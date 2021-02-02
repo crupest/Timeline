@@ -389,5 +389,29 @@ namespace Timeline.Tests.IntegratedTests
                 }
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Color(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            {
+                var timeline = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}");
+                timeline.Color.Should().Be(null);
+            }
+
+            await client.TestPatchAssertInvalidModelAsync($"timelines/{generator(1)}", new HttpTimelinePatchRequest { Color = "!!!" });
+
+            {
+                var timeline = await client.TestPatchAsync<HttpTimeline>($"timelines/{generator(1)}", new HttpTimelinePatchRequest { Color = "#112233" });
+                timeline.Color.Should().Be("#112233");
+            }
+
+            {
+                var timeline = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}");
+                timeline.Color.Should().Be("#112233");
+            }
+        }
     }
 }
