@@ -64,7 +64,7 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
     "@types/classnames": "^2.2.11",
     "@types/lodash": "^4.14.168",
-    "@types/node": "^14.14.21",
+    "@types/node": "^14.14.24",
     "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.0",
     "@types/react-responsive": "^8.0.2",
