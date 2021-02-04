@@ -42,6 +42,7 @@ namespace Timeline.Models.Mapper
                 owner: await _userMapper.MapToHttp(entity.Owner, urlHelper),
                 visibility: entity.Visibility,
                 members: await _userMapper.MapToHttp(entity.Members.Select(m => m.User).ToList(), urlHelper),
+                color: entity.Color,
                 createTime: entity.CreateTime,
                 lastModified: entity.LastModified,
                 isHighlight: await _highlightTimelineService.IsHighlightTimeline(entity.Id),
@@ -105,6 +106,7 @@ namespace Timeline.Models.Mapper
                     deleted: content is null,
                     time: entity.Time,
                     author: author,
+                    color: entity.Color,
                     lastUpdated: entity.LastUpdated
                 );
         }
