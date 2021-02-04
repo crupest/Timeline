@@ -142,7 +142,7 @@ namespace Timeline.Controllers
                 {
                     return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
                 }
-                post = await _postService.CreateTextPost(timelineId, userId, text, body.Time);
+                post = await _postService.CreateTextPost(timelineId, userId, text, new TimelinePostCommonProperties { Time = body.Time });
             }
             else if (content.Type == TimelinePostContentTypes.Image)
             {
@@ -163,7 +163,7 @@ namespace Timeline.Controllers
 
                 try
                 {
-                    post = await _postService.CreateImagePost(timelineId, userId, data, body.Time);
+                    post = await _postService.CreateImagePost(timelineId, userId, data, new TimelinePostCommonProperties { Time = body.Time });
                 }
                 catch (ImageException)
                 {
