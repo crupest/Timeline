@@ -53,6 +53,7 @@ namespace Timeline.Services
         public string? Title { get; set; }
         public string? Description { get; set; }
         public TimelineVisibility? Visibility { get; set; }
+        public string? Color { get; set; }
     }
 
     /// <summary>
@@ -186,6 +187,8 @@ namespace Timeline.Services
 
         private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
 
+        private readonly ColorValidator _colorValidator = new ColorValidator();
+
         private void ValidateTimelineName(string name, string paramName)
         {
             if (!_timelineNameValidator.Validate(name, out var message))
@@ -211,6 +214,15 @@ namespace Timeline.Services
 
             if (newProperties.Name is not null)
                 ValidateTimelineName(newProperties.Name, nameof(newProperties));
+
+            if (newProperties.Color is not null)
+            {
+                var (result, message) = _colorValidator.Validate(newProperties.Color);
+                if (!result)
+                {
+                    throw new ArgumentException(message, nameof(newProperties));
+                }
+            }
 
             var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
 
@@ -249,6 +261,12 @@ namespace Timeline.Services
             {
                 changed = true;
                 entity.Visibility = newProperties.Visibility.Value;
+            }
+
+            if (newProperties.Color is not null)
+            {
+                changed = true;
+                entity.Color = newProperties.Color;
             }
 
             if (changed)

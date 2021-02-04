@@ -41,6 +41,9 @@ namespace Timeline.Entities
         [Column("visibility")]
         public TimelineVisibility Visibility { get; set; }
 
+        [Column("color")]
+        public string? Color { get; set; }
+
         [Column("create_time")]
         public DateTime CreateTime { get; set; }
 
