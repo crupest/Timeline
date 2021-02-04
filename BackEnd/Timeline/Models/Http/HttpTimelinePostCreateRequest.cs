@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
@@ -15,5 +16,11 @@ namespace Timeline.Models.Http
         /// Time of the post. If not set, current time will be used.
         /// </summary>
         public DateTime? Time { get; set; }
+
+        /// <summary>
+        /// Color of the post.
+        /// </summary>
+        [Color]
+        public string? Color { get; set; }
     }
 }

@@ -9,13 +9,14 @@ namespace Timeline.Models.Http
     {
         public HttpTimelinePost() { }
 
-        public HttpTimelinePost(long id, HttpTimelinePostContent? content, bool deleted, DateTime time, HttpUser? author, DateTime lastUpdated)
+        public HttpTimelinePost(long id, HttpTimelinePostContent? content, bool deleted, DateTime time, HttpUser? author, string? color, DateTime lastUpdated)
         {
             Id = id;
             Content = content;
             Deleted = deleted;
             Time = time;
             Author = author;
+            Color = color;
             LastUpdated = lastUpdated;
         }
 
@@ -39,6 +40,10 @@ namespace Timeline.Models.Http
         /// The author. May be null if the user has been deleted.
         /// </summary>
         public HttpUser? Author { get; set; } = default!;
+        /// <summary>
+        /// The color.
+        /// </summary>
+        public string? Color { get; set; }
         /// <summary>
         /// Last updated time.
         /// </summary>

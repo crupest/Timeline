@@ -135,6 +135,8 @@ namespace Timeline.Controllers
 
             TimelinePostEntity post;
 
+            TimelinePostCommonProperties properties = new TimelinePostCommonProperties { Color = body.Color, Time = body.Time };
+
             if (content.Type == TimelinePostContentTypes.Text)
             {
                 var text = content.Text;
@@ -142,7 +144,7 @@ namespace Timeline.Controllers
                 {
                     return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
                 }
-                post = await _postService.CreateTextPost(timelineId, userId, text, new TimelinePostCommonProperties { Time = body.Time });
+                post = await _postService.CreateTextPost(timelineId, userId, text, properties);
             }
             else if (content.Type == TimelinePostContentTypes.Image)
             {
@@ -163,7 +165,7 @@ namespace Timeline.Controllers
 
                 try
                 {
-                    post = await _postService.CreateImagePost(timelineId, userId, data, new TimelinePostCommonProperties { Time = body.Time });
+                    post = await _postService.CreateImagePost(timelineId, userId, data, properties);
                 }
                 catch (ImageException)
                 {
