@@ -45,6 +45,17 @@ namespace Timeline.Services
         Task<List<TimelinePostEntity>> GetPosts(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false);
 
         /// <summary>
+        /// Get a post of a timeline.
+        /// </summary>
+        /// <param name="timelineId">The id of the timeline of the post.</param>
+        /// <param name="postId">The id of the post.</param>
+        /// <param name="includeDelete">If true, return the entity even if it is deleted.</param>
+        /// <returns>The post.</returns>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
+        Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDelete = false);
+
+        /// <summary>
         /// Get the etag of data of a post.
         /// </summary>
         /// <param name="timelineId">The id of the timeline of the post.</param>
@@ -187,6 +198,25 @@ namespace Timeline.Services
             query = query.OrderBy(p => p.Time);
 
             return await query.ToListAsync();
+        }
+
+        public async Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDelete = false)
+        {
+            await CheckTimelineExistence(timelineId);
+
+            var post = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+
+            if (post is null)
+            {
+                throw new TimelinePostNotExistException(timelineId, postId, false);
+            }
+
+            if (!includeDelete && post.Content is null)
+            {
+                throw new TimelinePostNotExistException(timelineId, postId, true);
+            }
+
+            return post;
         }
 
         public async Task<string> GetPostDataETag(long timelineId, long postId)
