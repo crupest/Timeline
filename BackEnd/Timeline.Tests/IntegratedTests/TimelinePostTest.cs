@@ -473,5 +473,32 @@ namespace Timeline.Tests.IntegratedTests
             }
         }
 
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Color(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            HttpTimelinePostCreateRequestContent CreateRequestContent() => new()
+            {
+                Type = "text",
+                Text = "aaa"
+            };
+
+            await client.TestPostAssertInvalidModelAsync($"timelines/{generator(1)}/posts", new HttpTimelinePostCreateRequest
+            {
+                Content = CreateRequestContent(),
+                Color = "#1"
+            });
+
+            {
+                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", new HttpTimelinePostCreateRequest
+                {
+                    Content = CreateRequestContent(),
+                    Color = "#aabbcc"
+                });
+                post.Color.Should().Be("#aabbcc");
+            }
+        }
     }
 }

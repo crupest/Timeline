@@ -106,6 +106,7 @@ namespace Timeline.Models.Mapper
                     deleted: content is null,
                     time: entity.Time,
                     author: author,
+                    color: entity.Color,
                     lastUpdated: entity.LastUpdated
                 );
         }
