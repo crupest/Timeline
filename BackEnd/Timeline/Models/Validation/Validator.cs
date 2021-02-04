@@ -51,7 +51,7 @@ namespace Timeline.Models.Validation
 
         public (bool, string) Validate(object? value)
         {
-            if (value == null)
+            if (value is null)
             {
                 if (PermitNull)
                     return (true, GetSuccessMessage());
