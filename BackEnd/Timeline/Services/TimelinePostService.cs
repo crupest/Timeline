@@ -24,12 +24,50 @@ namespace Timeline.Services
         public DateTime? LastModified { get; set; } // TODO: Why nullable?
     }
 
-    public class TimelinePostCommonProperties
+    public abstract class TimelinePostCreateRequestContent
     {
+        public abstract string TypeName { get; }
+    }
+
+    public class TimelinePostCreateRequestTextContent : TimelinePostCreateRequestContent
+    {
+        public TimelinePostCreateRequestTextContent(string text)
+        {
+            Text = text;
+        }
+
+        public override string TypeName => TimelinePostContentTypes.Text;
+
+        public string Text { get; set; }
+    }
+
+    public class TimelinePostCreateRequestImageContent : TimelinePostCreateRequestContent
+    {
+        public TimelinePostCreateRequestImageContent(byte[] data)
+        {
+            Data = data;
+        }
+
+        public override string TypeName => TimelinePostContentTypes.Image;
+
+#pragma warning disable CA1819 // Properties should not return arrays
+        public byte[] Data { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
+    }
+
+    public class TimelinePostCreateRequest
+    {
+        public TimelinePostCreateRequest(TimelinePostCreateRequestContent content)
+        {
+            Content = content;
+        }
+
         public string? Color { get; set; }
 
         /// <summary>If not set, current time is used.</summary>
         public DateTime? Time { get; set; }
+
+        public TimelinePostCreateRequestContent Content { get; set; }
     }
 
     public interface ITimelinePostService
@@ -79,31 +117,18 @@ namespace Timeline.Services
         Task<PostData> GetPostData(long timelineId, long postId);
 
         /// <summary>
-        /// Create a new text post in timeline.
+        /// Create a new post in timeline.
         /// </summary>
         /// <param name="timelineId">The id of the timeline to create post against.</param>
         /// <param name="authorId">The author's user id.</param>
-        /// <param name="text">The content text.</param>
-        /// <param name="properties">Some properties.</param>
+        /// <param name="request">Info about the post.</param>
         /// <returns>The info of the created post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="text"/> is null.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
-        Task<TimelinePostEntity> CreateTextPost(long timelineId, long authorId, string text, TimelinePostCommonProperties? properties = null);
-
-        /// <summary>
-        /// Create a new image post in timeline.
-        /// </summary>
-        /// <param name="timelineId">The id of the timeline to create post against.</param>
-        /// <param name="authorId">The author's user id.</param>
-        /// <param name="imageData">The image data.</param>
-        /// <param name="properties">Some properties.</param>
-        /// <returns>The info of the created post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="imageData"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="request"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
         /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
-        Task<TimelinePostEntity> CreateImagePost(long timelineId, long authorId, byte[] imageData, TimelinePostCommonProperties? properties = null);
+        Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request);
 
         /// <summary>
         /// Delete a post.
@@ -284,22 +309,27 @@ namespace Timeline.Services
             };
         }
 
-        private async Task<TimelinePostEntity> GeneralCreatePost(long timelineId, long authorId, TimelinePostCommonProperties? properties, Func<TimelinePostEntity, Task> saveContent)
+        public async Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request)
         {
-            if (properties is not null)
+            if (request is null)
+                throw new ArgumentNullException(nameof(request));
+
+
+            if (request.Content is null)
+                throw new ArgumentException("Content is null.", nameof(request));
+
             {
-                if (!_colorValidator.Validate(properties.Color, out var message))
-                {
-                    throw new ArgumentException(message, nameof(properties));
-                }
-                properties.Time = properties.Time?.MyToUtc();
+                if (!_colorValidator.Validate(request.Color, out var message))
+                    throw new ArgumentException("Color is not valid.", nameof(request));
             }
+
+            request.Time = request.Time?.MyToUtc();
 
             await CheckTimelineExistence(timelineId);
             await CheckUserExistence(authorId);
 
             var currentTime = _clock.GetCurrentTime();
-            var finalTime = properties?.Time ?? currentTime;
+            var finalTime = request.Time ?? currentTime;
 
             var postEntity = new TimelinePostEntity
             {
@@ -307,10 +337,29 @@ namespace Timeline.Services
                 TimelineId = timelineId,
                 Time = finalTime,
                 LastUpdated = currentTime,
-                Color = properties?.Color
+                Color = request.Color
             };
 
-            await saveContent(postEntity);
+            switch (request.Content)
+            {
+                case TimelinePostCreateRequestTextContent content:
+                    postEntity.ContentType = content.TypeName;
+                    postEntity.Content = content.Text;
+                    break;
+                case TimelinePostCreateRequestImageContent content:
+                    var imageFormat = await _imageValidator.Validate(content.Data);
+                    var imageFormatText = imageFormat.DefaultMimeType;
+
+                    var tag = await _dataManager.RetainEntry(content.Data);
+
+                    postEntity.ContentType = content.TypeName;
+                    postEntity.Content = tag;
+                    postEntity.ExtraContent = imageFormatText;
+                    break;
+                default:
+                    throw new ArgumentException("Unknown content type.", nameof(request));
+            };
+
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
             timelineEntity.CurrentPostLocalId += 1;
@@ -321,40 +370,6 @@ namespace Timeline.Services
             await _database.SaveChangesAsync();
 
             return postEntity;
-        }
-
-        public async Task<TimelinePostEntity> CreateTextPost(long timelineId, long authorId, string text, TimelinePostCommonProperties? properties = null)
-        {
-            if (text is null)
-                throw new ArgumentNullException(nameof(text));
-
-            return await GeneralCreatePost(timelineId, authorId, properties, (entity) =>
-            {
-                entity.ContentType = TimelinePostContentTypes.Text;
-                entity.Content = text;
-
-                return Task.CompletedTask;
-            });
-        }
-
-        public async Task<TimelinePostEntity> CreateImagePost(long timelineId, long authorId, byte[] data, TimelinePostCommonProperties? properties = null)
-        {
-            if (data is null)
-                throw new ArgumentNullException(nameof(data));
-
-            await CheckTimelineExistence(timelineId);
-
-            return await GeneralCreatePost(timelineId, authorId, properties, async (entity) =>
-            {
-                var imageFormat = await _imageValidator.Validate(data);
-                var imageFormatText = imageFormat.DefaultMimeType;
-
-                var tag = await _dataManager.RetainEntry(data);
-
-                entity.ContentType = TimelinePostContentTypes.Image;
-                entity.Content = tag;
-                entity.ExtraContent = imageFormatText;
-            });
         }
 
         public async Task DeletePost(long timelineId, long postId)
