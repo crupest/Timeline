@@ -162,54 +162,51 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var content = body.Content;
+            var requestContent = body.Content;
 
-            TimelinePostEntity post;
+            TimelinePostCreateRequestContent createContent;
 
-            TimelinePostCommonProperties properties = new TimelinePostCommonProperties { Color = body.Color, Time = body.Time };
-
-            if (content.Type == TimelinePostContentTypes.Text)
+            switch (requestContent.Type)
             {
-                var text = content.Text;
-                if (text == null)
-                {
-                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
-                }
-                post = await _postService.CreateTextPost(timelineId, userId, text, properties);
-            }
-            else if (content.Type == TimelinePostContentTypes.Image)
-            {
-                var base64Data = content.Data;
-                if (base64Data == null)
-                {
-                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataRequired));
-                }
-                byte[] data;
-                try
-                {
-                    data = Convert.FromBase64String(base64Data);
-                }
-                catch (FormatException)
-                {
-                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotBase64));
-                }
+                case TimelinePostContentTypes.Text:
+                    if (requestContent.Text is null)
+                    {
+                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
+                    }
+                    createContent = new TimelinePostCreateRequestTextContent(requestContent.Text);
+                    break;
+                case TimelinePostContentTypes.Image:
+                    if (requestContent.Data is null)
+                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataRequired));
 
-                try
-                {
-                    post = await _postService.CreateImagePost(timelineId, userId, data, properties);
-                }
-                catch (ImageException)
-                {
-                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotImage));
-                }
-            }
-            else
-            {
-                return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ContentUnknownType));
+                    // decode base64
+                    byte[] data;
+                    try
+                    {
+                        data = Convert.FromBase64String(requestContent.Data);
+                    }
+                    catch (FormatException)
+                    {
+                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotBase64));
+                    }
+
+                    createContent = new TimelinePostCreateRequestImageContent(data);
+                    break;
+                default:
+                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ContentUnknownType));
+
             }
 
-            var result = await _timelineMapper.MapToHttp(post, timeline, Url);
-            return result;
+            try
+            {
+                var post = await _postService.CreatePost(timelineId, userId, new TimelinePostCreateRequest(createContent) { Time = body.Time, Color = body.Color });
+                var result = await _timelineMapper.MapToHttp(post, timeline, Url);
+                return result;
+            }
+            catch (ImageException)
+            {
+                return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotImage));
+            }
         }
 
         /// <summary>
