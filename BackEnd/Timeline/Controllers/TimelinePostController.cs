@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Entities;
 using Timeline.Filters;
 using Timeline.Helpers;
 using Timeline.Models;
@@ -206,6 +205,40 @@ namespace Timeline.Controllers
             catch (ImageException)
             {
                 return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotImage));
+            }
+        }
+
+        /// <summary>
+        /// Update a post except content.
+        /// </summary>
+        /// <param name="timeline">Timeline name.</param>
+        /// <param name="post">Post id.</param>
+        /// <param name="body">Request body.</param>
+        /// <returns>New info of post.</returns>
+        [HttpPatch("{post}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<HttpTimelinePost>> Patch([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromBody] HttpTimelinePostPatchRequest body)
+        {
+            var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+
+            try
+            {
+                if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(timelineId, post, this.GetUserId(), true))
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                }
+
+                var entity = await _postService.PatchPost(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
+                var result = await _timelineMapper.MapToHttp(entity, timeline, Url);
+                return Ok(result);
+            }
+            catch (TimelinePostNotExistException)
+            {
+                return BadRequest(ErrorResponse.TimelineController.PostNotExist());
             }
         }
 
