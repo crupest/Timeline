@@ -31,27 +31,55 @@ namespace Timeline.Services
 
     public class TimelinePostCreateRequestTextContent : TimelinePostCreateRequestContent
     {
+        private string _text;
+
         public TimelinePostCreateRequestTextContent(string text)
         {
-            Text = text;
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+
+            _text = text;
         }
 
         public override string TypeName => TimelinePostContentTypes.Text;
 
-        public string Text { get; set; }
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                if (value is null)
+                    throw new ArgumentNullException(nameof(value));
+                _text = value;
+            }
+        }
     }
 
     public class TimelinePostCreateRequestImageContent : TimelinePostCreateRequestContent
     {
+        private byte[] _data;
+
         public TimelinePostCreateRequestImageContent(byte[] data)
         {
-            Data = data;
+            if (data is null)
+                throw new ArgumentNullException(nameof(data));
+
+            _data = data;
         }
 
         public override string TypeName => TimelinePostContentTypes.Image;
 
 #pragma warning disable CA1819 // Properties should not return arrays
-        public byte[] Data { get; set; }
+        public byte[] Data
+        {
+            get => _data;
+            set
+            {
+                if (value is null)
+                    throw new ArgumentNullException(nameof(value));
+                _data = value;
+            }
+        }
 #pragma warning restore CA1819 // Properties should not return arrays
     }
 
@@ -68,6 +96,13 @@ namespace Timeline.Services
         public DateTime? Time { get; set; }
 
         public TimelinePostCreateRequestContent Content { get; set; }
+    }
+
+    public class TimelinePostPatchRequest
+    {
+        public string? Color { get; set; }
+        public DateTime? Time { get; set; }
+        public TimelinePostCreateRequestContent? Content { get; set; }
     }
 
     public interface ITimelinePostService
@@ -122,13 +157,27 @@ namespace Timeline.Services
         /// <param name="timelineId">The id of the timeline to create post against.</param>
         /// <param name="authorId">The author's user id.</param>
         /// <param name="request">Info about the post.</param>
-        /// <returns>The info of the created post.</returns>
+        /// <returns>The entity of the created post.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="request"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
         /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
         Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request);
+
+        /// <summary>
+        /// Modify a post. Change its properties or replace its content.
+        /// </summary>
+        /// <param name="timelineId">The timeline id.</param>
+        /// <param name="postId">The post id.</param>
+        /// <param name="request">The request.</param>
+        /// <returns>The entity of the patched post.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="request"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when post does not exist.</exception>
+        /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
+        Task<TimelinePostEntity> PatchPost(long timelineId, long postId, TimelinePostPatchRequest request);
 
         /// <summary>
         /// Delete a post.
@@ -309,6 +358,36 @@ namespace Timeline.Services
             };
         }
 
+        private async Task SaveContent(TimelinePostEntity entity, TimelinePostCreateRequestContent content)
+        {
+            switch (content)
+            {
+                case TimelinePostCreateRequestTextContent c:
+                    entity.ContentType = c.TypeName;
+                    entity.Content = c.Text;
+                    break;
+                case TimelinePostCreateRequestImageContent c:
+                    var imageFormat = await _imageValidator.Validate(c.Data);
+                    var imageFormatText = imageFormat.DefaultMimeType;
+
+                    var tag = await _dataManager.RetainEntry(c.Data);
+
+                    entity.ContentType = content.TypeName;
+                    entity.Content = tag;
+                    entity.ExtraContent = imageFormatText;
+                    break;
+                default:
+                    throw new ArgumentException("Unknown content type.", nameof(content));
+            };
+        }
+
+        private async Task CleanContent(TimelinePostEntity entity)
+        {
+            if (entity.Content is not null && entity.ContentType == TimelinePostContentTypes.Image)
+                await _dataManager.FreeEntry(entity.Content);
+            entity.Content = null;
+        }
+
         public async Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request)
         {
             if (request is null)
@@ -331,6 +410,8 @@ namespace Timeline.Services
             var currentTime = _clock.GetCurrentTime();
             var finalTime = request.Time ?? currentTime;
 
+            await using var transaction = await _database.Database.BeginTransactionAsync();
+
             var postEntity = new TimelinePostEntity
             {
                 AuthorId = authorId,
@@ -340,26 +421,7 @@ namespace Timeline.Services
                 Color = request.Color
             };
 
-            switch (request.Content)
-            {
-                case TimelinePostCreateRequestTextContent content:
-                    postEntity.ContentType = content.TypeName;
-                    postEntity.Content = content.Text;
-                    break;
-                case TimelinePostCreateRequestImageContent content:
-                    var imageFormat = await _imageValidator.Validate(content.Data);
-                    var imageFormatText = imageFormat.DefaultMimeType;
-
-                    var tag = await _dataManager.RetainEntry(content.Data);
-
-                    postEntity.ContentType = content.TypeName;
-                    postEntity.Content = tag;
-                    postEntity.ExtraContent = imageFormatText;
-                    break;
-                default:
-                    throw new ArgumentException("Unknown content type.", nameof(request));
-            };
-
+            await SaveContent(postEntity, request.Content);
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
             timelineEntity.CurrentPostLocalId += 1;
@@ -369,37 +431,77 @@ namespace Timeline.Services
 
             await _database.SaveChangesAsync();
 
+            await transaction.CommitAsync();
+
             return postEntity;
+        }
+
+        public async Task<TimelinePostEntity> PatchPost(long timelineId, long postId, TimelinePostPatchRequest request)
+        {
+            if (request is null)
+                throw new ArgumentNullException(nameof(request));
+
+            {
+                if (!_colorValidator.Validate(request.Color, out var message))
+                    throw new ArgumentException("Color is not valid.", nameof(request));
+            }
+
+            request.Time = request.Time?.MyToUtc();
+
+            await CheckTimelineExistence(timelineId);
+
+            var entity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+
+            await using var transaction = await _database.Database.BeginTransactionAsync();
+
+            if (entity is null)
+                throw new TimelinePostNotExistException(timelineId, postId, false);
+
+            if (entity.Content is null)
+                throw new TimelinePostNotExistException(timelineId, postId, true);
+
+            if (request.Time.HasValue)
+                entity.Time = request.Time.Value;
+
+            if (request.Color is not null)
+                entity.Color = request.Color;
+
+            if (request.Content is not null)
+            {
+                await CleanContent(entity);
+                await SaveContent(entity, request.Content);
+            }
+
+            entity.LastUpdated = _clock.GetCurrentTime();
+
+            await _database.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return entity;
         }
 
         public async Task DeletePost(long timelineId, long postId)
         {
             await CheckTimelineExistence(timelineId);
 
-            var post = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+            var entity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
-            if (post == null)
+            if (entity == null)
                 throw new TimelinePostNotExistException(timelineId, postId, false);
 
-            if (post.Content == null)
+            if (entity.Content == null)
                 throw new TimelinePostNotExistException(timelineId, postId, true);
 
-            string? dataTag = null;
+            await using var transaction = await _database.Database.BeginTransactionAsync();
 
-            if (post.ContentType == TimelinePostContentTypes.Image)
-            {
-                dataTag = post.Content;
-            }
+            await CleanContent(entity);
 
-            post.Content = null;
-            post.LastUpdated = _clock.GetCurrentTime();
+            entity.LastUpdated = _clock.GetCurrentTime();
 
             await _database.SaveChangesAsync();
 
-            if (dataTag != null)
-            {
-                await _dataManager.FreeEntry(dataTag);
-            }
+            await transaction.CommitAsync();
         }
 
         public async Task DeleteAllPostsOfUser(long userId)
