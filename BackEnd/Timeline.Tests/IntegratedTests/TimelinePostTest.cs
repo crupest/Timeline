@@ -535,5 +535,35 @@ namespace Timeline.Tests.IntegratedTests
 
             await client.TestGetAssertNotFoundAsync($"timelines/{generator(1)}/posts/{post.Id}");
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task PatchPost(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", new HttpTimelinePostCreateRequest
+            {
+                Content = new()
+                {
+                    Type = "text",
+                    Text = "aaa"
+                }
+            });
+
+            var date = new DateTime(2000, 10, 1);
+
+            var post2 = await client.TestPatchAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}", new HttpTimelinePostPatchRequest
+            {
+                Time = date,
+                Color = "#aabbcc"
+            });
+            post2.Time.Should().Be(date);
+            post2.Color.Should().Be("#aabbcc");
+
+            var post3 = await client.TestGetAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}");
+            post3.Time.Should().Be(date);
+            post3.Color.Should().Be("#aabbcc");
+        }
     }
 }
