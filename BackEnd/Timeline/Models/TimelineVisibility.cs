@@ -1,4 +1,4 @@
-﻿namespace Timeline.Models
+namespace Timeline.Models
 {
     public enum TimelineVisibility
     {
@@ -14,11 +14,5 @@
         /// Only member.
         /// </summary>
         Private
-    }
-
-    public static class TimelinePostContentTypes
-    {
-        public const string Text = "text";
-        public const string Image = "image";
     }
 }

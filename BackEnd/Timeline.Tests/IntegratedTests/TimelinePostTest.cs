@@ -491,6 +491,8 @@ namespace Timeline.Tests.IntegratedTests
                 Color = "#1"
             });
 
+            long id;
+
             {
                 var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", new HttpTimelinePostCreateRequest
                 {
@@ -498,7 +500,70 @@ namespace Timeline.Tests.IntegratedTests
                     Color = "#aabbcc"
                 });
                 post.Color.Should().Be("#aabbcc");
+                id = post.Id;
             }
+
+            {
+                var post = await client.TestGetAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{id}");
+                post.Color.Should().Be("#aabbcc");
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task GetPost(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            HttpTimelinePostCreateRequestContent CreateRequestContent() => new()
+            {
+                Type = "text",
+                Text = "aaa"
+            };
+
+            await client.TestGetAssertNotFoundAsync($"timelines/{generator(1)}/posts/1");
+
+            var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", new HttpTimelinePostCreateRequest
+            {
+                Content = CreateRequestContent(),
+            });
+
+            var post2 = await client.TestGetAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}");
+            post2.Should().BeEquivalentTo(post);
+
+            await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{post.Id}");
+
+            await client.TestGetAssertNotFoundAsync($"timelines/{generator(1)}/posts/{post.Id}");
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task PatchPost(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", new HttpTimelinePostCreateRequest
+            {
+                Content = new()
+                {
+                    Type = "text",
+                    Text = "aaa"
+                }
+            });
+
+            var date = new DateTime(2000, 10, 1);
+
+            var post2 = await client.TestPatchAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}", new HttpTimelinePostPatchRequest
+            {
+                Time = date,
+                Color = "#aabbcc"
+            });
+            post2.Time.Should().Be(date);
+            post2.Color.Should().Be("#aabbcc");
+
+            var post3 = await client.TestGetAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}");
+            post3.Time.Should().Be(date);
+            post3.Color.Should().Be("#aabbcc");
         }
     }
 }

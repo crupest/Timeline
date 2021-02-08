@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
@@ -11,6 +12,7 @@ namespace Timeline.Models.Http
         /// Type of post content.
         /// </summary>
         [Required]
+        [TimelinePostContentType]
         public string Type { get; set; } = default!;
         /// <summary>
         /// If post is of text type, this is the text.
