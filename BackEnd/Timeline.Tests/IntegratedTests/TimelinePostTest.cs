@@ -108,7 +108,7 @@ namespace Timeline.Tests.IntegratedTests
             foreach (var content in postContentList)
             {
                 var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
-                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostDataKind.Text } });
                 posts.Add(post);
                 await Task.Delay(1000);
             }
@@ -134,7 +134,7 @@ namespace Timeline.Tests.IntegratedTests
             foreach (var (content, index) in postContentList.Select((v, i) => (v, i)))
             {
                 var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
-                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostDataKind.Text } });
                 posts.Add(post);
                 await Task.Delay(1000);
             }
@@ -162,7 +162,7 @@ namespace Timeline.Tests.IntegratedTests
             foreach (var content in postContentList)
             {
                 var body = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts",
-                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostContentTypes.Text } });
+                    new HttpTimelinePostCreateRequest { Content = new HttpTimelinePostCreateRequestContent { Text = content, Type = TimelinePostDataKind.Text } });
                 posts.Add(body);
             }
 
@@ -367,7 +367,7 @@ namespace Timeline.Tests.IntegratedTests
 
             void AssertPostContent(HttpTimelinePostContent content)
             {
-                content.Type.Should().Be(TimelinePostContentTypes.Image);
+                content.Type.Should().Be(TimelinePostDataKind.Image);
                 content.Url.Should().EndWith($"timelines/{generator(1)}/posts/{postId}/data");
                 content.Text.Should().Be(null);
             }
@@ -380,7 +380,7 @@ namespace Timeline.Tests.IntegratedTests
                     {
                         Content = new HttpTimelinePostCreateRequestContent
                         {
-                            Type = TimelinePostContentTypes.Image,
+                            Type = TimelinePostDataKind.Image,
                             Data = Convert.ToBase64String(imageData)
                         }
                     });
@@ -455,7 +455,7 @@ namespace Timeline.Tests.IntegratedTests
                 {
                     Content = new HttpTimelinePostCreateRequestContent
                     {
-                        Type = TimelinePostContentTypes.Image,
+                        Type = TimelinePostDataKind.Image,
                         Data = Convert.ToBase64String(ImageHelper.CreatePngWithSize(100, 50))
                     }
                 });

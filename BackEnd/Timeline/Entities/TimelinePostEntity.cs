@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,14 +26,7 @@ namespace Timeline.Entities
         [ForeignKey(nameof(AuthorId))]
         public UserEntity? Author { get; set; } = default!;
 
-        [Column("content_type"), Required]
-        public string ContentType { get; set; } = default!;
-
-        [Column("content")]
-        public string? Content { get; set; }
-
-        [Column("extra_content")]
-        public string? ExtraContent { get; set; }
+        public bool Deleted { get; set; }
 
         [Column("color")]
         public string? Color { get; set; }
@@ -42,5 +36,7 @@ namespace Timeline.Entities
 
         [Column("last_updated")]
         public DateTime LastUpdated { get; set; }
+
+        public List<TimelinePostDataEntity> DataList { get; set; } = default!;
     }
 }

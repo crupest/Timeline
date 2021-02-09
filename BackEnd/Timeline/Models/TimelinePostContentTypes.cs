@@ -2,13 +2,12 @@
 
 namespace Timeline.Models
 {
-    public static class TimelinePostContentTypes
+    public static class TimelinePostDataKind
     {
-#pragma warning disable CA1819 // Properties should not return arrays
-        public static string[] AllTypes { get; } = new string[] { Text, Image };
-#pragma warning restore CA1819 // Properties should not return arrays
+        public static IReadOnlyList<string> AllTypes { get; } = new List<string> { Text, Image, Markdown };
 
         public const string Text = "text";
         public const string Image = "image";
+        public const string Markdown = "markdown";
     }
 }

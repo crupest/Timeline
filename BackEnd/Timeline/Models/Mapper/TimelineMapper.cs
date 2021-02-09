@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Controllers;
@@ -67,34 +66,12 @@ namespace Timeline.Models.Mapper
 
         public async Task<HttpTimelinePost> MapToHttp(TimelinePostEntity entity, string timelineName, IUrlHelper urlHelper)
         {
-            HttpTimelinePostContent? content = null;
-
-            if (entity.Content != null)
-            {
-                content = entity.ContentType switch
-                {
-                    TimelinePostContentTypes.Text => new HttpTimelinePostContent
-                    (
-                        type: TimelinePostContentTypes.Text,
-                        text: entity.Content,
-                        url: null,
-                        eTag: null
-                    ),
-                    TimelinePostContentTypes.Image => new HttpTimelinePostContent
-                    (
-                        type: TimelinePostContentTypes.Image,
-                        text: null,
-                        url: urlHelper.ActionLink(nameof(TimelinePostController.DataGet), nameof(TimelinePostController)[0..^nameof(Controller).Length], new { timeline = timelineName, post = entity.LocalId }),
-                        eTag: $"\"{entity.Content}\""
-                    ),
-                    _ => throw new DatabaseCorruptedException(string.Format(CultureInfo.InvariantCulture, "Unknown timeline post type {0}.", entity.ContentType))
-                };
-            }
-
+            await _database.Entry(entity).Collection(p => p.DataList).LoadAsync();
             await _database.Entry(entity).Reference(e => e.Author).LoadAsync();
 
-            HttpUser? author = null;
+            List<HttpTimelinePostDataDigest> dataDigestList = entity.DataList.OrderBy(d => d.Index).Select(d => new HttpTimelinePostDataDigest(d.Kind, d.DataTag, d.LastUpdated)).ToList();
 
+            HttpUser? author = null;
             if (entity.Author is not null)
             {
                 author = await _userMapper.MapToHttp(entity.Author, urlHelper);
@@ -102,11 +79,11 @@ namespace Timeline.Models.Mapper
 
             return new HttpTimelinePost(
                     id: entity.LocalId,
-                    content: content,
-                    deleted: content is null,
+                    dataList: dataDigestList,
                     time: entity.Time,
                     author: author,
                     color: entity.Color,
+                    deleted: entity.Deleted,
                     lastUpdated: entity.LastUpdated
                 );
         }

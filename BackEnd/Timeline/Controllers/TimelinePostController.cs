@@ -112,7 +112,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DataGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
+        public async Task<IActionResult> DataIndexGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
         {
             _ = ifNoneMatch;
 
@@ -140,6 +140,24 @@ namespace Timeline.Controllers
         }
 
         /// <summary>
+        /// Get the data of a post. Usually a image post.
+        /// </summary>
+        /// <param name="timeline">Timeline name.</param>
+        /// <param name="post">The id of the post.</param>
+        /// <param name="ifNoneMatch">If-None-Match header.</param>
+        /// <returns>The data.</returns>
+        [HttpGet("{post}/data/{data_index}")]
+        [Produces("image/png", "image/jpeg", "image/gif", "image/webp", "application/json", "text/json")]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DataGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
+        {
+        }
+
+        /// <summary>
         /// Create a new post.
         /// </summary>
         /// <param name="timeline">Timeline name.</param>
@@ -163,18 +181,18 @@ namespace Timeline.Controllers
 
             var requestContent = body.Content;
 
-            TimelinePostCreateRequestContent createContent;
+            TimelinePostCreateRequestData createContent;
 
             switch (requestContent.Type)
             {
-                case TimelinePostContentTypes.Text:
+                case TimelinePostDataKind.Text:
                     if (requestContent.Text is null)
                     {
                         return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
                     }
                     createContent = new TimelinePostCreateRequestTextContent(requestContent.Text);
                     break;
-                case TimelinePostContentTypes.Image:
+                case TimelinePostDataKind.Image:
                     if (requestContent.Data is null)
                         return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataRequired));
 
@@ -189,7 +207,7 @@ namespace Timeline.Controllers
                         return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotBase64));
                     }
 
-                    createContent = new TimelinePostCreateRequestImageContent(data);
+                    createContent = new TimelinePostCreateRequestImageData(data);
                     break;
                 default:
                     return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ContentUnknownType));

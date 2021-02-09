@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 
 namespace Timeline.Models.Http
 {
+
     /// <summary>
     /// Info of a post.
     /// </summary>
@@ -9,10 +11,10 @@ namespace Timeline.Models.Http
     {
         public HttpTimelinePost() { }
 
-        public HttpTimelinePost(long id, HttpTimelinePostContent? content, bool deleted, DateTime time, HttpUser? author, string? color, DateTime lastUpdated)
+        public HttpTimelinePost(long id, List<HttpTimelinePostDataDigest> dataList, bool deleted, DateTime time, HttpUser? author, string? color, DateTime lastUpdated)
         {
             Id = id;
-            Content = content;
+            DataList = dataList;
             Deleted = deleted;
             Time = time;
             Author = author;
@@ -24,10 +26,7 @@ namespace Timeline.Models.Http
         /// Post id.
         /// </summary>
         public long Id { get; set; }
-        /// <summary>
-        /// Content of the post. May be null if post is deleted.
-        /// </summary>
-        public HttpTimelinePostContent? Content { get; set; }
+        public List<HttpTimelinePostDataDigest> DataList { get; set; } = default!;
         /// <summary>
         /// True if post is deleted.
         /// </summary>
