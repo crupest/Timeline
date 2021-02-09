@@ -1,16 +1,17 @@
 using System;
+using System.Linq;
 
 namespace Timeline.Models.Validation
 {
-    public class TimelinePostContentTypeValidator : StringSetValidator
+    public class TimelinePostDataKindValidator : StringSetValidator
     {
-        public TimelinePostContentTypeValidator() : base(TimelinePostContentTypes.AllTypes) { }
+        public TimelinePostDataKindValidator() : base(TimelinePostDataKind.AllTypes.ToArray()) { }
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
-    public class TimelinePostContentTypeAttribute : ValidateWithAttribute
+    public class TimelinePostDataKindAttribute : ValidateWithAttribute
     {
-        public TimelinePostContentTypeAttribute() : base(typeof(TimelinePostContentTypeValidator))
+        public TimelinePostDataKindAttribute() : base(typeof(TimelinePostDataKindValidator))
         {
 
         }

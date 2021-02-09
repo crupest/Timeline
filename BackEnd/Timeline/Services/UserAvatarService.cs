@@ -8,28 +8,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
+using Timeline.Helpers.Cache;
+using Timeline.Models;
 using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
 {
-    public class Avatar
-    {
-        public string Type { get; set; } = default!;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "DTO Object")]
-        public byte[] Data { get; set; } = default!;
-    }
-
-    public class AvatarInfo
-    {
-        public Avatar Avatar { get; set; } = default!;
-        public DateTime LastModified { get; set; }
-
-        public CacheableData ToCacheableData()
-        {
-            return new CacheableData(Avatar.Type, Avatar.Data, LastModified);
-        }
-    }
-
     /// <summary>
     /// Provider for default user avatar.
     /// </summary>
@@ -42,29 +26,24 @@ namespace Timeline.Services
         /// Get the etag of default avatar.
         /// </summary>
         /// <returns></returns>
-        Task<string> GetDefaultAvatarETag();
+        Task<ICacheableDataDigest> GetDefaultAvatarETag();
 
         /// <summary>
         /// Get the default avatar.
         /// </summary>
-        Task<AvatarInfo> GetDefaultAvatar();
+        Task<ByteData> GetDefaultAvatar();
     }
 
     public interface IUserAvatarService
     {
-        /// <summary>
-        /// Get the etag of a user's avatar. Warning: This method does not check the user existence.
-        /// </summary>
-        /// <param name="id">The id of the user to get avatar etag of.</param>
-        /// <returns>The etag.</returns>
-        Task<string> GetAvatarETag(long id);
+        Task<ICacheableDataDigest> GetAvatarDigest(long id);
 
         /// <summary>
         /// Get avatar of a user. If the user has no avatar set, a default one is returned. Warning: This method does not check the user existence.
         /// </summary>
         /// <param name="id">The id of the user to get avatar of.</param>
         /// <returns>The avatar info.</returns>
-        Task<AvatarInfo> GetAvatar(long id);
+        Task<ByteData> GetAvatar(long id);
 
         /// <summary>
         /// Set avatar for a user. Warning: This method does not check the user existence.
@@ -74,7 +53,9 @@ namespace Timeline.Services
         /// <returns>The etag of the avatar.</returns>
         /// <exception cref="ArgumentException">Thrown if any field in <paramref name="avatar"/> is null when <paramref name="avatar"/> is not null.</exception>
         /// <exception cref="ImageException">Thrown if avatar is of bad format.</exception>
-        Task<string> SetAvatar(long id, Avatar? avatar);
+        Task<string> SetAvatar(long id, ByteData avatar);
+
+        Task DeleteAvatar(long id);
     }
 
     // TODO! : Make this configurable.

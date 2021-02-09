@@ -17,6 +17,7 @@
             public static class Header
             {
                 public const int IfNonMatch_BadFormat = 1_000_01_01;
+                public const int IfModifiedSince_BadFormat = 1_000_01_02;
             }
 
             public static class Content
