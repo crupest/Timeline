@@ -20,7 +20,7 @@ namespace Timeline.Migrations
 
             migrationBuilder.Sql($@"
 UPDATE timeline_posts
-SET content_type = '{TimelinePostDataKind.Text}';
+SET content_type = 'text';
             ");
         }
 

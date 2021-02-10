@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 using Timeline.Filters;
-using Timeline.Helpers;
+using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
 using Timeline.Services;
-using Timeline.Services.Exceptions;
 
 namespace Timeline.Controllers
 {
@@ -21,6 +21,8 @@ namespace Timeline.Controllers
     [ApiController]
     [Route("timelines/{timeline}/posts")]
     [CatchTimelineNotExistException]
+    [CatchTimelinePostNotExistException]
+    [CatchTimelinePostDataNotExistException]
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TimelinePostController : Controller
     {
@@ -86,16 +88,27 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            try
-            {
-                var post = await _postService.GetPost(timelineId, postId);
-                var result = await _timelineMapper.MapToHttp(post, timeline, Url);
-                return result;
-            }
-            catch (TimelinePostNotExistException)
-            {
-                return NotFound(ErrorResponse.TimelineController.PostNotExist());
-            }
+            var post = await _postService.GetPost(timelineId, postId);
+            var result = await _timelineMapper.MapToHttp(post, timeline, Url);
+            return result;
+        }
+
+        /// <summary>
+        /// Get the first data of a post.
+        /// </summary>
+        /// <param name="timeline">Timeline name.</param>
+        /// <param name="post">The id of the post.</param>
+        /// <returns>The data.</returns>
+        [HttpGet("{post}/data")]
+        [Produces(MimeTypes.ImagePng, MimeTypes.ImageJpeg, MimeTypes.ImageGif, MimeTypes.ImageWebp, MimeTypes.TextPlain, MimeTypes.TextMarkdown, MimeTypes.TextPlain, MimeTypes.ApplicationJson)]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ByteData>> DataIndexGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post)
+        {
+            return await DataGet(timeline, post, 0);
         }
 
         /// <summary>
@@ -103,19 +116,17 @@ namespace Timeline.Controllers
         /// </summary>
         /// <param name="timeline">Timeline name.</param>
         /// <param name="post">The id of the post.</param>
-        /// <param name="ifNoneMatch">If-None-Match header.</param>
+        /// <param name="dataIndex">Index of the data.</param>
         /// <returns>The data.</returns>
-        [HttpGet("{post}/data")]
-        [Produces("image/png", "image/jpeg", "image/gif", "image/webp", "application/json", "text/json")]
+        [HttpGet("{post}/data/{data_index}")]
+        [Produces(MimeTypes.ImagePng, MimeTypes.ImageJpeg, MimeTypes.ImageGif, MimeTypes.ImageWebp, MimeTypes.TextPlain, MimeTypes.TextMarkdown, MimeTypes.TextPlain, MimeTypes.ApplicationJson)]
         [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DataIndexGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
+        public async Task<ActionResult> DataGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromRoute(Name = "data_index")][Range(0, 100)] long dataIndex)
         {
-            _ = ifNoneMatch;
-
             var timelineId = await _timelineService.GetTimelineIdByName(timeline);
 
             if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermission(timelineId, this.GetOptionalUserId()))
@@ -123,38 +134,10 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            try
-            {
-                return await DataCacheHelper.GenerateActionResult(this,
-                    () => _postService.GetPostDataETag(timelineId, post),
-                    async () => await _postService.GetPostData(timelineId, post));
-            }
-            catch (TimelinePostNotExistException)
-            {
-                return NotFound(ErrorResponse.TimelineController.PostNotExist());
-            }
-            catch (TimelinePostNoDataException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.PostNoData());
-            }
-        }
-
-        /// <summary>
-        /// Get the data of a post. Usually a image post.
-        /// </summary>
-        /// <param name="timeline">Timeline name.</param>
-        /// <param name="post">The id of the post.</param>
-        /// <param name="ifNoneMatch">If-None-Match header.</param>
-        /// <returns>The data.</returns>
-        [HttpGet("{post}/data/{data_index}")]
-        [Produces("image/png", "image/jpeg", "image/gif", "image/webp", "application/json", "text/json")]
-        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DataGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
-        {
+            return await DataCacheHelper.GenerateActionResult(this,
+                () => _postService.GetPostDataDigest(timelineId, post, dataIndex),
+                () => _postService.GetPostData(timelineId, post, dataIndex)
+            );
         }
 
         /// <summary>
@@ -179,50 +162,36 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var requestContent = body.Content;
-
-            TimelinePostCreateRequestData createContent;
-
-            switch (requestContent.Type)
+            var createRequest = new TimelinePostCreateRequest()
             {
-                case TimelinePostDataKind.Text:
-                    if (requestContent.Text is null)
-                    {
-                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_TextContentTextRequired));
-                    }
-                    createContent = new TimelinePostCreateRequestTextContent(requestContent.Text);
-                    break;
-                case TimelinePostDataKind.Image:
-                    if (requestContent.Data is null)
-                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataRequired));
+                Time = body.Time,
+                Color = body.Color
+            };
 
-                    // decode base64
-                    byte[] data;
-                    try
-                    {
-                        data = Convert.FromBase64String(requestContent.Data);
-                    }
-                    catch (FormatException)
-                    {
-                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotBase64));
-                    }
-
-                    createContent = new TimelinePostCreateRequestImageData(data);
-                    break;
-                default:
-                    return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ContentUnknownType));
-
+            for (int i = 0; i < body.DataList.Count; i++)
+            {
+                var data = body.DataList[i];
+                try
+                {
+                    var d = Convert.FromBase64String(data.Data);
+                    createRequest.DataList.Add(new TimelinePostCreateRequestData(data.ContentType, d));
+                }
+                catch (FormatException)
+                {
+                    return BadRequest(new CommonResponse(ErrorCodes.Common.InvalidModel, $"Data at index {i} is not a valid base64 string."));
+                }
             }
+
 
             try
             {
-                var post = await _postService.CreatePost(timelineId, userId, new TimelinePostCreateRequest(createContent) { Time = body.Time, Color = body.Color });
+                var post = await _postService.CreatePost(timelineId, userId, createRequest);
                 var result = await _timelineMapper.MapToHttp(post, timeline, Url);
                 return result;
             }
-            catch (ImageException)
+            catch (TimelinePostCreateDataException e)
             {
-                return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_ImageContentDataNotImage));
+                return BadRequest(new CommonResponse(ErrorCodes.Common.InvalidModel, $"Data at index {e.Index} is invalid. {e.Message}"));
             }
         }
 
@@ -243,21 +212,15 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByName(timeline);
 
-            try
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(timelineId, post, this.GetUserId(), true))
             {
-                if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(timelineId, post, this.GetUserId(), true))
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
-                }
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+            }
 
-                var entity = await _postService.PatchPost(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
-                var result = await _timelineMapper.MapToHttp(entity, timeline, Url);
-                return Ok(result);
-            }
-            catch (TimelinePostNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.PostNotExist());
-            }
+            var entity = await _postService.PatchPost(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
+            var result = await _timelineMapper.MapToHttp(entity, timeline, Url);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -276,19 +239,14 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByName(timeline);
 
-            try
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(timelineId, post, this.GetUserId(), true))
             {
-                if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(timelineId, post, this.GetUserId(), true))
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
-                }
-                await _postService.DeletePost(timelineId, post);
-                return Ok();
+                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
-            catch (TimelinePostNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.PostNotExist());
-            }
+
+            await _postService.DeletePost(timelineId, post);
+
+            return Ok();
         }
     }
 }
