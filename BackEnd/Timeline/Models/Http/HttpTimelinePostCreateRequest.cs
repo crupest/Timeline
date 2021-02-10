@@ -5,22 +5,6 @@ using Timeline.Models.Validation;
 
 namespace Timeline.Models.Http
 {
-    public class HttpTimelinePostCreateRequestData
-    {
-        /// <summary>
-        /// Kind of the data.
-        /// </summary>
-        [Required]
-        [TimelinePostDataKind]
-        public string Kind { get; set; } = default!;
-
-        /// <summary>
-        /// The true data. If kind is text or markdown, this is a string. If kind is image, this is base64 of data.
-        /// </summary>
-        [Required]
-        public string Data { get; set; } = default!;
-    }
-
     public class HttpTimelinePostCreateRequest
     {
         /// <summary>
@@ -28,6 +12,7 @@ namespace Timeline.Models.Http
         /// </summary>
         [Required]
         [MinLength(1)]
+        [MaxLength(100)]
         public List<HttpTimelinePostCreateRequestData> DataList { get; set; } = default!;
 
         /// <summary>

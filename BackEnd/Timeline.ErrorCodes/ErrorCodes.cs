@@ -61,7 +61,7 @@
             public const int NotExist = 1_104_02_01;
             public const int QueryRelateNotExist = 1_104_04_01;
             public const int PostNotExist = 1_104_05_01;
-            public const int PostNoData = 1_104_05_02;
+            public const int PostDataNotExist = 1_104_05_02;
         }
 
         public static class HighlightTimelineController

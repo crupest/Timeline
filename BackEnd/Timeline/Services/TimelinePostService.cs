@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
+using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Validation;
 using Timeline.Services.Exceptions;
@@ -14,49 +15,15 @@ using static Timeline.Resources.Services.TimelineService;
 
 namespace Timeline.Services
 {
-    public class TimelinePostDataDigest
-    {
-        public TimelinePostDataDigest(string kind, string eTag, DateTime lastModified)
-        {
-            Kind = kind;
-            ETag = eTag;
-            LastModified = lastModified;
-        }
-
-        public string Kind { get; set; }
-        public string ETag { get; set; }
-        public DateTime LastModified { get; set; }
-    }
-
-    public class TimelinePostData
-    {
-        public TimelinePostData(string kind, byte[] data, string eTag, DateTime lastModified)
-        {
-            Kind = kind;
-            Data = data;
-            ETag = eTag;
-            LastModified = lastModified;
-        }
-
-        public string Kind { get; set; }
-
-#pragma warning disable CA1819 // Properties should not return arrays
-        public byte[] Data { get; set; }
-#pragma warning restore CA1819 // Properties should not return arrays
-
-        public string ETag { get; set; }
-        public DateTime LastModified { get; set; }
-    }
-
     public class TimelinePostCreateRequestData
     {
-        public TimelinePostCreateRequestData(string kind, byte[] data)
+        public TimelinePostCreateRequestData(string contentType, byte[] data)
         {
-            Kind = kind;
+            ContentType = contentType;
             Data = data;
         }
 
-        public string Kind { get; set; }
+        public string ContentType { get; set; }
 #pragma warning disable CA1819 // Properties should not return arrays
         public byte[] Data { get; set; }
 #pragma warning restore CA1819 // Properties should not return arrays
@@ -69,14 +36,13 @@ namespace Timeline.Services
         /// <summary>If not set, current time is used.</summary>
         public DateTime? Time { get; set; }
 
-        public List<TimelinePostCreateRequestData> Content { get; set; } = new List<TimelinePostCreateRequestData>();
+        public List<TimelinePostCreateRequestData> DataList { get; set; } = new List<TimelinePostCreateRequestData>();
     }
 
     public class TimelinePostPatchRequest
     {
         public string? Color { get; set; }
         public DateTime? Time { get; set; }
-        public List<TimelinePostCreateRequestData?>? Content { get; set; }
     }
 
     public interface ITimelinePostService
@@ -102,18 +68,29 @@ namespace Timeline.Services
         /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
         Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDelete = false);
 
-        Task<TimelinePostDataDigest> GetPostDataDigest(long timelineId, long postId, long dataIndex);
+        /// <summary>
+        /// Get the data digest of a post.
+        /// </summary>
+        /// <param name="timelineId">The timeline id.</param>
+        /// <param name="postId">The post id.</param>
+        /// <param name="dataIndex">The index of the data.</param>
+        /// <returns>The data digest.</returns>
+        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
+        /// <exception cref="TimelinePostDataNotExistException">Thrown when data of that index does not exist.</exception>
+        Task<ICacheableDataDigest> GetPostDataDigest(long timelineId, long postId, long dataIndex);
 
         /// <summary>
         /// Get the data of a post.
         /// </summary>
-        /// <param name="timelineId">The id of the timeline of the post.</param>
-        /// <param name="postId">The id of the post.</param>
-        /// <returns>The etag of the data.</returns>
+        /// <param name="timelineId">The timeline id.</param>
+        /// <param name="postId">The post id.</param>
+        /// <param name="dataIndex">The index of the data.</param>
+        /// <returns>The data.</returns>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
-        /// <exception cref="TimelinePostNoDataException">Thrown when post has no data.</exception>
-        Task<TimelinePostData> GetPostData(long timelineId, long postId, long dataIndex);
+        /// <exception cref="TimelinePostDataNotExistException">Thrown when data of that index does not exist.</exception>
+        Task<ByteData> GetPostData(long timelineId, long postId, long dataIndex);
 
         /// <summary>
         /// Create a new post in timeline.
@@ -140,7 +117,6 @@ namespace Timeline.Services
         /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="TimelinePostNotExistException">Thrown when post does not exist.</exception>
-        /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
         Task<TimelinePostEntity> PatchPost(long timelineId, long postId, TimelinePostPatchRequest request);
 
         /// <summary>
