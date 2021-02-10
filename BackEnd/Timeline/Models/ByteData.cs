@@ -1,4 +1,5 @@
-﻿using NSwag.Annotations;
+﻿using System;
+using NSwag.Annotations;
 
 namespace Timeline.Models
 {
@@ -14,6 +15,11 @@ namespace Timeline.Models
         /// <param name="contentType">The content type.</param>
         public ByteData(byte[] data, string contentType)
         {
+            if (data is null)
+                throw new ArgumentNullException(nameof(data));
+            if (contentType is null)
+                throw new ArgumentNullException(nameof(contentType));
+
             Data = data;
             ContentType = contentType;
         }

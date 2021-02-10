@@ -2,7 +2,7 @@ using System;
 
 namespace Timeline.Helpers.Cache
 {
-    public class CacheableDataDigest
+    public class CacheableDataDigest : ICacheableDataDigest
     {
         public CacheableDataDigest(string eTag, DateTime lastModified)
         {

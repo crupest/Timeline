@@ -29,6 +29,14 @@ namespace Timeline.Services
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
         Task<long> GetUserIdByUsername(string username);
+
+        /// <summary>
+        /// Get the username modified time of a user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <returns>The time.</returns>
+        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        Task<DateTime> GetUsernameLastModifiedTime(long userId);
     }
 
     public class BasicUserService : IBasicUserService
@@ -61,6 +69,27 @@ namespace Timeline.Services
                 throw new UserNotExistException(username);
 
             return entity.Id;
+        }
+
+        public async Task<DateTime> GetUsernameLastModifiedTime(long userId)
+        {
+            var entity = await _database.Users.Where(u => u.Id == userId).Select(u => new { u.UsernameChangeTime }).SingleOrDefaultAsync();
+
+            if (entity is null)
+                throw new UserNotExistException(userId);
+
+            return entity.UsernameChangeTime;
+        }
+    }
+
+    public static class BasicUserServiceExtensions
+    {
+        public static async Task ThrowIfUserNotExist(this IBasicUserService service, long userId)
+        {
+            if (!await service.CheckUserExistence(userId))
+            {
+                throw new UserNotExistException(userId);
+            }
         }
     }
 }
