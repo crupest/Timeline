@@ -38,13 +38,12 @@ namespace Timeline.Services
         public Task FreeEntry(string tag);
 
         /// <summary>
-        /// Retrieve the entry with given tag.
+        /// Retrieve the entry with given tag. If not exist, returns null.
         /// </summary>
         /// <param name="tag">The tag of the entry.</param>
-        /// <returns>The data of the entry.</returns>
+        /// <returns>The data of the entry. If not exist, returns null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="tag"/> is null.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when entry with given tag does not exist.</exception>
-        public Task<byte[]> GetEntry(string tag);
+        public Task<byte[]?> GetEntry(string tag);
     }
 
     public class DataManager : IDataManager
@@ -106,17 +105,31 @@ namespace Timeline.Services
             }
         }
 
-        public async Task<byte[]> GetEntry(string tag)
+        public async Task<byte[]?> GetEntry(string tag)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
 
             var entity = await _database.Data.Where(d => d.Tag == tag).Select(d => new { d.Data }).SingleOrDefaultAsync();
 
-            if (entity == null)
-                throw new InvalidOperationException(Resources.Services.DataManager.ExceptionEntryNotExist);
+            if (entity is null)
+                return null;
 
             return entity.Data;
+        }
+    }
+
+    public static class DataManagerExtensions
+    {
+        /// <summary>
+        /// Try to get an entry and throw <see cref="DatabaseCorruptedException"/> if not exist.
+        /// </summary>
+        public static async Task<byte[]> GetEntryAndCheck(this IDataManager dataManager, string tag, string notExistMessage)
+        {
+            var data = await dataManager.GetEntry(tag);
+            if (data is null)
+                throw new DatabaseCorruptedException($"Can't get data of tag {tag}. {notExistMessage}");
+            return data;
         }
     }
 }
