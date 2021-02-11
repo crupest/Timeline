@@ -22,20 +22,22 @@ namespace Timeline.Services
         /// increases its ref count and returns a tag to the entry.
         /// </summary>
         /// <param name="data">The data. Can't be null.</param>
+        /// <param name="saveDatabaseChange">If true save database change. Otherwise it does not save database change.</param>
         /// <returns>The tag of the created entry.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
-        public Task<string> RetainEntry(byte[] data);
+        public Task<string> RetainEntry(byte[] data, bool saveDatabaseChange = true);
 
         /// <summary>
         /// Decrease the the ref count of the entry.
         /// Remove it if ref count is zero.
         /// </summary>
         /// <param name="tag">The tag of the entry.</param>
+        /// <param name="saveDatabaseChange">If true save database change. Otherwise it does not save database change.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="tag"/> is null.</exception>
         /// <remarks>
         /// It's no-op if entry with tag does not exist.
         /// </remarks>
-        public Task FreeEntry(string tag);
+        public Task FreeEntry(string tag, bool saveDatabaseChange = true);
 
         /// <summary>
         /// Retrieve the entry with given tag. If not exist, returns null.
@@ -57,7 +59,7 @@ namespace Timeline.Services
             _eTagGenerator = eTagGenerator;
         }
 
-        public async Task<string> RetainEntry(byte[] data)
+        public async Task<string> RetainEntry(byte[] data, bool saveDatabaseChange = true)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -80,11 +82,14 @@ namespace Timeline.Services
             {
                 entity.Ref += 1;
             }
-            await _database.SaveChangesAsync();
+
+            if (saveDatabaseChange)
+                await _database.SaveChangesAsync();
+
             return tag;
         }
 
-        public async Task FreeEntry(string tag)
+        public async Task FreeEntry(string tag, bool saveDatabaseChange)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
@@ -101,7 +106,9 @@ namespace Timeline.Services
                 {
                     entity.Ref -= 1;
                 }
-                await _database.SaveChangesAsync();
+
+                if (saveDatabaseChange)
+                    await _database.SaveChangesAsync();
             }
         }
 

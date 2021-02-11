@@ -10,11 +10,12 @@ namespace Timeline.Entities
         [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [Required]
         [Column("post")]
         public long PostId { get; set; }
 
         [ForeignKey(nameof(PostId))]
-        public TimelinePostEntity Timeline { get; set; } = default!;
+        public TimelinePostEntity Post { get; set; } = default!;
 
         [Column("index")]
         public long Index { get; set; }
