@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,6 @@ using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Validation;
 using Timeline.Services.Exceptions;
-using static Timeline.Resources.Services.TimelineService;
 
 namespace Timeline.Services
 {
@@ -37,7 +35,9 @@ namespace Timeline.Services
         /// <summary>If not set, current time is used.</summary>
         public DateTime? Time { get; set; }
 
+#pragma warning disable CA2227
         public List<TimelinePostCreateRequestData> DataList { get; set; } = new List<TimelinePostCreateRequestData>();
+#pragma warning restore CA2227
     }
 
     public class TimelinePostPatchRequest

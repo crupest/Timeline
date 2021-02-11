@@ -11,8 +11,8 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Timeline.Models;
 using Timeline.Models.Http;
-using Timeline.Services;
 using Timeline.Tests.Helpers;
 using Xunit;
 
@@ -23,11 +23,10 @@ namespace Timeline.Tests.IntegratedTests
         [Fact]
         public async Task Test()
         {
-            Avatar mockAvatar = new Avatar
-            {
-                Data = ImageHelper.CreatePngWithSize(100, 100),
-                Type = PngFormat.Instance.DefaultMimeType
-            };
+            ByteData mockAvatar = new ByteData(
+                ImageHelper.CreatePngWithSize(100, 100),
+                PngFormat.Instance.DefaultMimeType
+            );
 
             using (var client = await CreateClientAsUser())
             {
@@ -106,7 +105,7 @@ namespace Timeline.Tests.IntegratedTests
                 }
 
                 {
-                    await client.TestPutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.Type);
+                    await client.TestPutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.ContentType);
                     await TestAvatar("user1", mockAvatar.Data);
                 }
 
@@ -137,7 +136,7 @@ namespace Timeline.Tests.IntegratedTests
             // Authorization check.
             using (var client = await CreateClientAsAdministrator())
             {
-                await client.TestPutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.Type);
+                await client.TestPutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.ContentType);
                 await client.TestDeleteAsync("users/user1/avatar");
                 await client.TestPutByteArrayAssertErrorAsync("users/usernotexist/avatar", new[] { (byte)0x00 }, "image/png", errorCode: ErrorCodes.UserCommon.NotExist);
                 await client.TestDeleteAssertErrorAsync("users/usernotexist/avatar", errorCode: ErrorCodes.UserCommon.NotExist);
