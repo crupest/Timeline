@@ -4,6 +4,7 @@ using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers;
@@ -62,11 +63,11 @@ namespace Timeline.Services
         /// </summary>
         /// <param name="timelineId">The id of the timeline of the post.</param>
         /// <param name="postId">The id of the post.</param>
-        /// <param name="includeDelete">If true, return the entity even if it is deleted.</param>
+        /// <param name="includeDeleted">If true, return the entity even if it is deleted.</param>
         /// <returns>The post.</returns>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
-        Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDelete = false);
+        Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDeleted = false);
 
         /// <summary>
         /// Get the data digest of a post.
@@ -201,7 +202,7 @@ namespace Timeline.Services
 
             if (!includeDeleted)
             {
-                query = query.Where(p => p.Content != null);
+                query = query.Where(p => !p.Deleted);
             }
 
             if (modifiedSince.HasValue)
@@ -214,7 +215,7 @@ namespace Timeline.Services
             return await query.ToListAsync();
         }
 
-        public async Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDelete = false)
+        public async Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDeleted = false)
         {
             await CheckTimelineExistence(timelineId);
 
@@ -225,7 +226,7 @@ namespace Timeline.Services
                 throw new TimelinePostNotExistException(timelineId, postId, false);
             }
 
-            if (!includeDelete && post.Content is null)
+            if (!includeDeleted && post.Deleted)
             {
                 throw new TimelinePostNotExistException(timelineId, postId, true);
             }
@@ -233,99 +234,46 @@ namespace Timeline.Services
             return post;
         }
 
-        public async Task<string> GetPostDataETag(long timelineId, long postId)
+        public async Task<ICacheableDataDigest> GetPostDataDigest(long timelineId, long postId, long dataIndex)
         {
             await CheckTimelineExistence(timelineId);
 
-            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
 
-            if (postEntity == null)
+            if (postEntity is null)
                 throw new TimelinePostNotExistException(timelineId, postId, false);
 
-            if (postEntity.Content == null)
+            if (postEntity.Deleted)
                 throw new TimelinePostNotExistException(timelineId, postId, true);
 
-            if (postEntity.ContentType != TimelinePostDataKind.Image)
-                throw new TimelinePostNoDataException(ExceptionGetDataNonImagePost);
+            var dataEntity = await _database.TimelinePostData.Where(d => d.PostId == postEntity.Id && d.Index == dataIndex).SingleOrDefaultAsync();
 
-            var tag = postEntity.Content;
+            if (dataEntity is null)
+                throw new TimelinePostDataNotExistException(timelineId, postId, dataIndex);
 
-            return tag;
+            return new CacheableDataDigest(dataEntity.DataTag, dataEntity.LastUpdated);
         }
 
-        public async Task<TimelinePostData> GetPostData(long timelineId, long postId)
+        public async Task<ByteData> GetPostData(long timelineId, long postId, long dataIndex)
         {
             await CheckTimelineExistence(timelineId);
 
-            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
 
-            if (postEntity == null)
+            if (postEntity is null)
                 throw new TimelinePostNotExistException(timelineId, postId, false);
 
-            if (postEntity.Content == null)
+            if (postEntity.Deleted)
                 throw new TimelinePostNotExistException(timelineId, postId, true);
 
-            if (postEntity.ContentType != TimelinePostDataKind.Image)
-                throw new TimelinePostNoDataException(ExceptionGetDataNonImagePost);
+            var dataEntity = await _database.TimelinePostData.Where(d => d.PostId == postEntity.Id && d.Index == dataIndex).SingleOrDefaultAsync();
 
-            var tag = postEntity.Content;
+            if (dataEntity is null)
+                throw new TimelinePostDataNotExistException(timelineId, postId, dataIndex);
 
-            byte[] data;
+            var data = await _dataManager.GetEntryAndCheck(dataEntity.DataTag, $"Timeline {timelineId}, post {postId}, data {dataIndex} requires this data.");
 
-            try
-            {
-                data = await _dataManager.GetEntry(tag);
-            }
-            catch (InvalidOperationException e)
-            {
-                throw new DatabaseCorruptedException(ExceptionGetDataDataEntryNotExist, e);
-            }
-
-            if (postEntity.ExtraContent == null)
-            {
-                _logger.LogWarning(LogGetDataNoFormat);
-                var format = Image.DetectFormat(data);
-                postEntity.ExtraContent = format.DefaultMimeType;
-                await _database.SaveChangesAsync();
-            }
-
-            return new TimelinePostData
-            {
-                Data = data,
-                Type = postEntity.ExtraContent,
-                ETag = tag,
-                LastModified = postEntity.LastUpdated
-            };
-        }
-
-        private async Task SaveContent(TimelinePostEntity entity, TimelinePostCreateRequestData content)
-        {
-            switch (content)
-            {
-                case TimelinePostCreateRequestTextData c:
-                    entity.ContentType = c.Kind;
-                    entity.Content = c.Data;
-                    break;
-                case TimelinePostCreateRequestImageData c:
-                    var imageFormat = await _imageValidator.Validate(c.Data);
-                    var imageFormatText = imageFormat.DefaultMimeType;
-
-                    var tag = await _dataManager.RetainEntry(c.Data);
-
-                    entity.ContentType = content.Kind;
-                    entity.Content = tag;
-                    entity.ExtraContent = imageFormatText;
-                    break;
-                default:
-                    throw new ArgumentException("Unknown content type.", nameof(content));
-            };
-        }
-
-        private async Task CleanContent(TimelinePostEntity entity)
-        {
-            if (entity.Content is not null && entity.ContentType == TimelinePostDataKind.Image)
-                await _dataManager.FreeEntry(entity.Content);
-            entity.Content = null;
+            return new ByteData(data, dataEntity.Kind);
         }
 
         public async Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request)
@@ -333,13 +281,53 @@ namespace Timeline.Services
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
-
-            if (request.Content is null)
-                throw new ArgumentException("Content is null.", nameof(request));
-
             {
                 if (!_colorValidator.Validate(request.Color, out var message))
                     throw new ArgumentException("Color is not valid.", nameof(request));
+            }
+
+            if (request.DataList is null)
+                throw new ArgumentException("Data list can't be null.", nameof(request));
+
+            if (request.DataList.Count == 0)
+                throw new ArgumentException("Data list can't be empty.", nameof(request));
+
+            if (request.DataList.Count > 100)
+                throw new ArgumentException("Data list count can't be bigger than 100.", nameof(request));
+
+            for (int index = 0; index < request.DataList.Count; index++)
+            {
+                var data = request.DataList[index];
+
+                switch (data.ContentType)
+                {
+                    case MimeTypes.ImageGif:
+                    case MimeTypes.ImageJpeg:
+                    case MimeTypes.ImagePng:
+                    case MimeTypes.ImageWebp:
+                        try
+                        {
+                            await _imageValidator.Validate(data.Data, data.ContentType);
+                        }
+                        catch (ImageException e)
+                        {
+                            throw new TimelinePostCreateDataException(index, "Image validation failed.", e);
+                        }
+                        break;
+                    case MimeTypes.TextPlain:
+                    case MimeTypes.TextMarkdown:
+                        try
+                        {
+                            new UTF8Encoding(false, true).GetString(data.Data);
+                        }
+                        catch (DecoderFallbackException e)
+                        {
+                            throw new TimelinePostCreateDataException(index, "Text is not a valid utf-8 sequence.", e);
+                        }
+                        break;
+                    default:
+                        throw new TimelinePostCreateDataException(index, "Unsupported content type.");
+                }
             }
 
             request.Time = request.Time?.MyToUtc();
@@ -361,13 +349,29 @@ namespace Timeline.Services
                 Color = request.Color
             };
 
-            await SaveContent(postEntity, request.Content);
-
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).SingleAsync();
             timelineEntity.CurrentPostLocalId += 1;
             postEntity.LocalId = timelineEntity.CurrentPostLocalId;
-
             _database.TimelinePosts.Add(postEntity);
+            await _database.SaveChangesAsync();
+
+            List<string> dataTags = new List<string>();
+
+            for (int index = 0; index < request.DataList.Count; index++)
+            {
+                var data = request.DataList[index];
+
+                var tag = await _dataManager.RetainEntry(data.Data, false);
+
+                _database.TimelinePostData.Add(new TimelinePostDataEntity
+                {
+                    DataTag = tag,
+                    Kind = data.ContentType,
+                    Index = index,
+                    PostId = postEntity.Id,
+                    LastUpdated = currentTime,
+                });
+            }
 
             await _database.SaveChangesAsync();
 
@@ -392,12 +396,10 @@ namespace Timeline.Services
 
             var entity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
-            await using var transaction = await _database.Database.BeginTransactionAsync();
-
             if (entity is null)
                 throw new TimelinePostNotExistException(timelineId, postId, false);
 
-            if (entity.Content is null)
+            if (entity.Deleted)
                 throw new TimelinePostNotExistException(timelineId, postId, true);
 
             if (request.Time.HasValue)
@@ -406,17 +408,9 @@ namespace Timeline.Services
             if (request.Color is not null)
                 entity.Color = request.Color;
 
-            if (request.Content is not null)
-            {
-                await CleanContent(entity);
-                await SaveContent(entity, request.Content);
-            }
-
             entity.LastUpdated = _clock.GetCurrentTime();
 
             await _database.SaveChangesAsync();
-
-            await transaction.CommitAsync();
 
             return entity;
         }
@@ -430,14 +424,22 @@ namespace Timeline.Services
             if (entity == null)
                 throw new TimelinePostNotExistException(timelineId, postId, false);
 
-            if (entity.Content == null)
+            if (entity.Deleted)
                 throw new TimelinePostNotExistException(timelineId, postId, true);
 
             await using var transaction = await _database.Database.BeginTransactionAsync();
 
-            await CleanContent(entity);
-
+            entity.Deleted = true;
             entity.LastUpdated = _clock.GetCurrentTime();
+
+            var dataEntities = await _database.TimelinePostData.Where(d => d.PostId == entity.Id).ToListAsync();
+
+            foreach (var dataEntity in dataEntities)
+            {
+                await _dataManager.FreeEntry(dataEntity.DataTag, false);
+            }
+
+            _database.TimelinePostData.RemoveRange(dataEntities);
 
             await _database.SaveChangesAsync();
 
@@ -446,30 +448,11 @@ namespace Timeline.Services
 
         public async Task DeleteAllPostsOfUser(long userId)
         {
-            var posts = await _database.TimelinePosts.Where(p => p.AuthorId == userId).ToListAsync();
+            var postEntities = await _database.TimelinePosts.Where(p => p.AuthorId == userId).Select(p => new { p.TimelineId, p.LocalId }).ToListAsync();
 
-            var now = _clock.GetCurrentTime();
-
-            var dataTags = new List<string>();
-
-            foreach (var post in posts)
+            foreach (var postEntity in postEntities)
             {
-                if (post.Content != null)
-                {
-                    if (post.ContentType == TimelinePostDataKind.Image)
-                    {
-                        dataTags.Add(post.Content);
-                    }
-                    post.Content = null;
-                }
-                post.LastUpdated = now;
-            }
-
-            await _database.SaveChangesAsync();
-
-            foreach (var dataTag in dataTags)
-            {
-                await _dataManager.FreeEntry(dataTag);
+                await this.DeletePost(postEntity.TimelineId, postEntity.LocalId);
             }
         }
 
@@ -479,9 +462,9 @@ namespace Timeline.Services
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
-            var postEntity = await _database.TimelinePosts.Where(p => p.Id == postId).Select(p => new { p.Content, p.AuthorId }).SingleOrDefaultAsync();
+            var postEntity = await _database.TimelinePosts.Where(p => p.Id == postId).Select(p => new { p.Deleted, p.AuthorId }).SingleOrDefaultAsync();
 
-            if (postEntity == null)
+            if (postEntity is null)
             {
                 if (throwOnPostNotExist)
                     throw new TimelinePostNotExistException(timelineId, postId, false);
@@ -489,7 +472,7 @@ namespace Timeline.Services
                     return true;
             }
 
-            if (postEntity.Content == null && throwOnPostNotExist)
+            if (postEntity.Deleted && throwOnPostNotExist)
             {
                 throw new TimelinePostNotExistException(timelineId, postId, true);
             }
