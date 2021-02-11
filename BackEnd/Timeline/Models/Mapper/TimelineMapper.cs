@@ -66,6 +66,8 @@ namespace Timeline.Models.Mapper
 
         public async Task<HttpTimelinePost> MapToHttp(TimelinePostEntity entity, string timelineName, IUrlHelper urlHelper)
         {
+            _ = timelineName;
+
             await _database.Entry(entity).Collection(p => p.DataList).LoadAsync();
             await _database.Entry(entity).Reference(e => e.Author).LoadAsync();
 

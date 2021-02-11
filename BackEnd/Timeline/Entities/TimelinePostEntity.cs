@@ -37,6 +37,8 @@ namespace Timeline.Entities
         [Column("last_updated")]
         public DateTime LastUpdated { get; set; }
 
+#pragma warning disable CA2227
         public List<TimelinePostDataEntity> DataList { get; set; } = default!;
+#pragma warning restore CA2227
     }
 }

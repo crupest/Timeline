@@ -13,7 +13,9 @@ namespace Timeline.Models.Http
         [Required]
         [MinLength(1)]
         [MaxLength(100)]
+#pragma warning disable CA2227
         public List<HttpTimelinePostCreateRequestData> DataList { get; set; } = default!;
+#pragma warning restore CA2227
 
         /// <summary>
         /// Time of the post. If not set, current time will be used.

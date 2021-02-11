@@ -44,6 +44,12 @@ namespace Timeline.Formatters
 
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ByteDataInputFormatter>>();
 
+            if (request.ContentType is null)
+            {
+                logger.LogInformation("Failed to read body as bytes. Content-Type is not set.");
+                return await InputFormatterResult.FailureAsync();
+            }
+
             if (contentLength == null)
             {
                 logger.LogInformation("Failed to read body as bytes. Content-Length is not set.");

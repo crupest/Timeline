@@ -26,7 +26,12 @@ namespace Timeline.Models.Http
         /// Post id.
         /// </summary>
         public long Id { get; set; }
+        /// <summary>
+        /// The data list.
+        /// </summary>
+#pragma warning disable CA2227
         public List<HttpTimelinePostDataDigest> DataList { get; set; } = default!;
+#pragma warning restore CA2227
         /// <summary>
         /// True if post is deleted.
         /// </summary>

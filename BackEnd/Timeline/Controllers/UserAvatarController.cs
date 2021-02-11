@@ -102,12 +102,12 @@ namespace Timeline.Controllers
 
             try
             {
-                var etag = await _service.SetAvatar(id, body);
+                var digest = await _service.SetAvatar(id, body);
 
                 _logger.LogInformation(Log.Format(LogPutSuccess,
                     ("Username", username), ("Mime Type", Request.ContentType)));
 
-                Response.Headers.Append("ETag", new EntityTagHeaderValue($"\"{etag}\"").ToString());
+                Response.Headers.Append("ETag", new EntityTagHeaderValue($"\"{digest.ETag}\"").ToString());
 
                 return Ok();
             }
