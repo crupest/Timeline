@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Models.Http;
+using Timeline.Tests.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -342,6 +343,147 @@ namespace Timeline.Tests.IntegratedTests
             var post3 = await client.TestGetAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}");
             post3.Time.Should().Be(date);
             post3.Color.Should().Be("#aabbcc");
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task CreatePost_InvalidModel(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest { DataList = null! }
+            );
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest { DataList = new List<HttpTimelinePostCreateRequestData>() }
+            );
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = Enumerable.Repeat(new HttpTimelinePostCreateRequestData
+                    {
+                        ContentType = "text/plain",
+                        Data = Convert.ToBase64String(Encoding.UTF8.GetBytes("a"))
+                    }, 200).ToList()
+                }
+            );
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>()
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = null!,
+                            Data = Convert.ToBase64String(Encoding.UTF8.GetBytes("a"))
+                        }
+                    }
+                }
+            );
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>()
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = "text/plain",
+                            Data = null!
+                        }
+                    }
+                }
+            );
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>()
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = "text/xxxxxxx",
+                            Data = Convert.ToBase64String(Encoding.UTF8.GetBytes("a"))
+                        }
+                    }
+                }
+            );
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>()
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = "text/plain",
+                            Data = "aaa"
+                        }
+                    }
+                }
+            );
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task CreatePost_InvalidModel_NonUtf8(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>()
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = "text/plain",
+                            Data = Convert.ToBase64String(new byte[] {0xE4, 0x1, 0xA0})
+                        }
+                    }
+                }
+            );
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task CreatePost_InvalidModel_Image(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>()
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = "image/jpeg",
+                            Data = Convert.ToBase64String(ImageHelper.CreatePngWithSize(100, 100))
+                        }
+                    }
+                }
+            );
+            await client.TestPostAssertInvalidModelAsync(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>()
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = "image/jpeg",
+                            Data = Convert.ToBase64String(new byte[] { 100, 200 })
+                        }
+                    }
+                }
+            );
         }
     }
 }
