@@ -171,6 +171,10 @@ namespace Timeline.Controllers
             for (int i = 0; i < body.DataList.Count; i++)
             {
                 var data = body.DataList[i];
+
+                if (data is null)
+                    return BadRequest(new CommonResponse(ErrorCodes.Common.InvalidModel, $"Data at index {i} is null."));
+
                 try
                 {
                     var d = Convert.FromBase64String(data.Data);
