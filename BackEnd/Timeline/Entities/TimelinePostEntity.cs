@@ -26,6 +26,16 @@ namespace Timeline.Entities
         [ForeignKey(nameof(AuthorId))]
         public UserEntity? Author { get; set; } = default!;
 
+        [Column("content_type")]
+        public string? ContentType { get; set; }
+
+        [Column("content")]
+        public string? Content { get; set; }
+
+        [Column("extra_content")]
+        public string? ExtraContent { get; set; }
+
+        [Column("deleted")]
         public bool Deleted { get; set; }
 
         [Column("color")]
