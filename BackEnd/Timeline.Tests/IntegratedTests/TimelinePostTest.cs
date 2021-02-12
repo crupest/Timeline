@@ -401,13 +401,7 @@ namespace Timeline.Tests.IntegratedTests
 
             testDataList.AddRange(testData.Select(d => new List<HttpTimelinePostCreateRequestData>() { d! }));
 
-            foreach (var generatorTestData in TimelineNameGeneratorTestData())
-            {
-                var generator = generatorTestData[0];
-
-                foreach (var d in testDataList)
-                    yield return new object?[] { generator, d };
-            }
+            return TimelineNameGeneratorTestData().AppendTestData(testDataList);
         }
 
         [Theory]
