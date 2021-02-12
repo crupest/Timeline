@@ -21,6 +21,7 @@ using Timeline.Models.Converters;
 using Timeline.Models.Mapper;
 using Timeline.Routes;
 using Timeline.Services;
+using Timeline.Services.Migration;
 using Timeline.Swagger;
 
 namespace Timeline
@@ -61,7 +62,7 @@ namespace Timeline
             services.AddControllers(setup =>
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
-                setup.InputFormatters.Add(new BytesInputFormatter());
+                setup.InputFormatters.Add(new ByteDataInputFormatter());
                 setup.Filters.Add(new ConsumesAttribute(MediaTypeNames.Application.Json, "text/json"));
                 setup.Filters.Add(new ProducesAttribute(MediaTypeNames.Application.Json, "text/json"));
                 setup.UseApiRoutePrefix("api");
@@ -86,7 +87,9 @@ namespace Timeline
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddSingleton<IPathProvider, PathProvider>();
+
             services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
+            services.AddCustomMigration();
 
             services.AddAutoMapper(GetType().Assembly);
             services.AddMappers();
