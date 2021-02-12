@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using Timeline.Filters;
 using Timeline.Helpers;
+using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
@@ -63,11 +64,7 @@ namespace Timeline.Controllers
                 return NotFound(ErrorResponse.UserCommon.NotExist());
             }
 
-            return await DataCacheHelper.GenerateActionResult(this, () => _service.GetAvatarETag(id), async () =>
-            {
-                var avatar = await _service.GetAvatar(id);
-                return avatar.ToCacheableData();
-            });
+            return await DataCacheHelper.GenerateActionResult(this, () => _service.GetAvatarDigest(id), () => _service.GetAvatar(id));
         }
 
         /// <summary>
@@ -105,16 +102,12 @@ namespace Timeline.Controllers
 
             try
             {
-                var etag = await _service.SetAvatar(id, new Avatar
-                {
-                    Data = body.Data,
-                    Type = body.ContentType
-                });
+                var digest = await _service.SetAvatar(id, body);
 
                 _logger.LogInformation(Log.Format(LogPutSuccess,
                     ("Username", username), ("Mime Type", Request.ContentType)));
 
-                Response.Headers.Append("ETag", new EntityTagHeaderValue($"\"{etag}\"").ToString());
+                Response.Headers.Append("ETag", $"\"{digest.ETag}\"");
 
                 return Ok();
             }
@@ -166,7 +159,7 @@ namespace Timeline.Controllers
                 return BadRequest(ErrorResponse.UserCommon.NotExist());
             }
 
-            await _service.SetAvatar(id, null);
+            await _service.DeleteAvatar(id);
             return Ok();
         }
     }

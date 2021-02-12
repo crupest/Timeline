@@ -2,34 +2,18 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Helpers;
+using Timeline.Helpers.Cache;
+using Timeline.Models;
 using Timeline.Services.Exceptions;
 
 namespace Timeline.Services
 {
-    public class Avatar
-    {
-        public string Type { get; set; } = default!;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "DTO Object")]
-        public byte[] Data { get; set; } = default!;
-    }
-
-    public class AvatarInfo
-    {
-        public Avatar Avatar { get; set; } = default!;
-        public DateTime LastModified { get; set; }
-
-        public CacheableData ToCacheableData()
-        {
-            return new CacheableData(Avatar.Type, Avatar.Data, LastModified);
-        }
-    }
-
     /// <summary>
     /// Provider for default user avatar.
     /// </summary>
@@ -39,42 +23,53 @@ namespace Timeline.Services
     public interface IDefaultUserAvatarProvider
     {
         /// <summary>
-        /// Get the etag of default avatar.
+        /// Get the digest of default avatar.
         /// </summary>
-        /// <returns></returns>
-        Task<string> GetDefaultAvatarETag();
+        /// <returns>The digest.</returns>
+        Task<ICacheableDataDigest> GetDefaultAvatarDigest();
 
         /// <summary>
         /// Get the default avatar.
         /// </summary>
-        Task<AvatarInfo> GetDefaultAvatar();
+        /// <returns>The avatar.</returns>
+        Task<ByteData> GetDefaultAvatar();
     }
 
     public interface IUserAvatarService
     {
         /// <summary>
-        /// Get the etag of a user's avatar. Warning: This method does not check the user existence.
+        /// Get avatar digest of a user.
         /// </summary>
-        /// <param name="id">The id of the user to get avatar etag of.</param>
-        /// <returns>The etag.</returns>
-        Task<string> GetAvatarETag(long id);
+        /// <param name="userId">User id.</param>
+        /// <returns>The avatar digest.</returns>
+        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        Task<ICacheableDataDigest> GetAvatarDigest(long userId);
 
         /// <summary>
-        /// Get avatar of a user. If the user has no avatar set, a default one is returned. Warning: This method does not check the user existence.
+        /// Get avatar of a user. If the user has no avatar set, a default one is returned.
         /// </summary>
-        /// <param name="id">The id of the user to get avatar of.</param>
-        /// <returns>The avatar info.</returns>
-        Task<AvatarInfo> GetAvatar(long id);
+        /// <param name="userId">User id.</param>
+        /// <returns>The avatar.</returns>
+        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        Task<ByteData> GetAvatar(long userId);
 
         /// <summary>
-        /// Set avatar for a user. Warning: This method does not check the user existence.
+        /// Set avatar for a user.
         /// </summary>
-        /// <param name="id">The id of the user to set avatar for.</param>
-        /// <param name="avatar">The avatar. Can be null to delete the saved avatar.</param>
-        /// <returns>The etag of the avatar.</returns>
-        /// <exception cref="ArgumentException">Thrown if any field in <paramref name="avatar"/> is null when <paramref name="avatar"/> is not null.</exception>
+        /// <param name="userId">User id.</param>
+        /// <param name="avatar">The new avatar data.</param>
+        /// <returns>The digest of the avatar.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="avatar"/> is null.</exception>
+        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="ImageException">Thrown if avatar is of bad format.</exception>
-        Task<string> SetAvatar(long id, Avatar? avatar);
+        Task<ICacheableDataDigest> SetAvatar(long userId, ByteData avatar);
+
+        /// <summary>
+        /// Remove avatar of a user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        Task DeleteAvatar(long userId);
     }
 
     // TODO! : Make this configurable.
@@ -84,9 +79,8 @@ namespace Timeline.Services
 
         private readonly string _avatarPath;
 
-        private byte[] _cacheData = default!;
-        private DateTime _cacheLastModified;
-        private string _cacheETag = default!;
+        private CacheableDataDigest? _cacheDigest;
+        private ByteData? _cacheData;
 
         public DefaultUserAvatarProvider(IWebHostEnvironment environment, IETagGenerator eTagGenerator)
         {
@@ -97,53 +91,42 @@ namespace Timeline.Services
         private async Task CheckAndInit()
         {
             var path = _avatarPath;
-            if (_cacheData == null || File.GetLastWriteTime(path) > _cacheLastModified)
+            if (_cacheData == null || File.GetLastWriteTime(path) > _cacheDigest!.LastModified)
             {
-                _cacheData = await File.ReadAllBytesAsync(path);
-                _cacheLastModified = File.GetLastWriteTime(path);
-                _cacheETag = await _eTagGenerator.Generate(_cacheData);
+                var data = await File.ReadAllBytesAsync(path);
+                _cacheDigest = new CacheableDataDigest(await _eTagGenerator.Generate(data), File.GetLastWriteTime(path));
+                Image.Identify(data, out var format);
+                _cacheData = new ByteData(data, format.DefaultMimeType);
             }
         }
 
-        public async Task<string> GetDefaultAvatarETag()
+        public async Task<ICacheableDataDigest> GetDefaultAvatarDigest()
         {
             await CheckAndInit();
-            return _cacheETag;
+            return _cacheDigest!;
         }
 
-        public async Task<AvatarInfo> GetDefaultAvatar()
+        public async Task<ByteData> GetDefaultAvatar()
         {
             await CheckAndInit();
-            return new AvatarInfo
-            {
-                Avatar = new Avatar
-                {
-                    Type = "image/png",
-                    Data = _cacheData
-                },
-                LastModified = _cacheLastModified
-            };
+            return _cacheData!;
         }
     }
 
     public class UserAvatarService : IUserAvatarService
     {
-
         private readonly ILogger<UserAvatarService> _logger;
-
         private readonly DatabaseContext _database;
-
+        private readonly IBasicUserService _basicUserService;
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
-
         private readonly IImageValidator _imageValidator;
-
         private readonly IDataManager _dataManager;
-
         private readonly IClock _clock;
 
         public UserAvatarService(
             ILogger<UserAvatarService> logger,
             DatabaseContext database,
+            IBasicUserService basicUserService,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
             IImageValidator imageValidator,
             IDataManager dataManager,
@@ -151,106 +134,123 @@ namespace Timeline.Services
         {
             _logger = logger;
             _database = database;
+            _basicUserService = basicUserService;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
             _imageValidator = imageValidator;
             _dataManager = dataManager;
             _clock = clock;
         }
 
-        public async Task<string> GetAvatarETag(long id)
+        public async Task<ICacheableDataDigest> GetAvatarDigest(long userId)
         {
-            var eTag = (await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.DataTag }).SingleOrDefaultAsync())?.DataTag;
-            if (eTag == null)
-                return await _defaultUserAvatarProvider.GetDefaultAvatarETag();
-            else
-                return eTag;
-        }
+            var usernameChangeTime = await _basicUserService.GetUsernameLastModifiedTime(userId);
 
-        public async Task<AvatarInfo> GetAvatar(long id)
-        {
-            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == id).Select(a => new { a.Type, a.DataTag, a.LastModified }).SingleOrDefaultAsync();
+            var entity = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.DataTag, a.LastModified }).SingleOrDefaultAsync();
 
-            if (avatarEntity != null)
+            if (entity is null)
             {
-                if (!LanguageHelper.AreSame(avatarEntity.DataTag == null, avatarEntity.Type == null))
-                {
-                    var message = Resources.Services.UserAvatarService.ExceptionDatabaseCorruptedDataAndTypeNotSame;
-                    _logger.LogCritical(message);
-                    throw new DatabaseCorruptedException(message);
-                }
-
-
-                if (avatarEntity.DataTag != null)
-                {
-                    var data = await _dataManager.GetEntry(avatarEntity.DataTag);
-                    return new AvatarInfo
-                    {
-                        Avatar = new Avatar
-                        {
-                            Type = avatarEntity.Type!,
-                            Data = data
-                        },
-                        LastModified = avatarEntity.LastModified
-                    };
-                }
+                var defaultAvatarDigest = await _defaultUserAvatarProvider.GetDefaultAvatarDigest();
+                return new CacheableDataDigest(defaultAvatarDigest.ETag, new DateTime[] { usernameChangeTime, defaultAvatarDigest.LastModified }.Max());
             }
-            var defaultAvatar = await _defaultUserAvatarProvider.GetDefaultAvatar();
-            if (avatarEntity != null)
-                defaultAvatar.LastModified = defaultAvatar.LastModified > avatarEntity.LastModified ? defaultAvatar.LastModified : avatarEntity.LastModified;
-            return defaultAvatar;
-        }
-
-        public async Task<string> SetAvatar(long id, Avatar? avatar)
-        {
-            if (avatar != null)
+            else if (entity.DataTag is null)
             {
-                if (avatar.Data == null)
-                    throw new ArgumentException(Resources.Services.UserAvatarService.ExceptionAvatarDataNull, nameof(avatar));
-                if (string.IsNullOrEmpty(avatar.Type))
-                    throw new ArgumentException(Resources.Services.UserAvatarService.ExceptionAvatarTypeNullOrEmpty, nameof(avatar));
-            }
-
-            var avatarEntity = await _database.UserAvatars.Where(a => a.UserId == id).SingleOrDefaultAsync();
-
-            if (avatar == null)
-            {
-                if (avatarEntity != null && avatarEntity.DataTag != null)
-                {
-                    await _dataManager.FreeEntry(avatarEntity.DataTag);
-                    avatarEntity.DataTag = null;
-                    avatarEntity.Type = null;
-                    avatarEntity.LastModified = _clock.GetCurrentTime();
-                    await _database.SaveChangesAsync();
-                    _logger.LogInformation(Resources.Services.UserAvatarService.LogUpdateEntity);
-                }
-                return await _defaultUserAvatarProvider.GetDefaultAvatarETag();
+                var defaultAvatarDigest = await _defaultUserAvatarProvider.GetDefaultAvatarDigest();
+                return new CacheableDataDigest(defaultAvatarDigest.ETag, new DateTime[] { usernameChangeTime, defaultAvatarDigest.LastModified, entity.LastModified }.Max());
             }
             else
             {
-                await _imageValidator.Validate(avatar.Data, avatar.Type, true);
-                var tag = await _dataManager.RetainEntry(avatar.Data);
-                var oldTag = avatarEntity?.DataTag;
-                var create = avatarEntity == null;
-                if (avatarEntity == null)
-                {
-                    avatarEntity = new UserAvatarEntity();
-                    _database.UserAvatars.Add(avatarEntity);
-                }
-                avatarEntity.DataTag = tag;
-                avatarEntity.Type = avatar.Type;
-                avatarEntity.LastModified = _clock.GetCurrentTime();
-                avatarEntity.UserId = id;
+                return new CacheableDataDigest(entity.DataTag, new DateTime[] { usernameChangeTime, entity.LastModified }.Max());
+            }
+        }
+
+        public async Task<ByteData> GetAvatar(long userId)
+        {
+            await _basicUserService.ThrowIfUserNotExist(userId);
+
+            var entity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
+
+            if (entity is null || entity.DataTag is null)
+            {
+                return await _defaultUserAvatarProvider.GetDefaultAvatar();
+            }
+
+            var data = await _dataManager.GetEntryAndCheck(entity.DataTag, $"This is required by avatar of {userId}.");
+
+            if (entity.Type is null)
+            {
+                Image.Identify(data, out var format);
+                entity.Type = format.DefaultMimeType;
                 await _database.SaveChangesAsync();
-                _logger.LogInformation(create ?
-                    Resources.Services.UserAvatarService.LogCreateEntity
-                    : Resources.Services.UserAvatarService.LogUpdateEntity);
-                if (oldTag != null)
-                {
-                    await _dataManager.FreeEntry(oldTag);
-                }
-
-                return avatarEntity.DataTag;
             }
+
+            return new ByteData(data, entity.Type);
+        }
+
+        public async Task<ICacheableDataDigest> SetAvatar(long userId, ByteData avatar)
+        {
+            if (avatar is null)
+                throw new ArgumentNullException(nameof(avatar));
+
+            await _imageValidator.Validate(avatar.Data, avatar.ContentType, true);
+
+            await _basicUserService.ThrowIfUserNotExist(userId);
+
+            var entity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
+
+            await using var transaction = await _database.Database.BeginTransactionAsync();
+
+            var tag = await _dataManager.RetainEntry(avatar.Data);
+
+            var now = _clock.GetCurrentTime();
+
+            if (entity is null)
+            {
+                var newEntity = new UserAvatarEntity
+                {
+                    DataTag = tag,
+                    Type = avatar.ContentType,
+                    LastModified = now,
+                    UserId = userId
+                };
+                _database.Add(newEntity);
+            }
+            else
+            {
+                if (entity.DataTag is not null)
+                    await _dataManager.FreeEntry(entity.DataTag);
+
+                entity.DataTag = tag;
+                entity.Type = avatar.ContentType;
+                entity.LastModified = now;
+            }
+
+            await _database.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return new CacheableDataDigest(tag, now);
+        }
+
+        public async Task DeleteAvatar(long userId)
+        {
+            await _basicUserService.ThrowIfUserNotExist(userId);
+
+            var entity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
+
+            if (entity is null || entity.DataTag is null)
+                return;
+
+            await using var transaction = await _database.Database.BeginTransactionAsync();
+
+            await _dataManager.FreeEntry(entity.DataTag);
+
+            entity.DataTag = null;
+            entity.Type = null;
+            entity.LastModified = _clock.GetCurrentTime();
+
+            await _database.SaveChangesAsync();
+
+            await transaction.CommitAsync();
         }
     }
 

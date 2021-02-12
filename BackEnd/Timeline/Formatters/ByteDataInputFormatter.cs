@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
 using Timeline.Models;
@@ -9,19 +8,21 @@ using Timeline.Models;
 namespace Timeline.Formatters
 {
     /// <summary>
-    /// Formatter that reads body as bytes.
+    /// Formatter that reads body as byte data.
     /// </summary>
-    public class BytesInputFormatter : InputFormatter
+    public class ByteDataInputFormatter : InputFormatter
     {
         /// <summary>
         /// 
         /// </summary>
-        public BytesInputFormatter()
+        public ByteDataInputFormatter()
         {
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("image/png"));
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("image/jpeg"));
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("image/gif"));
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("image/webp"));
+            SupportedMediaTypes.Add(MimeTypes.ImagePng);
+            SupportedMediaTypes.Add(MimeTypes.ImageJpeg);
+            SupportedMediaTypes.Add(MimeTypes.ImageGif);
+            SupportedMediaTypes.Add(MimeTypes.ImageWebp);
+            SupportedMediaTypes.Add(MimeTypes.TextPlain);
+            SupportedMediaTypes.Add(MimeTypes.TextMarkdown);
         }
 
         /// <inheritdoc/>
@@ -41,7 +42,13 @@ namespace Timeline.Formatters
             var request = context.HttpContext.Request;
             var contentLength = request.ContentLength;
 
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BytesInputFormatter>>();
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ByteDataInputFormatter>>();
+
+            if (request.ContentType is null)
+            {
+                logger.LogInformation("Failed to read body as bytes. Content-Type is not set.");
+                return await InputFormatterResult.FailureAsync();
+            }
 
             if (contentLength == null)
             {

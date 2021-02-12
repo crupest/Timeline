@@ -253,17 +253,6 @@ namespace Timeline.Models.Http
             {
                 return new CommonResponse(ErrorCodes.TimelineController.PostNotExist, string.Format(message, formatArgs));
             }
-
-            public static CommonResponse PostNoData(params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.PostNoData, string.Format(TimelineController_PostNoData, formatArgs));
-            }
-
-            public static CommonResponse CustomMessage_PostNoData(string message, params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.PostNoData, string.Format(message, formatArgs));
-            }
-
         }
 
     }
