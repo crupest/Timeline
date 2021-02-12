@@ -71,7 +71,7 @@ namespace Timeline.Models.Mapper
             await _database.Entry(entity).Collection(p => p.DataList).LoadAsync();
             await _database.Entry(entity).Reference(e => e.Author).LoadAsync();
 
-            List<HttpTimelinePostDataDigest> dataDigestList = entity.DataList.OrderBy(d => d.Index).Select(d => new HttpTimelinePostDataDigest(d.Kind, d.DataTag, d.LastUpdated)).ToList();
+            List<HttpTimelinePostDataDigest> dataDigestList = entity.DataList.OrderBy(d => d.Index).Select(d => new HttpTimelinePostDataDigest(d.Kind, $"\"{d.DataTag}\"", d.LastUpdated)).ToList();
 
             HttpUser? author = null;
             if (entity.Author is not null)
