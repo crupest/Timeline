@@ -35,5 +35,7 @@ namespace Timeline.Entities
 
         public DbSet<JwtTokenEntity> JwtToken { get; set; } = default!;
         public DbSet<DataEntity> Data { get; set; } = default!;
+
+        public DbSet<MigrationEntity> Migrations { get; set; } = default!;
     }
 }

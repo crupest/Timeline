@@ -26,12 +26,15 @@ namespace Timeline.Entities
         [ForeignKey(nameof(AuthorId))]
         public UserEntity? Author { get; set; } = default!;
 
+        [Obsolete("Use post data instead.")]
         [Column("content_type")]
         public string? ContentType { get; set; }
 
+        [Obsolete("Use post data instead.")]
         [Column("content")]
         public string? Content { get; set; }
 
+        [Obsolete("Use post data instead.")]
         [Column("extra_content")]
         public string? ExtraContent { get; set; }
 

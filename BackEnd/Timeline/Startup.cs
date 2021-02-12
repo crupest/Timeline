@@ -21,6 +21,7 @@ using Timeline.Models.Converters;
 using Timeline.Models.Mapper;
 using Timeline.Routes;
 using Timeline.Services;
+using Timeline.Services.Migration;
 using Timeline.Swagger;
 
 namespace Timeline
@@ -86,7 +87,9 @@ namespace Timeline
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddSingleton<IPathProvider, PathProvider>();
+
             services.AddSingleton<IDatabaseBackupService, DatabaseBackupService>();
+            services.AddCustomMigration();
 
             services.AddAutoMapper(GetType().Assembly);
             services.AddMappers();

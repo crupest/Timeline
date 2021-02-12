@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using System.Resources;
 using Timeline.Entities;
 using Timeline.Services;
+using Timeline.Services.Migration;
 
 [assembly: NeutralResourcesLanguage("en")]
 
@@ -17,18 +18,16 @@ namespace Timeline
         {
             var host = CreateWebHostBuilder(args).Build();
 
-            var env = host.Services.GetRequiredService<IWebHostEnvironment>();
-
-            var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
-            databaseBackupService.BackupNow();
-
-            if (env.IsProduction())
+            using (var scope = host.Services.CreateScope())
             {
-                using (var scope = host.Services.CreateScope())
-                {
-                    var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                    databaseContext.Database.Migrate();
-                }
+                var databaseBackupService = scope.ServiceProvider.GetRequiredService<IDatabaseBackupService>();
+                databaseBackupService.BackupNow();
+
+                var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                databaseContext.Database.Migrate();
+
+                var customMigrationManager = scope.ServiceProvider.GetRequiredService<ICustomMigrationManager>();
+                customMigrationManager.Migrate();
             }
 
             host.Run();
