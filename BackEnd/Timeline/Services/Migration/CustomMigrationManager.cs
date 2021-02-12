@@ -36,7 +36,7 @@ namespace Timeline.Services.Migration
 
                 if (!did)
                 {
-                    _logger.LogInformation("Begin custom migration '{0}'.", name);
+                    _logger.LogWarning("Begin custom migration '{0}'.", name);
 
                     await using var transaction = await _database.Database.BeginTransactionAsync();
 
@@ -47,7 +47,7 @@ namespace Timeline.Services.Migration
 
                     await transaction.CommitAsync();
 
-                    _logger.LogInformation("End custom migration '{0}'.", name);
+                    _logger.LogWarning("End custom migration '{0}'.", name);
                 }
             }
         }

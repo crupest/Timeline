@@ -5,8 +5,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_FRONTEND": "Proxy"
-      },
-      "applicationUrl": "http://0.0.0.0:5000"
+      }
     },
     "Dev-Mock": {
       "commandName": "Project",

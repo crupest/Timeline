@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Resources;
+using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
 using Timeline.Services.Migration;
@@ -14,20 +15,19 @@ namespace Timeline
 {
     public static class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             var host = CreateWebHostBuilder(args).Build();
 
+            var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
+            databaseBackupService.BackupNow();
+
             using (var scope = host.Services.CreateScope())
             {
-                var databaseBackupService = scope.ServiceProvider.GetRequiredService<IDatabaseBackupService>();
-                databaseBackupService.BackupNow();
-
                 var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                databaseContext.Database.Migrate();
-
+                await databaseContext.Database.MigrateAsync();
                 var customMigrationManager = scope.ServiceProvider.GetRequiredService<ICustomMigrationManager>();
-                customMigrationManager.Migrate();
+                await customMigrationManager.Migrate();
             }
 
             host.Run();
