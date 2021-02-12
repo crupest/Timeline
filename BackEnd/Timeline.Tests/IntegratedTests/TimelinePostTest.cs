@@ -488,5 +488,83 @@ namespace Timeline.Tests.IntegratedTests
                 body.Should().Equal(data.Data);
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task CreatePost_MultipleData_ShouldWork(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+
+            var textData = Encoding.UTF8.GetBytes("aaa");
+            var imageData = ImageHelper.CreatePngWithSize(100, 50);
+
+            var post = await client.TestPostAsync<HttpTimelinePost>(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = MimeTypes.TextMarkdown,
+                            Data = Convert.ToBase64String(textData)
+                        },
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = MimeTypes.ImagePng,
+                            Data = Convert.ToBase64String(imageData)
+                        }
+                    }
+                }
+            );
+
+            post.DataList.Should().NotBeNull().And.HaveCount(2);
+
+            var postData0 = post.DataList[0];
+            postData0.Should().NotBeNull();
+            var postDataEtag0 = postData0.ETag;
+            postDataEtag0.Should().NotBeNullOrEmpty();
+
+            var postData1 = post.DataList[1];
+            postData1.Should().NotBeNull();
+            var postDataEtag1 = postData1.ETag;
+            postDataEtag1.Should().NotBeNullOrEmpty();
+
+            {
+                var response = await client.GetAsync($"timelines/{generator(1)}/posts/{post.Id}/data");
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Headers.ETag.Should().NotBeNull();
+                response.Headers.ETag!.Tag.Should().Be(postDataEtag0);
+                response.Content.Headers.ContentType.Should().NotBeNull();
+                response.Content.Headers.ContentType!.MediaType.Should().Be(MimeTypes.TextMarkdown);
+
+                var body = await response.Content.ReadAsByteArrayAsync();
+                body.Should().Equal(textData);
+            }
+
+            {
+                var response = await client.GetAsync($"timelines/{generator(1)}/posts/{post.Id}/data/0");
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Headers.ETag.Should().NotBeNull();
+                response.Headers.ETag!.Tag.Should().Be(postDataEtag0);
+                response.Content.Headers.ContentType.Should().NotBeNull();
+                response.Content.Headers.ContentType!.MediaType.Should().Be(MimeTypes.TextMarkdown);
+
+                var body = await response.Content.ReadAsByteArrayAsync();
+                body.Should().Equal(textData);
+            }
+
+            {
+                var response = await client.GetAsync($"timelines/{generator(1)}/posts/{post.Id}/data/1");
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Headers.ETag.Should().NotBeNull();
+                response.Headers.ETag!.Tag.Should().Be(postDataEtag1);
+                response.Content.Headers.ContentType.Should().NotBeNull();
+                response.Content.Headers.ContentType!.MediaType.Should().Be(MimeTypes.ImagePng);
+
+                var body = await response.Content.ReadAsByteArrayAsync();
+                body.Should().Equal(imageData);
+            }
+        }
     }
 }
