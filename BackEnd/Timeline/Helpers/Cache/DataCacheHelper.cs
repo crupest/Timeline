@@ -33,7 +33,7 @@ namespace Timeline.Helpers.Cache
             }
 
             var digest = await provider.GetDigest();
-            var eTagValue = '"' + digest.ETag + '"';
+            var eTagValue = $"\"{digest.ETag}\"";
             var eTag = new EntityTagHeaderValue(eTagValue);
 
             ActionResult Generate304Result()

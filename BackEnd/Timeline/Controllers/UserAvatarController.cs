@@ -107,7 +107,7 @@ namespace Timeline.Controllers
                 _logger.LogInformation(Log.Format(LogPutSuccess,
                     ("Username", username), ("Mime Type", Request.ContentType)));
 
-                Response.Headers.Append("ETag", new EntityTagHeaderValue($"\"{digest.ETag}\"").ToString());
+                Response.Headers.Append("ETag", $"\"{digest.ETag}\"");
 
                 return Ok();
             }

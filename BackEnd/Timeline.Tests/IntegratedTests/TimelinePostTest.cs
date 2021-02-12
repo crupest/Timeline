@@ -10,6 +10,10 @@ using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
 using Xunit.Abstractions;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using System.Net;
 
 namespace Timeline.Tests.IntegratedTests
 {
@@ -417,6 +421,72 @@ namespace Timeline.Tests.IntegratedTests
                     DataList = dataList
                 }
             );
+        }
+
+        public static IEnumerable<object?[]> CreatePost_ShouldWork_TestData()
+        {
+            var testByteDatas = new List<ByteData>()
+            {
+                new ByteData(Encoding.UTF8.GetBytes("aaa"), MimeTypes.TextPlain),
+                new ByteData(Encoding.UTF8.GetBytes("aaa"), MimeTypes.TextMarkdown),
+                new ByteData(ImageHelper.CreateImageWithSize(100, 50, PngFormat.Instance), MimeTypes.ImagePng),
+                new ByteData(ImageHelper.CreateImageWithSize(100, 50, JpegFormat.Instance), MimeTypes.ImageJpeg),
+                new ByteData(ImageHelper.CreateImageWithSize(100, 50, GifFormat.Instance), MimeTypes.ImageGif),
+            };
+
+            return TimelineNameGeneratorTestData().AppendTestData(testByteDatas);
+        }
+
+        [Theory]
+        [MemberData(nameof(CreatePost_ShouldWork_TestData))]
+        public async Task CreatePost_ShouldWork(TimelineNameGenerator generator, ByteData data)
+        {
+            using var client = await CreateClientAsUser();
+
+            var post = await client.TestPostAsync<HttpTimelinePost>(
+                $"timelines/{generator(1)}/posts",
+                new HttpTimelinePostCreateRequest
+                {
+                    DataList = new List<HttpTimelinePostCreateRequestData>
+                    {
+                        new HttpTimelinePostCreateRequestData
+                        {
+                            ContentType = data.ContentType,
+                            Data = Convert.ToBase64String(data.Data)
+                        }
+                    }
+                }
+            );
+
+            post.DataList.Should().NotBeNull().And.HaveCount(1);
+            var postData = post.DataList[0];
+            postData.Should().NotBeNull();
+            var postDataEtag = postData.ETag;
+            postDataEtag.Should().NotBeNullOrEmpty();
+
+            {
+                var response = await client.GetAsync($"timelines/{generator(1)}/posts/{post.Id}/data");
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Headers.ETag.Should().NotBeNull();
+                response.Headers.ETag!.Tag.Should().Be(postDataEtag);
+                response.Content.Headers.ContentType.Should().NotBeNull();
+                response.Content.Headers.ContentType!.MediaType.Should().Be(data.ContentType);
+
+                var body = await response.Content.ReadAsByteArrayAsync();
+                body.Should().Equal(data.Data);
+            }
+
+            {
+                var response = await client.GetAsync($"timelines/{generator(1)}/posts/{post.Id}/data/0");
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Headers.ETag.Should().NotBeNull();
+                response.Headers.ETag!.Tag.Should().Be(postDataEtag);
+                response.Content.Headers.ContentType.Should().NotBeNull();
+                response.Content.Headers.ContentType!.MediaType.Should().Be(data.ContentType);
+
+                var body = await response.Content.ReadAsByteArrayAsync();
+                body.Should().Equal(data.Data);
+            }
         }
     }
 }
