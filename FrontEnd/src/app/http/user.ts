@@ -59,6 +59,7 @@ export class HttpChangePasswordBadCredentialError extends Error {
 export interface IHttpUserClient {
   list(): Promise<HttpUser[]>;
   get(username: string): Promise<HttpUser>;
+  post(req: HttpCreateUserRequest): Promise<HttpUser>;
   patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser>;
   delete(username: string): Promise<void>;
   generateAvatarUrl(username: string): string;
@@ -72,8 +73,6 @@ export interface IHttpUserClient {
     username: string,
     permission: UserPermission
   ): Promise<void>;
-
-  createUser(req: HttpCreateUserRequest, token: string): Promise<HttpUser>;
 }
 
 export class HttpUserClient implements IHttpUserClient {
@@ -88,6 +87,13 @@ export class HttpUserClient implements IHttpUserClient {
       .get<HttpUser>(`${apiBaseUrl}/users/${username}`)
       .then(extractResponseData)
       .catch(convertToIfStatusCodeIs(404, HttpUserNotExistError));
+  }
+
+  post(req: HttpCreateUserRequest): Promise<HttpUser> {
+    return axios
+      .post<HttpUser>(`${apiBaseUrl}/users`, req)
+      .then(extractResponseData)
+      .then();
   }
 
   patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser> {
@@ -138,13 +144,6 @@ export class HttpUserClient implements IHttpUserClient {
   ): Promise<void> {
     return axios
       .delete(`${apiBaseUrl}/users/${username}/permissions/${permission}`)
-      .then();
-  }
-
-  createUser(req: HttpCreateUserRequest): Promise<HttpUser> {
-    return axios
-      .post<HttpUser>(`${apiBaseUrl}/userop/createuser`, req)
-      .then(extractResponseData)
       .then();
   }
 }
