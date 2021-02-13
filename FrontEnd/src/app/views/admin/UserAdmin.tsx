@@ -18,7 +18,6 @@ import { Trans, useTranslation } from "react-i18next";
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
   close: () => void;
-  token: string;
   data: TData;
   onSuccess: (data: TReturn) => void;
 }
@@ -26,7 +25,6 @@ interface DialogProps<TData = undefined, TReturn = undefined> {
 const CreateUserDialog: React.FC<DialogProps<undefined, HttpUser>> = ({
   open,
   close,
-  token,
   onSuccess,
 }) => {
   return (
@@ -41,13 +39,10 @@ const CreateUserDialog: React.FC<DialogProps<undefined, HttpUser>> = ({
         ] as const
       }
       onProcess={([username, password]) =>
-        getHttpUserClient().createUser(
-          {
-            username,
-            password,
-          },
-          token
-        )
+        getHttpUserClient().post({
+          username,
+          password,
+        })
       }
       close={close}
       open={open}
@@ -280,8 +275,6 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
     setUsersVersion(usersVersion + 1);
   };
 
-  const token = props.user.token;
-
   useEffect(() => {
     let subscribe = true;
     void getHttpUserClient()
@@ -304,7 +297,6 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           <CreateUserDialog
             open
             close={() => setDialog(null)}
-            token={token}
             data={undefined}
             onSuccess={updateUsers}
           />
@@ -315,7 +307,6 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           <UserDeleteDialog
             open
             close={() => setDialog(null)}
-            token={token}
             data={{ username: dialog.username }}
             onSuccess={updateUsers}
           />
@@ -326,7 +317,6 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           <UserModifyDialog
             open
             close={() => setDialog(null)}
-            token={token}
             data={{ oldUser: dialog.user }}
             onSuccess={updateUsers}
           />
@@ -337,7 +327,6 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
           <UserPermissionModifyDialog
             open
             close={() => setDialog(null)}
-            token={token}
             data={{
               username: dialog.username,
               permissions: dialog.permissions,

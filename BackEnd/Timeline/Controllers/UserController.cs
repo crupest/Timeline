@@ -183,21 +183,6 @@ namespace Timeline.Controllers
         }
 
         /// <summary>
-        /// Create a new user. You have to be administrator.
-        /// </summary>
-        /// <returns>The new user's info.</returns>
-        [HttpPost("userop/createuser"), PermissionAuthorize(UserPermission.UserManagement)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Obsolete("Use post instead.")]
-        public async Task<ActionResult<HttpUser>> CreateUser([FromBody] HttpCreateUserRequest body)
-        {
-            return await Post(body);
-        }
-
-        /// <summary>
         /// Change password with old password.
         /// </summary>
         [HttpPost("userop/changepassword"), Authorize]
