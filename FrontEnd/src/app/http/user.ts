@@ -61,7 +61,7 @@ export interface IHttpUserClient {
   get(username: string): Promise<HttpUser>;
   patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser>;
   delete(username: string): Promise<void>;
-  // return etag
+  generateAvatarUrl(username: string): string;
   putAvatar(username: string, data: Blob): Promise<string>;
   changePassword(req: HttpChangePasswordRequest): Promise<void>;
   putUserPermission(
@@ -98,6 +98,10 @@ export class HttpUserClient implements IHttpUserClient {
 
   delete(username: string): Promise<void> {
     return axios.delete(`${apiBaseUrl}/users/${username}`).then();
+  }
+
+  generateAvatarUrl(username: string): string {
+    return `${apiBaseUrl}/users/${username}/avatar`;
   }
 
   putAvatar(username: string, data: Blob): Promise<string> {

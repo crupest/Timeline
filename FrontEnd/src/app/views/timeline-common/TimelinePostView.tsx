@@ -2,10 +2,13 @@ import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 
-import { HttpTimelinePostInfo } from "@/http/timeline";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
+
+import { pushAlert } from "@/services/alert";
 
 import UserAvatar from "../common/user/UserAvatar";
 import TimelineLine from "./TimelineLine";
+import TimelinePostContentView from "./TimelinePostContentView";
 import TimelinePostDeleteConfirmDialog from "./TimelinePostDeleteConfirmDialog";
 
 export interface TimelinePostViewProps {
@@ -13,10 +16,11 @@ export interface TimelinePostViewProps {
   current?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  onDeleted?: () => void;
 }
 
 const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
-  const { post, className, style } = props;
+  const { post, className, style, onDeleted } = props;
   const current = props.current === true;
 
   const [
@@ -24,8 +28,6 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
     setOperationMaskVisible,
   ] = React.useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
-
-  // TODO: Load content.
 
   return (
     <div
@@ -59,7 +61,9 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
             </span>
           </span>
         </div>
-        <div className="timeline-content">{/** TODO: Load content. */}</div>
+        <div className="timeline-content">
+          <TimelinePostContentView post={post} />
+        </div>
         {operationMaskVisible ? (
           <div
             className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
@@ -84,7 +88,17 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
             setOperationMaskVisible(false);
           }}
           onConfirm={() => {
-            // TODO: Implement this!
+            void getHttpTimelineClient()
+              .deletePost(post.timelineName, post.id)
+              .then(onDeleted, () => {
+                pushAlert({
+                  type: "danger",
+                  message: {
+                    type: "i18n",
+                    key: "timeline.deletePostFailed",
+                  },
+                });
+              });
           }}
         />
       ) : null}

@@ -7,6 +7,7 @@ import {
   apiBaseUrl,
   extractResponseData,
   convertToIfErrorCodeIs,
+  getHttpToken,
 } from "./common";
 import { HttpUser } from "./user";
 
@@ -50,20 +51,22 @@ export interface HttpTimelinePostInfo {
   id: number;
   time: string;
   author: HttpUser;
-  dataList: HttpTimelinePostDataDigest;
+  dataList: HttpTimelinePostDataDigest[];
   color: string;
   lastUpdated: string;
   timelineName: string;
   editable: boolean;
 }
 
+export interface HttpTimelinePostPostRequestData {
+  contentType: string;
+  data: string;
+}
+
 export interface HttpTimelinePostPostRequest {
   time?: string;
   color?: string;
-  dataList: {
-    contentType: string;
-    data: string;
-  }[];
+  dataList: HttpTimelinePostPostRequestData[];
 }
 
 export interface HttpTimelinePatchRequest {
@@ -91,6 +94,8 @@ export interface IHttpTimelineClient {
   memberPut(timelineName: string, username: string): Promise<void>;
   memberDelete(timelineName: string, username: string): Promise<void>;
   listPost(timelineName: string): Promise<HttpTimelinePostInfo[]>;
+  generatePostDataUrl(timelineName: string, postId: number): string;
+  getPostDataAsString(timelineName: string, postId: number): Promise<string>;
   postPost(
     timelineName: string,
     req: HttpTimelinePostPostRequest
@@ -149,6 +154,24 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     return axios
       .get<HttpTimelinePostInfo[]>(
         `${apiBaseUrl}/timelines/${timelineName}/posts`
+      )
+      .then(extractResponseData);
+  }
+
+  generatePostDataUrl(timelineName: string, postId: number): string {
+    return applyQueryParameters(
+      `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}/data`,
+      { token: getHttpToken() }
+    );
+  }
+
+  getPostDataAsString(timelineName: string, postId: number): Promise<string> {
+    return axios
+      .get<string>(
+        `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}/data`,
+        {
+          responseType: "text",
+        }
       )
       .then(extractResponseData);
   }
