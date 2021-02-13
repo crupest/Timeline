@@ -49,9 +49,9 @@ namespace Timeline.Controllers
             return _timelineMapper.MapToHttp(post, timelineName, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
         }
 
-        private Task<List<HttpTimelinePost>> Map(List<TimelinePostEntity> post, string timelineName)
+        private Task<List<HttpTimelinePost>> Map(List<TimelinePostEntity> posts, string timelineName)
         {
-            return _timelineMapper.MapToHttp(post, timelineName, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+            return _timelineMapper.MapToHttp(posts, timelineName, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Timeline.Entities;
 using Timeline.Filters;
 using Timeline.Models;
 using Timeline.Models.Http;
@@ -42,6 +43,16 @@ namespace Timeline.Controllers
         }
 
         private bool UserHasAllTimelineManagementPermission => this.UserHasPermission(UserPermission.AllTimelineManagement);
+
+        private Task<HttpTimeline> Map(TimelineEntity timeline)
+        {
+            return _timelineMapper.MapToHttp(timeline, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+        }
+
+        private Task<List<HttpTimeline>> Map(List<TimelineEntity> timelines)
+        {
+            return _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+        }
 
         /// <summary>
         /// List all timelines.
@@ -102,7 +113,7 @@ namespace Timeline.Controllers
             }
 
             var timelines = await _service.GetTimelines(relationship, visibilityFilter);
-            var result = await _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId());
+            var result = await Map(timelines);
             return result;
         }
 
@@ -118,7 +129,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _service.GetTimelineIdByName(timeline);
             var t = await _service.GetTimeline(timelineId);
-            var result = await _timelineMapper.MapToHttp(t, Url, this.GetOptionalUserId());
+            var result = await Map(t);
             return result;
         }
 
@@ -147,7 +158,7 @@ namespace Timeline.Controllers
             {
                 await _service.ChangeProperty(timelineId, _mapper.Map<TimelineChangePropertyParams>(body));
                 var t = await _service.GetTimeline(timelineId);
-                var result = await _timelineMapper.MapToHttp(t, Url, this.GetOptionalUserId());
+                var result = await Map(t);
                 return result;
             }
             catch (EntityAlreadyExistException)
@@ -237,7 +248,7 @@ namespace Timeline.Controllers
             try
             {
                 var timeline = await _service.CreateTimeline(body.Name, userId);
-                var result = await _timelineMapper.MapToHttp(timeline, Url, this.GetOptionalUserId());
+                var result = await Map(timeline);
                 return result;
             }
             catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.Timeline)
