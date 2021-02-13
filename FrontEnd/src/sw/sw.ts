@@ -20,13 +20,13 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 const networkOnly = new NetworkOnly();
 
-registerRoute("/swagger", new NetworkOnly());
+registerRoute(new RegExp("/swagger/.+"), new NetworkOnly());
 
-registerRoute("/api/token", new NetworkOnly());
-registerRoute("/api/search", new NetworkOnly());
+registerRoute(new RegExp("/api/token/.+"), new NetworkOnly());
+registerRoute(new RegExp("/api/search/.+"), new NetworkOnly());
 
 registerRoute(
-  /\/api\/users\/.+\/avatar/,
+  new RegExp("/api/users/.+/avatar"),
   new StaleWhileRevalidate({
     cacheName: "avatars",
     plugins: [
@@ -41,7 +41,7 @@ registerRoute(
 );
 
 registerRoute(
-  "/api",
+  new RegExp("/api/.+"),
   new NetworkFirst({
     plugins: [
       new CacheableResponsePlugin({
