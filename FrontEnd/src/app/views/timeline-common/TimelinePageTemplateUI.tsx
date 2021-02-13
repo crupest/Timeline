@@ -3,15 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Spinner } from "react-bootstrap";
 
 import { getAlertHost } from "@/services/alert";
-import { TimelineInfo, TimelinePostInfo } from "@/services/timeline";
+
+import { HttpTimelineInfo } from "@/http/timeline";
 
 import Timeline from "./Timeline";
 import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
-import { TimelineSyncStatus } from "./SyncStatusBadge";
 
 export interface TimelineCardComponentProps<TManageItems> {
-  timeline: TimelineInfo;
-  syncStatus: TimelineSyncStatus;
+  timeline: HttpTimelineInfo;
   operations: {
     onManage?: (item: TManageItems | "property") => void;
     onMember: () => void;
@@ -31,13 +30,11 @@ export interface TimelinePageTemplateUIOperations<TManageItems> {
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
   timeline?:
-    | (TimelineInfo & {
+    | (HttpTimelineInfo & {
         operations: TimelinePageTemplateUIOperations<TManageItems>;
-        posts?: TimelinePostInfo[] | "forbid";
       })
     | "notexist"
     | "offline";
-  syncStatus: TimelineSyncStatus;
   notExistMessageI18nKey: string;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
 }
@@ -45,7 +42,7 @@ export interface TimelinePageTemplateUIProps<TManageItems> {
 export default function TimelinePageTemplateUI<TManageItems>(
   props: TimelinePageTemplateUIProps<TManageItems>
 ): React.ReactElement | null {
-  const { timeline, syncStatus, CardComponent } = props;
+  const { timeline, CardComponent } = props;
 
   const { t } = useTranslation();
 
@@ -105,35 +102,24 @@ export default function TimelinePageTemplateUI<TManageItems>(
   } else if (timeline === "notexist") {
     body = <p className="text-danger">{t(props.notExistMessageI18nKey)}</p>;
   } else {
-    const { operations, posts } = timeline;
+    const { operations } = timeline;
     body = (
       <>
         <CardComponent
           className="timeline-template-card"
           timeline={timeline}
           operations={operations}
-          syncStatus={syncStatus}
           collapse={cardCollapse}
           toggleCollapse={toggleCardCollapse}
         />
-        {posts != null ? (
-          posts === "forbid" ? (
-            <div>{t("timeline.messageCantSee")}</div>
-          ) : (
-            <div
-              className="timeline-container"
-              style={{
-                minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
-              }}
-            >
-              <Timeline timeline={timeline} posts={posts} />
-            </div>
-          )
-        ) : (
-          <div className="full-viewport-center-child">
-            <Spinner variant="primary" animation="grow" />
-          </div>
-        )}
+        <div
+          className="timeline-container"
+          style={{
+            minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
+          }}
+        >
+          <Timeline timelineName={timeline.name} />
+        </div>
         {operations.onPost != null ? (
           <>
             <div
