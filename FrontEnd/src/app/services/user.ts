@@ -1,33 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { BehaviorSubject, Observable, from } from "rxjs";
+import { useState, useEffect } from "react";
+import { BehaviorSubject, Observable } from "rxjs";
 
 import { UiLogicError } from "@/common";
 
-import {
-  HttpNetworkError,
-  BlobWithEtag,
-  NotModified,
-  setHttpToken,
-} from "@/http/common";
+import { HttpNetworkError, setHttpToken } from "@/http/common";
 import {
   getHttpTokenClient,
   HttpCreateTokenBadCredentialError,
 } from "@/http/token";
-import {
-  getHttpUserClient,
-  HttpUserNotExistError,
-  HttpUser,
-  UserPermission,
-} from "@/http/user";
+import { getHttpUserClient, HttpUser, UserPermission } from "@/http/user";
 
-import { DataHub2 } from "./DataHub2";
-import { dataStorage } from "./common";
 import { pushAlert } from "./alert";
 
-export type User = HttpUser;
+interface IAuthUser extends HttpUser {
+  token: string;
+}
 
-export class AuthUser implements User {
-  constructor(user: User, public token: string) {
+export class AuthUser implements IAuthUser {
+  constructor(user: HttpUser, public token: string) {
     this.uniqueId = user.uniqueId;
     this.username = user.username;
     this.permissions = user.permissions;
@@ -87,9 +77,17 @@ export class UserService {
       console.warn("Already checked user. Can't check twice.");
     }
 
-    const savedUser = await dataStorage.getItem<AuthUser | null>(
-      USER_STORAGE_KEY
-    );
+    const savedUserString = localStorage.getItem(USER_STORAGE_KEY);
+
+    const savedAuthUserData =
+      savedUserString == null
+        ? null
+        : (JSON.parse(savedUserString) as IAuthUser);
+
+    const savedUser =
+      savedAuthUserData == null
+        ? null
+        : new AuthUser(savedAuthUserData, savedAuthUserData.token);
 
     if (savedUser == null) {
       this.userSubject.next(null);
@@ -102,7 +100,7 @@ export class UserService {
     try {
       const res = await getHttpTokenClient().verify({ token: savedToken });
       const user = new AuthUser(res.user, savedToken);
-      await dataStorage.setItem<AuthUser>(USER_STORAGE_KEY, user);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
       this.userSubject.next(user);
       pushAlert({
         type: "success",
@@ -120,7 +118,7 @@ export class UserService {
         });
         return savedUser;
       } else {
-        await dataStorage.removeItem(USER_STORAGE_KEY);
+        localStorage.removeItem(USER_STORAGE_KEY);
         this.userSubject.next(null);
         pushAlert({
           type: "danger",
@@ -145,7 +143,7 @@ export class UserService {
       });
       const user = new AuthUser(res.user, res.token);
       if (rememberMe) {
-        await dataStorage.setItem<AuthUser>(USER_STORAGE_KEY, user);
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
       }
       this.userSubject.next(user);
     } catch (e) {
@@ -157,34 +155,29 @@ export class UserService {
     }
   }
 
-  async logout(): Promise<void> {
+  logout(): Promise<void> {
     if (this.currentUser === undefined) {
       throw new UiLogicError("Please check user first.");
     }
     if (this.currentUser === null) {
       throw new UiLogicError("No login.");
     }
-    await dataStorage.removeItem(USER_STORAGE_KEY);
+    localStorage.removeItem(USER_STORAGE_KEY);
     this.userSubject.next(null);
+    return Promise.resolve();
   }
 
-  changePassword(
-    oldPassword: string,
-    newPassword: string
-  ): Observable<unknown> {
+  changePassword(oldPassword: string, newPassword: string): Promise<void> {
     if (this.currentUser == undefined) {
       throw new UiLogicError("Not login or checked now, can't log out.");
     }
-    const $ = from(
-      getHttpUserClient().changePassword({
+
+    return getHttpUserClient()
+      .changePassword({
         oldPassword,
         newPassword,
       })
-    );
-    $.subscribe(() => {
-      void this.logout();
-    });
-    return $;
+      .then(() => this.logout());
   }
 }
 
@@ -235,157 +228,4 @@ export function useUserLoggedIn(): AuthUser {
     throw new UiLogicError("You assert user has logged in but actually not.");
   }
   return user;
-}
-
-export function checkLogin(): AuthUser {
-  const user = userService.currentUser;
-  if (user == null) {
-    throw new UiLogicError("You must login to perform the operation.");
-  }
-  return user;
-}
-
-export class UserNotExistError extends Error {}
-
-export class UserInfoService {
-  saveUser(user: HttpUser): Promise<void> {
-    return this.userHub.getLine(user.username).save(user);
-  }
-
-  saveUsers(users: HttpUser[]): Promise<void> {
-    return Promise.all(users.map((user) => this.saveUser(user))).then();
-  }
-
-  async getCachedUser(username: string): Promise<HttpUser | null> {
-    const user = await this.userHub.getLine(username).getSavedData();
-    if (user == null || user === "notexist") return null;
-    return user;
-  }
-
-  async getCachedUsers(usernames: string[]): Promise<HttpUser[] | null> {
-    const users = await Promise.all(
-      usernames.map((username) => this.userHub.getLine(username).getSavedData())
-    );
-
-    for (const u of users) {
-      if (u == null || u === "notexist") {
-        return null;
-      }
-    }
-
-    return users as HttpUser[];
-  }
-
-  private generateUserDataStorageKey(username: string): string {
-    return `user.${username}`;
-  }
-
-  readonly userHub = new DataHub2<string, HttpUser | "notexist">({
-    saveData: (username, data) => {
-      if (typeof data === "string") return Promise.resolve();
-      return dataStorage
-        .setItem<HttpUser>(this.generateUserDataStorageKey(username), data)
-        .then();
-    },
-    getSavedData: (username) => {
-      return dataStorage.getItem<HttpUser | null>(
-        this.generateUserDataStorageKey(username)
-      );
-    },
-    fetchData: async (username) => {
-      try {
-        return await getHttpUserClient().get(username);
-      } catch (e) {
-        if (e instanceof HttpUserNotExistError) {
-          return "notexist";
-        } else if (e instanceof HttpNetworkError) {
-          return null;
-        }
-        throw e;
-      }
-    },
-  });
-
-  private generateAvatarDataStorageKey(username: string): string {
-    return `user.${username}.avatar`;
-  }
-
-  readonly avatarHub = new DataHub2<string, BlobWithEtag | "notexist">({
-    saveData: async (username, data) => {
-      if (typeof data === "string") return;
-      await dataStorage.setItem<BlobWithEtag>(
-        this.generateAvatarDataStorageKey(username),
-        data
-      );
-    },
-    getSavedData: (username) =>
-      dataStorage.getItem<BlobWithEtag | null>(
-        this.generateAvatarDataStorageKey(username)
-      ),
-    fetchData: async (username, savedData) => {
-      try {
-        if (savedData == null || savedData === "notexist") {
-          return await getHttpUserClient().getAvatar(username);
-        } else {
-          const res = await getHttpUserClient().getAvatar(
-            username,
-            savedData.etag
-          );
-          if (res instanceof NotModified) {
-            return savedData;
-          } else {
-            return res;
-          }
-        }
-      } catch (e) {
-        if (e instanceof HttpUserNotExistError) {
-          return "notexist";
-        } else if (e instanceof HttpNetworkError) {
-          return null;
-        } else {
-          throw e;
-        }
-      }
-    },
-  });
-
-  async setAvatar(username: string, blob: Blob): Promise<void> {
-    const etag = await getHttpUserClient().putAvatar(username, blob);
-    await this.avatarHub.getLine(username).save({ data: blob, etag });
-  }
-
-  async setNickname(username: string, nickname: string): Promise<void> {
-    return getHttpUserClient()
-      .patch(username, { nickname })
-      .then((user) => this.saveUser(user));
-  }
-}
-
-export const userInfoService = new UserInfoService();
-
-export function useAvatar(username?: string): Blob | undefined {
-  const [state, setState] = React.useState<Blob | undefined>(undefined);
-  React.useEffect(() => {
-    if (username == null) {
-      setState(undefined);
-      return;
-    }
-
-    const subscription = userInfoService.avatarHub
-      .getLine(username)
-      .getObservalble()
-      .subscribe((data) => {
-        if (data.data != null && data.data !== "notexist") {
-          setState(data.data.data);
-        } else {
-          setState(undefined);
-        }
-      });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [username]);
-
-  return state;
 }

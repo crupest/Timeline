@@ -4,6 +4,45 @@ export const apiBaseUrl = "/api";
 
 export const axios = rawAxios.create();
 
+function convertToNetworkError(error: AxiosError): never {
+  if (error.isAxiosError && error.response == null) {
+    throw new HttpNetworkError(error);
+  } else {
+    throw error;
+  }
+}
+
+function convertToForbiddenError(error: AxiosError): never {
+  if (
+    error.isAxiosError &&
+    error.response != null &&
+    (error.response.status == 401 || error.response.status == 403)
+  ) {
+    throw new HttpForbiddenError(error);
+  } else {
+    throw error;
+  }
+}
+
+function convertToNotFoundError(error: AxiosError): never {
+  if (
+    error.isAxiosError &&
+    error.response != null &&
+    error.response.status == 404
+  ) {
+    throw new HttpNotFoundError(error);
+  } else {
+    throw error;
+  }
+}
+
+rawAxios.interceptors.response.use(undefined, convertToNetworkError);
+rawAxios.interceptors.response.use(undefined, convertToForbiddenError);
+rawAxios.interceptors.response.use(undefined, convertToNotFoundError);
+axios.interceptors.response.use(undefined, convertToNetworkError);
+axios.interceptors.response.use(undefined, convertToForbiddenError);
+axios.interceptors.response.use(undefined, convertToNotFoundError);
+
 let _token: string | null = null;
 
 export function getHttpToken(): string | null {
@@ -71,6 +110,12 @@ export class HttpForbiddenError extends Error {
   }
 }
 
+export class HttpNotFoundError extends Error {
+  constructor(public innerError?: AxiosError) {
+    super();
+  }
+}
+
 export class NotModified {}
 
 export interface BlobWithEtag {
@@ -133,30 +178,6 @@ export function convertToIfErrorCodeIs<NewError>(
   return catchIfErrorCodeIs(errorCode, (error) => {
     throw new newErrorType(error);
   });
-}
-
-export function convertToNetworkError(
-  error: AxiosError<CommonErrorResponse>
-): never {
-  if (error.isAxiosError && error.response == null) {
-    throw new HttpNetworkError(error);
-  } else {
-    throw error;
-  }
-}
-
-export function convertToForbiddenError(
-  error: AxiosError<CommonErrorResponse>
-): never {
-  if (
-    error.isAxiosError &&
-    error.response != null &&
-    (error.response.status == 401 || error.response.status == 403)
-  ) {
-    throw new HttpForbiddenError(error);
-  } else {
-    throw error;
-  }
 }
 
 export function convertToNotModified(

@@ -3,14 +3,9 @@ import { AxiosError } from "axios";
 import {
   axios,
   apiBaseUrl,
-  convertToNetworkError,
   extractResponseData,
   convertToIfStatusCodeIs,
   convertToIfErrorCodeIs,
-  NotModified,
-  BlobWithEtag,
-  convertToBlobWithEtag,
-  convertToNotModified,
   extractEtag,
 } from "./common";
 
@@ -66,11 +61,6 @@ export interface IHttpUserClient {
   get(username: string): Promise<HttpUser>;
   patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser>;
   delete(username: string): Promise<void>;
-  getAvatar(username: string): Promise<BlobWithEtag>;
-  getAvatar(
-    username: string,
-    etag: string
-  ): Promise<BlobWithEtag | NotModified>;
   // return etag
   putAvatar(username: string, data: Blob): Promise<string>;
   changePassword(req: HttpChangePasswordRequest): Promise<void>;
@@ -90,53 +80,24 @@ export class HttpUserClient implements IHttpUserClient {
   list(): Promise<HttpUser[]> {
     return axios
       .get<HttpUser[]>(`${apiBaseUrl}/users`)
-      .then(extractResponseData)
-      .catch(convertToNetworkError);
+      .then(extractResponseData);
   }
 
   get(username: string): Promise<HttpUser> {
     return axios
       .get<HttpUser>(`${apiBaseUrl}/users/${username}`)
       .then(extractResponseData)
-      .catch(convertToIfStatusCodeIs(404, HttpUserNotExistError))
-      .catch(convertToNetworkError);
+      .catch(convertToIfStatusCodeIs(404, HttpUserNotExistError));
   }
 
   patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser> {
     return axios
       .patch<HttpUser>(`${apiBaseUrl}/users/${username}`, req)
-      .then(extractResponseData)
-      .catch(convertToNetworkError);
+      .then(extractResponseData);
   }
 
   delete(username: string): Promise<void> {
-    return axios
-      .delete(`${apiBaseUrl}/users/${username}`)
-      .catch(convertToNetworkError)
-      .then();
-  }
-
-  getAvatar(username: string): Promise<BlobWithEtag>;
-  getAvatar(
-    username: string,
-    etag?: string
-  ): Promise<BlobWithEtag | NotModified> {
-    const headers =
-      etag != null
-        ? {
-            "If-None-Match": etag,
-          }
-        : undefined;
-
-    return axios
-      .get(`${apiBaseUrl}/users/${username}/avatar`, {
-        responseType: "blob",
-        headers,
-      })
-      .then(convertToBlobWithEtag)
-      .catch(convertToNotModified)
-      .catch(convertToIfStatusCodeIs(404, HttpUserNotExistError))
-      .catch(convertToNetworkError);
+    return axios.delete(`${apiBaseUrl}/users/${username}`).then();
   }
 
   putAvatar(username: string, data: Blob): Promise<string> {
@@ -146,7 +107,6 @@ export class HttpUserClient implements IHttpUserClient {
           "Content-Type": data.type,
         },
       })
-      .catch(convertToNetworkError)
       .then(extractEtag);
   }
 
@@ -156,7 +116,6 @@ export class HttpUserClient implements IHttpUserClient {
       .catch(
         convertToIfErrorCodeIs(11020201, HttpChangePasswordBadCredentialError)
       )
-      .catch(convertToNetworkError)
       .then();
   }
 
@@ -166,7 +125,6 @@ export class HttpUserClient implements IHttpUserClient {
   ): Promise<void> {
     return axios
       .put(`${apiBaseUrl}/users/${username}/permissions/${permission}`)
-      .catch(convertToNetworkError)
       .then();
   }
 
@@ -176,7 +134,6 @@ export class HttpUserClient implements IHttpUserClient {
   ): Promise<void> {
     return axios
       .delete(`${apiBaseUrl}/users/${username}/permissions/${permission}`)
-      .catch(convertToNetworkError)
       .then();
   }
 
@@ -184,7 +141,6 @@ export class HttpUserClient implements IHttpUserClient {
     return axios
       .post<HttpUser>(`${apiBaseUrl}/userop/createuser`, req)
       .then(extractResponseData)
-      .catch(convertToNetworkError)
       .then();
   }
 }

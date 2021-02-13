@@ -1,15 +1,6 @@
-import {
-  axios,
-  apiBaseUrl,
-  convertToNetworkError,
-  extractResponseData,
-} from "./common";
+import { axios, apiBaseUrl, extractResponseData } from "./common";
 
-import {
-  HttpTimelineInfo,
-  processRawTimelineInfo,
-  RawHttpTimelineInfo,
-} from "./timeline";
+import { HttpTimelineInfo } from "./timeline";
 
 export interface HttpHighlightMoveRequest {
   timeline: string;
@@ -26,31 +17,20 @@ export interface IHttpBookmarkClient {
 export class HttpHighlightClient implements IHttpBookmarkClient {
   list(): Promise<HttpTimelineInfo[]> {
     return axios
-      .get<RawHttpTimelineInfo[]>(`${apiBaseUrl}/bookmarks`)
-      .then(extractResponseData)
-      .then((list) => list.map(processRawTimelineInfo))
-      .catch(convertToNetworkError);
+      .get<HttpTimelineInfo[]>(`${apiBaseUrl}/bookmarks`)
+      .then(extractResponseData);
   }
 
   put(timeline: string): Promise<void> {
-    return axios
-      .put(`${apiBaseUrl}/bookmarks/${timeline}`)
-      .catch(convertToNetworkError)
-      .then();
+    return axios.put(`${apiBaseUrl}/bookmarks/${timeline}`).then();
   }
 
   delete(timeline: string): Promise<void> {
-    return axios
-      .delete(`${apiBaseUrl}/bookmarks/${timeline}`)
-      .catch(convertToNetworkError)
-      .then();
+    return axios.delete(`${apiBaseUrl}/bookmarks/${timeline}`).then();
   }
 
   move(req: HttpHighlightMoveRequest): Promise<void> {
-    return axios
-      .post(`${apiBaseUrl}/bookmarkop/move`, req)
-      .catch(convertToNetworkError)
-      .then();
+    return axios.post(`${apiBaseUrl}/bookmarkop/move`, req).then();
   }
 }
 
