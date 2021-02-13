@@ -3,10 +3,15 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { Dropdown, Button } from "react-bootstrap";
 
-import { TimelineCardComponentProps } from "../timeline-common/TimelinePageTemplateUI";
-import CollapseButton from "../timeline-common/CollapseButton";
+import { getHttpHighlightClient } from "@/http/highlight";
+import { getHttpBookmarkClient } from "@/http/bookmark";
+
 import { useUser } from "@/services/user";
 import { pushAlert } from "@/services/alert";
+import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
+
+import { TimelineCardComponentProps } from "../timeline-common/TimelinePageTemplateUI";
+import CollapseButton from "../timeline-common/CollapseButton";
 
 export interface TimelineCardTemplateProps
   extends Omit<TimelineCardComponentProps<"">, "operations"> {
@@ -33,7 +38,6 @@ function TimelineCardTemplate({
   infoArea,
   manageArea,
   toggleCollapse,
-  syncStatus,
   className,
 }: TimelineCardTemplateProps): React.ReactElement | null {
   const { t } = useTranslation();
@@ -43,7 +47,6 @@ function TimelineCardTemplate({
   return (
     <div className={clsx("cru-card p-2 clearfix", className)}>
       <div className="float-right d-flex align-items-center">
-        <SyncStatusBadge status={syncStatus} className="mr-2" />
         <CollapseButton collapse={collapse} onClick={toggleCollapse} />
       </div>
       <div style={{ display: collapse ? "none" : "block" }}>
@@ -61,8 +64,8 @@ function TimelineCardTemplate({
             onClick={
               user != null && user.hasHighlightTimelineAdministrationPermission
                 ? () => {
-                    timelineService
-                      .setHighlight(timeline.name, !timeline.isHighlight)
+                    getHttpHighlightClient()
+                      [timeline.isHighlight ? "delete" : "put"](timeline.name)
                       .catch(() => {
                         pushAlert({
                           message: {
@@ -85,8 +88,8 @@ function TimelineCardTemplate({
                 "icon-button text-yellow mr-3"
               )}
               onClick={() => {
-                timelineService
-                  .setBookmark(timeline.name, !timeline.isBookmark)
+                getHttpBookmarkClient()
+                  [timeline.isBookmark ? "delete" : "put"](timeline.name)
                   .catch(() => {
                     pushAlert({
                       message: {

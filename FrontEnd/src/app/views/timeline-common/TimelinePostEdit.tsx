@@ -6,7 +6,7 @@ import { Button, Spinner, Row, Col, Form } from "react-bootstrap";
 import { UiLogicError } from "@/common";
 
 import { pushAlert } from "@/services/alert";
-import { TimelineCreatePostRequest } from "@/services/timeline";
+import { HttpTimelineInfo } from "@/http/timeline";
 
 interface TimelinePostEditImageProps {
   onSelect: (blob: Blob | null) => void;
@@ -74,26 +74,20 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
   );
 };
 
-export type TimelinePostSendCallback = (
-  content: TimelineCreatePostRequest
-) => Promise<void>;
-
 export interface TimelinePostEditProps {
   className?: string;
-  onPost: TimelinePostSendCallback;
+  timeline: HttpTimelineInfo;
   onHeightChange?: (height: number) => void;
-  timelineUniqueId: string;
 }
 
 const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
-  const { onPost } = props;
-
   const { t } = useTranslation();
+
+  const { timeline } = props;
 
   const [state, setState] = React.useState<"input" | "process">("input");
   const [kind, setKind] = React.useState<"text" | "image">("text");
   const [text, setText] = React.useState<string>("");
-  const [imageBlob, setImageBlob] = React.useState<Blob | null>(null);
 
   const draftLocalStorageKey = `timeline.${props.timelineUniqueId}.postDraft`;
 
@@ -124,57 +118,60 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   });
 
   const toggleKind = React.useCallback(() => {
-    setKind((oldKind) => (oldKind === "text" ? "image" : "text"));
-    setImageBlob(null);
+    // TODO: Implement this.
+    // setKind((oldKind) => (oldKind === "text" ? "image" : "text"));
+    // setImageBlob(null);
   }, []);
 
   const onSend = React.useCallback(() => {
     setState("process");
 
-    const req: TimelineCreatePostRequest = (() => {
-      switch (kind) {
-        case "text":
-          return {
-            content: {
-              type: "text",
-              text: text,
-            },
-          } as TimelineCreatePostRequest;
-        case "image":
-          if (imageBlob == null) {
-            throw new UiLogicError(
-              "Content type is image but image blob is null."
-            );
-          }
-          return {
-            content: {
-              type: "image",
-              data: imageBlob,
-            },
-          } as TimelineCreatePostRequest;
-        default:
-          throw new UiLogicError("Unknown content type.");
-      }
-    })();
+    // TODO: Implement this.
 
-    onPost(req).then(
-      (_) => {
-        if (kind === "text") {
-          setText("");
-          window.localStorage.removeItem(draftLocalStorageKey);
-        }
-        setState("input");
-        setKind("text");
-      },
-      (_) => {
-        pushAlert({
-          type: "danger",
-          message: t("timeline.sendPostFailed"),
-        });
-        setState("input");
-      }
-    );
-  }, [onPost, kind, text, imageBlob, t, draftLocalStorageKey]);
+    // const req: TimelineCreatePostRequest = (() => {
+    //   switch (kind) {
+    //     case "text":
+    //       return {
+    //         content: {
+    //           type: "text",
+    //           text: text,
+    //         },
+    //       } as TimelineCreatePostRequest;
+    //     case "image":
+    //       if (imageBlob == null) {
+    //         throw new UiLogicError(
+    //           "Content type is image but image blob is null."
+    //         );
+    //       }
+    //       return {
+    //         content: {
+    //           type: "image",
+    //           data: imageBlob,
+    //         },
+    //       } as TimelineCreatePostRequest;
+    //     default:
+    //       throw new UiLogicError("Unknown content type.");
+    //   }
+    // })();
+
+    // onPost(req).then(
+    //   (_) => {
+    //     if (kind === "text") {
+    //       setText("");
+    //       window.localStorage.removeItem(draftLocalStorageKey);
+    //     }
+    //     setState("input");
+    //     setKind("text");
+    //   },
+    //   (_) => {
+    //     pushAlert({
+    //       type: "danger",
+    //       message: t("timeline.sendPostFailed"),
+    //     });
+    //     setState("input");
+    //   }
+    // );
+  }, []);
 
   const onImageSelect = React.useCallback((blob: Blob | null) => {
     setImageBlob(blob);

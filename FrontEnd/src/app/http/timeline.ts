@@ -26,6 +26,8 @@ export interface HttpTimelineInfo {
   members: HttpUser[];
   isHighlight: boolean;
   isBookmark: boolean;
+  manageable: boolean;
+  postable: boolean;
 }
 
 export interface HttpTimelineListQuery {
