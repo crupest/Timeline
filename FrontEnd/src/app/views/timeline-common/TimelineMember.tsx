@@ -143,11 +143,10 @@ const TimelineMemberUserSearch: React.FC<{ timeline: HttpTimelineInfo }> = ({
 
 export interface TimelineMemberProps {
   timeline: HttpTimelineInfo;
-  editable: boolean;
 }
 
 const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
-  const { timeline, editable } = props;
+  const { timeline } = props;
   const members = [timeline.owner, ...timeline.members];
 
   return (
@@ -158,7 +157,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
             key={member.username}
             user={member}
             onAction={
-              editable && index !== 0
+              timeline.manageable && index !== 0
                 ? () => {
                     void getHttpTimelineClient().memberDelete(
                       timeline.name,
@@ -170,7 +169,9 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
           />
         ))}
       </ListGroup>
-      {editable ? <TimelineMemberUserSearch timeline={timeline} /> : null}
+      {timeline.manageable ? (
+        <TimelineMemberUserSearch timeline={timeline} />
+      ) : null}
     </Container>
   );
 };

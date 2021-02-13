@@ -1,21 +1,13 @@
 import React from "react";
 
 import { UiLogicError } from "@/common";
-import { useUser } from "@/services/user";
-import {
-  TimelinePostInfo,
-  timelineService,
-  usePosts,
-  useTimeline,
-} from "@/services/timeline";
-import { mergeDataStatus } from "@/services/DataHub2";
+
+import { HttpNetworkError, HttpNotFoundError } from "@/http/common";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
-import {
-  TimelinePageTemplateUIOperations,
-  TimelinePageTemplateUIProps,
-} from "./TimelinePageTemplateUI";
+import { TimelinePageTemplateUIProps } from "./TimelinePageTemplateUI";
 
 export interface TimelinePageTemplateProps<TManageItem> {
   name: string;
@@ -31,95 +23,58 @@ export default function TimelinePageTemplate<TManageItem>(
 ): React.ReactElement | null {
   const { name } = props;
 
-  const service = timelineService;
-
-  const user = useUser();
-
   const [dialog, setDialog] = React.useState<null | "property" | "member">(
     null
   );
 
-  const [scrollBottomKey, setScrollBottomKey] = React.useState<number>(0);
+  // TODO: Auto scroll.
+  // const [scrollBottomKey, _setScrollBottomKey] = React.useState<number>(0);
+
+  // React.useEffect(() => {
+  //   if (scrollBottomKey > 0) {
+  //     window.scrollTo(0, document.body.scrollHeight);
+  //   }
+  // }, [scrollBottomKey]);
+
+  const [timeline, setTimeline] = React.useState<
+    HttpTimelineInfo | "loading" | "offline" | "notexist" | "error"
+  >("loading");
 
   React.useEffect(() => {
-    if (scrollBottomKey > 0) {
-      window.scrollTo(0, document.body.scrollHeight);
-    }
-  }, [scrollBottomKey]);
+    setTimeline("loading");
 
-  const timelineAndStatus = useTimeline(name);
-  const postsAndState = usePosts(name);
-
-  const [
-    scrollToBottomNextSyncKey,
-    setScrollToBottomNextSyncKey,
-  ] = React.useState<number>(0);
-
-  const scrollToBottomNextSync = (): void => {
-    setScrollToBottomNextSyncKey((old) => old + 1);
-  };
-
-  React.useEffect(() => {
     let subscribe = true;
-    void timelineService.syncPosts(name).then(() => {
-      if (subscribe) {
-        setScrollBottomKey((old) => old + 1);
-      }
-    });
+    void getHttpTimelineClient()
+      .getTimeline(name)
+      .then(
+        (data) => {
+          if (subscribe) {
+            setTimeline(data);
+          }
+        },
+        (error) => {
+          if (subscribe) {
+            if (error instanceof HttpNetworkError) {
+              setTimeline("offline");
+            } else if (error instanceof HttpNotFoundError) {
+              setTimeline("notexist");
+            } else {
+              console.error(error);
+              setTimeline("error");
+            }
+          }
+        }
+      );
     return () => {
       subscribe = false;
     };
-  }, [name, scrollToBottomNextSyncKey]);
+  }, [name]);
 
-  const uiTimelineProp = ((): TimelinePageTemplateUIProps<TManageItem>["timeline"] => {
-    const { status, data: timeline } = timelineAndStatus;
-    if (timeline == null) {
-      if (status === "offline") {
-        return "offline";
-      } else {
-        return undefined;
-      }
-    } else if (timeline === "notexist") {
-      return "notexist";
-    } else {
-      const operations: TimelinePageTemplateUIOperations<TManageItem> = {
-        onPost: service.hasPostPermission(user, timeline)
-          ? (req) =>
-              service.createPost(name, req).then(() => scrollToBottomNextSync())
-          : undefined,
-        onManage: service.hasManagePermission(user, timeline)
-          ? (item) => {
-              if (item === "property") {
-                setDialog(item);
-              } else {
-                props.onManage(item);
-              }
-            }
-          : undefined,
-        onMember: () => setDialog("member"),
-      };
-
-      const posts = ((): TimelinePostInfo[] | "forbid" | undefined => {
-        const { data: postsInfo } = postsAndState;
-        if (postsInfo === "forbid") {
-          return "forbid";
-        } else if (postsInfo == null || postsInfo === "notexist") {
-          return undefined;
-        } else {
-          return postsInfo.posts;
-        }
-      })();
-
-      return { ...timeline, operations, posts };
-    }
-  })();
-
-  const timeline = timelineAndStatus?.data;
   let dialogElement: React.ReactElement | undefined;
   const closeDialog = (): void => setDialog(null);
 
   if (dialog === "property") {
-    if (timeline == null || timeline === "notexist") {
+    if (typeof timeline !== "object") {
       throw new UiLogicError(
         "Timeline is null but attempt to open change property dialog."
       );
@@ -130,23 +85,17 @@ export default function TimelinePageTemplate<TManageItem>(
         open
         close={closeDialog}
         timeline={timeline}
-        onProcess={(req) => service.changeTimelineProperty(name, req)}
       />
     );
   } else if (dialog === "member") {
-    if (timeline == null || timeline === "notexist") {
+    if (typeof timeline !== "object") {
       throw new UiLogicError(
         "Timeline is null but attempt to open change property dialog."
       );
     }
 
     dialogElement = (
-      <TimelineMemberDialog
-        open
-        onClose={closeDialog}
-        timeline={timeline}
-        editable={service.hasManagePermission(user, timeline)}
-      />
+      <TimelineMemberDialog open onClose={closeDialog} timeline={timeline} />
     );
   }
 
@@ -155,11 +104,25 @@ export default function TimelinePageTemplate<TManageItem>(
   return (
     <>
       <UiComponent
-        timeline={uiTimelineProp}
-        syncStatus={mergeDataStatus([
-          timelineAndStatus.status,
-          postsAndState.status,
-        ])}
+        timeline={
+          typeof timeline === "object"
+            ? {
+                ...timeline,
+                operations: {
+                  onManage: timeline.manageable
+                    ? (item) => {
+                        if (item === "property") {
+                          setDialog(item);
+                        } else {
+                          props.onManage(item);
+                        }
+                      }
+                    : undefined,
+                  onMember: () => setDialog("member"),
+                },
+              }
+            : timeline
+        }
         notExistMessageI18nKey={props.notFoundI18nKey}
       />
       {dialogElement}

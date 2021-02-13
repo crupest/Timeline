@@ -7,7 +7,7 @@ import { getAlertHost } from "@/services/alert";
 import { HttpTimelineInfo } from "@/http/timeline";
 
 import Timeline from "./Timeline";
-import TimelinePostEdit, { TimelinePostSendCallback } from "./TimelinePostEdit";
+import TimelinePostEdit from "./TimelinePostEdit";
 
 export interface TimelineCardComponentProps<TManageItems> {
   timeline: HttpTimelineInfo;
@@ -25,16 +25,17 @@ export interface TimelinePageTemplateUIOperations<TManageItems> {
   onMember: () => void;
   onBookmark?: () => void;
   onHighlight?: () => void;
-  onPost?: TimelinePostSendCallback;
 }
 
 export interface TimelinePageTemplateUIProps<TManageItems> {
-  timeline?:
+  timeline:
     | (HttpTimelineInfo & {
         operations: TimelinePageTemplateUIOperations<TManageItems>;
       })
     | "notexist"
-    | "offline";
+    | "offline"
+    | "loading"
+    | "error";
   notExistMessageI18nKey: string;
   CardComponent: React.ComponentType<TimelineCardComponentProps<TManageItems>>;
 }
@@ -90,7 +91,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
   let body: React.ReactElement;
 
-  if (timeline == null) {
+  if (timeline == "loading") {
     body = (
       <div className="full-viewport-center-child">
         <Spinner variant="primary" animation="grow" />
@@ -101,6 +102,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
     body = <p className="text-danger">Offline!</p>;
   } else if (timeline === "notexist") {
     body = <p className="text-danger">{t(props.notExistMessageI18nKey)}</p>;
+  } else if (timeline === "error") {
+    // TODO: i18n
+    body = <p className="text-danger">Error!</p>;
   } else {
     const { operations } = timeline;
     body = (
@@ -120,7 +124,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
         >
           <Timeline timelineName={timeline.name} />
         </div>
-        {operations.onPost != null ? (
+        {timeline.postable ? (
           <>
             <div
               style={{ height: bottomSpaceHeight }}
@@ -128,7 +132,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
             />
             <TimelinePostEdit
               className="fixed-bottom"
-              onPost={operations.onPost}
+              timeline={timeline}
               onHeightChange={onPostEditHeightChange}
               timelineUniqueId={timeline.uniqueId}
             />
