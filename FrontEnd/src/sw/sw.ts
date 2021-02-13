@@ -1,6 +1,12 @@
 import { precacheAndRoute, matchPrecache } from "workbox-precaching";
-import { setDefaultHandler } from "workbox-routing";
-import { NetworkOnly } from "workbox-strategies";
+import { registerRoute, setDefaultHandler } from "workbox-routing";
+import {
+  NetworkFirst,
+  NetworkOnly,
+  StaleWhileRevalidate,
+} from "workbox-strategies";
+import { CacheableResponsePlugin } from "workbox-cacheable-response";
+import { ExpirationPlugin } from "workbox-expiration";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -14,15 +20,39 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 const networkOnly = new NetworkOnly();
 
-const networkOnlyPaths = ["/api", "/swagger"];
+registerRoute("/swagger", new NetworkOnly());
+
+registerRoute("/api/token", new NetworkOnly());
+registerRoute("/api/search", new NetworkOnly());
+
+registerRoute(
+  /\/api\/users\/.+\/avatar/,
+  new StaleWhileRevalidate({
+    cacheName: "avatars",
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [200],
+      }),
+      new ExpirationPlugin({
+        maxAgeSeconds: 60 * 60 * 24 * 30 * 3, // 3 months
+      }),
+    ],
+  })
+);
+
+registerRoute(
+  "/api",
+  new NetworkFirst({
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [200],
+      }),
+    ],
+  })
+);
 
 setDefaultHandler((options) => {
-  const { request, url } = options;
-  if (url) {
-    for (const p of networkOnlyPaths) {
-      if (url.pathname.startsWith(p)) return networkOnly.handle(options);
-    }
-  }
+  const { request } = options;
 
   if (request instanceof Request && request.destination === "document")
     return matchPrecache("/index.html").then((r) =>
