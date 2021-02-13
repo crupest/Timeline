@@ -566,5 +566,25 @@ namespace Timeline.Tests.IntegratedTests
                 body.Should().Equal(imageData);
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Post_Editable(TimelineNameGenerator generator)
+        {
+            HttpTimelinePost post;
+
+            {
+                using var client = await CreateClientAsUser();
+                post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", CreateTextPostRequest("a"));
+
+                post.Editable.Should().BeTrue();
+            }
+
+            {
+                using var client = await CreateClientAs(2);
+                var post2 = await client.TestGetAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}");
+                post2.Editable.Should().BeFalse();
+            }
+        }
     }
 }

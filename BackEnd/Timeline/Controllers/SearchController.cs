@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Timeline.Entities;
 using Timeline.Models.Http;
 using Timeline.Models.Mapper;
 using Timeline.Services;
@@ -28,6 +29,11 @@ namespace Timeline.Controllers
             _userMapper = userMapper;
         }
 
+        private Task<List<HttpTimeline>> Map(List<TimelineEntity> timelines)
+        {
+            return _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId(), this.UserHasPermission(UserPermission.AllTimelineManagement));
+        }
+
         /// <summary>
         /// Search timelines whose name or title contains query string case-insensitively.
         /// </summary>
@@ -40,7 +46,7 @@ namespace Timeline.Controllers
         {
             var searchResult = await _service.SearchTimeline(query);
             var timelines = searchResult.Items.Select(i => i.Item).ToList();
-            return await _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId());
+            return await Map(timelines);
         }
 
         /// <summary>
