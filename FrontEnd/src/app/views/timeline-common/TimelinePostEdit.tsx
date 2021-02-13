@@ -8,6 +8,7 @@ import { UiLogicError } from "@/common";
 import {
   getHttpTimelineClient,
   HttpTimelineInfo,
+  HttpTimelinePostInfo,
   HttpTimelinePostPostRequestData,
 } from "@/http/timeline";
 
@@ -83,7 +84,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
 export interface TimelinePostEditProps {
   className?: string;
   timeline: HttpTimelineInfo;
-  onPosted: () => void;
+  onPosted: (newPost: HttpTimelinePostInfo) => void;
   onHeightChange?: (height: number) => void;
 }
 
@@ -161,14 +162,14 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         dataList: [requestData],
       })
       .then(
-        (_) => {
+        (data) => {
           if (kind === "text") {
             setText("");
             window.localStorage.removeItem(draftLocalStorageKey);
           }
           setState("input");
           setKind("text");
-          onPosted();
+          onPosted(data);
         },
         (_) => {
           pushAlert({

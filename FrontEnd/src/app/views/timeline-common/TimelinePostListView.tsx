@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import clsx from "clsx";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
@@ -53,7 +53,7 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
     <div style={style} className={clsx("timeline", className)}>
       {groupedPosts.map((group) => {
         return (
-          <>
+          <Fragment key={group.date.toDateString()}>
             <TimelineDateLabel date={group.date} />
             {group.posts.map((post) => {
               return (
@@ -65,7 +65,7 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
                 />
               );
             })}
-          </>
+          </Fragment>
         );
       })}
     </div>

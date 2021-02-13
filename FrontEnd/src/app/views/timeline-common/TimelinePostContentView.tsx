@@ -1,5 +1,6 @@
 import React from "react";
 import { Spinner } from "react-bootstrap";
+import clsx from "clsx";
 
 import { HttpNetworkError } from "@/http/common";
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
@@ -38,7 +39,7 @@ const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
     return () => {
       subscribe = false;
     };
-  }, [post]);
+  }, [post.timelineName, post.id]);
 
   if (error != null) {
     // TODO: i18n
@@ -69,7 +70,7 @@ const ImageView: React.FC<TimelinePostContentViewProps> = (props) => {
         post.timelineName,
         post.id
       )}
-      className={className}
+      className={clsx(className, "timeline-content-image")}
       style={style}
     />
   );
