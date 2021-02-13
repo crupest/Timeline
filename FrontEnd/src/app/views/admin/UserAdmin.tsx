@@ -249,7 +249,7 @@ interface UserAdminProps {
   user: AuthUser;
 }
 
-const UserAdmin: React.FC<UserAdminProps> = (props) => {
+const UserAdmin: React.FC<UserAdminProps> = () => {
   const { t } = useTranslation();
 
   type DialogInfo =
