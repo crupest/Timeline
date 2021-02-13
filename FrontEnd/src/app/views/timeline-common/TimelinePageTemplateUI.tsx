@@ -134,7 +134,6 @@ export default function TimelinePageTemplateUI<TManageItems>(
               className="fixed-bottom"
               timeline={timeline}
               onHeightChange={onPostEditHeightChange}
-              timelineUniqueId={timeline.uniqueId}
             />
           </>
         ) : null}

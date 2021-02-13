@@ -46,9 +46,10 @@ const TimelineMemberItem: React.FC<{
   );
 };
 
-const TimelineMemberUserSearch: React.FC<{ timeline: HttpTimelineInfo }> = ({
-  timeline,
-}) => {
+const TimelineMemberUserSearch: React.FC<{
+  timeline: HttpTimelineInfo;
+  onChange: () => void;
+}> = ({ timeline, onChange }) => {
   const { t } = useTranslation();
 
   const [userSearchText, setUserSearchText] = useState<string>("");
@@ -120,6 +121,7 @@ const TimelineMemberUserSearch: React.FC<{ timeline: HttpTimelineInfo }> = ({
                         .then(() => {
                           setUserSearchText("");
                           setUserSearchState({ type: "init" });
+                          onChange();
                         });
                     }}
                   />
@@ -139,14 +141,13 @@ const TimelineMemberUserSearch: React.FC<{ timeline: HttpTimelineInfo }> = ({
   );
 };
 
-// TODO: Trigger resync.
-
 export interface TimelineMemberProps {
   timeline: HttpTimelineInfo;
+  onChange: () => void;
 }
 
 const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
-  const { timeline } = props;
+  const { timeline, onChange } = props;
   const members = [timeline.owner, ...timeline.members];
 
   return (
@@ -159,10 +160,9 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
             onAction={
               timeline.manageable && index !== 0
                 ? () => {
-                    void getHttpTimelineClient().memberDelete(
-                      timeline.name,
-                      member.username
-                    );
+                    void getHttpTimelineClient()
+                      .memberDelete(timeline.name, member.username)
+                      .then(onChange);
                   }
                 : undefined
             }
@@ -170,7 +170,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
         ))}
       </ListGroup>
       {timeline.manageable ? (
-        <TimelineMemberUserSearch timeline={timeline} />
+        <TimelineMemberUserSearch timeline={timeline} onChange={onChange} />
       ) : null}
     </Container>
   );
