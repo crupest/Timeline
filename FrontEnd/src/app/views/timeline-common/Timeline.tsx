@@ -2,15 +2,13 @@ import React from "react";
 import clsx from "clsx";
 
 import {
-  TimelineInfo,
-  TimelinePostInfo,
-  timelineService,
-} from "@/services/timeline";
-import { useUser } from "@/services/user";
-import { pushAlert } from "@/services/alert";
+  HttpForbiddenError,
+  HttpNetworkError,
+  HttpNotFoundError,
+} from "@/http/common";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import TimelineItem from "./TimelineItem";
-import TimelineTop from "./TimelineTop";
 import TimelineDateItem from "./TimelineDateItem";
 
 function dateEqual(left: Date, right: Date): boolean {
@@ -24,27 +22,106 @@ function dateEqual(left: Date, right: Date): boolean {
 export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
-  timeline: TimelineInfo;
-  posts: TimelinePostInfo[];
+  timelineName: string;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timeline, posts } = props;
+  const { timelineName, className, style } = props;
 
-  const user = useUser();
+  const [posts, setPosts] = React.useState<
+    | HttpTimelinePostInfo[]
+    | "loading"
+    | "offline"
+    | "notexist"
+    | "forbid"
+    | "error"
+  >("loading");
 
-  const [showMoreIndex, setShowMoreIndex] = React.useState<number>(-1);
+  React.useEffect(() => {
+    let subscribe = true;
+
+    void getHttpTimelineClient()
+      .listPost(timelineName)
+      .then(
+        (data) => {
+          if (subscribe) setPosts(data);
+        },
+        (error) => {
+          if (error instanceof HttpNetworkError) {
+            setPosts("offline");
+          } else if (error instanceof HttpForbiddenError) {
+            setPosts("forbid");
+          } else if (error instanceof HttpNotFoundError) {
+            setPosts("notexist");
+          } else {
+            console.error(error);
+            setPosts("error");
+          }
+        }
+      );
+
+    return () => {
+      subscribe = false;
+    };
+  }, [timelineName]);
+
+  switch (posts) {
+    case "loading":
+      return (
+        <div className={className} style={style}>
+          Loading.
+        </div>
+      );
+    case "offline":
+      return (
+        <div className={className} style={style}>
+          Offline.
+        </div>
+      );
+    case "notexist":
+      return (
+        <div className={className} style={style}>
+          Not exist.
+        </div>
+      );
+    case "forbid":
+      return (
+        <div className={className} style={style}>
+          Forbid.
+        </div>
+      );
+    case "error":
+      return (
+        <div className={className} style={style}>
+          Error.
+        </div>
+      );
+    default:
+      return <TimelinePostListView posts={posts} />;
+  }
+};
+
+export interface TimelinePostListViewProps {
+  className?: string;
+  style?: React.CSSProperties;
+  posts: HttpTimelinePostInfo[];
+}
+
+export const TimelinePostListView: React.FC<TimelinePostListViewProps> = (
+  props
+) => {
+  const { className, style, posts } = props;
 
   const groupedPosts = React.useMemo<
-    { date: Date; posts: (TimelinePostInfo & { index: number })[] }[]
+    { date: Date; posts: (HttpTimelinePostInfo & { index: number })[] }[]
   >(() => {
     const result: {
       date: Date;
-      posts: (TimelinePostInfo & { index: number })[];
+      posts: (HttpTimelinePostInfo & { index: number })[];
     }[] = [];
     let index = 0;
     for (const post of posts) {
-      const { time } = post;
+      const time = new Date(post.time);
       if (result.length === 0) {
         result.push({ date: time, posts: [{ ...post, index }] });
       } else {
@@ -61,48 +138,17 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [posts]);
 
   return (
-    <div style={props.style} className={clsx("timeline", props.className)}>
-      <TimelineTop height="56px" />
+    <div style={style} className={clsx("timeline", className)}>
       {groupedPosts.map((group) => {
         return (
           <>
             <TimelineDateItem date={group.date} />
             {group.posts.map((post) => {
-              const deletable = timelineService.hasModifyPostPermission(
-                user,
-                timeline,
-                post
-              );
               return (
                 <TimelineItem
-                  post={post}
                   key={post.id}
+                  post={post}
                   current={posts.length - 1 === post.index}
-                  more={
-                    deletable
-                      ? {
-                          isOpen: showMoreIndex === post.index,
-                          toggle: () =>
-                            setShowMoreIndex((old) =>
-                              old === post.index ? -1 : post.index
-                            ),
-                          onDelete: () => {
-                            timelineService
-                              .deletePost(timeline.name, post.id)
-                              .catch(() => {
-                                pushAlert({
-                                  type: "danger",
-                                  message: {
-                                    type: "i18n",
-                                    key: "timeline.deletePostFailed",
-                                  },
-                                });
-                              });
-                          },
-                        }
-                      : undefined
-                  }
-                  onClick={() => setShowMoreIndex(-1)}
                 />
               );
             })}

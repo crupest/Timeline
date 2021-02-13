@@ -6,15 +6,14 @@ import { Link } from "react-router-dom";
 
 import { HttpNetworkError } from "@/http/common";
 import { getHttpSearchClient } from "@/http/search";
-
-import { TimelineInfo } from "@/services/timeline";
+import { HttpTimelineInfo } from "@/http/timeline";
 
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
 
-const TimelineSearchResultItemView: React.FC<{ timeline: TimelineInfo }> = ({
-  timeline,
-}) => {
+const TimelineSearchResultItemView: React.FC<{
+  timeline: HttpTimelineInfo;
+}> = ({ timeline }) => {
   const link = timeline.name.startsWith("@")
     ? `users/${timeline.owner.username}`
     : `timelines/${timeline.name}`;
@@ -51,7 +50,7 @@ const SearchPage: React.FC = () => {
 
   const [searchText, setSearchText] = React.useState<string>("");
   const [state, setState] = React.useState<
-    TimelineInfo[] | "init" | "loading" | "network-error" | "error"
+    HttpTimelineInfo[] | "init" | "loading" | "network-error" | "error"
   >("init");
 
   const [forceResearchKey, setForceResearchKey] = React.useState<number>(0);
