@@ -1,19 +1,21 @@
 import React from "react";
 
 import {
-  TimelineVisibility,
+  getHttpTimelineClient,
+  HttpTimelineInfo,
+  HttpTimelinePatchRequest,
   kTimelineVisibilities,
-  TimelineChangePropertyRequest,
-  TimelineInfo,
-} from "@/services/timeline";
+  TimelineVisibility,
+} from "@/http/timeline";
 
 import OperationDialog from "../common/OperationDialog";
+
+// TODO: Trigger resync.
 
 export interface TimelinePropertyChangeDialogProps {
   open: boolean;
   close: () => void;
-  timeline: TimelineInfo;
-  onProcess: (request: TimelineChangePropertyRequest) => Promise<void>;
+  timeline: HttpTimelineInfo;
 }
 
 const labelMap: { [key in TimelineVisibility]: string } = {
@@ -54,7 +56,7 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
       open={props.open}
       close={props.close}
       onProcess={([newTitle, newVisibility, newDescription]) => {
-        const req: TimelineChangePropertyRequest = {};
+        const req: HttpTimelinePatchRequest = {};
         if (newTitle !== timeline.title) {
           req.title = newTitle;
         }
@@ -64,7 +66,7 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
         if (newDescription !== timeline.description) {
           req.description = newDescription;
         }
-        return props.onProcess(req);
+        return getHttpTimelineClient().patchTimeline(timeline.name, req);
       }}
     />
   );
