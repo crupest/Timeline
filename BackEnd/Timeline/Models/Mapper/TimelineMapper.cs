@@ -16,13 +16,17 @@ namespace Timeline.Models.Mapper
         private readonly UserMapper _userMapper;
         private readonly IHighlightTimelineService _highlightTimelineService;
         private readonly IBookmarkTimelineService _bookmarkTimelineService;
+        private readonly ITimelineService _timelineService;
+        private readonly ITimelinePostService _timelinePostService;
 
-        public TimelineMapper(DatabaseContext database, UserMapper userMapper, IHighlightTimelineService highlightTimelineService, IBookmarkTimelineService bookmarkTimelineService)
+        public TimelineMapper(DatabaseContext database, UserMapper userMapper, IHighlightTimelineService highlightTimelineService, IBookmarkTimelineService bookmarkTimelineService, ITimelineService timelineService, ITimelinePostService timelinePostService)
         {
             _database = database;
             _userMapper = userMapper;
             _highlightTimelineService = highlightTimelineService;
             _bookmarkTimelineService = bookmarkTimelineService;
+            _timelineService = timelineService;
+            _timelinePostService = timelinePostService;
         }
 
         public async Task<HttpTimeline> MapToHttp(TimelineEntity entity, IUrlHelper urlHelper, long? userId)
@@ -64,7 +68,7 @@ namespace Timeline.Models.Mapper
         }
 
 
-        public async Task<HttpTimelinePost> MapToHttp(TimelinePostEntity entity, string timelineName, IUrlHelper urlHelper)
+        public async Task<HttpTimelinePost> MapToHttp(TimelinePostEntity entity, string timelineName, IUrlHelper urlHelper, long? userId, bool isAdministrator)
         {
             _ = timelineName;
 
@@ -79,6 +83,22 @@ namespace Timeline.Models.Mapper
                 author = await _userMapper.MapToHttp(entity.Author, urlHelper);
             }
 
+            bool editable;
+
+            if (userId is null)
+            {
+                editable = false;
+            }
+            else if (isAdministrator)
+            {
+                editable = true;
+            }
+            else
+            {
+                editable = await _timelinePostService.HasPostModifyPermission(entity.TimelineId, entity.LocalId, userId.Value);
+            }
+
+
             return new HttpTimelinePost(
                     id: entity.LocalId,
                     dataList: dataDigestList,
@@ -86,18 +106,25 @@ namespace Timeline.Models.Mapper
                     author: author,
                     color: entity.Color,
                     deleted: entity.Deleted,
-                    lastUpdated: entity.LastUpdated
+                    lastUpdated: entity.LastUpdated,
+                    timelineName: timelineName,
+                    editable: editable
                 );
         }
 
-        public async Task<List<HttpTimelinePost>> MapToHttp(List<TimelinePostEntity> entities, string timelineName, IUrlHelper urlHelper)
+        public async Task<List<HttpTimelinePost>> MapToHttp(List<TimelinePostEntity> entities, string timelineName, IUrlHelper urlHelper, long? userId, bool isAdministrator)
         {
             var result = new List<HttpTimelinePost>();
             foreach (var entity in entities)
             {
-                result.Add(await MapToHttp(entity, timelineName, urlHelper));
+                result.Add(await MapToHttp(entity, timelineName, urlHelper, userId, isAdministrator));
             }
             return result;
+        }
+
+        internal Task MapToHttp(TimelinePostEntity post, string timeline, IUrlHelper url)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
