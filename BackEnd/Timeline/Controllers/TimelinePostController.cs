@@ -12,6 +12,7 @@ using Timeline.Models.Http;
 using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
 using Timeline.Services;
+using Timeline.Entities;
 
 namespace Timeline.Controllers
 {
@@ -43,6 +44,16 @@ namespace Timeline.Controllers
 
         private bool UserHasAllTimelineManagementPermission => this.UserHasPermission(UserPermission.AllTimelineManagement);
 
+        private Task<HttpTimelinePost> Map(TimelinePostEntity post, string timelineName)
+        {
+            return _timelineMapper.MapToHttp(post, timelineName, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+        }
+
+        private Task<List<HttpTimelinePost>> Map(List<TimelinePostEntity> posts, string timelineName)
+        {
+            return _timelineMapper.MapToHttp(posts, timelineName, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+        }
+
         /// <summary>
         /// Get posts of a timeline.
         /// </summary>
@@ -65,7 +76,7 @@ namespace Timeline.Controllers
 
             var posts = await _postService.GetPosts(timelineId, modifiedSince, includeDeleted ?? false);
 
-            var result = await _timelineMapper.MapToHttp(posts, timeline, Url);
+            var result = await Map(posts, timeline);
             return result;
         }
 
@@ -89,7 +100,7 @@ namespace Timeline.Controllers
             }
 
             var post = await _postService.GetPost(timelineId, postId);
-            var result = await _timelineMapper.MapToHttp(post, timeline, Url);
+            var result = await Map(post, timeline);
             return result;
         }
 
@@ -190,7 +201,7 @@ namespace Timeline.Controllers
             try
             {
                 var post = await _postService.CreatePost(timelineId, userId, createRequest);
-                var result = await _timelineMapper.MapToHttp(post, timeline, Url);
+                var result = await Map(post, timeline);
                 return result;
             }
             catch (TimelinePostCreateDataException e)
@@ -222,7 +233,7 @@ namespace Timeline.Controllers
             }
 
             var entity = await _postService.PatchPost(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
-            var result = await _timelineMapper.MapToHttp(entity, timeline, Url);
+            var result = await Map(entity, timeline);
 
             return Ok(result);
         }

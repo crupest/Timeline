@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Timeline.Entities;
 using Timeline.Models.Http;
 using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
@@ -28,6 +29,11 @@ namespace Timeline.Controllers
             _timelineMapper = timelineMapper;
         }
 
+        private Task<List<HttpTimeline>> Map(List<TimelineEntity> timelines)
+        {
+            return _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId(), this.UserHasPermission(UserPermission.AllTimelineManagement));
+        }
+
         /// <summary>
         /// Get bookmark list in order.
         /// </summary>
@@ -40,7 +46,7 @@ namespace Timeline.Controllers
         {
             var ids = await _service.GetBookmarks(this.GetUserId());
             var timelines = await _timelineService.GetTimelineList(ids);
-            return await _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId());
+            return await Map(timelines);
         }
 
         /// <summary>
