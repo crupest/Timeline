@@ -4,7 +4,7 @@ import { Spinner } from "react-bootstrap";
 
 import { getAlertHost } from "@/services/alert";
 
-import { HttpTimelineInfo } from "@/http/timeline";
+import { HttpTimelineInfo, HttpTimelinePostInfo } from "@/http/timeline";
 
 import Timeline from "./Timeline";
 import TimelinePostEdit from "./TimelinePostEdit";
@@ -47,10 +47,20 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
   const { t } = useTranslation();
 
+  const scrollToBottom = React.useCallback(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, []);
+
   const [bottomSpaceHeight, setBottomSpaceHeight] = React.useState<number>(0);
 
   const [timelineReloadKey, setTimelineReloadKey] = React.useState<number>(0);
-  const reloadTimeline = (): void => setTimelineReloadKey((old) => old + 1);
+
+  const [newPosts, setNewPosts] = React.useState<HttpTimelinePostInfo[]>([]);
+
+  const reloadTimeline = (): void => {
+    setTimelineReloadKey((old) => old + 1);
+    setNewPosts([]);
+  };
 
   const onPostEditHeightChange = React.useCallback((height: number): void => {
     setBottomSpaceHeight(height);
@@ -129,6 +139,8 @@ export default function TimelinePageTemplateUI<TManageItems>(
             timelineName={timeline.name}
             reloadKey={timelineReloadKey}
             onReload={reloadTimeline}
+            additionalPosts={newPosts}
+            onLoad={scrollToBottom}
           />
         </div>
         {timeline.postable ? (
@@ -141,7 +153,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
               className="fixed-bottom"
               timeline={timeline}
               onHeightChange={onPostEditHeightChange}
-              onPosted={reloadTimeline}
+              onPosted={(newPost) => {
+                setNewPosts((old) => [...old, newPost]);
+              }}
             />
           </>
         ) : null}

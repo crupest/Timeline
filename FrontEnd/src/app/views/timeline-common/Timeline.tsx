@@ -15,10 +15,20 @@ export interface TimelineProps {
   timelineName: string;
   reloadKey: number;
   onReload: () => void;
+  additionalPosts?: HttpTimelinePostInfo[];
+  onLoad?: () => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timelineName, className, style, reloadKey, onReload } = props;
+  const {
+    timelineName,
+    className,
+    style,
+    reloadKey,
+    onReload,
+    additionalPosts,
+    onLoad,
+  } = props;
 
   const [posts, setPosts] = React.useState<
     | HttpTimelinePostInfo[]
@@ -59,6 +69,12 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     };
   }, [timelineName, reloadKey]);
 
+  React.useEffect(() => {
+    if (Array.isArray(posts)) {
+      onLoad?.();
+    }
+  }, [posts, additionalPosts, onLoad]);
+
   switch (posts) {
     case "loading":
       return (
@@ -91,7 +107,12 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         </div>
       );
     default:
-      return <TimelinePostListView posts={posts} onReload={onReload} />;
+      return (
+        <TimelinePostListView
+          posts={[...posts, ...(additionalPosts ?? [])]}
+          onReload={onReload}
+        />
+      );
   }
 };
 

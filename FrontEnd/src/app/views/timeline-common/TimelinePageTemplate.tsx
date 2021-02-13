@@ -29,15 +29,6 @@ export default function TimelinePageTemplate<TManageItem>(
     null
   );
 
-  // TODO: Auto scroll.
-  // const [scrollBottomKey, _setScrollBottomKey] = React.useState<number>(0);
-
-  // React.useEffect(() => {
-  //   if (scrollBottomKey > 0) {
-  //     window.scrollTo(0, document.body.scrollHeight);
-  //   }
-  // }, [scrollBottomKey]);
-
   const [timeline, setTimeline] = React.useState<
     HttpTimelineInfo | "loading" | "offline" | "notexist" | "error"
   >("loading");
