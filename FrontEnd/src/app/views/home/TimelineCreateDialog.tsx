@@ -1,12 +1,9 @@
 import React from "react";
 import { useHistory } from "react-router";
 
-import {
-  validateTimelineName,
-  timelineService,
-  TimelineInfo,
-} from "@/services/timeline";
+import { validateTimelineName } from "@/services/timeline";
 import OperationDialog from "../common/OperationDialog";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 interface TimelineCreateDialogProps {
   open: boolean;
@@ -42,10 +39,10 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
           return null;
         }
       }}
-      onProcess={([name]): Promise<TimelineInfo> => {
-        return timelineService.createTimeline(name).toPromise();
-      }}
-      onSuccessAndClose={(timeline: TimelineInfo) => {
+      onProcess={([name]): Promise<HttpTimelineInfo> =>
+        getHttpTimelineClient().postTimeline({ name })
+      }
+      onSuccessAndClose={(timeline: HttpTimelineInfo) => {
         history.push(`timelines/${timeline.name}`);
       }}
       failurePrompt={(e) => `${e as string}`}

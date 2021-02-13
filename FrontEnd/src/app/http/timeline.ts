@@ -6,15 +6,7 @@ import {
   axios,
   apiBaseUrl,
   extractResponseData,
-  convertToNetworkError,
-  base64,
-  convertToIfStatusCodeIs,
   convertToIfErrorCodeIs,
-  BlobWithEtag,
-  NotModified,
-  convertToNotModified,
-  convertToForbiddenError,
-  convertToBlobWithEtag,
 } from "./common";
 import { HttpUser } from "./user";
 
@@ -29,7 +21,8 @@ export interface HttpTimelineInfo {
   description: string;
   owner: HttpUser;
   visibility: TimelineVisibility;
-  lastModified: Date;
+  color: string;
+  lastModified: string;
   members: HttpUser[];
   isHighlight: boolean;
   isBookmark: boolean;
@@ -45,57 +38,28 @@ export interface HttpTimelinePostRequest {
   name: string;
 }
 
-export interface HttpTimelinePostTextContent {
-  type: "text";
-  text: string;
+export interface HttpTimelinePostDataDigest {
+  kind: string;
+  eTag: string;
+  lastUpdated: string;
 }
-
-export interface HttpTimelinePostImageContent {
-  type: "image";
-}
-
-export type HttpTimelinePostContent =
-  | HttpTimelinePostTextContent
-  | HttpTimelinePostImageContent;
 
 export interface HttpTimelinePostInfo {
   id: number;
-  content: HttpTimelinePostContent;
-  time: Date;
-  lastUpdated: Date;
+  time: string;
   author: HttpUser;
-  deleted: false;
+  dataList: HttpTimelinePostDataDigest;
+  color: string;
+  lastUpdated: string;
 }
-
-export interface HttpTimelineDeletedPostInfo {
-  id: number;
-  time: Date;
-  lastUpdated: Date;
-  author?: HttpUser;
-  deleted: true;
-}
-
-export type HttpTimelineGenericPostInfo =
-  | HttpTimelinePostInfo
-  | HttpTimelineDeletedPostInfo;
-
-export interface HttpTimelinePostPostRequestTextContent {
-  type: "text";
-  text: string;
-}
-
-export interface HttpTimelinePostPostRequestImageContent {
-  type: "image";
-  data: Blob;
-}
-
-export type HttpTimelinePostPostRequestContent =
-  | HttpTimelinePostPostRequestTextContent
-  | HttpTimelinePostPostRequestImageContent;
 
 export interface HttpTimelinePostPostRequest {
-  content: HttpTimelinePostPostRequestContent;
-  time?: Date;
+  time?: string;
+  color?: string;
+  dataList: {
+    contentType: string;
+    data: string;
+  }[];
 }
 
 export interface HttpTimelinePatchRequest {
@@ -105,118 +69,10 @@ export interface HttpTimelinePatchRequest {
   description?: string;
 }
 
-export class HttpTimelineNotExistError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
-}
-
-export class HttpTimelinePostNotExistError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
-}
-
 export class HttpTimelineNameConflictError extends Error {
   constructor(public innerError?: AxiosError) {
     super();
   }
-}
-
-//-------------------- begin: internal model --------------------
-
-export interface RawHttpTimelineInfo {
-  uniqueId: string;
-  title: string;
-  name: string;
-  description: string;
-  owner: HttpUser;
-  visibility: TimelineVisibility;
-  lastModified: string;
-  members: HttpUser[];
-  isHighlight: boolean;
-  isBookmark: boolean;
-}
-
-interface RawTimelinePostTextContent {
-  type: "text";
-  text: string;
-}
-
-interface RawTimelinePostImageContent {
-  type: "image";
-  url: string;
-}
-
-type RawTimelinePostContent =
-  | RawTimelinePostTextContent
-  | RawTimelinePostImageContent;
-
-interface RawTimelinePostInfo {
-  id: number;
-  content: RawTimelinePostContent;
-  time: string;
-  lastUpdated: string;
-  author: HttpUser;
-  deleted: false;
-}
-
-interface RawTimelineDeletedPostInfo {
-  id: number;
-  time: string;
-  lastUpdated: string;
-  author: HttpUser;
-  deleted: true;
-}
-
-type RawTimelineGenericPostInfo =
-  | RawTimelinePostInfo
-  | RawTimelineDeletedPostInfo;
-
-interface RawTimelinePostPostRequestTextContent {
-  type: "text";
-  text: string;
-}
-
-interface RawTimelinePostPostRequestImageContent {
-  type: "image";
-  data: string;
-}
-
-type RawTimelinePostPostRequestContent =
-  | RawTimelinePostPostRequestTextContent
-  | RawTimelinePostPostRequestImageContent;
-
-interface RawTimelinePostPostRequest {
-  content: RawTimelinePostPostRequestContent;
-  time?: string;
-}
-
-//-------------------- end: internal model --------------------
-
-export function processRawTimelineInfo(
-  raw: RawHttpTimelineInfo
-): HttpTimelineInfo {
-  return {
-    ...raw,
-    lastModified: new Date(raw.lastModified),
-  };
-}
-
-function processRawTimelinePostInfo(
-  raw: RawTimelinePostInfo
-): HttpTimelinePostInfo;
-function processRawTimelinePostInfo(
-  raw: RawTimelineGenericPostInfo
-): HttpTimelineGenericPostInfo;
-function processRawTimelinePostInfo(
-  raw: RawTimelineGenericPostInfo
-): HttpTimelineGenericPostInfo {
-  return {
-    ...raw,
-    time: new Date(raw.time),
-    lastUpdated: new Date(raw.lastUpdated),
-  };
 }
 
 export interface IHttpTimelineClient {
@@ -231,26 +87,6 @@ export interface IHttpTimelineClient {
   memberPut(timelineName: string, username: string): Promise<void>;
   memberDelete(timelineName: string, username: string): Promise<void>;
   listPost(timelineName: string): Promise<HttpTimelinePostInfo[]>;
-  listPost(
-    timelineName: string,
-    query: {
-      modifiedSince?: Date;
-      includeDeleted?: false;
-    }
-  ): Promise<HttpTimelinePostInfo[]>;
-  listPost(
-    timelineName: string,
-    query: {
-      modifiedSince?: Date;
-      includeDeleted: true;
-    }
-  ): Promise<HttpTimelineGenericPostInfo[]>;
-  getPostData(timelineName: string, postId: number): Promise<BlobWithEtag>;
-  getPostData(
-    timelineName: string,
-    postId: number,
-    etag: string
-  ): Promise<BlobWithEtag | NotModified>;
   postPost(
     timelineName: string,
     req: HttpTimelinePostPostRequest
@@ -261,30 +97,23 @@ export interface IHttpTimelineClient {
 export class HttpTimelineClient implements IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]> {
     return axios
-      .get<RawHttpTimelineInfo[]>(
+      .get<HttpTimelineInfo[]>(
         applyQueryParameters(`${apiBaseUrl}/timelines`, query)
       )
-      .then(extractResponseData)
-      .then((list) => list.map(processRawTimelineInfo))
-      .catch(convertToNetworkError);
+      .then(extractResponseData);
   }
 
   getTimeline(timelineName: string): Promise<HttpTimelineInfo> {
     return axios
-      .get<RawHttpTimelineInfo>(`${apiBaseUrl}/timelines/${timelineName}`)
-      .then(extractResponseData)
-      .then(processRawTimelineInfo)
-      .catch(convertToIfStatusCodeIs(404, HttpTimelineNotExistError))
-      .catch(convertToNetworkError);
+      .get<HttpTimelineInfo>(`${apiBaseUrl}/timelines/${timelineName}`)
+      .then(extractResponseData);
   }
 
   postTimeline(req: HttpTimelinePostRequest): Promise<HttpTimelineInfo> {
     return axios
-      .post<RawHttpTimelineInfo>(`${apiBaseUrl}/timelines`, req)
+      .post<HttpTimelineInfo>(`${apiBaseUrl}/timelines`, req)
       .then(extractResponseData)
-      .then(processRawTimelineInfo)
-      .catch(convertToIfErrorCodeIs(11040101, HttpTimelineNameConflictError))
-      .catch(convertToNetworkError);
+      .catch(convertToIfErrorCodeIs(11040101, HttpTimelineNameConflictError));
   }
 
   patchTimeline(
@@ -292,134 +121,49 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     req: HttpTimelinePatchRequest
   ): Promise<HttpTimelineInfo> {
     return axios
-      .patch<RawHttpTimelineInfo>(
-        `${apiBaseUrl}/timelines/${timelineName}`,
-        req
-      )
-      .then(extractResponseData)
-      .then(processRawTimelineInfo)
-      .catch(convertToNetworkError);
+      .patch<HttpTimelineInfo>(`${apiBaseUrl}/timelines/${timelineName}`, req)
+      .then(extractResponseData);
   }
 
   deleteTimeline(timelineName: string): Promise<void> {
-    return axios
-      .delete(`${apiBaseUrl}/timelines/${timelineName}`)
-      .catch(convertToNetworkError)
-      .then();
+    return axios.delete(`${apiBaseUrl}/timelines/${timelineName}`).then();
   }
 
   memberPut(timelineName: string, username: string): Promise<void> {
     return axios
       .put(`${apiBaseUrl}/timelines/${timelineName}/members/${username}`)
-      .catch(convertToNetworkError)
       .then();
   }
 
   memberDelete(timelineName: string, username: string): Promise<void> {
     return axios
       .delete(`${apiBaseUrl}/timelines/${timelineName}/members/${username}`)
-      .catch(convertToNetworkError)
       .then();
   }
 
-  listPost(timelineName: string): Promise<HttpTimelinePostInfo[]>;
-  listPost(
-    timelineName: string,
-    query: {
-      modifiedSince?: Date;
-      includeDeleted?: false;
-    }
-  ): Promise<HttpTimelinePostInfo[]>;
-  listPost(
-    timelineName: string,
-    query: {
-      modifiedSince?: Date;
-      includeDeleted: true;
-    }
-  ): Promise<HttpTimelineGenericPostInfo[]>;
-  listPost(
-    timelineName: string,
-    query?: {
-      modifiedSince?: Date;
-      includeDeleted?: boolean;
-    }
-  ): Promise<HttpTimelineGenericPostInfo[]> {
+  listPost(timelineName: string): Promise<HttpTimelinePostInfo[]> {
     return axios
-      .get<RawTimelineGenericPostInfo[]>(
-        applyQueryParameters(
-          `${apiBaseUrl}/timelines/${timelineName}/posts`,
-          query
-        )
+      .get<HttpTimelinePostInfo[]>(
+        `${apiBaseUrl}/timelines/${timelineName}/posts`
       )
-      .then(extractResponseData)
-      .catch(convertToIfStatusCodeIs(404, HttpTimelineNotExistError))
-      .catch(convertToForbiddenError)
-      .catch(convertToNetworkError)
-      .then((rawPosts) =>
-        rawPosts.map((raw) => processRawTimelinePostInfo(raw))
-      );
+      .then(extractResponseData);
   }
 
-  getPostData(timelineName: string, postId: number): Promise<BlobWithEtag>;
-  getPostData(
-    timelineName: string,
-    postId: number,
-    etag?: string
-  ): Promise<BlobWithEtag | NotModified> {
-    const headers =
-      etag != null
-        ? {
-            "If-None-Match": etag,
-          }
-        : undefined;
-
-    const url = `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}/data`;
-
-    return axios
-      .get(url, {
-        responseType: "blob",
-        headers,
-      })
-      .then(convertToBlobWithEtag)
-      .catch(convertToNotModified)
-      .catch(convertToIfStatusCodeIs(404, HttpTimelinePostNotExistError))
-      .catch(convertToNetworkError);
-  }
-
-  async postPost(
+  postPost(
     timelineName: string,
     req: HttpTimelinePostPostRequest
   ): Promise<HttpTimelinePostInfo> {
-    let content: RawTimelinePostPostRequestContent;
-    if (req.content.type === "image") {
-      const base64Data = await base64(req.content.data);
-      content = {
-        ...req.content,
-        data: base64Data,
-      } as RawTimelinePostPostRequestImageContent;
-    } else {
-      content = req.content;
-    }
-    const rawReq: RawTimelinePostPostRequest = {
-      content,
-    };
-    if (req.time != null) {
-      rawReq.time = req.time.toISOString();
-    }
-    return await axios
-      .post<RawTimelinePostInfo>(
+    return axios
+      .post<HttpTimelinePostInfo>(
         `${apiBaseUrl}/timelines/${timelineName}/posts`,
-        rawReq
+        req
       )
-      .then(extractResponseData)
-      .catch(convertToNetworkError)
-      .then((rawPost) => processRawTimelinePostInfo(rawPost));
+      .then(extractResponseData);
   }
 
   deletePost(timelineName: string, postId: number): Promise<void> {
     return axios
       .delete(`${apiBaseUrl}/timelines/${timelineName}/posts/${postId}`)
-      .catch(convertToNetworkError)
       .then();
   }
 }

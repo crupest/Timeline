@@ -6,7 +6,7 @@ import OperationDialog, {
   OperationBoolInputInfo,
 } from "../common/OperationDialog";
 
-import { User, AuthUser } from "@/services/user";
+import { AuthUser } from "@/services/user";
 import {
   getHttpUserClient,
   HttpUser,
@@ -199,7 +199,7 @@ type ContextMenuItem = TModify | TModifyPermission | TDelete;
 
 interface UserItemProps {
   on: { [key in ContextMenuItem]: () => void };
-  user: User;
+  user: HttpUser;
 }
 
 const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
@@ -273,7 +273,7 @@ const UserAdmin: React.FC<UserAdminProps> = (props) => {
       }
     | { type: TDelete; username: string };
 
-  const [users, setUsers] = useState<User[] | null>(null);
+  const [users, setUsers] = useState<HttpUser[] | null>(null);
   const [dialog, setDialog] = useState<DialogInfo>(null);
   const [usersVersion, setUsersVersion] = useState<number>(0);
   const updateUsers = (): void => {

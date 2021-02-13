@@ -29,7 +29,6 @@
     "relatedTimeline": "关于你的时间线",
     "publicTimeline": "公开时间线",
     "bookmarkTimeline": "书签时间线",
-    "offlinePrompt": "你好像处于离线状态。以下是一些缓存在本地的时间线。你可以查看它们或者<1>点击</1>重新获取在线信息。",
     "message": {
       "moveHighlightFail": "移动高光时间线失败。",
       "deleteHighlightFail": "删除高光时间线失败。",

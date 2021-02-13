@@ -4,7 +4,6 @@ import axios, { AxiosError } from "axios";
 
 import {
   apiBaseUrl,
-  convertToNetworkError,
   convertToIfErrorCodeIs,
   extractResponseData,
 } from "./common";
@@ -47,15 +46,13 @@ export class HttpTokenClient implements IHttpTokenClient {
       .then(extractResponseData)
       .catch(
         convertToIfErrorCodeIs(11010101, HttpCreateTokenBadCredentialError)
-      )
-      .catch(convertToNetworkError);
+      );
   }
 
   verify(req: HttpVerifyTokenRequest): Promise<HttpVerifyTokenResponse> {
     return axios
       .post<HttpVerifyTokenResponse>(`${apiBaseUrl}/token/verify`, req)
-      .then(extractResponseData)
-      .catch(convertToNetworkError);
+      .then(extractResponseData);
   }
 }
 

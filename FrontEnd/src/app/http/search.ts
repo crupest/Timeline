@@ -1,14 +1,5 @@
-import {
-  apiBaseUrl,
-  axios,
-  convertToNetworkError,
-  extractResponseData,
-} from "./common";
-import {
-  HttpTimelineInfo,
-  processRawTimelineInfo,
-  RawHttpTimelineInfo,
-} from "./timeline";
+import { apiBaseUrl, axios, extractResponseData } from "./common";
+import { HttpTimelineInfo } from "./timeline";
 import { HttpUser } from "./user";
 
 export interface IHttpSearchClient {
@@ -19,17 +10,14 @@ export interface IHttpSearchClient {
 export class HttpSearchClient implements IHttpSearchClient {
   searchTimelines(query: string): Promise<HttpTimelineInfo[]> {
     return axios
-      .get<RawHttpTimelineInfo[]>(`${apiBaseUrl}/search/timelines?q=${query}`)
-      .then(extractResponseData)
-      .then((ts) => ts.map(processRawTimelineInfo))
-      .catch(convertToNetworkError);
+      .get<HttpTimelineInfo[]>(`${apiBaseUrl}/search/timelines?q=${query}`)
+      .then(extractResponseData);
   }
 
   searchUsers(query: string): Promise<HttpUser[]> {
     return axios
       .get<HttpUser[]>(`${apiBaseUrl}/search/users?q=${query}`)
-      .then(extractResponseData)
-      .catch(convertToNetworkError);
+      .then(extractResponseData);
   }
 }
 
