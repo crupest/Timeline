@@ -75,15 +75,6 @@ namespace Timeline.Tests.IntegratedTests
                 await client.TestGetAssertInvalidModelAsync("timelines?visibility=aaa");
             }
 
-            var testResultRelate = new List<HttpTimeline>();
-            var testResultOwn = new List<HttpTimeline>();
-            var testResultJoin = new List<HttpTimeline>();
-            var testResultOwnPrivate = new List<HttpTimeline>();
-            var testResultRelatePublic = new List<HttpTimeline>();
-            var testResultRelateRegister = new List<HttpTimeline>();
-            var testResultJoinPrivate = new List<HttpTimeline>();
-            var testResultPublic = new List<HttpTimeline>();
-
             {
                 using var client = await CreateClientAsUser();
 
@@ -91,6 +82,34 @@ namespace Timeline.Tests.IntegratedTests
                 await client.PutTimelineMemberAsync("t1", "user3");
                 await client.PatchTimelineAsync("@user1", new() { Visibility = TimelineVisibility.Public });
                 await client.PatchTimelineAsync("t1", new() { Visibility = TimelineVisibility.Register });
+            }
+
+            {
+                using var client = await CreateClientAs(2);
+
+                await client.PutTimelineMemberAsync("@user2", "user3");
+                await client.PutTimelineMemberAsync("t2", "user3");
+                await client.PatchTimelineAsync("@user2", new() { Visibility = TimelineVisibility.Register });
+                await client.PatchTimelineAsync("t2", new() { Visibility = TimelineVisibility.Private });
+            }
+
+            {
+                using var client = await CreateClientAs(3);
+                await client.PatchTimelineAsync("@user3", new HttpTimelinePatchRequest { Visibility = TimelineVisibility.Private });
+                await client.PatchTimelineAsync("t3", new HttpTimelinePatchRequest { Visibility = TimelineVisibility.Register });
+            }
+
+            {
+                var testResultRelate = new List<HttpTimeline>();
+                var testResultOwn = new List<HttpTimeline>();
+                var testResultJoin = new List<HttpTimeline>();
+                var testResultOwnPrivate = new List<HttpTimeline>();
+                var testResultRelatePublic = new List<HttpTimeline>();
+                var testResultRelateRegister = new List<HttpTimeline>();
+                var testResultJoinPrivate = new List<HttpTimeline>();
+                var testResultPublic = new List<HttpTimeline>();
+
+                using var client = await CreateDefaultClient();
 
                 {
                     var timeline = await client.GetTimelineAsync("@user1");
@@ -106,15 +125,6 @@ namespace Timeline.Tests.IntegratedTests
                     testResultJoin.Add(timeline);
                     testResultRelateRegister.Add(timeline);
                 }
-            }
-
-            {
-                using var client = await CreateClientAs(2);
-
-                await client.PutTimelineMemberAsync("@user2", "user3");
-                await client.PutTimelineMemberAsync("t2", "user3");
-                await client.PatchTimelineAsync("@user2", new() { Visibility = TimelineVisibility.Register });
-                await client.PatchTimelineAsync("t2", new() { Visibility = TimelineVisibility.Private });
 
                 {
                     var timeline = await client.GetTimelineAsync("@user2");
@@ -129,12 +139,6 @@ namespace Timeline.Tests.IntegratedTests
                     testResultJoin.Add(timeline);
                     testResultJoinPrivate.Add(timeline);
                 }
-            }
-
-            {
-                using var client = await CreateClientAs(3);
-                await client.PatchTimelineAsync("@user3", new HttpTimelinePatchRequest { Visibility = TimelineVisibility.Private });
-                await client.PatchTimelineAsync("t3", new HttpTimelinePatchRequest { Visibility = TimelineVisibility.Register });
 
                 {
                     var timeline = await client.GetTimelineAsync("@user3");
@@ -149,10 +153,6 @@ namespace Timeline.Tests.IntegratedTests
                     testResultOwn.Add(timeline);
                     testResultRelateRegister.Add(timeline);
                 }
-            }
-
-            {
-                using var client = await CreateDefaultClient();
 
                 async Task TestAgainst(string url, List<HttpTimeline> against)
                 {
@@ -411,6 +411,23 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var timeline = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}");
                 timeline.Color.Should().Be("#112233");
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Get_Manageable(TimelineNameGenerator generator)
+        {
+            {
+                using var client = await CreateClientAsUser();
+                var timeline = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}");
+                timeline.Manageable.Should().Be(true);
+            }
+
+            {
+                using var client = await CreateClientAs(2);
+                var timeline = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}");
+                timeline.Manageable.Should().Be(false);
             }
         }
     }
