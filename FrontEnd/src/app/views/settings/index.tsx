@@ -53,8 +53,7 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
         return result;
       }}
       onProcess={async ([oldPassword, newPassword]) => {
-        await userService.changePassword(oldPassword, newPassword).toPromise();
-        await userService.logout();
+        await userService.changePassword(oldPassword, newPassword);
         setRedirect(true);
       }}
       close={() => {
