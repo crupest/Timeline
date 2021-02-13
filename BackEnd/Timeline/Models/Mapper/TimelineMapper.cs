@@ -51,6 +51,16 @@ namespace Timeline.Models.Mapper
                 manageable = await _timelineService.HasManagePermission(entity.Id, userId.Value);
             }
 
+            bool postable;
+            if (userId is null)
+            {
+                postable = false;
+            }
+            else
+            {
+                postable = await _timelineService.IsMemberOf(entity.Id, userId.Value);
+            }
+
             return new HttpTimeline(
                 uniqueId: entity.UniqueId,
                 title: string.IsNullOrEmpty(entity.Title) ? timelineName : entity.Title,
@@ -66,6 +76,7 @@ namespace Timeline.Models.Mapper
                 isHighlight: await _highlightTimelineService.IsHighlightTimeline(entity.Id),
                 isBookmark: userId is not null && await _bookmarkTimelineService.IsBookmark(userId.Value, entity.Id, false, false),
                 manageable: manageable,
+                postable: postable,
                 links: new HttpTimelineLinks(
                     self: urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = timelineName }),
                     posts: urlHelper.ActionLink(nameof(TimelinePostController.List), nameof(TimelinePostController)[0..^nameof(Controller).Length], new { timeline = timelineName })

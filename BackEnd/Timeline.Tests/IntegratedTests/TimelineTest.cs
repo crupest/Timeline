@@ -416,18 +416,20 @@ namespace Timeline.Tests.IntegratedTests
 
         [Theory]
         [MemberData(nameof(TimelineNameGeneratorTestData))]
-        public async Task Get_Manageable(TimelineNameGenerator generator)
+        public async Task Get_Manageable_Postable(TimelineNameGenerator generator)
         {
             {
                 using var client = await CreateClientAsUser();
                 var timeline = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}");
                 timeline.Manageable.Should().Be(true);
+                timeline.Postable.Should().Be(true);
             }
 
             {
                 using var client = await CreateClientAs(2);
                 var timeline = await client.TestGetAsync<HttpTimeline>($"timelines/{generator(1)}");
                 timeline.Manageable.Should().Be(false);
+                timeline.Postable.Should().Be(false);
             }
         }
     }
