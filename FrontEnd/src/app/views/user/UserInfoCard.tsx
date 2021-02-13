@@ -1,12 +1,10 @@
 import React from "react";
 
-import { useAvatar } from "@/services/user";
-
-import BlobImage from "../common/BlobImage";
 import TimelineCardTemplate, {
   TimelineCardTemplateProps,
 } from "../timeline-common/TimelineCardTemplate";
 import { TimelineCardComponentProps } from "../timeline-common/TimelinePageTemplateUI";
+import UserAvatar from "../common/user/UserAvatar";
 
 export type PersonalTimelineManageItem = "avatar" | "nickname";
 
@@ -15,8 +13,6 @@ export type UserInfoCardProps = TimelineCardComponentProps<PersonalTimelineManag
 const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
   const { timeline, operations } = props;
   const { onManage, onMember } = operations;
-
-  const avatar = useAvatar(timeline?.owner?.username);
 
   return (
     <TimelineCardTemplate
@@ -27,8 +23,8 @@ const UserInfoCard: React.FC<UserInfoCardProps> = (props) => {
             <small className="ml-3 text-secondary">{timeline.name}</small>
           </h3>
           <div className="align-middle">
-            <BlobImage
-              blob={avatar}
+            <UserAvatar
+              username={timeline.owner.username}
               className="avatar small rounded-circle mr-3"
             />
             {timeline.owner.nickname}

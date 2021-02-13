@@ -2,7 +2,7 @@ import React from "react";
 import { useHistory } from "react-router";
 import { Trans } from "react-i18next";
 
-import { timelineService } from "@/services/timeline";
+import { getHttpTimelineClient } from "@/http/timeline";
 
 import OperationDialog from "../common/OperationDialog";
 
@@ -43,7 +43,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
         }
       }}
       onProcess={() => {
-        return timelineService.deleteTimeline(name).toPromise();
+        return getHttpTimelineClient().deleteTimeline(name);
       }}
       onSuccessAndClose={() => {
         history.replace("/");

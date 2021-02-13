@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useParams } from "react-router";
 
-import { userInfoService } from "@/services/user";
+import { getHttpUserClient } from "@/http/user";
 
 import TimelinePageTemplate from "../timeline-common/TimelinePageTemplate";
-
 import UserPageUI from "./UserPageUI";
 import { PersonalTimelineManageItem } from "./UserInfoCard";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
@@ -15,6 +14,8 @@ const UserPage: React.FC = (_) => {
 
   const [dialog, setDialog] = useState<null | PersonalTimelineManageItem>(null);
 
+  const [reloadKey, setReloadKey] = React.useState<number>(0);
+
   let dialogElement: React.ReactElement | undefined;
 
   const closeDialog = (): void => setDialog(null);
@@ -24,9 +25,10 @@ const UserPage: React.FC = (_) => {
       <ChangeNicknameDialog
         open
         close={closeDialog}
-        onProcess={(newNickname) =>
-          userInfoService.setNickname(username, newNickname)
-        }
+        onProcess={async (newNickname) => {
+          await getHttpUserClient().patch(username, { nickname: newNickname });
+          setReloadKey(reloadKey + 1);
+        }}
       />
     );
   } else if (dialog === "avatar") {
@@ -34,7 +36,10 @@ const UserPage: React.FC = (_) => {
       <ChangeAvatarDialog
         open
         close={closeDialog}
-        process={(file) => userInfoService.setAvatar(username, file)}
+        process={async (file) => {
+          await getHttpUserClient().putAvatar(username, file);
+          setReloadKey(reloadKey + 1);
+        }}
       />
     );
   }
@@ -46,6 +51,8 @@ const UserPage: React.FC = (_) => {
         UiComponent={UserPageUI}
         onManage={(item) => setDialog(item)}
         notFoundI18nKey="timeline.userNotExist"
+        reloadKey={reloadKey}
+        onReload={() => setReloadKey(reloadKey + 1)}
       />
       {dialogElement}
     </>

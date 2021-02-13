@@ -10,12 +10,11 @@ import {
 
 import OperationDialog from "../common/OperationDialog";
 
-// TODO: Trigger resync.
-
 export interface TimelinePropertyChangeDialogProps {
   open: boolean;
   close: () => void;
   timeline: HttpTimelineInfo;
+  onChange: () => void;
 }
 
 const labelMap: { [key in TimelineVisibility]: string } = {
@@ -27,7 +26,7 @@ const labelMap: { [key in TimelineVisibility]: string } = {
 const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> = (
   props
 ) => {
-  const { timeline } = props;
+  const { timeline, onChange } = props;
 
   return (
     <OperationDialog
@@ -66,7 +65,9 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
         if (newDescription !== timeline.description) {
           req.description = newDescription;
         }
-        return getHttpTimelineClient().patchTimeline(timeline.name, req);
+        return getHttpTimelineClient()
+          .patchTimeline(timeline.name, req)
+          .then(onChange);
       }}
     />
   );

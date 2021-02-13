@@ -16,12 +16,14 @@ export interface TimelinePageTemplateProps<TManageItem> {
     Omit<TimelinePageTemplateUIProps<TManageItem>, "CardComponent">
   >;
   notFoundI18nKey: string;
+  reloadKey: number;
+  onReload: () => void;
 }
 
 export default function TimelinePageTemplate<TManageItem>(
   props: TimelinePageTemplateProps<TManageItem>
 ): React.ReactElement | null {
-  const { name } = props;
+  const { name, reloadKey, onReload } = props;
 
   const [dialog, setDialog] = React.useState<null | "property" | "member">(
     null
@@ -68,7 +70,7 @@ export default function TimelinePageTemplate<TManageItem>(
     return () => {
       subscribe = false;
     };
-  }, [name]);
+  }, [name, reloadKey]);
 
   let dialogElement: React.ReactElement | undefined;
   const closeDialog = (): void => setDialog(null);
@@ -85,6 +87,7 @@ export default function TimelinePageTemplate<TManageItem>(
         open
         close={closeDialog}
         timeline={timeline}
+        onChange={onReload}
       />
     );
   } else if (dialog === "member") {
@@ -95,7 +98,12 @@ export default function TimelinePageTemplate<TManageItem>(
     }
 
     dialogElement = (
-      <TimelineMemberDialog open onClose={closeDialog} timeline={timeline} />
+      <TimelineMemberDialog
+        open
+        onClose={closeDialog}
+        timeline={timeline}
+        onChange={onReload}
+      />
     );
   }
 
