@@ -1,8 +1,6 @@
 import React from "react";
 
-import { useAvatar } from "@/services/user";
-
-import BlobImage from "../BlobImage";
+import { getHttpUserClient } from "@/http/user";
 
 export interface UserAvatarProps
   extends React.ImgHTMLAttributes<HTMLImageElement> {
@@ -10,9 +8,12 @@ export interface UserAvatarProps
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ username, ...otherProps }) => {
-  const avatar = useAvatar(username);
-
-  return <BlobImage blob={avatar} {...otherProps} />;
+  return (
+    <img
+      src={getHttpUserClient().generateAvatarUrl(username)}
+      {...otherProps}
+    />
+  );
 };
 
 export default UserAvatar;

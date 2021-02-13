@@ -4,14 +4,13 @@ import { LinkContainer } from "react-router-bootstrap";
 import { Navbar, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 
-import { useUser, useAvatar } from "@/services/user";
+import { useUser } from "@/services/user";
 
 import TimelineLogo from "./TimelineLogo";
-import BlobImage from "./BlobImage";
+import UserAvatar from "./user/UserAvatar";
 
 const AppBar: React.FC = (_) => {
   const user = useUser();
-  const avatar = useAvatar(user?.username);
 
   const { t } = useTranslation();
 
@@ -70,10 +69,9 @@ const AppBar: React.FC = (_) => {
         <Nav className="ml-auto mr-2 align-items-center">
           {user != null ? (
             <LinkContainer to={`/users/${user.username}`}>
-              <BlobImage
+              <UserAvatar
+                username={user.username}
                 className="avatar small rounded-circle bg-white cursor-pointer ml-auto"
-                onClick={collapse}
-                blob={avatar}
               />
             </LinkContainer>
           ) : (

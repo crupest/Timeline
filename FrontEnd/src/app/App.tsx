@@ -12,7 +12,6 @@ import TimelinePage from "./views/timeline";
 import Search from "./views/search";
 import AlertHost from "./views/common/alert/AlertHost";
 
-import { dataStorage } from "./services/common";
 import { userService, useRawUser } from "./services/user";
 
 const NoMatch: React.FC = () => {
@@ -24,16 +23,13 @@ const LazyAdmin = React.lazy(
 );
 
 const App: React.FC = () => {
-  const [loading, setLoading] = React.useState<boolean>(true);
-
   const user = useRawUser();
 
   React.useEffect(() => {
     void userService.checkLoginState();
-    void dataStorage.ready().then(() => setLoading(false));
   }, []);
 
-  if (user === undefined || loading) {
+  if (user === undefined) {
     return <LoadingPage />;
   } else {
     return (

@@ -13,10 +13,12 @@ export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
   timelineName: string;
+  reloadKey: number;
+  onReload: () => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timelineName, className, style } = props;
+  const { timelineName, className, style, reloadKey, onReload } = props;
 
   const [posts, setPosts] = React.useState<
     | HttpTimelinePostInfo[]
@@ -29,6 +31,8 @@ const Timeline: React.FC<TimelineProps> = (props) => {
 
   React.useEffect(() => {
     let subscribe = true;
+
+    setPosts("loading");
 
     void getHttpTimelineClient()
       .listPost(timelineName)
@@ -53,7 +57,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     return () => {
       subscribe = false;
     };
-  }, [timelineName]);
+  }, [timelineName, reloadKey]);
 
   switch (posts) {
     case "loading":
@@ -87,7 +91,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         </div>
       );
     default:
-      return <TimelinePostListView posts={posts} />;
+      return <TimelinePostListView posts={posts} onReload={onReload} />;
   }
 };
 

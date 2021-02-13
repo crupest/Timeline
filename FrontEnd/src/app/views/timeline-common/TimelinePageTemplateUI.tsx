@@ -49,6 +49,9 @@ export default function TimelinePageTemplateUI<TManageItems>(
 
   const [bottomSpaceHeight, setBottomSpaceHeight] = React.useState<number>(0);
 
+  const [timelineReloadKey, setTimelineReloadKey] = React.useState<number>(0);
+  const reloadTimeline = (): void => setTimelineReloadKey((old) => old + 1);
+
   const onPostEditHeightChange = React.useCallback((height: number): void => {
     setBottomSpaceHeight(height);
     if (height === 0) {
@@ -122,7 +125,11 @@ export default function TimelinePageTemplateUI<TManageItems>(
             minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
           }}
         >
-          <Timeline timelineName={timeline.name} />
+          <Timeline
+            timelineName={timeline.name}
+            reloadKey={timelineReloadKey}
+            onReload={reloadTimeline}
+          />
         </div>
         {timeline.postable ? (
           <>
@@ -134,6 +141,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
               className="fixed-bottom"
               timeline={timeline}
               onHeightChange={onPostEditHeightChange}
+              onPosted={reloadTimeline}
             />
           </>
         ) : null}

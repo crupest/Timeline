@@ -18,10 +18,11 @@ export interface TimelinePostListViewProps {
   className?: string;
   style?: React.CSSProperties;
   posts: HttpTimelinePostInfo[];
+  onReload: () => void;
 }
 
 const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
-  const { className, style, posts } = props;
+  const { className, style, posts, onReload } = props;
 
   const groupedPosts = React.useMemo<
     { date: Date; posts: (HttpTimelinePostInfo & { index: number })[] }[]
@@ -60,6 +61,7 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
                   key={post.id}
                   post={post}
                   current={posts.length - 1 === post.index}
+                  onDeleted={onReload}
                 />
               );
             })}

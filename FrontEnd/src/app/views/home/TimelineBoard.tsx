@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { Spinner } from "react-bootstrap";
 
-import { TimelineInfo } from "@/services/timeline";
+import { HttpTimelineInfo } from "@/http/timeline";
+
 import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
-import { HttpTimelineInfo } from "@/http/timeline";
 
 interface TimelineBoardItemProps {
   timeline: HttpTimelineInfo;
@@ -98,7 +98,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
 };
 
 interface TimelineBoardItemContainerProps {
-  timelines: TimelineInfo[];
+  timelines: HttpTimelineInfo[];
   editHandler?: {
     // offset may exceed index range plusing index.
     onMove: (timeline: string, index: number, offset: number) => void;
@@ -206,7 +206,7 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
 
 interface TimelineBoardUIProps {
   title?: string;
-  timelines: TimelineInfo[] | "offline" | "loading";
+  timelines: HttpTimelineInfo[] | "offline" | "loading";
   onReload: () => void;
   className?: string;
   editHandler?: {
@@ -304,7 +304,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
 export interface TimelineBoardProps {
   title?: string;
   className?: string;
-  load: () => Promise<TimelineInfo[]>;
+  load: () => Promise<HttpTimelineInfo[]>;
   editHandler?: {
     onMove: (timeline: string, index: number, offset: number) => Promise<void>;
     onDelete: (timeline: string) => Promise<void>;
@@ -318,7 +318,7 @@ const TimelineBoard: React.FC<TimelineBoardProps> = ({
   editHandler,
 }) => {
   const [timelines, setTimelines] = React.useState<
-    TimelineInfo[] | "offline" | "loading"
+    HttpTimelineInfo[] | "offline" | "loading"
   >("loading");
 
   React.useEffect(() => {
