@@ -33,7 +33,7 @@ namespace Timeline.Services.Migration
                 {
                     if (postEntity.ContentType == "text")
                     {
-                        var tag = await _dataManager.RetainEntry(Encoding.UTF8.GetBytes(postEntity.Content), false);
+                        var tag = await _dataManager.RetainEntry(Encoding.UTF8.GetBytes(postEntity.Content));
                         database.TimelinePostData.Add(new TimelinePostDataEntity
                         {
                             DataTag = tag,
