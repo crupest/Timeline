@@ -51,6 +51,8 @@ export interface HttpTimelinePostInfo {
   dataList: HttpTimelinePostDataDigest;
   color: string;
   lastUpdated: string;
+  timelineName: string;
+  editable: boolean;
 }
 
 export interface HttpTimelinePostPostRequest {

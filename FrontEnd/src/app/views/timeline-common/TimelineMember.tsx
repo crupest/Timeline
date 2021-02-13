@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Container, ListGroup, Modal, Row, Col, Button } from "react-bootstrap";
 
-import { getHttpSearchClient } from "@/http/search";
+import { convertI18nText, I18nText } from "@/common";
 
-import { User } from "@/services/user";
-import { TimelineInfo, timelineService } from "@/services/timeline";
+import { HttpUser } from "@/http/user";
+import { getHttpSearchClient } from "@/http/search";
 
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
-import { convertI18nText, I18nText } from "@/common";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 const TimelineMemberItem: React.FC<{
-  user: User;
+  user: HttpUser;
   add?: boolean;
   onAction?: (username: string) => void;
 }> = ({ user, add, onAction }) => {
@@ -46,7 +46,7 @@ const TimelineMemberItem: React.FC<{
   );
 };
 
-const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
+const TimelineMemberUserSearch: React.FC<{ timeline: HttpTimelineInfo }> = ({
   timeline,
 }) => {
   const { t } = useTranslation();
@@ -55,7 +55,7 @@ const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
   const [userSearchState, setUserSearchState] = useState<
     | {
         type: "users";
-        data: User[];
+        data: HttpUser[];
       }
     | { type: "error"; data: I18nText }
     | { type: "loading" }
@@ -115,8 +115,8 @@ const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
                     user={user}
                     add
                     onAction={() => {
-                      void timelineService
-                        .addMember(timeline.name, user.username)
+                      void getHttpTimelineClient()
+                        .memberPut(timeline.name, user.username)
                         .then(() => {
                           setUserSearchText("");
                           setUserSearchState({ type: "init" });
@@ -139,8 +139,10 @@ const TimelineMemberUserSearch: React.FC<{ timeline: TimelineInfo }> = ({
   );
 };
 
+// TODO: Trigger resync.
+
 export interface TimelineMemberProps {
-  timeline: TimelineInfo;
+  timeline: HttpTimelineInfo;
   editable: boolean;
 }
 
@@ -158,7 +160,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
             onAction={
               editable && index !== 0
                 ? () => {
-                    void timelineService.removeMember(
+                    void getHttpTimelineClient().memberDelete(
                       timeline.name,
                       member.username
                     );

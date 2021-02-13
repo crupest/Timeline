@@ -3,13 +3,7 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { Dropdown, Button } from "react-bootstrap";
 
-import {
-  timelineService,
-  timelineVisibilityTooltipTranslationMap,
-} from "@/services/timeline";
-
 import { TimelineCardComponentProps } from "../timeline-common/TimelinePageTemplateUI";
-import SyncStatusBadge from "../timeline-common/SyncStatusBadge";
 import CollapseButton from "../timeline-common/CollapseButton";
 import { useUser } from "@/services/user";
 import { pushAlert } from "@/services/alert";

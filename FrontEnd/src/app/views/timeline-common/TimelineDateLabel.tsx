@@ -5,7 +5,7 @@ export interface TimelineDateItemProps {
   date: Date;
 }
 
-const TimelineDateItem: React.FC<TimelineDateItemProps> = ({ date }) => {
+const TimelineDateLabel: React.FC<TimelineDateItemProps> = ({ date }) => {
   return (
     <div className="timeline-date-item">
       <TimelineLine center={null} />
@@ -16,4 +16,4 @@ const TimelineDateItem: React.FC<TimelineDateItemProps> = ({ date }) => {
   );
 };
 
-export default TimelineDateItem;
+export default TimelineDateLabel;

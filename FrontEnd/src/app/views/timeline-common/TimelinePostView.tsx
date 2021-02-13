@@ -2,46 +2,43 @@ import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 
-import { TimelinePostInfo } from "@/services/timeline";
+import { HttpTimelinePostInfo } from "@/http/timeline";
 
-import BlobImage from "../common/BlobImage";
 import UserAvatar from "../common/user/UserAvatar";
 import TimelineLine from "./TimelineLine";
 import TimelinePostDeleteConfirmDialog from "./TimelinePostDeleteConfirmDialog";
 
-export interface TimelineItemProps {
-  post: TimelinePostInfo;
+export interface TimelinePostViewProps {
+  post: HttpTimelinePostInfo;
   current?: boolean;
-  more?: {
-    isOpen: boolean;
-    toggle: () => void;
-    onDelete: () => void;
-  };
-  onClick?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const TimelineItem: React.FC<TimelineItemProps> = (props) => {
+const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
+  const { post, className, style } = props;
   const current = props.current === true;
 
-  const { post, more } = props;
-
+  const [
+    operationMaskVisible,
+    setOperationMaskVisible,
+  ] = React.useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
+
+  // TODO: Load content.
 
   return (
     <div
-      className={clsx("timeline-item", current && "current", props.className)}
-      onClick={props.onClick}
-      style={props.style}
+      className={clsx("timeline-item", current && "current", className)}
+      style={style}
     >
       <TimelineLine center="node" current={current} />
       <div className="timeline-item-card">
-        {more != null ? (
+        {post.editable ? (
           <i
             className="bi-chevron-down text-info icon-button float-right"
             onClick={(e) => {
-              more.toggle();
+              setOperationMaskVisible(true);
               e.stopPropagation();
             }}
           />
@@ -57,30 +54,18 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
               </Link>
               <small className="text-dark mr-2">{post.author.nickname}</small>
               <small className="text-secondary white-space-no-wrap">
-                {post.time.toLocaleTimeString()}
+                {new Date(post.time).toLocaleTimeString()}
               </small>
             </span>
           </span>
         </div>
-        <div className="timeline-content">
-          {(() => {
-            const { content } = post;
-            if (content.type === "text") {
-              return content.text;
-            } else {
-              return (
-                <BlobImage
-                  blob={content.data}
-                  className="timeline-content-image"
-                />
-              );
-            }
-          })()}
-        </div>
-        {more != null && more.isOpen ? (
+        <div className="timeline-content">{/** TODO: Load content. */}</div>
+        {operationMaskVisible ? (
           <div
             className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
-            onClick={more.toggle}
+            onClick={() => {
+              setOperationMaskVisible(false);
+            }}
           >
             <i
               className="bi-trash text-danger icon-button large"
@@ -92,17 +77,19 @@ const TimelineItem: React.FC<TimelineItemProps> = (props) => {
           </div>
         ) : null}
       </div>
-      {deleteDialog && more != null ? (
+      {deleteDialog ? (
         <TimelinePostDeleteConfirmDialog
           onClose={() => {
             setDeleteDialog(false);
-            more.toggle();
+            setOperationMaskVisible(false);
           }}
-          onConfirm={more.onDelete}
+          onConfirm={() => {
+            // TODO: Implement this!
+          }}
         />
       ) : null}
     </div>
   );
 };
 
-export default TimelineItem;
+export default TimelinePostView;
