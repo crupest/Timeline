@@ -49,6 +49,21 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const [overrideIsHighlight, setOverrideIsHighlight] = React.useState<
+    boolean | null
+  >(null);
+  const [overrideIsBookmark, setOverrideIsBookmark] = React.useState<
+    boolean | null
+  >(null);
+
+  const isHighlight = overrideIsHighlight ?? timeline.isHighlight;
+  const isBookmark = overrideIsBookmark ?? timeline.isBookmark;
+
+  React.useEffect(() => {
+    setOverrideIsHighlight(null);
+    setOverrideIsBookmark(null);
+  }, [timeline]);
+
   const user = useUser();
 
   return (
@@ -66,23 +81,25 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
           <div className="text-right mt-2">
             <i
               className={clsx(
-                timeline.isHighlight ? "bi-star-fill" : "bi-star",
+                isHighlight ? "bi-star-fill" : "bi-star",
                 "icon-button text-yellow mr-3"
               )}
               onClick={
-                user != null &&
-                user.hasHighlightTimelineAdministrationPermission
+                user?.hasHighlightTimelineAdministrationPermission
                   ? () => {
                       getHttpHighlightClient()
-                        [timeline.isHighlight ? "delete" : "put"](timeline.name)
-                        .catch(() => {
-                          pushAlert({
-                            message: timeline.isHighlight
-                              ? "timeline.removeHighlightFail"
-                              : "timeline.addHighlightFail",
-                            type: "danger",
-                          });
-                        });
+                        [isHighlight ? "delete" : "put"](timeline.name)
+                        .then(
+                          () => setOverrideIsHighlight(!isHighlight),
+                          () => {
+                            pushAlert({
+                              message: timeline.isHighlight
+                                ? "timeline.removeHighlightFail"
+                                : "timeline.addHighlightFail",
+                              type: "danger",
+                            });
+                          }
+                        );
                     }
                   : undefined
               }
@@ -90,20 +107,23 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
             {user != null ? (
               <i
                 className={clsx(
-                  timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
+                  isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
                   "icon-button text-yellow mr-3"
                 )}
                 onClick={() => {
                   getHttpBookmarkClient()
-                    [timeline.isBookmark ? "delete" : "put"](timeline.name)
-                    .catch(() => {
-                      pushAlert({
-                        message: timeline.isBookmark
-                          ? "timeline.removeBookmarkFail"
-                          : "timeline.addBookmarkFail",
-                        type: "danger",
-                      });
-                    });
+                    [isBookmark ? "delete" : "put"](timeline.name)
+                    .then(
+                      () => setOverrideIsBookmark(!isBookmark),
+                      () => {
+                        pushAlert({
+                          message: timeline.isBookmark
+                            ? "timeline.removeBookmarkFail"
+                            : "timeline.addBookmarkFail",
+                          type: "danger",
+                        });
+                      }
+                    );
                 }}
               />
             ) : null}
