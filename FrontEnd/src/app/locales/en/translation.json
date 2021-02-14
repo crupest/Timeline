@@ -129,7 +129,31 @@
     "badCredential": "Username or password is invalid.",
     "alreadyLogin": "Already login! Redirect to home page in 3s!"
   },
-  "userPage": {
+  "settings": {
+    "subheaders": {
+      "account": "Account",
+      "customization": "Customization"
+    },
+    "languagePrimary": "Choose display language.",
+    "languageSecondary": "You language preference will be saved locally. Next time you visit this page, last language option will be used.",
+    "changePassword": "Change account's password.",
+    "logout": "Log out this account.",
+    "changeAvatar": "Change avatar.",
+    "changeNickname": "Change nickname.",
+    "dialogChangePassword": {
+      "title": "Change Password",
+      "prompt": "You are changing your password. You need to input the correct old password. After change, you need to login again and all old login will be invalid.",
+      "inputOldPassword": "Old password",
+      "inputNewPassword": "New password",
+      "inputRetypeNewPassword": "Retype new password",
+      "errorEmptyOldPassword": "Old password can't be empty.",
+      "errorEmptyNewPassword": "New password can't be empty.",
+      "errorRetypeNotMatch": "Password retyped does not match."
+    },
+    "dialogConfirmLogout": {
+      "title": "Confirm Logout",
+      "prompt": "Are you sure to log out? All cached data in the browser will be deleted."
+    },
     "dialogChangeNickname": {
       "title": "Change Nickname",
       "inputLabel": "New nickname"
@@ -145,31 +169,6 @@
         "preview": "Please preview avatar"
       },
       "upload": "upload"
-    }
-  },
-  "settings": {
-    "subheaders": {
-      "account": "Account",
-      "customization": "Customization"
-    },
-    "languagePrimary": "Choose display language.",
-    "languageSecondary": "You language preference will be saved locally. Next time you visit this page, last language option will be used.",
-    "changePassword": "Change account's password.",
-    "logout": "Log out this account.",
-    "gotoSelf": "Click here to go to timeline of myself to change nickname and avatar.",
-    "dialogChangePassword": {
-      "title": "Change Password",
-      "prompt": "You are changing your password. You need to input the correct old password. After change, you need to login again and all old login will be invalid.",
-      "inputOldPassword": "Old password",
-      "inputNewPassword": "New password",
-      "inputRetypeNewPassword": "Retype new password",
-      "errorEmptyOldPassword": "Old password can't be empty.",
-      "errorEmptyNewPassword": "New password can't be empty.",
-      "errorRetypeNotMatch": "Password retyped does not match."
-    },
-    "dialogConfirmLogout": {
-      "title": "Confirm Logout",
-      "prompt": "Are you sure to log out? All cached data in the browser will be deleted."
     }
   },
   "about": {
