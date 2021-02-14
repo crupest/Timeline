@@ -7,12 +7,15 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 import { useUser } from "@/services/user";
 
 import Skeleton from "../common/Skeleton";
+import LoadFailReload from "../common/LoadFailReload";
 
 const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
   const { post, className, style } = props;
 
   const [text, setText] = React.useState<string | null>(null);
   const [error, setError] = React.useState<"offline" | "error" | null>(null);
+
+  const [reloadKey, setReloadKey] = React.useState<number>(0);
 
   React.useEffect(() => {
     let subscribe = true;
@@ -40,14 +43,15 @@ const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
     return () => {
       subscribe = false;
     };
-  }, [post.timelineName, post.id]);
+  }, [post.timelineName, post.id, reloadKey]);
 
   if (error != null) {
-    // TODO: i18n
     return (
-      <div className={className} style={style}>
-        Error!
-      </div>
+      <LoadFailReload
+        className={className}
+        style={style}
+        onReload={() => setReloadKey(reloadKey + 1)}
+      />
     );
   } else if (text == null) {
     return <Skeleton />;
@@ -109,6 +113,7 @@ const TimelinePostContentView: React.FC<TimelinePostContentViewProps> = (
     return <View post={post} className={className} style={style} />;
   } else {
     // TODO: i18n
+    console.error("Unknown post type", post);
     return <div>Error, unknown post type!</div>;
   }
 };
