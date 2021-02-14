@@ -77,13 +77,13 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
   );
 
   const offsetStyle: React.CSSProperties = {
-    translate:
+    transform:
       arbitraryOffset != null
-        ? `0 ${arbitraryOffset}px`
+        ? `translate(0,${arbitraryOffset}px)`
         : offset != null
-        ? `0 ${offset * 100}%`
+        ? `translate(0,${offset * 100}%)`
         : undefined,
-    transition: offset != null ? "translate 0.5s" : undefined,
+    transition: offset != null ? "transform 0.5s" : undefined,
     zIndex: arbitraryOffset != null ? 1 : undefined,
   };
 
