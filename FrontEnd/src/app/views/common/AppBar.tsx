@@ -36,6 +36,7 @@ const AppBar: React.FC = (_) => {
       </LinkContainer>
 
       <Navbar.Toggle onClick={toggleExpand} />
+
       <Navbar.Collapse>
         <Nav className="mr-auto">
           <NavLink
@@ -66,7 +67,7 @@ const AppBar: React.FC = (_) => {
             </NavLink>
           )}
         </Nav>
-        <Nav className="ml-auto mr-2 align-items-center">
+        <Nav className="ml-auto md-mr-2">
           {user != null ? (
             <LinkContainer to={`/users/${user.username}`}>
               <UserAvatar
