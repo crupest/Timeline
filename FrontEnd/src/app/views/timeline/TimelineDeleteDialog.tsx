@@ -2,20 +2,20 @@ import React from "react";
 import { useHistory } from "react-router";
 import { Trans } from "react-i18next";
 
-import { getHttpTimelineClient } from "@/http/timeline";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 import OperationDialog from "../common/OperationDialog";
 
 interface TimelineDeleteDialog {
+  timeline: HttpTimelineInfo;
   open: boolean;
-  name: string;
   close: () => void;
 }
 
 const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
   const history = useHistory();
 
-  const { name } = props;
+  const { timeline } = props;
 
   return (
     <OperationDialog
@@ -36,14 +36,14 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
         },
       ]}
       inputValidator={([value]) => {
-        if (value !== name) {
+        if (value !== timeline.name) {
           return { 0: "timeline.deleteDialog.notMatch" };
         } else {
           return null;
         }
       }}
       onProcess={() => {
-        return getHttpTimelineClient().deleteTimeline(name);
+        return getHttpTimelineClient().deleteTimeline(timeline.name);
       }}
       onSuccessAndClose={() => {
         history.replace("/");
