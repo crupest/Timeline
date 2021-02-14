@@ -11,10 +11,7 @@ if ("serviceWorker" in navigator) {
 
   if (window.localStorage.getItem(upgradeSuccessLocalStorageKey)) {
     pushAlert({
-      message: {
-        type: "i18n",
-        key: "serviceWorker.upgradeSuccess",
-      },
+      message: "serviceWorker.upgradeSuccess",
       type: "success",
     });
     window.localStorage.removeItem(upgradeSuccessLocalStorageKey);
@@ -61,10 +58,7 @@ if ("serviceWorker" in navigator) {
     wb.addEventListener("activated", (event) => {
       if (!event.isUpdate) {
         pushAlert({
-          message: {
-            type: "i18n",
-            key: "serviceWorker.availableOffline",
-          },
+          message: "serviceWorker.availableOffline",
           type: "success",
         });
       }

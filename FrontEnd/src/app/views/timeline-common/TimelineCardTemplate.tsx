@@ -68,12 +68,9 @@ function TimelineCardTemplate({
                       [timeline.isHighlight ? "delete" : "put"](timeline.name)
                       .catch(() => {
                         pushAlert({
-                          message: {
-                            type: "i18n",
-                            key: timeline.isHighlight
-                              ? "timeline.removeHighlightFail"
-                              : "timeline.addHighlightFail",
-                          },
+                          message: timeline.isHighlight
+                            ? "timeline.removeHighlightFail"
+                            : "timeline.addHighlightFail",
                           type: "danger",
                         });
                       });
@@ -92,12 +89,9 @@ function TimelineCardTemplate({
                   [timeline.isBookmark ? "delete" : "put"](timeline.name)
                   .catch(() => {
                     pushAlert({
-                      message: {
-                        type: "i18n",
-                        key: timeline.isBookmark
-                          ? "timeline.removeBookmarkFail"
-                          : "timeline.addBookmarkFail",
-                      },
+                      message: timeline.isBookmark
+                        ? "timeline.removeBookmarkFail"
+                        : "timeline.addBookmarkFail",
                       type: "danger",
                     });
                   });
