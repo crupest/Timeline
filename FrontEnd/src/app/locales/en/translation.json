@@ -3,7 +3,7 @@
   "search": "Search",
   "edit": "Edit",
   "done": "Done",
-  "loadFailReload": "Load failed, click <1>here</1> to reload.",
+  "loadFailReload": "Load failed, <1>click here to reload</1>.",
   "error": {
     "network": "Network error.",
     "unknown": "Unknown error."
@@ -97,11 +97,6 @@
       "title": "Delete Timeline",
       "inputPrompt": "This is a dangerous action. If you are sure to delete timeline<1>{{name}}</1>, please input its name below and click confirm button.",
       "notMatch": "Name does not match."
-    },
-    "postSyncState": {
-      "syncing": "Syncing",
-      "synced": "Synced",
-      "offline": "Offline"
     },
     "post": {
       "deleteDialog": {

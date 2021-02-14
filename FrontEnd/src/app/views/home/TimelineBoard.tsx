@@ -1,13 +1,14 @@
 import React from "react";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { Spinner } from "react-bootstrap";
 
 import { HttpTimelineInfo } from "@/http/timeline";
 
 import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
+import LoadFailReload from "../common/LoadFailReload";
 
 interface TimelineBoardItemProps {
   timeline: HttpTimelineInfo;
@@ -259,19 +260,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
         } else if (timelines === "offline") {
           return (
             <div className="d-flex flex-grow-1 justify-content-center align-items-center">
-              <Trans i18nKey="loadFailReload" parent="div">
-                0
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    props.onReload();
-                    e.preventDefault();
-                  }}
-                >
-                  1
-                </a>
-                2
-              </Trans>
+              <LoadFailReload onReload={props.onReload} />
             </div>
           );
         } else {
