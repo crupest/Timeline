@@ -61,7 +61,7 @@ const SettingsPage: React.FC = (_) => {
               {t("settings.changeAvatar")}
             </div>
             <div
-              className="settings-item clickable first"
+              className="settings-item clickable"
               onClick={() => setDialog("changenickname")}
             >
               {t("settings.changeNickname")}
