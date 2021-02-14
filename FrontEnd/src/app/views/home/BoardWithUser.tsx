@@ -27,10 +27,7 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
                   .delete(timeline)
                   .catch((e) => {
                     pushAlert({
-                      message: {
-                        type: "i18n",
-                        key: "home.message.deleteBookmarkFail",
-                      },
+                      message: "home.message.deleteBookmarkFail",
                       type: "danger",
                     });
                     throw e;
@@ -43,10 +40,7 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
                   )
                   .catch((e) => {
                     pushAlert({
-                      message: {
-                        type: "i18n",
-                        key: "home.message.moveBookmarkFail",
-                      },
+                      message: "home.message.moveBookmarkFail",
                       type: "danger",
                     });
                     throw e;
@@ -77,10 +71,7 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
                         .delete(timeline)
                         .catch((e) => {
                           pushAlert({
-                            message: {
-                              type: "i18n",
-                              key: "home.message.deleteHighlightFail",
-                            },
+                            message: "home.message.deleteHighlightFail",
                             type: "danger",
                           });
                           throw e;
@@ -93,10 +84,7 @@ const BoardWithUser: React.FC<{ user: AuthUser }> = ({ user }) => {
                         )
                         .catch((e) => {
                           pushAlert({
-                            message: {
-                              type: "i18n",
-                              key: "home.message.moveHighlightFail",
-                            },
+                            message: "home.message.moveHighlightFail",
                             type: "danger",
                           });
                           throw e;

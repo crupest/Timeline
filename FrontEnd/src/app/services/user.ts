@@ -104,17 +104,14 @@ export class UserService {
       this.userSubject.next(user);
       pushAlert({
         type: "success",
-        message: {
-          type: "i18n",
-          key: "user.welcomeBack",
-        },
+        message: "user.welcomeBack",
       });
       return user;
     } catch (error) {
       if (error instanceof HttpNetworkError) {
         pushAlert({
           type: "danger",
-          message: { type: "i18n", key: "user.verifyTokenFailedNetwork" },
+          message: "user.verifyTokenFailedNetwork",
         });
         return savedUser;
       } else {
@@ -122,7 +119,7 @@ export class UserService {
         this.userSubject.next(null);
         pushAlert({
           type: "danger",
-          message: { type: "i18n", key: "user.verifyTokenFailed" },
+          message: "user.verifyTokenFailed",
         });
         return null;
       }

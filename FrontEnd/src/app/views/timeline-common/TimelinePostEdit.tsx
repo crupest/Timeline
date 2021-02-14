@@ -174,7 +174,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         (_) => {
           pushAlert({
             type: "danger",
-            message: t("timeline.sendPostFailed"),
+            message: "timeline.sendPostFailed",
           });
           setState("input");
         }

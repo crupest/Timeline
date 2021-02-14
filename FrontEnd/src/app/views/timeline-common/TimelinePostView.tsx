@@ -93,10 +93,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
               .then(onDeleted, () => {
                 pushAlert({
                   type: "danger",
-                  message: {
-                    type: "i18n",
-                    key: "timeline.deletePostFailed",
-                  },
+                  message: "timeline.deletePostFailed",
                 });
               });
           }}
