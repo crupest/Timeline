@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Spinner } from "react-bootstrap";
+import { Container, Spinner } from "react-bootstrap";
 
 import { HttpNetworkError, HttpNotFoundError } from "@/http/common";
 import {
@@ -143,8 +143,8 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           toggleCollapse={toggleCardCollapse}
           onReload={onReload}
         />
-        <div
-          className="timeline-container"
+        <Container
+          className="px-0"
           style={{
             minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
           }}
@@ -157,7 +157,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
             additionalPosts={newPosts}
             onLoad={scrollToBottom}
           />
-        </div>
+        </Container>
         {timeline.postable ? (
           <>
             <div
