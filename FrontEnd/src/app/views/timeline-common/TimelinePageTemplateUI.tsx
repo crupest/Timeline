@@ -136,6 +136,7 @@ export default function TimelinePageTemplateUI<TManageItems>(
           }}
         >
           <Timeline
+            top={40}
             timelineName={timeline.name}
             reloadKey={timelineReloadKey}
             onReload={reloadTimeline}

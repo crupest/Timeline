@@ -12,6 +12,7 @@ import TimelinePostListView from "./TimelinePostListView";
 export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
+  top?: string | number;
   timelineName: string;
   reloadKey: number;
   onReload: () => void;
@@ -24,6 +25,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     timelineName,
     className,
     style,
+    top,
     reloadKey,
     onReload,
     additionalPosts,
@@ -110,6 +112,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       return (
         <TimelinePostListView
           posts={[...posts, ...(additionalPosts ?? [])]}
+          top={top}
           onReload={onReload}
         />
       );
