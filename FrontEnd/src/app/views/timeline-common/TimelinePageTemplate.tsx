@@ -1,33 +1,39 @@
 import React from "react";
-
-import { UiLogicError } from "@/common";
+import { useTranslation } from "react-i18next";
+import { Spinner } from "react-bootstrap";
 
 import { HttpNetworkError, HttpNotFoundError } from "@/http/common";
-import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
+import {
+  getHttpTimelineClient,
+  HttpTimelineInfo,
+  HttpTimelinePostInfo,
+} from "@/http/timeline";
 
-import { TimelineMemberDialog } from "./TimelineMember";
-import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
-import { TimelinePageTemplateUIProps } from "./TimelinePageTemplateUI";
+import { getAlertHost } from "@/services/alert";
 
-export interface TimelinePageTemplateProps<TManageItem> {
-  name: string;
-  onManage: (item: TManageItem) => void;
-  UiComponent: React.ComponentType<
-    Omit<TimelinePageTemplateUIProps<TManageItem>, "CardComponent">
-  >;
-  notFoundI18nKey: string;
-  reloadKey: number;
+import Timeline from "./Timeline";
+import TimelinePostEdit from "./TimelinePostEdit";
+
+export interface TimelinePageCardProps {
+  timeline: HttpTimelineInfo;
+  collapse: boolean;
+  toggleCollapse: () => void;
+  className?: string;
   onReload: () => void;
 }
 
-export default function TimelinePageTemplate<TManageItem>(
-  props: TimelinePageTemplateProps<TManageItem>
-): React.ReactElement | null {
-  const { name, reloadKey, onReload } = props;
+export interface TimelinePageTemplateProps {
+  timelineName: string;
+  notFoundI18nKey: string;
+  reloadKey: number;
+  onReload: () => void;
+  CardComponent: React.ComponentType<TimelinePageCardProps>;
+}
 
-  const [dialog, setDialog] = React.useState<null | "property" | "member">(
-    null
-  );
+const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
+  const { timelineName, reloadKey, onReload, CardComponent } = props;
+
+  const { t } = useTranslation();
 
   const [timeline, setTimeline] = React.useState<
     HttpTimelineInfo | "loading" | "offline" | "notexist" | "error"
@@ -38,7 +44,7 @@ export default function TimelinePageTemplate<TManageItem>(
 
     let subscribe = true;
     void getHttpTimelineClient()
-      .getTimeline(name)
+      .getTimeline(timelineName)
       .then(
         (data) => {
           if (subscribe) {
@@ -61,70 +67,117 @@ export default function TimelinePageTemplate<TManageItem>(
     return () => {
       subscribe = false;
     };
-  }, [name, reloadKey]);
+  }, [timelineName, reloadKey]);
 
-  let dialogElement: React.ReactElement | undefined;
-  const closeDialog = (): void => setDialog(null);
+  const scrollToBottom = React.useCallback(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, []);
 
-  if (dialog === "property") {
-    if (typeof timeline !== "object") {
-      throw new UiLogicError(
-        "Timeline is null but attempt to open change property dialog."
-      );
+  const [bottomSpaceHeight, setBottomSpaceHeight] = React.useState<number>(0);
+
+  const [timelineReloadKey, setTimelineReloadKey] = React.useState<number>(0);
+
+  const [newPosts, setNewPosts] = React.useState<HttpTimelinePostInfo[]>([]);
+
+  const reloadTimeline = (): void => {
+    setTimelineReloadKey((old) => old + 1);
+    setNewPosts([]);
+  };
+
+  const onPostEditHeightChange = React.useCallback((height: number): void => {
+    setBottomSpaceHeight(height);
+    if (height === 0) {
+      const alertHost = getAlertHost();
+      if (alertHost != null) {
+        alertHost.style.removeProperty("margin-bottom");
+      }
+    } else {
+      const alertHost = getAlertHost();
+      if (alertHost != null) {
+        alertHost.style.marginBottom = `${height}px`;
+      }
     }
+  }, []);
 
-    dialogElement = (
-      <TimelinePropertyChangeDialog
-        open
-        close={closeDialog}
-        timeline={timeline}
-        onChange={onReload}
-      />
+  const cardCollapseLocalStorageKey = `timeline.${timelineName}.cardCollapse`;
+
+  const [cardCollapse, setCardCollapse] = React.useState<boolean>(true);
+  React.useEffect(() => {
+    const savedCollapse =
+      window.localStorage.getItem(cardCollapseLocalStorageKey) === "true";
+    setCardCollapse(savedCollapse);
+  }, [cardCollapseLocalStorageKey]);
+
+  const toggleCardCollapse = (): void => {
+    const newState = !cardCollapse;
+    setCardCollapse(newState);
+    window.localStorage.setItem(
+      cardCollapseLocalStorageKey,
+      newState.toString()
     );
-  } else if (dialog === "member") {
-    if (typeof timeline !== "object") {
-      throw new UiLogicError(
-        "Timeline is null but attempt to open change property dialog."
-      );
-    }
+  };
 
-    dialogElement = (
-      <TimelineMemberDialog
-        open
-        onClose={closeDialog}
-        timeline={timeline}
-        onChange={onReload}
-      />
+  let body: React.ReactElement;
+
+  if (timeline == "loading") {
+    body = (
+      <div className="full-viewport-center-child">
+        <Spinner variant="primary" animation="grow" />
+      </div>
+    );
+  } else if (timeline === "offline") {
+    // TODO: i18n
+    body = <p className="text-danger">Offline!</p>;
+  } else if (timeline === "notexist") {
+    body = <p className="text-danger">{t(props.notFoundI18nKey)}</p>;
+  } else if (timeline === "error") {
+    // TODO: i18n
+    body = <p className="text-danger">Error!</p>;
+  } else {
+    body = (
+      <>
+        <CardComponent
+          className="timeline-template-card"
+          timeline={timeline}
+          collapse={cardCollapse}
+          toggleCollapse={toggleCardCollapse}
+          onReload={onReload}
+        />
+        <div
+          className="timeline-container"
+          style={{
+            minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
+          }}
+        >
+          <Timeline
+            top={40}
+            timelineName={timeline.name}
+            reloadKey={timelineReloadKey}
+            onReload={reloadTimeline}
+            additionalPosts={newPosts}
+            onLoad={scrollToBottom}
+          />
+        </div>
+        {timeline.postable ? (
+          <>
+            <div
+              style={{ height: bottomSpaceHeight }}
+              className="flex-fix-length"
+            />
+            <TimelinePostEdit
+              className="fixed-bottom"
+              timeline={timeline}
+              onHeightChange={onPostEditHeightChange}
+              onPosted={(newPost) => {
+                setNewPosts((old) => [...old, newPost]);
+              }}
+            />
+          </>
+        ) : null}
+      </>
     );
   }
+  return body;
+};
 
-  const { UiComponent } = props;
-
-  return (
-    <>
-      <UiComponent
-        timeline={
-          typeof timeline === "object"
-            ? {
-                ...timeline,
-                operations: {
-                  onManage: timeline.manageable
-                    ? (item) => {
-                        if (item === "property") {
-                          setDialog(item);
-                        } else {
-                          props.onManage(item);
-                        }
-                      }
-                    : undefined,
-                  onMember: () => setDialog("member"),
-                },
-              }
-            : timeline
-        }
-        notExistMessageI18nKey={props.notFoundI18nKey}
-      />
-      {dialogElement}
-    </>
-  );
-}
+export default TimelinePageTemplate;
