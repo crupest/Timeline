@@ -15,7 +15,10 @@ const Skeleton: React.FC<SkeletonProps> = (props) => {
   return (
     <div className={clsx(className, "cru-skeleton")} style={style}>
       {range(lineNumber).map((i) => (
-        <div key={i} className="cru-skeleton-line" />
+        <div
+          key={i}
+          className={clsx("cru-skeleton-line", i === lineNumber - 1 && "last")}
+        />
       ))}
     </div>
   );
