@@ -4,67 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Container, Form, Row, Col, Button, Modal } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
-import OperationDialog from "../common/OperationDialog";
 
-interface ChangePasswordDialogProps {
-  open: boolean;
-  close: () => void;
-}
-
-const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
-  const history = useHistory();
-
-  const [redirect, setRedirect] = useState<boolean>(false);
-
-  return (
-    <OperationDialog
-      open={props.open}
-      title="settings.dialogChangePassword.title"
-      themeColor="danger"
-      inputPrompt="settings.dialogChangePassword.prompt"
-      inputScheme={[
-        {
-          type: "text",
-          label: "settings.dialogChangePassword.inputOldPassword",
-          password: true,
-        },
-        {
-          type: "text",
-          label: "settings.dialogChangePassword.inputNewPassword",
-          password: true,
-        },
-        {
-          type: "text",
-          label: "settings.dialogChangePassword.inputRetypeNewPassword",
-          password: true,
-        },
-      ]}
-      inputValidator={([oldPassword, newPassword, retypedNewPassword]) => {
-        const result: Record<number, string> = {};
-        if (oldPassword === "") {
-          result[0] = "settings.dialogChangePassword.errorEmptyOldPassword";
-        }
-        if (newPassword === "") {
-          result[1] = "settings.dialogChangePassword.errorEmptyNewPassword";
-        }
-        if (retypedNewPassword !== newPassword) {
-          result[2] = "settings.dialogChangePassword.errorRetypeNotMatch";
-        }
-        return result;
-      }}
-      onProcess={async ([oldPassword, newPassword]) => {
-        await userService.changePassword(oldPassword, newPassword);
-        setRedirect(true);
-      }}
-      close={() => {
-        props.close();
-        if (redirect) {
-          history.push("/login");
-        }
-      }}
-    />
-  );
-};
+import ChangePasswordDialog from "./ChangePasswordDialog";
+import ChangeAvatarDialog from "./ChangeAvatarDialog";
+import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
 const ConfirmLogoutDialog: React.FC<{
   onClose: () => void;
@@ -97,9 +40,9 @@ const SettingsPage: React.FC = (_) => {
   const user = useUser();
   const history = useHistory();
 
-  const [dialog, setDialog] = useState<null | "changepassword" | "logout">(
-    null
-  );
+  const [dialog, setDialog] = useState<
+    null | "changepassword" | "changeavatar" | "changenickname" | "logout"
+  >(null);
 
   const language = i18n.language.slice(0, 2);
 
@@ -113,11 +56,15 @@ const SettingsPage: React.FC = (_) => {
             </h3>
             <div
               className="settings-item clickable first"
-              onClick={() => {
-                history.push(`/users/${user.username}`);
-              }}
+              onClick={() => setDialog("changeavatar")}
             >
-              {t("settings.gotoSelf")}
+              {t("settings.changeAvatar")}
+            </div>
+            <div
+              className="settings-item clickable first"
+              onClick={() => setDialog("changenickname")}
+            >
+              {t("settings.changeNickname")}
             </div>
             <div
               className="settings-item clickable text-danger"
@@ -164,14 +111,7 @@ const SettingsPage: React.FC = (_) => {
       {(() => {
         switch (dialog) {
           case "changepassword":
-            return (
-              <ChangePasswordDialog
-                open
-                close={() => {
-                  setDialog(null);
-                }}
-              />
-            );
+            return <ChangePasswordDialog open close={() => setDialog(null)} />;
           case "logout":
             return (
               <ConfirmLogoutDialog
@@ -183,6 +123,10 @@ const SettingsPage: React.FC = (_) => {
                 }}
               />
             );
+          case "changeavatar":
+            return <ChangeAvatarDialog open close={() => setDialog(null)} />;
+          case "changenickname":
+            return <ChangeNicknameDialog open close={() => setDialog(null)} />;
           default:
             return null;
         }

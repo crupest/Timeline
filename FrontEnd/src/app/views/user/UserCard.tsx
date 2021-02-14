@@ -5,16 +5,13 @@ import TimelinePageCardTemplate, {
 } from "../timeline-common/TimelinePageCardTemplate";
 import { TimelinePageCardProps } from "../timeline-common/TimelinePageTemplate";
 import UserAvatar from "../common/user/UserAvatar";
-import ChangeNicknameDialog from "./ChangeNicknameDialog";
-import { getHttpUserClient } from "@/http/user";
-import ChangeAvatarDialog from "./ChangeAvatarDialog";
 
 const UserCard: React.FC<TimelinePageCardProps> = (props) => {
-  const { timeline, onReload } = props;
+  const { timeline } = props;
 
-  const [dialog, setDialog] = React.useState<
-    "member" | "property" | "avatar" | "nickname" | null
-  >(null);
+  const [dialog, setDialog] = React.useState<"member" | "property" | null>(
+    null
+  );
 
   return (
     <>
@@ -43,16 +40,6 @@ const UserCard: React.FC<TimelinePageCardProps> = (props) => {
               items: [
                 {
                   type: "button",
-                  text: "timeline.manageItem.nickname",
-                  onClick: () => setDialog("nickname"),
-                },
-                {
-                  type: "button",
-                  text: "timeline.manageItem.avatar",
-                  onClick: () => setDialog("avatar"),
-                },
-                {
-                  type: "button",
                   text: "timeline.manageItem.property",
                   onClick: () => setDialog("property"),
                 },
@@ -69,37 +56,6 @@ const UserCard: React.FC<TimelinePageCardProps> = (props) => {
         setDialog={setDialog}
         {...props}
       />
-      {(() => {
-        // TODO: Move this two to settings.
-        if (dialog === "nickname") {
-          return (
-            <ChangeNicknameDialog
-              open
-              close={() => setDialog(null)}
-              onProcess={async (newNickname) => {
-                await getHttpUserClient().patch(timeline.owner.username, {
-                  nickname: newNickname,
-                });
-                onReload();
-              }}
-            />
-          );
-        } else if (dialog === "avatar") {
-          return (
-            <ChangeAvatarDialog
-              open
-              close={() => setDialog(null)}
-              process={async (file) => {
-                await getHttpUserClient().putAvatar(
-                  timeline.owner.username,
-                  file
-                );
-                onReload();
-              }}
-            />
-          );
-        }
-      })()}
     </>
   );
 };

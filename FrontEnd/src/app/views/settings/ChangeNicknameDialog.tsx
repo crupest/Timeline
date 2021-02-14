@@ -1,3 +1,5 @@
+import { getHttpUserClient } from "@/http/user";
+import { useUserLoggedIn } from "@/services/user";
 import React from "react";
 
 import OperationDialog from "../common/OperationDialog";
@@ -5,19 +7,22 @@ import OperationDialog from "../common/OperationDialog";
 export interface ChangeNicknameDialogProps {
   open: boolean;
   close: () => void;
-  onProcess: (newNickname: string) => Promise<void>;
 }
 
 const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
+  const user = useUserLoggedIn();
+
   return (
     <OperationDialog
       open={props.open}
-      title="userPage.dialogChangeNickname.title"
+      title="settings.dialogChangeNickname.title"
       inputScheme={[
-        { type: "text", label: "userPage.dialogChangeNickname.inputLabel" },
+        { type: "text", label: "settings.dialogChangeNickname.inputLabel" },
       ]}
       onProcess={([newNickname]) => {
-        return props.onProcess(newNickname);
+        return getHttpUserClient().patch(user.username, {
+          nickname: newNickname,
+        });
       }}
       close={props.close}
     />
