@@ -1,11 +1,12 @@
 import React from "react";
-import { Spinner } from "react-bootstrap";
 import clsx from "clsx";
 
 import { HttpNetworkError } from "@/http/common";
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import { useUser } from "@/services/user";
+
+import Skeleton from "../common/Skeleton";
 
 const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
   const { post, className, style } = props;
@@ -49,7 +50,7 @@ const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
       </div>
     );
   } else if (text == null) {
-    return <Spinner variant="primary" animation="grow" />;
+    return <Skeleton />;
   } else {
     return (
       <div className={className} style={style}>
