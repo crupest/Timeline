@@ -1,9 +1,11 @@
 import React from "react";
 import pull from "lodash/pull";
 
+import { I18nText } from "@/common";
+
 export interface AlertInfo {
   type?: "primary" | "secondary" | "success" | "danger" | "warning" | "info";
-  message: string | React.FC<unknown> | { type: "i18n"; key: string };
+  message: React.FC<unknown> | I18nText;
   dismissTime?: number | "never";
 }
 
