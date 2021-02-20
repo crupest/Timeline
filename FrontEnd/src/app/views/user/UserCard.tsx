@@ -1,8 +1,6 @@
 import React from "react";
 
-import TimelinePageCardTemplate, {
-  TimelineCardTemplateProps,
-} from "../timeline-common/TimelinePageCardTemplate";
+import TimelinePageCardTemplate from "../timeline-common/TimelinePageCardTemplate";
 import { TimelinePageCardProps } from "../timeline-common/TimelinePageTemplate";
 import UserAvatar from "../common/user/UserAvatar";
 
@@ -31,27 +29,17 @@ const UserCard: React.FC<TimelinePageCardProps> = (props) => {
             </div>
           </>
         }
-        manageArea={((): TimelineCardTemplateProps["manageArea"] => {
-          if (!timeline.manageable) {
-            return { type: "member" };
-          } else {
-            return {
-              type: "manage",
-              items: [
+        manageItems={
+          timeline.manageable
+            ? [
                 {
                   type: "button",
                   text: "timeline.manageItem.property",
                   onClick: () => setDialog("property"),
                 },
-                {
-                  type: "button",
-                  text: "timeline.manageItem.member",
-                  onClick: () => setDialog("member"),
-                },
-              ],
-            };
-          }
-        })()}
+              ]
+            : undefined
+        }
         dialog={dialog}
         setDialog={setDialog}
         {...props}
