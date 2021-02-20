@@ -3,11 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Container, Spinner } from "react-bootstrap";
 
 import { HttpNetworkError, HttpNotFoundError } from "@/http/common";
-import {
-  getHttpTimelineClient,
-  HttpTimelineInfo,
-  HttpTimelinePostInfo,
-} from "@/http/timeline";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 import { getAlertHost } from "@/services/alert";
 
@@ -41,7 +37,9 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
 
   React.useEffect(() => {
     setTimeline("loading");
+  }, [timelineName]);
 
+  React.useEffect(() => {
     let subscribe = true;
     void getHttpTimelineClient()
       .getTimeline(timelineName)
@@ -77,11 +75,8 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
 
   const [timelineReloadKey, setTimelineReloadKey] = React.useState<number>(0);
 
-  const [newPosts, setNewPosts] = React.useState<HttpTimelinePostInfo[]>([]);
-
   const reloadTimeline = (): void => {
     setTimelineReloadKey((old) => old + 1);
-    setNewPosts([]);
   };
 
   const onPostEditHeightChange = React.useCallback((height: number): void => {
@@ -154,7 +149,6 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
             timelineName={timeline.name}
             reloadKey={timelineReloadKey}
             onReload={reloadTimeline}
-            additionalPosts={newPosts}
             onLoad={scrollToBottom}
           />
         </Container>
@@ -168,9 +162,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
               className="fixed-bottom"
               timeline={timeline}
               onHeightChange={onPostEditHeightChange}
-              onPosted={(newPost) => {
-                setNewPosts((old) => [...old, newPost]);
-              }}
+              onPosted={reloadTimeline}
             />
           </>
         ) : null}
