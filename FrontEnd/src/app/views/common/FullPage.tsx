@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 
 export interface FullPageProps {
   show: boolean;
@@ -23,7 +24,14 @@ const FullPage: React.FC<FullPageProps> = ({
           onClick={onBack}
         />
       </div>
-      <div className={contentContainerClassName}>{children}</div>
+      <div
+        className={clsx(
+          "cru-full-page-content-container",
+          contentContainerClassName
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 };
