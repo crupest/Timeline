@@ -1,7 +1,6 @@
 import React from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
-import { Dropdown, Button } from "react-bootstrap";
 
 import { getHttpHighlightClient } from "@/http/highlight";
 import { getHttpBookmarkClient } from "@/http/bookmark";
@@ -10,28 +9,19 @@ import { useUser } from "@/services/user";
 import { pushAlert } from "@/services/alert";
 import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
 
+import { useIsSmallScreen } from "@/utilities/mediaQuery";
+
 import { TimelinePageCardProps } from "./TimelinePageTemplate";
 
 import CollapseButton from "./CollapseButton";
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
+import { MenuItems, PopupMenu } from "../common/Menu";
+import FullPage from "../common/FullPage";
 
 export interface TimelineCardTemplateProps extends TimelinePageCardProps {
   infoArea: React.ReactElement;
-  manageArea:
-    | { type: "member" }
-    | {
-        type: "manage";
-        items: (
-          | {
-              type: "button";
-              text: string;
-              color?: string;
-              onClick: () => void;
-            }
-          | { type: "divider" }
-        )[];
-      };
+  manageItems?: MenuItems;
   dialog: string | "property" | "member" | null;
   setDialog: (dialog: "property" | "member" | null) => void;
 }
@@ -41,7 +31,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
   collapse,
   toggleCollapse,
   infoArea,
-  manageArea,
+  manageItems,
   onReload,
   className,
   dialog,
@@ -49,7 +39,72 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const isSmallScreen = useIsSmallScreen();
+
   const user = useUser();
+
+  const content = (
+    <>
+      {infoArea}
+      <p className="mb-0">{timeline.description}</p>
+      <small className="mt-1 d-block">
+        {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
+      </small>
+      <div className="text-right mt-2">
+        <i
+          className={clsx(
+            timeline.isHighlight ? "bi-star-fill" : "bi-star",
+            "icon-button text-yellow mr-3"
+          )}
+          onClick={
+            user?.hasHighlightTimelineAdministrationPermission
+              ? () => {
+                  getHttpHighlightClient()
+                    [timeline.isHighlight ? "delete" : "put"](timeline.name)
+                    .then(onReload, () => {
+                      pushAlert({
+                        message: timeline.isHighlight
+                          ? "timeline.removeHighlightFail"
+                          : "timeline.addHighlightFail",
+                        type: "danger",
+                      });
+                    });
+                }
+              : undefined
+          }
+        />
+        {user != null ? (
+          <i
+            className={clsx(
+              timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
+              "icon-button text-yellow mr-3"
+            )}
+            onClick={() => {
+              getHttpBookmarkClient()
+                [timeline.isBookmark ? "delete" : "put"](timeline.name)
+                .then(onReload, () => {
+                  pushAlert({
+                    message: timeline.isBookmark
+                      ? "timeline.removeBookmarkFail"
+                      : "timeline.addBookmarkFail",
+                    type: "danger",
+                  });
+                });
+            }}
+          />
+        ) : null}
+        <i
+          className={"icon-button bi-people text-primary mr-3"}
+          onClick={() => setDialog("member")}
+        />
+        {manageItems != null ? (
+          <PopupMenu items={manageItems}>
+            <i className="icon-button bi-three-dots-vertical text-primary" />
+          </PopupMenu>
+        ) : null}
+      </div>
+    </>
+  );
 
   return (
     <>
@@ -57,92 +112,17 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
         <div className="float-right d-flex align-items-center">
           <CollapseButton collapse={collapse} onClick={toggleCollapse} />
         </div>
-        <div style={{ display: collapse ? "none" : "block" }}>
-          {infoArea}
-          <p className="mb-0">{timeline.description}</p>
-          <small className="mt-1 d-block">
-            {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
-          </small>
-          <div className="text-right mt-2">
-            <i
-              className={clsx(
-                timeline.isHighlight ? "bi-star-fill" : "bi-star",
-                "icon-button text-yellow mr-3"
-              )}
-              onClick={
-                user?.hasHighlightTimelineAdministrationPermission
-                  ? () => {
-                      getHttpHighlightClient()
-                        [timeline.isHighlight ? "delete" : "put"](timeline.name)
-                        .then(onReload, () => {
-                          pushAlert({
-                            message: timeline.isHighlight
-                              ? "timeline.removeHighlightFail"
-                              : "timeline.addHighlightFail",
-                            type: "danger",
-                          });
-                        });
-                    }
-                  : undefined
-              }
-            />
-            {user != null ? (
-              <i
-                className={clsx(
-                  timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
-                  "icon-button text-yellow mr-3"
-                )}
-                onClick={() => {
-                  getHttpBookmarkClient()
-                    [timeline.isBookmark ? "delete" : "put"](timeline.name)
-                    .then(onReload, () => {
-                      pushAlert({
-                        message: timeline.isBookmark
-                          ? "timeline.removeBookmarkFail"
-                          : "timeline.addBookmarkFail",
-                        type: "danger",
-                      });
-                    });
-                }}
-              />
-            ) : null}
-            {manageArea.type === "manage" ? (
-              <Dropdown className="d-inline-block">
-                <Dropdown.Toggle variant="outline-primary">
-                  {t("timeline.manage")}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {manageArea.items.map((item, index) => {
-                    if (item.type === "divider") {
-                      return <Dropdown.Divider key={index} />;
-                    } else {
-                      return (
-                        <Dropdown.Item
-                          key={index}
-                          onClick={item.onClick}
-                          className={
-                            item.color != null
-                              ? "text-" + item.color
-                              : undefined
-                          }
-                        >
-                          {t(item.text)}
-                        </Dropdown.Item>
-                      );
-                    }
-                  })}
-                </Dropdown.Menu>
-              </Dropdown>
-            ) : (
-              <Button
-                variant="outline-primary"
-                onClick={() => setDialog("member")}
-              >
-                {t("timeline.memberButton")}
-              </Button>
-            )}
-          </div>
-        </div>
+        {isSmallScreen ? (
+          <FullPage
+            onBack={toggleCollapse}
+            show={!collapse}
+            contentContainerClassName="p-2"
+          >
+            {content}
+          </FullPage>
+        ) : (
+          <div style={{ display: collapse ? "none" : "block" }}>{content}</div>
+        )}
       </div>
       {(() => {
         if (dialog === "member") {

@@ -43,3 +43,45 @@
 
   &.last
     width: 50%
+
+.cru-full-page
+  position: fixed
+  z-index: 1031
+  left: 0
+  top: 0
+  right: 0
+  bottom: 0
+  background-color: white
+  padding-top: 56px
+
+.cru-full-page-top-bar
+  height: 56px
+
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  z-index: 1
+
+  @extend .bg-primary
+
+  display: flex
+  align-items: center
+
+.cru-menu
+  min-width: 200px
+
+.cru-menu-item
+  font-size: 1.2em
+  padding: 0.5em 1.5em
+  cursor: pointer
+
+  @each $color, $value in $theme-colors
+    &.color-#{$color}
+      color: $value
+
+      &:hover
+        color: white
+        background-color: $value
+
+.cru-menu-divider

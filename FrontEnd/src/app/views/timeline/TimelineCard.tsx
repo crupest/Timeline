@@ -1,9 +1,8 @@
 import React from "react";
 
-import TimelinePageCardTemplate, {
-  TimelineCardTemplateProps,
-} from "../timeline-common/TimelinePageCardTemplate";
 import { TimelinePageCardProps } from "../timeline-common/TimelinePageTemplate";
+import TimelinePageCardTemplate from "../timeline-common/TimelinePageCardTemplate";
+
 import UserAvatar from "../common/user/UserAvatar";
 import TimelineDeleteDialog from "./TimelineDeleteDialog";
 
@@ -35,22 +34,13 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
             </div>
           </>
         }
-        manageArea={((): TimelineCardTemplateProps["manageArea"] => {
-          if (!timeline.manageable) {
-            return { type: "member" };
-          } else {
-            return {
-              type: "manage",
-              items: [
+        manageItems={
+          timeline.manageable
+            ? [
                 {
                   type: "button",
                   text: "timeline.manageItem.property",
                   onClick: () => setDialog("property"),
-                },
-                {
-                  type: "button",
-                  onClick: () => setDialog("member"),
-                  text: "timeline.manageItem.member",
                 },
                 { type: "divider" },
                 {
@@ -59,10 +49,9 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
                   color: "danger",
                   text: "timeline.manageItem.delete",
                 },
-              ],
-            };
-          }
-        })()}
+              ]
+            : undefined
+        }
         dialog={dialog}
         setDialog={setDialog}
         {...props}

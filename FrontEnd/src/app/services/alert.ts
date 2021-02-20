@@ -1,10 +1,10 @@
 import React from "react";
 import pull from "lodash/pull";
 
-import { I18nText } from "@/common";
+import { BootstrapThemeColor, I18nText } from "@/common";
 
 export interface AlertInfo {
-  type?: "primary" | "secondary" | "success" | "danger" | "warning" | "info";
+  type?: BootstrapThemeColor;
   message: React.FC<unknown> | I18nText;
   dismissTime?: number | "never";
 }
