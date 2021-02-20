@@ -42,9 +42,11 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   >("loading");
 
   React.useEffect(() => {
-    let subscribe = true;
-
     setPosts("loading");
+  }, [timelineName]);
+
+  React.useEffect(() => {
+    let subscribe = true;
 
     void getHttpTimelineClient()
       .listPost(timelineName)
