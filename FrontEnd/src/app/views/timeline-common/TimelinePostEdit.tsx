@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
-import { Button, Spinner, Row, Col, Form } from "react-bootstrap";
+import { Row, Col, Form } from "react-bootstrap";
 
 import { UiLogicError } from "@/common";
 
@@ -15,50 +15,31 @@ import {
 import { pushAlert } from "@/services/alert";
 import { base64 } from "@/http/common";
 
+import BlobImage from "../common/BlobImage";
+import LoadingButton from "../common/LoadingButton";
+
 interface TimelinePostEditImageProps {
-  onSelect: (blob: Blob | null) => void;
+  onSelect: (file: File | null) => void;
 }
 
 const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
   const { onSelect } = props;
+
   const { t } = useTranslation();
 
   const [file, setFile] = React.useState<File | null>(null);
-  const [fileUrl, setFileUrl] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<boolean>(false);
 
-  React.useEffect(() => {
-    if (file != null) {
-      const url = URL.createObjectURL(file);
-      setFileUrl(url);
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    }
-  }, [file]);
-
-  const onInputChange: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
-    (e) => {
-      const files = e.target.files;
-      if (files == null || files.length === 0) {
-        setFile(null);
-        setFileUrl(null);
-      } else {
-        setFile(files[0]);
-      }
+  const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setError(false);
+    const files = e.target.files;
+    if (files == null || files.length === 0) {
+      setFile(null);
       onSelect(null);
-      setError(null);
-    },
-    [onSelect]
-  );
-
-  const onImgLoad = React.useCallback(() => {
-    onSelect(file);
-  }, [onSelect, file]);
-
-  const onImgError = React.useCallback(() => {
-    setError("loadImageError");
-  }, []);
+    } else {
+      setFile(files[0]);
+    }
+  };
 
   return (
     <>
@@ -68,15 +49,20 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
         accept="image/*"
         className="mx-3 my-1 d-inline-block"
       />
-      {fileUrl && error == null && (
-        <img
-          src={fileUrl}
+      {file != null && error == null && (
+        <BlobImage
+          blob={file}
           className="timeline-post-edit-image"
-          onLoad={onImgLoad}
-          onError={onImgError}
+          onLoad={() => onSelect(file)}
+          onError={() => {
+            onSelect(null);
+            setError(true);
+          }}
         />
       )}
-      {error != null && <div className="text-danger">{t(error)}</div>}
+      {error != null && (
+        <div className="text-danger">{t("loadImageError")}</div>
+      )}
     </>
   );
 };
@@ -93,10 +79,10 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   const { t } = useTranslation();
 
-  const [state, setState] = React.useState<"input" | "process">("input");
+  const [process, setProcess] = React.useState<boolean>(false);
   const [kind, setKind] = React.useState<"text" | "image">("text");
   const [text, setText] = React.useState<string>("");
-  const [imageBlob, setImageBlob] = React.useState<Blob | null>(null);
+  const [image, setImage] = React.useState<File | null>(null);
 
   const draftLocalStorageKey = `timeline.${timeline.name}.postDraft`;
 
@@ -104,7 +90,9 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
     setText(window.localStorage.getItem(draftLocalStorageKey) ?? "");
   }, [draftLocalStorageKey]);
 
-  const canSend = kind === "text" || (kind === "image" && imageBlob != null);
+  const canSend =
+    (kind === "text" && text.length !== 0) ||
+    (kind === "image" && image != null);
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
@@ -128,11 +116,11 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   const toggleKind = React.useCallback(() => {
     setKind((oldKind) => (oldKind === "text" ? "image" : "text"));
-    setImageBlob(null);
+    setImage(null);
   }, []);
 
   const onSend = async (): Promise<void> => {
-    setState("process");
+    setProcess(true);
 
     let requestData: HttpTimelinePostPostRequestData;
     switch (kind) {
@@ -143,14 +131,14 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         };
         break;
       case "image":
-        if (imageBlob == null) {
+        if (image == null) {
           throw new UiLogicError(
             "Content type is image but image blob is null."
           );
         }
         requestData = {
-          contentType: imageBlob.type,
-          data: await base64(imageBlob),
+          contentType: image.type,
+          data: await base64(image),
         };
         break;
       default:
@@ -167,7 +155,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
             setText("");
             window.localStorage.removeItem(draftLocalStorageKey);
           }
-          setState("input");
+          setProcess(false);
           setKind("text");
           onPosted(data);
         },
@@ -176,14 +164,10 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
             type: "danger",
             message: "timeline.sendPostFailed",
           });
-          setState("input");
+          setProcess(false);
         }
       );
   };
-
-  const onImageSelect = React.useCallback((blob: Blob | null) => {
-    setImageBlob(blob);
-  }, []);
 
   return (
     <div
@@ -197,7 +181,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
               as="textarea"
               className="w-100 h-100 timeline-post-edit"
               value={text}
-              disabled={state === "process"}
+              disabled={process}
               onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
                 const value = event.currentTarget.value;
                 setText(value);
@@ -205,37 +189,28 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
               }}
             />
           ) : (
-            <TimelinePostEditImage onSelect={onImageSelect} />
+            <TimelinePostEditImage onSelect={setImage} />
           )}
         </Col>
         <Col xs="auto" className="align-self-end m-1">
-          {(() => {
-            if (state === "input") {
-              return (
-                <>
-                  <div className="d-block text-center mt-1 mb-2">
-                    <i
-                      onLoad={notifyHeightChange}
-                      className={clsx(
-                        kind === "text" ? "bi-image" : "bi-card-text",
-                        "icon-button"
-                      )}
-                      onClick={toggleKind}
-                    />
-                  </div>
-                  <Button
-                    variant="primary"
-                    onClick={onSend}
-                    disabled={!canSend}
-                  >
-                    {t("timeline.send")}
-                  </Button>
-                </>
-              );
-            } else {
-              return <Spinner variant="primary" animation="border" />;
-            }
-          })()}
+          <div className="d-block text-center mt-1 mb-2">
+            <i
+              onLoad={notifyHeightChange}
+              className={clsx(
+                kind === "text" ? "bi-image" : "bi-card-text",
+                "icon-button"
+              )}
+              onClick={process ? undefined : toggleKind}
+            />
+          </div>
+          <LoadingButton
+            variant="primary"
+            onClick={onSend}
+            disabled={!canSend}
+            loading={process}
+          >
+            {t("timeline.send")}
+          </LoadingButton>
         </Col>
       </Row>
     </div>
