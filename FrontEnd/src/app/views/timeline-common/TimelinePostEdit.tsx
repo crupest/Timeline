@@ -49,7 +49,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
         accept="image/*"
         className="mx-3 my-1 d-inline-block"
       />
-      {file != null && error == null && (
+      {file != null && !error && (
         <BlobImage
           blob={file}
           className="timeline-post-edit-image"
@@ -60,9 +60,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
           }}
         />
       )}
-      {error != null && (
-        <div className="text-danger">{t("loadImageError")}</div>
-      )}
+      {error ? <div className="text-danger">{t("loadImageError")}</div> : null}
     </>
   );
 };
