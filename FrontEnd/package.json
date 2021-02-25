@@ -20,7 +20,7 @@
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.0",
     "react-dom": "^17.0.1",
-    "react-i18next": "^11.8.7",
+    "react-i18next": "^11.8.8",
     "react-inlinesvg": "^2.2.2",
     "react-responsive": "^8.2.0",
     "react-router": "^5.2.0",
