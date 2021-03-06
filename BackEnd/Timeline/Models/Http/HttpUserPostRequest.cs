@@ -5,9 +5,9 @@ using Timeline.Models.Validation;
 namespace Timeline.Models.Http
 {
     /// <summary>
-    /// Request model for <see cref="UserController.CreateUser(HttpCreateUserRequest)"/>.
+    /// Request model for <see cref="UserController.Post(HttpUserPostRequest)"/>.
     /// </summary>
-    public class HttpCreateUserRequest
+    public class HttpUserPostRequest
     {
         /// <summary>
         /// Username of the new user.

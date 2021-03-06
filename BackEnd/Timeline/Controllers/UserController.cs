@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
@@ -69,7 +68,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<HttpUser>> Post([FromBody] HttpCreateUserRequest body)
+        public async Task<ActionResult<HttpUser>> Post([FromBody] HttpUserPostRequest body)
         {
             try
             {
