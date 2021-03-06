@@ -127,6 +127,11 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "Markdig": {
+        "type": "Transitive",
+        "resolved": "0.23.0",
+        "contentHash": "jPPcnHGSDSedPvwZ6jiMJpvK3iJGA2djU6TFmEr6XK2BiYK1ier2lTHVwDt41XLxDbfGu5Dn42hKDzwqs049PA=="
+      },
       "Microsoft.AspNetCore.Authorization": {
         "type": "Transitive",
         "resolved": "1.0.3",
@@ -1981,6 +1986,7 @@
         "dependencies": {
           "AutoMapper": "10.1.1",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "8.1.0",
+          "Markdig": "0.23.0",
           "Microsoft.AspNetCore.SpaServices.Extensions": "5.0.0",
           "Microsoft.EntityFrameworkCore": "5.0.0",
           "Microsoft.EntityFrameworkCore.Analyzers": "5.0.0",

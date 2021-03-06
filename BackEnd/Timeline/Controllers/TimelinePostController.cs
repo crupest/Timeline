@@ -32,14 +32,17 @@ namespace Timeline.Controllers
 
         private readonly TimelineMapper _timelineMapper;
 
+        private readonly MarkdownProcessor _markdownProcessor;
+
         /// <summary>
         /// 
         /// </summary>
-        public TimelinePostController(ITimelineService timelineService, ITimelinePostService timelinePostService, TimelineMapper timelineMapper)
+        public TimelinePostController(ITimelineService timelineService, ITimelinePostService timelinePostService, TimelineMapper timelineMapper, MarkdownProcessor markdownProcessor)
         {
             _timelineService = timelineService;
             _postService = timelinePostService;
             _timelineMapper = timelineMapper;
+            _markdownProcessor = markdownProcessor;
         }
 
         private bool UserHasAllTimelineManagementPermission => this.UserHasPermission(UserPermission.AllTimelineManagement);
@@ -147,7 +150,15 @@ namespace Timeline.Controllers
 
             return await DataCacheHelper.GenerateActionResult(this,
                 () => _postService.GetPostDataDigest(timelineId, post, dataIndex),
-                () => _postService.GetPostData(timelineId, post, dataIndex)
+                async () =>
+                {
+                    var data = await _postService.GetPostData(timelineId, post, dataIndex);
+                    if (data.ContentType == MimeTypes.TextMarkdown)
+                    {
+                        return new ByteData(_markdownProcessor.Process(data.Data, Url, timeline, post), data.ContentType);
+                    }
+                    return data;
+                }
             );
         }
 

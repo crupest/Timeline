@@ -214,7 +214,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsAdministrator();
             {
-                var body = await client.TestPostAsync<HttpUser>(createUserUrl, new HttpCreateUserRequest
+                var body = await client.TestPostAsync<HttpUser>(createUserUrl, new HttpUserPostRequest
                 {
                     Username = "aaa",
                     Password = "bbb",
@@ -233,15 +233,15 @@ namespace Timeline.Tests.IntegratedTests
 
         public static IEnumerable<object[]> Op_CreateUser_InvalidModel_Data()
         {
-            yield return new[] { new HttpCreateUserRequest { Username = "aaa" } };
-            yield return new[] { new HttpCreateUserRequest { Password = "bbb" } };
-            yield return new[] { new HttpCreateUserRequest { Username = "a!a", Password = "bbb" } };
-            yield return new[] { new HttpCreateUserRequest { Username = "aaa", Password = "" } };
+            yield return new[] { new HttpUserPostRequest { Username = "aaa" } };
+            yield return new[] { new HttpUserPostRequest { Password = "bbb" } };
+            yield return new[] { new HttpUserPostRequest { Username = "a!a", Password = "bbb" } };
+            yield return new[] { new HttpUserPostRequest { Username = "aaa", Password = "" } };
         }
 
         [Theory]
         [MemberData(nameof(Op_CreateUser_InvalidModel_Data))]
-        public async Task Op_CreateUser_InvalidModel(HttpCreateUserRequest body)
+        public async Task Op_CreateUser_InvalidModel(HttpUserPostRequest body)
         {
             using var client = await CreateClientAsAdministrator();
             await client.TestPostAssertInvalidModelAsync(createUserUrl, body);
@@ -251,7 +251,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_CreateUser_UsernameConflict()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPostAssertErrorAsync(createUserUrl, new HttpCreateUserRequest
+            await client.TestPostAssertErrorAsync(createUserUrl, new HttpUserPostRequest
             {
                 Username = "user1",
                 Password = "bbb",
@@ -262,7 +262,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_CreateUser_NoAuth_Unauthorized()
         {
             using var client = await CreateDefaultClient();
-            await client.TestPostAssertUnauthorizedAsync(createUserUrl, new HttpCreateUserRequest
+            await client.TestPostAssertUnauthorizedAsync(createUserUrl, new HttpUserPostRequest
             {
                 Username = "aaa",
                 Password = "bbb",
@@ -273,7 +273,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_CreateUser_User_Forbid()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPostAssertForbiddenAsync(createUserUrl, new HttpCreateUserRequest
+            await client.TestPostAssertForbiddenAsync(createUserUrl, new HttpUserPostRequest
             {
                 Username = "aaa",
                 Password = "bbb",
