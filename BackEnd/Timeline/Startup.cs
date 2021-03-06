@@ -125,6 +125,8 @@ namespace Timeline
 
             services.AddScoped<ISearchService, SearchService>();
 
+            services.AddScoped<MarkdownProcessor>();
+
             services.AddOpenApiDocs();
 
             if (_frontEndMode == FrontEndMode.Mock)

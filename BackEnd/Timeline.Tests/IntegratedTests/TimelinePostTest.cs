@@ -14,6 +14,7 @@ using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Timeline.Tests.IntegratedTests
 {
@@ -30,6 +31,23 @@ namespace Timeline.Tests.IntegratedTests
                     new HttpTimelinePostCreateRequestData()
                     {
                         ContentType = MimeTypes.TextPlain,
+                        Data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text))
+                    }
+                }
+            };
+        }
+
+        private static HttpTimelinePostCreateRequest CreateMarkdownPostRequest(string text, DateTime? time = null, string? color = null)
+        {
+            return new HttpTimelinePostCreateRequest()
+            {
+                Time = time,
+                Color = color,
+                DataList = new List<HttpTimelinePostCreateRequestData>()
+                {
+                    new HttpTimelinePostCreateRequestData()
+                    {
+                        ContentType = MimeTypes.TextMarkdown,
                         Data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text))
                     }
                 }
@@ -585,6 +603,20 @@ namespace Timeline.Tests.IntegratedTests
                 var post2 = await client.TestGetAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts/{post.Id}");
                 post2.Editable.Should().BeFalse();
             }
+        }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Post_Markdown_Url_Map(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+            var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", CreateMarkdownPostRequest("[aaa](1) ![bbb](2)"));
+
+            var res = await client.GetAsync($"timelines/{generator(1)}/posts/{post.Id}/data");
+            var markdown = await res.Content.ReadAsStringAsync();
+
+            markdown.Should().MatchRegex(@$"\[aaa\]\(https?://.*/timelines/{generator(1)}/posts/{post.Id}/data/1\)");
+            markdown.Should().MatchRegex(@$"\[bbb\]\(https?://.*/timelines/{generator(1)}/posts/{post.Id}/data/2\)");
         }
     }
 }

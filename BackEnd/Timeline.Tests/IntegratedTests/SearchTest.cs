@@ -39,10 +39,10 @@ namespace Timeline.Tests.IntegratedTests
             var client = await CreateClientAsAdministrator();
 
             {
-                await client.TestPostAsync("users", new HttpCreateUserRequest { Username = "hahaha", Password = "p" });
-                await client.TestPostAsync("users", new HttpCreateUserRequest { Username = "bababa", Password = "p" });
+                await client.TestPostAsync("users", new HttpUserPostRequest { Username = "hahaha", Password = "p" });
+                await client.TestPostAsync("users", new HttpUserPostRequest { Username = "bababa", Password = "p" });
                 await client.TestPatchAsync("users/bababa", new HttpUserPatchRequest { Nickname = "hahaha" });
-                await client.TestPostAsync("users", new HttpCreateUserRequest { Username = "gagaga", Password = "p" });
+                await client.TestPostAsync("users", new HttpUserPostRequest { Username = "gagaga", Password = "p" });
             }
 
             {
