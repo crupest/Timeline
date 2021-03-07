@@ -17,6 +17,7 @@ import { base64 } from "@/http/common";
 
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/LoadingButton";
+import { PopupMenu } from "../common/Menu";
 
 interface TimelinePostEditTextProps {
   text: string;
@@ -67,6 +68,12 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
     }
   };
 
+  React.useEffect(() => {
+    return () => {
+      onSelect(null);
+    };
+  }, [onSelect]);
+
   return (
     <>
       <Form.File
@@ -92,6 +99,14 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
   );
 };
 
+type PostKind = "text" | "markdown" | "image";
+
+const postKindIconClassNameMap: Record<PostKind, string> = {
+  text: "bi-fonts",
+  markdown: "bi-markdown",
+  image: "bi-image",
+};
+
 export interface TimelinePostEditProps {
   className?: string;
   timeline: HttpTimelineInfo;
@@ -105,8 +120,6 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   const { t } = useTranslation();
 
   const [process, setProcess] = React.useState<boolean>(false);
-
-  type PostKind = "text" | "markdown" | "image";
 
   const [kind, setKind] = React.useState<PostKind>("text");
 
@@ -250,18 +263,23 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         </Col>
         <Col xs="auto" className="align-self-end m-1">
           <div className="d-block text-center mt-1 mb-2">
-            <Form.Control
-              as="select"
-              value={kind}
-              onChange={(event) => {
-                const { value } = event.currentTarget;
-                setKind(value as PostKind);
-              }}
+            <PopupMenu
+              items={(["text", "image", "markdown"] as const).map((kind) => ({
+                type: "button",
+                text: `timeline.post.type.${kind}`,
+                iconClassName: postKindIconClassNameMap[kind],
+                onClick: () => {
+                  setKind(kind);
+                },
+              }))}
             >
-              <option value="text">text</option>
-              <option value="image">image</option>
-              <option value="markdown">markdown</option>
-            </Form.Control>
+              <i
+                className={clsx(
+                  postKindIconClassNameMap[kind],
+                  "icon-button large"
+                )}
+              />
+            </PopupMenu>
           </div>
           <LoadingButton
             variant="primary"

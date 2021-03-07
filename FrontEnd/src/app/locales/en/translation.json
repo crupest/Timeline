@@ -99,6 +99,11 @@
       "notMatch": "Name does not match."
     },
     "post": {
+      "type": {
+        "text": "Plain Text",
+        "markdown": "Markdown",
+        "image": "Image"
+      },
       "deleteDialog": {
         "title": "Confirm Delete",
         "prompt": "Are you sure to delete the post? This operation is not recoverable."
