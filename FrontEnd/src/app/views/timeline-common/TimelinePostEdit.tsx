@@ -18,12 +18,38 @@ import { base64 } from "@/http/common";
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/LoadingButton";
 
+interface TimelinePostEditTextProps {
+  text: string;
+  disabled: boolean;
+  onChange: (text: string) => void;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const TimelinePostEditText: React.FC<TimelinePostEditTextProps> = (props) => {
+  const { text, disabled, onChange, className, style } = props;
+
+  return (
+    <Form.Control
+      as="textarea"
+      value={text}
+      disabled={disabled}
+      onChange={(event) => {
+        onChange(event.target.value);
+      }}
+      className={className}
+      style={style}
+    />
+  );
+};
+
 interface TimelinePostEditImageProps {
   onSelect: (file: File | null) => void;
+  disabled: boolean;
 }
 
 const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
-  const { onSelect } = props;
+  const { onSelect, disabled } = props;
 
   const { t } = useTranslation();
 
@@ -47,6 +73,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
         label={t("chooseImage")}
         onChange={onInputChange}
         accept="image/*"
+        disabled={disabled}
         className="mx-3 my-1 d-inline-block"
       />
       {file != null && !error && (
@@ -78,15 +105,24 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   const { t } = useTranslation();
 
   const [process, setProcess] = React.useState<boolean>(false);
-  const [kind, setKind] = React.useState<"text" | "image">("text");
+
+  type PostKind = "text" | "markdown" | "image";
+
+  const [kind, setKind] = React.useState<PostKind>("text");
+
   const [text, setText] = React.useState<string>("");
+  const [markdown, setMarkdown] = React.useState<string>("");
   const [image, setImage] = React.useState<File | null>(null);
 
-  const draftLocalStorageKey = `timeline.${timeline.name}.postDraft`;
+  const draftTextLocalStorageKey = `timeline.${timeline.name}.postDraft.text`;
+  const draftMarkdownLocalStorageKey = `timeline.${timeline.name}.postDraft.markdown`;
 
   React.useEffect(() => {
-    setText(window.localStorage.getItem(draftLocalStorageKey) ?? "");
-  }, [draftLocalStorageKey]);
+    setText(window.localStorage.getItem(draftTextLocalStorageKey) ?? "");
+    setMarkdown(
+      window.localStorage.getItem(draftMarkdownLocalStorageKey) ?? ""
+    );
+  }, [draftTextLocalStorageKey, draftMarkdownLocalStorageKey]);
 
   const canSend =
     (kind === "text" && text.length !== 0) ||
@@ -102,20 +138,13 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   };
 
   React.useEffect(() => {
-    if (onHeightChange) {
-      onHeightChange(containerRef.current.clientHeight);
-    }
+    notifyHeightChange();
     return () => {
       if (onHeightChange) {
         onHeightChange(0);
       }
     };
   });
-
-  const toggleKind = React.useCallback(() => {
-    setKind((oldKind) => (oldKind === "text" ? "image" : "text"));
-    setImage(null);
-  }, []);
 
   const onSend = async (): Promise<void> => {
     setProcess(true);
@@ -126,6 +155,12 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         requestData = {
           contentType: "text/plain",
           data: await base64(new Blob([text])),
+        };
+        break;
+      case "markdown":
+        requestData = {
+          contentType: "text/markdown",
+          data: await base64(new Blob([markdown])),
         };
         break;
       case "image":
@@ -151,7 +186,10 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         (data) => {
           if (kind === "text") {
             setText("");
-            window.localStorage.removeItem(draftLocalStorageKey);
+            window.localStorage.removeItem(draftTextLocalStorageKey);
+          } else if (kind === "markdown") {
+            setMarkdown("");
+            window.localStorage.removeItem(draftMarkdownLocalStorageKey);
           }
           setProcess(false);
           setKind("text");
@@ -174,32 +212,55 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
     >
       <Row>
         <Col className="px-1 py-1">
-          {kind === "text" ? (
-            <Form.Control
-              as="textarea"
-              className="w-100 h-100 timeline-post-edit"
-              value={text}
-              disabled={process}
-              onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                const value = event.currentTarget.value;
-                setText(value);
-                window.localStorage.setItem(draftLocalStorageKey, value);
-              }}
-            />
-          ) : (
-            <TimelinePostEditImage onSelect={setImage} />
-          )}
+          {(() => {
+            if (kind === "text") {
+              return (
+                <TimelinePostEditText
+                  className="w-100 h-100 timeline-post-edit"
+                  text={text}
+                  disabled={process}
+                  onChange={(t) => {
+                    setText(t);
+                    window.localStorage.setItem(draftTextLocalStorageKey, t);
+                  }}
+                />
+              );
+            } else if (kind === "image") {
+              return (
+                <TimelinePostEditImage onSelect={setImage} disabled={process} />
+              );
+            } else if (kind === "markdown") {
+              return (
+                <TimelinePostEditText
+                  className="w-100 h-100 timeline-post-edit"
+                  text={markdown}
+                  disabled={process}
+                  onChange={(t) => {
+                    setMarkdown(t);
+                    window.localStorage.setItem(
+                      draftMarkdownLocalStorageKey,
+                      t
+                    );
+                  }}
+                />
+              );
+            }
+          })()}
         </Col>
         <Col xs="auto" className="align-self-end m-1">
           <div className="d-block text-center mt-1 mb-2">
-            <i
-              onLoad={notifyHeightChange}
-              className={clsx(
-                kind === "text" ? "bi-image" : "bi-card-text",
-                "icon-button"
-              )}
-              onClick={process ? undefined : toggleKind}
-            />
+            <Form.Control
+              as="select"
+              value={kind}
+              onChange={(event) => {
+                const { value } = event.currentTarget;
+                setKind(value as PostKind);
+              }}
+            >
+              <option value="text">text</option>
+              <option value="image">image</option>
+              <option value="markdown">markdown</option>
+            </Form.Control>
           </div>
           <LoadingButton
             variant="primary"
