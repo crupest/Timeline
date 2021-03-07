@@ -1,5 +1,8 @@
 import React from "react";
 import clsx from "clsx";
+import { Remarkable } from "remarkable";
+
+import { UiLogicError } from "@/common";
 
 import { HttpNetworkError } from "@/http/common";
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
@@ -81,9 +84,82 @@ const ImageView: React.FC<TimelinePostContentViewProps> = (props) => {
   );
 };
 
-const MarkdownView: React.FC<TimelinePostContentViewProps> = (_props) => {
-  // TODO: Implement this.
-  return <div>Unsupported now!</div>;
+const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
+  const { post, className, style } = props;
+
+  const _remarkable = React.useRef<Remarkable>();
+
+  const getRemarkable = (): Remarkable => {
+    if (_remarkable.current) {
+      return _remarkable.current;
+    } else {
+      _remarkable.current = new Remarkable();
+      return _remarkable.current;
+    }
+  };
+
+  const [markdown, setMarkdown] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<"offline" | "error" | null>(null);
+
+  const [reloadKey, setReloadKey] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    let subscribe = true;
+
+    setMarkdown(null);
+    setError(null);
+
+    void getHttpTimelineClient()
+      .getPostDataAsString(post.timelineName, post.id)
+      .then(
+        (data) => {
+          if (subscribe) setMarkdown(data);
+        },
+        (error) => {
+          if (subscribe) {
+            if (error instanceof HttpNetworkError) {
+              setError("offline");
+            } else {
+              setError("error");
+            }
+          }
+        }
+      );
+
+    return () => {
+      subscribe = false;
+    };
+  }, [post.timelineName, post.id, reloadKey]);
+
+  const markdownHtml = React.useMemo<string | null>(() => {
+    if (markdown == null) return null;
+    return getRemarkable().render(markdown);
+  }, [markdown]);
+
+  if (error != null) {
+    return (
+      <LoadFailReload
+        className={className}
+        style={style}
+        onReload={() => setReloadKey(reloadKey + 1)}
+      />
+    );
+  } else if (markdown == null) {
+    return <Skeleton />;
+  } else {
+    if (markdownHtml == null) {
+      throw new UiLogicError("Markdown is not null but markdown html is.");
+    }
+    return (
+      <div
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{
+          __html: markdownHtml,
+        }}
+      />
+    );
+  }
 };
 
 export interface TimelinePostContentViewProps {
