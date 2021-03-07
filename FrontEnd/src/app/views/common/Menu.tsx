@@ -12,6 +12,7 @@ export type MenuItem =
   | {
       type: "button";
       text: I18nText;
+      iconClassName?: string;
       color?: BootstrapThemeColor;
       onClick: () => void;
     };
@@ -44,6 +45,9 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
                 onItemClicked?.();
               }}
             >
+              {item.iconClassName != null ? (
+                <i className={clsx(item.iconClassName, "cru-menu-item-icon")} />
+              ) : null}
               {convertI18nText(item.text, t)}
             </div>
           );
@@ -67,7 +71,6 @@ export const PopupMenu: React.FC<PopupMenuProps> = ({ items, children }) => {
   return (
     <OverlayTrigger
       trigger="click"
-      placement="bottom"
       rootClose
       overlay={
         <Popover id="menu-popover">
