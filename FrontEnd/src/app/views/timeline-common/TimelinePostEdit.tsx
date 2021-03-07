@@ -126,7 +126,8 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   const canSend =
     (kind === "text" && text.length !== 0) ||
-    (kind === "image" && image != null);
+    (kind === "image" && image != null) ||
+    (kind === "markdown" && markdown.length !== 0);
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
