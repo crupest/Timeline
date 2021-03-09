@@ -78,7 +78,7 @@
     "@types/webpack-env": "^1.16.0",
     "@types/xregexp": "^4.3.0",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.16.1",
+    "@typescript-eslint/parser": "^4.17.0",
     "@yarnpkg/pnpify": "^2.4.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
