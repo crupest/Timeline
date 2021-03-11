@@ -168,13 +168,13 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       case "text":
         requestData = {
           contentType: "text/plain",
-          data: await base64(new Blob([text])),
+          data: await base64(text),
         };
         break;
       case "markdown":
         requestData = {
           contentType: "text/markdown",
-          data: await base64(new Blob([markdown])),
+          data: await base64(markdown),
         };
         break;
       case "image":

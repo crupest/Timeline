@@ -61,7 +61,11 @@ export function setHttpToken(token: string | null): void {
   }
 }
 
-export function base64(blob: Blob): Promise<string> {
+export function base64(blob: Blob | string): Promise<string> {
+  if (typeof blob === "string") {
+    return Promise.resolve(btoa(blob));
+  }
+
   return new Promise<string>((resolve) => {
     const reader = new FileReader();
     reader.onload = function () {
