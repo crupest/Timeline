@@ -10,7 +10,7 @@ import { UiLogicError } from "@/common";
 import { base64 } from "@/http/common";
 import { HttpTimelinePostPostRequest } from "@/http/timeline";
 
-export class TimelinePostBuilder {
+export default class TimelinePostBuilder {
   private _onChange: () => void;
   private _text = "";
   private _images: { file: File; url: string }[] = [];
@@ -84,6 +84,10 @@ export class TimelinePostBuilder {
     this._images.splice(index, 1);
 
     this._onChange();
+  }
+
+  get text(): string {
+    return this._text;
   }
 
   get images(): { file: File; url: string }[] {

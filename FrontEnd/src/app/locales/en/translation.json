@@ -2,7 +2,9 @@
   "welcome": "Welcome!",
   "search": "Search",
   "edit": "Edit",
+  "image": "Image",
   "done": "Done",
+  "preview": "Preview",
   "loadFailReload": "Load failed, <1>click here to reload</1>.",
   "error": {
     "network": "Network error.",

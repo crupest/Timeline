@@ -2,7 +2,9 @@
   "welcome": "欢迎！",
   "search": "搜索",
   "edit": "编辑",
+  "image": "图片",
   "done": "完成",
+  "preview": "预览",
   "loadFailReload": "加载失败，<1>点击重试</1>。",
   "error": {
     "network": "网络错误。",
