@@ -20,10 +20,10 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 const networkOnly = new NetworkOnly();
 
-registerRoute(new RegExp("/swagger/.+"), new NetworkOnly());
+registerRoute(new RegExp("/swagger/?.*"), new NetworkOnly());
 
-registerRoute(new RegExp("/api/token/.+"), new NetworkOnly());
-registerRoute(new RegExp("/api/search/.+"), new NetworkOnly());
+registerRoute(new RegExp("/api/token/?.*"), new NetworkOnly());
+registerRoute(new RegExp("/api/search/?.*"), new NetworkOnly());
 
 registerRoute(
   new RegExp("/api/users/.+/avatar"),
@@ -41,7 +41,7 @@ registerRoute(
 );
 
 registerRoute(
-  new RegExp("/api/.+"),
+  new RegExp("/api/?.*"),
   new NetworkFirst({
     plugins: [
       new CacheableResponsePlugin({
