@@ -1,6 +1,7 @@
 import React from "react";
 import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import { Prompt } from "react-router";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
@@ -26,6 +27,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const [canLeave, setCanLeave] = React.useState<boolean>(true);
+
   const [process, setProcess] = React.useState<boolean>(false);
 
   const [text, _setText] = React.useState<string>("");
@@ -39,6 +42,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
   const getBuilder = (): TimelinePostBuilder => {
     if (_builder.current == null) {
       const builder = new TimelinePostBuilder(() => {
+        setCanLeave(builder.isEmpty);
         _setText(builder.text);
         _setImages(builder.images);
         _setPreviewHtml(builder.renderHtml());
@@ -53,6 +57,18 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
       getBuilder().dispose();
     };
   }, []);
+
+  React.useEffect(() => {
+    window.onbeforeunload = () => {
+      if (!canLeave) {
+        return t("timeline.confirmLeave");
+      }
+    };
+
+    return () => {
+      window.onbeforeunload = null;
+    };
+  }, [canLeave, t]);
 
   const send = async (): Promise<void> => {
     setProcess(true);
@@ -70,73 +86,76 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
   };
 
   return (
-    <TabPages
-      className={className}
-      style={style}
-      pageContainerClassName="py-2"
-      actions={
-        <>
-          <div className="flat-button text-danger mr-2" onClick={onClose}>
-            {t("operationDialog.cancel")}
-          </div>
-          <div className="flat-button text-primary" onClick={send}>
-            {t("timeline.send")}
-          </div>
-        </>
-      }
-      pages={[
-        {
-          id: "text",
-          tabText: "edit",
-          page: (
-            <Form.Control
-              as="textarea"
-              value={text}
-              disabled={process}
-              onChange={(event) => {
-                getBuilder().setMarkdownText(event.currentTarget.value);
-              }}
-            />
-          ),
-        },
-        {
-          id: "images",
-          tabText: "image",
-          page: (
-            <div className="timeline-markdown-post-edit-page">
-              {images.map((image) => (
-                <img
-                  key={image.url}
-                  src={image.url}
-                  className="timeline-markdown-post-edit-image"
-                />
-              ))}
-              <Form.File
-                label={t("chooseImage")}
-                accept="image/*"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  const { files } = event.currentTarget;
-                  if (files != null && files.length !== 0) {
-                    getBuilder().appendImage(files[0]);
-                  }
-                }}
-                disabled={process}
-              />
+    <>
+      <Prompt when={!canLeave} message={t("timeline.confirmLeave")} />
+      <TabPages
+        className={className}
+        style={style}
+        pageContainerClassName="py-2"
+        actions={
+          <>
+            <div className="flat-button text-danger mr-2" onClick={onClose}>
+              {t("operationDialog.cancel")}
             </div>
-          ),
-        },
-        {
-          id: "preview",
-          tabText: "preview",
-          page: (
-            <div
-              className="markdown-container timeline-markdown-post-edit-page"
-              dangerouslySetInnerHTML={{ __html: previewHtml }}
-            />
-          ),
-        },
-      ]}
-    />
+            <div className="flat-button text-primary" onClick={send}>
+              {t("timeline.send")}
+            </div>
+          </>
+        }
+        pages={[
+          {
+            id: "text",
+            tabText: "edit",
+            page: (
+              <Form.Control
+                as="textarea"
+                value={text}
+                disabled={process}
+                onChange={(event) => {
+                  getBuilder().setMarkdownText(event.currentTarget.value);
+                }}
+              />
+            ),
+          },
+          {
+            id: "images",
+            tabText: "image",
+            page: (
+              <div className="timeline-markdown-post-edit-page">
+                {images.map((image) => (
+                  <img
+                    key={image.url}
+                    src={image.url}
+                    className="timeline-markdown-post-edit-image"
+                  />
+                ))}
+                <Form.File
+                  label={t("chooseImage")}
+                  accept="image/*"
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    const { files } = event.currentTarget;
+                    if (files != null && files.length !== 0) {
+                      getBuilder().appendImage(files[0]);
+                    }
+                  }}
+                  disabled={process}
+                />
+              </div>
+            ),
+          },
+          {
+            id: "preview",
+            tabText: "preview",
+            page: (
+              <div
+                className="markdown-container timeline-markdown-post-edit-page"
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
+            ),
+          },
+        ]}
+      />
+    </>
   );
 };
 

@@ -67,6 +67,7 @@
     "send": "发送",
     "deletePostFailed": "删除消息失败。",
     "sendPostFailed": "发送消息失败。",
+    "confirmLeave":"确定要离开吗？所有输入的内容将会丢失。",
     "visibility": {
       "public": "对所有人公开",
       "register": "仅注册可见",
