@@ -1,8 +1,3 @@
-import {
-  escapeHtml,
-  replaceEntities,
-  unescapeMd,
-} from "remarkable/lib/common/utils";
 import { Remarkable } from "remarkable";
 
 import { UiLogicError } from "@/common";
@@ -10,7 +5,7 @@ import { UiLogicError } from "@/common";
 import { base64 } from "@/http/common";
 import { HttpTimelinePostPostRequest } from "@/http/timeline";
 
-export class TimelinePostBuilder {
+export default class TimelinePostBuilder {
   private _onChange: () => void;
   private _text = "";
   private _images: { file: File; url: string }[] = [];
@@ -18,28 +13,16 @@ export class TimelinePostBuilder {
 
   constructor(onChange: () => void) {
     this._onChange = onChange;
+    const oldImageRenderer = this._md.renderer.rules.image;
     this._md.renderer.rules.image = ((
       _t: TimelinePostBuilder
     ): Remarkable.Rule<Remarkable.ImageToken, string> =>
       function (tokens, idx, options /*, env */) {
         const i = parseInt(tokens[idx].src);
-        const src =
-          ' src="' +
-          (isNaN(i) && i > 0 && i <= _t._images.length
-            ? escapeHtml(tokens[idx].src)
-            : _t._images[i - 1].url) +
-          '"';
-        const title = tokens[idx].title
-          ? ' title="' + escapeHtml(replaceEntities(tokens[idx].title)) + '"'
-          : "";
-        const alt =
-          ' alt="' +
-          (tokens[idx].alt
-            ? escapeHtml(replaceEntities(unescapeMd(tokens[idx].alt)))
-            : "") +
-          '"';
-        const suffix = options?.xhtmlOut ? " /" : "";
-        return "<img" + src + alt + title + suffix + ">";
+        if (!isNaN(i) && i > 0 && i <= _t._images.length) {
+          tokens[idx].src = _t._images[i - 1].url;
+        }
+        return oldImageRenderer(tokens, idx, options);
       })(this);
   }
 
@@ -49,6 +32,7 @@ export class TimelinePostBuilder {
   }
 
   appendImage(file: File): void {
+    this._images = this._images.slice();
     this._images.push({
       file,
       url: URL.createObjectURL(file),
@@ -69,6 +53,8 @@ export class TimelinePostBuilder {
       newIndex = this._images.length - 1;
     }
 
+    this._images = this._images.slice();
+
     const [old] = this._images.splice(oldIndex, 1);
     this._images.splice(newIndex, 0, old);
 
@@ -80,14 +66,24 @@ export class TimelinePostBuilder {
       throw new UiLogicError("Old index out of range.");
     }
 
+    this._images = this._images.slice();
+
     URL.revokeObjectURL(this._images[index].url);
     this._images.splice(index, 1);
 
     this._onChange();
   }
 
+  get text(): string {
+    return this._text;
+  }
+
   get images(): { file: File; url: string }[] {
     return this._images;
+  }
+
+  get isEmpty(): boolean {
+    return this._text.length === 0 && this._images.length === 0;
   }
 
   renderHtml(): string {

@@ -45,8 +45,15 @@ small
   cursor: pointer
   padding: 0.2em 0.5em
   border-radius: 0.2em
-  &:hover
+  &:hover:not(.disabled)
     background-color: $gray-200
+  &.disabled
+    cursor: default
+  @each $color, $value in $theme-colors
+    &.#{$color}
+      color: $value
+      &.disabled
+        color: adjust-color($value, $lightness: +15%)
 
 .cursor-pointer
   cursor: pointer
@@ -81,10 +88,10 @@ textarea
 .text-yellow
   color: $yellow
 
-@each $color, $value in $theme-colors
-  .text-button
-    background: transparent
-    border: none
+.text-button
+  background: transparent
+  border: none
+  @each $color, $value in $theme-colors
     &.#{$color}
       color: $value
       &:hover
@@ -95,3 +102,8 @@ textarea
 
 i
   line-height: 1
+
+.markdown-container
+  img
+    max-height: 200px
+    max-width: 100%

@@ -152,7 +152,7 @@ const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
     }
     return (
       <div
-        className={className}
+        className={clsx(className, "markdown-container")}
         style={style}
         dangerouslySetInnerHTML={{
           __html: markdownHtml,
