@@ -30,12 +30,13 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
 
   return (
     <div className={clsx("cru-menu", className)}>
-      {items.map((item) => {
+      {items.map((item, index) => {
         if (item.type === "divider") {
-          return <div className="cru-menu-divider" />;
+          return <div key={index} className="cru-menu-divider" />;
         } else {
           return (
             <div
+              key={index}
               className={clsx(
                 "cru-menu-item",
                 `color-${item.color ?? "primary"}`
