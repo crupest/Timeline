@@ -18,6 +18,7 @@ import { base64 } from "@/http/common";
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/LoadingButton";
 import { PopupMenu } from "../common/Menu";
+import MarkdownPostEdit from "./MarkdownPostEdit";
 
 interface TimelinePostEditTextProps {
   text: string;
@@ -121,26 +122,21 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   const [process, setProcess] = React.useState<boolean>(false);
 
-  const [kind, setKind] = React.useState<PostKind>("text");
+  const [kind, setKind] = React.useState<Exclude<PostKind, "markdown">>("text");
+  const [showMarkdown, setShowMarkdown] = React.useState<boolean>(false);
 
   const [text, setText] = React.useState<string>("");
-  const [markdown, setMarkdown] = React.useState<string>("");
   const [image, setImage] = React.useState<File | null>(null);
 
   const draftTextLocalStorageKey = `timeline.${timeline.name}.postDraft.text`;
-  const draftMarkdownLocalStorageKey = `timeline.${timeline.name}.postDraft.markdown`;
 
   React.useEffect(() => {
     setText(window.localStorage.getItem(draftTextLocalStorageKey) ?? "");
-    setMarkdown(
-      window.localStorage.getItem(draftMarkdownLocalStorageKey) ?? ""
-    );
-  }, [draftTextLocalStorageKey, draftMarkdownLocalStorageKey]);
+  }, [draftTextLocalStorageKey]);
 
   const canSend =
     (kind === "text" && text.length !== 0) ||
-    (kind === "image" && image != null) ||
-    (kind === "markdown" && markdown.length !== 0);
+    (kind === "image" && image != null);
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
@@ -160,6 +156,13 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
     };
   });
 
+  const onPostError = (): void => {
+    pushAlert({
+      type: "danger",
+      message: "timeline.sendPostFailed",
+    });
+  };
+
   const onSend = async (): Promise<void> => {
     setProcess(true);
 
@@ -169,12 +172,6 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         requestData = {
           contentType: "text/plain",
           data: await base64(text),
-        };
-        break;
-      case "markdown":
-        requestData = {
-          contentType: "text/markdown",
-          data: await base64(markdown),
         };
         break;
       case "image":
@@ -201,20 +198,14 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
           if (kind === "text") {
             setText("");
             window.localStorage.removeItem(draftTextLocalStorageKey);
-          } else if (kind === "markdown") {
-            setMarkdown("");
-            window.localStorage.removeItem(draftMarkdownLocalStorageKey);
           }
           setProcess(false);
           setKind("text");
           onPosted(data);
         },
         (_) => {
-          pushAlert({
-            type: "danger",
-            message: "timeline.sendPostFailed",
-          });
           setProcess(false);
+          onPostError();
         }
       );
   };
@@ -224,73 +215,75 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       ref={containerRef}
       className={clsx("container-fluid bg-light", className)}
     >
-      <Row>
-        <Col className="px-1 py-1">
-          {(() => {
-            if (kind === "text") {
-              return (
-                <TimelinePostEditText
-                  className="w-100 h-100 timeline-post-edit"
-                  text={text}
-                  disabled={process}
-                  onChange={(t) => {
-                    setText(t);
-                    window.localStorage.setItem(draftTextLocalStorageKey, t);
-                  }}
+      {showMarkdown ? (
+        <MarkdownPostEdit
+          className="w-100"
+          onClose={() => setShowMarkdown(false)}
+          timeline={timeline.name}
+          onPosted={onPosted}
+          onPostError={onPostError}
+        />
+      ) : (
+        <Row>
+          <Col className="px-1 py-1">
+            {(() => {
+              if (kind === "text") {
+                return (
+                  <TimelinePostEditText
+                    className="w-100 h-100 timeline-post-edit"
+                    text={text}
+                    disabled={process}
+                    onChange={(t) => {
+                      setText(t);
+                      window.localStorage.setItem(draftTextLocalStorageKey, t);
+                    }}
+                  />
+                );
+              } else if (kind === "image") {
+                return (
+                  <TimelinePostEditImage
+                    onSelect={setImage}
+                    disabled={process}
+                  />
+                );
+              }
+            })()}
+          </Col>
+          <Col xs="auto" className="align-self-end m-1">
+            <div className="d-block text-center mt-1 mb-2">
+              <PopupMenu
+                items={(["text", "image", "markdown"] as const).map((kind) => ({
+                  type: "button",
+                  text: `timeline.post.type.${kind}`,
+                  iconClassName: postKindIconClassNameMap[kind],
+                  onClick: () => {
+                    if (kind === "markdown") {
+                      setShowMarkdown(true);
+                    } else {
+                      setKind(kind);
+                    }
+                  },
+                }))}
+              >
+                <i
+                  className={clsx(
+                    postKindIconClassNameMap[kind],
+                    "icon-button large"
+                  )}
                 />
-              );
-            } else if (kind === "image") {
-              return (
-                <TimelinePostEditImage onSelect={setImage} disabled={process} />
-              );
-            } else if (kind === "markdown") {
-              return (
-                <TimelinePostEditText
-                  className="w-100 h-100 timeline-post-edit"
-                  text={markdown}
-                  disabled={process}
-                  onChange={(t) => {
-                    setMarkdown(t);
-                    window.localStorage.setItem(
-                      draftMarkdownLocalStorageKey,
-                      t
-                    );
-                  }}
-                />
-              );
-            }
-          })()}
-        </Col>
-        <Col xs="auto" className="align-self-end m-1">
-          <div className="d-block text-center mt-1 mb-2">
-            <PopupMenu
-              items={(["text", "image", "markdown"] as const).map((kind) => ({
-                type: "button",
-                text: `timeline.post.type.${kind}`,
-                iconClassName: postKindIconClassNameMap[kind],
-                onClick: () => {
-                  setKind(kind);
-                },
-              }))}
+              </PopupMenu>
+            </div>
+            <LoadingButton
+              variant="primary"
+              onClick={onSend}
+              disabled={!canSend}
+              loading={process}
             >
-              <i
-                className={clsx(
-                  postKindIconClassNameMap[kind],
-                  "icon-button large"
-                )}
-              />
-            </PopupMenu>
-          </div>
-          <LoadingButton
-            variant="primary"
-            onClick={onSend}
-            disabled={!canSend}
-            loading={process}
-          >
-            {t("timeline.send")}
-          </LoadingButton>
-        </Col>
-      </Row>
+              {t("timeline.send")}
+            </LoadingButton>
+          </Col>
+        </Row>
+      )}
     </div>
   );
 };

@@ -1,23 +1,30 @@
 import React from "react";
-import { Nav, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
+import TabPages from "../common/TabPages";
 import TimelinePostBuilder from "@/services/TimelinePostBuilder";
 
 export interface MarkdownPostEditProps {
   timeline: string;
   onPosted: (post: HttpTimelinePostInfo) => void;
+  onPostError: () => void;
+  onClose: () => void;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
   timeline: timelineName,
   onPosted,
+  onClose,
+  onPostError,
+  className,
+  style,
 }) => {
   const { t } = useTranslation();
-
-  const [tab, setTab] = React.useState<"text" | "images" | "preview">("text");
 
   const [process, setProcess] = React.useState<boolean>(false);
 
@@ -48,68 +55,88 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
   }, []);
 
   const send = async (): Promise<void> => {
-    const dataList = await getBuilder().build();
-    const post = await getHttpTimelineClient().postPost(timelineName, {
-      dataList,
-    });
-    onPosted(post);
+    setProcess(true);
+    try {
+      const dataList = await getBuilder().build();
+      const post = await getHttpTimelineClient().postPost(timelineName, {
+        dataList,
+      });
+      onPosted(post);
+      onClose();
+    } catch (e) {
+      setProcess(false);
+      onPostError();
+    }
   };
 
   return (
-    <div>
-      <Nav variant="tabs" className="my-2">
-        <Nav.Item>
-          <Nav.Link
-            active={tab === "text"}
-            onClick={() => {
-              setTab("text");
-            }}
-          >
-            {t("edit")}
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link
-            active={tab === "images"}
-            onClick={() => {
-              setTab("images");
-            }}
-          >
-            {t("image")}
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link
-            active={tab === "preview"}
-            onClick={() => {
-              setTab("preview");
-            }}
-          >
-            {t("preview")}
-          </Nav.Link>
-        </Nav.Item>
-      </Nav>
-      <div>
-        {(() => {
-          if (tab === "text") {
-            return (
-              <Form.Control
-                as="textarea"
-                value={text}
-                disabled={process}
-                onChange={(event) => {
-                  getBuilder().setMarkdownText(event.currentTarget.value);
+    <TabPages
+      className={className}
+      style={style}
+      pageContainerClassName="py-2"
+      actions={
+        <>
+          <div className="flat-button text-danger mr-2" onClick={onClose}>
+            {t("operationDialog.cancel")}
+          </div>
+          <div className="flat-button text-primary" onClick={send}>
+            {t("timeline.send")}
+          </div>
+        </>
+      }
+      pages={[
+        {
+          id: "text",
+          tabText: "edit",
+          page: (
+            <Form.Control
+              as="textarea"
+              value={text}
+              disabled={process}
+              onChange={(event) => {
+                getBuilder().setMarkdownText(event.currentTarget.value);
+              }}
+            />
+          ),
+        },
+        {
+          id: "images",
+          tabText: "image",
+          page: (
+            <div className="timeline-markdown-post-edit-page">
+              {images.map((image) => (
+                <img
+                  key={image.url}
+                  src={image.url}
+                  className="timeline-markdown-post-edit-image"
+                />
+              ))}
+              <Form.File
+                label={t("chooseImage")}
+                accept="image/*"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  const { files } = event.currentTarget;
+                  if (files != null && files.length !== 0) {
+                    getBuilder().appendImage(files[0]);
+                  }
                 }}
+                disabled={process}
               />
-            );
-          } else if (tab === "images") {
-            return <div></div>;
-          } else {
-            return <div dangerouslySetInnerHTML={{ __html: previewHtml }} />;
-          }
-        })()}
-      </div>
-    </div>
+            </div>
+          ),
+        },
+        {
+          id: "preview",
+          tabText: "preview",
+          page: (
+            <div
+              className="markdown-container timeline-markdown-post-edit-page"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
+          ),
+        },
+      ]}
+    />
   );
 };
 
