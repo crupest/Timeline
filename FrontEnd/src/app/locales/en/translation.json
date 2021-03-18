@@ -2,7 +2,9 @@
   "welcome": "Welcome!",
   "search": "Search",
   "edit": "Edit",
+  "image": "Image",
   "done": "Done",
+  "preview": "Preview",
   "loadFailReload": "Load failed, <1>click here to reload</1>.",
   "error": {
     "network": "Network error.",
@@ -65,6 +67,8 @@
     "send": "Send",
     "deletePostFailed": "Failed to delete post.",
     "sendPostFailed": "Failed to send post.",
+    "dropDraft": "Drop Draft",
+    "confirmLeave": "Are you sure to leave? All content you typed would be lost.",
     "visibility": {
       "public": "public to everyone",
       "register": "only registed people can see",

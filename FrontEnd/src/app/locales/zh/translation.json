@@ -2,7 +2,9 @@
   "welcome": "欢迎！",
   "search": "搜索",
   "edit": "编辑",
+  "image": "图片",
   "done": "完成",
+  "preview": "预览",
   "loadFailReload": "加载失败，<1>点击重试</1>。",
   "error": {
     "network": "网络错误。",
@@ -65,6 +67,8 @@
     "send": "发送",
     "deletePostFailed": "删除消息失败。",
     "sendPostFailed": "发送消息失败。",
+    "dropDraft": "放弃草稿",
+    "confirmLeave": "确定要离开吗？所有输入的内容将会丢失。",
     "visibility": {
       "public": "对所有人公开",
       "register": "仅注册可见",
