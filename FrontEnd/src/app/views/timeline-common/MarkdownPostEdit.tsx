@@ -139,12 +139,22 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
             tabText: "image",
             page: (
               <div className="timeline-markdown-post-edit-page">
-                {images.map((image) => (
-                  <img
+                {images.map((image, index) => (
+                  <div
                     key={image.url}
-                    src={image.url}
-                    className="timeline-markdown-post-edit-image"
-                  />
+                    className="timeline-markdown-post-edit-image-container"
+                  >
+                    <img
+                      src={image.url}
+                      className="timeline-markdown-post-edit-image"
+                    />
+                    <i
+                      className="bi-trash text-danger icon-button timeline-markdown-post-edit-image-delete-button"
+                      onClick={() => {
+                        getBuilder().deleteImage(index);
+                      }}
+                    />
+                  </div>
                 ))}
                 <Form.File
                   label={t("chooseImage")}
