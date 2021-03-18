@@ -158,7 +158,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                 ))}
                 <Form.File
                   label={t("chooseImage")}
-                  accept="image/*"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     const { files } = event.currentTarget;
                     if (files != null && files.length !== 0) {
