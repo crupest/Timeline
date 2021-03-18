@@ -7,6 +7,7 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import TabPages from "../common/TabPages";
 import TimelinePostBuilder from "@/services/TimelinePostBuilder";
+import ConfirmDialog from "../common/ConfirmDialog";
 
 export interface MarkdownPostEditProps {
   timeline: string;
@@ -30,6 +31,11 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
   const [canLeave, setCanLeave] = React.useState<boolean>(true);
 
   const [process, setProcess] = React.useState<boolean>(false);
+
+  const [
+    showLeaveConfirmDialog,
+    setShowLeaveConfirmDialog,
+  ] = React.useState<boolean>(false);
 
   const [text, _setText] = React.useState<string>("");
   const [images, _setImages] = React.useState<{ file: File; url: string }[]>(
@@ -94,7 +100,16 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         pageContainerClassName="py-2"
         actions={
           <>
-            <div className="flat-button text-danger mr-2" onClick={onClose}>
+            <div
+              className="flat-button text-danger mr-2"
+              onClick={() => {
+                if (canLeave) {
+                  onClose();
+                } else {
+                  setShowLeaveConfirmDialog(true);
+                }
+              }}
+            >
               {t("operationDialog.cancel")}
             </div>
             <div className="flat-button text-primary" onClick={send}>
@@ -155,6 +170,14 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
           },
         ]}
       />
+      {showLeaveConfirmDialog && (
+        <ConfirmDialog
+          onClose={() => setShowLeaveConfirmDialog(false)}
+          onConfirm={onClose}
+          title="timeline.dropDraft"
+          body="timeline.confirmLeave"
+        />
+      )}
     </>
   );
 };

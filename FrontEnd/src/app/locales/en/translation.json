@@ -67,6 +67,7 @@
     "send": "Send",
     "deletePostFailed": "Failed to delete post.",
     "sendPostFailed": "Failed to send post.",
+    "dropDraft": "Drop Draft",
     "confirmLeave": "Are you sure to leave? All content you typed would be lost.",
     "visibility": {
       "public": "public to everyone",
