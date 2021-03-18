@@ -82,6 +82,10 @@ export default class TimelinePostBuilder {
     return this._images;
   }
 
+  get isEmpty(): boolean {
+    return this._text.length === 0 && this._images.length === 0;
+  }
+
   renderHtml(): string {
     return this._md.render(this._text);
   }
