@@ -60,6 +60,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
     return _builder.current;
   };
 
+  const canSend = text.length > 0;
+
   React.useEffect(() => {
     return () => {
       getBuilder().dispose();
@@ -118,7 +120,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
               >
                 {t("operationDialog.cancel")}
               </FlatButton>
-              <FlatButton onClick={send} disabled={canLeave}>
+              <FlatButton onClick={send} disabled={!canSend}>
                 {t("timeline.send")}
               </FlatButton>
             </>
