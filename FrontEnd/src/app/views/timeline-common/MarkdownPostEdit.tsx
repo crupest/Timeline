@@ -1,5 +1,6 @@
 import React from "react";
-import { Form } from "react-bootstrap";
+import clsx from "clsx";
+import { Form, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Prompt } from "react-router";
 
@@ -100,24 +101,28 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         style={style}
         pageContainerClassName="py-2"
         actions={
-          <>
-            <FlatButton
-              className="mr-2"
-              variant="danger"
-              onClick={() => {
-                if (canLeave) {
-                  onClose();
-                } else {
-                  setShowLeaveConfirmDialog(true);
-                }
-              }}
-            >
-              {t("operationDialog.cancel")}
-            </FlatButton>
-            <FlatButton onClick={send} disabled={canLeave}>
-              {t("timeline.send")}
-            </FlatButton>
-          </>
+          process ? (
+            <Spinner variant="primary" animation="border" size="sm" />
+          ) : (
+            <>
+              <FlatButton
+                className="mr-2"
+                variant="danger"
+                onClick={() => {
+                  if (canLeave) {
+                    onClose();
+                  } else {
+                    setShowLeaveConfirmDialog(true);
+                  }
+                }}
+              >
+                {t("operationDialog.cancel")}
+              </FlatButton>
+              <FlatButton onClick={send} disabled={canLeave}>
+                {t("timeline.send")}
+              </FlatButton>
+            </>
+          )
         }
         pages={[
           {
@@ -149,7 +154,10 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                       className="timeline-markdown-post-edit-image"
                     />
                     <i
-                      className="bi-trash text-danger icon-button timeline-markdown-post-edit-image-delete-button"
+                      className={clsx(
+                        "bi-trash text-danger icon-button timeline-markdown-post-edit-image-delete-button",
+                        process && "d-none"
+                      )}
                       onClick={() => {
                         getBuilder().deleteImage(index);
                       }}
