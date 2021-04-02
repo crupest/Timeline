@@ -1,4 +1,5 @@
 import rawAxios, { AxiosError, AxiosResponse } from "axios";
+import { Base64 } from "js-base64";
 
 export const apiBaseUrl = "/api";
 
@@ -63,7 +64,7 @@ export function setHttpToken(token: string | null): void {
 
 export function base64(blob: Blob | string): Promise<string> {
   if (typeof blob === "string") {
-    return Promise.resolve(btoa(blob));
+    return Promise.resolve(Base64.encode(blob));
   }
 
   return new Promise<string>((resolve) => {
