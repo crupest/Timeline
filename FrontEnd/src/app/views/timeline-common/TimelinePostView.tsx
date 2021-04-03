@@ -31,6 +31,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
 
   return (
     <div
+      id={`timeline-post-${post.id}`}
       className={clsx("timeline-item", current && "current", className)}
       style={style}
     >
