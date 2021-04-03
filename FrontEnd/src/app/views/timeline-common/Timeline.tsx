@@ -7,7 +7,7 @@ import {
 } from "@/http/common";
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
-import TimelinePostListView from "./TimelinePostListView";
+import TimelinePagedPostListView from "./TimelinePagedPostListView";
 
 export interface TimelineProps {
   className?: string;
@@ -16,7 +16,6 @@ export interface TimelineProps {
   timelineName: string;
   reloadKey: number;
   onReload: () => void;
-  additionalPosts?: HttpTimelinePostInfo[];
   onLoad?: () => void;
 }
 
@@ -28,7 +27,6 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     top,
     reloadKey,
     onReload,
-    additionalPosts,
     onLoad,
   } = props;
 
@@ -77,7 +75,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     if (Array.isArray(posts)) {
       onLoad?.();
     }
-  }, [posts, additionalPosts, onLoad]);
+  }, [posts, onLoad]);
 
   switch (posts) {
     case "loading":
@@ -112,8 +110,8 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       );
     default:
       return (
-        <TimelinePostListView
-          posts={[...posts, ...(additionalPosts ?? [])]}
+        <TimelinePagedPostListView
+          posts={posts}
           top={top}
           onReload={onReload}
         />
