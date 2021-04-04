@@ -31,17 +31,14 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     onLoad,
   } = props;
 
-  const [posts, setPosts] = React.useState<
-    | HttpTimelinePostInfo[]
-    | "loading"
-    | "offline"
-    | "notexist"
-    | "forbid"
-    | "error"
+  const [state, setState] = React.useState<
+    "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
   >("loading");
+  const [posts, setPosts] = React.useState<HttpTimelinePostInfo[]>([]);
 
   React.useEffect(() => {
-    setPosts("loading");
+    setState("loading");
+    setPosts([]);
   }, [timelineName]);
 
   React.useEffect(() => {
@@ -51,18 +48,21 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       .listPost(timelineName)
       .then(
         (data) => {
-          if (subscribe) setPosts(data);
+          if (subscribe) {
+            setState("loaded");
+            setPosts(data);
+          }
         },
         (error) => {
           if (error instanceof HttpNetworkError) {
-            setPosts("offline");
+            setState("offline");
           } else if (error instanceof HttpForbiddenError) {
-            setPosts("forbid");
+            setState("forbid");
           } else if (error instanceof HttpNotFoundError) {
-            setPosts("notexist");
+            setState("notexist");
           } else {
             console.error(error);
-            setPosts("error");
+            setState("error");
           }
         }
       );
@@ -78,7 +78,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     }
   }, [posts, onLoad]);
 
-  switch (posts) {
+  switch (state) {
     case "loading":
       return (
         <div>

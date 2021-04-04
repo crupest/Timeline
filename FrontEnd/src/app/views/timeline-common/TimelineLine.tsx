@@ -1,5 +1,5 @@
-import clsx from "clsx";
 import React from "react";
+import clsx from "clsx";
 
 export interface TimelineLineProps {
   current?: boolean;
@@ -17,7 +17,15 @@ const TimelineLine: React.FC<TimelineLineProps> = ({
   style,
 }) => {
   return (
-    <div className={clsx("timeline-line", className)} style={style}>
+    <div
+      className={clsx(
+        "timeline-line",
+        current && "current",
+        center === "loading" && "loading",
+        className
+      )}
+      style={style}
+    >
       <div className="segment start" style={{ height: startSegmentLength }} />
       {center !== "none" ? (
         <div className="node-container">

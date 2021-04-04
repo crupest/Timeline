@@ -27,6 +27,10 @@ $timeline-line-color-current: #36c2e6
     background: color.adjust($timeline-line-color-current, $lightness: +10%)
     box-shadow: 0 0 20px 3px color.adjust($timeline-line-color-current, $lightness: +10%, $alpha: -0.1)
 
+@keyframes timeline-line-node-loading
+  to
+    box-shadow: 0 0 20px 3px color.adjust($timeline-line-color, $lightness: +20%)
+
 @keyframes timeline-line-node-loading-edge
   from
     transform: rotate(0turn)
@@ -95,11 +99,7 @@ $timeline-line-color-current: #36c2e6
     z-index: 2
     animation: 1.5s linear infinite timeline-line-node-loading-edge
 
-.current
-  &.timeline-item
-    padding-bottom: 2.5em
-
-  .timeline-line
+  &.current
     .segment
       &.start
         background: linear-gradient($timeline-line-color, $timeline-line-color-current)
@@ -107,6 +107,14 @@ $timeline-line-color-current: #36c2e6
         background: $timeline-line-color-current
     .node
       animation-name: timeline-line-node-current
+
+  &.loading
+    .node
+      background: $timeline-line-color
+      animation-name: timeline-line-node-loading
+
+.timeline-item.current
+  padding-bottom: 2.5em
 
 .timeline-top
   position: relative
