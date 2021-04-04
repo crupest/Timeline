@@ -27,6 +27,12 @@ $timeline-line-color-current: #36c2e6
     background: color.adjust($timeline-line-color-current, $lightness: +10%)
     box-shadow: 0 0 20px 3px color.adjust($timeline-line-color-current, $lightness: +10%, $alpha: -0.1)
 
+@keyframes timeline-line-node-loading-edge
+  from
+    transform: rotate(0turn)
+  to
+    transform: rotate(1turn)
+
 .timeline-line
   display: flex
   flex-direction: column
@@ -77,6 +83,17 @@ $timeline-line-color-current: #36c2e6
     z-index: 1
     animation: 1s infinite alternate
     animation-name: timeline-line-node-noncurrent
+
+  .node-loading-edge
+    color: $timeline-line-color
+    width: $timeline-line-node-radius + 20
+    height: $timeline-line-node-radius + 20
+    position: absolute
+    left: -10px
+    top: -10px
+    box-sizing: border-box
+    z-index: 2
+    animation: 1.5s linear infinite timeline-line-node-loading-edge
 
 .current
   &.timeline-item
