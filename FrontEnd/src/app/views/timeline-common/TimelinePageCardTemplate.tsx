@@ -108,7 +108,10 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
 
   return (
     <>
-      <div className={clsx("cru-card p-2 clearfix", className)}>
+      <div
+        className={clsx("cru-card p-2 clearfix", className)}
+        style={{ zIndex: collapse ? 1029 : 1031 }}
+      >
         <div className="float-right d-flex align-items-center">
           <CollapseButton collapse={collapse} onClick={toggleCollapse} />
         </div>
