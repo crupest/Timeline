@@ -13,7 +13,6 @@ import TimelineTop from "./TimelineTop";
 export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
-  top?: string | number;
   timelineName: string;
   reloadKey: number;
   onReload: () => void;
@@ -21,15 +20,7 @@ export interface TimelineProps {
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const {
-    timelineName,
-    className,
-    style,
-    top,
-    reloadKey,
-    onReload,
-    onLoad,
-  } = props;
+  const { timelineName, className, style, reloadKey, onReload, onLoad } = props;
 
   const [state, setState] = React.useState<
     "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
@@ -81,14 +72,16 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   switch (state) {
     case "loading":
       return (
-        <TimelineTop
-          className="timeline-top-loading-enter"
-          height={100}
-          lineProps={{
-            center: "loading",
-            startSegmentLength: 56,
-          }}
-        />
+        <>
+          <TimelineTop
+            className="timeline-top-loading-enter"
+            height={100}
+            lineProps={{
+              center: "loading",
+              startSegmentLength: 56,
+            }}
+          />
+        </>
       );
     case "offline":
       return (
@@ -116,11 +109,10 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       );
     default:
       return (
-        <TimelinePagedPostListView
-          posts={posts}
-          top={top}
-          onReload={onReload}
-        />
+        <>
+          <TimelineTop height={40} />
+          <TimelinePagedPostListView posts={posts} onReload={onReload} />
+        </>
       );
   }
 };

@@ -16,11 +16,12 @@ export interface TimelinePostViewProps {
   current?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  cardStyle?: React.CSSProperties;
   onDeleted?: () => void;
 }
 
 const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
-  const { post, className, style, onDeleted } = props;
+  const { post, className, style, cardStyle, onDeleted } = props;
   const current = props.current === true;
 
   const [
@@ -36,7 +37,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
       style={style}
     >
       <TimelineLine center="node" current={current} />
-      <div className="timeline-item-card">
+      <div className="timeline-item-card" style={cardStyle}>
         {post.editable ? (
           <i
             className="bi-chevron-down text-info icon-button float-right"

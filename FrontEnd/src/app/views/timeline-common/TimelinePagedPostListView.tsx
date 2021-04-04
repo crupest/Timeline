@@ -2,12 +2,13 @@ import React from "react";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
 
-import TimelinePostListView from "./TimelinePostListView";
+import TimelinePostListView, {
+  TimelinePostListViewProps,
+} from "./TimelinePostListView";
 
 export interface TimelinePagedPostListViewProps {
   className?: string;
   style?: React.CSSProperties;
-  top?: string | number;
   posts: HttpTimelinePostInfo[];
   onReload: () => void;
 }
@@ -15,16 +16,21 @@ export interface TimelinePagedPostListViewProps {
 const TimelinePagedPostListView: React.FC<TimelinePagedPostListViewProps> = (
   props
 ) => {
-  const { className, style, top, posts, onReload } = props;
+  const { className, style, posts, onReload } = props;
 
   const [lastViewCount, setLastViewCount] = React.useState<number>(10);
 
   const viewingPosts = React.useMemo(() => {
-    if (lastViewCount >= posts.length) {
-      return posts;
-    } else {
-      return posts.slice(-lastViewCount, -1);
+    const p: TimelinePostListViewProps["posts"] =
+      lastViewCount >= posts.length
+        ? posts.slice()
+        : posts.slice(-lastViewCount);
+
+    for (let i = 0; i < p.length; i++) {
+      p[p.length - i - 1].enterDelay = (i % 10) * 0.4;
     }
+
+    return p;
   }, [posts, lastViewCount]);
 
   React.useEffect(() => {
@@ -43,7 +49,6 @@ const TimelinePagedPostListView: React.FC<TimelinePagedPostListViewProps> = (
     <TimelinePostListView
       className={className}
       style={style}
-      top={top}
       posts={viewingPosts}
       onReload={onReload}
     />
