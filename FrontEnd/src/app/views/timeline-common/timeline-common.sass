@@ -37,6 +37,15 @@ $timeline-line-color-current: #36c2e6
   to
     transform: rotate(1turn)
 
+@keyframes timeline-top-loading-enter
+  from
+    transform: translate(0, -100%)
+
+  to
+
+.timeline-top-loading-enter
+  animation: 1s timeline-top-loading-enter
+
 .timeline-line
   display: flex
   flex-direction: column

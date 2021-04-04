@@ -1,21 +1,25 @@
 import React from "react";
+import clsx from "clsx";
 
 import TimelineLine, { TimelineLineProps } from "./TimelineLine";
 
 export interface TimelineTopProps {
   height?: number | string;
   lineProps?: TimelineLineProps;
-  children?: React.ReactElement;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const TimelineTop: React.FC<TimelineTopProps> = (props) => {
-  const { height, children } = props;
+  const { height, style, className } = props;
   const lineProps = props.lineProps ?? { center: "none" };
 
   return (
-    <div style={{ height: height }} className="timeline-top">
+    <div
+      style={{ ...style, height: height }}
+      className={clsx("timeline-top", className)}
+    >
       <TimelineLine {...lineProps} />
-      {children}
     </div>
   );
 };
