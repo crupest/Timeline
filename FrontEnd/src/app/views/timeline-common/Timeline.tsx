@@ -73,22 +73,22 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [timelineName, reloadKey]);
 
   React.useEffect(() => {
-    if (Array.isArray(posts)) {
+    if (state === "loaded") {
       onLoad?.();
     }
-  }, [posts, onLoad]);
+  }, [state, onLoad]);
 
   switch (state) {
     case "loading":
       return (
-        <div>
-          <TimelineTop
-            lineProps={{
-              center: "loading",
-              startSegmentLength: 56,
-            }}
-          />
-        </div>
+        <TimelineTop
+          className="timeline-top-loading-enter"
+          height={100}
+          lineProps={{
+            center: "loading",
+            startSegmentLength: 56,
+          }}
+        />
       );
     case "offline":
       return (
