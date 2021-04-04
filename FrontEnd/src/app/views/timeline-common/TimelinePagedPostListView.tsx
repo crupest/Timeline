@@ -1,6 +1,7 @@
 import React from "react";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
+
 import TimelinePostListView from "./TimelinePostListView";
 
 export interface TimelinePagedPostListViewProps {
@@ -35,16 +36,6 @@ const TimelinePagedPostListView: React.FC<TimelinePagedPostListViewProps> = (
       };
       window.addEventListener("scroll", listener);
       return () => window.removeEventListener("scroll", listener);
-    }
-  }, [lastViewCount, posts]);
-
-  React.useEffect(() => {
-    if (lastViewCount !== 10) {
-      document
-        .getElementById(
-          `timeline-post-${posts[posts.length - (lastViewCount - 10)].id}`
-        )
-        ?.scrollIntoView(true);
     }
   }, [lastViewCount, posts]);
 

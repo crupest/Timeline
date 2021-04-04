@@ -10,6 +10,8 @@ import { getAlertHost } from "@/services/alert";
 import Timeline from "./Timeline";
 import TimelinePostEdit from "./TimelinePostEdit";
 
+import useReverseScrollPositionRemember from "@/utilities/useReverseScrollPositionRemember";
+
 export interface TimelinePageCardProps {
   timeline: HttpTimelineInfo;
   collapse: boolean;
@@ -34,6 +36,8 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
   const [timeline, setTimeline] = React.useState<
     HttpTimelineInfo | "loading" | "offline" | "notexist" | "error"
   >("loading");
+
+  useReverseScrollPositionRemember();
 
   React.useEffect(() => {
     setTimeline("loading");
