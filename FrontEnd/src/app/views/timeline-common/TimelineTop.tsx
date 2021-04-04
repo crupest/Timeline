@@ -1,16 +1,20 @@
 import React from "react";
 
-import TimelineLine from "./TimelineLine";
+import TimelineLine, { TimelineLineProps } from "./TimelineLine";
 
 export interface TimelineTopProps {
   height?: number | string;
+  lineProps?: TimelineLineProps;
   children?: React.ReactElement;
 }
 
-const TimelineTop: React.FC<TimelineTopProps> = ({ height, children }) => {
+const TimelineTop: React.FC<TimelineTopProps> = (props) => {
+  const { height, children } = props;
+  const lineProps = props.lineProps ?? { center: "none" };
+
   return (
     <div style={{ height: height }} className="timeline-top">
-      <TimelineLine center={null} />
+      <TimelineLine {...lineProps} />
       {children}
     </div>
   );

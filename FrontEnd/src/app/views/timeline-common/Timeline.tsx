@@ -8,6 +8,7 @@ import {
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import TimelinePagedPostListView from "./TimelinePagedPostListView";
+import TimelineTop from "./TimelineTop";
 
 export interface TimelineProps {
   className?: string;
@@ -80,8 +81,13 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   switch (posts) {
     case "loading":
       return (
-        <div className={className} style={style}>
-          Loading.
+        <div>
+          <TimelineTop
+            lineProps={{
+              center: "loading",
+              startSegmentLength: 56,
+            }}
+          />
         </div>
       );
     case "offline":
