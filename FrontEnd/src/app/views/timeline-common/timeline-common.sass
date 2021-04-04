@@ -5,6 +5,7 @@
   position: relative
   width: 100%
   overflow-wrap: break-word
+  animation: 1s timeline-enter
 
 $timeline-line-width: 7px
 $timeline-line-node-radius: 18px
@@ -37,11 +38,25 @@ $timeline-line-color-current: #36c2e6
   to
     transform: rotate(1turn)
 
+@keyframes timeline-enter
+  from
+    transform: translate(0, -100vh)
+
+  to
+
 @keyframes timeline-top-loading-enter
   from
     transform: translate(0, -100%)
 
   to
+
+@keyframes timeline-post-enter
+  from
+    transform: translate(0, -100%)
+    opacity: 0
+
+  to
+    opacity: 1
 
 .timeline-top-loading-enter
   animation: 1s timeline-top-loading-enter
@@ -138,6 +153,8 @@ $timeline-line-color-current: #36c2e6
   position: relative
   padding: 0.3em 0.5em 1em 4em
   transition: background 0.5s, padding-left 0.5s
+  animation: 0.4s forwards timeline-post-enter
+  opacity: 0
 
   @include media-breakpoint-down(sm)
     padding-left: 3em

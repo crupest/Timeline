@@ -149,7 +149,6 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           }}
         >
           <Timeline
-            top={40}
             timelineName={timeline.name}
             reloadKey={timelineReloadKey}
             onReload={reloadTimeline}

@@ -5,7 +5,6 @@ import { HttpTimelinePostInfo } from "@/http/timeline";
 
 import TimelinePostView from "./TimelinePostView";
 import TimelineDateLabel from "./TimelineDateLabel";
-import TimelineTop from "./TimelineTop";
 
 function dateEqual(left: Date, right: Date): boolean {
   return (
@@ -18,20 +17,22 @@ function dateEqual(left: Date, right: Date): boolean {
 export interface TimelinePostListViewProps {
   className?: string;
   style?: React.CSSProperties;
-  top?: string | number;
-  posts: HttpTimelinePostInfo[];
+  posts: (HttpTimelinePostInfo & { enterDelay?: number })[];
   onReload: () => void;
 }
 
 const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
-  const { className, style, top, posts, onReload } = props;
+  const { className, style, posts, onReload } = props;
 
   const groupedPosts = React.useMemo<
-    { date: Date; posts: (HttpTimelinePostInfo & { index: number })[] }[]
+    {
+      date: Date;
+      posts: (HttpTimelinePostInfo & { index: number; enterDelay?: number })[];
+    }[]
   >(() => {
     const result: {
       date: Date;
-      posts: (HttpTimelinePostInfo & { index: number })[];
+      posts: (HttpTimelinePostInfo & { index: number; enterDelay?: number })[];
     }[] = [];
     let index = 0;
     for (const post of posts) {
@@ -53,7 +54,6 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
 
   return (
     <div style={style} className={clsx("timeline", className)}>
-      {top && <TimelineTop height={top} />}
       {groupedPosts.map((group) => {
         return (
           <Fragment key={group.date.toDateString()}>
@@ -65,6 +65,9 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
                   post={post}
                   current={posts.length - 1 === post.index}
                   onDeleted={onReload}
+                  cardStyle={{
+                    animationDelay: `${post.enterDelay ?? 0}s`,
+                  }}
                 />
               );
             })}
