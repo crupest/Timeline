@@ -7,19 +7,31 @@ export default function useReverseScrollPositionRemember(): void {
     if (on) return;
     on = true;
 
-    let scrollPosition =
-      document.documentElement.scrollHeight -
-      document.documentElement.scrollTop;
+    function getScrollPosition(): number {
+      if (document.documentElement.scrollHeight <= window.innerHeight) {
+        return 0;
+      } else {
+        return (
+          document.documentElement.scrollHeight -
+          document.documentElement.scrollTop -
+          window.innerHeight
+        );
+      }
+    }
 
+    let scrollPosition = getScrollPosition();
     const scrollListener = (): void => {
-      scrollPosition = document.documentElement.scrollHeight - window.scrollY;
+      scrollPosition = getScrollPosition();
     };
 
     window.addEventListener("scroll", scrollListener);
 
     const resizeObserver = new ResizeObserver(() => {
+      if (document.documentElement.scrollHeight <= window.innerHeight) return;
       document.documentElement.scrollTop =
-        document.documentElement.scrollHeight - scrollPosition;
+        document.documentElement.scrollHeight -
+        window.innerHeight -
+        scrollPosition;
     });
 
     resizeObserver.observe(document.documentElement);
