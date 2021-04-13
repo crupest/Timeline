@@ -34,7 +34,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
   const cardRef = React.useRef<HTMLDivElement>(null!);
   React.useEffect(() => {
     const cardIntersectionObserver = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
+      if (e.intersectionRatio > 0) {
         cardRef.current.style.animationName = "timeline-post-enter";
       }
     });
