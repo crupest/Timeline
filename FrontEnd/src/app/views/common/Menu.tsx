@@ -47,7 +47,12 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
               }}
             >
               {item.iconClassName != null ? (
-                <i className={classnames(item.iconClassName, "cru-menu-item-icon")} />
+                <i
+                  className={classnames(
+                    item.iconClassName,
+                    "cru-menu-item-icon"
+                  )}
+                />
               ) : null}
               {convertI18nText(item.text, t)}
             </div>
