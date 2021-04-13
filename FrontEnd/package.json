@@ -32,7 +32,7 @@
     "rxjs": "^6.6.7",
     "workbox-cacheable-response": "^6.1.0",
     "workbox-expiration": "^6.1.2",
-    "workbox-precaching": "^6.1.0",
+    "workbox-precaching": "^6.1.5",
     "workbox-routing": "^6.1.2",
     "workbox-strategies": "^6.1.0",
     "workbox-window": "^6.1.1",
