@@ -2,9 +2,7 @@ import React from "react";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
 
-import TimelinePostListView, {
-  TimelinePostListViewProps,
-} from "./TimelinePostListView";
+import TimelinePostListView from "./TimelinePostListView";
 
 export interface TimelinePagedPostListViewProps {
   className?: string;
@@ -21,16 +19,9 @@ const TimelinePagedPostListView: React.FC<TimelinePagedPostListViewProps> = (
   const [lastViewCount, setLastViewCount] = React.useState<number>(10);
 
   const viewingPosts = React.useMemo(() => {
-    const p: TimelinePostListViewProps["posts"] =
-      lastViewCount >= posts.length
-        ? posts.slice()
-        : posts.slice(-lastViewCount);
-
-    for (let i = 0; i < p.length; i++) {
-      p[p.length - i - 1].enterDelay = (i % 10) * 0.4;
-    }
-
-    return p;
+    return lastViewCount >= posts.length
+      ? posts.slice()
+      : posts.slice(-lastViewCount);
   }, [posts, lastViewCount]);
 
   React.useEffect(() => {

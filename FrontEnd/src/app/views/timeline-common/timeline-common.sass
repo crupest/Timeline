@@ -42,13 +42,9 @@ $timeline-line-color-current: #36c2e6
   from
     transform: translate(0, -100vh)
 
-  to
-
 @keyframes timeline-top-loading-enter
   from
     transform: translate(0, -100%)
-
-  to
 
 @keyframes timeline-post-enter
   from
@@ -153,7 +149,7 @@ $timeline-line-color-current: #36c2e6
   position: relative
   padding: 0.3em 0.5em 1em 4em
   transition: background 0.5s, padding-left 0.5s
-  animation: 0.4s forwards timeline-post-enter
+  animation: 0.4s forwards
   opacity: 0
 
   @include media-breakpoint-down(sm)

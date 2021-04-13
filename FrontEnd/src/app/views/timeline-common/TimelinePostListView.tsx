@@ -17,7 +17,7 @@ function dateEqual(left: Date, right: Date): boolean {
 export interface TimelinePostListViewProps {
   className?: string;
   style?: React.CSSProperties;
-  posts: (HttpTimelinePostInfo & { enterDelay?: number })[];
+  posts: HttpTimelinePostInfo[];
   onReload: () => void;
 }
 
@@ -27,12 +27,12 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
   const groupedPosts = React.useMemo<
     {
       date: Date;
-      posts: (HttpTimelinePostInfo & { index: number; enterDelay?: number })[];
+      posts: (HttpTimelinePostInfo & { index: number })[];
     }[]
   >(() => {
     const result: {
       date: Date;
-      posts: (HttpTimelinePostInfo & { index: number; enterDelay?: number })[];
+      posts: (HttpTimelinePostInfo & { index: number })[];
     }[] = [];
     let index = 0;
     for (const post of posts) {
@@ -65,9 +65,6 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
                   post={post}
                   current={posts.length - 1 === post.index}
                   onDeleted={onReload}
-                  cardStyle={{
-                    animationDelay: `${post.enterDelay ?? 0}s`,
-                  }}
                 />
               );
             })}
