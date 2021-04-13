@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 import { Spinner, Form, Button } from "react-bootstrap";
 
@@ -37,7 +37,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   );
 
   return (
-    <Form inline className={clsx(" flex-sm-nowrap", props.className)}>
+    <Form inline className={classnames(" flex-sm-nowrap", props.className)}>
       <Form.Control
         className="mr-sm-2 flex-grow-1"
         value={props.value}

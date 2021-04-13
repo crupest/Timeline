@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { Form, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Prompt } from "react-router";
@@ -156,7 +156,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                       className="timeline-markdown-post-edit-image"
                     />
                     <i
-                      className={clsx(
+                      className={classnames(
                         "bi-trash text-danger icon-button timeline-markdown-post-edit-image-delete-button",
                         process && "d-none"
                       )}

@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { OverlayTrigger, OverlayTriggerProps, Popover } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
@@ -29,7 +29,7 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
   const { t } = useTranslation();
 
   return (
-    <div className={clsx("cru-menu", className)}>
+    <div className={classnames("cru-menu", className)}>
       {items.map((item, index) => {
         if (item.type === "divider") {
           return <div key={index} className="cru-menu-divider" />;
@@ -37,7 +37,7 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
           return (
             <div
               key={index}
-              className={clsx(
+              className={classnames(
                 "cru-menu-item",
                 `color-${item.color ?? "primary"}`
               )}
@@ -47,7 +47,7 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
               }}
             >
               {item.iconClassName != null ? (
-                <i className={clsx(item.iconClassName, "cru-menu-item-icon")} />
+                <i className={classnames(item.iconClassName, "cru-menu-item-icon")} />
               ) : null}
               {convertI18nText(item.text, t)}
             </div>

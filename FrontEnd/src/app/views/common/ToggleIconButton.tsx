@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 
 export interface ToggleIconButtonProps
   extends React.HTMLAttributes<HTMLElement> {
@@ -17,7 +17,7 @@ const ToggleIconButton: React.FC<ToggleIconButtonProps> = ({
 }) => {
   return (
     <i
-      className={clsx(
+      className={classnames(
         state ? trueIconClassName : falseIconClassName,
         "icon-button",
         className

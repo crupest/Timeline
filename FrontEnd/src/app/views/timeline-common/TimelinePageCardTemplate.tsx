@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 
 import { getHttpHighlightClient } from "@/http/highlight";
@@ -52,7 +52,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
       </small>
       <div className="text-right mt-2">
         <i
-          className={clsx(
+          className={classnames(
             timeline.isHighlight ? "bi-star-fill" : "bi-star",
             "icon-button text-yellow mr-3"
           )}
@@ -75,7 +75,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
         />
         {user != null ? (
           <i
-            className={clsx(
+            className={classnames(
               timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
               "icon-button text-yellow mr-3"
             )}
@@ -109,7 +109,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
   return (
     <>
       <div
-        className={clsx("cru-card p-2 clearfix", className)}
+        className={classnames("cru-card p-2 clearfix", className)}
         style={{ zIndex: collapse ? 1029 : 1031 }}
       >
         <div className="float-right d-flex align-items-center">

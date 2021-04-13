@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 
 import TimelineLine, { TimelineLineProps } from "./TimelineLine";
 
@@ -17,7 +17,7 @@ const TimelineTop: React.FC<TimelineTopProps> = (props) => {
   return (
     <div
       style={{ ...style, height: height }}
-      className={clsx("timeline-top", className)}
+      className={classnames("timeline-top", className)}
     >
       <TimelineLine {...lineProps} />
     </div>
