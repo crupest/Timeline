@@ -17,7 +17,10 @@ const Skeleton: React.FC<SkeletonProps> = (props) => {
       {range(lineNumber).map((i) => (
         <div
           key={i}
-          className={classnames("cru-skeleton-line", i === lineNumber - 1 && "last")}
+          className={classnames(
+            "cru-skeleton-line",
+            i === lineNumber - 1 && "last"
+          )}
         />
       ))}
     </div>
