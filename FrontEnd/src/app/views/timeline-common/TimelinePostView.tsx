@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { Link } from "react-router-dom";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
@@ -48,7 +48,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
   return (
     <div
       id={`timeline-post-${post.id}`}
-      className={clsx("timeline-item", current && "current", className)}
+      className={classnames("timeline-item", current && "current", className)}
       style={style}
     >
       <TimelineLine center="node" current={current} />

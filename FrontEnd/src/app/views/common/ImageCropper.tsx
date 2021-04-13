@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 
 import { UiLogicError } from "@/common";
 
@@ -224,7 +224,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
   return (
     <div
-      className={clsx("image-cropper-container", className)}
+      className={classnames("image-cropper-container", className)}
       style={containerStyle}
     >
       <img ref={onImageRef} src={imageUrl} onLoad={onImageLoad} alt="to crop" />

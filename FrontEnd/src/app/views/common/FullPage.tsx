@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 
 export interface FullPageProps {
   show: boolean;
@@ -25,7 +25,7 @@ const FullPage: React.FC<FullPageProps> = ({
         />
       </div>
       <div
-        className={clsx(
+        className={classnames(
           "cru-full-page-content-container",
           contentContainerClassName
         )}

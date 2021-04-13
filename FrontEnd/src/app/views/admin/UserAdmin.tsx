@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
 
 import OperationDialog, {
@@ -228,7 +228,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
         })}
       </div>
       <div
-        className={clsx("edit-mask", !editMaskVisible && "d-none")}
+        className={classnames("edit-mask", !editMaskVisible && "d-none")}
         onClick={() => setEditMaskVisible(false)}
       >
         <button className="text-button primary" onClick={on[kModify]}>

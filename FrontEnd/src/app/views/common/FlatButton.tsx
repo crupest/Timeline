@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 
 import { BootstrapThemeColor } from "@/common";
 
@@ -19,7 +19,7 @@ const FlatButton: React.FC<FlatButtonProps> = (props) => {
 
   return (
     <div
-      className={clsx(
+      className={classnames(
         "flat-button",
         variant,
         disabled ? "disabled" : null,

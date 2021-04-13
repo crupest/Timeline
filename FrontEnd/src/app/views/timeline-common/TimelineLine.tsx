@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 
 export interface TimelineLineProps {
   current?: boolean;
@@ -18,7 +18,7 @@ const TimelineLine: React.FC<TimelineLineProps> = ({
 }) => {
   return (
     <div
-      className={clsx(
+      className={classnames(
         "timeline-line",
         current && "current",
         center === "loading" && "loading",

@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Form } from "react-bootstrap";
 
@@ -213,7 +213,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   return (
     <div
       ref={containerRef}
-      className={clsx("container-fluid bg-light", className)}
+      className={classnames("container-fluid bg-light", className)}
     >
       {showMarkdown ? (
         <MarkdownPostEdit
@@ -266,7 +266,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                 }))}
               >
                 <i
-                  className={clsx(
+                  className={classnames(
                     postKindIconClassNameMap[kind],
                     "icon-button large"
                   )}

@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import classnames from "classnames";
 import { Remarkable } from "remarkable";
 
 import { UiLogicError } from "@/common";
@@ -78,7 +78,7 @@ const ImageView: React.FC<TimelinePostContentViewProps> = (props) => {
         post.timelineName,
         post.id
       )}
-      className={clsx(className, "timeline-content-image")}
+      className={classnames(className, "timeline-content-image")}
       style={style}
     />
   );
@@ -152,7 +152,7 @@ const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
     }
     return (
       <div
-        className={clsx(className, "markdown-container")}
+        className={classnames(className, "markdown-container")}
         style={style}
         dangerouslySetInnerHTML={{
           __html: markdownHtml,
