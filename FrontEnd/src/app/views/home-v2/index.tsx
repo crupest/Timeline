@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Container, Button } from "react-bootstrap";
+import { Container, Button, Row, Col } from "react-bootstrap";
 
 import { useUser } from "@/services/user";
 import SearchInput from "../common/SearchInput";
@@ -22,27 +22,30 @@ const HomeV2: React.FC = () => {
 
   return (
     <>
-      <Container className="px-0">
-        <SearchInput
-          className="my-3 mx-3"
-          value={navText}
-          onChange={setNavText}
-          onButtonClick={() => {
-            history.push(`search?q=${navText}`);
-          }}
-          additionalButton={
-            user != null && (
-              <Button
-                variant="outline-success"
-                onClick={() => {
-                  setDialog("create");
-                }}
-              >
-                {t("home.createButton")}
-              </Button>
-            )
-          }
-        />
+      <Container fluid className="px-0">
+        <Row className="my-3 px-2 justify-content-end">
+          <Col xs="auto">
+            <SearchInput
+              value={navText}
+              onChange={setNavText}
+              onButtonClick={() => {
+                history.push(`search?q=${navText}`);
+              }}
+              additionalButton={
+                user != null && (
+                  <Button
+                    variant="outline-success"
+                    onClick={() => {
+                      setDialog("create");
+                    }}
+                  >
+                    {t("home.createButton")}
+                  </Button>
+                )
+              }
+            />
+          </Col>
+        </Row>
         <TimelineListView headerText="home.loadingHighlightTimelines" />
       </Container>
       {dialog === "create" && (
