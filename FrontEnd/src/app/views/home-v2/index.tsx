@@ -23,7 +23,7 @@ const HomeV2: React.FC = () => {
   return (
     <>
       <Container fluid className="px-0">
-        <Row className="my-3 px-2 justify-content-end">
+        <Row className="mx-0 my-3 px-2 justify-content-end">
           <Col xs="auto">
             <SearchInput
               value={navText}
