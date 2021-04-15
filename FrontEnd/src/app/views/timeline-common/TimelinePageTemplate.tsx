@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Container, Spinner } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 import { HttpNetworkError, HttpNotFoundError } from "@/http/common";
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
@@ -33,14 +33,16 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
 
   const { t } = useTranslation();
 
-  const [timeline, setTimeline] = React.useState<
-    HttpTimelineInfo | "loading" | "offline" | "notexist" | "error"
+  const [state, setState] = React.useState<
+    "loading" | "done" | "offline" | "notexist" | "error"
   >("loading");
+  const [timeline, setTimeline] = React.useState<HttpTimelineInfo | null>(null);
 
   useReverseScrollPositionRemember();
 
   React.useEffect(() => {
-    setTimeline("loading");
+    setState("loading");
+    setTimeline(null);
   }, [timelineName]);
 
   React.useEffect(() => {
@@ -50,19 +52,21 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
       .then(
         (data) => {
           if (subscribe) {
+            setState("done");
             setTimeline(data);
           }
         },
         (error) => {
           if (subscribe) {
             if (error instanceof HttpNetworkError) {
-              setTimeline("offline");
+              setState("offline");
             } else if (error instanceof HttpNotFoundError) {
-              setTimeline("notexist");
+              setState("notexist");
             } else {
               console.error(error);
-              setTimeline("error");
+              setState("error");
             }
+            setTimeline(null);
           }
         }
       );
@@ -70,10 +74,6 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
       subscribe = false;
     };
   }, [timelineName, reloadKey]);
-
-  const scrollToBottom = React.useCallback(() => {
-    window.scrollTo(0, document.body.scrollHeight);
-  }, []);
 
   const [bottomSpaceHeight, setBottomSpaceHeight] = React.useState<number>(0);
 
@@ -116,25 +116,9 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
     );
   };
 
-  let body: React.ReactElement;
-
-  if (timeline == "loading") {
-    body = (
-      <div className="full-viewport-center-child">
-        <Spinner variant="primary" animation="grow" />
-      </div>
-    );
-  } else if (timeline === "offline") {
-    // TODO: i18n
-    body = <p className="text-danger">Offline!</p>;
-  } else if (timeline === "notexist") {
-    body = <p className="text-danger">{t(props.notFoundI18nKey)}</p>;
-  } else if (timeline === "error") {
-    // TODO: i18n
-    body = <p className="text-danger">Error!</p>;
-  } else {
-    body = (
-      <>
+  return (
+    <>
+      {timeline != null ? (
         <CardComponent
           className="timeline-template-card"
           timeline={timeline}
@@ -142,37 +126,49 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           toggleCollapse={toggleCardCollapse}
           onReload={onReload}
         />
-        <Container
-          className="px-0"
-          style={{
-            minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
-          }}
-        >
-          <Timeline
-            timelineName={timeline.name}
-            reloadKey={timelineReloadKey}
-            onReload={reloadTimeline}
-            onLoad={scrollToBottom}
+      ) : null}
+      <Container
+        className="px-0"
+        style={{
+          minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
+        }}
+      >
+        {(() => {
+          if (state === "offline") {
+            // TODO: i18n
+            return <p className="text-danger">Offline!</p>;
+          } else if (state === "notexist") {
+            return <p className="text-danger">{t(props.notFoundI18nKey)}</p>;
+          } else if (state === "error") {
+            // TODO: i18n
+            return <p className="text-danger">Error!</p>;
+          } else {
+            return (
+              <Timeline
+                timelineName={timeline?.name}
+                reloadKey={timelineReloadKey}
+                onReload={reloadTimeline}
+              />
+            );
+          }
+        })()}
+      </Container>
+      {timeline != null && timeline.postable ? (
+        <>
+          <div
+            style={{ height: bottomSpaceHeight }}
+            className="flex-fix-length"
           />
-        </Container>
-        {timeline.postable ? (
-          <>
-            <div
-              style={{ height: bottomSpaceHeight }}
-              className="flex-fix-length"
-            />
-            <TimelinePostEdit
-              className="fixed-bottom"
-              timeline={timeline}
-              onHeightChange={onPostEditHeightChange}
-              onPosted={reloadTimeline}
-            />
-          </>
-        ) : null}
-      </>
-    );
-  }
-  return body;
+          <TimelinePostEdit
+            className="fixed-bottom"
+            timeline={timeline}
+            onHeightChange={onPostEditHeightChange}
+            onPosted={reloadTimeline}
+          />
+        </>
+      ) : null}
+    </>
+  );
 };
 
 export default TimelinePageTemplate;
