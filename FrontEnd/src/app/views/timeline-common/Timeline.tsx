@@ -9,18 +9,18 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import TimelinePagedPostListView from "./TimelinePagedPostListView";
 import TimelineTop from "./TimelineTop";
+import TimelineLoading from "./TimelineLoading";
 
 export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
-  timelineName: string;
+  timelineName?: string;
   reloadKey: number;
   onReload: () => void;
-  onLoad?: () => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timelineName, className, style, reloadKey, onReload, onLoad } = props;
+  const { timelineName, className, style, reloadKey, onReload } = props;
 
   const [state, setState] = React.useState<
     "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
@@ -33,56 +33,41 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [timelineName]);
 
   React.useEffect(() => {
-    let subscribe = true;
+    if (timelineName != null) {
+      let subscribe = true;
 
-    void getHttpTimelineClient()
-      .listPost(timelineName)
-      .then(
-        (data) => {
-          if (subscribe) {
-            setState("loaded");
-            setPosts(data);
+      void getHttpTimelineClient()
+        .listPost(timelineName)
+        .then(
+          (data) => {
+            if (subscribe) {
+              setState("loaded");
+              setPosts(data);
+            }
+          },
+          (error) => {
+            if (error instanceof HttpNetworkError) {
+              setState("offline");
+            } else if (error instanceof HttpForbiddenError) {
+              setState("forbid");
+            } else if (error instanceof HttpNotFoundError) {
+              setState("notexist");
+            } else {
+              console.error(error);
+              setState("error");
+            }
           }
-        },
-        (error) => {
-          if (error instanceof HttpNetworkError) {
-            setState("offline");
-          } else if (error instanceof HttpForbiddenError) {
-            setState("forbid");
-          } else if (error instanceof HttpNotFoundError) {
-            setState("notexist");
-          } else {
-            console.error(error);
-            setState("error");
-          }
-        }
-      );
+        );
 
-    return () => {
-      subscribe = false;
-    };
-  }, [timelineName, reloadKey]);
-
-  React.useEffect(() => {
-    if (state === "loaded") {
-      onLoad?.();
+      return () => {
+        subscribe = false;
+      };
     }
-  }, [state, onLoad]);
+  }, [timelineName, reloadKey]);
 
   switch (state) {
     case "loading":
-      return (
-        <>
-          <TimelineTop
-            className="timeline-top-loading-enter"
-            height={100}
-            lineProps={{
-              center: "loading",
-              startSegmentLength: 56,
-            }}
-          />
-        </>
-      );
+      return <TimelineLoading />;
     case "offline":
       return (
         <div className={className} style={style}>
