@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import AppBar from "./views/common/AppBar";
 import LoadingPage from "./views/common/LoadingPage";
 import Home from "./views/home";
+import HomeV2 from "./views/home-v2";
 import Login from "./views/login";
 import Settings from "./views/settings";
 import About from "./views/about";
@@ -40,6 +41,12 @@ const App: React.FC = () => {
           <Switch>
             <Route exact path="/">
               <Home />
+            </Route>
+            <Route exact path="/home">
+              <Home />
+            </Route>
+            <Route exact path="/home-new">
+              <HomeV2 />
             </Route>
             <Route exact path="/login">
               <Login />

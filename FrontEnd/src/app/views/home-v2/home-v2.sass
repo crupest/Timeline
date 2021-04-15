@@ -1,0 +1,18 @@
+.home-v2-timeline-list-item
+  display: flex
+  align-items: center
+
+.home-v2-timeline-list-item-line
+  width: 80px
+  flex-shrink: 0
+
+@keyframes home-v2-timeline-list-loading-head-animation
+  from
+    transform: translate(0,-30px)
+    opacity: 1
+
+  to
+    opacity: 0
+
+.home-v2-timeline-list-loading-head
+  animation: 1s infinite home-v2-timeline-list-loading-head-animation
