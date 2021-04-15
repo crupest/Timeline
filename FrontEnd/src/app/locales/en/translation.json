@@ -27,6 +27,7 @@
   "chooseImage": "Choose a image",
   "loadImageError": "Failed to load image.",
   "home": {
+    "loadingHighlightTimelines": "Loading highlight timelines...",
     "highlightTimeline": "Highlight Timelines",
     "relatedTimeline": "Timelines Related To You",
     "publicTimeline": "Public Timelines",
