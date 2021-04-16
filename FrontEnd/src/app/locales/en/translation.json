@@ -28,6 +28,8 @@
   "loadImageError": "Failed to load image.",
   "home": {
     "loadingHighlightTimelines": "Loading highlight timelines...",
+    "loadedHighlightTimelines": "Here are some highlight timelines💡",
+    "errorHighlightTimelines": "Failed to load highlight timelines, please try reloading!",
     "highlightTimeline": "Highlight Timelines",
     "relatedTimeline": "Timelines Related To You",
     "publicTimeline": "Public Timelines",
