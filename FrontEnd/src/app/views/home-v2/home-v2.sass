@@ -2,6 +2,17 @@
   display: flex
   align-items: center
 
+.home-v2-timeline-list-item-timeline
+  transition: background 0.8s
+  animation: 0.8s home-v2-timeline-list-item-timeline-enter
+  &:hover
+    background: $gray-200
+
+@keyframes home-v2-timeline-list-item-timeline-enter
+  from
+    transform: translate(-100%,0)
+    opacity: 0
+
 .home-v2-timeline-list-item-line
   width: 80px
   flex-shrink: 0

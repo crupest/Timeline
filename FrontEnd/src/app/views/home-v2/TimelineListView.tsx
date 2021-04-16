@@ -4,14 +4,23 @@ import { convertI18nText, I18nText } from "@/common";
 
 import { HttpTimelineInfo } from "@/http/timeline";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 interface TimelineListItemProps {
   timeline: HttpTimelineInfo;
 }
 
 const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
+  const url = React.useMemo(
+    () =>
+      timeline.name.startsWith("@")
+        ? `/users/${timeline.owner.username}`
+        : `/timelines/${timeline.name}`,
+    [timeline]
+  );
+
   return (
-    <div className="home-v2-timeline-list-item">
+    <div className="home-v2-timeline-list-item home-v2-timeline-list-item-timeline">
       <svg className="home-v2-timeline-list-item-line" viewBox="0 0 120 100">
         <path
           d="M 80,50 m 0,-12 a 12 12 180 1 1 0,24 12 12 180 1 1 0,-24 z M 60,0 h 40 v 100 h -40 z"
@@ -19,12 +28,20 @@ const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
           fill="#007bff"
         />
       </svg>
-      <div>{timeline.title}</div>
+      <div>
+        <div>{timeline.title}</div>
+        <div>
+          <small className="text-secondary">{timeline.description}</small>
+        </div>
+      </div>
+      <Link to={url}>
+        <i className="icon-button bi-arrow-right ml-3" />
+      </Link>
     </div>
   );
 };
 
-const TimelineListLoading: React.FC = () => {
+const TimelineListArrow: React.FC = () => {
   return (
     <div>
       <div className="home-v2-timeline-list-item">
@@ -73,11 +90,10 @@ const TimelineListView: React.FC<TimelineListViewProps> = ({
         </svg>
         <h3>{convertI18nText(headerText, t)}</h3>
       </div>
-      {timelines != null ? (
-        timelines.map((t) => <TimelineListItem key={t.name} timeline={t} />)
-      ) : (
-        <TimelineListLoading />
-      )}
+      {timelines != null
+        ? timelines.map((t) => <TimelineListItem key={t.name} timeline={t} />)
+        : null}
+      <TimelineListArrow />
     </div>
   );
 };

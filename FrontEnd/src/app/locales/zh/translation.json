@@ -28,6 +28,8 @@
   "loadImageError": "加载图片失败",
   "home": {
     "loadingHighlightTimelines": "正在加载高光时间线...",
+    "loadedHighlightTimelines": "康康以下这些高光时间线💡",
+    "errorHighlightTimelines": "加载高光时间线失败，刷新试试！",
     "highlightTimeline": "高光时间线",
     "relatedTimeline": "关于你的时间线",
     "publicTimeline": "公开时间线",
