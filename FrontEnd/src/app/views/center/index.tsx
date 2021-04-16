@@ -3,11 +3,10 @@ import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Row, Container, Button, Col } from "react-bootstrap";
 
-import { useUser } from "@/services/user";
-import SearchInput from "../common/SearchInput";
+import { useUserLoggedIn } from "@/services/user";
 
-import BoardWithoutUser from "./BoardWithoutUser";
-import BoardWithUser from "./BoardWithUser";
+import SearchInput from "../common/SearchInput";
+import CenterBoards from "./CenterBoards";
 import TimelineCreateDialog from "./TimelineCreateDialog";
 
 const HomePage: React.FC = () => {
@@ -15,7 +14,7 @@ const HomePage: React.FC = () => {
 
   const { t } = useTranslation();
 
-  const user = useUser();
+  const user = useUserLoggedIn();
 
   const [navText, setNavText] = React.useState<string>("");
 
@@ -48,13 +47,7 @@ const HomePage: React.FC = () => {
             />
           </Col>
         </Row>
-        {(() => {
-          if (user == null) {
-            return <BoardWithoutUser />;
-          } else {
-            return <BoardWithUser user={user} />;
-          }
-        })()}
+        <CenterBoards />
       </Container>
       {dialog === "create" && (
         <TimelineCreateDialog

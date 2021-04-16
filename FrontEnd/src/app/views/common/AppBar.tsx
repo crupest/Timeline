@@ -69,7 +69,7 @@ const AppBar: React.FC = (_) => {
         </Nav>
         <Nav className="ml-auto md-mr-2">
           {user != null ? (
-            <LinkContainer to={`/users/${user.username}`}>
+            <LinkContainer to="/">
               <UserAvatar
                 username={user.username}
                 className="avatar small rounded-circle bg-white cursor-pointer ml-auto"

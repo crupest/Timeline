@@ -30,10 +30,9 @@
     "loadingHighlightTimelines": "Loading highlight timelines...",
     "loadedHighlightTimelines": "Here are some highlight timelines💡",
     "errorHighlightTimelines": "Failed to load highlight timelines, please try reloading!",
-    "highlightTimeline": "Highlight Timelines",
-    "relatedTimeline": "Timelines Related To You",
-    "publicTimeline": "Public Timelines",
     "bookmarkTimeline": "Bookmark Timelines",
+    "highlightTimeline": "Highlight Timelines",
+    "relatedTimeline": "Timelines You Participate",
     "message": {
       "moveHighlightFail": "Failed to move highlight timeline.",
       "deleteHighlightFail": "Failed to delete highlight timeline.",

@@ -45,9 +45,11 @@ const App: React.FC = () => {
             <Route exact path="/home">
               <Home />
             </Route>
-            <Route exact path="/center">
-              <Center />
-            </Route>
+            {user != null ? (
+              <Route exact path="/center">
+                <Center />
+              </Route>
+            ) : null}
             <Route exact path="/login">
               <Login />
             </Route>
