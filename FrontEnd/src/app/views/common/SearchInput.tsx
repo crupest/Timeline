@@ -12,10 +12,11 @@ export interface SearchInputProps {
   buttonText?: string;
   placeholder?: string;
   additionalButton?: React.ReactNode;
+  alwaysOneline?: boolean;
 }
 
 const SearchInput: React.FC<SearchInputProps> = (props) => {
-  const { onChange, onButtonClick } = props;
+  const { onChange, onButtonClick, alwaysOneline } = props;
 
   const { t } = useTranslation();
 
@@ -37,7 +38,13 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   );
 
   return (
-    <Form inline className={classnames(" flex-sm-nowrap", props.className)}>
+    <Form
+      inline
+      className={classnames(
+        alwaysOneline ? "flex-nowrap" : "flex-sm-nowrap",
+        props.className
+      )}
+    >
       <Form.Control
         className="mr-sm-2 flex-grow-1"
         value={props.value}
@@ -50,7 +57,12 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           {props.additionalButton}
         </div>
       ) : null}
-      <div className="mt-2 mt-sm-0 flex-shrink-0 ml-auto ml-sm-0">
+      <div
+        className={classnames(
+          alwaysOneline ? "mt-0 ml-2" : "mt-2 mt-sm-0 ml-auto ml-sm-0",
+          "flex-shrink-0"
+        )}
+      >
         {props.loading ? (
           <Spinner variant="primary" animation="border" />
         ) : (
