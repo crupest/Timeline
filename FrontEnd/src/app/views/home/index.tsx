@@ -1,16 +1,25 @@
 import React from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Row, Container, Button, Col } from "react-bootstrap";
+import { Container, Button, Row, Col } from "react-bootstrap";
+
+import { HttpTimelineInfo } from "@/http/timeline";
+import { getHttpHighlightClient } from "@/http/highlight";
 
 import { useUser } from "@/services/user";
+
 import SearchInput from "../common/SearchInput";
+import TimelineCreateDialog from "../center/TimelineCreateDialog";
+import TimelineListView from "./TimelineListView";
+import WebsiteIntroduction from "./WebsiteIntroduction";
 
-import BoardWithoutUser from "./BoardWithoutUser";
-import BoardWithUser from "./BoardWithUser";
-import TimelineCreateDialog from "./TimelineCreateDialog";
+const highlightTimelineMessageMap = {
+  loading: "home.loadingHighlightTimelines",
+  done: "home.loadedHighlightTimelines",
+  error: "home.errorHighlightTimelines",
+} as const;
 
-const HomePage: React.FC = () => {
+const HomeV2: React.FC = () => {
   const history = useHistory();
 
   const { t } = useTranslation();
@@ -21,13 +30,44 @@ const HomePage: React.FC = () => {
 
   const [dialog, setDialog] = React.useState<"create" | null>(null);
 
+  const [highlightTimelineState, setHighlightTimelineState] = React.useState<
+    "loading" | "done" | "error"
+  >("loading");
+  const [highlightTimelines, setHighlightTimelines] = React.useState<
+    HttpTimelineInfo[] | undefined
+  >();
+
+  React.useEffect(() => {
+    if (highlightTimelineState === "loading") {
+      let subscribe = true;
+      void getHttpHighlightClient()
+        .list()
+        .then(
+          (data) => {
+            if (subscribe) {
+              setHighlightTimelineState("done");
+              setHighlightTimelines(data);
+            }
+          },
+          () => {
+            if (subscribe) {
+              setHighlightTimelineState("error");
+              setHighlightTimelines(undefined);
+            }
+          }
+        );
+      return () => {
+        subscribe = false;
+      };
+    }
+  }, [highlightTimelineState]);
+
   return (
     <>
-      <Container>
-        <Row className="my-3 justify-content-center">
-          <Col xs={12} sm={8} lg={6}>
+      <Container fluid className="px-0">
+        <Row className="mx-0 my-3 px-2 justify-content-end">
+          <Col xs="12" sm="auto">
             <SearchInput
-              className="justify-content-center"
               value={navText}
               onChange={setNavText}
               onButtonClick={() => {
@@ -48,24 +88,17 @@ const HomePage: React.FC = () => {
             />
           </Col>
         </Row>
-        {(() => {
-          if (user == null) {
-            return <BoardWithoutUser />;
-          } else {
-            return <BoardWithUser user={user} />;
-          }
-        })()}
+        <WebsiteIntroduction className="p-2" />
+        <TimelineListView
+          headerText={highlightTimelineMessageMap[highlightTimelineState]}
+          timelines={highlightTimelines}
+        />
       </Container>
       {dialog === "create" && (
-        <TimelineCreateDialog
-          open
-          close={() => {
-            setDialog(null);
-          }}
-        />
+        <TimelineCreateDialog open close={() => setDialog(null)} />
       )}
     </>
   );
 };
 
-export default HomePage;
+export default HomeV2;
