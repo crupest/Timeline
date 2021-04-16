@@ -20,8 +20,8 @@ const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
   );
 
   return (
-    <div className="home-v2-timeline-list-item home-v2-timeline-list-item-timeline">
-      <svg className="home-v2-timeline-list-item-line" viewBox="0 0 120 100">
+    <div className="home-timeline-list-item home-timeline-list-item-timeline">
+      <svg className="home-timeline-list-item-line" viewBox="0 0 120 100">
         <path
           d="M 80,50 m 0,-12 a 12 12 180 1 1 0,24 12 12 180 1 1 0,-24 z M 60,0 h 40 v 100 h -40 z"
           fillRule="evenodd"
@@ -44,14 +44,14 @@ const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
 const TimelineListArrow: React.FC = () => {
   return (
     <div>
-      <div className="home-v2-timeline-list-item">
-        <svg className="home-v2-timeline-list-item-line" viewBox="0 0 120 60">
+      <div className="home-timeline-list-item">
+        <svg className="home-timeline-list-item-line" viewBox="0 0 120 60">
           <path d="M 60,0 h 40 v 20 l -20,20 l -20,-20 z" fill="#007bff" />
         </svg>
       </div>
-      <div className="home-v2-timeline-list-item">
+      <div className="home-timeline-list-item">
         <svg
-          className="home-v2-timeline-list-item-line home-v2-timeline-list-loading-head"
+          className="home-timeline-list-item-line home-timeline-list-loading-head"
           viewBox="0 0 120 40"
         >
           <path
@@ -78,9 +78,9 @@ const TimelineListView: React.FC<TimelineListViewProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="home-v2-timeline-list">
-      <div className="home-v2-timeline-list-item">
-        <svg className="home-v2-timeline-list-item-line" viewBox="0 0 120 120">
+    <div className="home-timeline-list">
+      <div className="home-timeline-list-item">
+        <svg className="home-timeline-list-item-line" viewBox="0 0 120 120">
           <path
             d="M 0,20 Q 80,20 80,80 l 0,40"
             stroke="#007bff"
