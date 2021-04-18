@@ -618,5 +618,22 @@ namespace Timeline.Tests.IntegratedTests
             markdown.Should().MatchRegex(@$"\[aaa\]\(https?://.*/timelines/{generator(1)}/posts/{post.Id}/data/1\)");
             markdown.Should().MatchRegex(@$"\[bbb\]\(https?://.*/timelines/{generator(1)}/posts/{post.Id}/data/2\)");
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Post_Markdown_Delete_Test(TimelineNameGenerator generator)
+        {
+            {
+                using var client = await CreateClientAs(2);
+                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(2)}/posts", CreateMarkdownPostRequest("[aaa](https://crupest.life)"));
+                await client.TestDeleteAsync($"timelines/{generator(2)}/posts/{post.Id}");
+            }
+
+            {
+                using var client = await CreateClientAsUser();
+                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", CreateMarkdownPostRequest("[aaa](https://crupest.life)"));
+                await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{post.Id}");
+            }
+        }
     }
 }

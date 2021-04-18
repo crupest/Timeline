@@ -462,7 +462,7 @@ namespace Timeline.Services
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
-            var postEntity = await _database.TimelinePosts.Where(p => p.Id == postId).Select(p => new { p.Deleted, p.AuthorId }).SingleOrDefaultAsync();
+            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Deleted, p.AuthorId }).SingleOrDefaultAsync();
 
             if (postEntity is null)
             {
