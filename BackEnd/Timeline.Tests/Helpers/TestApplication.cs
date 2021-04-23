@@ -15,21 +15,12 @@ namespace Timeline.Tests.Helpers
 {
     public class TestApplication : IAsyncLifetime
     {
-        public TestDatabase Database { get; }
-
         public IHost Host { get; private set; } = default!;
 
         public string WorkDir { get; private set; } = default!;
 
-        public TestApplication()
-        {
-            Database = new TestDatabase(false);
-        }
-
         public async Task InitializeAsync()
         {
-            await Database.InitializeAsync();
-
             WorkDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(WorkDir);
 
@@ -40,13 +31,6 @@ namespace Timeline.Tests.Helpers
                     {
                         [ApplicationConfiguration.FrontEndKey] = "Mock",
                         ["WorkDir"] = WorkDir
-                    });
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddDbContext<DatabaseContext>(options =>
-                    {
-                        options.UseSqlite(Database.Connection);
                     });
                 })
                 .ConfigureWebHost(webBuilder =>
@@ -64,8 +48,6 @@ namespace Timeline.Tests.Helpers
             Host.Dispose();
 
             Directory.Delete(WorkDir, true);
-
-            await Database.DisposeAsync();
         }
     }
 }

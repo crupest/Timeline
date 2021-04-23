@@ -1,13 +1,14 @@
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
 
-namespace Timeline.Services.Migration
+namespace Timeline.Services.DatabaseManagement
 {
-    public class TimelinePostContentToDataMigration : ICustomMigration
+    public class TimelinePostContentToDataMigration : IDatabaseCustomMigration
     {
         private readonly IDataManager _dataManager;
 
@@ -18,10 +19,10 @@ namespace Timeline.Services.Migration
 
         public string GetName() => "TimelinePostContentToData";
 
-        public async Task Execute(DatabaseContext database)
+        public async Task ExecuteAsync(DatabaseContext database, CancellationToken cancellationToken)
         {
 #pragma warning disable CS0618
-            var postEntities = await database.TimelinePosts.ToListAsync();
+            var postEntities = await database.TimelinePosts.ToListAsync(cancellationToken);
 
             foreach (var postEntity in postEntities)
             {
@@ -62,7 +63,7 @@ namespace Timeline.Services.Migration
                 postEntity.ExtraContent = null;
             }
 
-            await database.SaveChangesAsync();
+            await database.SaveChangesAsync(cancellationToken);
 #pragma warning restore CS0618
         }
     }
