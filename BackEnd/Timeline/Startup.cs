@@ -111,7 +111,7 @@ namespace Timeline
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserCredentialService, UserCredentialService>();
             services.AddScoped<IUserDeleteService, UserDeleteService>();
-            services.AddScoped<IUserTokenService, JwtUserTokenService>();
+            services.AddScoped<IUserTokenHandler, JwtUserTokenHandler>();
             services.AddScoped<IUserTokenManager, UserTokenManager>();
             services.AddScoped<IUserPermissionService, UserPermissionService>();
             services.AddUserAvatarService();

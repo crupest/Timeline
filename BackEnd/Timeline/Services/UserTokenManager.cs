@@ -34,10 +34,10 @@ namespace Timeline.Services
         /// <param name="token">The token.</param>
         /// <returns>The user stored in token.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
-        /// <exception cref="UserTokenTimeExpireException">Thrown when the token is expired.</exception>
-        /// <exception cref="UserTokenBadVersionException">Thrown when the token is of bad version.</exception>
+        /// <exception cref="UserTokenTimeExpiredException">Thrown when the token is expired.</exception>
+        /// <exception cref="UserTokenVersionExpiredException">Thrown when the token is of bad version.</exception>
         /// <exception cref="UserTokenBadFormatException">Thrown when the token is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user specified by the token does not exist. Usually the user had been deleted after the token was issued.</exception>
+        /// <exception cref="UserTokenUserNotExistException">Thrown when the user specified by the token does not exist. Usually the user had been deleted after the token was issued.</exception>
         public Task<UserEntity> VerifyToken(string token);
     }
 
@@ -46,10 +46,10 @@ namespace Timeline.Services
         private readonly ILogger<UserTokenManager> _logger;
         private readonly IUserService _userService;
         private readonly IUserCredentialService _userCredentialService;
-        private readonly IUserTokenService _userTokenService;
+        private readonly IUserTokenHandler _userTokenService;
         private readonly IClock _clock;
 
-        public UserTokenManager(ILogger<UserTokenManager> logger, IUserService userService, IUserCredentialService userCredentialService, IUserTokenService userTokenService, IClock clock)
+        public UserTokenManager(ILogger<UserTokenManager> logger, IUserService userService, IUserCredentialService userCredentialService, IUserTokenHandler userTokenService, IClock clock)
         {
             _logger = logger;
             _userService = userService;
@@ -86,15 +86,23 @@ namespace Timeline.Services
             {
                 var currentTime = _clock.GetCurrentTime();
                 if (tokenInfo.ExpireAt < currentTime)
-                    throw new UserTokenTimeExpireException(token, tokenInfo.ExpireAt.Value, currentTime);
+                    throw new UserTokenTimeExpiredException(token, tokenInfo.ExpireAt.Value, currentTime);
             }
 
-            var user = await _userService.GetUser(tokenInfo.Id);
+            try
+            {
+                var user = await _userService.GetUser(tokenInfo.Id);
 
-            if (tokenInfo.Version < user.Version)
-                throw new UserTokenBadVersionException(token, tokenInfo.Version, user.Version);
+                if (tokenInfo.Version < user.Version)
+                    throw new UserTokenVersionExpiredException(token, tokenInfo.Version, user.Version);
 
-            return user;
+                return user;
+
+            }
+            catch (UserNotExistException e)
+            {
+                throw new UserTokenUserNotExistException(token, e);
+            }
         }
     }
 }
