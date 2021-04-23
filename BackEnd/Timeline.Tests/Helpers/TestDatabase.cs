@@ -12,11 +12,11 @@ namespace Timeline.Tests.Helpers
 {
     public class TestDatabase : IAsyncLifetime
     {
-        private readonly bool _createUser;
+        private readonly bool _init;
 
-        public TestDatabase(bool createUser = true)
+        public TestDatabase(bool init = true)
         {
-            _createUser = createUser;
+            _init = init;
             Connection = new SqliteConnection("Data Source=:memory:;");
         }
 
@@ -24,9 +24,11 @@ namespace Timeline.Tests.Helpers
         {
             await Connection.OpenAsync();
 
-            using (var context = CreateContext())
+            if (_init)
             {
+                using var context = CreateContext();
                 await context.Database.EnsureCreatedAsync();
+
                 context.JwtToken.Add(new JwtTokenEntity
                 {
                     Key = JwtTokenGenerateHelper.GenerateKey()
@@ -42,11 +44,8 @@ namespace Timeline.Tests.Helpers
 
                 await context.SaveChangesAsync();
 
-                if (_createUser)
-                {
-                    var user = await userService.CreateUser("user", "userpw");
-                    await userService.ModifyUser(user.Id, new ModifyUserParams() { Nickname = "imuser" });
-                }
+                var user = await userService.CreateUser("user", "userpw");
+                await userService.ModifyUser(user.Id, new ModifyUserParams() { Nickname = "imuser" });
             }
         }
 

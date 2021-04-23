@@ -7,7 +7,7 @@ using System.Resources;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
-using Timeline.Services.Migration;
+using Timeline.Services.DatabaseManagement;
 
 [assembly: NeutralResourcesLanguage("en")]
 
@@ -19,18 +19,7 @@ namespace Timeline
         {
             var host = CreateWebHostBuilder(args).Build();
 
-            var databaseBackupService = host.Services.GetRequiredService<IDatabaseBackupService>();
-            databaseBackupService.BackupNow();
-
-            using (var scope = host.Services.CreateScope())
-            {
-                var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                await databaseContext.Database.MigrateAsync();
-                var customMigrationManager = scope.ServiceProvider.GetRequiredService<ICustomMigrationManager>();
-                await customMigrationManager.Migrate();
-            }
-
-            host.Run();
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateWebHostBuilder(string[] args) =>
