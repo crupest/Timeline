@@ -20,14 +20,14 @@ namespace Timeline.Services
 
 
     [Serializable]
-    public class UserTokenTimeExpireException : UserTokenException
+    public class UserTokenTimeExpiredException : UserTokenException
     {
-        public UserTokenTimeExpireException() : base(Resources.Services.Exception.UserTokenTimeExpireException) { }
-        public UserTokenTimeExpireException(string message) : base(message) { }
-        public UserTokenTimeExpireException(string message, Exception inner) : base(message, inner) { }
-        public UserTokenTimeExpireException(string token, DateTime expireTime, DateTime verifyTime) : base(token, Resources.Services.Exception.UserTokenTimeExpireException) { ExpireTime = expireTime; VerifyTime = verifyTime; }
-        public UserTokenTimeExpireException(string token, DateTime expireTime, DateTime verifyTime, Exception inner) : base(token, Resources.Services.Exception.UserTokenTimeExpireException, inner) { ExpireTime = expireTime; VerifyTime = verifyTime; }
-        protected UserTokenTimeExpireException(
+        public UserTokenTimeExpiredException() : base(Resources.Services.Exception.UserTokenTimeExpireException) { }
+        public UserTokenTimeExpiredException(string message) : base(message) { }
+        public UserTokenTimeExpiredException(string message, Exception inner) : base(message, inner) { }
+        public UserTokenTimeExpiredException(string token, DateTime expireTime, DateTime verifyTime) : base(token, Resources.Services.Exception.UserTokenTimeExpireException) { ExpireTime = expireTime; VerifyTime = verifyTime; }
+        public UserTokenTimeExpiredException(string token, DateTime expireTime, DateTime verifyTime, Exception inner) : base(token, Resources.Services.Exception.UserTokenTimeExpireException, inner) { ExpireTime = expireTime; VerifyTime = verifyTime; }
+        protected UserTokenTimeExpiredException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
@@ -37,20 +37,35 @@ namespace Timeline.Services
     }
 
     [Serializable]
-    public class UserTokenBadVersionException : UserTokenException
+    public class UserTokenVersionExpiredException : UserTokenException
     {
-        public UserTokenBadVersionException() : base(Resources.Services.Exception.UserTokenBadVersionException) { }
-        public UserTokenBadVersionException(string message) : base(message) { }
-        public UserTokenBadVersionException(string message, Exception inner) : base(message, inner) { }
-        public UserTokenBadVersionException(string token, long tokenVersion, long requiredVersion) : base(token, Resources.Services.Exception.UserTokenBadVersionException) { TokenVersion = tokenVersion; RequiredVersion = requiredVersion; }
-        public UserTokenBadVersionException(string token, long tokenVersion, long requiredVersion, Exception inner) : base(token, Resources.Services.Exception.UserTokenBadVersionException, inner) { TokenVersion = tokenVersion; RequiredVersion = requiredVersion; }
-        protected UserTokenBadVersionException(
+        public UserTokenVersionExpiredException() : base(Resources.Services.Exception.UserTokenBadVersionException) { }
+        public UserTokenVersionExpiredException(string message) : base(message) { }
+        public UserTokenVersionExpiredException(string message, Exception inner) : base(message, inner) { }
+        public UserTokenVersionExpiredException(string token, long tokenVersion, long requiredVersion) : base(token, Resources.Services.Exception.UserTokenBadVersionException) { TokenVersion = tokenVersion; RequiredVersion = requiredVersion; }
+        public UserTokenVersionExpiredException(string token, long tokenVersion, long requiredVersion, Exception inner) : base(token, Resources.Services.Exception.UserTokenBadVersionException, inner) { TokenVersion = tokenVersion; RequiredVersion = requiredVersion; }
+        protected UserTokenVersionExpiredException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
         public long TokenVersion { get; set; }
 
         public long RequiredVersion { get; set; }
+    }
+
+
+    [Serializable]
+    public class UserTokenUserNotExistException : UserTokenException
+    {
+        const string message = "The owner of the token does not exist.";
+
+        public UserTokenUserNotExistException() : base(message) { }
+        public UserTokenUserNotExistException(string token) : base(token, message) { }
+        public UserTokenUserNotExistException(string token, Exception inner) : base(token, message, inner) { }
+
+        protected UserTokenUserNotExistException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
     [Serializable]

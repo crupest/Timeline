@@ -117,12 +117,12 @@ namespace Timeline.Controllers
                     User = await _userMapper.MapToHttp(result, Url)
                 };
             }
-            catch (UserTokenTimeExpireException e)
+            catch (UserTokenTimeExpiredException e)
             {
                 LogFailure(LogVerifyExpire, e, ("Expire Time", e.ExpireTime), ("Verify Time", e.VerifyTime));
                 return BadRequest(ErrorResponse.TokenController.Verify_TimeExpired());
             }
-            catch (UserTokenBadVersionException e)
+            catch (UserTokenVersionExpiredException e)
             {
                 LogFailure(LogVerifyOldVersion, e, ("Token Version", e.TokenVersion), ("Required Version", e.RequiredVersion));
                 return BadRequest(ErrorResponse.TokenController.Verify_OldVersion());
@@ -133,7 +133,7 @@ namespace Timeline.Controllers
                 LogFailure(LogVerifyBadFormat, e);
                 return BadRequest(ErrorResponse.TokenController.Verify_BadFormat());
             }
-            catch (UserNotExistException e)
+            catch (UserTokenUserNotExistException e)
             {
                 LogFailure(LogVerifyUserNotExist, e);
                 return BadRequest(ErrorResponse.TokenController.Verify_UserNotExist());

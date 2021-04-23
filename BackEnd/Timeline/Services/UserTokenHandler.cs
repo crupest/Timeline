@@ -17,7 +17,7 @@ namespace Timeline.Services
         public DateTime? ExpireAt { get; set; }
     }
 
-    public interface IUserTokenService
+    public interface IUserTokenHandler
     {
         /// <summary>
         /// Create a token for a given token info.
@@ -40,7 +40,7 @@ namespace Timeline.Services
         UserTokenInfo VerifyToken(string token);
     }
 
-    public class JwtUserTokenService : IUserTokenService
+    public class JwtUserTokenHandler : IUserTokenHandler
     {
         private const string VersionClaimType = "timeline_version";
 
@@ -50,7 +50,7 @@ namespace Timeline.Services
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
         private SymmetricSecurityKey _tokenSecurityKey;
 
-        public JwtUserTokenService(IOptionsMonitor<JwtConfiguration> jwtConfig, IClock clock, DatabaseContext database)
+        public JwtUserTokenHandler(IOptionsMonitor<JwtConfiguration> jwtConfig, IClock clock, DatabaseContext database)
         {
             _jwtConfig = jwtConfig;
             _clock = clock;

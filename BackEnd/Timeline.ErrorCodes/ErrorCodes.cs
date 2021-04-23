@@ -13,6 +13,7 @@
             public const int InvalidModel = 1_000_0001;
             public const int Forbid = 1_000_0002;
             public const int UnknownEndpoint = 1_000_0003;
+            public const int Unauthorized = 1_000_0004;
 
             public static class Header
             {
@@ -23,6 +24,15 @@
             public static class Content
             {
                 public const int TooBig = 1_000_11_01;
+            }
+
+            public static class Token
+            {
+                public const int TimeExpired = 1_000_21_01;
+                public const int VersionExpired = 1_000_21_02;
+                public const int BadFormat = 1_000_21_03;
+                public const int UserNotExist = 1_000_21_04;
+                public const int Unknown = 1_000_21_05;
             }
         }
 
