@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Migrations;
 using Timeline.Services;
 using Xunit;
 using Xunit.Abstractions;
@@ -12,11 +11,8 @@ namespace Timeline.Tests.Helpers
 {
     public class TestDatabase : IAsyncLifetime
     {
-        private readonly bool _init;
-
-        public TestDatabase(bool init = true)
+        public TestDatabase()
         {
-            _init = init;
             Connection = new SqliteConnection("Data Source=:memory:;");
         }
 
@@ -24,29 +20,17 @@ namespace Timeline.Tests.Helpers
         {
             await Connection.OpenAsync();
 
-            if (_init)
-            {
-                using var context = CreateContext();
-                await context.Database.EnsureCreatedAsync();
+            using var context = CreateContext();
+            await context.Database.MigrateAsync();
 
-                context.JwtToken.Add(new JwtTokenEntity
-                {
-                    Key = JwtTokenGenerateHelper.GenerateKey()
-                });
+            var userService = new UserService(NullLogger<UserService>.Instance, context, new PasswordService(), new Clock());
 
-                await context.SaveChangesAsync();
+            await userService.ModifyUser(
+                await userService.GetUserIdByUsername("administrator"),
+                new ModifyUserParams() { Username = "admin", Password = "adminpw", Nickname = "administrator" });
 
-                var passwordService = new PasswordService();
-                var userService = new UserService(NullLogger<UserService>.Instance, context, passwordService, new Clock());
-
-                var admin = await userService.CreateUser("admin", "adminpw");
-                await userService.ModifyUser(admin.Id, new ModifyUserParams() { Nickname = "administrator" });
-
-                await context.SaveChangesAsync();
-
-                var user = await userService.CreateUser("user", "userpw");
-                await userService.ModifyUser(user.Id, new ModifyUserParams() { Nickname = "imuser" });
-            }
+            var user = await userService.CreateUser("user", "userpw");
+            await userService.ModifyUser(user.Id, new ModifyUserParams() { Nickname = "imuser" });
         }
 
         public async Task DisposeAsync()

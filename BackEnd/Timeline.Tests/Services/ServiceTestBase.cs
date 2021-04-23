@@ -22,13 +22,11 @@ namespace Timeline.Tests.Services
         protected long UserId { get; private set; }
         protected long AdminId { get; private set; }
 
-        protected ServiceTestBase(bool databaseCreateUsers = true, ITestOutputHelper? testOutputHelper = null)
+        protected ServiceTestBase(ITestOutputHelper? testOutputHelper = null)
         {
             _testOutputHelper = testOutputHelper;
-            TestDatabase = new TestDatabase(databaseCreateUsers);
+            TestDatabase = new TestDatabase();
         }
-
-        protected ServiceTestBase(ITestOutputHelper? testOutputHelper) : this(true, testOutputHelper) { }
 
         public async Task InitializeAsync()
         {
