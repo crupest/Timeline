@@ -17,12 +17,12 @@ namespace Timeline.Tests.Helpers
     {
         public IHost Host { get; private set; } = default!;
 
-        public string WorkDir { get; private set; } = default!;
+        public string WorkDirectory { get; private set; } = default!;
 
         public async Task InitializeAsync()
         {
-            WorkDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(WorkDir);
+            WorkDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(WorkDirectory);
 
             Host = await Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
                 .ConfigureAppConfiguration((context, config) =>
@@ -30,7 +30,7 @@ namespace Timeline.Tests.Helpers
                     config.AddInMemoryCollection(new Dictionary<string, string>
                     {
                         [ApplicationConfiguration.FrontEndKey] = "Mock",
-                        ["WorkDir"] = WorkDir
+                        [ApplicationConfiguration.WorkDirectoryKey] = WorkDirectory
                     });
                 })
                 .ConfigureWebHost(webBuilder =>
@@ -47,7 +47,7 @@ namespace Timeline.Tests.Helpers
             await Host.StopAsync();
             Host.Dispose();
 
-            Directory.Delete(WorkDir, true);
+            Directory.Delete(WorkDirectory, true);
         }
     }
 }
