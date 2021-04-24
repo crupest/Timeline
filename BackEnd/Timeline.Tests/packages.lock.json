@@ -17,12 +17,6 @@
           "System.Configuration.ConfigurationManager": "4.4.0"
         }
       },
-      "JunitXml.TestLogger": {
-        "type": "Direct",
-        "requested": "[3.0.87, )",
-        "resolved": "3.0.87",
-        "contentHash": "qnNYxt+lSgUYOSb3aKFO/azfhrVEBrSmITlW+Af9ukOsmI1O9MUKmJOPBidZJzDpW8D6czhvG8B7ShU7soQXAg=="
-      },
       "Microsoft.AspNet.WebApi.Client": {
         "type": "Direct",
         "requested": "[5.2.7, )",
