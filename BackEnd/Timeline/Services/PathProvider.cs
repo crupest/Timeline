@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
 using Timeline.Configs;
 
@@ -6,7 +7,7 @@ namespace Timeline.Services
 {
     public interface IPathProvider
     {
-        public string GetWorkingDirectory();
+        public string GetWorkDirectory();
         public string GetDatabaseFilePath();
         public string GetDatabaseBackupDirectory();
     }
@@ -15,28 +16,33 @@ namespace Timeline.Services
     {
         private readonly IConfiguration _configuration;
 
-        private readonly string _workingDirectory;
+        private readonly string _workDirectory;
 
+        public static string GetDefaultWorkDirectory()
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            return Path.Combine(home, ApplicationConfiguration.DefaultWorkDirectoryName);
+        }
 
         public PathProvider(IConfiguration configuration)
         {
             _configuration = configuration;
-            _workingDirectory = configuration.GetValue<string?>(ApplicationConfiguration.WorkDirKey) ?? ApplicationConfiguration.DefaultWorkDir;
+            _workDirectory = configuration.GetValue<string?>(ApplicationConfiguration.WorkDirectoryKey) ?? GetDefaultWorkDirectory();
         }
 
-        public string GetWorkingDirectory()
+        public string GetWorkDirectory()
         {
-            return _workingDirectory;
+            return _workDirectory;
         }
 
         public string GetDatabaseFilePath()
         {
-            return Path.Combine(_workingDirectory, ApplicationConfiguration.DatabaseFileName);
+            return Path.Combine(_workDirectory, ApplicationConfiguration.DatabaseFileName);
         }
 
         public string GetDatabaseBackupDirectory()
         {
-            return Path.Combine(_workingDirectory, ApplicationConfiguration.DatabaseBackupDirectoryName);
+            return Path.Combine(_workDirectory, ApplicationConfiguration.DatabaseBackupDirectoryName);
         }
     }
 }

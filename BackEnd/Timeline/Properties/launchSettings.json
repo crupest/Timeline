@@ -19,14 +19,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging"
       }
-    },
-    "Dev-Windows": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_FRONTEND": "Proxy",
-        "TIMELINE_WORKDIR": "D:\\timeline-development"
-      }
     }
   }
 }
