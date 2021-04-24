@@ -8,13 +8,13 @@ using System.Security.Claims;
 using Timeline.Configs;
 using Timeline.Entities;
 
-namespace Timeline.Services
+namespace Timeline.Services.Token
 {
     public class UserTokenInfo
     {
         public long Id { get; set; }
         public long Version { get; set; }
-        public DateTime? ExpireAt { get; set; }
+        public DateTime ExpireAt { get; set; }
     }
 
     public interface IUserTokenHandler
@@ -28,7 +28,7 @@ namespace Timeline.Services
         string GenerateToken(UserTokenInfo tokenInfo);
 
         /// <summary>
-        /// Verify a token and get the saved info.
+        /// Verify a token and get the saved info. Do not validate lifetime!!!
         /// </summary>
         /// <param name="token">The token to verify.</param>
         /// <returns>The saved info in token.</returns>
@@ -44,13 +44,13 @@ namespace Timeline.Services
     {
         private const string VersionClaimType = "timeline_version";
 
-        private readonly IOptionsMonitor<JwtConfiguration> _jwtConfig;
+        private readonly IOptionsMonitor<JwtOptions> _jwtConfig;
         private readonly IClock _clock;
 
         private readonly JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
         private SymmetricSecurityKey _tokenSecurityKey;
 
-        public JwtUserTokenHandler(IOptionsMonitor<JwtConfiguration> jwtConfig, IClock clock, DatabaseContext database)
+        public JwtUserTokenHandler(IOptionsMonitor<JwtOptions> jwtConfig, IClock clock, DatabaseContext database)
         {
             _jwtConfig = jwtConfig;
             _clock = clock;
@@ -83,7 +83,7 @@ namespace Timeline.Services
                 Audience = config.Audience,
                 SigningCredentials = new SigningCredentials(_tokenSecurityKey, SecurityAlgorithms.HmacSha384),
                 IssuedAt = _clock.GetCurrentTime(),
-                Expires = tokenInfo.ExpireAt.GetValueOrDefault(_clock.GetCurrentTime().AddSeconds(config.DefaultExpireOffset)),
+                Expires = tokenInfo.ExpireAt,
                 NotBefore = _clock.GetCurrentTime() // I must explicitly set this or it will use the current time by default and mock is not work in which case test will not pass.
             };
 
@@ -127,17 +127,14 @@ namespace Timeline.Services
 
                 var decodedToken = (JwtSecurityToken)t;
                 var exp = decodedToken.Payload.Exp;
-                DateTime? expireAt = null;
-                if (exp.HasValue)
-                {
-                    expireAt = EpochTime.DateTime(exp.Value);
-                }
+                if (exp is null)
+                    throw new JwtUserTokenBadFormatException(token, JwtUserTokenBadFormatException.ErrorKind.NoExp);
 
                 return new UserTokenInfo
                 {
                     Id = id,
                     Version = version,
-                    ExpireAt = expireAt
+                    ExpireAt = EpochTime.DateTime(exp.Value)
                 };
             }
             catch (Exception e) when (e is SecurityTokenException || e is ArgumentException)

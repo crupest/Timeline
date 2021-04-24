@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
+using Timeline.Configs;
 using Timeline.Entities;
 using Timeline.Helpers;
 using Timeline.Services.Exceptions;
 
-namespace Timeline.Services
+namespace Timeline.Services.Token
 {
     public class UserTokenCreateResult
     {
@@ -44,14 +46,16 @@ namespace Timeline.Services
     public class UserTokenManager : IUserTokenManager
     {
         private readonly ILogger<UserTokenManager> _logger;
+        private readonly IOptionsMonitor<TokenOptions> _tokenOptionsMonitor;
         private readonly IUserService _userService;
         private readonly IUserCredentialService _userCredentialService;
         private readonly IUserTokenHandler _userTokenService;
         private readonly IClock _clock;
 
-        public UserTokenManager(ILogger<UserTokenManager> logger, IUserService userService, IUserCredentialService userCredentialService, IUserTokenHandler userTokenService, IClock clock)
+        public UserTokenManager(ILogger<UserTokenManager> logger, IOptionsMonitor<TokenOptions> tokenOptionsMonitor, IUserService userService, IUserCredentialService userCredentialService, IUserTokenHandler userTokenService, IClock clock)
         {
             _logger = logger;
+            _tokenOptionsMonitor = tokenOptionsMonitor;
             _userService = userService;
             _userCredentialService = userCredentialService;
             _userTokenService = userTokenService;
@@ -69,7 +73,13 @@ namespace Timeline.Services
 
             var userId = await _userCredentialService.VerifyCredential(username, password);
             var user = await _userService.GetUser(userId);
-            var token = _userTokenService.GenerateToken(new UserTokenInfo { Id = user.Id, Version = user.Version, ExpireAt = expireAt });
+
+            var token = _userTokenService.GenerateToken(new UserTokenInfo
+            {
+                Id = user.Id,
+                Version = user.Version,
+                ExpireAt = expireAt ?? _clock.GetCurrentTime() + TimeSpan.FromSeconds(_tokenOptionsMonitor.CurrentValue.DefaultExpireSeconds)
+            });
 
             return new UserTokenCreateResult { Token = token, User = user };
         }
@@ -82,12 +92,9 @@ namespace Timeline.Services
 
             var tokenInfo = _userTokenService.VerifyToken(token);
 
-            if (tokenInfo.ExpireAt.HasValue)
-            {
-                var currentTime = _clock.GetCurrentTime();
-                if (tokenInfo.ExpireAt < currentTime)
-                    throw new UserTokenTimeExpiredException(token, tokenInfo.ExpireAt.Value, currentTime);
-            }
+            var currentTime = _clock.GetCurrentTime();
+            if (tokenInfo.ExpireAt < currentTime)
+                throw new UserTokenTimeExpiredException(token, tokenInfo.ExpireAt, currentTime);
 
             try
             {

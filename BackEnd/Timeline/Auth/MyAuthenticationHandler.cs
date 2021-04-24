@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
+using Timeline.Services.Token;
 
 namespace Timeline.Auth
 {
