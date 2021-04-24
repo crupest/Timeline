@@ -10,6 +10,7 @@ using Timeline.Models.Http;
 using Timeline.Models.Mapper;
 using Timeline.Services;
 using Timeline.Services.Exceptions;
+using Timeline.Services.Token;
 using static Timeline.Resources.Controllers.TokenController;
 
 namespace Timeline.Controllers

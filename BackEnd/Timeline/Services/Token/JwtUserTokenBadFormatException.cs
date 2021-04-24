@@ -2,7 +2,7 @@
 using System.Globalization;
 using static Timeline.Resources.Services.Exception;
 
-namespace Timeline.Services
+namespace Timeline.Services.Token
 {
     [Serializable]
     public class JwtUserTokenBadFormatException : UserTokenBadFormatException
@@ -13,6 +13,7 @@ namespace Timeline.Services
             IdClaimBadFormat,
             NoVersionClaim,
             VersionClaimBadFormat,
+            NoExp,
             Other
         }
 

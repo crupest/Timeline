@@ -22,6 +22,7 @@ using Timeline.Models.Mapper;
 using Timeline.Routes;
 using Timeline.Services;
 using Timeline.Services.DatabaseManagement;
+using Timeline.Services.Token;
 using Timeline.Swagger;
 
 namespace Timeline
@@ -78,7 +79,6 @@ namespace Timeline
                 options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
             });
 
-            services.Configure<JwtConfiguration>(Configuration.GetSection("Jwt"));
             services.AddAuthentication(AuthenticationConstants.Scheme)
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
             services.AddAuthorization();
@@ -111,10 +111,10 @@ namespace Timeline
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserCredentialService, UserCredentialService>();
             services.AddScoped<IUserDeleteService, UserDeleteService>();
-            services.AddScoped<IUserTokenHandler, JwtUserTokenHandler>();
-            services.AddScoped<IUserTokenManager, UserTokenManager>();
             services.AddScoped<IUserPermissionService, UserPermissionService>();
             services.AddUserAvatarService();
+
+            services.AddTokenService(Configuration);
 
             services.AddScoped<IBasicTimelineService, BasicTimelineService>();
             services.AddScoped<ITimelineService, TimelineService>();
