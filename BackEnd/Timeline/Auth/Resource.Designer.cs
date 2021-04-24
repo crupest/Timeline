@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources.Authentication {
+namespace Timeline.Auth {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Timeline.Resources.Authentication {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AuthHandler {
+    internal class Resource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthHandler() {
+        internal Resource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Authentication {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Authentication.AuthHandler", typeof(AuthHandler).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Auth.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -88,11 +88,65 @@ namespace Timeline.Resources.Authentication {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A jwt token validation failed..
+        ///   Looks up a localized string similar to A jwt token validation failed. Error reason: {0}.
         /// </summary>
         internal static string LogTokenValidationFail {
             get {
                 return ResourceManager.GetString("LogTokenValidationFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must use a token to authenticate to access this resource..
+        /// </summary>
+        internal static string MessageNoToken {
+            get {
+                return ResourceManager.GetString("MessageNoToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is of bad format. It might not be created by this server..
+        /// </summary>
+        internal static string MessageTokenBadFormat {
+            get {
+                return ResourceManager.GetString("MessageTokenBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is out of date and expired. Please create a new one..
+        /// </summary>
+        internal static string MessageTokenTimeExpired {
+            get {
+                return ResourceManager.GetString("MessageTokenTimeExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A unknown error occured when verify token..
+        /// </summary>
+        internal static string MessageTokenUnknownError {
+            get {
+                return ResourceManager.GetString("MessageTokenUnknownError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The owner of the token does not exist. It might have been deleted..
+        /// </summary>
+        internal static string MessageTokenUserNotExist {
+            get {
+                return ResourceManager.GetString("MessageTokenUserNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The token is of old version and expired. Please create a new one..
+        /// </summary>
+        internal static string MessageTokenVersionExpired {
+            get {
+                return ResourceManager.GetString("MessageTokenVersionExpired", resourceCulture);
             }
         }
     }

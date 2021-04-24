@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Services;
-using static Timeline.Resources.Authentication.AuthHandler;
 
 namespace Timeline.Auth
 {
@@ -37,16 +36,28 @@ namespace Timeline.Auth
     {
         private const string TokenErrorCodeKey = "TokenErrorCode";
 
-        private static CommonResponse CreateChallengeResponseBody(int errorCode)
+        private static int GetErrorCodeForUserTokenException(UserTokenException e)
         {
-            return new CommonResponse(errorCode, errorCode switch
+            return e switch
             {
-                ErrorCodes.Common.Token.TimeExpired => "The token is out of date and expired. Please create a new one.",
-                ErrorCodes.Common.Token.VersionExpired => "The token is of old version and expired. Please create a new one.",
-                ErrorCodes.Common.Token.BadFormat => "The token is of bad format. It might not be created by this server.",
-                ErrorCodes.Common.Token.UserNotExist => "The owner of the token does not exist. It might have been deleted.",
-                _ => "Unknown error."
-            });
+                UserTokenTimeExpiredException => ErrorCodes.Common.Token.TimeExpired,
+                UserTokenVersionExpiredException => ErrorCodes.Common.Token.VersionExpired,
+                UserTokenBadFormatException => ErrorCodes.Common.Token.BadFormat,
+                UserTokenUserNotExistException => ErrorCodes.Common.Token.UserNotExist,
+                _ => ErrorCodes.Common.Token.Unknown
+            };
+        }
+
+        private static string GetTokenErrorMessageFromErrorCode(int errorCode)
+        {
+            return errorCode switch
+            {
+                ErrorCodes.Common.Token.TimeExpired => Resource.MessageTokenTimeExpired,
+                ErrorCodes.Common.Token.VersionExpired => Resource.MessageTokenVersionExpired,
+                ErrorCodes.Common.Token.BadFormat => Resource.MessageTokenBadFormat,
+                ErrorCodes.Common.Token.UserNotExist => Resource.MessageTokenUserNotExist,
+                _ => Resource.MessageTokenUnknownError
+            };
         }
 
         private readonly ILogger<MyAuthenticationHandler> _logger;
@@ -72,7 +83,7 @@ namespace Timeline.Auth
             if (!string.IsNullOrEmpty(header) && header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 var token = header["Bearer ".Length..].Trim();
-                _logger.LogInformation(LogTokenFoundInHeader, token);
+                _logger.LogInformation(Resource.LogTokenFoundInHeader, token);
                 return token;
             }
 
@@ -83,7 +94,7 @@ namespace Timeline.Auth
                 string token = Request.Query[paramQueryKey];
                 if (!string.IsNullOrEmpty(token))
                 {
-                    _logger.LogInformation(LogTokenFoundInQuery, paramQueryKey, token);
+                    _logger.LogInformation(Resource.LogTokenFoundInQuery, paramQueryKey, token);
                     return token;
                 }
             }
@@ -97,7 +108,7 @@ namespace Timeline.Auth
             var token = ExtractToken();
             if (string.IsNullOrEmpty(token))
             {
-                _logger.LogInformation(LogTokenNotFound);
+                _logger.LogInformation(Resource.LogTokenNotFound);
                 return AuthenticateResult.NoResult();
             }
 
@@ -117,19 +128,14 @@ namespace Timeline.Auth
 
                 return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthenticationConstants.Scheme));
             }
-            catch (Exception e) when (!(e is ArgumentException))
+            catch (UserTokenException e)
             {
-                _logger.LogInformation(e, LogTokenValidationFail);
+                var errorCode = GetErrorCodeForUserTokenException(e);
+
+                _logger.LogInformation(e, Resource.LogTokenValidationFail, GetTokenErrorMessageFromErrorCode(errorCode));
                 return AuthenticateResult.Fail(e, new AuthenticationProperties(new Dictionary<string, string?>()
                 {
-                    [TokenErrorCodeKey] = (e switch
-                    {
-                        UserTokenTimeExpiredException => ErrorCodes.Common.Token.TimeExpired,
-                        UserTokenVersionExpiredException => ErrorCodes.Common.Token.VersionExpired,
-                        UserTokenBadFormatException => ErrorCodes.Common.Token.BadFormat,
-                        UserTokenUserNotExistException => ErrorCodes.Common.Token.UserNotExist,
-                        _ => ErrorCodes.Common.Token.Unknown
-                    }).ToString(CultureInfo.InvariantCulture)
+                    [TokenErrorCodeKey] = errorCode.ToString(CultureInfo.InvariantCulture)
                 }));
             }
         }
@@ -144,13 +150,12 @@ namespace Timeline.Auth
             {
                 if (!int.TryParse(tokenErrorCode, out var errorCode))
                     errorCode = ErrorCodes.Common.Token.Unknown;
-                body = CreateChallengeResponseBody(errorCode);
+                body = new CommonResponse(errorCode, GetTokenErrorMessageFromErrorCode(errorCode));
             }
             else
             {
-                body = new CommonResponse(ErrorCodes.Common.Unauthorized, "You must use a token to authenticate.");
+                body = new CommonResponse(ErrorCodes.Common.Unauthorized, Resource.MessageNoToken);
             }
-
 
             var bodyData = JsonSerializer.SerializeToUtf8Bytes(body, typeof(CommonResponse), _jsonOptions.CurrentValue.JsonSerializerOptions);
 
