@@ -56,10 +56,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Resources\Authentication\AuthHandler.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>AuthHandler.resx</DependentUpon>
+        <Compile Update="Auth\Resource.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Controllers\ControllerAuthExtensions.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -169,9 +169,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Update="Resources\Authentication\AuthHandler.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>AuthHandler.Designer.cs</LastGenOutput>
+        <EmbeddedResource Update="Auth\Resource.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Controllers\ControllerAuthExtensions.resx">
             <Generator>ResXFileCodeGenerator</Generator>
