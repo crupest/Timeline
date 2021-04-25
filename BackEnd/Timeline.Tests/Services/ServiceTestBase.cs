@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Services;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 using Timeline.Tests.Helpers;
 using Xunit;
 using Xunit.Abstractions;

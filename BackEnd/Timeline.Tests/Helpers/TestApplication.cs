@@ -1,14 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Timeline.Configs;
-using Timeline.Entities;
 using Xunit;
 
 namespace Timeline.Tests.Helpers

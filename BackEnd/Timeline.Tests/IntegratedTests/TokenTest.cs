@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
-using Timeline.Services;
+using Timeline.Services.User;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests

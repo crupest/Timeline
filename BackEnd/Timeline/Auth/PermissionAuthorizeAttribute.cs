@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Linq;
-using Timeline.Services;
+using Timeline.Services.User;
 
 namespace Timeline.Auth
 {

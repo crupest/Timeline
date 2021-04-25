@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Timeline.Services;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 
 namespace Timeline.Models.Http
 {

@@ -5,8 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models.Http;
-using Timeline.Models.Mapper;
-using Timeline.Services;
+using Timeline.Services.Api;
+using Timeline.Services.Mapper;
+using Timeline.Services.User;
 
 namespace Timeline.Controllers
 {

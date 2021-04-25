@@ -13,8 +13,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Models.Http;
-using Timeline.Services;
 using Timeline.Services.Token;
+using Timeline.Services.User;
 
 namespace Timeline.Auth
 {

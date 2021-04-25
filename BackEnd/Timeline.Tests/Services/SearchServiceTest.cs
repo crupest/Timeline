@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using System.Threading.Tasks;
-using Timeline.Services;
+using Timeline.Services.Api;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 using Xunit;
 
 namespace Timeline.Tests.Services

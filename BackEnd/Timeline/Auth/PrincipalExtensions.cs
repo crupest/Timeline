@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
-using Timeline.Services;
+using Timeline.Services.User;
 
 namespace Timeline.Auth
 {

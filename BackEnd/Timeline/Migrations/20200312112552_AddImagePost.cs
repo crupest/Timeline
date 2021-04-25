@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Timeline.Models;
 
 namespace Timeline.Migrations
 {

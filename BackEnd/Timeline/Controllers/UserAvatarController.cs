@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
 using Timeline.Filters;
@@ -11,8 +10,8 @@ using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
-using Timeline.Services;
-using Timeline.Services.Exceptions;
+using Timeline.Services.Imaging;
+using Timeline.Services.User;
 using static Timeline.Resources.Controllers.UserAvatarController;
 
 namespace Timeline.Controllers

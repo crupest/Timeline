@@ -141,21 +141,6 @@
   <data name="TimelineNoDataException" xml:space="preserve">
     <value>The timeline has no data.</value>
   </data>
-  <data name="ImageException" xml:space="preserve">
-    <value>Image is in valid because {0}.</value>
-  </data>
-  <data name="ImageExceptionBadSize" xml:space="preserve">
-    <value>image is not of required size</value>
-  </data>
-  <data name="ImageExceptionCantDecode" xml:space="preserve">
-    <value>failed to decode image, see inner exception</value>
-  </data>
-  <data name="ImageExceptionUnknownError" xml:space="preserve">
-    <value>unknown error</value>
-  </data>
-  <data name="ImageExceptionUnmatchedFormat" xml:space="preserve">
-    <value>image's actual mime type is not the specified one</value>
-  </data>
   <data name="TimelinePostNotExistExceptionDeleted" xml:space="preserve">
     <value>Request timeline id is "{0}".  Request timeline post id is "{1}". The post does not exist because it is deleted.</value>
   </data>

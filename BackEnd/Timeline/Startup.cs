@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,11 +17,16 @@ using Timeline.Entities;
 using Timeline.Formatters;
 using Timeline.Helpers;
 using Timeline.Models.Converters;
-using Timeline.Models.Mapper;
 using Timeline.Routes;
 using Timeline.Services;
+using Timeline.Services.Api;
+using Timeline.Services.Data;
 using Timeline.Services.DatabaseManagement;
+using Timeline.Services.Imaging;
+using Timeline.Services.Mapper;
+using Timeline.Services.Timeline;
 using Timeline.Services.Token;
+using Timeline.Services.User;
 using Timeline.Swagger;
 
 namespace Timeline

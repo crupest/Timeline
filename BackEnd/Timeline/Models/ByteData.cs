@@ -1,5 +1,5 @@
-﻿using System;
-using NSwag.Annotations;
+﻿using NSwag.Annotations;
+using System;
 
 namespace Timeline.Models
 {
