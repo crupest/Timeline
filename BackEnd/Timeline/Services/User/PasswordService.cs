@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
@@ -12,18 +13,13 @@ namespace Timeline.Services.User
     [Serializable]
     public class HashedPasswordBadFromatException : Exception
     {
-        private static string MakeMessage(string reason)
-        {
-            return Resources.Services.Exception.HashedPasswordBadFromatException + " Reason: " + reason;
-        }
-
-        public HashedPasswordBadFromatException() : base(Resources.Services.Exception.HashedPasswordBadFromatException) { }
+        public HashedPasswordBadFromatException() : base(Resource.ExceptionHashedPasswordBadFormat) { }
 
         public HashedPasswordBadFromatException(string message) : base(message) { }
         public HashedPasswordBadFromatException(string message, Exception inner) : base(message, inner) { }
 
-        public HashedPasswordBadFromatException(string hashedPassword, string reason) : base(MakeMessage(reason)) { HashedPassword = hashedPassword; }
-        public HashedPasswordBadFromatException(string hashedPassword, string reason, Exception inner) : base(MakeMessage(reason), inner) { HashedPassword = hashedPassword; }
+        public HashedPasswordBadFromatException(string hashedPassword, string reason, Exception? inner = null) 
+            : base(string.Format(CultureInfo.InvariantCulture, Resource.ExceptionHashedPasswordBadFormat, reason), inner) { HashedPassword = hashedPassword; }
         protected HashedPasswordBadFromatException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
@@ -150,19 +146,19 @@ namespace Timeline.Services.User
             }
             catch (FormatException e)
             {
-                throw new HashedPasswordBadFromatException(hashedPassword, Resources.Services.Exception.HashedPasswordBadFromatExceptionNotBase64, e);
+                throw new HashedPasswordBadFromatException(hashedPassword, Resource.ExceptionHashedPasswordBadFormatReasonNotBase64, e);
             }
 
             // read the format marker from the hashed password
             if (decodedHashedPassword.Length == 0)
             {
-                throw new HashedPasswordBadFromatException(hashedPassword, Resources.Services.Exception.HashedPasswordBadFromatExceptionNotLength0);
+                throw new HashedPasswordBadFromatException(hashedPassword, Resource.ExceptionHashedPasswordBadFormatReasonLength0);
             }
 
             return (decodedHashedPassword[0]) switch
             {
                 0x01 => VerifyHashedPasswordV3(decodedHashedPassword, providedPassword, hashedPassword),
-                _ => throw new HashedPasswordBadFromatException(hashedPassword, Resources.Services.Exception.HashedPasswordBadFromatExceptionNotUnknownMarker),
+                _ => throw new HashedPasswordBadFromatException(hashedPassword, Resource.ExceptionHashedPasswordBadFormatReasonUnknownMarker),
             };
         }
 
@@ -178,7 +174,7 @@ namespace Timeline.Services.User
                 // Read the salt: must be >= 128 bits
                 if (saltLength < 128 / 8)
                 {
-                    throw new HashedPasswordBadFromatException(hashedPasswordString, Resources.Services.Exception.HashedPasswordBadFromatExceptionNotSaltTooShort);
+                    throw new HashedPasswordBadFromatException(hashedPasswordString, Resource.ExceptionHashedPasswordBadFormatReasonSaltTooShort);
                 }
                 byte[] salt = new byte[saltLength];
                 Buffer.BlockCopy(hashedPassword, 13, salt, 0, salt.Length);
@@ -187,7 +183,7 @@ namespace Timeline.Services.User
                 int subkeyLength = hashedPassword.Length - 13 - salt.Length;
                 if (subkeyLength < 128 / 8)
                 {
-                    throw new HashedPasswordBadFromatException(hashedPasswordString, Resources.Services.Exception.HashedPasswordBadFromatExceptionNotSubkeyTooShort);
+                    throw new HashedPasswordBadFromatException(hashedPasswordString, Resource.ExceptionHashedPasswordBadFormatReasonSubkeyTooShort);
                 }
                 byte[] expectedSubkey = new byte[subkeyLength];
                 Buffer.BlockCopy(hashedPassword, 13 + salt.Length, expectedSubkey, 0, expectedSubkey.Length);
@@ -201,7 +197,7 @@ namespace Timeline.Services.User
                 // This should never occur except in the case of a malformed payload, where
                 // we might go off the end of the array. Regardless, a malformed payload
                 // implies verification failed.
-                throw new HashedPasswordBadFromatException(hashedPasswordString, Resources.Services.Exception.HashedPasswordBadFromatExceptionNotOthers, e);
+                throw new HashedPasswordBadFromatException(hashedPasswordString, Resource.ExceptionHashedPasswordBadFormatReasonOthers, e);
             }
         }
 

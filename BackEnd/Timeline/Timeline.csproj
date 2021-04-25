@@ -128,11 +128,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>DataManager.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Services\Exception.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Exception.resx</DependentUpon>
-        </Compile>
         <Compile Update="Resources\Services\Exceptions.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -169,6 +164,11 @@
           <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\Timeline\Resource.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resource.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Services\Token\Resource.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
           <DependentUpon>Resource.resx</DependentUpon>
@@ -246,10 +246,6 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>DataManager.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\Exception.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Exception.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\Exceptions.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
@@ -279,6 +275,10 @@
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Timeline\Resource.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Services\Token\Resource.resx">
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
