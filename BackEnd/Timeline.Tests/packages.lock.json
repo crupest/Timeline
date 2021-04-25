@@ -1602,12 +1602,8 @@
           "Microsoft.EntityFrameworkCore.Sqlite": "5.0.5",
           "NSwag.AspNetCore": "13.10.9",
           "SixLabors.ImageSharp": "1.0.3",
-          "System.IdentityModel.Tokens.Jwt": "6.10.2",
-          "Timeline.ErrorCodes": "1.0.0"
+          "System.IdentityModel.Tokens.Jwt": "6.10.2"
         }
-      },
-      "timeline.errorcodes": {
-        "type": "Project"
       }
     }
   }
