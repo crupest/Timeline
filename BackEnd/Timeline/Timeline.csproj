@@ -128,11 +128,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>DataManager.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Services\Exceptions.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Exceptions.resx</DependentUpon>
-        </Compile>
         <Compile Update="Resources\Services\TimelineService.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -245,10 +240,6 @@
         <EmbeddedResource Update="Resources\Services\DataManager.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>DataManager.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\Exceptions.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\TimelineService.resx">
             <Generator>ResXFileCodeGenerator</Generator>
