@@ -48,10 +48,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Timeline.ErrorCodes\Timeline.ErrorCodes.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Compile Update="Auth\Resource.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>

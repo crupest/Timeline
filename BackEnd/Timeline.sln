@@ -6,10 +6,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline", "Timeline\Timeli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline.Tests", "Timeline.Tests\Timeline.Tests.csproj", "{3D76D578-37BC-43C2-97BF-9C6DD3825F10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline.ErrorCodes", "Timeline.ErrorCodes\Timeline.ErrorCodes.csproj", "{1044E3B0-1010-47CA-956E-B6E8FE87055B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Timeline.ErrorCodes.CodeGenerator", "Timeline.ErrorCodes.CodeGenerator\Timeline.ErrorCodes.CodeGenerator.csproj", "{D0263FD3-DC6A-4676-A746-FDAFCDACC5F2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,14 +20,6 @@ Global
 		{3D76D578-37BC-43C2-97BF-9C6DD3825F10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D76D578-37BC-43C2-97BF-9C6DD3825F10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D76D578-37BC-43C2-97BF-9C6DD3825F10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1044E3B0-1010-47CA-956E-B6E8FE87055B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1044E3B0-1010-47CA-956E-B6E8FE87055B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1044E3B0-1010-47CA-956E-B6E8FE87055B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1044E3B0-1010-47CA-956E-B6E8FE87055B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D0263FD3-DC6A-4676-A746-FDAFCDACC5F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0263FD3-DC6A-4676-A746-FDAFCDACC5F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D0263FD3-DC6A-4676-A746-FDAFCDACC5F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D0263FD3-DC6A-4676-A746-FDAFCDACC5F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
