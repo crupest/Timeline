@@ -7,10 +7,10 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Timeline.Helpers;
 using Timeline.Models.Http;
-using Timeline.Models.Mapper;
 using Timeline.Services;
-using Timeline.Services.Exceptions;
+using Timeline.Services.Mapper;
 using Timeline.Services.Token;
+using Timeline.Services.User;
 using static Timeline.Resources.Controllers.TokenController;
 
 namespace Timeline.Controllers

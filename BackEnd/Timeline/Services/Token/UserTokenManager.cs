@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Timeline.Configs;
 using Timeline.Entities;
 using Timeline.Helpers;
-using Timeline.Services.Exceptions;
+using Timeline.Services.User;
 
 namespace Timeline.Services.Token
 {

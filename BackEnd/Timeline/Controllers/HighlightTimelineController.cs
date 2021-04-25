@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Entities;
 using Timeline.Models.Http;
-using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
-using Timeline.Services;
-using Timeline.Services.Exceptions;
+using Timeline.Services.Api;
+using Timeline.Services.Mapper;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 
 namespace Timeline.Controllers
 {

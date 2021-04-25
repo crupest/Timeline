@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
+using Timeline.Services.User;
 using Xunit;
 using Xunit.Abstractions;
 

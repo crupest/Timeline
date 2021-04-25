@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
-using Timeline.Services;
+using Timeline.Services.User;
 using Timeline.Tests.Helpers;
 using Xunit;
 

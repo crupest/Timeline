@@ -2,7 +2,7 @@
 using System;
 using System.Security.Claims;
 using Timeline.Auth;
-using Timeline.Services;
+using Timeline.Services.User;
 using static Timeline.Resources.Controllers.ControllerAuthExtensions;
 
 namespace Timeline.Controllers

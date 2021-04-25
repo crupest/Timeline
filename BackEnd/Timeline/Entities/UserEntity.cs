@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Timeline.Services.User;
 
 namespace Timeline.Entities
 {
@@ -40,7 +41,7 @@ namespace Timeline.Entities
 
 #pragma warning disable CA2227 // Collection properties should be read only
         /// <summary>
-        /// Do not use this directly. Get permissions with <see cref="Timeline.Services.IUserPermissionService"/>.
+        /// Do not use this directly. Get permissions with <see cref="IUserPermissionService"/>.
         /// </summary>
         [Obsolete("Use IUserPermissionService instead.")]
         public List<UserPermissionEntity> Permissions { get; set; } = default!;

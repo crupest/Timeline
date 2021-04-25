@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Helpers;
 using Timeline.Models.Http;
-using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
 using Timeline.Services;
-using Timeline.Services.Exceptions;
+using Timeline.Services.Mapper;
+using Timeline.Services.User;
 using static Timeline.Resources.Controllers.UserController;
 using static Timeline.Resources.Messages;
 

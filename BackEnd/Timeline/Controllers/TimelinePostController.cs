@@ -3,16 +3,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using Timeline.Entities;
 using Timeline.Filters;
 using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Http;
-using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
-using Timeline.Services;
-using Timeline.Entities;
+using Timeline.Services.Mapper;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 
 namespace Timeline.Controllers
 {

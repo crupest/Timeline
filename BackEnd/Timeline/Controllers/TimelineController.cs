@@ -9,10 +9,11 @@ using Timeline.Entities;
 using Timeline.Filters;
 using Timeline.Models;
 using Timeline.Models.Http;
-using Timeline.Models.Mapper;
 using Timeline.Models.Validation;
 using Timeline.Services;
-using Timeline.Services.Exceptions;
+using Timeline.Services.Mapper;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 
 namespace Timeline.Controllers
 {

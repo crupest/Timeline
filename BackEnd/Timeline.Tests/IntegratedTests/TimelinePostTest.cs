@@ -1,8 +1,12 @@
 ﻿using FluentAssertions;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Timeline.Models;
@@ -10,11 +14,6 @@ using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
 using Xunit.Abstractions;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using System.Net;
-using System.Text.RegularExpressions;
 
 namespace Timeline.Tests.IntegratedTests
 {

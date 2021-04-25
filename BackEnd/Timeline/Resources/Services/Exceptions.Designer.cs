@@ -97,51 +97,6 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Image is in valid because {0}..
-        /// </summary>
-        internal static string ImageException {
-            get {
-                return ResourceManager.GetString("ImageException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to image is not of required size.
-        /// </summary>
-        internal static string ImageExceptionBadSize {
-            get {
-                return ResourceManager.GetString("ImageExceptionBadSize", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to failed to decode image, see inner exception.
-        /// </summary>
-        internal static string ImageExceptionCantDecode {
-            get {
-                return ResourceManager.GetString("ImageExceptionCantDecode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to unknown error.
-        /// </summary>
-        internal static string ImageExceptionUnknownError {
-            get {
-                return ResourceManager.GetString("ImageExceptionUnknownError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to image&apos;s actual mime type is not the specified one.
-        /// </summary>
-        internal static string ImageExceptionUnmatchedFormat {
-            get {
-                return ResourceManager.GetString("ImageExceptionUnmatchedFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The timeline has no data..
         /// </summary>
         internal static string TimelineNoDataException {

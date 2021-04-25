@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System.Threading.Tasks;
-using Timeline.Services;
-using Timeline.Services.Exceptions;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 using Xunit;
 
 namespace Timeline.Tests.Services

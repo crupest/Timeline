@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Timeline.Models.Http;
-using Timeline.Services.Exceptions;
+using Timeline.Services.Timeline;
+using Timeline.Services.User;
 
 namespace Timeline.Filters
 {
