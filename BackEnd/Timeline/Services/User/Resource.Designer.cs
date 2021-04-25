@@ -70,6 +70,69 @@ namespace Timeline.Services.User {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The hashes password is of bad format. It might not be created by server. Reason: {0}.
+        /// </summary>
+        internal static string ExceptionHashedPasswordBadFormat {
+            get {
+                return ResourceManager.GetString("ExceptionHashedPasswordBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decoded hashed password is of length 0..
+        /// </summary>
+        internal static string ExceptionHashedPasswordBadFormatReasonLength0 {
+            get {
+                return ResourceManager.GetString("ExceptionHashedPasswordBadFormatReasonLength0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not of valid base64 format. See inner exception..
+        /// </summary>
+        internal static string ExceptionHashedPasswordBadFormatReasonNotBase64 {
+            get {
+                return ResourceManager.GetString("ExceptionHashedPasswordBadFormatReasonNotBase64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to See inner exception..
+        /// </summary>
+        internal static string ExceptionHashedPasswordBadFormatReasonOthers {
+            get {
+                return ResourceManager.GetString("ExceptionHashedPasswordBadFormatReasonOthers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Salt length &lt; 128 bits..
+        /// </summary>
+        internal static string ExceptionHashedPasswordBadFormatReasonSaltTooShort {
+            get {
+                return ResourceManager.GetString("ExceptionHashedPasswordBadFormatReasonSaltTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subkey length &lt; 128 bits..
+        /// </summary>
+        internal static string ExceptionHashedPasswordBadFormatReasonSubkeyTooShort {
+            get {
+                return ResourceManager.GetString("ExceptionHashedPasswordBadFormatReasonSubkeyTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown format marker..
+        /// </summary>
+        internal static string ExceptionHashedPasswordBadFormatReasonUnknownMarker {
+            get {
+                return ResourceManager.GetString("ExceptionHashedPasswordBadFormatReasonUnknownMarker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Nickname is of bad format. {0}.
         /// </summary>
         internal static string ExceptionNicknameBadFormat {

@@ -120,6 +120,27 @@
   <data name="ExceptionBadPassword" xml:space="preserve">
     <value>Password is wrong.</value>
   </data>
+  <data name="ExceptionHashedPasswordBadFormat" xml:space="preserve">
+    <value>The hashes password is of bad format. It might not be created by server. Reason: {0}</value>
+  </data>
+  <data name="ExceptionHashedPasswordBadFormatReasonLength0" xml:space="preserve">
+    <value>Decoded hashed password is of length 0.</value>
+  </data>
+  <data name="ExceptionHashedPasswordBadFormatReasonNotBase64" xml:space="preserve">
+    <value>Not of valid base64 format. See inner exception.</value>
+  </data>
+  <data name="ExceptionHashedPasswordBadFormatReasonOthers" xml:space="preserve">
+    <value>See inner exception.</value>
+  </data>
+  <data name="ExceptionHashedPasswordBadFormatReasonSaltTooShort" xml:space="preserve">
+    <value>Salt length &lt; 128 bits.</value>
+  </data>
+  <data name="ExceptionHashedPasswordBadFormatReasonSubkeyTooShort" xml:space="preserve">
+    <value>Subkey length &lt; 128 bits.</value>
+  </data>
+  <data name="ExceptionHashedPasswordBadFormatReasonUnknownMarker" xml:space="preserve">
+    <value>Unknown format marker.</value>
+  </data>
   <data name="ExceptionNicknameBadFormat" xml:space="preserve">
     <value>Nickname is of bad format. {0}</value>
   </data>

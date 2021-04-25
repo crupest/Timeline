@@ -117,61 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BadPasswordException" xml:space="preserve">
-    <value>The password is wrong.</value>
-  </data>
-  <data name="HashedPasswordBadFromatException" xml:space="preserve">
-    <value>The hashes password is of bad format. It might not be created by server.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotBase64" xml:space="preserve">
-    <value>Not of valid base64 format. See inner exception.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotLength0" xml:space="preserve">
-    <value>Decoded hashed password is of length 0.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotOthers" xml:space="preserve">
-    <value>See inner exception.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotSaltTooShort" xml:space="preserve">
-    <value>Salt length &lt; 128 bits.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotSubkeyTooShort" xml:space="preserve">
-    <value>Subkey length &lt; 128 bits.</value>
-  </data>
-  <data name="HashedPasswordBadFromatExceptionNotUnknownMarker" xml:space="preserve">
-    <value>Unknown format marker.</value>
-  </data>
-  <data name="JwtUserTokenBadFormatException" xml:space="preserve">
+  <data name="ExceptionJwtUserTokenBadFormat" xml:space="preserve">
     <value>The token didn't pass verification because {0}.</value>
   </data>
-  <data name="JwtUserTokenBadFormatExceptionIdBadFormat" xml:space="preserve">
+  <data name="ExceptionJwtUserTokenBadFormatReasonIdBadFormat" xml:space="preserve">
     <value>id claim is not a number</value>
   </data>
-  <data name="JwtUserTokenBadFormatExceptionIdMissing" xml:space="preserve">
+  <data name="ExceptionJwtUserTokenBadFormatReasonIdMissing" xml:space="preserve">
     <value>id claim does not exist</value>
   </data>
-  <data name="JwtUserTokenBadFormatExceptionOthers" xml:space="preserve">
+  <data name="ExceptionJwtUserTokenBadFormatReasonOthers" xml:space="preserve">
     <value>other error, see inner exception for information</value>
   </data>
-  <data name="JwtUserTokenBadFormatExceptionUnknown" xml:space="preserve">
+  <data name="ExceptionJwtUserTokenBadFormatReasonUnknown" xml:space="preserve">
     <value>unknown error</value>
   </data>
-  <data name="JwtUserTokenBadFormatExceptionVersionBadFormat" xml:space="preserve">
+  <data name="ExceptionJwtUserTokenBadFormatReasonVersionBadFormat" xml:space="preserve">
     <value>version claim is not a number.</value>
   </data>
-  <data name="JwtUserTokenBadFormatExceptionVersionMissing" xml:space="preserve">
+  <data name="ExceptionJwtUserTokenBadFormatReasonVersionMissing" xml:space="preserve">
     <value>version claim does not exist.</value>
   </data>
-  <data name="PasswordBadFormatException" xml:space="preserve">
-    <value>Password is of bad format.</value>
-  </data>
-  <data name="UserTokenBadFormatException" xml:space="preserve">
+  <data name="ExceptionUserTokenBadFormat" xml:space="preserve">
     <value>The token is of bad format, which means it may not be created by the server.</value>
   </data>
-  <data name="UserTokenBadVersionException" xml:space="preserve">
-    <value>The token is of bad version.</value>
-  </data>
-  <data name="UserTokenTimeExpireException" xml:space="preserve">
+  <data name="ExceptionUserTokenTimeExpired" xml:space="preserve">
     <value>The token is expired because its expiration time has passed.</value>
+  </data>
+  <data name="ExceptionUserTokenUserNotExist" xml:space="preserve">
+    <value>The owner user of the token does not exist.</value>
+  </data>
+  <data name="ExceptionUserTokenVersionExpired" xml:space="preserve">
+    <value>The token is of bad version.</value>
   </data>
 </root>

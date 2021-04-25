@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using static Timeline.Resources.Services.Exception;
 
 namespace Timeline.Services.Token
 {
@@ -34,16 +33,15 @@ namespace Timeline.Services.Token
         {
             var reason = type switch
             {
-                ErrorKind.NoIdClaim => JwtUserTokenBadFormatExceptionIdMissing,
-                ErrorKind.IdClaimBadFormat => JwtUserTokenBadFormatExceptionIdBadFormat,
-                ErrorKind.NoVersionClaim => JwtUserTokenBadFormatExceptionVersionMissing,
-                ErrorKind.VersionClaimBadFormat => JwtUserTokenBadFormatExceptionVersionBadFormat,
-                ErrorKind.Other => JwtUserTokenBadFormatExceptionOthers,
-                _ => JwtUserTokenBadFormatExceptionUnknown
+                ErrorKind.NoIdClaim => Resource.ExceptionJwtUserTokenBadFormatReasonIdMissing,
+                ErrorKind.IdClaimBadFormat => Resource.ExceptionJwtUserTokenBadFormatReasonIdBadFormat,
+                ErrorKind.NoVersionClaim => Resource.ExceptionJwtUserTokenBadFormatReasonVersionMissing,
+                ErrorKind.VersionClaimBadFormat => Resource.ExceptionJwtUserTokenBadFormatReasonVersionBadFormat,
+                ErrorKind.Other => Resource.ExceptionJwtUserTokenBadFormatReasonOthers,
+                _ => Resource.ExceptionJwtUserTokenBadFormatReasonUnknown
             };
 
-            return string.Format(CultureInfo.CurrentCulture,
-                Resources.Services.Exception.JwtUserTokenBadFormatException, reason);
+            return string.Format(CultureInfo.CurrentCulture, Resource.ExceptionJwtUserTokenBadFormat, reason);
         }
     }
 }
