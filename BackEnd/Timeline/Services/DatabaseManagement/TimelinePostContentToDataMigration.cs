@@ -35,7 +35,7 @@ namespace Timeline.Services.DatabaseManagement
                 {
                     if (postEntity.ContentType == "text")
                     {
-                        var tag = await _dataManager.RetainEntry(Encoding.UTF8.GetBytes(postEntity.Content));
+                        var tag = await _dataManager.RetainEntryAsync(Encoding.UTF8.GetBytes(postEntity.Content), cancellationToken);
                         database.TimelinePostData.Add(new TimelinePostDataEntity
                         {
                             DataTag = tag,
@@ -47,7 +47,7 @@ namespace Timeline.Services.DatabaseManagement
                     }
                     else
                     {
-                        var data = await _dataManager.GetEntryAndCheck(postEntity.Content, "Old image content does not have corresponding data with the tag.");
+                        var data = await _dataManager.GetEntryAndCheck(postEntity.Content, Resource.TimelinePostContentToDataMigrationImageNoData, cancellationToken);
                         var format = Image.DetectFormat(data);
                         database.TimelinePostData.Add(new TimelinePostDataEntity
                         {

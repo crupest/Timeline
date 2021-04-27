@@ -363,7 +363,7 @@ namespace Timeline.Services.Timeline
             {
                 var data = request.DataList[index];
 
-                var tag = await _dataManager.RetainEntry(data.Data);
+                var tag = await _dataManager.RetainEntryAsync(data.Data);
 
                 _database.TimelinePostData.Add(new TimelinePostDataEntity
                 {
@@ -438,7 +438,7 @@ namespace Timeline.Services.Timeline
 
             foreach (var dataEntity in dataEntities)
             {
-                await _dataManager.FreeEntry(dataEntity.DataTag);
+                await _dataManager.FreeEntryAsync(dataEntity.DataTag);
             }
 
             _database.TimelinePostData.RemoveRange(dataEntities);

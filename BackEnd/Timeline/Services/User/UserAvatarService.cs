@@ -200,7 +200,7 @@ namespace Timeline.Services.User
 
             await using var transaction = await _database.Database.BeginTransactionAsync();
 
-            var tag = await _dataManager.RetainEntry(avatar.Data);
+            var tag = await _dataManager.RetainEntryAsync(avatar.Data);
 
             var now = _clock.GetCurrentTime();
 
@@ -218,7 +218,7 @@ namespace Timeline.Services.User
             else
             {
                 if (entity.DataTag is not null)
-                    await _dataManager.FreeEntry(entity.DataTag);
+                    await _dataManager.FreeEntryAsync(entity.DataTag);
 
                 entity.DataTag = tag;
                 entity.Type = avatar.ContentType;
@@ -243,7 +243,7 @@ namespace Timeline.Services.User
 
             await using var transaction = await _database.Database.BeginTransactionAsync();
 
-            await _dataManager.FreeEntry(entity.DataTag);
+            await _dataManager.FreeEntryAsync(entity.DataTag);
 
             entity.DataTag = null;
             entity.Type = null;
