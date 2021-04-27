@@ -19,7 +19,7 @@ namespace Timeline.Services.User
         public HashedPasswordBadFromatException(string message, Exception inner) : base(message, inner) { }
 
         public HashedPasswordBadFromatException(string hashedPassword, string reason, Exception? inner = null) 
-            : base(string.Format(CultureInfo.InvariantCulture, Resource.ExceptionHashedPasswordBadFormat, reason), inner) { HashedPassword = hashedPassword; }
+            : base(string.Format(CultureInfo.CurrentCulture, Resource.ExceptionHashedPasswordBadFormat, reason), inner) { HashedPassword = hashedPassword; }
         protected HashedPasswordBadFromatException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }

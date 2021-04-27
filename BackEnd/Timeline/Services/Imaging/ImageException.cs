@@ -38,7 +38,7 @@ namespace Timeline.Services.Imaging
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
         private static string MakeMessage(ErrorReason? reason) =>
-            string.Format(CultureInfo.InvariantCulture, Resource.ExceptionImage, reason switch
+            string.Format(CultureInfo.CurrentCulture, Resource.ExceptionImage, reason switch
             {
                 ErrorReason.CantDecode => Resource.ExceptionImageReasonCantDecode,
                 ErrorReason.UnmatchedFormat => Resource.ExceptionImageReasonUnmatchedFormat,

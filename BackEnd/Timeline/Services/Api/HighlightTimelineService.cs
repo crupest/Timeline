@@ -95,7 +95,7 @@ namespace Timeline.Services.Api
             if (!await _timelineService.CheckExistence(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
-            if (operatorId.HasValue && !await _userService.CheckUserExistence(operatorId.Value))
+            if (operatorId.HasValue && !await _userService.CheckUserExistenceAsync(operatorId.Value))
             {
                 throw new UserNotExistException(null, operatorId.Value, "User with given operator id does not exist.", null);
             }
@@ -121,7 +121,7 @@ namespace Timeline.Services.Api
             if (!await _timelineService.CheckExistence(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
-            if (operatorId.HasValue && !await _userService.CheckUserExistence(operatorId.Value))
+            if (operatorId.HasValue && !await _userService.CheckUserExistenceAsync(operatorId.Value))
             {
                 throw new UserNotExistException(null, operatorId.Value, "User with given operator id does not exist.", null);
             }

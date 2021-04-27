@@ -20,5 +20,8 @@ namespace Timeline.Models.Http
         /// </summary>
         [Required, MinLength(1)]
         public string Password { get; set; } = default!;
+
+        [Nickname]
+        public string? Nickname { get; set; }
     }
 }

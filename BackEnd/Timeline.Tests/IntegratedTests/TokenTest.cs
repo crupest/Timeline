@@ -92,8 +92,8 @@ namespace Timeline.Tests.IntegratedTests
             {
                 // create a user for test
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                var id = await userService.GetUserIdByUsername("user1");
-                await userService.ModifyUser(id, new ModifyUserParams { Password = "user1pw" });
+                var id = await userService.GetUserIdByUsernameAsync("user1");
+                await userService.ModifyUserAsync(id, new ModifyUserParams { Password = "user1pw" });
             }
 
             await client.TestPostAssertErrorAsync(VerifyTokenUrl,

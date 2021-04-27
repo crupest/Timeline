@@ -94,7 +94,7 @@ namespace Timeline.Services.Timeline
                 long userId;
                 try
                 {
-                    userId = await _basicUserService.GetUserIdByUsername(timelineName);
+                    userId = await _basicUserService.GetUserIdByUsernameAsync(timelineName);
                 }
                 catch (UserNotExistException e)
                 {

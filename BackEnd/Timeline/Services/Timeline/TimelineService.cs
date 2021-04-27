@@ -284,7 +284,7 @@ namespace Timeline.Services.Timeline
             if (!await CheckExistence(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
-            if (!await _userService.CheckUserExistence(userId))
+            if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
             if (await _database.TimelineMembers.AnyAsync(m => m.TimelineId == timelineId && m.UserId == userId))
@@ -306,7 +306,7 @@ namespace Timeline.Services.Timeline
             if (!await CheckExistence(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
-            if (!await _userService.CheckUserExistence(userId))
+            if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
             var entity = await _database.TimelineMembers.SingleOrDefaultAsync(m => m.TimelineId == timelineId && m.UserId == userId);

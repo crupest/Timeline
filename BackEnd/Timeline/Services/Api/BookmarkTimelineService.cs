@@ -93,7 +93,7 @@ namespace Timeline.Services.Api
 
         public async Task<bool> AddBookmark(long userId, long timelineId)
         {
-            if (!await _userService.CheckUserExistence(userId))
+            if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
             if (!await _timelineService.CheckExistence(timelineId))
@@ -115,7 +115,7 @@ namespace Timeline.Services.Api
 
         public async Task<List<long>> GetBookmarks(long userId)
         {
-            if (!await _userService.CheckUserExistence(userId))
+            if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
             var entities = await _database.BookmarkTimelines.Where(t => t.UserId == userId).OrderBy(t => t.Rank).Select(t => new { t.TimelineId }).ToListAsync();
@@ -125,7 +125,7 @@ namespace Timeline.Services.Api
 
         public async Task<bool> IsBookmark(long userId, long timelineId, bool checkUserExistence = true, bool checkTimelineExistence = true)
         {
-            if (checkUserExistence && !await _userService.CheckUserExistence(userId))
+            if (checkUserExistence && !await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
             if (checkTimelineExistence && !await _timelineService.CheckExistence(timelineId))
@@ -136,7 +136,7 @@ namespace Timeline.Services.Api
 
         public async Task MoveBookmark(long userId, long timelineId, long newPosition)
         {
-            if (!await _userService.CheckUserExistence(userId))
+            if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
             if (!await _timelineService.CheckExistence(timelineId))
@@ -178,7 +178,7 @@ namespace Timeline.Services.Api
 
         public async Task<bool> RemoveBookmark(long userId, long timelineId)
         {
-            if (!await _userService.CheckUserExistence(userId))
+            if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
             if (!await _timelineService.CheckExistence(timelineId))

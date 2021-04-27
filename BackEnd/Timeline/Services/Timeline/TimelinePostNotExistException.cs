@@ -22,7 +22,7 @@ namespace Timeline.Services.Timeline
 
         private static string MakeMessage(bool isDelete)
         {
-            return string.Format(CultureInfo.InvariantCulture, Resource.ExceptionTimelinePostNoExist, isDelete ? Resource.ExceptionTimelinePostNoExistReasonDeleted : Resource.ExceptionTimelinePostNoExistReasonNotCreated);
+            return string.Format(CultureInfo.CurrentCulture, Resource.ExceptionTimelinePostNoExist, isDelete ? Resource.ExceptionTimelinePostNoExistReasonDeleted : Resource.ExceptionTimelinePostNoExistReasonNotCreated);
         }
 
         public long? TimelineId { get; set; }

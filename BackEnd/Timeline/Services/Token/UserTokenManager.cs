@@ -48,16 +48,14 @@ namespace Timeline.Services.Token
         private readonly ILogger<UserTokenManager> _logger;
         private readonly IOptionsMonitor<TokenOptions> _tokenOptionsMonitor;
         private readonly IUserService _userService;
-        private readonly IUserCredentialService _userCredentialService;
         private readonly IUserTokenHandler _userTokenService;
         private readonly IClock _clock;
 
-        public UserTokenManager(ILogger<UserTokenManager> logger, IOptionsMonitor<TokenOptions> tokenOptionsMonitor, IUserService userService, IUserCredentialService userCredentialService, IUserTokenHandler userTokenService, IClock clock)
+        public UserTokenManager(ILogger<UserTokenManager> logger, IOptionsMonitor<TokenOptions> tokenOptionsMonitor, IUserService userService, IUserTokenHandler userTokenService, IClock clock)
         {
             _logger = logger;
             _tokenOptionsMonitor = tokenOptionsMonitor;
             _userService = userService;
-            _userCredentialService = userCredentialService;
             _userTokenService = userTokenService;
             _clock = clock;
         }
@@ -71,8 +69,8 @@ namespace Timeline.Services.Token
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
 
-            var userId = await _userCredentialService.VerifyCredential(username, password);
-            var user = await _userService.GetUser(userId);
+            var userId = await _userService.VerifyCredential(username, password);
+            var user = await _userService.GetUserAsync(userId);
 
             var token = _userTokenService.GenerateToken(new UserTokenInfo
             {
@@ -98,7 +96,7 @@ namespace Timeline.Services.Token
 
             try
             {
-                var user = await _userService.GetUser(tokenInfo.Id);
+                var user = await _userService.GetUserAsync(tokenInfo.Id);
 
                 if (tokenInfo.Version < user.Version)
                     throw new UserTokenVersionExpiredException(token, tokenInfo.Version, user.Version);

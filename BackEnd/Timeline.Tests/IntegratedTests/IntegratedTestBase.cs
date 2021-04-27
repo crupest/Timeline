@@ -65,7 +65,7 @@ namespace Timeline.Tests.IntegratedTests
 
             var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-            await userService.ModifyUser(await userService.GetUserIdByUsername("administrator"), new ModifyUserParams
+            await userService.ModifyUserAsync(await userService.GetUserIdByUsernameAsync("administrator"), new ModifyUserParams
             {
                 Username = "admin",
                 Password = "adminpw",
@@ -75,8 +75,8 @@ namespace Timeline.Tests.IntegratedTests
             foreach (var user in users)
             {
                 var (username, password, nickname) = user;
-                var u = await userService.CreateUser(username, password);
-                await userService.ModifyUser(u.Id, new ModifyUserParams() { Nickname = nickname });
+                var u = await userService.CreateUserAsync(new CreateUserParams(username, password));
+                await userService.ModifyUserAsync(u.Id, new ModifyUserParams() { Nickname = nickname });
             }
         }
 
