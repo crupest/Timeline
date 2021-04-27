@@ -12,6 +12,7 @@ using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services.Imaging;
 using Timeline.Services.User;
+using Timeline.Services.User.Avatar;
 using static Timeline.Resources.Controllers.UserAvatarController;
 
 namespace Timeline.Controllers
