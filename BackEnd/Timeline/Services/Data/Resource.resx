@@ -117,7 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ExceptionEntryNotExist" xml:space="preserve">
-    <value>Entry with given tag does not exist.</value>
+  <data name="GetEntryAndCheckNotExist" xml:space="preserve">
+    <value>Can't get data entry of tag {0}. {1}</value>
+  </data>
+  <data name="LogDataManagerFreeEntryDecreaseRefCount" xml:space="preserve">
+    <value>Decrease ref count of existing entry with tag {0}.</value>
+  </data>
+  <data name="LogDataManagerFreeEntryNotExist" xml:space="preserve">
+    <value>Attempt to free an entry that does not exist with tag {0}.</value>
+  </data>
+  <data name="LogDataManagerFreeEntryRemove" xml:space="preserve">
+    <value>Remove a entry with tag {0}.</value>
+  </data>
+  <data name="LogDataManagerRetainEntryAddRefCount" xml:space="preserve">
+    <value>Add ref count of existing entry with tag {0}.</value>
+  </data>
+  <data name="LogDataManagerRetainEntryCreate" xml:space="preserve">
+    <value>Create a new entry with tag {0}.</value>
   </data>
 </root>

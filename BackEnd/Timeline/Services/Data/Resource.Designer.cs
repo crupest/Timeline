@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources.Services {
+namespace Timeline.Services.Data {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Timeline.Resources.Services {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class DataManager {
+    internal class Resource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal DataManager() {
+        internal Resource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Services {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Services.DataManager", typeof(DataManager).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Services.Data.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,56 @@ namespace Timeline.Resources.Services {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entry with given tag does not exist..
+        ///   Looks up a localized string similar to Can&apos;t get data entry of tag {0}. {1}.
         /// </summary>
-        internal static string ExceptionEntryNotExist {
+        internal static string GetEntryAndCheckNotExist {
             get {
-                return ResourceManager.GetString("ExceptionEntryNotExist", resourceCulture);
+                return ResourceManager.GetString("GetEntryAndCheckNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decrease ref count of existing entry with tag {0}..
+        /// </summary>
+        internal static string LogDataManagerFreeEntryDecreaseRefCount {
+            get {
+                return ResourceManager.GetString("LogDataManagerFreeEntryDecreaseRefCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempt to free an entry that does not exist with tag {0}..
+        /// </summary>
+        internal static string LogDataManagerFreeEntryNotExist {
+            get {
+                return ResourceManager.GetString("LogDataManagerFreeEntryNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove a entry with tag {0}..
+        /// </summary>
+        internal static string LogDataManagerFreeEntryRemove {
+            get {
+                return ResourceManager.GetString("LogDataManagerFreeEntryRemove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add ref count of existing entry with tag {0}..
+        /// </summary>
+        internal static string LogDataManagerRetainEntryAddRefCount {
+            get {
+                return ResourceManager.GetString("LogDataManagerRetainEntryAddRefCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a new entry with tag {0}..
+        /// </summary>
+        internal static string LogDataManagerRetainEntryCreate {
+            get {
+                return ResourceManager.GetString("LogDataManagerRetainEntryCreate", resourceCulture);
             }
         }
     }

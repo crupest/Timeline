@@ -1,73 +1,40 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Timeline.Entities;
 
 namespace Timeline.Services.Data
 {
-    /// <summary>
-    /// A data manager controlling data.
-    /// </summary>
-    /// <remarks>
-    /// Identical data will be saved as one copy and return the same tag.
-    /// Every data has a ref count. When data is retained, ref count increase.
-    /// When data is freed, ref count decease. If ref count is decreased
-    /// to 0, the data entry will be destroyed and no longer occupy space.
-    /// </remarks>
-    public interface IDataManager
-    {
-        /// <summary>
-        /// Saves the data to a new entry if it does not exist, 
-        /// increases its ref count and returns a tag to the entry.
-        /// </summary>
-        /// <param name="data">The data. Can't be null.</param>
-        /// <returns>The tag of the created entry.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
-        public Task<string> RetainEntry(byte[] data);
-
-        /// <summary>
-        /// Decrease the the ref count of the entry.
-        /// Remove it if ref count is zero.
-        /// </summary>
-        /// <param name="tag">The tag of the entry.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="tag"/> is null.</exception>
-        /// <remarks>
-        /// It's no-op if entry with tag does not exist.
-        /// </remarks>
-        public Task FreeEntry(string tag);
-
-        /// <summary>
-        /// Retrieve the entry with given tag. If not exist, returns null.
-        /// </summary>
-        /// <param name="tag">The tag of the entry.</param>
-        /// <returns>The data of the entry. If not exist, returns null.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="tag"/> is null.</exception>
-        public Task<byte[]?> GetEntry(string tag);
-    }
-
     public class DataManager : IDataManager
     {
+        private readonly ILogger<DataManager> _logger;
         private readonly DatabaseContext _database;
         private readonly IETagGenerator _eTagGenerator;
 
-        public DataManager(DatabaseContext database, IETagGenerator eTagGenerator)
+        public DataManager(ILogger<DataManager> logger, DatabaseContext database, IETagGenerator eTagGenerator)
         {
+            _logger = logger;
             _database = database;
             _eTagGenerator = eTagGenerator;
         }
 
-        public async Task<string> RetainEntry(byte[] data)
+        public async Task<string> RetainEntry(byte[] data, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            var tag = await _eTagGenerator.Generate(data);
+            var tag = await _eTagGenerator.GenerateETagAsync(data, cancellationToken);
 
-            var entity = await _database.Data.Where(d => d.Tag == tag).SingleOrDefaultAsync();
+            var entity = await _database.Data.Where(d => d.Tag == tag).SingleOrDefaultAsync(cancellationToken);
+            bool create;
+
 
             if (entity == null)
             {
+                create = true;
                 entity = new DataEntity
                 {
                     Tag = tag,
@@ -78,61 +45,59 @@ namespace Timeline.Services.Data
             }
             else
             {
+                create = false;
                 entity.Ref += 1;
             }
 
-            await _database.SaveChangesAsync();
+            await _database.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation(create ? Resource.LogDataManagerRetainEntryCreate : Resource.LogDataManagerRetainEntryAddRefCount, tag);
 
             return tag;
         }
 
-        public async Task FreeEntry(string tag)
+        public async Task FreeEntry(string tag, CancellationToken cancellationToken = default)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
 
-            var entity = await _database.Data.Where(d => d.Tag == tag).SingleOrDefaultAsync();
+            var entity = await _database.Data.Where(d => d.Tag == tag).SingleOrDefaultAsync(cancellationToken);
 
             if (entity != null)
             {
+                bool remove;
+
                 if (entity.Ref == 1)
                 {
+                    remove = true;
                     _database.Data.Remove(entity);
                 }
                 else
                 {
+                    remove = false;
                     entity.Ref -= 1;
                 }
 
-                await _database.SaveChangesAsync();
+                await _database.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation(remove ? Resource.LogDataManagerFreeEntryRemove : Resource.LogDataManagerFreeEntryDecreaseRefCount, tag);
+            }
+            else
+            {
+                _logger.LogInformation(Resource.LogDataManagerFreeEntryNotExist, tag);
             }
         }
 
-        public async Task<byte[]?> GetEntry(string tag)
+        public async Task<byte[]?> GetEntry(string tag, CancellationToken cancellationToken = default)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
 
-            var entity = await _database.Data.Where(d => d.Tag == tag).Select(d => new { d.Data }).SingleOrDefaultAsync();
+            var entity = await _database.Data.Where(d => d.Tag == tag).Select(d => new { d.Data }).SingleOrDefaultAsync(cancellationToken);
 
             if (entity is null)
                 return null;
 
             return entity.Data;
-        }
-    }
-
-    public static class DataManagerExtensions
-    {
-        /// <summary>
-        /// Try to get an entry and throw <see cref="DatabaseCorruptedException"/> if not exist.
-        /// </summary>
-        public static async Task<byte[]> GetEntryAndCheck(this IDataManager dataManager, string tag, string notExistMessage)
-        {
-            var data = await dataManager.GetEntry(tag);
-            if (data is null)
-                throw new DatabaseCorruptedException($"Can't get data of tag {tag}. {notExistMessage}");
-            return data;
         }
     }
 }
