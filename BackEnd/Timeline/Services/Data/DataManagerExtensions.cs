@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Timeline.Services.Data
@@ -8,7 +9,7 @@ namespace Timeline.Services.Data
         /// <summary>
         /// Try to get an entry and throw <see cref="DatabaseCorruptedException"/> if not exist.
         /// </summary>
-        public static async Task<byte[]> GetEntryAndCheck(this IDataManager dataManager, string tag, string notExistMessage)
+        public static async Task<byte[]> GetEntryAndCheck(this IDataManager dataManager, string tag, string notExistMessage, CancellationToken cancellationToken = default)
         {
             if (dataManager is null)
                 throw new ArgumentNullException(nameof(dataManager));
@@ -17,7 +18,7 @@ namespace Timeline.Services.Data
             if (notExistMessage is null)
                 throw new ArgumentNullException(nameof(notExistMessage));
 
-            var data = await dataManager.GetEntry(tag);
+            var data = await dataManager.GetEntryAsync(tag, cancellationToken);
             if (data is null)
                 throw new DatabaseCorruptedException(string.Format(Resource.GetEntryAndCheckNotExist, tag, notExistMessage));
             return data;

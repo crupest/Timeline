@@ -21,7 +21,7 @@ namespace Timeline.Services.Data
             _eTagGenerator = eTagGenerator;
         }
 
-        public async Task<string> RetainEntry(byte[] data, CancellationToken cancellationToken = default)
+        public async Task<string> RetainEntryAsync(byte[] data, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -56,7 +56,7 @@ namespace Timeline.Services.Data
             return tag;
         }
 
-        public async Task FreeEntry(string tag, CancellationToken cancellationToken = default)
+        public async Task FreeEntryAsync(string tag, CancellationToken cancellationToken = default)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
@@ -87,7 +87,7 @@ namespace Timeline.Services.Data
             }
         }
 
-        public async Task<byte[]?> GetEntry(string tag, CancellationToken cancellationToken = default)
+        public async Task<byte[]?> GetEntryAsync(string tag, CancellationToken cancellationToken = default)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));

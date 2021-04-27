@@ -7,17 +7,12 @@ using Timeline.Entities;
 
 namespace Timeline.Services.DatabaseManagement
 {
-    public interface IDatabaseCustomMigrator
-    {
-        Task MigrateAsync(CancellationToken cancellationToken = default);
-    }
-
     public class DatabaseCustomMigrator : IDatabaseCustomMigrator
     {
-        private IEnumerable<IDatabaseCustomMigration> _migrations;
-        private DatabaseContext _database;
+        private readonly IEnumerable<IDatabaseCustomMigration> _migrations;
+        private readonly DatabaseContext _database;
 
-        private ILogger<DatabaseCustomMigrator> _logger;
+        private readonly ILogger<DatabaseCustomMigrator> _logger;
 
         public DatabaseCustomMigrator(IEnumerable<IDatabaseCustomMigration> migrations, DatabaseContext database, ILogger<DatabaseCustomMigrator> logger)
         {
@@ -33,11 +28,11 @@ namespace Timeline.Services.DatabaseManagement
                 var name = migration.GetName();
                 var isApplied = await _database.Migrations.AnyAsync(m => m.Name == name, cancellationToken);
 
-                _logger.LogInformation("Found custom migration '{0}'. Applied: {1}.", name, isApplied);
+                _logger.LogInformation(Resource.DatabaseCustomMigratorFoundMigration, name, isApplied);
 
                 if (!isApplied)
                 {
-                    _logger.LogWarning("Begin custom migration '{0}'.", name);
+                    _logger.LogWarning(Resource.DatabaseCustomMigratorBeginMigration, name);
 
                     await using var transaction = await _database.Database.BeginTransactionAsync(cancellationToken);
 
@@ -48,7 +43,7 @@ namespace Timeline.Services.DatabaseManagement
 
                     await transaction.CommitAsync(cancellationToken);
 
-                    _logger.LogWarning("End custom migration '{0}'.", name);
+                    _logger.LogWarning(Resource.DatabaseCustomMigratorFinishMigration, name);
                 }
             }
         }

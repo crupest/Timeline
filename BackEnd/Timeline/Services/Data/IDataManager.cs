@@ -23,7 +23,7 @@ namespace Timeline.Services.Data
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The tag of the created entry.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
-        public Task<string> RetainEntry(byte[] data, CancellationToken cancellationToken = default);
+        public Task<string> RetainEntryAsync(byte[] data, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Decrease the the ref count of the entry.
@@ -35,7 +35,7 @@ namespace Timeline.Services.Data
         /// <remarks>
         /// It's no-op if entry with tag does not exist.
         /// </remarks>
-        public Task FreeEntry(string tag, CancellationToken cancellationToken = default);
+        public Task FreeEntryAsync(string tag, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve the entry with given tag. If not exist, returns null.
@@ -44,6 +44,6 @@ namespace Timeline.Services.Data
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The data of the entry. If not exist, returns null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="tag"/> is null.</exception>
-        public Task<byte[]?> GetEntry(string tag, CancellationToken cancellationToken = default);
+        public Task<byte[]?> GetEntryAsync(string tag, CancellationToken cancellationToken = default);
     }
 }
