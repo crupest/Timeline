@@ -95,7 +95,7 @@ namespace Timeline.Services.User
             if (_cacheData == null || File.GetLastWriteTime(path) > _cacheDigest!.LastModified)
             {
                 var data = await File.ReadAllBytesAsync(path);
-                _cacheDigest = new CacheableDataDigest(await _eTagGenerator.Generate(data), File.GetLastWriteTime(path));
+                _cacheDigest = new CacheableDataDigest(await _eTagGenerator.GenerateETagAsync(data), File.GetLastWriteTime(path));
                 Image.Identify(data, out var format);
                 _cacheData = new ByteData(data, format.DefaultMimeType);
             }
