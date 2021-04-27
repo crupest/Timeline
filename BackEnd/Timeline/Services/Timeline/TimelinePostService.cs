@@ -106,7 +106,7 @@ namespace Timeline.Services.Timeline
         /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
         /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
-        /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageValidator"/>.</exception>
+        /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageService"/>.</exception>
         Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request);
 
         /// <summary>
@@ -167,11 +167,11 @@ namespace Timeline.Services.Timeline
         private readonly IBasicTimelineService _basicTimelineService;
         private readonly IBasicUserService _basicUserService;
         private readonly IDataManager _dataManager;
-        private readonly IImageValidator _imageValidator;
+        private readonly IImageService _imageValidator;
         private readonly IClock _clock;
         private readonly ColorValidator _colorValidator = new ColorValidator();
 
-        public TimelinePostService(ILogger<TimelinePostService> logger, DatabaseContext database, IBasicTimelineService basicTimelineService, IBasicUserService basicUserService, IDataManager dataManager, IImageValidator imageValidator, IClock clock)
+        public TimelinePostService(ILogger<TimelinePostService> logger, DatabaseContext database, IBasicTimelineService basicTimelineService, IBasicUserService basicUserService, IDataManager dataManager, IImageService imageValidator, IClock clock)
         {
             _logger = logger;
             _database = database;
@@ -309,7 +309,7 @@ namespace Timeline.Services.Timeline
                     case MimeTypes.ImageWebp:
                         try
                         {
-                            await _imageValidator.Validate(data.Data, data.ContentType);
+                            await _imageValidator.ValidateAsync(data.Data, data.ContentType);
                         }
                         catch (ImageException e)
                         {

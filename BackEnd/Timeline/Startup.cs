@@ -88,21 +88,13 @@ namespace Timeline
             services.AddAuthorization();
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
-            // TODO: Remove this.
-            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
-
-            services.AddSingleton<IPathProvider, PathProvider>();
-
+            services.AddBasicServices();
             services.AddDatabaseManagementService();
+            services.AddDataServices();
+            services.AddImageServices();
 
             services.AddAutoMapper(GetType().Assembly);
             services.AddMappers();
-
-            services.AddTransient<IClock, Clock>();
-
-            services.AddScoped<IETagGenerator, ETagGenerator>();
-            services.AddScoped<IDataManager, DataManager>();
-            services.AddScoped<IImageValidator, ImageValidator>();
 
             services.AddDbContext<DatabaseContext>((services, options) =>
             {

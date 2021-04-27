@@ -117,7 +117,7 @@ namespace Timeline.Controllers
                 {
                     ImageException.ErrorReason.CantDecode => ErrorResponse.UserAvatar.BadFormat_CantDecode(),
                     ImageException.ErrorReason.UnmatchedFormat => ErrorResponse.UserAvatar.BadFormat_UnmatchedFormat(),
-                    ImageException.ErrorReason.NotSquare => ErrorResponse.UserAvatar.BadFormat_BadSize(),
+                    ImageException.ErrorReason.BadSize => ErrorResponse.UserAvatar.BadFormat_BadSize(),
                     _ =>
                         throw new Exception(ExceptionUnknownAvatarFormatError)
                 });
