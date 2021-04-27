@@ -19,7 +19,7 @@ namespace Timeline.Services.Imaging
             /// <summary>
             /// Image is not of required size.
             /// </summary>
-            NotSquare,
+            BadSize,
             /// <summary>
             /// Other unknown errer.
             /// </summary>
@@ -42,16 +42,13 @@ namespace Timeline.Services.Imaging
             {
                 ErrorReason.CantDecode => Resource.ExceptionImageReasonCantDecode,
                 ErrorReason.UnmatchedFormat => Resource.ExceptionImageReasonUnmatchedFormat,
-                ErrorReason.NotSquare => Resource.ExceptionImageReasonBadSize,
+                ErrorReason.BadSize => Resource.ExceptionImageReasonBadSize,
                 _ => Resource.ExceptionImageReasonUnknownError
             });
 
         public ErrorReason Error { get; }
-#pragma warning disable CA1819 // Properties should not return arrays
         public byte[]? ImageData { get; }
-#pragma warning restore CA1819 // Properties should not return arrays
         public string? RequestType { get; }
-
         // This field will be null if decoding failed.
         public string? RealType { get; }
     }

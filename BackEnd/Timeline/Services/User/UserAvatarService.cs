@@ -120,7 +120,7 @@ namespace Timeline.Services.User
         private readonly DatabaseContext _database;
         private readonly IBasicUserService _basicUserService;
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
-        private readonly IImageValidator _imageValidator;
+        private readonly IImageService _imageValidator;
         private readonly IDataManager _dataManager;
         private readonly IClock _clock;
 
@@ -129,7 +129,7 @@ namespace Timeline.Services.User
             DatabaseContext database,
             IBasicUserService basicUserService,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
-            IImageValidator imageValidator,
+            IImageService imageValidator,
             IDataManager dataManager,
             IClock clock)
         {
@@ -192,7 +192,7 @@ namespace Timeline.Services.User
             if (avatar is null)
                 throw new ArgumentNullException(nameof(avatar));
 
-            await _imageValidator.Validate(avatar.Data, avatar.ContentType, true);
+            await _imageValidator.ValidateAsync(avatar.Data, avatar.ContentType, true);
 
             await _basicUserService.ThrowIfUserNotExist(userId);
 
