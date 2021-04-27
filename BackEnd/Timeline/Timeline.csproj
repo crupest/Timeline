@@ -128,11 +128,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>TimelineService.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Services\UserAvatarService.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>UserAvatarService.resx</DependentUpon>
-        </Compile>
         <Compile Update="Resources\Services\UserTokenService.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -240,10 +235,6 @@
         <EmbeddedResource Update="Resources\Services\TimelineService.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>TimelineService.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\UserAvatarService.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>UserAvatarService.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Services\UserTokenService.resx">
             <Generator>ResXFileCodeGenerator</Generator>

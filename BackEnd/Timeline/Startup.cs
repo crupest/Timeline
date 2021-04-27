@@ -86,11 +86,6 @@ namespace Timeline
             services.AddAuthorization();
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
-            services.AddBasicServices();
-            services.AddDatabaseManagementService();
-            services.AddDataServices();
-            services.AddImageServices();
-
             services.AddAutoMapper(GetType().Assembly);
             services.AddMappers();
 
@@ -100,13 +95,11 @@ namespace Timeline
                 options.UseSqlite($"Data Source={pathProvider.GetDatabaseFilePath()}");
             });
 
-            services.AddTransient<IPasswordService, PasswordService>();
-            services.AddScoped<IBasicUserService, BasicUserService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserDeleteService, UserDeleteService>();
-            services.AddScoped<IUserPermissionService, UserPermissionService>();
-            services.AddUserAvatarService();
-
+            services.AddBasicServices();
+            services.AddDatabaseManagementService();
+            services.AddDataServices();
+            services.AddImageServices();
+            services.AddUserServices();
             services.AddTokenService(Configuration);
 
             services.AddScoped<IBasicTimelineService, BasicTimelineService>();
