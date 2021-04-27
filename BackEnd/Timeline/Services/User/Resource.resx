@@ -120,6 +120,12 @@
   <data name="ExceptionBadPassword" xml:space="preserve">
     <value>Password is wrong.</value>
   </data>
+  <data name="ExceptionChangeRootUserPermission" xml:space="preserve">
+    <value>Can't change root user's permission.</value>
+  </data>
+  <data name="ExceptionDeleteRootUser" xml:space="preserve">
+    <value>Can't delete root user.</value>
+  </data>
   <data name="ExceptionHashedPasswordBadFormat" xml:space="preserve">
     <value>The hashes password is of bad format. It might not be created by server. Reason: {0}</value>
   </data>
@@ -141,11 +147,17 @@
   <data name="ExceptionHashedPasswordBadFormatReasonUnknownMarker" xml:space="preserve">
     <value>Unknown format marker.</value>
   </data>
+  <data name="ExceptionInvalidOperationOnRootUser" xml:space="preserve">
+    <value>Can't perform such operation on root user.</value>
+  </data>
   <data name="ExceptionNicknameBadFormat" xml:space="preserve">
     <value>Nickname is of bad format. {0}</value>
   </data>
   <data name="ExceptionPasswordEmpty" xml:space="preserve">
     <value>Password can't be empty.</value>
+  </data>
+  <data name="ExceptionPasswordNull" xml:space="preserve">
+    <value>Password can't be null.</value>
   </data>
   <data name="ExceptionUserAlreadyExist" xml:space="preserve">
     <value>User with given constraints already exists.</value>
@@ -153,7 +165,22 @@
   <data name="ExceptionUsernameBadFormat" xml:space="preserve">
     <value>Username is of bad format. {0}</value>
   </data>
+  <data name="ExceptionUsernameNull" xml:space="preserve">
+    <value>Username can't be null.</value>
+  </data>
   <data name="ExceptionUserNotExist" xml:space="preserve">
     <value>Requested user does not exist.</value>
+  </data>
+  <data name="LogChangePassowrd" xml:space="preserve">
+    <value>User with username = {0}, id ={1} changed password.</value>
+  </data>
+  <data name="LogDeleteUser" xml:space="preserve">
+    <value>A user is deleted with username = {0}, id = {1}.</value>
+  </data>
+  <data name="LogUserCreated" xml:space="preserve">
+    <value>A new user is created with username = {0}, id = {1}.</value>
+  </data>
+  <data name="LogUserModified" xml:space="preserve">
+    <value>A user is modified with username = {0}, id = {1}.</value>
   </data>
 </root>

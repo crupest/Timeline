@@ -55,7 +55,7 @@ namespace Timeline.Controllers
             long id;
             try
             {
-                id = await _userService.GetUserIdByUsername(username);
+                id = await _userService.GetUserIdByUsernameAsync(username);
             }
             catch (UserNotExistException e)
             {
@@ -91,7 +91,7 @@ namespace Timeline.Controllers
             long id;
             try
             {
-                id = await _userService.GetUserIdByUsername(username);
+                id = await _userService.GetUserIdByUsernameAsync(username);
             }
             catch (UserNotExistException e)
             {
@@ -150,7 +150,7 @@ namespace Timeline.Controllers
             long id;
             try
             {
-                id = await _userService.GetUserIdByUsername(username);
+                id = await _userService.GetUserIdByUsernameAsync(username);
             }
             catch (UserNotExistException e)
             {

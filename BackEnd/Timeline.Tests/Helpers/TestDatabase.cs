@@ -26,12 +26,12 @@ namespace Timeline.Tests.Helpers
 
             var userService = new UserService(NullLogger<UserService>.Instance, context, new PasswordService(), new Clock());
 
-            await userService.ModifyUser(
-                await userService.GetUserIdByUsername("administrator"),
+            await userService.ModifyUserAsync(
+                await userService.GetUserIdByUsernameAsync("administrator"),
                 new ModifyUserParams() { Username = "admin", Password = "adminpw", Nickname = "administrator" });
 
-            var user = await userService.CreateUser("user", "userpw");
-            await userService.ModifyUser(user.Id, new ModifyUserParams() { Nickname = "imuser" });
+            var user = await userService.CreateUserAsync(new CreateUserParams("user", "userpw"));
+            await userService.ModifyUserAsync(user.Id, new ModifyUserParams() { Nickname = "imuser" });
         }
 
         public async Task DisposeAsync()

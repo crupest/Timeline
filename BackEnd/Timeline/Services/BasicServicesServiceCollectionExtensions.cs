@@ -13,6 +13,7 @@ namespace Timeline.Services
         {
             services.TryAddSingleton<IPathProvider, PathProvider>();
             services.TryAddTransient<IClock, Clock>();
+            return services;
         }
     }
 }

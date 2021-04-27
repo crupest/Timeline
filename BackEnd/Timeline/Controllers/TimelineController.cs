@@ -101,7 +101,7 @@ namespace Timeline.Controllers
             {
                 try
                 {
-                    var relatedUserId = await _userService.GetUserIdByUsername(relate);
+                    var relatedUserId = await _userService.GetUserIdByUsernameAsync(relate);
 
                     var relationType = relateType is null ? TimelineUserRelationshipType.Default : Enum.Parse<TimelineUserRelationshipType>(relateType, true);
 
@@ -190,7 +190,7 @@ namespace Timeline.Controllers
 
             try
             {
-                var userId = await _userService.GetUserIdByUsername(member);
+                var userId = await _userService.GetUserIdByUsernameAsync(member);
                 var create = await _service.AddMember(timelineId, userId);
                 return Ok(CommonPutResponse.Create(create));
             }
@@ -222,7 +222,7 @@ namespace Timeline.Controllers
 
             try
             {
-                var userId = await _userService.GetUserIdByUsername(member);
+                var userId = await _userService.GetUserIdByUsernameAsync(member);
                 var delete = await _service.RemoveMember(timelineId, userId);
                 return Ok(CommonDeleteResponse.Create(delete));
             }

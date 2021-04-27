@@ -7,37 +7,6 @@ using Timeline.Models.Validation;
 
 namespace Timeline.Services.User
 {
-    /// <summary>
-    /// This service provide some basic user features, which should be used internally for other services.
-    /// </summary>
-    public interface IBasicUserService
-    {
-        /// <summary>
-        /// Check if a user exists.
-        /// </summary>
-        /// <param name="id">The id of the user.</param>
-        /// <returns>True if exists. Otherwise false.</returns>
-        Task<bool> CheckUserExistence(long id);
-
-        /// <summary>
-        /// Get the user id of given username.
-        /// </summary>
-        /// <param name="username">Username of the user.</param>
-        /// <returns>The id of the user.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
-        Task<long> GetUserIdByUsername(string username);
-
-        /// <summary>
-        /// Get the username modified time of a user.
-        /// </summary>
-        /// <param name="userId">User id.</param>
-        /// <returns>The time.</returns>
-        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
-        Task<DateTime> GetUsernameLastModifiedTime(long userId);
-    }
-
     public class BasicUserService : IBasicUserService
     {
         private readonly DatabaseContext _database;
@@ -49,12 +18,12 @@ namespace Timeline.Services.User
             _database = database;
         }
 
-        public async Task<bool> CheckUserExistence(long id)
+        public async Task<bool> CheckUserExistenceAsync(long id)
         {
             return await _database.Users.AnyAsync(u => u.Id == id);
         }
 
-        public async Task<long> GetUserIdByUsername(string username)
+        public async Task<long> GetUserIdByUsernameAsync(string username)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -70,7 +39,7 @@ namespace Timeline.Services.User
             return entity.Id;
         }
 
-        public async Task<DateTime> GetUsernameLastModifiedTime(long userId)
+        public async Task<DateTime> GetUsernameLastModifiedTimeAsync(long userId)
         {
             var entity = await _database.Users.Where(u => u.Id == userId).Select(u => new { u.UsernameChangeTime }).SingleOrDefaultAsync();
 
@@ -85,7 +54,7 @@ namespace Timeline.Services.User
     {
         public static async Task ThrowIfUserNotExist(this IBasicUserService service, long userId)
         {
-            if (!await service.CheckUserExistence(userId))
+            if (!await service.CheckUserExistenceAsync(userId))
             {
                 throw new UserNotExistException(userId);
             }

@@ -70,6 +70,24 @@ namespace Timeline.Services.User {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t change root user&apos;s permission..
+        /// </summary>
+        internal static string ExceptionChangeRootUserPermission {
+            get {
+                return ResourceManager.GetString("ExceptionChangeRootUserPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t delete root user..
+        /// </summary>
+        internal static string ExceptionDeleteRootUser {
+            get {
+                return ResourceManager.GetString("ExceptionDeleteRootUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The hashes password is of bad format. It might not be created by server. Reason: {0}.
         /// </summary>
         internal static string ExceptionHashedPasswordBadFormat {
@@ -133,6 +151,15 @@ namespace Timeline.Services.User {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t perform such operation on root user..
+        /// </summary>
+        internal static string ExceptionInvalidOperationOnRootUser {
+            get {
+                return ResourceManager.GetString("ExceptionInvalidOperationOnRootUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Nickname is of bad format. {0}.
         /// </summary>
         internal static string ExceptionNicknameBadFormat {
@@ -147,6 +174,15 @@ namespace Timeline.Services.User {
         internal static string ExceptionPasswordEmpty {
             get {
                 return ResourceManager.GetString("ExceptionPasswordEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password can&apos;t be null..
+        /// </summary>
+        internal static string ExceptionPasswordNull {
+            get {
+                return ResourceManager.GetString("ExceptionPasswordNull", resourceCulture);
             }
         }
         
@@ -169,11 +205,56 @@ namespace Timeline.Services.User {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Username can&apos;t be null..
+        /// </summary>
+        internal static string ExceptionUsernameNull {
+            get {
+                return ResourceManager.GetString("ExceptionUsernameNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Requested user does not exist..
         /// </summary>
         internal static string ExceptionUserNotExist {
             get {
                 return ResourceManager.GetString("ExceptionUserNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User with username = {0}, id ={1} changed password..
+        /// </summary>
+        internal static string LogChangePassowrd {
+            get {
+                return ResourceManager.GetString("LogChangePassowrd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A user is deleted with username = {0}, id = {1}..
+        /// </summary>
+        internal static string LogDeleteUser {
+            get {
+                return ResourceManager.GetString("LogDeleteUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new user is created with username = {0}, id = {1}..
+        /// </summary>
+        internal static string LogUserCreated {
+            get {
+                return ResourceManager.GetString("LogUserCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A user is modified with username = {0}, id = {1}..
+        /// </summary>
+        internal static string LogUserModified {
+            get {
+                return ResourceManager.GetString("LogUserModified", resourceCulture);
             }
         }
     }

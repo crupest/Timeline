@@ -190,7 +190,7 @@ namespace Timeline.Services.Timeline
 
         private async Task CheckUserExistence(long userId)
         {
-            if (!await _basicUserService.CheckUserExistence(userId))
+            if (!await _basicUserService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
         }
 

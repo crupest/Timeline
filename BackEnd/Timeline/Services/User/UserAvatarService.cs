@@ -144,7 +144,7 @@ namespace Timeline.Services.User
 
         public async Task<ICacheableDataDigest> GetAvatarDigest(long userId)
         {
-            var usernameChangeTime = await _basicUserService.GetUsernameLastModifiedTime(userId);
+            var usernameChangeTime = await _basicUserService.GetUsernameLastModifiedTimeAsync(userId);
 
             var entity = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.DataTag, a.LastModified }).SingleOrDefaultAsync();
 

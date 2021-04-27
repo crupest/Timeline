@@ -26,18 +26,16 @@ namespace Timeline.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
-        private readonly IUserCredentialService _userCredentialService;
         private readonly IUserPermissionService _userPermissionService;
         private readonly IUserDeleteService _userDeleteService;
         private readonly UserMapper _userMapper;
         private readonly IMapper _mapper;
 
         /// <summary></summary>
-        public UserController(ILogger<UserController> logger, IUserService userService, IUserCredentialService userCredentialService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, UserMapper userMapper, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, UserMapper userMapper, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
-            _userCredentialService = userCredentialService;
             _userPermissionService = userPermissionService;
             _userDeleteService = userDeleteService;
             _userMapper = userMapper;
@@ -54,7 +52,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<HttpUser>>> List()
         {
-            var users = await _userService.GetUsers();
+            var users = await _userService.GetUsersAsync();
             var result = await _userMapper.MapToHttp(users, Url);
             return result;
         }
@@ -72,7 +70,8 @@ namespace Timeline.Controllers
         {
             try
             {
-                var user = await _userService.CreateUser(body.Username, body.Password);
+                var user = await _userService.CreateUserAsync(
+                    new CreateUserParams(body.Username, body.Password) { Nickname = body.Nickname });
                 return await _userMapper.MapToHttp(user, Url);
             }
             catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
@@ -93,8 +92,8 @@ namespace Timeline.Controllers
         {
             try
             {
-                var id = await _userService.GetUserIdByUsername(username);
-                var user = await _userService.GetUser(id);
+                var id = await _userService.GetUserIdByUsernameAsync(username);
+                var user = await _userService.GetUserAsync(id);
                 return await _userMapper.MapToHttp(user, Url);
             }
             catch (UserNotExistException e)
@@ -122,8 +121,8 @@ namespace Timeline.Controllers
             {
                 try
                 {
-                    var id = await _userService.GetUserIdByUsername(username);
-                    var user = await _userService.ModifyUser(id, _mapper.Map<ModifyUserParams>(body));
+                    var id = await _userService.GetUserIdByUsernameAsync(username);
+                    var user = await _userService.ModifyUserAsync(id, _mapper.Map<ModifyUserParams>(body));
                     return await _userMapper.MapToHttp(user, Url);
                 }
                 catch (UserNotExistException e)
@@ -150,7 +149,7 @@ namespace Timeline.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden,
                         ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Password));
 
-                var user = await _userService.ModifyUser(this.GetUserId(), _mapper.Map<ModifyUserParams>(body));
+                var user = await _userService.ModifyUserAsync(this.GetUserId(), _mapper.Map<ModifyUserParams>(body));
                 return await _userMapper.MapToHttp(user, Url);
             }
         }
@@ -192,7 +191,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                await _userCredentialService.ChangePassword(this.GetUserId(), request.OldPassword, request.NewPassword);
+                await _userService.ChangePassword(this.GetUserId(), request.OldPassword, request.NewPassword);
                 return Ok();
             }
             catch (BadPasswordException e)
@@ -214,7 +213,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var id = await _userService.GetUserIdByUsername(username);
+                var id = await _userService.GetUserIdByUsernameAsync(username);
                 await _userPermissionService.AddPermissionToUserAsync(id, permission);
                 return Ok();
             }
@@ -238,7 +237,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var id = await _userService.GetUserIdByUsername(username);
+                var id = await _userService.GetUserIdByUsernameAsync(username);
                 await _userPermissionService.RemovePermissionFromUserAsync(id, permission);
                 return Ok();
             }

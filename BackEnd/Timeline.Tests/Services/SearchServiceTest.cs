@@ -35,10 +35,10 @@ namespace Timeline.Tests.Services
         [Fact]
         public async Task UserSearch_Should_Work()
         {
-            await UserService.CreateUser("hahaha", "p");
-            var u2 = await UserService.CreateUser("bababa", "p");
-            await UserService.ModifyUser(u2.Id, new ModifyUserParams { Nickname = "hahaha" });
-            await UserService.CreateUser("bbbbbb", "p");
+            await UserService.CreateUserAsync(new CreateUserParams("hahaha", "p"));
+            var u2 = await UserService.CreateUserAsync(new CreateUserParams("bababa", "p"));
+            await UserService.ModifyUserAsync(u2.Id, new ModifyUserParams { Nickname = "hahaha" });
+            await UserService.CreateUserAsync(new CreateUserParams("bbbbbb", "p"));
 
             var searchResult = await _service.SearchUser("hah");
             searchResult.Items.Should().HaveCount(2);
