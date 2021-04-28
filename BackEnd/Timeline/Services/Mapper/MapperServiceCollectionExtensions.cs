@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Timeline.Entities;
+using Timeline.Models.Http;
 
 namespace Timeline.Services.Mapper
 {
@@ -6,8 +8,11 @@ namespace Timeline.Services.Mapper
     {
         public static void AddMappers(this IServiceCollection services)
         {
-            services.AddScoped<UserMapper, UserMapper>();
-            services.AddScoped<TimelineMapper, TimelineMapper>();
+            services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddScoped<IMapper<UserEntity, HttpUser>, UserMapper>();
+            services.AddScoped<IMapper<TimelineEntity, HttpTimeline>, TimelineMapper>();
+            services.AddScoped<IMapper<TimelinePostEntity, HttpTimelinePost>, TimelineMapper>();
+            services.AddScoped<IGenericMapper, GenericMapper>();
         }
     }
 }

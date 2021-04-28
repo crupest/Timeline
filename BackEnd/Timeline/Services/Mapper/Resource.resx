@@ -117,37 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ExceptionUserIdentifierClaimBadFormat" xml:space="preserve">
-    <value>User identitifier claim is of bad format.</value>
-  </data>
-  <data name="LogTokenFoundInHeader" xml:space="preserve">
-    <value>Token is found in authorization header. Token is {0} .</value>
-  </data>
-  <data name="LogTokenFoundInQuery" xml:space="preserve">
-    <value>Token is found in query param with key "{0}". Token is {1} .</value>
-  </data>
-  <data name="LogTokenNotFound" xml:space="preserve">
-    <value>No jwt token is found.</value>
-  </data>
-  <data name="LogTokenValidationFail" xml:space="preserve">
-    <value>A jwt token validation failed. Error reason: {0}</value>
-  </data>
-  <data name="MessageNoToken" xml:space="preserve">
-    <value>You must use a token to authenticate to access this resource.</value>
-  </data>
-  <data name="MessageTokenBadFormat" xml:space="preserve">
-    <value>The token is of bad format. It might not be created by this server.</value>
-  </data>
-  <data name="MessageTokenTimeExpired" xml:space="preserve">
-    <value>The token is out of date and expired. Please create a new one.</value>
-  </data>
-  <data name="MessageTokenUnknownError" xml:space="preserve">
-    <value>A unknown error occured when verify token.</value>
-  </data>
-  <data name="MessageTokenUserNotExist" xml:space="preserve">
-    <value>The owner of the token does not exist. It might have been deleted.</value>
-  </data>
-  <data name="MessageTokenVersionExpired" xml:space="preserve">
-    <value>The token is of old version and expired. Please create a new one.</value>
+  <data name="ExceptionUnsupportedMap" xml:space="preserve">
+    <value>This map is unsupported by this map provider.</value>
   </data>
 </root>

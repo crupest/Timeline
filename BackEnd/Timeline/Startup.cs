@@ -86,8 +86,6 @@ namespace Timeline
             services.AddAuthorization();
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
-            services.AddAutoMapper(GetType().Assembly);
-            services.AddMappers();
 
             services.AddDbContext<DatabaseContext>((services, options) =>
             {
@@ -103,6 +101,8 @@ namespace Timeline
             services.AddTokenServices(Configuration);
 
             services.AddTimelineServices();
+
+            services.AddMappers();
 
             services.AddScoped<IHighlightTimelineService, HighlightTimelineService>();
             services.AddScoped<IBookmarkTimelineService, BookmarkTimelineService>();

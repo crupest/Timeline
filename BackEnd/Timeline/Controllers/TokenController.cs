@@ -25,15 +25,15 @@ namespace Timeline.Controllers
     {
         private readonly IUserTokenManager _userTokenManager;
         private readonly ILogger<TokenController> _logger;
-        private readonly UserMapper _userMapper;
+        private readonly IGenericMapper _mapper;
         private readonly IClock _clock;
 
         /// <summary></summary>
-        public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, UserMapper userMapper, IClock clock)
+        public TokenController(IUserTokenManager userTokenManager, ILogger<TokenController> logger, IGenericMapper mapper, IClock clock)
         {
             _userTokenManager = userTokenManager;
             _logger = logger;
-            _userMapper = userMapper;
+            _mapper = mapper;
             _clock = clock;
         }
 
@@ -72,7 +72,7 @@ namespace Timeline.Controllers
                 return new HttpCreateTokenResponse
                 {
                     Token = result.Token,
-                    User = await _userMapper.MapToHttp(result.User, Url)
+                    User = await _mapper.MapAsync<HttpUser>(result.User, Url, User)
                 };
             }
             catch (UserNotExistException e)
@@ -113,7 +113,7 @@ namespace Timeline.Controllers
                     ("Username", result.Username), ("Token", request.Token)));
                 return new HttpVerifyTokenResponse
                 {
-                    User = await _userMapper.MapToHttp(result, Url)
+                    User = await _mapper.MapAsync<HttpUser>(result, Url, User)
                 };
             }
             catch (UserTokenTimeExpiredException e)

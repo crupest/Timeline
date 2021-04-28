@@ -21,18 +21,18 @@ namespace Timeline.Controllers
     {
         private readonly IHighlightTimelineService _service;
         private readonly ITimelineService _timelineService;
-        private readonly TimelineMapper _timelineMapper;
+        private readonly IGenericMapper _mapper;
 
-        public HighlightTimelineController(IHighlightTimelineService service, ITimelineService timelineService, TimelineMapper timelineMapper)
+        public HighlightTimelineController(IHighlightTimelineService service, ITimelineService timelineService, IGenericMapper mapper)
         {
             _service = service;
             _timelineService = timelineService;
-            _timelineMapper = timelineMapper;
+            _mapper = mapper;
         }
 
         private Task<List<HttpTimeline>> Map(List<TimelineEntity> timelines)
         {
-            return _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId(), this.UserHasPermission(UserPermission.AllTimelineManagement));
+            return _mapper.MapListAsync<HttpTimeline>(timelines, Url, User);
         }
 
         /// <summary>

@@ -2,25 +2,29 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Timeline.Auth;
 using Timeline.Controllers;
 using Timeline.Entities;
 using Timeline.Models.Http;
 using Timeline.Services.Api;
 using Timeline.Services.Timeline;
+using Timeline.Services.User;
 
 namespace Timeline.Services.Mapper
 {
-    public class TimelineMapper
+    public class TimelineMapper : IMapper<TimelineEntity, HttpTimeline>,
+        IMapper<TimelinePostEntity, HttpTimelinePost>
     {
         private readonly DatabaseContext _database;
-        private readonly UserMapper _userMapper;
+        private readonly IMapper<UserEntity, HttpUser> _userMapper;
         private readonly IHighlightTimelineService _highlightTimelineService;
         private readonly IBookmarkTimelineService _bookmarkTimelineService;
         private readonly ITimelineService _timelineService;
         private readonly ITimelinePostService _timelinePostService;
 
-        public TimelineMapper(DatabaseContext database, UserMapper userMapper, IHighlightTimelineService highlightTimelineService, IBookmarkTimelineService bookmarkTimelineService, ITimelineService timelineService, ITimelinePostService timelinePostService)
+        public TimelineMapper(DatabaseContext database, IMapper<UserEntity, HttpUser> userMapper, IHighlightTimelineService highlightTimelineService, IBookmarkTimelineService bookmarkTimelineService, ITimelineService timelineService, ITimelinePostService timelinePostService)
         {
             _database = database;
             _userMapper = userMapper;
@@ -30,20 +34,27 @@ namespace Timeline.Services.Mapper
             _timelinePostService = timelinePostService;
         }
 
-        public async Task<HttpTimeline> MapToHttp(TimelineEntity entity, IUrlHelper urlHelper, long? userId, bool isAdministrator)
+        private string CalculateTimelineName(TimelineEntity entity)
         {
+            return entity.Name is null ? "@" + entity.Owner.Username : entity.Name;
+        }
+
+        public async Task<HttpTimeline> MapAsync(TimelineEntity entity, IUrlHelper urlHelper, ClaimsPrincipal? user)
+        {
+            var userId = user.GetUserId();
+
             await _database.Entry(entity).Reference(e => e.Owner).LoadAsync();
             await _database.Entry(entity).Collection(e => e.Members).Query().Include(m => m.User).LoadAsync();
 
-            var timelineName = entity.Name is null ? "@" + entity.Owner.Username : entity.Name;
+            var timelineName = CalculateTimelineName(entity);
 
             bool manageable;
 
-            if (userId is null)
+            if (user is null || userId is null)
             {
                 manageable = false;
             }
-            else if (isAdministrator)
+            else if (user.HasPermission(UserPermission.AllTimelineManagement))
             {
                 manageable = true;
             }
@@ -53,7 +64,7 @@ namespace Timeline.Services.Mapper
             }
 
             bool postable;
-            if (userId is null)
+            if (user is null || userId is null)
             {
                 postable = false;
             }
@@ -68,9 +79,9 @@ namespace Timeline.Services.Mapper
                 name: timelineName,
                 nameLastModifed: entity.NameLastModified,
                 description: entity.Description ?? "",
-                owner: await _userMapper.MapToHttp(entity.Owner, urlHelper),
+                owner: await _userMapper.MapAsync(entity.Owner, urlHelper, user),
                 visibility: entity.Visibility,
-                members: await _userMapper.MapToHttp(entity.Members.Select(m => m.User).ToList(), urlHelper),
+                members: await _userMapper.MapListAsync(entity.Members.Select(m => m.User).ToList(), urlHelper, user),
                 color: entity.Color,
                 createTime: entity.CreateTime,
                 lastModified: entity.LastModified,
@@ -85,39 +96,31 @@ namespace Timeline.Services.Mapper
             );
         }
 
-        public async Task<List<HttpTimeline>> MapToHttp(List<TimelineEntity> entities, IUrlHelper urlHelper, long? userId, bool isAdministrator)
+
+        public async Task<HttpTimelinePost> MapAsync(TimelinePostEntity entity, IUrlHelper urlHelper, ClaimsPrincipal? user)
         {
-            var result = new List<HttpTimeline>();
-            foreach (var entity in entities)
-            {
-                result.Add(await MapToHttp(entity, urlHelper, userId, isAdministrator));
-            }
-            return result;
-        }
+            var userId = user.GetUserId();
 
-
-        public async Task<HttpTimelinePost> MapToHttp(TimelinePostEntity entity, string timelineName, IUrlHelper urlHelper, long? userId, bool isAdministrator)
-        {
-            _ = timelineName;
-
+            await _database.Entry(entity).Reference(e => e.Timeline).LoadAsync();
             await _database.Entry(entity).Collection(p => p.DataList).LoadAsync();
             await _database.Entry(entity).Reference(e => e.Author).LoadAsync();
+            await _database.Entry(entity.Timeline).Reference(e => e.Owner).LoadAsync();
 
             List<HttpTimelinePostDataDigest> dataDigestList = entity.DataList.OrderBy(d => d.Index).Select(d => new HttpTimelinePostDataDigest(d.Kind, $"\"{d.DataTag}\"", d.LastUpdated)).ToList();
 
             HttpUser? author = null;
             if (entity.Author is not null)
             {
-                author = await _userMapper.MapToHttp(entity.Author, urlHelper);
+                author = await _userMapper.MapAsync(entity.Author, urlHelper, user);
             }
 
             bool editable;
 
-            if (userId is null)
+            if (user is null || userId is null)
             {
                 editable = false;
             }
-            else if (isAdministrator)
+            else if (user.HasPermission(UserPermission.AllTimelineManagement))
             {
                 editable = true;
             }
@@ -125,7 +128,6 @@ namespace Timeline.Services.Mapper
             {
                 editable = await _timelinePostService.HasPostModifyPermissionAsync(entity.TimelineId, entity.LocalId, userId.Value);
             }
-
 
             return new HttpTimelinePost(
                     id: entity.LocalId,
@@ -135,24 +137,9 @@ namespace Timeline.Services.Mapper
                     color: entity.Color,
                     deleted: entity.Deleted,
                     lastUpdated: entity.LastUpdated,
-                    timelineName: timelineName,
+                    timelineName: CalculateTimelineName(entity.Timeline),
                     editable: editable
                 );
-        }
-
-        public async Task<List<HttpTimelinePost>> MapToHttp(List<TimelinePostEntity> entities, string timelineName, IUrlHelper urlHelper, long? userId, bool isAdministrator)
-        {
-            var result = new List<HttpTimelinePost>();
-            foreach (var entity in entities)
-            {
-                result.Add(await MapToHttp(entity, timelineName, urlHelper, userId, isAdministrator));
-            }
-            return result;
-        }
-
-        internal Task MapToHttp(TimelinePostEntity post, string timeline, IUrlHelper url)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
