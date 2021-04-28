@@ -62,7 +62,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
                 var create = await _service.AddHighlightTimeline(timelineId, this.GetUserId());
                 return CommonPutResponse.Create(create);
             }
@@ -86,7 +86,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
                 var delete = await _service.RemoveHighlightTimeline(timelineId, this.GetUserId());
                 return CommonDeleteResponse.Create(delete);
             }
@@ -109,7 +109,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var timelineId = await _timelineService.GetTimelineIdByName(body.Timeline);
+                var timelineId = await _timelineService.GetTimelineIdByNameAsync(body.Timeline);
                 await _service.MoveHighlightTimeline(timelineId, body.NewPosition!.Value);
                 return Ok();
             }

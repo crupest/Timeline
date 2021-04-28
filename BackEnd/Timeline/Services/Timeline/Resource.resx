@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ExceptionGeneralTimelineNameBadFormat" xml:space="preserve">
+    <value>This timeline name is neither a valid personal timeline name nor a valid ordinary timeline name. {0}</value>
+  </data>
   <data name="ExceptionTimelineAlreadyExist" xml:space="preserve">
     <value>Timeline with given constraints already exist.</value>
   </data>
@@ -134,5 +137,8 @@
   </data>
   <data name="ExceptionTimelinePostNoExistReasonNotCreated" xml:space="preserve">
     <value>it has not been created</value>
+  </data>
+  <data name="LogPersonalTimelineAutoCreate" xml:space="preserve">
+    <value>A personal timeline for user with username={0} is created automatically.</value>
   </data>
 </root>

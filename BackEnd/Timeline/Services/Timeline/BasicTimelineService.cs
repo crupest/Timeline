@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,39 +11,10 @@ using Timeline.Services.User;
 
 namespace Timeline.Services.Timeline
 {
-    /// <summary>
-    /// This service provide some basic timeline functions, which should be used internally for other services.
-    /// </summary>
-    public interface IBasicTimelineService
-    {
-        /// <summary>
-        /// Check whether a timeline with given id exists without getting full info.
-        /// </summary>
-        /// <param name="id">The timeline id.</param>
-        /// <returns>True if exist. Otherwise false.</returns>
-        Task<bool> CheckExistence(long id);
-
-        /// <summary>
-        /// Get the timeline id by name.
-        /// </summary>
-        /// <param name="timelineName">Timeline name.</param>
-        /// <returns>Id of the timeline.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
-        /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
-        /// <exception cref="TimelineNotExistException">
-        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
-        /// If it is a personal timeline, then inner exception is <see cref="UserNotExistException"/>.
-        /// </exception>
-        /// <remarks>
-        /// If name is of personal timeline and the timeline does not exist, it will be created if user exists.
-        /// If the user does not exist,  <see cref="TimelineNotExistException"/> will be thrown with <see cref="UserNotExistException"/> as inner exception.
-        ///</remarks>
-        Task<long> GetTimelineIdByName(string timelineName);
-    }
-
-
     public class BasicTimelineService : IBasicTimelineService
     {
+        private readonly ILogger<BasicTimelineService> _logger;
+
         private readonly DatabaseContext _database;
 
         private readonly IBasicUserService _basicUserService;
@@ -50,8 +22,9 @@ namespace Timeline.Services.Timeline
 
         private readonly GeneralTimelineNameValidator _generalTimelineNameValidator = new GeneralTimelineNameValidator();
 
-        public BasicTimelineService(DatabaseContext database, IBasicUserService basicUserService, IClock clock)
+        public BasicTimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IBasicUserService basicUserService, IClock clock)
         {
+            _logger = loggerFactory.CreateLogger<BasicTimelineService>();
             _database = database;
             _basicUserService = basicUserService;
             _clock = clock;
@@ -74,27 +47,33 @@ namespace Timeline.Services.Timeline
             };
         }
 
-        public async Task<bool> CheckExistence(long id)
+        protected void CheckGeneralTimelineName(string timelineName, string? paramName)
+        {
+            if (!_generalTimelineNameValidator.Validate(timelineName, out var message))
+                throw new ArgumentException(string.Format(Resource.ExceptionGeneralTimelineNameBadFormat, message), paramName);
+        }
+
+        public async Task<bool> CheckTimelineExistenceAsync(long id)
         {
             return await _database.Timelines.AnyAsync(t => t.Id == id);
         }
 
-        public async Task<long> GetTimelineIdByName(string timelineName)
+        public async Task<long> GetTimelineIdByNameAsync(string timelineName)
         {
             if (timelineName == null)
                 throw new ArgumentNullException(nameof(timelineName));
 
-            if (!_generalTimelineNameValidator.Validate(timelineName, out var message))
-                throw new ArgumentException(message);
+            CheckGeneralTimelineName(timelineName, nameof(timelineName));
 
-            timelineName = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+            var name = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
 
             if (isPersonal)
             {
+                var username = name;
                 long userId;
                 try
                 {
-                    userId = await _basicUserService.GetUserIdByUsernameAsync(timelineName);
+                    userId = await _basicUserService.GetUserIdByUsernameAsync(username);
                 }
                 catch (UserNotExistException e)
                 {
@@ -112,6 +91,8 @@ namespace Timeline.Services.Timeline
                     var newTimelineEntity = CreateNewTimelineEntity(null, userId);
                     _database.Timelines.Add(newTimelineEntity);
                     await _database.SaveChangesAsync();
+
+                    _logger.LogInformation(Resource.LogPersonalTimelineAutoCreate, username);
 
                     return newTimelineEntity.Id;
                 }

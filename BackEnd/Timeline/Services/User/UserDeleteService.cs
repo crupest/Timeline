@@ -44,7 +44,7 @@ namespace Timeline.Services.User
             if (user.Id == 1)
                 throw new InvalidOperationOnRootUserException(Resource.ExceptionDeleteRootUser);
 
-            await _timelinePostService.DeleteAllPostsOfUser(user.Id);
+            await _timelinePostService.DeleteAllPostsOfUserAsync(user.Id);
 
             _databaseContext.Users.Remove(user);
 

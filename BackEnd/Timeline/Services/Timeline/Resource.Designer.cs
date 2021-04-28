@@ -61,6 +61,15 @@ namespace Timeline.Services.Timeline {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This timeline name is neither a valid personal timeline name nor a valid ordinary timeline name. {0}.
+        /// </summary>
+        internal static string ExceptionGeneralTimelineNameBadFormat {
+            get {
+                return ResourceManager.GetString("ExceptionGeneralTimelineNameBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Timeline with given constraints already exist..
         /// </summary>
         internal static string ExceptionTimelineAlreadyExist {
@@ -111,6 +120,15 @@ namespace Timeline.Services.Timeline {
         internal static string ExceptionTimelinePostNoExistReasonNotCreated {
             get {
                 return ResourceManager.GetString("ExceptionTimelinePostNoExistReasonNotCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A personal timeline for user with username={0} is created automatically..
+        /// </summary>
+        internal static string LogPersonalTimelineAutoCreate {
+            get {
+                return ResourceManager.GetString("LogPersonalTimelineAutoCreate", resourceCulture);
             }
         }
     }

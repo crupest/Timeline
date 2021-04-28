@@ -49,7 +49,7 @@ namespace Timeline.Services.Mapper
             }
             else
             {
-                manageable = await _timelineService.HasManagePermission(entity.Id, userId.Value);
+                manageable = await _timelineService.HasManagePermissionAsync(entity.Id, userId.Value);
             }
 
             bool postable;
@@ -59,7 +59,7 @@ namespace Timeline.Services.Mapper
             }
             else
             {
-                postable = await _timelineService.IsMemberOf(entity.Id, userId.Value);
+                postable = await _timelineService.IsMemberOfAsync(entity.Id, userId.Value);
             }
 
             return new HttpTimeline(
@@ -123,7 +123,7 @@ namespace Timeline.Services.Mapper
             }
             else
             {
-                editable = await _timelinePostService.HasPostModifyPermission(entity.TimelineId, entity.LocalId, userId.Value);
+                editable = await _timelinePostService.HasPostModifyPermissionAsync(entity.TimelineId, entity.LocalId, userId.Value);
             }
 
 

@@ -63,7 +63,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
                 var create = await _service.AddBookmark(this.GetUserId(), timelineId);
                 return CommonPutResponse.Create(create);
             }
@@ -86,7 +86,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
                 var delete = await _service.RemoveBookmark(this.GetUserId(), timelineId);
                 return CommonDeleteResponse.Create(delete);
             }
@@ -109,7 +109,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var timelineId = await _timelineService.GetTimelineIdByName(request.Timeline);
+                var timelineId = await _timelineService.GetTimelineIdByNameAsync(request.Timeline);
                 await _service.MoveBookmark(this.GetUserId(), timelineId, request.NewPosition!.Value);
                 return Ok();
             }

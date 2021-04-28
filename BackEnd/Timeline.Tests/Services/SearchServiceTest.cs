@@ -19,10 +19,10 @@ namespace Timeline.Tests.Services
         [Fact]
         public async Task TimelineSearch_Should_Work()
         {
-            await TimelineService.CreateTimeline("hahaha", UserId);
-            var t2 = await TimelineService.CreateTimeline("bababa", UserId);
-            await TimelineService.ChangeProperty(t2.Id, new TimelineChangePropertyParams { Title = "hahaha" });
-            await TimelineService.CreateTimeline("bbbbbb", UserId);
+            await TimelineService.CreateTimelineAsync("hahaha", UserId);
+            var t2 = await TimelineService.CreateTimelineAsync("bababa", UserId);
+            await TimelineService.ChangePropertyAsync(t2.Id, new TimelineChangePropertyParams { Title = "hahaha" });
+            await TimelineService.CreateTimelineAsync("bbbbbb", UserId);
 
             var searchResult = await _service.SearchTimeline("hah");
             searchResult.Items.Should().HaveCount(2);

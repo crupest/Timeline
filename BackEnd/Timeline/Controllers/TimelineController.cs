@@ -113,7 +113,7 @@ namespace Timeline.Controllers
                 }
             }
 
-            var timelines = await _service.GetTimelines(relationship, visibilityFilter);
+            var timelines = await _service.GetTimelinesAsync(relationship, visibilityFilter);
             var result = await Map(timelines);
             return result;
         }
@@ -128,8 +128,8 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<HttpTimeline>> TimelineGet([FromRoute][GeneralTimelineName] string timeline)
         {
-            var timelineId = await _service.GetTimelineIdByName(timeline);
-            var t = await _service.GetTimeline(timelineId);
+            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
+            var t = await _service.GetTimelineAsync(timelineId);
             var result = await Map(t);
             return result;
         }
@@ -148,17 +148,17 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<HttpTimeline>> TimelinePatch([FromRoute][GeneralTimelineName] string timeline, [FromBody] HttpTimelinePatchRequest body)
         {
-            var timelineId = await _service.GetTimelineIdByName(timeline);
+            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _service.HasManagePermission(timelineId, this.GetUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _service.HasManagePermissionAsync(timelineId, this.GetUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
             try
             {
-                await _service.ChangeProperty(timelineId, _mapper.Map<TimelineChangePropertyParams>(body));
-                var t = await _service.GetTimeline(timelineId);
+                await _service.ChangePropertyAsync(timelineId, _mapper.Map<TimelineChangePropertyParams>(body));
+                var t = await _service.GetTimelineAsync(timelineId);
                 var result = await Map(t);
                 return result;
             }
@@ -181,9 +181,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<CommonPutResponse>> TimelineMemberPut([FromRoute][GeneralTimelineName] string timeline, [FromRoute][Username] string member)
         {
-            var timelineId = await _service.GetTimelineIdByName(timeline);
+            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(timelineId, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -191,7 +191,7 @@ namespace Timeline.Controllers
             try
             {
                 var userId = await _userService.GetUserIdByUsernameAsync(member);
-                var create = await _service.AddMember(timelineId, userId);
+                var create = await _service.AddMemberAsync(timelineId, userId);
                 return Ok(CommonPutResponse.Create(create));
             }
             catch (UserNotExistException)
@@ -213,9 +213,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> TimelineMemberDelete([FromRoute][GeneralTimelineName] string timeline, [FromRoute][Username] string member)
         {
-            var timelineId = await _service.GetTimelineIdByName(timeline);
+            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(timelineId, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -223,7 +223,7 @@ namespace Timeline.Controllers
             try
             {
                 var userId = await _userService.GetUserIdByUsernameAsync(member);
-                var delete = await _service.RemoveMember(timelineId, userId);
+                var delete = await _service.RemoveMemberAsync(timelineId, userId);
                 return Ok(CommonDeleteResponse.Create(delete));
             }
             catch (UserNotExistException)
@@ -248,7 +248,7 @@ namespace Timeline.Controllers
 
             try
             {
-                var timeline = await _service.CreateTimeline(body.Name, userId);
+                var timeline = await _service.CreateTimelineAsync(body.Name, userId);
                 var result = await Map(timeline);
                 return result;
             }
@@ -271,16 +271,16 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> TimelineDelete([FromRoute][TimelineName] string timeline)
         {
-            var timelineId = await _service.GetTimelineIdByName(timeline);
+            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermission(timelineId, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
             try
             {
-                await _service.DeleteTimeline(timelineId);
+                await _service.DeleteTimelineAsync(timelineId);
                 return Ok();
             }
             catch (TimelineNotExistException)

@@ -71,14 +71,14 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<HttpTimelinePost>>> List([FromRoute][GeneralTimelineName] string timeline, [FromQuery] DateTime? modifiedSince, [FromQuery] bool? includeDeleted)
         {
-            var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermission(timelineId, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var posts = await _postService.GetPosts(timelineId, modifiedSince, includeDeleted ?? false);
+            var posts = await _postService.GetPostsAsync(timelineId, modifiedSince, includeDeleted ?? false);
 
             var result = await Map(posts, timeline);
             return result;
@@ -96,14 +96,14 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<HttpTimelinePost>> Get([FromRoute][GeneralTimelineName] string timeline, [FromRoute(Name = "post")] long postId)
         {
-            var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermission(timelineId, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var post = await _postService.GetPost(timelineId, postId);
+            var post = await _postService.GetPostAsync(timelineId, postId);
             var result = await Map(post, timeline);
             return result;
         }
@@ -142,18 +142,18 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DataGet([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromRoute(Name = "data_index")][Range(0, 100)] long dataIndex)
         {
-            var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermission(timelineId, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
             return await DataCacheHelper.GenerateActionResult(this,
-                () => _postService.GetPostDataDigest(timelineId, post, dataIndex),
+                () => _postService.GetPostDataDigestAsync(timelineId, post, dataIndex),
                 async () =>
                 {
-                    var data = await _postService.GetPostData(timelineId, post, dataIndex);
+                    var data = await _postService.GetPostDataAsync(timelineId, post, dataIndex);
                     if (data.ContentType == MimeTypes.TextMarkdown)
                     {
                         return new ByteData(_markdownProcessor.Process(data.Data, Url, timeline, post), data.ContentType);
@@ -177,10 +177,10 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<HttpTimelinePost>> Post([FromRoute][GeneralTimelineName] string timeline, [FromBody] HttpTimelinePostCreateRequest body)
         {
-            var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
             var userId = this.GetUserId();
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.IsMemberOf(timelineId, userId))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.IsMemberOfAsync(timelineId, userId))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
@@ -212,7 +212,7 @@ namespace Timeline.Controllers
 
             try
             {
-                var post = await _postService.CreatePost(timelineId, userId, createRequest);
+                var post = await _postService.CreatePostAsync(timelineId, userId, createRequest);
                 var result = await Map(post, timeline);
                 return result;
             }
@@ -237,14 +237,14 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<HttpTimelinePost>> Patch([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post, [FromBody] HttpTimelinePostPatchRequest body)
         {
-            var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(timelineId, post, this.GetUserId(), true))
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, this.GetUserId(), true))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            var entity = await _postService.PatchPost(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
+            var entity = await _postService.PatchPostAsync(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
             var result = await Map(entity, timeline);
 
             return Ok(result);
@@ -264,14 +264,14 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> Delete([FromRoute][GeneralTimelineName] string timeline, [FromRoute] long post)
         {
-            var timelineId = await _timelineService.GetTimelineIdByName(timeline);
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermission(timelineId, post, this.GetUserId(), true))
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, this.GetUserId(), true))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            await _postService.DeletePost(timelineId, post);
+            await _postService.DeletePostAsync(timelineId, post);
 
             return Ok();
         }

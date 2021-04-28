@@ -16,150 +16,6 @@ using Timeline.Services.User;
 
 namespace Timeline.Services.Timeline
 {
-    public class TimelinePostCreateRequestData
-    {
-        public TimelinePostCreateRequestData(string contentType, byte[] data)
-        {
-            ContentType = contentType;
-            Data = data;
-        }
-
-        public string ContentType { get; set; }
-#pragma warning disable CA1819 // Properties should not return arrays
-        public byte[] Data { get; set; }
-#pragma warning restore CA1819 // Properties should not return arrays
-    }
-
-    public class TimelinePostCreateRequest
-    {
-        public string? Color { get; set; }
-
-        /// <summary>If not set, current time is used.</summary>
-        public DateTime? Time { get; set; }
-
-#pragma warning disable CA2227
-        public List<TimelinePostCreateRequestData> DataList { get; set; } = new List<TimelinePostCreateRequestData>();
-#pragma warning restore CA2227
-    }
-
-    public class TimelinePostPatchRequest
-    {
-        public string? Color { get; set; }
-        public DateTime? Time { get; set; }
-    }
-
-    public interface ITimelinePostService
-    {
-        /// <summary>
-        /// Get all the posts in the timeline.
-        /// </summary>
-        /// <param name="timelineId">The id of the timeline.</param>
-        /// <param name="modifiedSince">The time that posts have been modified since.</param>
-        /// <param name="includeDeleted">Whether include deleted posts.</param>
-        /// <returns>A list of all posts.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        Task<List<TimelinePostEntity>> GetPosts(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false);
-
-        /// <summary>
-        /// Get a post of a timeline.
-        /// </summary>
-        /// <param name="timelineId">The id of the timeline of the post.</param>
-        /// <param name="postId">The id of the post.</param>
-        /// <param name="includeDeleted">If true, return the entity even if it is deleted.</param>
-        /// <returns>The post.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
-        Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDeleted = false);
-
-        /// <summary>
-        /// Get the data digest of a post.
-        /// </summary>
-        /// <param name="timelineId">The timeline id.</param>
-        /// <param name="postId">The post id.</param>
-        /// <param name="dataIndex">The index of the data.</param>
-        /// <returns>The data digest.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
-        /// <exception cref="TimelinePostDataNotExistException">Thrown when data of that index does not exist.</exception>
-        Task<ICacheableDataDigest> GetPostDataDigest(long timelineId, long postId, long dataIndex);
-
-        /// <summary>
-        /// Get the data of a post.
-        /// </summary>
-        /// <param name="timelineId">The timeline id.</param>
-        /// <param name="postId">The post id.</param>
-        /// <param name="dataIndex">The index of the data.</param>
-        /// <returns>The data.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="TimelinePostNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
-        /// <exception cref="TimelinePostDataNotExistException">Thrown when data of that index does not exist.</exception>
-        Task<ByteData> GetPostData(long timelineId, long postId, long dataIndex);
-
-        /// <summary>
-        /// Create a new post in timeline.
-        /// </summary>
-        /// <param name="timelineId">The id of the timeline to create post against.</param>
-        /// <param name="authorId">The author's user id.</param>
-        /// <param name="request">Info about the post.</param>
-        /// <returns>The entity of the created post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="request"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="UserNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
-        /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageService"/>.</exception>
-        Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request);
-
-        /// <summary>
-        /// Modify a post. Change its properties or replace its content.
-        /// </summary>
-        /// <param name="timelineId">The timeline id.</param>
-        /// <param name="postId">The post id.</param>
-        /// <param name="request">The request.</param>
-        /// <returns>The entity of the patched post.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="request"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="TimelinePostNotExistException">Thrown when post does not exist.</exception>
-        Task<TimelinePostEntity> PatchPost(long timelineId, long postId, TimelinePostPatchRequest request);
-
-        /// <summary>
-        /// Delete a post.
-        /// </summary>
-        /// <param name="timelineId">The id of the timeline to delete post against.</param>
-        /// <param name="postId">The id of the post to delete.</param>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="TimelinePostNotExistException">Thrown when the post with given id does not exist or is deleted already.</exception>
-        /// <remarks>
-        /// First use <see cref="HasPostModifyPermission(long, long, long, bool)"/> to check the permission.
-        /// </remarks>
-        Task DeletePost(long timelineId, long postId);
-
-        /// <summary>
-        /// Delete all posts of the given user. Used when delete a user.
-        /// </summary>
-        /// <param name="userId">The id of the user.</param>
-        Task DeleteAllPostsOfUser(long userId);
-
-        /// <summary>
-        /// Verify whether a user has the permission to modify a post.
-        /// </summary>
-        /// <param name="timelineId">The id of the timeline.</param>
-        /// <param name="postId">The id of the post.</param>
-        /// <param name="modifierId">The id of the user to check on.</param>
-        /// <param name="throwOnPostNotExist">True if you want it to throw <see cref="TimelinePostNotExistException"/>. Default false.</param>
-        /// <returns>True if can modify, false if can't modify.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="TimelinePostNotExistException">Thrown when the post with given id does not exist or is deleted already and <paramref name="throwOnPostNotExist"/> is true.</exception>
-        /// <remarks>
-        /// Unless <paramref name="throwOnPostNotExist"/> is true, this method should return true if the post does not exist.
-        /// If the post is deleted, its author info still exists, so it is checked as the post is not deleted unless <paramref name="throwOnPostNotExist"/> is true.
-        /// This method does not check whether the user is administrator.
-        /// It only checks whether he is the author of the post or the owner of the timeline.
-        /// Return false when user with modifier id does not exist.
-        /// </remarks>
-        Task<bool> HasPostModifyPermission(long timelineId, long postId, long modifierId, bool throwOnPostNotExist = false);
-    }
-
     public class TimelinePostService : ITimelinePostService
     {
         private readonly ILogger<TimelinePostService> _logger;
@@ -184,7 +40,7 @@ namespace Timeline.Services.Timeline
 
         private async Task CheckTimelineExistence(long timelineId)
         {
-            if (!await _basicTimelineService.CheckExistence(timelineId))
+            if (!await _basicTimelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
         }
 
@@ -194,7 +50,7 @@ namespace Timeline.Services.Timeline
                 throw new UserNotExistException(userId);
         }
 
-        public async Task<List<TimelinePostEntity>> GetPosts(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false)
+        public async Task<List<TimelinePostEntity>> GetPostsAsync(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false)
         {
             await CheckTimelineExistence(timelineId);
 
@@ -217,7 +73,7 @@ namespace Timeline.Services.Timeline
             return await query.ToListAsync();
         }
 
-        public async Task<TimelinePostEntity> GetPost(long timelineId, long postId, bool includeDeleted = false)
+        public async Task<TimelinePostEntity> GetPostAsync(long timelineId, long postId, bool includeDeleted = false)
         {
             await CheckTimelineExistence(timelineId);
 
@@ -236,7 +92,7 @@ namespace Timeline.Services.Timeline
             return post;
         }
 
-        public async Task<ICacheableDataDigest> GetPostDataDigest(long timelineId, long postId, long dataIndex)
+        public async Task<ICacheableDataDigest> GetPostDataDigestAsync(long timelineId, long postId, long dataIndex)
         {
             await CheckTimelineExistence(timelineId);
 
@@ -256,7 +112,7 @@ namespace Timeline.Services.Timeline
             return new CacheableDataDigest(dataEntity.DataTag, dataEntity.LastUpdated);
         }
 
-        public async Task<ByteData> GetPostData(long timelineId, long postId, long dataIndex)
+        public async Task<ByteData> GetPostDataAsync(long timelineId, long postId, long dataIndex)
         {
             await CheckTimelineExistence(timelineId);
 
@@ -278,7 +134,7 @@ namespace Timeline.Services.Timeline
             return new ByteData(data, dataEntity.Kind);
         }
 
-        public async Task<TimelinePostEntity> CreatePost(long timelineId, long authorId, TimelinePostCreateRequest request)
+        public async Task<TimelinePostEntity> CreatePostAsync(long timelineId, long authorId, TimelinePostCreateRequest request)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
@@ -382,7 +238,7 @@ namespace Timeline.Services.Timeline
             return postEntity;
         }
 
-        public async Task<TimelinePostEntity> PatchPost(long timelineId, long postId, TimelinePostPatchRequest request)
+        public async Task<TimelinePostEntity> PatchPostAsync(long timelineId, long postId, TimelinePostPatchRequest request)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
@@ -417,7 +273,7 @@ namespace Timeline.Services.Timeline
             return entity;
         }
 
-        public async Task DeletePost(long timelineId, long postId)
+        public async Task DeletePostAsync(long timelineId, long postId)
         {
             await CheckTimelineExistence(timelineId);
 
@@ -448,17 +304,17 @@ namespace Timeline.Services.Timeline
             await transaction.CommitAsync();
         }
 
-        public async Task DeleteAllPostsOfUser(long userId)
+        public async Task DeleteAllPostsOfUserAsync(long userId)
         {
             var postEntities = await _database.TimelinePosts.Where(p => p.AuthorId == userId).Select(p => new { p.TimelineId, p.LocalId }).ToListAsync();
 
             foreach (var postEntity in postEntities)
             {
-                await this.DeletePost(postEntity.TimelineId, postEntity.LocalId);
+                await this.DeletePostAsync(postEntity.TimelineId, postEntity.LocalId);
             }
         }
 
-        public async Task<bool> HasPostModifyPermission(long timelineId, long postId, long modifierId, bool throwOnPostNotExist = false)
+        public async Task<bool> HasPostModifyPermissionAsync(long timelineId, long postId, long modifierId, bool throwOnPostNotExist = false)
         {
             await CheckTimelineExistence(timelineId);
 
