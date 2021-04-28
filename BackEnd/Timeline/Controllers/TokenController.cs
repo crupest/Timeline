@@ -63,7 +63,7 @@ namespace Timeline.Controllers
                 if (request.Expire != null)
                     expireTime = _clock.GetCurrentTime().AddDays(request.Expire.Value);
 
-                var result = await _userTokenManager.CreateToken(request.Username, request.Password, expireTime);
+                var result = await _userTokenManager.CreateTokenAsync(request.Username, request.Password, expireTime);
 
                 _logger.LogInformation(Log.Format(LogCreateSuccess,
                     ("Username", request.Username),
@@ -108,7 +108,7 @@ namespace Timeline.Controllers
 
             try
             {
-                var result = await _userTokenManager.VerifyToken(request.Token);
+                var result = await _userTokenManager.VerifyTokenAsync(request.Token);
                 _logger.LogInformation(Log.Format(LogVerifySuccess,
                     ("Username", result.Username), ("Token", request.Token)));
                 return new HttpVerifyTokenResponse

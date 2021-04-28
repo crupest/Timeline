@@ -26,7 +26,7 @@ namespace Timeline.Services.Token
             _clock = clock;
         }
 
-        public async Task<UserTokenCreateResult> CreateToken(string username, string password, DateTime? expireAt = null)
+        public async Task<UserTokenCreateResult> CreateTokenAsync(string username, string password, DateTime? expireAt = null)
         {
             expireAt = expireAt?.MyToUtc();
 
@@ -51,7 +51,7 @@ namespace Timeline.Services.Token
         }
 
 
-        public async Task<UserEntity> VerifyToken(string token)
+        public async Task<UserEntity> VerifyTokenAsync(string token)
         {
             if (token == null)
                 throw new ArgumentNullException(nameof(token));

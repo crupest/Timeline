@@ -92,7 +92,7 @@ namespace Timeline.Services.Api
 
         public async Task<bool> AddHighlightTimeline(long timelineId, long? operatorId)
         {
-            if (!await _timelineService.CheckExistence(timelineId))
+            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             if (operatorId.HasValue && !await _userService.CheckUserExistenceAsync(operatorId.Value))
@@ -118,7 +118,7 @@ namespace Timeline.Services.Api
 
         public async Task<bool> RemoveHighlightTimeline(long timelineId, long? operatorId)
         {
-            if (!await _timelineService.CheckExistence(timelineId))
+            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             if (operatorId.HasValue && !await _userService.CheckUserExistenceAsync(operatorId.Value))
@@ -146,7 +146,7 @@ namespace Timeline.Services.Api
 
         public async Task MoveHighlightTimeline(long timelineId, long newPosition)
         {
-            if (!await _timelineService.CheckExistence(timelineId))
+            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             var entity = await _database.HighlightTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId);
@@ -185,7 +185,7 @@ namespace Timeline.Services.Api
 
         public async Task<bool> IsHighlightTimeline(long timelineId, bool checkTimelineExistence = true)
         {
-            if (checkTimelineExistence && !await _timelineService.CheckExistence(timelineId))
+            if (checkTimelineExistence && !await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             return await _database.HighlightTimelines.AnyAsync(t => t.TimelineId == timelineId);

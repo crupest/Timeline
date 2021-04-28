@@ -96,7 +96,7 @@ namespace Timeline.Services.Api
             if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
-            if (!await _timelineService.CheckExistence(timelineId))
+            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             if (await _database.BookmarkTimelines.AnyAsync(t => t.TimelineId == timelineId && t.UserId == userId))
@@ -128,7 +128,7 @@ namespace Timeline.Services.Api
             if (checkUserExistence && !await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
-            if (checkTimelineExistence && !await _timelineService.CheckExistence(timelineId))
+            if (checkTimelineExistence && !await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             return await _database.BookmarkTimelines.AnyAsync(b => b.TimelineId == timelineId && b.UserId == userId);
@@ -139,7 +139,7 @@ namespace Timeline.Services.Api
             if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
-            if (!await _timelineService.CheckExistence(timelineId))
+            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             var entity = await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId && t.UserId == userId);
@@ -181,7 +181,7 @@ namespace Timeline.Services.Api
             if (!await _userService.CheckUserExistenceAsync(userId))
                 throw new UserNotExistException(userId);
 
-            if (!await _timelineService.CheckExistence(timelineId))
+            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
                 throw new TimelineNotExistException(timelineId);
 
             var entity = await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.UserId == userId && t.TimelineId == timelineId);

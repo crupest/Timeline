@@ -18,7 +18,7 @@ namespace Timeline.Services.Token
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
         /// <exception cref="UserNotExistException">Thrown when the user with <paramref name="username"/> does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown when <paramref name="password"/> is wrong.</exception>
-        public Task<UserTokenCreateResult> CreateToken(string username, string password, DateTime? expireAt = null);
+        public Task<UserTokenCreateResult> CreateTokenAsync(string username, string password, DateTime? expireAt = null);
 
         /// <summary>
         /// Verify a token and get the saved user info. This also check the database for existence of the user.
@@ -30,6 +30,6 @@ namespace Timeline.Services.Token
         /// <exception cref="UserTokenVersionExpiredException">Thrown when the token is of bad version.</exception>
         /// <exception cref="UserTokenBadFormatException">Thrown when the token is of bad format.</exception>
         /// <exception cref="UserTokenUserNotExistException">Thrown when the user specified by the token does not exist. Usually the user had been deleted after the token was issued.</exception>
-        public Task<UserEntity> VerifyToken(string token);
+        public Task<UserEntity> VerifyTokenAsync(string token);
     }
 }

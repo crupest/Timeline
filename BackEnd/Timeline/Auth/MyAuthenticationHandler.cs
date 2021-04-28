@@ -115,7 +115,7 @@ namespace Timeline.Auth
 
             try
             {
-                var user = await _userTokenManager.VerifyToken(token);
+                var user = await _userTokenManager.VerifyTokenAsync(token);
 
                 var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
