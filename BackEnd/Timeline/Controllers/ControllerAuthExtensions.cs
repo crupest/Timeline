@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Security.Claims;
 using Timeline.Auth;
 using Timeline.Services.User;
-using static Timeline.Resources.Controllers.ControllerAuthExtensions;
 
 namespace Timeline.Controllers
 {
@@ -11,31 +9,17 @@ namespace Timeline.Controllers
     {
         public static bool UserHasPermission(this ControllerBase controller, UserPermission permission)
         {
-            return controller.User != null && controller.User.HasPermission(permission);
+            return controller.User.HasPermission(permission);
         }
 
         public static long GetUserId(this ControllerBase controller)
         {
-            var claim = controller.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (claim == null)
-                throw new InvalidOperationException(ExceptionNoUserIdentifierClaim);
-
-            if (long.TryParse(claim.Value, out var value))
-                return value;
-
-            throw new InvalidOperationException(ExceptionUserIdentifierClaimBadFormat);
+            return controller.GetOptionalUserId() ?? throw new InvalidOperationException(Resource.ExceptionNoUserId);
         }
 
         public static long? GetOptionalUserId(this ControllerBase controller)
         {
-            var claim = controller.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (claim == null)
-                return null;
-
-            if (long.TryParse(claim.Value, out var value))
-                return value;
-
-            throw new InvalidOperationException(ExceptionUserIdentifierClaimBadFormat);
+            return controller.User.GetUserId();
         }
     }
 }

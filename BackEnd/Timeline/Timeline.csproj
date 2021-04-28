@@ -53,6 +53,11 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
+        <Compile Update="Controllers\Resource.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resource.resx</DependentUpon>
+        </Compile>
         <Compile Update="Resources\Controllers\ControllerAuthExtensions.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -182,6 +187,10 @@
 
     <ItemGroup>
         <EmbeddedResource Update="Auth\Resource.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Controllers\Resource.resx">
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
