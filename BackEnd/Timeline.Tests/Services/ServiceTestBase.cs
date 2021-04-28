@@ -35,7 +35,7 @@ namespace Timeline.Tests.Services
             Database = TestDatabase.CreateContext(_testOutputHelper);
 
             UserService = new UserService(NullLogger<UserService>.Instance, Database, new PasswordService(), Clock);
-            TimelineService = new TimelineService(Database, UserService, Clock);
+            TimelineService = new TimelineService(NullLoggerFactory.Instance, Database, UserService, Clock);
 
             UserId = await UserService.GetUserIdByUsernameAsync("user");
             AdminId = await UserService.GetUserIdByUsernameAsync("admin");
