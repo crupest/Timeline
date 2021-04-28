@@ -100,7 +100,7 @@ namespace Timeline
             services.AddDataServices();
             services.AddImageServices();
             services.AddUserServices();
-            services.AddTokenService(Configuration);
+            services.AddTokenServices(Configuration);
 
             services.AddScoped<IBasicTimelineService, BasicTimelineService>();
             services.AddScoped<ITimelineService, TimelineService>();

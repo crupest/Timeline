@@ -9,40 +9,6 @@ using Timeline.Services.User;
 
 namespace Timeline.Services.Token
 {
-    public class UserTokenCreateResult
-    {
-        public string Token { get; set; } = default!;
-        public UserEntity User { get; set; } = default!;
-    }
-
-    public interface IUserTokenManager
-    {
-        /// <summary>
-        /// Try to create a token for given username and password.
-        /// </summary>
-        /// <param name="username">The username.</param>
-        /// <param name="password">The password.</param>
-        /// <param name="expireAt">The expire time of the token.</param>
-        /// <returns>The created token and the user info.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user with <paramref name="username"/> does not exist.</exception>
-        /// <exception cref="BadPasswordException">Thrown when <paramref name="password"/> is wrong.</exception>
-        public Task<UserTokenCreateResult> CreateToken(string username, string password, DateTime? expireAt = null);
-
-        /// <summary>
-        /// Verify a token and get the saved user info. This also check the database for existence of the user.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <returns>The user stored in token.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
-        /// <exception cref="UserTokenTimeExpiredException">Thrown when the token is expired.</exception>
-        /// <exception cref="UserTokenVersionExpiredException">Thrown when the token is of bad version.</exception>
-        /// <exception cref="UserTokenBadFormatException">Thrown when the token is of bad format.</exception>
-        /// <exception cref="UserTokenUserNotExistException">Thrown when the user specified by the token does not exist. Usually the user had been deleted after the token was issued.</exception>
-        public Task<UserEntity> VerifyToken(string token);
-    }
-
     public class UserTokenManager : IUserTokenManager
     {
         private readonly ILogger<UserTokenManager> _logger;
@@ -79,6 +45,8 @@ namespace Timeline.Services.Token
                 ExpireAt = expireAt ?? _clock.GetCurrentTime() + TimeSpan.FromSeconds(_tokenOptionsMonitor.CurrentValue.DefaultExpireSeconds)
             });
 
+            _logger.LogInformation(Resource.LogTokenCreate, user.Username, userId);
+
             return new UserTokenCreateResult { Token = token, User = user };
         }
 
@@ -88,25 +56,46 @@ namespace Timeline.Services.Token
             if (token == null)
                 throw new ArgumentNullException(nameof(token));
 
-            var tokenInfo = _userTokenService.VerifyToken(token);
+            UserTokenInfo tokenInfo;
+
+            try
+            {
+                tokenInfo = _userTokenService.VerifyToken(token);
+            }
+            catch (UserTokenBadFormatException e)
+            {
+                _logger.LogInformation(e, Resource.LogTokenVerifiedFail);
+                throw;
+            }
 
             var currentTime = _clock.GetCurrentTime();
             if (tokenInfo.ExpireAt < currentTime)
-                throw new UserTokenTimeExpiredException(token, tokenInfo.ExpireAt, currentTime);
+            {
+                var e = new UserTokenTimeExpiredException(token, tokenInfo.ExpireAt, currentTime);
+                _logger.LogInformation(e, Resource.LogTokenVerifiedFail);
+                throw e;
+            }
 
             try
             {
                 var user = await _userService.GetUserAsync(tokenInfo.Id);
 
                 if (tokenInfo.Version < user.Version)
-                    throw new UserTokenVersionExpiredException(token, tokenInfo.Version, user.Version);
+                {
+                    var e = new UserTokenVersionExpiredException(token, tokenInfo.Version, user.Version);
+                    _logger.LogInformation(e, Resource.LogTokenVerifiedFail);
+                    throw e;
+                }
+
+                _logger.LogInformation(Resource.LogTokenVerified, user.Username, user.Id);
 
                 return user;
-
             }
             catch (UserNotExistException e)
             {
-                throw new UserTokenUserNotExistException(token, e);
+                var exception = new UserTokenUserNotExistException(token, e);
+                _logger.LogInformation(exception, Resource.LogTokenVerifiedFail);
+                throw exception;
             }
         }
     }
