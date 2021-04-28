@@ -102,16 +102,11 @@ namespace Timeline
             services.AddUserServices();
             services.AddTokenServices(Configuration);
 
-            services.AddScoped<IBasicTimelineService, BasicTimelineService>();
-            services.AddScoped<ITimelineService, TimelineService>();
-            services.AddScoped<ITimelinePostService, TimelinePostService>();
+            services.AddTimelineServices();
 
             services.AddScoped<IHighlightTimelineService, HighlightTimelineService>();
             services.AddScoped<IBookmarkTimelineService, BookmarkTimelineService>();
-
             services.AddScoped<ISearchService, SearchService>();
-
-            services.AddScoped<MarkdownProcessor>();
 
             services.AddOpenApiDocs();
 
