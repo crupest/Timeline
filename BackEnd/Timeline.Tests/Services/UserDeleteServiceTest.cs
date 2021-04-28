@@ -21,7 +21,7 @@ namespace Timeline.Tests.Services
         [Fact]
         public async Task DeleteRootUser_Should_Throw()
         {
-            await _service.Awaiting(s => s.DeleteUser("admin")).Should().ThrowAsync<InvalidOperationOnRootUserException>();
+            await _service.Awaiting(s => s.DeleteUserAsync("admin")).Should().ThrowAsync<InvalidOperationOnRootUserException>();
         }
     }
 }

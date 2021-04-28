@@ -168,7 +168,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                var delete = await _userDeleteService.DeleteUser(username);
+                var delete = await _userDeleteService.DeleteUserAsync(username);
                 if (delete)
                     return Ok(CommonDeleteResponse.Delete());
                 else

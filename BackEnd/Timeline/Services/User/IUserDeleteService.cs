@@ -13,6 +13,6 @@ namespace Timeline.Services.User
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="username"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
         /// <exception cref="InvalidOperationOnRootUserException">Thrown when deleting root user.</exception>
-        Task<bool> DeleteUser(string username);
+        Task<bool> DeleteUserAsync(string username);
     }
 }

@@ -14,7 +14,7 @@ namespace Timeline.Services.User.Avatar
         /// <param name="userId">User id.</param>
         /// <returns>The avatar digest.</returns>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
-        Task<ICacheableDataDigest> GetAvatarDigest(long userId);
+        Task<ICacheableDataDigest> GetAvatarDigestAsync(long userId);
 
         /// <summary>
         /// Get avatar of a user. If the user has no avatar set, a default one is returned.
@@ -22,7 +22,7 @@ namespace Timeline.Services.User.Avatar
         /// <param name="userId">User id.</param>
         /// <returns>The avatar.</returns>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
-        Task<ByteData> GetAvatar(long userId);
+        Task<ByteData> GetAvatarAsync(long userId);
 
         /// <summary>
         /// Set avatar for a user.
@@ -33,13 +33,13 @@ namespace Timeline.Services.User.Avatar
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="avatar"/> is null.</exception>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="ImageException">Thrown if avatar is of bad format.</exception>
-        Task<ICacheableDataDigest> SetAvatar(long userId, ByteData avatar);
+        Task<ICacheableDataDigest> SetAvatarAsync(long userId, ByteData avatar);
 
         /// <summary>
         /// Remove avatar of a user.
         /// </summary>
         /// <param name="userId">User id.</param>
         /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
-        Task DeleteAvatar(long userId);
+        Task DeleteAvatarAsync(long userId);
     }
 }

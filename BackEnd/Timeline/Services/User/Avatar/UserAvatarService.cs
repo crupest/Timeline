@@ -39,7 +39,7 @@ namespace Timeline.Services.User.Avatar
             _clock = clock;
         }
 
-        public async Task<ICacheableDataDigest> GetAvatarDigest(long userId)
+        public async Task<ICacheableDataDigest> GetAvatarDigestAsync(long userId)
         {
             var usernameChangeTime = await _basicUserService.GetUsernameLastModifiedTimeAsync(userId);
 
@@ -61,7 +61,7 @@ namespace Timeline.Services.User.Avatar
             }
         }
 
-        public async Task<ByteData> GetAvatar(long userId)
+        public async Task<ByteData> GetAvatarAsync(long userId)
         {
             await _basicUserService.ThrowIfUserNotExist(userId);
 
@@ -72,7 +72,7 @@ namespace Timeline.Services.User.Avatar
                 return await _defaultUserAvatarProvider.GetDefaultAvatar();
             }
 
-            var data = await _dataManager.GetEntryAndCheck(entity.DataTag, $"This is required by avatar of {userId}.");
+            var data = await _dataManager.GetEntryAndCheck(entity.DataTag, string.Format(Resource.AvatarDataEntryNotExist, userId));
 
             if (entity.Type is null)
             {
@@ -84,7 +84,7 @@ namespace Timeline.Services.User.Avatar
             return new ByteData(data, entity.Type);
         }
 
-        public async Task<ICacheableDataDigest> SetAvatar(long userId, ByteData avatar)
+        public async Task<ICacheableDataDigest> SetAvatarAsync(long userId, ByteData avatar)
         {
             if (avatar is null)
                 throw new ArgumentNullException(nameof(avatar));
@@ -126,10 +126,12 @@ namespace Timeline.Services.User.Avatar
 
             await transaction.CommitAsync();
 
+            _logger.LogInformation(Resource.LogSetAvatar, userId);
+
             return new CacheableDataDigest(tag, now);
         }
 
-        public async Task DeleteAvatar(long userId)
+        public async Task DeleteAvatarAsync(long userId)
         {
             await _basicUserService.ThrowIfUserNotExist(userId);
 
@@ -149,6 +151,8 @@ namespace Timeline.Services.User.Avatar
             await _database.SaveChangesAsync();
 
             await transaction.CommitAsync();
+
+            _logger.LogInformation(Resource.LogRemoveAvatar, userId);
         }
     }
 }
