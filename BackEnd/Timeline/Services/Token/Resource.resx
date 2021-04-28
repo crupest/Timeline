@@ -150,4 +150,13 @@
   <data name="ExceptionUserTokenVersionExpired" xml:space="preserve">
     <value>The token is of bad version.</value>
   </data>
+  <data name="LogTokenCreate" xml:space="preserve">
+    <value>A token is created for user with username={0}, id={1}.</value>
+  </data>
+  <data name="LogTokenVerified" xml:space="preserve">
+    <value>A token of user with username = {0}, id = {1} is verified successfully.</value>
+  </data>
+  <data name="LogTokenVerifiedFail" xml:space="preserve">
+    <value>A token fails to be verified.</value>
+  </data>
 </root>

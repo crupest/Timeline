@@ -4,9 +4,9 @@ using Timeline.Configs;
 
 namespace Timeline.Services.Token
 {
-    public static class TokenServiceColletionExtensions
+    public static class TokenServicesServiceColletionExtensions
     {
-        public static IServiceCollection AddTokenService(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddTokenServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<TokenOptions>(configuration.GetSection("Token"));
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));

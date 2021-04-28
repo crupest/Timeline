@@ -178,10 +178,16 @@ namespace Timeline.Services.User
             var entity = await _databaseContext.Users.Where(u => u.Username == username).Select(u => new { u.Id, u.Password }).SingleOrDefaultAsync();
 
             if (entity is null)
+            {
+                _logger.LogInformation(Resource.LogVerifyCredentialsUsernameBad, username);
                 throw new UserNotExistException(username);
+            }
 
             if (!_passwordService.VerifyPassword(entity.Password, password))
+            {
+                _logger.LogInformation(Resource.LogVerifyCredentialsPasswordBad, username);
                 throw new BadPasswordException(password);
+            }
 
             return entity.Id;
         }

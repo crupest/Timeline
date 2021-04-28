@@ -183,4 +183,10 @@
   <data name="LogUserModified" xml:space="preserve">
     <value>A user is modified with username = {0}, id = {1}.</value>
   </data>
+  <data name="LogVerifyCredentialsPasswordBad" xml:space="preserve">
+    <value>An attemp to login with wrong pasword with username '{0}' failed.</value>
+  </data>
+  <data name="LogVerifyCredentialsUsernameBad" xml:space="preserve">
+    <value>An attemp to login with wrong username '{0}' failed.</value>
+  </data>
 </root>

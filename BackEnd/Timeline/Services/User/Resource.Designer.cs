@@ -257,5 +257,23 @@ namespace Timeline.Services.User {
                 return ResourceManager.GetString("LogUserModified", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An attemp to login with wrong pasword with username &apos;{0}&apos; failed..
+        /// </summary>
+        internal static string LogVerifyCredentialsPasswordBad {
+            get {
+                return ResourceManager.GetString("LogVerifyCredentialsPasswordBad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An attemp to login with wrong username &apos;{0}&apos; failed..
+        /// </summary>
+        internal static string LogVerifyCredentialsUsernameBad {
+            get {
+                return ResourceManager.GetString("LogVerifyCredentialsUsernameBad", resourceCulture);
+            }
+        }
     }
 }

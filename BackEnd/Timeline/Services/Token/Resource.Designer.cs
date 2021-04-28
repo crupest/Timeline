@@ -158,5 +158,32 @@ namespace Timeline.Services.Token {
                 return ResourceManager.GetString("ExceptionUserTokenVersionExpired", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A token is created for user with username={0}, id={1}..
+        /// </summary>
+        internal static string LogTokenCreate {
+            get {
+                return ResourceManager.GetString("LogTokenCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A token of user with username = {0}, id = {1} is verified successfully..
+        /// </summary>
+        internal static string LogTokenVerified {
+            get {
+                return ResourceManager.GetString("LogTokenVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A token fails to be verified..
+        /// </summary>
+        internal static string LogTokenVerifiedFail {
+            get {
+                return ResourceManager.GetString("LogTokenVerifiedFail", resourceCulture);
+            }
+        }
     }
 }
