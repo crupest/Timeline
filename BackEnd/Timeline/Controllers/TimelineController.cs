@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -28,18 +27,15 @@ namespace Timeline.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITimelineService _service;
-
-        private readonly TimelineMapper _timelineMapper;
-        private readonly IMapper _mapper;
+        private readonly IGenericMapper _mapper;
 
         /// <summary>
         /// 
         /// </summary>
-        public TimelineController(IUserService userService, ITimelineService service, TimelineMapper timelineMapper, IMapper mapper)
+        public TimelineController(IUserService userService, ITimelineService service, IGenericMapper mapper)
         {
             _userService = userService;
             _service = service;
-            _timelineMapper = timelineMapper;
             _mapper = mapper;
         }
 
@@ -47,12 +43,12 @@ namespace Timeline.Controllers
 
         private Task<HttpTimeline> Map(TimelineEntity timeline)
         {
-            return _timelineMapper.MapToHttp(timeline, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+            return _mapper.MapAsync<HttpTimeline>(timeline, Url, User);
         }
 
         private Task<List<HttpTimeline>> Map(List<TimelineEntity> timelines)
         {
-            return _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+            return _mapper.MapListAsync<HttpTimeline>(timelines, Url, User);
         }
 
         /// <summary>
@@ -157,7 +153,7 @@ namespace Timeline.Controllers
 
             try
             {
-                await _service.ChangePropertyAsync(timelineId, _mapper.Map<TimelineChangePropertyParams>(body));
+                await _service.ChangePropertyAsync(timelineId, _mapper.AutoMapperMap<TimelineChangePropertyParams>(body));
                 var t = await _service.GetTimelineAsync(timelineId);
                 var result = await Map(t);
                 return result;

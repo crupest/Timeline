@@ -4,9 +4,23 @@ using Timeline.Services.User;
 
 namespace Timeline.Auth
 {
-    internal static class PrincipalExtensions
+    public static class PrincipalExtensions
     {
-        internal static bool HasPermission(this ClaimsPrincipal principal, UserPermission permission)
+        public static long? GetUserId(this ClaimsPrincipal? principal)
+        {
+            if (principal is null) return null;
+
+            var claim = principal.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+                return null;
+
+            if (long.TryParse(claim.Value, out var value))
+                return value;
+
+            throw new InvalidOperationException(Resource.ExceptionUserIdentifierClaimBadFormat);
+        }
+
+        public static bool HasPermission(this ClaimsPrincipal principal, UserPermission permission)
         {
             return principal.HasClaim(
                 claim => claim.Type == AuthenticationConstants.PermissionClaimName && string.Equals(claim.Value, permission.ToString(), StringComparison.OrdinalIgnoreCase));

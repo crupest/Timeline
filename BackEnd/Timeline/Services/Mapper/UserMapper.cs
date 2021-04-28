@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Timeline.Controllers;
 using Timeline.Entities;
@@ -8,7 +8,7 @@ using Timeline.Services.User;
 
 namespace Timeline.Services.Mapper
 {
-    public class UserMapper
+    public class UserMapper : IMapper<UserEntity, HttpUser>
     {
         private readonly DatabaseContext _database;
         private readonly IUserPermissionService _userPermissionService;
@@ -19,7 +19,7 @@ namespace Timeline.Services.Mapper
             _userPermissionService = userPermissionService;
         }
 
-        public async Task<HttpUser> MapToHttp(UserEntity entity, IUrlHelper urlHelper)
+        public async Task<HttpUser> MapAsync(UserEntity entity, IUrlHelper urlHelper, ClaimsPrincipal? user)
         {
             return new HttpUser(
                 uniqueId: entity.UniqueId,
@@ -32,16 +32,6 @@ namespace Timeline.Services.Mapper
                     timeline: urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = "@" + entity.Username })
                 )
             );
-        }
-
-        public async Task<List<HttpUser>> MapToHttp(List<UserEntity> entities, IUrlHelper urlHelper)
-        {
-            var result = new List<HttpUser>();
-            foreach (var entity in entities)
-            {
-                result.Add(await MapToHttp(entity, urlHelper));
-            }
-            return result;
         }
     }
 }

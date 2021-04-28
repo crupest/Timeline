@@ -31,31 +31,31 @@ namespace Timeline.Controllers
         private readonly ITimelineService _timelineService;
         private readonly ITimelinePostService _postService;
 
-        private readonly TimelineMapper _timelineMapper;
+        private readonly IGenericMapper _mapper;
 
         private readonly MarkdownProcessor _markdownProcessor;
 
         /// <summary>
         /// 
         /// </summary>
-        public TimelinePostController(ITimelineService timelineService, ITimelinePostService timelinePostService, TimelineMapper timelineMapper, MarkdownProcessor markdownProcessor)
+        public TimelinePostController(ITimelineService timelineService, ITimelinePostService timelinePostService, IGenericMapper mapper, MarkdownProcessor markdownProcessor)
         {
             _timelineService = timelineService;
             _postService = timelinePostService;
-            _timelineMapper = timelineMapper;
+            _mapper = mapper;
             _markdownProcessor = markdownProcessor;
         }
 
         private bool UserHasAllTimelineManagementPermission => this.UserHasPermission(UserPermission.AllTimelineManagement);
 
-        private Task<HttpTimelinePost> Map(TimelinePostEntity post, string timelineName)
+        private Task<HttpTimelinePost> Map(TimelinePostEntity post)
         {
-            return _timelineMapper.MapToHttp(post, timelineName, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+            return _mapper.MapAsync<HttpTimelinePost>(post, Url, User);
         }
 
-        private Task<List<HttpTimelinePost>> Map(List<TimelinePostEntity> posts, string timelineName)
+        private Task<List<HttpTimelinePost>> Map(List<TimelinePostEntity> posts)
         {
-            return _timelineMapper.MapToHttp(posts, timelineName, Url, this.GetOptionalUserId(), UserHasAllTimelineManagementPermission);
+            return _mapper.MapListAsync<HttpTimelinePost>(posts, Url, User);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Timeline.Controllers
 
             var posts = await _postService.GetPostsAsync(timelineId, modifiedSince, includeDeleted ?? false);
 
-            var result = await Map(posts, timeline);
+            var result = await Map(posts);
             return result;
         }
 
@@ -104,7 +104,7 @@ namespace Timeline.Controllers
             }
 
             var post = await _postService.GetPostAsync(timelineId, postId);
-            var result = await Map(post, timeline);
+            var result = await Map(post);
             return result;
         }
 
@@ -213,7 +213,7 @@ namespace Timeline.Controllers
             try
             {
                 var post = await _postService.CreatePostAsync(timelineId, userId, createRequest);
-                var result = await Map(post, timeline);
+                var result = await Map(post);
                 return result;
             }
             catch (TimelinePostCreateDataException e)
@@ -245,7 +245,7 @@ namespace Timeline.Controllers
             }
 
             var entity = await _postService.PatchPostAsync(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
-            var result = await Map(entity, timeline);
+            var result = await Map(entity);
 
             return Ok(result);
         }

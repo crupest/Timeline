@@ -7,7 +7,6 @@ using Timeline.Entities;
 using Timeline.Models.Http;
 using Timeline.Services.Api;
 using Timeline.Services.Mapper;
-using Timeline.Services.User;
 
 namespace Timeline.Controllers
 {
@@ -20,19 +19,17 @@ namespace Timeline.Controllers
     public class SearchController : Controller
     {
         private readonly ISearchService _service;
-        private readonly TimelineMapper _timelineMapper;
-        private readonly UserMapper _userMapper;
+        private readonly IGenericMapper _mapper;
 
-        public SearchController(ISearchService service, TimelineMapper timelineMapper, UserMapper userMapper)
+        public SearchController(ISearchService service, IGenericMapper mapper)
         {
             _service = service;
-            _timelineMapper = timelineMapper;
-            _userMapper = userMapper;
+            _mapper = mapper;
         }
 
         private Task<List<HttpTimeline>> Map(List<TimelineEntity> timelines)
         {
-            return _timelineMapper.MapToHttp(timelines, Url, this.GetOptionalUserId(), this.UserHasPermission(UserPermission.AllTimelineManagement));
+            return _mapper.MapListAsync<HttpTimeline>(timelines, Url, User);
         }
 
         /// <summary>
@@ -62,7 +59,7 @@ namespace Timeline.Controllers
         {
             var searchResult = await _service.SearchUser(query);
             var users = searchResult.Items.Select(i => i.Item).ToList();
-            return await _userMapper.MapToHttp(users, Url);
+            return await _mapper.MapListAsync<HttpUser>(users, Url, User);
         }
     }
 }

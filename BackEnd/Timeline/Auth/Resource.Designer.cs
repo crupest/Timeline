@@ -61,6 +61,15 @@ namespace Timeline.Auth {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User identitifier claim is of bad format..
+        /// </summary>
+        internal static string ExceptionUserIdentifierClaimBadFormat {
+            get {
+                return ResourceManager.GetString("ExceptionUserIdentifierClaimBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Token is found in authorization header. Token is {0} ..
         /// </summary>
         internal static string LogTokenFoundInHeader {

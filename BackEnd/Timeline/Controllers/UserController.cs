@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,17 +27,15 @@ namespace Timeline.Controllers
         private readonly IUserService _userService;
         private readonly IUserPermissionService _userPermissionService;
         private readonly IUserDeleteService _userDeleteService;
-        private readonly UserMapper _userMapper;
-        private readonly IMapper _mapper;
+        private readonly IGenericMapper _mapper;
 
         /// <summary></summary>
-        public UserController(ILogger<UserController> logger, IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, UserMapper userMapper, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IGenericMapper mapper)
         {
             _logger = logger;
             _userService = userService;
             _userPermissionService = userPermissionService;
             _userDeleteService = userDeleteService;
-            _userMapper = userMapper;
             _mapper = mapper;
         }
 
@@ -53,7 +50,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<List<HttpUser>>> List()
         {
             var users = await _userService.GetUsersAsync();
-            var result = await _userMapper.MapToHttp(users, Url);
+            var result = await _mapper.MapListAsync<HttpUser>(users, Url, User);
             return result;
         }
 
@@ -72,7 +69,7 @@ namespace Timeline.Controllers
             {
                 var user = await _userService.CreateUserAsync(
                     new CreateUserParams(body.Username, body.Password) { Nickname = body.Nickname });
-                return await _userMapper.MapToHttp(user, Url);
+                return await _mapper.MapAsync<HttpUser>(user, Url, User);
             }
             catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
             {
@@ -94,7 +91,7 @@ namespace Timeline.Controllers
             {
                 var id = await _userService.GetUserIdByUsernameAsync(username);
                 var user = await _userService.GetUserAsync(id);
-                return await _userMapper.MapToHttp(user, Url);
+                return await _mapper.MapAsync<HttpUser>(user, Url, User);
             }
             catch (UserNotExistException e)
             {
@@ -122,8 +119,8 @@ namespace Timeline.Controllers
                 try
                 {
                     var id = await _userService.GetUserIdByUsernameAsync(username);
-                    var user = await _userService.ModifyUserAsync(id, _mapper.Map<ModifyUserParams>(body));
-                    return await _userMapper.MapToHttp(user, Url);
+                    var user = await _userService.ModifyUserAsync(id, _mapper.AutoMapperMap<ModifyUserParams>(body));
+                    return await _mapper.MapAsync<HttpUser>(user, Url, User);
                 }
                 catch (UserNotExistException e)
                 {
@@ -149,8 +146,8 @@ namespace Timeline.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden,
                         ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Password));
 
-                var user = await _userService.ModifyUserAsync(this.GetUserId(), _mapper.Map<ModifyUserParams>(body));
-                return await _userMapper.MapToHttp(user, Url);
+                var user = await _userService.ModifyUserAsync(this.GetUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
+                return await _mapper.MapAsync<HttpUser>(user, Url, User);
             }
         }
 
