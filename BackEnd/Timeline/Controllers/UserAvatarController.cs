@@ -64,7 +64,7 @@ namespace Timeline.Controllers
                 return NotFound(ErrorResponse.UserCommon.NotExist());
             }
 
-            return await DataCacheHelper.GenerateActionResult(this, () => _service.GetAvatarDigest(id), () => _service.GetAvatar(id));
+            return await DataCacheHelper.GenerateActionResult(this, () => _service.GetAvatarDigestAsync(id), () => _service.GetAvatarAsync(id));
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Timeline.Controllers
 
             try
             {
-                var digest = await _service.SetAvatar(id, body);
+                var digest = await _service.SetAvatarAsync(id, body);
 
                 _logger.LogInformation(Log.Format(LogPutSuccess,
                     ("Username", username), ("Mime Type", Request.ContentType)));
@@ -159,7 +159,7 @@ namespace Timeline.Controllers
                 return BadRequest(ErrorResponse.UserCommon.NotExist());
             }
 
-            await _service.DeleteAvatar(id);
+            await _service.DeleteAvatarAsync(id);
             return Ok();
         }
     }

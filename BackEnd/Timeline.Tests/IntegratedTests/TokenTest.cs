@@ -110,7 +110,7 @@ namespace Timeline.Tests.IntegratedTests
             using (var scope = TestApp.Host.Services.CreateScope()) // UserDeleteService is scoped.
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserDeleteService>();
-                await userService.DeleteUser("user1");
+                await userService.DeleteUserAsync("user1");
             }
 
             await client.TestPostAssertErrorAsync(VerifyTokenUrl,

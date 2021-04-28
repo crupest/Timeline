@@ -163,6 +163,11 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
+        <Compile Update="Services\User\Avatar\Resource.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resource.resx</DependentUpon>
+        </Compile>
         <Compile Update="Services\User\Resource.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
@@ -261,6 +266,10 @@
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Token\Resource.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Services\User\Avatar\Resource.resx">
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>

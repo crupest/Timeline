@@ -27,7 +27,7 @@ namespace Timeline.Services.User
             _timelinePostService = timelinePostService;
         }
 
-        public async Task<bool> DeleteUser(string username)
+        public async Task<bool> DeleteUserAsync(string username)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
