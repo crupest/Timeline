@@ -61,11 +61,74 @@ namespace Timeline.Services.Timeline {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color is not valid. {0}.
+        /// </summary>
+        internal static string ExceptionColorInvalid {
+            get {
+                return ResourceManager.GetString("ExceptionColorInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data list can&apos;t be empty..
+        /// </summary>
+        internal static string ExceptionDataListEmpty {
+            get {
+                return ResourceManager.GetString("ExceptionDataListEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data list can&apos;t be null..
+        /// </summary>
+        internal static string ExceptionDataListNull {
+            get {
+                return ResourceManager.GetString("ExceptionDataListNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data list count can&apos;t be bigger than 100..
+        /// </summary>
+        internal static string ExceptionDataListTooLarge {
+            get {
+                return ResourceManager.GetString("ExceptionDataListTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This timeline name is neither a valid personal timeline name nor a valid ordinary timeline name. {0}.
         /// </summary>
         internal static string ExceptionGeneralTimelineNameBadFormat {
             get {
                 return ResourceManager.GetString("ExceptionGeneralTimelineNameBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image validation failed..
+        /// </summary>
+        internal static string ExceptionPostDataImageInvalid {
+            get {
+                return ResourceManager.GetString("ExceptionPostDataImageInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It is not a valid utf-8 sequence..
+        /// </summary>
+        internal static string ExceptionPostDataNotValidUtf8 {
+            get {
+                return ResourceManager.GetString("ExceptionPostDataNotValidUtf8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported content type..
+        /// </summary>
+        internal static string ExceptionPostDataUnsupportedType {
+            get {
+                return ResourceManager.GetString("ExceptionPostDataUnsupportedType", resourceCulture);
             }
         }
         
@@ -129,6 +192,78 @@ namespace Timeline.Services.Timeline {
         internal static string LogPersonalTimelineAutoCreate {
             get {
                 return ResourceManager.GetString("LogPersonalTimelineAutoCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A member(user id={0}) is added to timeline(id={1})..
+        /// </summary>
+        internal static string LogTimelineAddMember {
+            get {
+                return ResourceManager.GetString("LogTimelineAddMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timeline is created with name={0}, id={1}..
+        /// </summary>
+        internal static string LogTimelineCreate {
+            get {
+                return ResourceManager.GetString("LogTimelineCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timeline(id={0}) is deleted..
+        /// </summary>
+        internal static string LogTimelineDelete {
+            get {
+                return ResourceManager.GetString("LogTimelineDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timeline(id={0}) post(id={1}) is created..
+        /// </summary>
+        internal static string LogTimelinePostCreated {
+            get {
+                return ResourceManager.GetString("LogTimelinePostCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timeline(id={0}) post(id={1}) is deleted..
+        /// </summary>
+        internal static string LogTimelinePostDeleted {
+            get {
+                return ResourceManager.GetString("LogTimelinePostDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timeline(id={0}) post(id={1}) is updated..
+        /// </summary>
+        internal static string LogTimelinePostUpdated {
+            get {
+                return ResourceManager.GetString("LogTimelinePostUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A member(user id={0}) is removed from timeline(id={1})..
+        /// </summary>
+        internal static string LogTimelineRemoveMember {
+            get {
+                return ResourceManager.GetString("LogTimelineRemoveMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timeline with id={0} is updated..
+        /// </summary>
+        internal static string LogTimelineUpdated {
+            get {
+                return ResourceManager.GetString("LogTimelineUpdated", resourceCulture);
             }
         }
     }

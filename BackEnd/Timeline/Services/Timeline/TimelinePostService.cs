@@ -50,6 +50,12 @@ namespace Timeline.Services.Timeline
                 throw new UserNotExistException(userId);
         }
 
+        private void CheckColor(string color, string paramName)
+        {
+            if (!_colorValidator.Validate(color, out var message))
+                throw new ArgumentException(string.Format(Resource.ExceptionColorInvalid, message), paramName);
+        }
+
         public async Task<List<TimelinePostEntity>> GetPostsAsync(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false)
         {
             await CheckTimelineExistence(timelineId);
@@ -139,19 +145,17 @@ namespace Timeline.Services.Timeline
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
-            {
-                if (!_colorValidator.Validate(request.Color, out var message))
-                    throw new ArgumentException("Color is not valid.", nameof(request));
-            }
+            if (request.Color is not null)
+                CheckColor(request.Color, nameof(request));
 
             if (request.DataList is null)
-                throw new ArgumentException("Data list can't be null.", nameof(request));
+                throw new ArgumentException(Resource.ExceptionDataListNull, nameof(request));
 
             if (request.DataList.Count == 0)
-                throw new ArgumentException("Data list can't be empty.", nameof(request));
+                throw new ArgumentException(Resource.ExceptionDataListEmpty, nameof(request));
 
             if (request.DataList.Count > 100)
-                throw new ArgumentException("Data list count can't be bigger than 100.", nameof(request));
+                throw new ArgumentException(Resource.ExceptionDataListTooLarge, nameof(request));
 
             for (int index = 0; index < request.DataList.Count; index++)
             {
@@ -169,7 +173,7 @@ namespace Timeline.Services.Timeline
                         }
                         catch (ImageException e)
                         {
-                            throw new TimelinePostCreateDataException(index, "Image validation failed.", e);
+                            throw new TimelinePostCreateDataException(index, Resource.ExceptionPostDataImageInvalid, e);
                         }
                         break;
                     case MimeTypes.TextPlain:
@@ -180,11 +184,11 @@ namespace Timeline.Services.Timeline
                         }
                         catch (DecoderFallbackException e)
                         {
-                            throw new TimelinePostCreateDataException(index, "Text is not a valid utf-8 sequence.", e);
+                            throw new TimelinePostCreateDataException(index, Resource.ExceptionPostDataNotValidUtf8, e);
                         }
                         break;
                     default:
-                        throw new TimelinePostCreateDataException(index, "Unsupported content type.");
+                        throw new TimelinePostCreateDataException(index, Resource.ExceptionPostDataUnsupportedType);
                 }
             }
 
@@ -234,6 +238,7 @@ namespace Timeline.Services.Timeline
             await _database.SaveChangesAsync();
 
             await transaction.CommitAsync();
+            _logger.LogInformation(Resource.LogTimelinePostCreated, timelineId, postEntity.Id);
 
             return postEntity;
         }
@@ -243,10 +248,8 @@ namespace Timeline.Services.Timeline
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
-            {
-                if (!_colorValidator.Validate(request.Color, out var message))
-                    throw new ArgumentException("Color is not valid.", nameof(request));
-            }
+            if (request.Color is not null)
+                CheckColor(request.Color, nameof(request));
 
             request.Time = request.Time?.MyToUtc();
 
@@ -269,6 +272,7 @@ namespace Timeline.Services.Timeline
             entity.LastUpdated = _clock.GetCurrentTime();
 
             await _database.SaveChangesAsync();
+            _logger.LogInformation(Resource.LogTimelinePostUpdated, timelineId, postId);
 
             return entity;
         }
@@ -302,6 +306,7 @@ namespace Timeline.Services.Timeline
             await _database.SaveChangesAsync();
 
             await transaction.CommitAsync();
+            _logger.LogWarning(Resource.LogTimelinePostDeleted, timelineId, postId);
         }
 
         public async Task DeleteAllPostsOfUserAsync(long userId)

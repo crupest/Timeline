@@ -61,6 +61,15 @@ namespace Timeline.Services.Token {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Jwt key is not found. Maybe you forget to do the migration..
+        /// </summary>
+        internal static string ExceptionJwtKeyNotExist {
+            get {
+                return ResourceManager.GetString("ExceptionJwtKeyNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The token didn&apos;t pass verification because {0}..
         /// </summary>
         internal static string ExceptionJwtUserTokenBadFormat {

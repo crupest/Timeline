@@ -128,16 +128,6 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Validator.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Services\TimelineService.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>TimelineService.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Services\UserTokenService.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>UserTokenService.resx</DependentUpon>
-        </Compile>
         <Compile Update="Services\DatabaseManagement\Resource.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
@@ -250,14 +240,6 @@
         <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Validator.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\TimelineService.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>TimelineService.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Services\UserTokenService.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>UserTokenService.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\DatabaseManagement\Resource.resx">
           <Generator>ResXFileCodeGenerator</Generator>
