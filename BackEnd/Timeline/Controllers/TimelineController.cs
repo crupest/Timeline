@@ -29,9 +29,6 @@ namespace Timeline.Controllers
         private readonly ITimelineService _service;
         private readonly IGenericMapper _mapper;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public TimelineController(IUserService userService, ITimelineService service, IGenericMapper mapper)
         {
             _userService = userService;

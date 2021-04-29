@@ -1,18 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
-using Timeline.Helpers;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
 using Timeline.Services.Mapper;
 using Timeline.Services.User;
-using static Timeline.Resources.Controllers.UserController;
-using static Timeline.Resources.Messages;
 
 namespace Timeline.Controllers
 {
@@ -23,16 +19,14 @@ namespace Timeline.Controllers
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class UserController : Controller
     {
-        private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
         private readonly IUserPermissionService _userPermissionService;
         private readonly IUserDeleteService _userDeleteService;
         private readonly IGenericMapper _mapper;
 
         /// <summary></summary>
-        public UserController(ILogger<UserController> logger, IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IGenericMapper mapper)
+        public UserController(IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IGenericMapper mapper)
         {
-            _logger = logger;
             _userService = userService;
             _userPermissionService = userPermissionService;
             _userDeleteService = userDeleteService;
@@ -93,9 +87,8 @@ namespace Timeline.Controllers
                 var user = await _userService.GetUserAsync(id);
                 return await _mapper.MapAsync<HttpUser>(user, Url, User);
             }
-            catch (UserNotExistException e)
+            catch (UserNotExistException)
             {
-                _logger.LogInformation(e, Log.Format(LogGetUserNotExist, ("Username", username)));
                 return NotFound(ErrorResponse.UserCommon.NotExist());
             }
         }
@@ -122,9 +115,8 @@ namespace Timeline.Controllers
                     var user = await _userService.ModifyUserAsync(id, _mapper.AutoMapperMap<ModifyUserParams>(body));
                     return await _mapper.MapAsync<HttpUser>(user, Url, User);
                 }
-                catch (UserNotExistException e)
+                catch (UserNotExistException)
                 {
-                    _logger.LogInformation(e, Log.Format(LogPatchUserNotExist, ("Username", username)));
                     return NotFound(ErrorResponse.UserCommon.NotExist());
                 }
                 catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
@@ -136,15 +128,15 @@ namespace Timeline.Controllers
             {
                 if (User.Identity!.Name != username)
                     return StatusCode(StatusCodes.Status403Forbidden,
-                        ErrorResponse.Common.CustomMessage_Forbid(Common_Forbid_NotSelf));
+                        ErrorResponse.Common.CustomMessage_Forbid(Resources.Messages.Common_Forbid_NotSelf));
 
                 if (body.Username != null)
                     return StatusCode(StatusCodes.Status403Forbidden,
-                        ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Username));
+                        ErrorResponse.Common.CustomMessage_Forbid(Resources.Messages.UserController_Patch_Forbid_Username));
 
                 if (body.Password != null)
                     return StatusCode(StatusCodes.Status403Forbidden,
-                        ErrorResponse.Common.CustomMessage_Forbid(UserController_Patch_Forbid_Password));
+                        ErrorResponse.Common.CustomMessage_Forbid(Resources.Messages.UserController_Patch_Forbid_Password));
 
                 var user = await _userService.ModifyUserAsync(this.GetUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
                 return await _mapper.MapAsync<HttpUser>(user, Url, User);
@@ -191,10 +183,8 @@ namespace Timeline.Controllers
                 await _userService.ChangePassword(this.GetUserId(), request.OldPassword, request.NewPassword);
                 return Ok();
             }
-            catch (BadPasswordException e)
+            catch (BadPasswordException)
             {
-                _logger.LogInformation(e, Log.Format(LogChangePasswordBadPassword,
-                    ("Username", User.Identity!.Name), ("Old Password", request.OldPassword)));
                 return BadRequest(ErrorResponse.UserController.ChangePassword_BadOldPassword());
             }
             // User can't be non-existent or the token is bad.

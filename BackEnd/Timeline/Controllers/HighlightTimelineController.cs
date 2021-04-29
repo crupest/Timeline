@@ -43,7 +43,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
-            var ids = await _service.GetHighlightTimelines();
+            var ids = await _service.GetHighlightTimelinesAsync();
             var timelines = await _timelineService.GetTimelineList(ids);
             return await Map(timelines);
         }
@@ -63,7 +63,7 @@ namespace Timeline.Controllers
             try
             {
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var create = await _service.AddHighlightTimeline(timelineId, this.GetUserId());
+                var create = await _service.AddHighlightTimelineAsync(timelineId, this.GetUserId());
                 return CommonPutResponse.Create(create);
             }
             catch (TimelineNotExistException)
@@ -87,7 +87,7 @@ namespace Timeline.Controllers
             try
             {
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var delete = await _service.RemoveHighlightTimeline(timelineId, this.GetUserId());
+                var delete = await _service.RemoveHighlightTimelineAsync(timelineId, this.GetUserId());
                 return CommonDeleteResponse.Create(delete);
             }
             catch (TimelineNotExistException)
@@ -110,7 +110,7 @@ namespace Timeline.Controllers
             try
             {
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(body.Timeline);
-                await _service.MoveHighlightTimeline(timelineId, body.NewPosition!.Value);
+                await _service.MoveHighlightTimelineAsync(timelineId, body.NewPosition!.Value);
                 return Ok();
             }
             catch (TimelineNotExistException)
