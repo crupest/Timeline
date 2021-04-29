@@ -42,7 +42,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<List<HttpTimeline>>> TimelineSearch([FromQuery(Name = "q"), Required(AllowEmptyStrings = false)] string query)
         {
-            var searchResult = await _service.SearchTimeline(query);
+            var searchResult = await _service.SearchTimelineAsync(query);
             var timelines = searchResult.Items.Select(i => i.Item).ToList();
             return await Map(timelines);
         }
@@ -57,7 +57,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<List<HttpUser>>> UserSearch([FromQuery(Name = "q"), Required(AllowEmptyStrings = false)] string query)
         {
-            var searchResult = await _service.SearchUser(query);
+            var searchResult = await _service.SearchUserAsync(query);
             var users = searchResult.Items.Select(i => i.Item).ToList();
             return await _mapper.MapListAsync<HttpUser>(users, Url, User);
         }

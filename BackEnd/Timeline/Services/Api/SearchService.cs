@@ -1,62 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 
 namespace Timeline.Services.Api
 {
-    public class SearchResultItem<TItem>
-    {
-        public SearchResultItem(TItem item, int score)
-        {
-            Item = item;
-            Score = score;
-        }
-
-        public TItem Item { get; set; } = default!;
-
-        /// <summary>
-        /// Bigger is better.
-        /// </summary>
-        public int Score { get; set; }
-    }
-
-    public class SearchResult<TItem>
-    {
-#pragma warning disable CA2227 // Collection properties should be read only
-        public List<SearchResultItem<TItem>> Items { get; set; } = new();
-#pragma warning restore CA2227 // Collection properties should be read only
-    }
-
-    public interface ISearchService
-    {
-        /// <summary>
-        /// Search timelines whose name or title contains query string.
-        /// </summary>
-        /// <param name="query">String to contain.</param>
-        /// <returns>Search results.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="query"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="query"/> is empty.</exception>
-        /// <remarks>
-        /// Implementation should promise high score is at first.
-        /// </remarks>
-        Task<SearchResult<TimelineEntity>> SearchTimeline(string query);
-
-        /// <summary>
-        /// Search users whose username or nickname contains query string.
-        /// </summary>
-        /// <param name="query">String to contain.</param>
-        /// <returns>Search results.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="query"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="query"/> is empty.</exception>
-        /// <remarks>
-        /// Implementation should promise high score is at first.
-        /// </remarks>
-        Task<SearchResult<UserEntity>> SearchUser(string query);
-    }
-
     public class SearchService : ISearchService
     {
         private readonly DatabaseContext _database;
@@ -66,7 +15,7 @@ namespace Timeline.Services.Api
             _database = database;
         }
 
-        public async Task<SearchResult<TimelineEntity>> SearchTimeline(string query)
+        public async Task<SearchResult<TimelineEntity>> SearchTimelineAsync(string query)
         {
             if (query is null)
                 throw new ArgumentNullException(nameof(query));
@@ -83,7 +32,7 @@ namespace Timeline.Services.Api
             return searchResult;
         }
 
-        public async Task<SearchResult<UserEntity>> SearchUser(string query)
+        public async Task<SearchResult<UserEntity>> SearchUserAsync(string query)
         {
             if (query is null)
                 throw new ArgumentNullException(nameof(query));

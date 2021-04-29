@@ -44,7 +44,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
-            var ids = await _service.GetBookmarks(this.GetUserId());
+            var ids = await _service.GetBookmarksAsync(this.GetUserId());
             var timelines = await _timelineService.GetTimelineList(ids);
             return await Map(timelines);
         }
@@ -63,7 +63,7 @@ namespace Timeline.Controllers
             try
             {
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var create = await _service.AddBookmark(this.GetUserId(), timelineId);
+                var create = await _service.AddBookmarkAsync(this.GetUserId(), timelineId);
                 return CommonPutResponse.Create(create);
             }
             catch (TimelineNotExistException)
@@ -86,7 +86,7 @@ namespace Timeline.Controllers
             try
             {
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var delete = await _service.RemoveBookmark(this.GetUserId(), timelineId);
+                var delete = await _service.RemoveBookmarkAsync(this.GetUserId(), timelineId);
                 return CommonDeleteResponse.Create(delete);
             }
             catch (TimelineNotExistException)
@@ -109,7 +109,7 @@ namespace Timeline.Controllers
             try
             {
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(request.Timeline);
-                await _service.MoveBookmark(this.GetUserId(), timelineId, request.NewPosition!.Value);
+                await _service.MoveBookmarkAsync(this.GetUserId(), timelineId, request.NewPosition!.Value);
                 return Ok();
             }
             catch (TimelineNotExistException)

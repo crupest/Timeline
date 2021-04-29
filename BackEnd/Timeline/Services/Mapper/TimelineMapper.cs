@@ -85,8 +85,8 @@ namespace Timeline.Services.Mapper
                 color: entity.Color,
                 createTime: entity.CreateTime,
                 lastModified: entity.LastModified,
-                isHighlight: await _highlightTimelineService.IsHighlightTimeline(entity.Id),
-                isBookmark: userId is not null && await _bookmarkTimelineService.IsBookmark(userId.Value, entity.Id, false, false),
+                isHighlight: await _highlightTimelineService.IsHighlightTimelineAsync(entity.Id),
+                isBookmark: userId is not null && await _bookmarkTimelineService.IsBookmarkAsync(userId.Value, entity.Id, false, false),
                 manageable: manageable,
                 postable: postable,
                 links: new HttpTimelineLinks(

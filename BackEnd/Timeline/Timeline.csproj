@@ -15,7 +15,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
 
-        <NoWarn>1701;1702;1591</NoWarn>
+        <NoWarn>1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -57,31 +57,6 @@
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
           <DependentUpon>Resource.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Controllers\ControllerAuthExtensions.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>ControllerAuthExtensions.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Controllers\TimelineController.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>TimelineController.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Controllers\TokenController.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>TokenController.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Controllers\UserAvatarController.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>UserAvatarController.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Controllers\UserController.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>UserController.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Entities.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -183,27 +158,6 @@
         <EmbeddedResource Update="Controllers\Resource.resx">
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Controllers\ControllerAuthExtensions.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>ControllerAuthExtensions.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Controllers\TimelineController.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>TimelineController.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Controllers\TokenController.resx">
-            <SubType>Designer</SubType>
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>TokenController.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Controllers\UserAvatarController.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>UserAvatarController.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Controllers\UserController.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>UserController.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Entities.resx">
             <Generator>ResXFileCodeGenerator</Generator>

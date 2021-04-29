@@ -24,7 +24,7 @@ namespace Timeline.Tests.Services
             await TimelineService.ChangePropertyAsync(t2.Id, new TimelineChangePropertyParams { Title = "hahaha" });
             await TimelineService.CreateTimelineAsync("bbbbbb", UserId);
 
-            var searchResult = await _service.SearchTimeline("hah");
+            var searchResult = await _service.SearchTimelineAsync("hah");
             searchResult.Items.Should().HaveCount(2);
             searchResult.Items[0].Item.Name.Should().Be("hahaha");
             searchResult.Items[0].Score.Should().Be(2);
@@ -40,7 +40,7 @@ namespace Timeline.Tests.Services
             await UserService.ModifyUserAsync(u2.Id, new ModifyUserParams { Nickname = "hahaha" });
             await UserService.CreateUserAsync(new CreateUserParams("bbbbbb", "p"));
 
-            var searchResult = await _service.SearchUser("hah");
+            var searchResult = await _service.SearchUserAsync("hah");
             searchResult.Items.Should().HaveCount(2);
             searchResult.Items[0].Item.Username.Should().Be("hahaha");
             searchResult.Items[0].Score.Should().Be(2);

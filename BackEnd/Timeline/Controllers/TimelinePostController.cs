@@ -35,9 +35,6 @@ namespace Timeline.Controllers
 
         private readonly MarkdownProcessor _markdownProcessor;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public TimelinePostController(ITimelineService timelineService, ITimelinePostService timelinePostService, IGenericMapper mapper, MarkdownProcessor markdownProcessor)
         {
             _timelineService = timelineService;
