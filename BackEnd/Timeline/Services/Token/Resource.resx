@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ExceptionJwtKeyNotExist" xml:space="preserve">
+    <value>Jwt key is not found. Maybe you forget to do the migration.</value>
+  </data>
   <data name="ExceptionJwtUserTokenBadFormat" xml:space="preserve">
     <value>The token didn't pass verification because {0}.</value>
   </data>

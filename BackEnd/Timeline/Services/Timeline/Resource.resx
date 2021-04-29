@@ -117,8 +117,29 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ExceptionColorInvalid" xml:space="preserve">
+    <value>Color is not valid. {0}</value>
+  </data>
+  <data name="ExceptionDataListEmpty" xml:space="preserve">
+    <value>Data list can't be empty.</value>
+  </data>
+  <data name="ExceptionDataListNull" xml:space="preserve">
+    <value>Data list can't be null.</value>
+  </data>
+  <data name="ExceptionDataListTooLarge" xml:space="preserve">
+    <value>Data list count can't be bigger than 100.</value>
+  </data>
   <data name="ExceptionGeneralTimelineNameBadFormat" xml:space="preserve">
     <value>This timeline name is neither a valid personal timeline name nor a valid ordinary timeline name. {0}</value>
+  </data>
+  <data name="ExceptionPostDataImageInvalid" xml:space="preserve">
+    <value>Image validation failed.</value>
+  </data>
+  <data name="ExceptionPostDataNotValidUtf8" xml:space="preserve">
+    <value>It is not a valid utf-8 sequence.</value>
+  </data>
+  <data name="ExceptionPostDataUnsupportedType" xml:space="preserve">
+    <value>Unsupported content type.</value>
   </data>
   <data name="ExceptionTimelineAlreadyExist" xml:space="preserve">
     <value>Timeline with given constraints already exist.</value>
@@ -140,5 +161,29 @@
   </data>
   <data name="LogPersonalTimelineAutoCreate" xml:space="preserve">
     <value>A personal timeline for user with username={0} is created automatically.</value>
+  </data>
+  <data name="LogTimelineAddMember" xml:space="preserve">
+    <value>A member(user id={0}) is added to timeline(id={1}).</value>
+  </data>
+  <data name="LogTimelineCreate" xml:space="preserve">
+    <value>A timeline is created with name={0}, id={1}.</value>
+  </data>
+  <data name="LogTimelineDelete" xml:space="preserve">
+    <value>A timeline(id={0}) is deleted.</value>
+  </data>
+  <data name="LogTimelinePostCreated" xml:space="preserve">
+    <value>A timeline(id={0}) post(id={1}) is created.</value>
+  </data>
+  <data name="LogTimelinePostDeleted" xml:space="preserve">
+    <value>A timeline(id={0}) post(id={1}) is deleted.</value>
+  </data>
+  <data name="LogTimelinePostUpdated" xml:space="preserve">
+    <value>A timeline(id={0}) post(id={1}) is updated.</value>
+  </data>
+  <data name="LogTimelineRemoveMember" xml:space="preserve">
+    <value>A member(user id={0}) is removed from timeline(id={1}).</value>
+  </data>
+  <data name="LogTimelineUpdated" xml:space="preserve">
+    <value>Timeline with id={0} is updated.</value>
   </data>
 </root>

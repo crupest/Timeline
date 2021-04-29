@@ -23,7 +23,6 @@ namespace Timeline.Services.Timeline
         private readonly IClock _clock;
 
         private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
-
         private readonly ColorValidator _colorValidator = new ColorValidator();
 
         public TimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IBasicUserService userService, IClock clock)
@@ -36,7 +35,7 @@ namespace Timeline.Services.Timeline
         }
 
 
-        private void ValidateTimelineName(string name, string paramName)
+        private void CheckTimelineName(string name, string paramName)
         {
             if (!_timelineNameValidator.Validate(name, out var message))
             {
@@ -60,7 +59,7 @@ namespace Timeline.Services.Timeline
                 throw new ArgumentNullException(nameof(newProperties));
 
             if (newProperties.Name is not null)
-                ValidateTimelineName(newProperties.Name, nameof(newProperties));
+                CheckTimelineName(newProperties.Name, nameof(newProperties));
 
             if (newProperties.Color is not null)
             {
@@ -125,6 +124,7 @@ namespace Timeline.Services.Timeline
             }
 
             await _database.SaveChangesAsync();
+            _logger.LogInformation(Resource.LogTimelineUpdated, id);
         }
 
         public async Task<bool> AddMemberAsync(long timelineId, long userId)
@@ -138,7 +138,6 @@ namespace Timeline.Services.Timeline
             if (await _database.TimelineMembers.AnyAsync(m => m.TimelineId == timelineId && m.UserId == userId))
                 return false;
 
-
             var entity = new TimelineMemberEntity { UserId = userId, TimelineId = timelineId };
             _database.TimelineMembers.Add(entity);
 
@@ -146,6 +145,8 @@ namespace Timeline.Services.Timeline
             timelineEntity.LastModified = _clock.GetCurrentTime();
 
             await _database.SaveChangesAsync();
+            _logger.LogInformation(Resource.LogTimelineAddMember, userId, timelineId);
+
             return true;
         }
 
@@ -166,6 +167,8 @@ namespace Timeline.Services.Timeline
             timelineEntity.LastModified = _clock.GetCurrentTime();
 
             await _database.SaveChangesAsync();
+            _logger.LogInformation(Resource.LogTimelineRemoveMember, userId, timelineId);
+
             return true;
         }
 
@@ -258,7 +261,7 @@ namespace Timeline.Services.Timeline
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            ValidateTimelineName(name, nameof(name));
+            CheckTimelineName(name, nameof(name));
 
             var conflict = await _database.Timelines.AnyAsync(t => t.Name == name);
 
@@ -269,6 +272,7 @@ namespace Timeline.Services.Timeline
 
             _database.Timelines.Add(entity);
             await _database.SaveChangesAsync();
+            _logger.LogInformation(Resource.LogTimelineCreate, name, entity.Id);
 
             return entity;
         }
@@ -282,6 +286,7 @@ namespace Timeline.Services.Timeline
 
             _database.Timelines.Remove(entity);
             await _database.SaveChangesAsync();
+            _logger.LogWarning(Resource.LogTimelineDelete, id);
         }
     }
 }

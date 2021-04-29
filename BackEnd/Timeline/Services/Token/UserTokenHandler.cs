@@ -29,7 +29,7 @@ namespace Timeline.Services.Token
 
             if (key == null)
             {
-                throw new InvalidOperationException(Resources.Services.UserTokenService.JwtKeyNotExist);
+                throw new InvalidOperationException(Resource.ExceptionJwtKeyNotExist);
             }
 
             _tokenSecurityKey = new SymmetricSecurityKey(key);
