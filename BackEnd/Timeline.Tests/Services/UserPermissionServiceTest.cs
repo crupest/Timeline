@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using System;
 using System.Threading.Tasks;
+using Timeline.Services;
 using Timeline.Services.User;
 using Xunit;
 
@@ -17,7 +18,7 @@ namespace Timeline.Tests.Services
 
         protected override void OnInitialize()
         {
-            _service = new UserPermissionService(Database);
+            _service = new UserPermissionService(Database, UserService);
         }
 
         [Fact]
@@ -37,7 +38,7 @@ namespace Timeline.Tests.Services
         [Fact]
         public async Task GetPermissionsOfInexistentUserShouldThrow()
         {
-            await _service.Awaiting(s => s.GetPermissionsOfUserAsync(10)).Should().ThrowAsync<UserNotExistException>();
+            await _service.Awaiting(s => s.GetPermissionsOfUserAsync(10)).Should().ThrowAsync<EntityNotExistException>();
         }
 
         [Fact]
@@ -91,13 +92,13 @@ namespace Timeline.Tests.Services
         [Fact]
         public async Task AddPermissionToInexistentUserShouldThrown()
         {
-            await _service.Awaiting(s => s.AddPermissionToUserAsync(10, UserPermission.HighlightTimelineManagement)).Should().ThrowAsync<UserNotExistException>();
+            await _service.Awaiting(s => s.AddPermissionToUserAsync(10, UserPermission.HighlightTimelineManagement)).Should().ThrowAsync<EntityNotExistException>();
         }
 
         [Fact]
         public async Task RemovePermissionFromInexistentUserShouldThrown()
         {
-            await _service.Awaiting(s => s.RemovePermissionFromUserAsync(10, UserPermission.HighlightTimelineManagement)).Should().ThrowAsync<UserNotExistException>();
+            await _service.Awaiting(s => s.RemovePermissionFromUserAsync(10, UserPermission.HighlightTimelineManagement)).Should().ThrowAsync<EntityNotExistException>();
         }
 
         [Fact]

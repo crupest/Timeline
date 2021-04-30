@@ -60,16 +60,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult<CommonPutResponse>> Put([GeneralTimelineName] string timeline)
         {
-            try
-            {
-                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var create = await _service.AddBookmarkAsync(this.GetUserId(), timelineId);
-                return CommonPutResponse.Create(create);
-            }
-            catch (TimelineNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NotExist());
-            }
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
+            var create = await _service.AddBookmarkAsync(this.GetUserId(), timelineId);
+            return CommonPutResponse.Create(create);
         }
 
         /// <summary>
@@ -83,16 +76,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult<CommonDeleteResponse>> Delete([GeneralTimelineName] string timeline)
         {
-            try
-            {
-                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var delete = await _service.RemoveBookmarkAsync(this.GetUserId(), timelineId);
-                return CommonDeleteResponse.Create(delete);
-            }
-            catch (TimelineNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NotExist());
-            }
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
+            var delete = await _service.RemoveBookmarkAsync(this.GetUserId(), timelineId);
+            return CommonDeleteResponse.Create(delete);
         }
 
         /// <summary>
@@ -111,10 +97,6 @@ namespace Timeline.Controllers
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(request.Timeline);
                 await _service.MoveBookmarkAsync(this.GetUserId(), timelineId, request.NewPosition!.Value);
                 return Ok();
-            }
-            catch (TimelineNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NotExist());
             }
             catch (InvalidBookmarkException)
             {

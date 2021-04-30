@@ -190,8 +190,8 @@ namespace Timeline.Tests.IntegratedTests
 
             const string url = "users/user123/permissions/UserManagement";
 
-            await client.TestPutAssertNotFoundAsync(url, errorCode: ErrorCodes.UserCommon.NotExist);
-            await client.TestDeleteAssertNotFoundAsync(url, errorCode: ErrorCodes.UserCommon.NotExist);
+            await client.TestPutAssertErrorAsync(url, errorCode: ErrorCodes.NotExist.User);
+            await client.TestDeleteAsync(url);
         }
     }
 }

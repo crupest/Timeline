@@ -13,7 +13,7 @@ namespace Timeline.Services.User.Avatar
         /// </summary>
         /// <param name="userId">User id.</param>
         /// <returns>The avatar digest.</returns>
-        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when user does not exist.</exception>
         Task<ICacheableDataDigest> GetAvatarDigestAsync(long userId);
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Timeline.Services.User.Avatar
         /// </summary>
         /// <param name="userId">User id.</param>
         /// <returns>The avatar.</returns>
-        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when user does not exist.</exception>
         Task<ByteData> GetAvatarAsync(long userId);
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Timeline.Services.User.Avatar
         /// <param name="avatar">The new avatar data.</param>
         /// <returns>The digest of the avatar.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="avatar"/> is null.</exception>
-        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="ImageException">Thrown if avatar is of bad format.</exception>
         Task<ICacheableDataDigest> SetAvatarAsync(long userId, ByteData avatar);
 
@@ -39,7 +39,7 @@ namespace Timeline.Services.User.Avatar
         /// Remove avatar of a user.
         /// </summary>
         /// <param name="userId">User id.</param>
-        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when user does not exist.</exception>
         Task DeleteAvatarAsync(long userId);
     }
 }

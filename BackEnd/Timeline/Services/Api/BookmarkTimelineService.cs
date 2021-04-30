@@ -24,11 +24,8 @@ namespace Timeline.Services.Api
 
         public async Task<bool> AddBookmarkAsync(long userId, long timelineId)
         {
-            if (!await _userService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
-
-            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            await _userService.ThrowIfUserNotExist(userId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             if (await _database.BookmarkTimelines.AnyAsync(t => t.TimelineId == timelineId && t.UserId == userId))
                 return false;
@@ -46,8 +43,7 @@ namespace Timeline.Services.Api
 
         public async Task<List<long>> GetBookmarksAsync(long userId)
         {
-            if (!await _userService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
+            await _userService.ThrowIfUserNotExist(userId);
 
             var entities = await _database.BookmarkTimelines.Where(t => t.UserId == userId).OrderBy(t => t.Rank).Select(t => new { t.TimelineId }).ToListAsync();
 
@@ -56,22 +52,19 @@ namespace Timeline.Services.Api
 
         public async Task<bool> IsBookmarkAsync(long userId, long timelineId, bool checkUserExistence = true, bool checkTimelineExistence = true)
         {
-            if (checkUserExistence && !await _userService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
+            if (checkUserExistence)
+                await _userService.ThrowIfUserNotExist(userId);
 
-            if (checkTimelineExistence && !await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            if (checkTimelineExistence)
+                await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             return await _database.BookmarkTimelines.AnyAsync(b => b.TimelineId == timelineId && b.UserId == userId);
         }
 
         public async Task MoveBookmarkAsync(long userId, long timelineId, long newPosition)
         {
-            if (!await _userService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
-
-            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            await _userService.ThrowIfUserNotExist(userId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var entity = await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId && t.UserId == userId);
 
@@ -109,11 +102,8 @@ namespace Timeline.Services.Api
 
         public async Task<bool> RemoveBookmarkAsync(long userId, long timelineId)
         {
-            if (!await _userService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
-
-            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            await _userService.ThrowIfUserNotExist(userId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var entity = await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.UserId == userId && t.TimelineId == timelineId);
 

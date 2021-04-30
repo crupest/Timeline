@@ -30,7 +30,7 @@ namespace Timeline.Tests.IntegratedTests
 
             using (var client = await CreateClientAsUser())
             {
-                await client.TestGetAssertNotFoundAsync("users/usernotexist/avatar", errorCode: ErrorCodes.UserCommon.NotExist);
+                await client.TestGetAssertNotFoundAsync("users/usernotexist/avatar", errorCode: ErrorCodes.NotExist.User);
 
                 var env = TestApp.Host.Services.GetRequiredService<IWebHostEnvironment>();
                 var defaultAvatarData = await File.ReadAllBytesAsync(Path.Combine(env.ContentRootPath, "default-avatar.png"));
@@ -138,8 +138,8 @@ namespace Timeline.Tests.IntegratedTests
             {
                 await client.TestPutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.ContentType);
                 await client.TestDeleteAsync("users/user1/avatar");
-                await client.TestPutByteArrayAssertErrorAsync("users/usernotexist/avatar", new[] { (byte)0x00 }, "image/png", errorCode: ErrorCodes.UserCommon.NotExist);
-                await client.TestDeleteAssertErrorAsync("users/usernotexist/avatar", errorCode: ErrorCodes.UserCommon.NotExist);
+                await client.TestPutByteArrayAssertErrorAsync("users/usernotexist/avatar", new[] { (byte)0x00 }, "image/png", errorCode: ErrorCodes.NotExist.User);
+                await client.TestDeleteAsync("users/usernotexist/avatar");
             }
 
             // bad username check

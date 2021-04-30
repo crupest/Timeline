@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ExceptionNoUserId" xml:space="preserve">
-    <value>Can't get user id.</value>
+  <data name="MessageEntityAlreadyExist" xml:space="preserve">
+    <value>The entity you want to create already exists. Entity type is {0}. Constraints are {1}.</value>
   </data>
-  <data name="MessageUsernameConflict" xml:space="preserve">
-    <value>A user with given username already exists.</value>
+  <data name="MessageEntityNotExist" xml:space="preserve">
+    <value>The entity you operate on does not exist. Entity type is {0}. Constraints are {1}.</value>
   </data>
 </root>

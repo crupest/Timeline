@@ -47,7 +47,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Get_404()
         {
             using var client = await CreateDefaultClient();
-            await client.TestGetAssertNotFoundAsync("users/usernotexist", errorCode: ErrorCodes.UserCommon.NotExist);
+            await client.TestGetAssertNotFoundAsync("users/usernotexist", errorCode: ErrorCodes.NotExist.User);
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Patch_NotExist()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPatchAssertNotFoundAsync("users/usernotexist", new HttpUserPatchRequest { }, errorCode: ErrorCodes.UserCommon.NotExist);
+            await client.TestPatchAssertErrorAsync("users/usernotexist", new HttpUserPatchRequest { }, errorCode: ErrorCodes.NotExist.User);
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Patch_UsernameConflict()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestPatchAssertErrorAsync("users/user1", new HttpUserPatchRequest { Username = "admin" }, errorCode: ErrorCodes.UserController.UsernameConflict);
+            await client.TestPatchAssertErrorAsync("users/user1", new HttpUserPatchRequest { Username = "admin" }, errorCode: ErrorCodes.Conflict.User);
         }
 
         [Fact]
@@ -255,7 +255,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 Username = "user1",
                 Password = "bbb",
-            }, errorCode: ErrorCodes.UserController.UsernameConflict);
+            }, errorCode: ErrorCodes.Conflict.User);
         }
 
         [Fact]

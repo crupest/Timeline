@@ -54,9 +54,10 @@ namespace Timeline.Services.User
             }
         }
 
-        private static void ThrowUsernameConflict(object? user)
+        private static EntityAlreadyExistException CreateUsernameConflictException(string username)
         {
-            throw new UserAlreadyExistException(user);
+            throw new EntityAlreadyExistException(EntityTypes.User,
+                new Dictionary<string, object> { ["username"] = username });
         }
 
         public async Task<UserEntity> GetUserAsync(long id)
@@ -64,7 +65,7 @@ namespace Timeline.Services.User
             var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
             if (user is null)
-                throw new UserNotExistException(id);
+                throw CreateUserNotExistException(id);
 
             return user;
         }
@@ -89,7 +90,7 @@ namespace Timeline.Services.User
 
             var conflict = await _databaseContext.Users.AnyAsync(u => u.Username == param.Username);
             if (conflict)
-                ThrowUsernameConflict(null);
+                throw CreateUsernameConflictException(param.Username);
 
             var newEntity = new UserEntity
             {
@@ -120,8 +121,8 @@ namespace Timeline.Services.User
             }
 
             var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
-            if (entity == null)
-                throw new UserNotExistException(id);
+            if (entity is null)
+                throw CreateUserNotExistException(id);
 
             if (param is not null)
             {
@@ -133,7 +134,7 @@ namespace Timeline.Services.User
                 {
                     var conflict = await _databaseContext.Users.AnyAsync(u => u.Username == username);
                     if (conflict)
-                        ThrowUsernameConflict(null);
+                        throw CreateUsernameConflictException(username);
 
                     entity.Username = username;
                     entity.UsernameChangeTime = now;
@@ -180,7 +181,7 @@ namespace Timeline.Services.User
             if (entity is null)
             {
                 _logger.LogInformation(Resource.LogVerifyCredentialsUsernameBad, username);
-                throw new UserNotExistException(username);
+                throw CreateUserNotExistException(username);
             }
 
             if (!_passwordService.VerifyPassword(entity.Password, password))
@@ -204,7 +205,7 @@ namespace Timeline.Services.User
             var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new UserNotExistException(id);
+                throw CreateUserNotExistException(id);
 
             if (!_passwordService.VerifyPassword(entity.Password, oldPassword))
                 throw new BadPasswordException(oldPassword);

@@ -34,6 +34,13 @@ namespace Timeline.Services.Timeline
             _clock = clock;
         }
 
+        private static EntityAlreadyExistException CreateTimelineConflictException(string name)
+        {
+            return new EntityAlreadyExistException(EntityTypes.Timeline, new Dictionary<string, object>
+            {
+                ["name"] = name
+            });
+        }
 
         private void CheckTimelineName(string name, string paramName)
         {
@@ -48,7 +55,7 @@ namespace Timeline.Services.Timeline
             var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new TimelineNotExistException(id);
+                throw CreateTimelineNotExistException(id);
 
             return entity;
         }
@@ -73,7 +80,7 @@ namespace Timeline.Services.Timeline
             var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new TimelineNotExistException(id);
+                throw CreateTimelineNotExistException(id);
 
             var changed = false;
             var nameChanged = false;
@@ -83,7 +90,7 @@ namespace Timeline.Services.Timeline
                 var conflict = await _database.Timelines.AnyAsync(t => t.Name == newProperties.Name);
 
                 if (conflict)
-                    throw new TimelineAlreadyExistException();
+                    throw CreateTimelineConflictException(newProperties.Name);
 
                 entity.Name = newProperties.Name;
 
@@ -130,10 +137,9 @@ namespace Timeline.Services.Timeline
         public async Task<bool> AddMemberAsync(long timelineId, long userId)
         {
             if (!await CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+                throw CreateTimelineNotExistException(timelineId);
 
-            if (!await _userService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
+            await _userService.ThrowIfUserNotExist(userId);
 
             if (await _database.TimelineMembers.AnyAsync(m => m.TimelineId == timelineId && m.UserId == userId))
                 return false;
@@ -153,10 +159,9 @@ namespace Timeline.Services.Timeline
         public async Task<bool> RemoveMemberAsync(long timelineId, long userId)
         {
             if (!await CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+                throw CreateTimelineNotExistException(timelineId);
 
-            if (!await _userService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
+            await _userService.ThrowIfUserNotExist(userId);
 
             var entity = await _database.TimelineMembers.SingleOrDefaultAsync(m => m.TimelineId == timelineId && m.UserId == userId);
             if (entity is null) return false;
@@ -177,7 +182,7 @@ namespace Timeline.Services.Timeline
             var entity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new TimelineNotExistException(timelineId);
+                throw CreateTimelineNotExistException(timelineId);
 
             return entity.OwnerId == userId;
         }
@@ -187,7 +192,7 @@ namespace Timeline.Services.Timeline
             var entity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.Visibility }).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new TimelineNotExistException(timelineId);
+                throw CreateTimelineNotExistException(timelineId);
 
             if (entity.Visibility == TimelineVisibility.Public)
                 return true;
@@ -211,7 +216,7 @@ namespace Timeline.Services.Timeline
             var entity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new TimelineNotExistException(timelineId);
+                throw CreateTimelineNotExistException(timelineId);
 
             if (userId == entity.OwnerId)
                 return true;
@@ -266,7 +271,7 @@ namespace Timeline.Services.Timeline
             var conflict = await _database.Timelines.AnyAsync(t => t.Name == name);
 
             if (conflict)
-                throw new TimelineAlreadyExistException();
+                throw CreateTimelineConflictException(name);
 
             var entity = CreateNewTimelineEntity(name, owner);
 
@@ -282,7 +287,7 @@ namespace Timeline.Services.Timeline
             var entity = await _database.Timelines.Where(t => t.Id == id).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new TimelineNotExistException(id);
+                throw CreateTimelineNotExistException(id);
 
             _database.Timelines.Remove(entity);
             await _database.SaveChangesAsync();

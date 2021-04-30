@@ -91,7 +91,7 @@ namespace Timeline.Services.Token
 
                 return user;
             }
-            catch (UserNotExistException e)
+            catch (EntityNotExistException e)
             {
                 var exception = new UserTokenUserNotExistException(token, e);
                 _logger.LogInformation(exception, Resource.LogTokenVerifiedFail);

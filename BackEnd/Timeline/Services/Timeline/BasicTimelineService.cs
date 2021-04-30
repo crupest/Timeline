@@ -47,6 +47,22 @@ namespace Timeline.Services.Timeline
             };
         }
 
+        protected static EntityNotExistException CreateTimelineNotExistException(string name, Exception? inner = null)
+        {
+            return new EntityNotExistException(EntityTypes.Timeline, new Dictionary<string, object>
+            {
+                ["name"] = name
+            }, null, inner);
+        }
+
+        protected static EntityNotExistException CreateTimelineNotExistException(long id)
+        {
+            return new EntityNotExistException(EntityTypes.Timeline, new Dictionary<string, object>
+            {
+                ["id"] = id
+            });
+        }
+
         protected void CheckGeneralTimelineName(string timelineName, string? paramName)
         {
             if (!_generalTimelineNameValidator.Validate(timelineName, out var message))
@@ -75,9 +91,9 @@ namespace Timeline.Services.Timeline
                 {
                     userId = await _basicUserService.GetUserIdByUsernameAsync(username);
                 }
-                catch (UserNotExistException e)
+                catch (EntityNotExistException e)
                 {
-                    throw new TimelineNotExistException(timelineName, e);
+                    throw CreateTimelineNotExistException(timelineName, e);
                 }
 
                 var timelineEntity = await _database.Timelines.Where(t => t.OwnerId == userId && t.Name == null).Select(t => new { t.Id }).SingleOrDefaultAsync();
@@ -103,7 +119,7 @@ namespace Timeline.Services.Timeline
 
                 if (timelineEntity == null)
                 {
-                    throw new TimelineNotExistException(timelineName);
+                    throw CreateTimelineNotExistException(timelineName);
                 }
                 else
                 {

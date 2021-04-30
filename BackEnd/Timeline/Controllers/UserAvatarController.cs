@@ -44,16 +44,8 @@ namespace Timeline.Controllers
         public async Task<IActionResult> Get([FromRoute][Username] string username, [FromHeader(Name = "If-None-Match")] string? ifNoneMatch)
         {
             _ = ifNoneMatch;
-            try
-            {
-                long userId = await _userService.GetUserIdByUsernameAsync(username);
-                return await DataCacheHelper.GenerateActionResult(this, () => _service.GetAvatarDigestAsync(userId), () => _service.GetAvatarAsync(userId));
-            }
-            catch (UserNotExistException)
-            {
-                return NotFound(ErrorResponse.UserCommon.NotExist());
-            }
-
+            long userId = await _userService.GetUserIdByUsernameAsync(username);
+            return await DataCacheHelper.GenerateActionResult(this, () => _service.GetAvatarDigestAsync(userId), () => _service.GetAvatarAsync(userId));
         }
 
         /// <summary>
@@ -76,15 +68,7 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            long id;
-            try
-            {
-                id = await _userService.GetUserIdByUsernameAsync(username);
-            }
-            catch (UserNotExistException)
-            {
-                return BadRequest(ErrorResponse.UserCommon.NotExist());
-            }
+            long id = await _userService.GetUserIdByUsernameAsync(username);
 
             try
             {
@@ -127,15 +111,7 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            long id;
-            try
-            {
-                id = await _userService.GetUserIdByUsernameAsync(username);
-            }
-            catch (UserNotExistException)
-            {
-                return BadRequest(ErrorResponse.UserCommon.NotExist());
-            }
+            long id = await _userService.GetUserIdByUsernameAsync(username);
 
             await _service.DeleteAvatarAsync(id);
             return Ok();

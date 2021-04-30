@@ -22,7 +22,7 @@ namespace Timeline.Services.User
         /// <returns>The id of the user.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user with given username does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when the user with given username does not exist.</exception>
         Task<long> GetUserIdByUsernameAsync(string username);
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Timeline.Services.User
         /// </summary>
         /// <param name="userId">User id.</param>
         /// <returns>The time.</returns>
-        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when user does not exist.</exception>
         Task<DateTime> GetUsernameLastModifiedTimeAsync(long userId);
     }
 }
