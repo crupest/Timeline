@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.ComponentModel;
-using System.Net.Mime;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;

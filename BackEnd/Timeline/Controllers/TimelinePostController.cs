@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Filters;
 using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Http;

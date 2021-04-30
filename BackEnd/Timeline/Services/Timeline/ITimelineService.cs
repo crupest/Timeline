@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
-using Timeline.Services.User;
 
 namespace Timeline.Services.Timeline
 {
