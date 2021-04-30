@@ -69,7 +69,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             var posts = await _postService.GetPostsAsync(timelineId, modifiedSince, includeDeleted ?? false);
@@ -94,7 +94,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             var post = await _postService.GetPostAsync(timelineId, postId);
@@ -140,7 +140,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             return await DataCacheHelper.GenerateActionResult(this,
@@ -176,7 +176,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !await _timelineService.IsMemberOfAsync(timelineId, userId))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             var createRequest = new TimelinePostCreateRequest()
@@ -235,7 +235,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, this.GetUserId(), true))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             var entity = await _postService.PatchPostAsync(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
@@ -262,7 +262,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, this.GetUserId(), true))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             await _postService.DeletePostAsync(timelineId, post);

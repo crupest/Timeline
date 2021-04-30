@@ -120,6 +120,54 @@
   <data name="ExceptionNoUserId" xml:space="preserve">
     <value>Can't get user id.</value>
   </data>
+  <data name="MessageForbid" xml:space="preserve">
+    <value>You have no permission to access this.</value>
+  </data>
+  <data name="MessageForbidNotAdministrator" xml:space="preserve">
+    <value>You can't do this unless you are administrator.</value>
+  </data>
+  <data name="MessageForbidNotAdministratorOrOwner" xml:space="preserve">
+    <value>You can't do this unless you are administrator or resource owner.</value>
+  </data>
+  <data name="MessageImageBadSize" xml:space="preserve">
+    <value>Image is not a square.</value>
+  </data>
+  <data name="MessageImageDecodeFailed" xml:space="preserve">
+    <value>Image decode failed.</value>
+  </data>
+  <data name="MessageImageFormatUnmatch" xml:space="preserve">
+    <value>Specified image format does not match the actual one .</value>
+  </data>
+  <data name="MessageImageUnknownError" xml:space="preserve">
+    <value>Unknown error happened to image.</value>
+  </data>
+  <data name="MessageInvalidOperationOnRootUser" xml:space="preserve">
+    <value>You can't do this because it is the root user.</value>
+  </data>
+  <data name="MessageOldPasswordWrong" xml:space="preserve">
+    <value>The old password is wrong.</value>
+  </data>
+  <data name="MessageTimelineListQueryRelateNotExist" xml:space="preserve">
+    <value>The user specified by query param "relate" does not exist.</value>
+  </data>
+  <data name="MessageTimelineListQueryVisibilityUnknown" xml:space="preserve">
+    <value>'{0}' is an unkown visibility in the query parameter 'visibility'. </value>
+  </data>
+  <data name="MessageTokenCreateBadCredential" xml:space="preserve">
+    <value>Username or password is invalid.</value>
+  </data>
+  <data name="MessageTokenVerifyBadFormat" xml:space="preserve">
+    <value>The token is of bad format. It might not be created by the server.</value>
+  </data>
+  <data name="MessageTokenVerifyOldVersion" xml:space="preserve">
+    <value>Token has an old version. User might have update some info.</value>
+  </data>
+  <data name="MessageTokenVerifyTimeExpired" xml:space="preserve">
+    <value>The token is expired.</value>
+  </data>
+  <data name="MessageTokenVerifyUserNotExist" xml:space="preserve">
+    <value>User does not exist. Administrator might have deleted this user.</value>
+  </data>
   <data name="MessageUsernameConflict" xml:space="preserve">
     <value>A user with given username already exists.</value>
   </data>

@@ -183,7 +183,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task DeleteRootUser_Should_Error()
         {
             using var client = await CreateClientAsAdministrator();
-            await client.TestDeleteAssertErrorAsync("users/admin", errorCode: ErrorCodes.UserController.Delete_RootUser);
+            await client.TestDeleteAssertErrorAsync("users/admin", errorCode: ErrorCodes.UserController.InvalidOperationOnRootUser);
         }
 
         [Fact]
@@ -310,7 +310,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task Op_ChangePassword_BadOldPassword()
         {
             using var client = await CreateClientAsUser();
-            await client.TestPostAssertErrorAsync(changePasswordUrl, new HttpChangePasswordRequest { OldPassword = "???", NewPassword = "???" }, errorCode: ErrorCodes.UserController.ChangePassword_BadOldPassword);
+            await client.TestPostAssertErrorAsync(changePasswordUrl, new HttpChangePasswordRequest { OldPassword = "???", NewPassword = "???" }, errorCode: ErrorCodes.UserController.ChangePasswordBadOldPassword);
         }
 
         [Fact]

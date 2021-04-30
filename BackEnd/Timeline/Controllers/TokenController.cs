@@ -57,11 +57,11 @@ namespace Timeline.Controllers
             }
             catch (EntityNotExistException)
             {
-                return BadRequest(ErrorResponse.TokenController.Create_BadCredential());
+                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.CreateBadCredential, Resource.MessageTokenCreateBadCredential);
             }
             catch (BadPasswordException)
             {
-                return BadRequest(ErrorResponse.TokenController.Create_BadCredential());
+                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.CreateBadCredential, Resource.MessageTokenCreateBadCredential);
             }
         }
 
@@ -85,19 +85,19 @@ namespace Timeline.Controllers
             }
             catch (UserTokenTimeExpiredException)
             {
-                return BadRequest(ErrorResponse.TokenController.Verify_TimeExpired());
+                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyTimeExpired, Resource.MessageTokenVerifyTimeExpired);
             }
             catch (UserTokenVersionExpiredException)
             {
-                return BadRequest(ErrorResponse.TokenController.Verify_OldVersion());
+                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyOldVersion, Resource.MessageTokenVerifyOldVersion);
             }
             catch (UserTokenBadFormatException)
             {
-                return BadRequest(ErrorResponse.TokenController.Verify_BadFormat());
+                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyBadFormat, Resource.MessageTokenVerifyBadFormat);
             }
             catch (UserTokenUserNotExistException)
             {
-                return BadRequest(ErrorResponse.TokenController.Verify_UserNotExist());
+                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyUserNotExist, Resource.MessageTokenVerifyUserNotExist);
             }
         }
     }

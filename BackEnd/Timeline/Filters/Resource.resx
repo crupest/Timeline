@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="MessageContentLengthTooBig" xml:space="preserve">
+    <value>Content length is too big. It can't be bigger than {0}.</value>
+  </data>
   <data name="MessageEntityAlreadyExist" xml:space="preserve">
     <value>The entity you want to create already exists. Entity type is {0}. Constraints are {1}.</value>
   </data>

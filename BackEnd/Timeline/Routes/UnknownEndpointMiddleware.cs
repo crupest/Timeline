@@ -24,7 +24,9 @@ namespace Timeline.Routes
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
                     context.Response.ContentType = MediaTypeNames.Application.Json;
 
-                    var body = JsonSerializer.SerializeToUtf8Bytes(ErrorResponse.Common.UnknownEndpoint(), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                    var body = JsonSerializer.SerializeToUtf8Bytes(
+                        new CommonResponse(ErrorCodes.Common.UnknownEndpoint, Resource.MessageUnknownEndpoint),
+                        new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
                     context.Response.ContentLength = body.Length;
                     await context.Response.Body.WriteAsync(body);

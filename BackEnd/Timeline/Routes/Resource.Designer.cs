@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Filters {
+namespace Timeline.Routes {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Timeline.Filters {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Filters.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Routes.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,29 +61,11 @@ namespace Timeline.Filters {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Content length is too big. It can&apos;t be bigger than {0}..
+        ///   Looks up a localized string similar to The api endpoint you request is unknown. You might get the wrong api entry..
         /// </summary>
-        internal static string MessageContentLengthTooBig {
+        internal static string MessageUnknownEndpoint {
             get {
-                return ResourceManager.GetString("MessageContentLengthTooBig", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The entity you want to create already exists. Entity type is {0}. Constraints are {1}..
-        /// </summary>
-        internal static string MessageEntityAlreadyExist {
-            get {
-                return ResourceManager.GetString("MessageEntityAlreadyExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The entity you operate on does not exist. Entity type is {0}. Constraints are {1}..
-        /// </summary>
-        internal static string MessageEntityNotExist {
-            get {
-                return ResourceManager.GetString("MessageEntityNotExist", resourceCulture);
+                return ResourceManager.GetString("MessageUnknownEndpoint", resourceCulture);
             }
         }
     }

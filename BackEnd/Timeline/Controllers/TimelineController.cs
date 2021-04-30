@@ -82,7 +82,7 @@ namespace Timeline.Controllers
                     }
                     else
                     {
-                        return BadRequest(ErrorResponse.Common.CustomMessage_InvalidModel(Resources.Messages.TimelineController_QueryVisibilityUnknown, item));
+                        return this.BadRequestWithCommonResponse(ErrorCodes.Common.InvalidModel, string.Format(Resource.MessageTimelineListQueryVisibilityUnknown, visibility));
                     }
                 }
             }
@@ -100,7 +100,7 @@ namespace Timeline.Controllers
                 }
                 catch (EntityNotExistException)
                 {
-                    return BadRequest(ErrorResponse.TimelineController.QueryRelateNotExist());
+                    return this.BadRequestWithCommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, Resource.MessageTimelineListQueryRelateNotExist);
                 }
             }
 
@@ -143,7 +143,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !await _service.HasManagePermissionAsync(timelineId, this.GetUserId()))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             await _service.ChangePropertyAsync(timelineId, _mapper.AutoMapperMap<TimelineChangePropertyParams>(body));
@@ -169,7 +169,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             var userId = await _userService.GetUserIdByUsernameAsync(member);
@@ -194,7 +194,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
 
@@ -239,7 +239,7 @@ namespace Timeline.Controllers
 
             if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage();
             }
 
             await _service.DeleteTimelineAsync(timelineId);

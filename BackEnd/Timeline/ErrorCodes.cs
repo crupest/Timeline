@@ -56,25 +56,25 @@
 
         public static class TokenController
         {
-            public const int Create_BadCredential = 1_101_01_01;
-            public const int Verify_BadFormat = 1_101_02_01;
-            public const int Verify_UserNotExist = 1_101_02_02;
-            public const int Verify_OldVersion = 1_101_02_03;
-            public const int Verify_TimeExpired = 1_101_02_04;
+            public const int CreateBadCredential = 1_101_01_01;
+            public const int VerifyBadFormat = 1_101_02_01;
+            public const int VerifyUserNotExist = 1_101_02_02;
+            public const int VerifyOldVersion = 1_101_02_03;
+            public const int VerifyTimeExpired = 1_101_02_04;
         }
 
         public static class UserController
         {
-            public const int ChangePassword_BadOldPassword = 1_102_02_01;
-            public const int ChangePermission_RootUser = 1_102_03_01;
-            public const int Delete_RootUser = 1_102_04_01;
+            public const int ChangePasswordBadOldPassword = 1_102_01_01;
+            public const int InvalidOperationOnRootUser = 1_102_02_01;
         }
 
-        public static class UserAvatar
+        public static class Image
         {
-            public const int BadFormat_CantDecode = 1_103_00_01;
-            public const int BadFormat_UnmatchedFormat = 1_103_00_02;
-            public const int BadFormat_BadSize = 1_103_00_03;
+            public const int CantDecode = 1_103_00_01;
+            public const int UnmatchedFormat = 1_103_00_02;
+            public const int BadSize = 1_103_00_03;
+            public const int Unknown = 1_103_00_04;
         }
 
         public static class TimelineController

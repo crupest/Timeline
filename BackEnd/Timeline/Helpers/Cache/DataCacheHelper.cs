@@ -48,7 +48,7 @@ namespace Timeline.Helpers.Cache
             {
                 if (!EntityTagHeaderValue.TryParseList(ifNonMatchHeaderValue, out var eTagList))
                 {
-                    return controller.BadRequest(ErrorResponse.Common.Header.IfNonMatch_BadFormat());
+                    return controller.BadRequest(new CommonResponse(ErrorCodes.Common.Header.IfNonMatch_BadFormat, "Header If-None-Match is of bad format."));
                 }
 
                 if (eTagList.FirstOrDefault(e => e.Equals(eTag)) != null)
