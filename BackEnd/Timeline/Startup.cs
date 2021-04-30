@@ -12,8 +12,10 @@ using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
 using Timeline.Entities;
+using Timeline.Filters;
 using Timeline.Formatters;
 using Timeline.Helpers;
+using Timeline.Models;
 using Timeline.Models.Converters;
 using Timeline.Routes;
 using Timeline.Services;
@@ -66,8 +68,10 @@ namespace Timeline
             {
                 setup.InputFormatters.Add(new StringInputFormatter());
                 setup.InputFormatters.Add(new ByteDataInputFormatter());
-                setup.Filters.Add(new ConsumesAttribute(MediaTypeNames.Application.Json, "text/json"));
-                setup.Filters.Add(new ProducesAttribute(MediaTypeNames.Application.Json, "text/json"));
+                setup.Filters.Add(new ConsumesAttribute(MimeTypes.ApplicationJson, MimeTypes.TextJson));
+                setup.Filters.Add(new ProducesAttribute(MimeTypes.ApplicationJson, MimeTypes.TextJson));
+                setup.Filters.Add<CatchEntityNotExistExceptionFilter>();
+                setup.Filters.Add<CatchEntityAlreadyExistExceptionFilter>();
                 setup.UseApiRoutePrefix("api");
             })
             .AddJsonOptions(options =>

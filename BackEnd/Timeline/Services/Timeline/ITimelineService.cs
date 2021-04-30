@@ -17,7 +17,7 @@ namespace Timeline.Services.Timeline
         /// </summary>
         /// <param name="id">Id of timeline.</param>
         /// <returns>The timeline info.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
         Task<TimelineEntity> GetTimelineAsync(long id);
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Timeline.Services.Timeline
         /// <param name="id">The id of the timeline.</param>
         /// <param name="newProperties">The new properties. Null member means not to change.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="newProperties"/> is null.</exception>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline with given id does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline with given id does not exist.</exception>
         /// <exception cref="EntityAlreadyExistException">Thrown when a timeline with new name already exists.</exception>
         Task ChangePropertyAsync(long id, TimelineChangePropertyParams newProperties);
 
@@ -36,8 +36,8 @@ namespace Timeline.Services.Timeline
         /// <param name="timelineId">Timeline id.</param>
         /// <param name="userId">User id.</param>
         /// <returns>True if the memeber was added. False if it is already a member.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when the user does not exist.</exception>
         Task<bool> AddMemberAsync(long timelineId, long userId);
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace Timeline.Services.Timeline
         /// <param name="timelineId">Timeline id.</param>
         /// <param name="userId">User id.</param>
         /// <returns>True if the memeber was removed. False if it was not a member before.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when the user does not exist.</exception>
         Task<bool> RemoveMemberAsync(long timelineId, long userId);
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Timeline.Services.Timeline
         /// <param name="timelineId">The id of the timeline.</param>
         /// <param name="userId">The id of the user to check on.</param>
         /// <returns>True if the user can manage the timeline, otherwise false.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
         /// <remarks>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with user id does not exist.
@@ -69,7 +69,7 @@ namespace Timeline.Services.Timeline
         /// <param name="timelineId">The id of the timeline.</param>
         /// <param name="visitorId">The id of the user to check on. Null means visitor without account.</param>
         /// <returns>True if can read, false if can't read.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
         /// <remarks>
         /// This method does not check whether visitor is administrator.
         /// Return false if user with visitor id does not exist.
@@ -82,7 +82,7 @@ namespace Timeline.Services.Timeline
         /// <param name="timelineId">The id of the timeline.</param>
         /// <param name="userId">The id of user to check on.</param>
         /// <returns>True if it is a member, false if not.</returns>
-        /// <exception cref="TimelineNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
         /// <remarks>
         /// Timeline owner is also considered as a member.
         /// Return false when user with user id does not exist.
@@ -109,14 +109,14 @@ namespace Timeline.Services.Timeline
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="EntityAlreadyExistException">Thrown when the timeline already exists.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the owner user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when the owner user does not exist.</exception>
         Task<TimelineEntity> CreateTimelineAsync(string timelineName, long ownerId);
 
         /// <summary>
         /// Delete a timeline.
         /// </summary>
         /// <param name="id">The id of the timeline to delete.</param>
-        /// <exception cref="TimelineNotExistException">Thrown when the timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when the timeline does not exist.</exception>
         Task DeleteTimelineAsync(long id);
     }
 }

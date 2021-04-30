@@ -66,20 +66,6 @@ namespace Timeline.Models.Http
 
         }
 
-        public static class UserCommon
-        {
-            public static CommonResponse NotExist(params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.UserCommon.NotExist, string.Format(UserCommon_NotExist, formatArgs));
-            }
-
-            public static CommonResponse CustomMessage_NotExist(string message, params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.UserCommon.NotExist, string.Format(message, formatArgs));
-            }
-
-        }
-
         public static class TokenController
         {
             public static CommonResponse Create_BadCredential(params object?[] formatArgs)
@@ -136,16 +122,6 @@ namespace Timeline.Models.Http
 
         public static class UserController
         {
-            public static CommonResponse UsernameConflict(params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.UserController.UsernameConflict, string.Format(UserController_UsernameConflict, formatArgs));
-            }
-
-            public static CommonResponse CustomMessage_UsernameConflict(string message, params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.UserController.UsernameConflict, string.Format(message, formatArgs));
-            }
-
             public static CommonResponse ChangePassword_BadOldPassword(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.UserController.ChangePassword_BadOldPassword, string.Format(UserController_ChangePassword_BadOldPassword, formatArgs));
@@ -214,26 +190,6 @@ namespace Timeline.Models.Http
 
         public static class TimelineController
         {
-            public static CommonResponse NameConflict(params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.NameConflict, string.Format(TimelineController_NameConflict, formatArgs));
-            }
-
-            public static CommonResponse CustomMessage_NameConflict(string message, params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.NameConflict, string.Format(message, formatArgs));
-            }
-
-            public static CommonResponse NotExist(params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.NotExist, string.Format(TimelineController_NotExist, formatArgs));
-            }
-
-            public static CommonResponse CustomMessage_NotExist(string message, params object?[] formatArgs)
-            {
-                return new CommonResponse(ErrorCodes.TimelineController.NotExist, string.Format(message, formatArgs));
-            }
-
             public static CommonResponse QueryRelateNotExist(params object?[] formatArgs)
             {
                 return new CommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, string.Format(TimelineController_QueryRelateNotExist, formatArgs));
@@ -246,12 +202,12 @@ namespace Timeline.Models.Http
 
             public static CommonResponse PostNotExist(params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.TimelineController.PostNotExist, string.Format(TimelineController_PostNotExist, formatArgs));
+                return new CommonResponse(ErrorCodes.NotExist.TimelinePost, string.Format(TimelineController_PostNotExist, formatArgs));
             }
 
             public static CommonResponse CustomMessage_PostNotExist(string message, params object?[] formatArgs)
             {
-                return new CommonResponse(ErrorCodes.TimelineController.PostNotExist, string.Format(message, formatArgs));
+                return new CommonResponse(ErrorCodes.NotExist.TimelinePost, string.Format(message, formatArgs));
             }
         }
 

@@ -60,16 +60,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(403)]
         public async Task<ActionResult<CommonPutResponse>> Put([GeneralTimelineName] string timeline)
         {
-            try
-            {
-                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var create = await _service.AddHighlightTimelineAsync(timelineId, this.GetUserId());
-                return CommonPutResponse.Create(create);
-            }
-            catch (TimelineNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NotExist());
-            }
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
+            var create = await _service.AddHighlightTimelineAsync(timelineId, this.GetUserId());
+            return CommonPutResponse.Create(create);
         }
 
         /// <summary>
@@ -84,16 +77,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(403)]
         public async Task<ActionResult<CommonDeleteResponse>> Delete([GeneralTimelineName] string timeline)
         {
-            try
-            {
-                var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-                var delete = await _service.RemoveHighlightTimelineAsync(timelineId, this.GetUserId());
-                return CommonDeleteResponse.Create(delete);
-            }
-            catch (TimelineNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NotExist());
-            }
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
+            var delete = await _service.RemoveHighlightTimelineAsync(timelineId, this.GetUserId());
+            return CommonDeleteResponse.Create(delete);
         }
 
         /// <summary>
@@ -112,10 +98,6 @@ namespace Timeline.Controllers
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(body.Timeline);
                 await _service.MoveHighlightTimelineAsync(timelineId, body.NewPosition!.Value);
                 return Ok();
-            }
-            catch (TimelineNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NotExist());
             }
             catch (InvalidHighlightTimelineException)
             {

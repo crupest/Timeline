@@ -188,7 +188,7 @@ namespace Timeline.Tests.IntegratedTests
                     body.Should().BeEquivalentTo(await client.GetTimelineAsync("aaa"));
                 }
 
-                await client.TestPostAssertErrorAsync("timelines", new HttpTimelineCreateRequest { Name = "aaa" }, errorCode: ErrorCodes.TimelineController.NameConflict);
+                await client.TestPostAssertErrorAsync("timelines", new HttpTimelineCreateRequest { Name = "aaa" }, errorCode: ErrorCodes.Conflict.Timeline);
             }
         }
 
@@ -210,7 +210,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
                 await client.TestDeleteAsync("timelines/t2");
-                await client.TestDeleteAssertErrorAsync("timelines/t2");
+                await client.TestDeleteAsync("timelines/t2");
             }
 
             {
@@ -218,7 +218,7 @@ namespace Timeline.Tests.IntegratedTests
 
                 await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
                 await client.TestDeleteAsync("timelines/t1");
-                await client.TestDeleteAssertErrorAsync("timelines/t1");
+                await client.TestDeleteAsync("timelines/t1");
             }
         }
 
@@ -294,13 +294,13 @@ namespace Timeline.Tests.IntegratedTests
             }
 
             await AssertEmptyMembers();
-            await client.TestPutAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.UserCommon.NotExist);
+            await client.TestPutAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.NotExist.User);
             await AssertEmptyMembers();
             await client.PutTimelineMemberAsync(timelineName, "user2");
             await AssertMembers(new List<HttpUser> { await client.GetUserAsync("user2") });
             await client.DeleteTimelineMemberAsync(timelineName, "user2", true);
             await AssertEmptyMembers();
-            await client.TestDeleteAssertErrorAsync($"timelines/{timelineName}/members/usernotexist", errorCode: ErrorCodes.UserCommon.NotExist);
+            await client.TestDeleteAsync($"timelines/{timelineName}/members/usernotexist", false);
             await AssertEmptyMembers();
         }
 
@@ -377,7 +377,7 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await CreateClientAsUser())
             {
                 await client.TestPatchAssertInvalidModelAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "!!!" });
-                await client.TestPatchAssertErrorAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "t2" }, errorCode: ErrorCodes.TimelineController.NameConflict);
+                await client.TestPatchAssertErrorAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "t2" }, errorCode: ErrorCodes.Conflict.Timeline);
 
                 await client.TestPatchAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "newt" });
 

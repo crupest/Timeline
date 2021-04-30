@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Timeline.Services
 {
@@ -9,24 +10,18 @@ namespace Timeline.Services
     /// For example, want to create a timeline but a timeline with the same name already exists.
     /// </remarks>
     [Serializable]
-    public class EntityAlreadyExistException : Exception
+    public class EntityAlreadyExistException : EntityException
     {
-        public EntityAlreadyExistException() : this(null, null, null, null) { }
-        public EntityAlreadyExistException(string? entityName) : this(entityName, null, null, null) { }
-        public EntityAlreadyExistException(string? entityName, Exception? inner) : this(entityName, null, null, inner) { }
-        public EntityAlreadyExistException(string? entityName, object? entity, Exception inner) : this(entityName, entity, null, inner) { }
-        public EntityAlreadyExistException(string? entityName, object? entity, string? message, Exception? inner) : base(message ?? Resource.ExceptionEntityAlreadyExist, inner)
+        public EntityAlreadyExistException() : base() { }
+        public EntityAlreadyExistException(string? message) : base(message) { }
+        public EntityAlreadyExistException(string? message, Exception? inner) : base(message, inner) { }
+        public EntityAlreadyExistException(EntityType entityType, IDictionary<string, object> constraints, string? message = null, Exception? inner = null)
+            : base(entityType, constraints, message ?? Resource.ExceptionEntityNotExist, inner)
         {
-            EntityName = entityName;
-            Entity = entity;
-        }
 
+        }
         protected EntityAlreadyExistException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        public string? EntityName { get; }
-
-        public object? Entity { get; }
     }
 }

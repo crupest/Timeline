@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Timeline.Services
 {
@@ -9,19 +10,18 @@ namespace Timeline.Services
     /// For example, you want to get a timeline with given name but it does not exist.
     /// </example>
     [Serializable]
-    public class EntityNotExistException : Exception
+    public class EntityNotExistException : EntityException
     {
-        public EntityNotExistException() : this(null, null) { }
-        public EntityNotExistException(string? entityName) : this(entityName, null) { }
-        public EntityNotExistException(string? entityName, Exception? inner) : this(entityName, null, inner) { }
-        public EntityNotExistException(string? entityName, string? message, Exception? inner) : base(message ?? Resource.ExceptionEntityNotExist, inner)
+        public EntityNotExistException() : base() { }
+        public EntityNotExistException(string? message) : base(message) { }
+        public EntityNotExistException(string? message, Exception? inner) : base(message, inner) { }
+        public EntityNotExistException(EntityType entityType, IDictionary<string, object> constraints, string? message = null, Exception? inner = null)
+            : base(entityType, constraints, message ?? Resource.ExceptionEntityNotExist, inner)
         {
-            EntityName = entityName;
+
         }
         protected EntityNotExistException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-
-        public string? EntityName { get; }
     }
 }

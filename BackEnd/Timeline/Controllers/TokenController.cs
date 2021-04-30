@@ -44,7 +44,7 @@ namespace Timeline.Controllers
             try
             {
                 DateTime? expireTime = null;
-                if (request.Expire != null)
+                if (request.Expire is not null)
                     expireTime = _clock.GetCurrentTime().AddDays(request.Expire.Value);
 
                 var result = await _userTokenManager.CreateTokenAsync(request.Username, request.Password, expireTime);
@@ -55,7 +55,7 @@ namespace Timeline.Controllers
                     User = await _mapper.MapAsync<HttpUser>(result.User, Url, User)
                 };
             }
-            catch (UserNotExistException)
+            catch (EntityNotExistException)
             {
                 return BadRequest(ErrorResponse.TokenController.Create_BadCredential());
             }

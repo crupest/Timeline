@@ -25,12 +25,11 @@ namespace Timeline.Services.Api
 
         public async Task<bool> AddHighlightTimelineAsync(long timelineId, long? operatorId)
         {
-            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
-            if (operatorId.HasValue && !await _userService.CheckUserExistenceAsync(operatorId.Value))
+            if (operatorId.HasValue)
             {
-                throw new UserNotExistException(null, operatorId.Value, "User with given operator id does not exist.", null);
+                await _userService.ThrowIfUserNotExist(operatorId.Value);
             }
 
             var alreadyIs = await _database.HighlightTimelines.AnyAsync(t => t.TimelineId == timelineId);
@@ -51,12 +50,11 @@ namespace Timeline.Services.Api
 
         public async Task<bool> RemoveHighlightTimelineAsync(long timelineId, long? operatorId)
         {
-            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
-            if (operatorId.HasValue && !await _userService.CheckUserExistenceAsync(operatorId.Value))
+            if (operatorId.HasValue)
             {
-                throw new UserNotExistException(null, operatorId.Value, "User with given operator id does not exist.", null);
+                await _userService.ThrowIfUserNotExist(operatorId.Value);
             }
 
             var entity = await _database.HighlightTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId);
@@ -79,8 +77,7 @@ namespace Timeline.Services.Api
 
         public async Task MoveHighlightTimelineAsync(long timelineId, long newPosition)
         {
-            if (!await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var entity = await _database.HighlightTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId);
 
@@ -118,8 +115,8 @@ namespace Timeline.Services.Api
 
         public async Task<bool> IsHighlightTimelineAsync(long timelineId, bool checkTimelineExistence = true)
         {
-            if (checkTimelineExistence && !await _timelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
+            if (checkTimelineExistence)
+                await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             return await _database.HighlightTimelines.AnyAsync(t => t.TimelineId == timelineId);
         }

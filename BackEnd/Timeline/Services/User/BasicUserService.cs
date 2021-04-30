@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
@@ -18,6 +19,18 @@ namespace Timeline.Services.User
             _database = database;
         }
 
+        protected static EntityNotExistException CreateUserNotExistException(string username)
+        {
+            return new EntityNotExistException(EntityTypes.User,
+                new Dictionary<string, object> { ["username"] = username });
+        }
+
+        protected static EntityNotExistException CreateUserNotExistException(long id)
+        {
+            return new EntityNotExistException(EntityTypes.User,
+                new Dictionary<string, object> { ["id"] = id });
+        }
+
         public async Task<bool> CheckUserExistenceAsync(long id)
         {
             return await _database.Users.AnyAsync(u => u.Id == id);
@@ -34,7 +47,7 @@ namespace Timeline.Services.User
             var entity = await _database.Users.Where(user => user.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
 
             if (entity == null)
-                throw new UserNotExistException(username);
+                throw CreateUserNotExistException(username);
 
             return entity.Id;
         }
@@ -44,20 +57,9 @@ namespace Timeline.Services.User
             var entity = await _database.Users.Where(u => u.Id == userId).Select(u => new { u.UsernameChangeTime }).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new UserNotExistException(userId);
+                throw CreateUserNotExistException(userId);
 
             return entity.UsernameChangeTime;
-        }
-    }
-
-    public static class BasicUserServiceExtensions
-    {
-        public static async Task ThrowIfUserNotExist(this IBasicUserService service, long userId)
-        {
-            if (!await service.CheckUserExistenceAsync(userId))
-            {
-                throw new UserNotExistException(userId);
-            }
         }
     }
 }

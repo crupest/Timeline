@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Filters;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
@@ -21,7 +20,6 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [Route("timelines")]
-    [CatchTimelineNotExistException]
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TimelineController : Controller
     {
@@ -100,7 +98,7 @@ namespace Timeline.Controllers
 
                     relationship = new TimelineUserRelationship(relationType, relatedUserId);
                 }
-                catch (UserNotExistException)
+                catch (EntityNotExistException)
                 {
                     return BadRequest(ErrorResponse.TimelineController.QueryRelateNotExist());
                 }
@@ -148,17 +146,10 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            try
-            {
-                await _service.ChangePropertyAsync(timelineId, _mapper.AutoMapperMap<TimelineChangePropertyParams>(body));
-                var t = await _service.GetTimelineAsync(timelineId);
-                var result = await Map(t);
-                return result;
-            }
-            catch (EntityAlreadyExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NameConflict());
-            }
+            await _service.ChangePropertyAsync(timelineId, _mapper.AutoMapperMap<TimelineChangePropertyParams>(body));
+            var t = await _service.GetTimelineAsync(timelineId);
+            var result = await Map(t);
+            return result;
         }
 
         /// <summary>
@@ -181,16 +172,9 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            try
-            {
-                var userId = await _userService.GetUserIdByUsernameAsync(member);
-                var create = await _service.AddMemberAsync(timelineId, userId);
-                return Ok(CommonPutResponse.Create(create));
-            }
-            catch (UserNotExistException)
-            {
-                return BadRequest(ErrorResponse.UserCommon.NotExist());
-            }
+            var userId = await _userService.GetUserIdByUsernameAsync(member);
+            var create = await _service.AddMemberAsync(timelineId, userId);
+            return Ok(CommonPutResponse.Create(create));
         }
 
         /// <summary>
@@ -213,16 +197,10 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            try
-            {
-                var userId = await _userService.GetUserIdByUsernameAsync(member);
-                var delete = await _service.RemoveMemberAsync(timelineId, userId);
-                return Ok(CommonDeleteResponse.Create(delete));
-            }
-            catch (UserNotExistException)
-            {
-                return BadRequest(ErrorResponse.UserCommon.NotExist());
-            }
+
+            var userId = await _userService.GetUserIdByUsernameAsync(member);
+            var delete = await _service.RemoveMemberAsync(timelineId, userId);
+            return Ok(CommonDeleteResponse.Create(delete));
         }
 
         /// <summary>
@@ -239,16 +217,9 @@ namespace Timeline.Controllers
         {
             var userId = this.GetUserId();
 
-            try
-            {
-                var timeline = await _service.CreateTimelineAsync(body.Name, userId);
-                var result = await Map(timeline);
-                return result;
-            }
-            catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.Timeline)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NameConflict());
-            }
+            var timeline = await _service.CreateTimelineAsync(body.Name, userId);
+            var result = await Map(timeline);
+            return result;
         }
 
         /// <summary>
@@ -271,15 +242,8 @@ namespace Timeline.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
             }
 
-            try
-            {
-                await _service.DeleteTimelineAsync(timelineId);
-                return Ok();
-            }
-            catch (TimelineNotExistException)
-            {
-                return BadRequest(ErrorResponse.TimelineController.NotExist());
-            }
+            await _service.DeleteTimelineAsync(timelineId);
+            return Ok();
         }
     }
 }

@@ -38,27 +38,35 @@ namespace Timeline.Services.Timeline
             _clock = clock;
         }
 
-        private async Task CheckTimelineExistence(long timelineId)
-        {
-            if (!await _basicTimelineService.CheckTimelineExistenceAsync(timelineId))
-                throw new TimelineNotExistException(timelineId);
-        }
-
-        private async Task CheckUserExistence(long userId)
-        {
-            if (!await _basicUserService.CheckUserExistenceAsync(userId))
-                throw new UserNotExistException(userId);
-        }
-
         private void CheckColor(string color, string paramName)
         {
             if (!_colorValidator.Validate(color, out var message))
                 throw new ArgumentException(string.Format(Resource.ExceptionColorInvalid, message), paramName);
         }
 
+        private static EntityNotExistException CreatePostNotExistException(long timelineId, long postId, bool deleted)
+        {
+            return new EntityNotExistException(EntityTypes.TimelinePost, new Dictionary<string, object>
+            {
+                ["timeline-id"] = timelineId,
+                ["post-id"] = postId,
+                ["deleted"] = deleted
+            });
+        }
+
+        private static EntityNotExistException CreatePostDataNotExistException(long timelineId, long postId, long dataIndex)
+        {
+            return new EntityNotExistException(EntityTypes.TimelinePost, new Dictionary<string, object>
+            {
+                ["timeline-id"] = timelineId,
+                ["post-id"] = postId,
+                ["data-index"] = dataIndex
+            });
+        }
+
         public async Task<List<TimelinePostEntity>> GetPostsAsync(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false)
         {
-            await CheckTimelineExistence(timelineId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             modifiedSince = modifiedSince?.MyToUtc();
 
@@ -81,18 +89,18 @@ namespace Timeline.Services.Timeline
 
         public async Task<TimelinePostEntity> GetPostAsync(long timelineId, long postId, bool includeDeleted = false)
         {
-            await CheckTimelineExistence(timelineId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             var post = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
             if (post is null)
             {
-                throw new TimelinePostNotExistException(timelineId, postId, false);
+                throw CreatePostNotExistException(timelineId, postId, false);
             }
 
             if (!includeDeleted && post.Deleted)
             {
-                throw new TimelinePostNotExistException(timelineId, postId, true);
+                throw CreatePostNotExistException(timelineId, postId, true);
             }
 
             return post;
@@ -100,40 +108,40 @@ namespace Timeline.Services.Timeline
 
         public async Task<ICacheableDataDigest> GetPostDataDigestAsync(long timelineId, long postId, long dataIndex)
         {
-            await CheckTimelineExistence(timelineId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
 
             if (postEntity is null)
-                throw new TimelinePostNotExistException(timelineId, postId, false);
+                throw CreatePostNotExistException(timelineId, postId, false);
 
             if (postEntity.Deleted)
-                throw new TimelinePostNotExistException(timelineId, postId, true);
+                throw CreatePostNotExistException(timelineId, postId, true);
 
             var dataEntity = await _database.TimelinePostData.Where(d => d.PostId == postEntity.Id && d.Index == dataIndex).SingleOrDefaultAsync();
 
             if (dataEntity is null)
-                throw new TimelinePostDataNotExistException(timelineId, postId, dataIndex);
+                throw CreatePostDataNotExistException(timelineId, postId, dataIndex);
 
             return new CacheableDataDigest(dataEntity.DataTag, dataEntity.LastUpdated);
         }
 
         public async Task<ByteData> GetPostDataAsync(long timelineId, long postId, long dataIndex)
         {
-            await CheckTimelineExistence(timelineId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
 
             if (postEntity is null)
-                throw new TimelinePostNotExistException(timelineId, postId, false);
+                throw CreatePostNotExistException(timelineId, postId, false);
 
             if (postEntity.Deleted)
-                throw new TimelinePostNotExistException(timelineId, postId, true);
+                throw CreatePostNotExistException(timelineId, postId, true);
 
             var dataEntity = await _database.TimelinePostData.Where(d => d.PostId == postEntity.Id && d.Index == dataIndex).SingleOrDefaultAsync();
 
             if (dataEntity is null)
-                throw new TimelinePostDataNotExistException(timelineId, postId, dataIndex);
+                throw CreatePostDataNotExistException(timelineId, postId, dataIndex);
 
             var data = await _dataManager.GetEntryAndCheck(dataEntity.DataTag, $"Timeline {timelineId}, post {postId}, data {dataIndex} requires this data.");
 
@@ -194,8 +202,8 @@ namespace Timeline.Services.Timeline
 
             request.Time = request.Time?.MyToUtc();
 
-            await CheckTimelineExistence(timelineId);
-            await CheckUserExistence(authorId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _basicUserService.ThrowIfUserNotExist(authorId);
 
             var currentTime = _clock.GetCurrentTime();
             var finalTime = request.Time ?? currentTime;
@@ -253,15 +261,15 @@ namespace Timeline.Services.Timeline
 
             request.Time = request.Time?.MyToUtc();
 
-            await CheckTimelineExistence(timelineId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             var entity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
             if (entity is null)
-                throw new TimelinePostNotExistException(timelineId, postId, false);
+                throw CreatePostNotExistException(timelineId, postId, false);
 
             if (entity.Deleted)
-                throw new TimelinePostNotExistException(timelineId, postId, true);
+                throw CreatePostNotExistException(timelineId, postId, true);
 
             if (request.Time.HasValue)
                 entity.Time = request.Time.Value;
@@ -279,15 +287,15 @@ namespace Timeline.Services.Timeline
 
         public async Task DeletePostAsync(long timelineId, long postId)
         {
-            await CheckTimelineExistence(timelineId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             var entity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
             if (entity == null)
-                throw new TimelinePostNotExistException(timelineId, postId, false);
+                throw CreatePostNotExistException(timelineId, postId, false);
 
             if (entity.Deleted)
-                throw new TimelinePostNotExistException(timelineId, postId, true);
+                throw CreatePostNotExistException(timelineId, postId, true);
 
             await using var transaction = await _database.Database.BeginTransactionAsync();
 
@@ -321,7 +329,7 @@ namespace Timeline.Services.Timeline
 
         public async Task<bool> HasPostModifyPermissionAsync(long timelineId, long postId, long modifierId, bool throwOnPostNotExist = false)
         {
-            await CheckTimelineExistence(timelineId);
+            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
@@ -330,14 +338,14 @@ namespace Timeline.Services.Timeline
             if (postEntity is null)
             {
                 if (throwOnPostNotExist)
-                    throw new TimelinePostNotExistException(timelineId, postId, false);
+                    throw CreatePostNotExistException(timelineId, postId, false);
                 else
                     return true;
             }
 
             if (postEntity.Deleted && throwOnPostNotExist)
             {
-                throw new TimelinePostNotExistException(timelineId, postId, true);
+                throw CreatePostNotExistException(timelineId, postId, true);
             }
 
             return timelineEntity.OwnerId == modifierId || postEntity.AuthorId == modifierId;

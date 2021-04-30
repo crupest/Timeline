@@ -10,7 +10,7 @@ namespace Timeline.Services.User
         /// <param name="userId">The id of the user.</param>
         /// <param name="checkUserExistence">Whether check the user's existence.</param>
         /// <returns>The permission list.</returns>
-        /// <exception cref="UserNotExistException">Thrown when <paramref name="checkUserExistence"/> is true and user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when <paramref name="checkUserExistence"/> is true and user does not exist.</exception>
         Task<UserPermissions> GetPermissionsOfUserAsync(long userId, bool checkUserExistence = true);
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace Timeline.Services.User
         /// </summary>
         /// <param name="userId">The id of the user.</param>
         /// <param name="permission">The new permission.</param>
-        /// <exception cref="UserNotExistException">Thrown when user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="InvalidOperationOnRootUserException">Thrown when change root user's permission.</exception>
         Task AddPermissionToUserAsync(long userId, UserPermission permission);
 
@@ -28,7 +28,7 @@ namespace Timeline.Services.User
         /// <param name="userId">The id of the user.</param>
         /// <param name="permission">The permission.</param>
         /// <param name="checkUserExistence">Whether check the user's existence.</param>
-        /// <exception cref="UserNotExistException">Thrown when <paramref name="checkUserExistence"/> is true and user does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when <paramref name="checkUserExistence"/> is true and user does not exist.</exception>
         /// <exception cref="InvalidOperationOnRootUserException">Thrown when change root user's permission.</exception>
         Task RemovePermissionFromUserAsync(long userId, UserPermission permission, bool checkUserExistence = true);
     }

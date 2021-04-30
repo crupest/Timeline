@@ -22,9 +22,6 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [Route("timelines/{timeline}/posts")]
-    [CatchTimelineNotExistException]
-    [CatchTimelinePostNotExistException]
-    [CatchTimelinePostDataNotExistException]
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TimelinePostController : Controller
     {

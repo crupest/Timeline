@@ -1,4 +1,4 @@
-﻿namespace Timeline.Models.Http
+﻿namespace Timeline
 {
     /// <summary>
     /// All error code constants.
@@ -36,9 +36,22 @@
             }
         }
 
-        public static class UserCommon
+        public static class NotExist
         {
-            public const int NotExist = 1_001_0001;
+            public const int Default = 2_001_00_00;
+            public const int User = 2_001_00_01;
+            public const int Timeline = 2_001_00_02;
+            public const int TimelinePost = 2_001_00_03;
+            public const int TimelinePostData = 2_001_00_04;
+        }
+
+        public static class Conflict
+        {
+            public const int Default = 2_002_00_00;
+            public const int User = 2_002_00_01;
+            public const int Timeline = 2_002_00_02;
+            public const int TimelinePost = 2_002_00_03;
+            public const int TimelinePostData = 2_002_00_04;
         }
 
         public static class TokenController
@@ -52,7 +65,6 @@
 
         public static class UserController
         {
-            public const int UsernameConflict = 1_102_01_01;
             public const int ChangePassword_BadOldPassword = 1_102_02_01;
             public const int ChangePermission_RootUser = 1_102_03_01;
             public const int Delete_RootUser = 1_102_04_01;
@@ -67,11 +79,7 @@
 
         public static class TimelineController
         {
-            public const int NameConflict = 1_104_01_01;
-            public const int NotExist = 1_104_02_01;
             public const int QueryRelateNotExist = 1_104_04_01;
-            public const int PostNotExist = 1_104_05_01;
-            public const int PostDataNotExist = 1_104_05_02;
         }
 
         public static class HighlightTimelineController

@@ -16,7 +16,7 @@ namespace Timeline.Services.Token
         /// <returns>The created token and the user info.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="username"/> or <paramref name="password"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="username"/> is of bad format.</exception>
-        /// <exception cref="UserNotExistException">Thrown when the user with <paramref name="username"/> does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when the user with <paramref name="username"/> does not exist.</exception>
         /// <exception cref="BadPasswordException">Thrown when <paramref name="password"/> is wrong.</exception>
         public Task<UserTokenCreateResult> CreateTokenAsync(string username, string password, DateTime? expireAt = null);
 

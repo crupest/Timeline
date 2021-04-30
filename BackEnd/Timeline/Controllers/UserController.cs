@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
-using Timeline.Services;
 using Timeline.Services.Mapper;
 using Timeline.Services.User;
 
@@ -59,16 +58,10 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<HttpUser>> Post([FromBody] HttpUserPostRequest body)
         {
-            try
-            {
-                var user = await _userService.CreateUserAsync(
-                    new CreateUserParams(body.Username, body.Password) { Nickname = body.Nickname });
-                return await _mapper.MapAsync<HttpUser>(user, Url, User);
-            }
-            catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
-            {
-                return BadRequest(ErrorResponse.UserController.UsernameConflict());
-            }
+
+            var user = await _userService.CreateUserAsync(
+                new CreateUserParams(body.Username, body.Password) { Nickname = body.Nickname });
+            return await _mapper.MapAsync<HttpUser>(user, Url, User);
         }
 
         /// <summary>
@@ -81,16 +74,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<HttpUser>> Get([FromRoute][Username] string username)
         {
-            try
-            {
-                var id = await _userService.GetUserIdByUsernameAsync(username);
-                var user = await _userService.GetUserAsync(id);
-                return await _mapper.MapAsync<HttpUser>(user, Url, User);
-            }
-            catch (UserNotExistException)
-            {
-                return NotFound(ErrorResponse.UserCommon.NotExist());
-            }
+            var id = await _userService.GetUserIdByUsernameAsync(username);
+            var user = await _userService.GetUserAsync(id);
+            return await _mapper.MapAsync<HttpUser>(user, Url, User);
         }
 
         /// <summary>
@@ -109,20 +95,9 @@ namespace Timeline.Controllers
         {
             if (UserHasUserManagementPermission)
             {
-                try
-                {
-                    var id = await _userService.GetUserIdByUsernameAsync(username);
-                    var user = await _userService.ModifyUserAsync(id, _mapper.AutoMapperMap<ModifyUserParams>(body));
-                    return await _mapper.MapAsync<HttpUser>(user, Url, User);
-                }
-                catch (UserNotExistException)
-                {
-                    return NotFound(ErrorResponse.UserCommon.NotExist());
-                }
-                catch (EntityAlreadyExistException e) when (e.EntityName == EntityNames.User)
-                {
-                    return BadRequest(ErrorResponse.UserController.UsernameConflict());
-                }
+                var id = await _userService.GetUserIdByUsernameAsync(username);
+                var user = await _userService.ModifyUserAsync(id, _mapper.AutoMapperMap<ModifyUserParams>(body));
+                return await _mapper.MapAsync<HttpUser>(user, Url, User);
             }
             else
             {
@@ -204,10 +179,6 @@ namespace Timeline.Controllers
                 await _userPermissionService.AddPermissionToUserAsync(id, permission);
                 return Ok();
             }
-            catch (UserNotExistException)
-            {
-                return NotFound(ErrorResponse.UserCommon.NotExist());
-            }
             catch (InvalidOperationOnRootUserException)
             {
                 return BadRequest(ErrorResponse.UserController.ChangePermission_RootUser());
@@ -227,10 +198,6 @@ namespace Timeline.Controllers
                 var id = await _userService.GetUserIdByUsernameAsync(username);
                 await _userPermissionService.RemovePermissionFromUserAsync(id, permission);
                 return Ok();
-            }
-            catch (UserNotExistException)
-            {
-                return NotFound(ErrorResponse.UserCommon.NotExist());
             }
             catch (InvalidOperationOnRootUserException)
             {

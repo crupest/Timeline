@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Controllers {
+namespace Timeline.Filters {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Timeline.Controllers {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Controllers.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Filters.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,20 +61,20 @@ namespace Timeline.Controllers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can&apos;t get user id..
+        ///   Looks up a localized string similar to The entity you want to create already exists. Entity type is {0}. Constraints are {1}..
         /// </summary>
-        internal static string ExceptionNoUserId {
+        internal static string MessageEntityAlreadyExist {
             get {
-                return ResourceManager.GetString("ExceptionNoUserId", resourceCulture);
+                return ResourceManager.GetString("MessageEntityAlreadyExist", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A user with given username already exists..
+        ///   Looks up a localized string similar to The entity you operate on does not exist. Entity type is {0}. Constraints are {1}..
         /// </summary>
-        internal static string MessageUsernameConflict {
+        internal static string MessageEntityNotExist {
             get {
-                return ResourceManager.GetString("MessageUsernameConflict", resourceCulture);
+                return ResourceManager.GetString("MessageEntityNotExist", resourceCulture);
             }
         }
     }
