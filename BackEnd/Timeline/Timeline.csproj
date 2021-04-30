@@ -63,30 +63,15 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Helper\DataCacheHelper.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>DataCacheHelper.resx</DependentUpon>
-        </Compile>
         <Compile Update="Models\Http\Resource.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Models\Validation\NicknameValidator.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>NicknameValidator.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Models\Validation\NameValidator.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>NameValidator.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Models\Validation\Validator.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Validator.resx</DependentUpon>
+        <Compile Update="Models\Validation\Resource.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Routes\Resource.Designer.cs">
           <DesignTime>True</DesignTime>
@@ -153,25 +138,13 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Helper\DataCacheHelper.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>DataCacheHelper.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
         <EmbeddedResource Update="Models\Http\Resource.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Models\Validation\NicknameValidator.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>NicknameValidator.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Models\Validation\NameValidator.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>NameValidator.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Models\Validation\Validator.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Validator.Designer.cs</LastGenOutput>
+        <EmbeddedResource Update="Models\Validation\Resource.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Routes\Resource.resx">
           <Generator>ResXFileCodeGenerator</Generator>
