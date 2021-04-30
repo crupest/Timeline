@@ -63,16 +63,6 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Entities.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Entities.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Filters.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Filters.resx</DependentUpon>
-        </Compile>
         <Compile Update="Resources\Helper\DataCacheHelper.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
@@ -83,15 +73,10 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Messages.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Models\Http\Common.Designer.cs">
+        <Compile Update="Models\Http\Resource.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>Common.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Resources\Models\Http\Exception.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Exception.resx</DependentUpon>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Resources\Models\Validation\NicknameValidator.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -168,14 +153,6 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Entities.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Entities.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Filters.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Filters.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
         <EmbeddedResource Update="Resources\Helper\DataCacheHelper.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>DataCacheHelper.Designer.cs</LastGenOutput>
@@ -184,13 +161,9 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Messages.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Models\Http\Common.resx">
+        <EmbeddedResource Update="Models\Http\Resource.resx">
             <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Common.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Models\Http\Exception.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Exception.Designer.cs</LastGenOutput>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Resources\Models\Validation\NicknameValidator.resx">
             <Generator>ResXFileCodeGenerator</Generator>

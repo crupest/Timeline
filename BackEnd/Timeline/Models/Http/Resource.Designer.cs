@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Timeline.Resources.Models.Http {
+namespace Timeline.Models.Http {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Timeline.Resources.Models.Http {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Exception {
+    internal class Resource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Exception() {
+        internal Resource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Timeline.Resources.Models.Http {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Resources.Models.Http.Exception", typeof(Exception).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Timeline.Models.Http.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,20 +61,38 @@ namespace Timeline.Resources.Models.Http {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No action context currently, can&apos;t fill urls in value resolver..
+        ///   Looks up a localized string similar to An existent item is deleted..
         /// </summary>
-        internal static string ActionContextNull {
+        internal static string MessageDeleteDelete {
             get {
-                return ResourceManager.GetString("ActionContextNull", resourceCulture);
+                return ResourceManager.GetString("MessageDeleteDelete", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown post content type..
+        ///   Looks up a localized string similar to The item does not exist, so nothing is changed..
         /// </summary>
-        internal static string UnknownPostContentType {
+        internal static string MessageDeleteNotExist {
             get {
-                return ResourceManager.GetString("UnknownPostContentType", resourceCulture);
+                return ResourceManager.GetString("MessageDeleteNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new item is created..
+        /// </summary>
+        internal static string MessagePutCreate {
+            get {
+                return ResourceManager.GetString("MessagePutCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An existent item is modified..
+        /// </summary>
+        internal static string MessagePutModify {
+            get {
+                return ResourceManager.GetString("MessagePutModify", resourceCulture);
             }
         }
     }
