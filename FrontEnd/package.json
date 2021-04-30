@@ -27,7 +27,7 @@
     "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.7",
     "remarkable": "^2.0.1",
-    "rxjs": "^6.6.7",
+    "rxjs": "^7.0.0",
     "workbox-cacheable-response": "^6.1.5",
     "workbox-expiration": "^6.1.2",
     "workbox-precaching": "^6.1.0",
