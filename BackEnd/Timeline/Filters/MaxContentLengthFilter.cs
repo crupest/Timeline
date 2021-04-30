@@ -34,30 +34,10 @@ namespace Timeline.Filters
             var contentLength = context.HttpContext.Request.ContentLength;
             if (contentLength != null && contentLength > MaxByteLength)
             {
-                context.Result = new BadRequestObjectResult(ErrorResponse.Common.Content.TooBig(MaxByteLength + "B"));
+                context.Result = new BadRequestObjectResult(
+                    new CommonResponse(ErrorCodes.Common.Content.TooBig,
+                        string.Format(Resource.MessageContentLengthTooBig, MaxByteLength + "B")));
             }
         }
-    }
-
-    /// <summary>
-    /// Restrict max content length.
-    /// </summary>
-    public class MaxContentLengthAttribute : TypeFilterAttribute
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="maxByteLength">Max length.</param>
-        public MaxContentLengthAttribute(long maxByteLength)
-            : base(typeof(MaxContentLengthFilter))
-        {
-            MaxByteLength = maxByteLength;
-            Arguments = new object[] { maxByteLength };
-        }
-
-        /// <summary>
-        /// Max length.
-        /// </summary>
-        public long MaxByteLength { get; }
     }
 }

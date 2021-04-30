@@ -65,7 +65,7 @@ namespace Timeline.Controllers
         {
             if (!this.UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage(Resource.MessageForbidNotAdministratorOrOwner);
             }
 
             long id = await _userService.GetUserIdByUsernameAsync(username);
@@ -82,10 +82,10 @@ namespace Timeline.Controllers
             {
                 return BadRequest(e.Error switch
                 {
-                    ImageException.ErrorReason.CantDecode => ErrorResponse.UserAvatar.BadFormat_CantDecode(),
-                    ImageException.ErrorReason.UnmatchedFormat => ErrorResponse.UserAvatar.BadFormat_UnmatchedFormat(),
-                    ImageException.ErrorReason.BadSize => ErrorResponse.UserAvatar.BadFormat_BadSize(),
-                    _ => throw new Exception()
+                    ImageException.ErrorReason.CantDecode => new CommonResponse(ErrorCodes.Image.CantDecode, Resource.MessageImageDecodeFailed),
+                    ImageException.ErrorReason.UnmatchedFormat => new CommonResponse(ErrorCodes.Image.UnmatchedFormat, Resource.MessageImageFormatUnmatch),
+                    ImageException.ErrorReason.BadSize => new CommonResponse(ErrorCodes.Image.BadSize, Resource.MessageImageBadSize),
+                    _ => new CommonResponse(ErrorCodes.Image.Unknown, Resource.MessageImageUnknownError)
                 });
             }
         }
@@ -108,7 +108,7 @@ namespace Timeline.Controllers
         {
             if (!this.UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, ErrorResponse.Common.Forbid());
+                return this.ForbidWithMessage(Resource.MessageForbidNotAdministratorOrOwner);
             }
 
             long id = await _userService.GetUserIdByUsernameAsync(username);

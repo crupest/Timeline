@@ -41,10 +41,10 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsAdministrator();
 
             await client.TestPutAssertErrorAsync($"users/admin/permissions/{permission}",
-                errorCode: ErrorCodes.UserController.ChangePermission_RootUser);
+                errorCode: ErrorCodes.UserController.InvalidOperationOnRootUser);
 
             await client.TestDeleteAssertErrorAsync($"users/admin/permissions/{permission}",
-                errorCode: ErrorCodes.UserController.ChangePermission_RootUser);
+                errorCode: ErrorCodes.UserController.InvalidOperationOnRootUser);
         }
 
         [Theory]

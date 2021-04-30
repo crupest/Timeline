@@ -102,16 +102,13 @@ namespace Timeline.Controllers
             else
             {
                 if (User.Identity!.Name != username)
-                    return StatusCode(StatusCodes.Status403Forbidden,
-                        ErrorResponse.Common.CustomMessage_Forbid(Resources.Messages.Common_Forbid_NotSelf));
+                    return this.ForbidWithMessage(Resource.MessageForbidNotAdministratorOrOwner);
 
                 if (body.Username != null)
-                    return StatusCode(StatusCodes.Status403Forbidden,
-                        ErrorResponse.Common.CustomMessage_Forbid(Resources.Messages.UserController_Patch_Forbid_Username));
+                    return this.ForbidWithMessage(Resource.MessageForbidNotAdministrator);
 
                 if (body.Password != null)
-                    return StatusCode(StatusCodes.Status403Forbidden,
-                        ErrorResponse.Common.CustomMessage_Forbid(Resources.Messages.UserController_Patch_Forbid_Password));
+                    return this.ForbidWithMessage(Resource.MessageForbidNotAdministrator);
 
                 var user = await _userService.ModifyUserAsync(this.GetUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
                 return await _mapper.MapAsync<HttpUser>(user, Url, User);
@@ -140,7 +137,7 @@ namespace Timeline.Controllers
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return BadRequest(ErrorResponse.UserController.Delete_RootUser());
+                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
             }
         }
 
@@ -160,7 +157,7 @@ namespace Timeline.Controllers
             }
             catch (BadPasswordException)
             {
-                return BadRequest(ErrorResponse.UserController.ChangePassword_BadOldPassword());
+                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.ChangePasswordBadOldPassword, Resource.MessageOldPasswordWrong);
             }
             // User can't be non-existent or the token is bad.
         }
@@ -181,7 +178,7 @@ namespace Timeline.Controllers
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return BadRequest(ErrorResponse.UserController.ChangePermission_RootUser());
+                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
             }
         }
 
@@ -201,7 +198,7 @@ namespace Timeline.Controllers
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return BadRequest(ErrorResponse.UserController.ChangePermission_RootUser());
+                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
             }
         }
     }

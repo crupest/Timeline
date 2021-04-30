@@ -53,7 +53,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             await client.TestPostAssertErrorAsync(CreateTokenUrl,
                 new HttpCreateTokenRequest { Username = username, Password = password },
-                errorCode: ErrorCodes.TokenController.Create_BadCredential);
+                errorCode: ErrorCodes.TokenController.CreateBadCredential);
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             await client.TestPostAssertErrorAsync(VerifyTokenUrl,
                 new HttpVerifyTokenRequest { Token = "bad token hahaha" },
-                errorCode: ErrorCodes.TokenController.Verify_BadFormat);
+                errorCode: ErrorCodes.TokenController.VerifyBadFormat);
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace Timeline.Tests.IntegratedTests
 
             await client.TestPostAssertErrorAsync(VerifyTokenUrl,
                 new HttpVerifyTokenRequest { Token = token },
-                errorCode: ErrorCodes.TokenController.Verify_OldVersion);
+                errorCode: ErrorCodes.TokenController.VerifyOldVersion);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace Timeline.Tests.IntegratedTests
 
             await client.TestPostAssertErrorAsync(VerifyTokenUrl,
                 new HttpVerifyTokenRequest { Token = token },
-                errorCode: ErrorCodes.TokenController.Verify_UserNotExist);
+                errorCode: ErrorCodes.TokenController.VerifyUserNotExist);
         }
 
         //[Fact]
