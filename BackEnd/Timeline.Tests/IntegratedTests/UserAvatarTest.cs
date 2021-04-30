@@ -12,7 +12,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Timeline.Models;
-using Timeline.Models.Http;
 using Timeline.Tests.Helpers;
 using Xunit;
 

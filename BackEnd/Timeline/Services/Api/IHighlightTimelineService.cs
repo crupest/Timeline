@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Services.Timeline;
-using Timeline.Services.User;
 
 namespace Timeline.Services.Api
 {

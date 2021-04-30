@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Timeline.Models.Http;
 using Xunit;
 using Xunit.Abstractions;
 

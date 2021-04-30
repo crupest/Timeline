@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Timeline.Models.Http;
 using Xunit;
 
 namespace Timeline.Tests.IntegratedTests
