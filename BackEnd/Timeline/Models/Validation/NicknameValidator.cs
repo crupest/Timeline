@@ -1,5 +1,4 @@
 ﻿using System;
-using static Timeline.Resources.Models.Validation.NicknameValidator;
 
 namespace Timeline.Models.Validation
 {
@@ -8,7 +7,7 @@ namespace Timeline.Models.Validation
         protected override (bool, string) DoValidate(string value)
         {
             if (value.Length > 25)
-                return (false, MessageTooLong);
+                return (false, Resource.NicknameTooLong);
 
             return (true, GetSuccessMessage());
         }

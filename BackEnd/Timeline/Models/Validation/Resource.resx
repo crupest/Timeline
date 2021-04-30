@@ -117,13 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="LogBadIfNoneMatch" xml:space="preserve">
-    <value>Header If-None-Match is of bad format.</value>
+  <data name="CantBeNull" xml:space="preserve">
+    <value>it can't be null</value>
   </data>
-  <data name="LogResultData" xml:space="preserve">
-    <value>Cache is invalid and data is returned.</value>
+  <data name="NameCantBeEmpty" xml:space="preserve">
+    <value>name can't be empty</value>
   </data>
-  <data name="LogResultNotModified" xml:space="preserve">
-    <value>Cache is valid and 304 Not Modified is returned.</value>
+  <data name="NameCantBeLongerThan" xml:space="preserve">
+    <value>name can't be longer than {0}</value>
+  </data>
+  <data name="NameCantBeUniqueIdPattern" xml:space="preserve">
+    <value>name can't has the same pattern of unique id</value>
+  </data>
+  <data name="NameInvalidChar" xml:space="preserve">
+    <value>name can only consists of alphabet, number, '_' and '-' </value>
+  </data>
+  <data name="NicknameTooLong" xml:space="preserve">
+    <value>nickname can't be longer than 25</value>
+  </data>
+  <data name="NotOfType" xml:space="preserve">
+    <value>it is not of type {0}</value>
+  </data>
+  <data name="ValidateWithAttributeExceptionCreateFail" xml:space="preserve">
+    <value>Failed to create validator instance.</value>
+  </data>
+  <data name="ValidateWithAttributeExceptionNotValidator" xml:space="preserve">
+    <value>Given type is not a IValidator instance.</value>
+  </data>
+  <data name="ValidationPassed" xml:space="preserve">
+    <value>validation passed</value>
   </data>
 </root>

@@ -41,8 +41,7 @@ namespace Timeline.Tests
         [InlineData("ab c！")] // This is a chinese ! .
         public void BadCharactor(string value)
         {
-            FailAndMessage(value).Should().ContainEquivalentOf("invalid")
-                .And.ContainEquivalentOf("character");
+            FailAndMessage(value).Should().ContainEquivalentOf("only consists of");
         }
 
         [Fact]

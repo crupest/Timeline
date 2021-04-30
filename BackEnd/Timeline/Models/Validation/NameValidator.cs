@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using static Timeline.Resources.Models.Validation.NameValidator;
 
 namespace Timeline.Models.Validation
 {
@@ -14,26 +13,26 @@ namespace Timeline.Models.Validation
         {
             if (value.Length == 0)
             {
-                return (false, MessageEmptyString);
+                return (false, Resource.NameCantBeEmpty);
             }
 
             if (value.Length > MaxLength)
             {
-                return (false, MessageTooLong);
+                return (false, string.Format(Resource.NameCantBeLongerThan, MaxLength));
             }
 
             foreach ((char c, int i) in value.Select((c, i) => (c, i)))
             {
                 if (!(char.IsLetterOrDigit(c) || c == '-' || c == '_'))
                 {
-                    return (false, MessageInvalidChar);
+                    return (false, Resource.NameInvalidChar);
                 }
             }
 
             // Currently name can't be longer than 26. So this is not needed. But reserve it for future use.
             if (UniqueIdRegex.IsMatch(value))
             {
-                return (false, MessageUnqiueId);
+                return (false, Resource.NameCantBeUniqueIdPattern);
             }
 
             return (true, GetSuccessMessage());

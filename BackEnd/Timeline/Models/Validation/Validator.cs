@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using static Timeline.Resources.Models.Validation.Validator;
 
 namespace Timeline.Models.Validation
 {
@@ -56,7 +55,7 @@ namespace Timeline.Models.Validation
                 if (PermitNull)
                     return (true, GetSuccessMessage());
                 else
-                    return (false, ValidatorMessageNull);
+                    return (false, Resource.CantBeNull);
             }
 
             if (value is T v)
@@ -65,11 +64,11 @@ namespace Timeline.Models.Validation
             }
             else
             {
-                return (false, ValidatorMessageBadType);
+                return (false, string.Format(Resource.NotOfType, typeof(T).Name));
             }
         }
 
-        protected static string GetSuccessMessage() => ValidatorMessageSuccess;
+        protected static string GetSuccessMessage() => Resource.ValidationPassed;
 
         protected abstract (bool, string) DoValidate(T value);
     }
@@ -99,7 +98,7 @@ namespace Timeline.Models.Validation
                 throw new ArgumentNullException(nameof(validatorType));
 
             if (!typeof(IValidator).IsAssignableFrom(validatorType))
-                throw new ArgumentException(ValidateWithAttributeExceptionNotValidator, nameof(validatorType));
+                throw new ArgumentException(Resource.ValidateWithAttributeExceptionNotValidator, nameof(validatorType));
 
             try
             {
@@ -107,7 +106,7 @@ namespace Timeline.Models.Validation
             }
             catch (Exception e)
             {
-                throw new ArgumentException(ValidateWithAttributeExceptionCreateFail, e);
+                throw new ArgumentException(Resource.ValidateWithAttributeExceptionCreateFail, e);
             }
         }
 
