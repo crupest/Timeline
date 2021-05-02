@@ -243,7 +243,7 @@ namespace Timeline.Controllers
             }
 
             await _service.DeleteTimelineAsync(timelineId);
-            return Ok();
+            return this.Delete();
         }
     }
 }

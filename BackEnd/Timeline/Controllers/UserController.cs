@@ -129,11 +129,8 @@ namespace Timeline.Controllers
         {
             try
             {
-                var delete = await _userDeleteService.DeleteUserAsync(username);
-                if (delete)
-                    return Ok(CommonDeleteResponse.Delete());
-                else
-                    return Ok(CommonDeleteResponse.NotExist());
+                await _userDeleteService.DeleteUserAsync(username);
+                return this.Delete();
             }
             catch (InvalidOperationOnRootUserException)
             {
@@ -187,7 +184,6 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
         {
             try

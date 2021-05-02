@@ -16,6 +16,11 @@ namespace Timeline.Controllers
             return controller.StatusCode(StatusCodes.Status403Forbidden, new CommonResponse(ErrorCodes.Common.Forbid, message ?? Resource.MessageForbid));
         }
 
+        public static ObjectResult Delete(this ControllerBase controller, bool delete = true)
+        {
+            return controller.StatusCode(StatusCodes.Status200OK, CommonDeleteResponse.Create(delete));
+        }
+
         public static BadRequestObjectResult BadRequestWithCommonResponse(this ControllerBase controller, int code, string message)
         {
             return controller.BadRequest(new CommonResponse(code, message));

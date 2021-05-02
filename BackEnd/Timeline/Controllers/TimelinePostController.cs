@@ -266,7 +266,7 @@ namespace Timeline.Controllers
 
             await _postService.DeletePostAsync(timelineId, post);
 
-            return Ok();
+            return this.Delete();
         }
     }
 }
