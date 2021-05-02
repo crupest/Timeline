@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace Timeline.Services.User
             _timelinePostService = timelinePostService;
         }
 
-        public async Task<bool> DeleteUserAsync(string username)
+        public async Task DeleteUserAsync(string username)
         {
             if (username == null)
                 throw new ArgumentNullException(nameof(username));
@@ -38,8 +39,11 @@ namespace Timeline.Services.User
             }
 
             var user = await _databaseContext.Users.Where(u => u.Username == username).SingleOrDefaultAsync();
-            if (user == null)
-                return false;
+            if (user is null)
+                throw new EntityNotExistException(EntityTypes.User, new Dictionary<string, object>
+                {
+                    ["username"] = username
+                });
 
             if (user.Id == 1)
                 throw new InvalidOperationOnRootUserException(Resource.ExceptionDeleteRootUser);
@@ -50,8 +54,6 @@ namespace Timeline.Services.User
 
             await _databaseContext.SaveChangesAsync();
             _logger.LogWarning(Resource.LogDeleteUser, user.Username, user.Id);
-
-            return true;
         }
 
     }
