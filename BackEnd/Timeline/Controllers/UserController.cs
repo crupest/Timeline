@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
+using Timeline.Filters;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services.Mapper;
@@ -16,7 +17,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class UserController : Controller
+    public class UserController : MyControllerBase
     {
         private readonly IUserService _userService;
         private readonly IUserPermissionService _userPermissionService;
@@ -32,7 +33,7 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
-        private bool UserHasUserManagementPermission => this.UserHasPermission(UserPermission.UserManagement);
+        private bool UserHasUserManagementPermission => UserHasPermission(UserPermission.UserManagement);
 
         /// <summary>
         /// Get all users.
@@ -51,14 +52,14 @@ namespace Timeline.Controllers
         /// Create a new user. You have to be administrator.
         /// </summary>
         /// <returns>The new user's info.</returns>
-        [HttpPost("users"), PermissionAuthorize(UserPermission.UserManagement)]
+        [HttpPost("users")]
+        [PermissionAuthorize(UserPermission.UserManagement)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<HttpUser>> Post([FromBody] HttpUserPostRequest body)
         {
-
             var user = await _userService.CreateUserAsync(
                 new CreateUserParams(body.Username, body.Password) { Nickname = body.Nickname });
             return await _mapper.MapAsync<HttpUser>(user, Url, User);
@@ -85,7 +86,8 @@ namespace Timeline.Controllers
         /// <param name="body"></param>
         /// <param name="username">Username of the user to change.</param>
         /// <returns>The new user info.</returns>
-        [HttpPatch("users/{username}"), Authorize]
+        [HttpPatch("users/{username}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -101,16 +103,16 @@ namespace Timeline.Controllers
             }
             else
             {
-                if (User.Identity!.Name != username)
-                    return this.ForbidWithMessage(Resource.MessageForbidNotAdministratorOrOwner);
+                if (GetUsername() != username)
+                    return ForbidWithCommonResponse(Resource.MessageForbidNotAdministratorOrOwner);
 
-                if (body.Username != null)
-                    return this.ForbidWithMessage(Resource.MessageForbidNotAdministrator);
+                if (body.Username is not null)
+                    return ForbidWithCommonResponse(Resource.MessageForbidNotAdministrator);
 
-                if (body.Password != null)
-                    return this.ForbidWithMessage(Resource.MessageForbidNotAdministrator);
+                if (body.Password is not null)
+                    return ForbidWithCommonResponse(Resource.MessageForbidNotAdministrator);
 
-                var user = await _userService.ModifyUserAsync(this.GetUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
+                var user = await _userService.ModifyUserAsync(GetUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
                 return await _mapper.MapAsync<HttpUser>(user, Url, User);
             }
         }
@@ -120,7 +122,8 @@ namespace Timeline.Controllers
         /// </summary>
         /// <param name="username">Username of the user to delete.</param>
         /// <returns>Info of deletion.</returns>
-        [HttpDelete("users/{username}"), PermissionAuthorize(UserPermission.UserManagement)]
+        [HttpDelete("users/{username}")]
+        [PermissionAuthorize(UserPermission.UserManagement)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -130,11 +133,11 @@ namespace Timeline.Controllers
             try
             {
                 await _userDeleteService.DeleteUserAsync(username);
-                return this.Delete();
+                return DeleteWithCommonDeleteResponse();
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
+                return BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
             }
         }
 
@@ -145,16 +148,16 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> ChangePassword([FromBody] HttpChangePasswordRequest request)
+        public async Task<ActionResult<CommonResponse>> ChangePassword([FromBody] HttpChangePasswordRequest request)
         {
             try
             {
-                await _userService.ChangePassword(this.GetUserId(), request.OldPassword, request.NewPassword);
-                return Ok();
+                await _userService.ChangePassword(GetUserId(), request.OldPassword, request.NewPassword);
+                return OkWithCommonResponse();
             }
             catch (BadPasswordException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.ChangePasswordBadOldPassword, Resource.MessageOldPasswordWrong);
+                return BadRequestWithCommonResponse(ErrorCodes.UserController.ChangePasswordBadOldPassword, Resource.MessageOldPasswordWrong);
             }
             // User can't be non-existent or the token is bad.
         }
@@ -165,36 +168,37 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> PutUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
+        public async Task<ActionResult<CommonResponse>> PutUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
         {
             try
             {
                 var id = await _userService.GetUserIdByUsernameAsync(username);
                 await _userPermissionService.AddPermissionToUserAsync(id, permission);
-                return Ok();
+                return OkWithCommonResponse();
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
+                return BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
             }
         }
 
         [HttpDelete("users/{username}/permissions/{permission}"), PermissionAuthorize(UserPermission.UserManagement)]
+        [NotEntityDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult> DeleteUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
+        public async Task<ActionResult<CommonResponse>> DeleteUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
         {
             try
             {
                 var id = await _userService.GetUserIdByUsernameAsync(username);
                 await _userPermissionService.RemovePermissionFromUserAsync(id, permission);
-                return Ok();
+                return OkWithCommonResponse();
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
+                return BadRequestWithCommonResponse(ErrorCodes.UserController.InvalidOperationOnRootUser, Resource.MessageInvalidOperationOnRootUser);
             }
         }
     }

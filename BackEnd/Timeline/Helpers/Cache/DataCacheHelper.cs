@@ -11,7 +11,7 @@ namespace Timeline.Helpers.Cache
 {
     public static class DataCacheHelper
     {
-        public static async Task<ActionResult> GenerateActionResult(Controller controller, ICacheableDataProvider provider, TimeSpan? maxAge = null)
+        public static async Task<ActionResult> GenerateActionResult(ControllerBase controller, ICacheableDataProvider provider, TimeSpan? maxAge = null)
         {
             const string CacheControlHeaderKey = "Cache-Control";
             const string IfNonMatchHeaderKey = "If-None-Match";
@@ -74,7 +74,7 @@ namespace Timeline.Helpers.Cache
             return controller.File(data.Data, data.ContentType, digest.LastModified, eTag);
         }
 
-        public static Task<ActionResult> GenerateActionResult(Controller controller, Func<Task<ICacheableDataDigest>> getDigestDelegate, Func<Task<ByteData>> getDataDelegate, TimeSpan? maxAge = null)
+        public static Task<ActionResult> GenerateActionResult(ControllerBase controller, Func<Task<ICacheableDataDigest>> getDigestDelegate, Func<Task<ByteData>> getDataDelegate, TimeSpan? maxAge = null)
         {
             return GenerateActionResult(controller, new DelegateCacheableDataProvider(getDigestDelegate, getDataDelegate), maxAge);
         }

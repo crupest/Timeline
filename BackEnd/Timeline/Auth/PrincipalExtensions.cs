@@ -6,7 +6,13 @@ namespace Timeline.Auth
 {
     public static class PrincipalExtensions
     {
-        public static long? GetUserId(this ClaimsPrincipal? principal)
+        public static string? GetOptionalName(this ClaimsPrincipal? principal)
+        {
+            if (principal is null) return null;
+            return principal.Identity?.Name;
+        }
+
+        public static long? GetOptionalUserId(this ClaimsPrincipal? principal)
         {
             if (principal is null) return null;
 

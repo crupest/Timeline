@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Filters;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
@@ -21,7 +22,7 @@ namespace Timeline.Controllers
     [ApiController]
     [Route("timelines")]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class TimelineController : Controller
+    public class TimelineController : MyControllerBase
     {
         private readonly IUserService _userService;
         private readonly ITimelineService _service;
@@ -34,7 +35,7 @@ namespace Timeline.Controllers
             _mapper = mapper;
         }
 
-        private bool UserHasAllTimelineManagementPermission => this.UserHasPermission(UserPermission.AllTimelineManagement);
+        private bool UserHasAllTimelineManagementPermission => UserHasPermission(UserPermission.AllTimelineManagement);
 
         private Task<HttpTimeline> Map(TimelineEntity timeline)
         {
@@ -82,7 +83,7 @@ namespace Timeline.Controllers
                     }
                     else
                     {
-                        return this.BadRequestWithCommonResponse(ErrorCodes.Common.InvalidModel, string.Format(Resource.MessageTimelineListQueryVisibilityUnknown, visibility));
+                        return BadRequestWithCommonResponse(ErrorCodes.Common.InvalidModel, string.Format(Resource.MessageTimelineListQueryVisibilityUnknown, visibility));
                     }
                 }
             }
@@ -100,7 +101,7 @@ namespace Timeline.Controllers
                 }
                 catch (EntityNotExistException)
                 {
-                    return this.BadRequestWithCommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, Resource.MessageTimelineListQueryRelateNotExist);
+                    return BadRequestWithCommonResponse(ErrorCodes.TimelineController.QueryRelateNotExist, Resource.MessageTimelineListQueryRelateNotExist);
                 }
             }
 
@@ -141,9 +142,9 @@ namespace Timeline.Controllers
         {
             var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _service.HasManagePermissionAsync(timelineId, this.GetUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _service.HasManagePermissionAsync(timelineId, GetUserId()))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             await _service.ChangePropertyAsync(timelineId, _mapper.AutoMapperMap<TimelineChangePropertyParams>(body));
@@ -167,14 +168,14 @@ namespace Timeline.Controllers
         {
             var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetUserId())))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             var userId = await _userService.GetUserIdByUsernameAsync(member);
-            var create = await _service.AddMemberAsync(timelineId, userId);
-            return Ok(CommonPutResponse.Create(create));
+            await _service.AddMemberAsync(timelineId, userId);
+            return OkWithCommonResponse();
         }
 
         /// <summary>
@@ -184,6 +185,7 @@ namespace Timeline.Controllers
         /// <param name="member">The member's username.</param>
         [HttpDelete("{timeline}/members/{member}")]
         [Authorize]
+        [NotEntityDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -192,15 +194,14 @@ namespace Timeline.Controllers
         {
             var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetUserId())))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
-
             var userId = await _userService.GetUserIdByUsernameAsync(member);
-            var delete = await _service.RemoveMemberAsync(timelineId, userId);
-            return Ok(CommonDeleteResponse.Create(delete));
+            await _service.RemoveMemberAsync(timelineId, userId);
+            return OkWithCommonResponse();
         }
 
         /// <summary>
@@ -215,7 +216,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<HttpTimeline>> TimelineCreate([FromBody] HttpTimelineCreateRequest body)
         {
-            var userId = this.GetUserId();
+            var userId = GetUserId();
 
             var timeline = await _service.CreateTimelineAsync(body.Name, userId);
             var result = await Map(timeline);
@@ -235,15 +236,29 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> TimelineDelete([FromRoute][TimelineName] string timeline)
         {
-            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
-
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, this.GetUserId())))
+            try
             {
-                return this.ForbidWithMessage();
-            }
+                var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            await _service.DeleteTimelineAsync(timelineId);
-            return this.Delete();
+                if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetUserId())))
+                {
+                    return ForbidWithCommonResponse();
+                }
+
+                await _service.DeleteTimelineAsync(timelineId);
+                return DeleteWithCommonDeleteResponse();
+            }
+            catch (EntityNotExistException)
+            {
+                if (UserHasAllTimelineManagementPermission)
+                {
+                    return DeleteWithCommonDeleteResponse(false);
+                }
+                else
+                {
+                    return ForbidWithCommonResponse();
+                }
+            }
         }
     }
 }

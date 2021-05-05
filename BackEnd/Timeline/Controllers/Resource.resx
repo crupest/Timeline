@@ -120,6 +120,9 @@
   <data name="ExceptionNoUserId" xml:space="preserve">
     <value>Can't get user id.</value>
   </data>
+  <data name="ExceptionNoUsername" xml:space="preserve">
+    <value>Can't get username.</value>
+  </data>
   <data name="MessageForbid" xml:space="preserve">
     <value>You have no permission to access this.</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="MessageOldPasswordWrong" xml:space="preserve">
     <value>The old password is wrong.</value>
+  </data>
+  <data name="MessageOperationSucceeded" xml:space="preserve">
+    <value>Operation succeeded.</value>
   </data>
   <data name="MessageTimelineListQueryRelateNotExist" xml:space="preserve">
     <value>The user specified by query param "relate" does not exist.</value>

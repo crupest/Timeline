@@ -209,16 +209,16 @@ namespace Timeline.Tests.IntegratedTests
                 using var client = await CreateClientAsAdministrator();
 
                 await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
-                await client.TestDeleteAsync("timelines/t2");
-                await client.TestDeleteAsync("timelines/t2");
+                await client.TestDeleteAsync("timelines/t2", true);
+                await client.TestDeleteAsync("timelines/t2", false);
             }
 
             {
                 using var client = await CreateClientAs(1);
 
                 await client.TestDeleteAssertInvalidModelAsync("timelines/!!!");
-                await client.TestDeleteAsync("timelines/t1");
-                await client.TestDeleteAsync("timelines/t1");
+                await client.TestDeleteAsync("timelines/t1", true);
+                await client.TestDeleteAssertForbiddenAsync("timelines/t1");
             }
         }
 
@@ -298,9 +298,9 @@ namespace Timeline.Tests.IntegratedTests
             await AssertEmptyMembers();
             await client.PutTimelineMemberAsync(timelineName, "user2");
             await AssertMembers(new List<HttpUser> { await client.GetUserAsync("user2") });
-            await client.DeleteTimelineMemberAsync(timelineName, "user2", true);
+            await client.DeleteTimelineMemberAsync(timelineName, "user2");
             await AssertEmptyMembers();
-            await client.TestDeleteAsync($"timelines/{timelineName}/members/usernotexist", false);
+            await client.TestDeleteAssertErrorAsync($"timelines/{timelineName}/members/usernotexist");
             await AssertEmptyMembers();
         }
 

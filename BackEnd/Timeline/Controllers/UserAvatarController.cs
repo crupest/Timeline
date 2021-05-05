@@ -18,7 +18,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class UserAvatarController : Controller
+    public class UserAvatarController : MyControllerBase
     {
         private readonly IUserService _userService;
         private readonly IUserAvatarService _service;
@@ -62,9 +62,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Put([FromRoute][Username] string username, [FromBody] ByteData body)
         {
-            if (!this.UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
+            if (!UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
             {
-                return this.ForbidWithMessage(Resource.MessageForbidNotAdministratorOrOwner);
+                return ForbidWithCommonResponse(Resource.MessageForbidNotAdministratorOrOwner);
             }
 
             long id = await _userService.GetUserIdByUsernameAsync(username);
@@ -105,9 +105,9 @@ namespace Timeline.Controllers
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute][Username] string username)
         {
-            if (!this.UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
+            if (!UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
             {
-                return this.ForbidWithMessage(Resource.MessageForbidNotAdministratorOrOwner);
+                return ForbidWithCommonResponse(Resource.MessageForbidNotAdministratorOrOwner);
             }
 
             long id = await _userService.GetUserIdByUsernameAsync(username);

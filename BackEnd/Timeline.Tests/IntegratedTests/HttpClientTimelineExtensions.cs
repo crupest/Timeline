@@ -15,7 +15,7 @@ namespace Timeline.Tests.IntegratedTests
         public static Task PutTimelineMemberAsync(this HttpClient client, string timelineName, string memberUsername)
             => client.TestPutAsync($"timelines/{timelineName}/members/{memberUsername}");
 
-        public static Task DeleteTimelineMemberAsync(this HttpClient client, string timelineName, string memberUsername, bool? delete)
-            => client.TestDeleteAsync($"timelines/{timelineName}/members/{memberUsername}", delete);
+        public static Task DeleteTimelineMemberAsync(this HttpClient client, string timelineName, string memberUsername)
+            => client.TestDeleteAsync($"timelines/{timelineName}/members/{memberUsername}");
     }
 }
