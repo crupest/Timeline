@@ -7,7 +7,6 @@ using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
-using Timeline.Services.Imaging;
 using Timeline.Services.User;
 using Timeline.Services.User.Avatar;
 
@@ -36,7 +35,7 @@ namespace Timeline.Controllers
         /// <param name="ifNoneMatch">If-None-Match header.</param>
         /// <returns>Avatar data.</returns>
         [HttpGet("users/{username}/avatar")]
-        [Produces("image/png", "image/jpeg", "image/gif", "image/webp", "application/json", "text/json")]
+        [ProducesImages]
         [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,7 +53,7 @@ namespace Timeline.Controllers
         /// <param name="body">The avatar data.</param>
         [HttpPut("users/{username}/avatar")]
         [Authorize]
-        [Consumes("image/png", "image/jpeg", "image/gif", "image/webp")]
+        [ConsumesImages]
         [MaxContentLength(1000 * 1000 * 10)]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,31 +61,17 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Put([FromRoute][Username] string username, [FromBody] ByteData body)
         {
-            if (!UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
+            if (!UserHasPermission(UserPermission.UserManagement) && GetUsername() != username)
             {
                 return ForbidWithCommonResponse(Resource.MessageForbidNotAdministratorOrOwner);
             }
 
             long id = await _userService.GetUserIdByUsernameAsync(username);
 
-            try
-            {
-                var digest = await _service.SetAvatarAsync(id, body);
+            var digest = await _service.SetAvatarAsync(id, body);
 
-                Response.Headers.Append("ETag", $"\"{digest.ETag}\"");
-
-                return Ok();
-            }
-            catch (ImageException e)
-            {
-                return BadRequest(e.Error switch
-                {
-                    ImageException.ErrorReason.CantDecode => new CommonResponse(ErrorCodes.Image.CantDecode, Resource.MessageImageDecodeFailed),
-                    ImageException.ErrorReason.UnmatchedFormat => new CommonResponse(ErrorCodes.Image.UnmatchedFormat, Resource.MessageImageFormatUnmatch),
-                    ImageException.ErrorReason.BadSize => new CommonResponse(ErrorCodes.Image.BadSize, Resource.MessageImageBadSize),
-                    _ => new CommonResponse(ErrorCodes.Image.Unknown, Resource.MessageImageUnknownError)
-                });
-            }
+            Response.Headers.Append("ETag", $"\"{digest.ETag}\"");
+            return Ok();
         }
 
         /// <summary>
@@ -98,11 +83,12 @@ namespace Timeline.Controllers
         /// <response code="401">You have not logged in.</response>
         /// <response code="403">You are not administrator.</response>
         [HttpDelete("users/{username}/avatar")]
+        [Authorize]
+        [NotEntityDelete]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize]
         public async Task<IActionResult> Delete([FromRoute][Username] string username)
         {
             if (!UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
@@ -113,7 +99,7 @@ namespace Timeline.Controllers
             long id = await _userService.GetUserIdByUsernameAsync(username);
 
             await _service.DeleteAvatarAsync(id);
-            return Ok();
+            return OkWithCommonResponse();
         }
     }
 }

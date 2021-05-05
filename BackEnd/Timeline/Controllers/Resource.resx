@@ -132,18 +132,6 @@
   <data name="MessageForbidNotAdministratorOrOwner" xml:space="preserve">
     <value>You can't do this unless you are administrator or resource owner.</value>
   </data>
-  <data name="MessageImageBadSize" xml:space="preserve">
-    <value>Image is not a square.</value>
-  </data>
-  <data name="MessageImageDecodeFailed" xml:space="preserve">
-    <value>Image decode failed.</value>
-  </data>
-  <data name="MessageImageFormatUnmatch" xml:space="preserve">
-    <value>Specified image format does not match the actual one .</value>
-  </data>
-  <data name="MessageImageUnknownError" xml:space="preserve">
-    <value>Unknown error happened to image.</value>
-  </data>
   <data name="MessageInvalidOperationOnRootUser" xml:space="preserve">
     <value>You can't do this because it is the root user.</value>
   </data>

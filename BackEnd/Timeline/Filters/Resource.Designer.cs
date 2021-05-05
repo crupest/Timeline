@@ -86,5 +86,41 @@ namespace Timeline.Filters {
                 return ResourceManager.GetString("MessageEntityNotExist", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image is not a square..
+        /// </summary>
+        internal static string MessageImageBadSize {
+            get {
+                return ResourceManager.GetString("MessageImageBadSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image decode failed..
+        /// </summary>
+        internal static string MessageImageDecodeFailed {
+            get {
+                return ResourceManager.GetString("MessageImageDecodeFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified image format does not match the actual one ..
+        /// </summary>
+        internal static string MessageImageFormatUnmatch {
+            get {
+                return ResourceManager.GetString("MessageImageFormatUnmatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown error happened to image..
+        /// </summary>
+        internal static string MessageImageUnknownError {
+            get {
+                return ResourceManager.GetString("MessageImageUnknownError", resourceCulture);
+            }
+        }
     }
 }

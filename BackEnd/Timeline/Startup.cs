@@ -71,6 +71,7 @@ namespace Timeline
                 setup.Filters.Add(new ProducesAttribute(MimeTypes.ApplicationJson, MimeTypes.TextJson));
                 setup.Filters.Add<CatchEntityNotExistExceptionFilter>();
                 setup.Filters.Add<CatchEntityAlreadyExistExceptionFilter>();
+                setup.Filters.Add<CatchImageExceptionFilter>();
                 setup.UseApiRoutePrefix("api");
             })
             .AddJsonOptions(options =>

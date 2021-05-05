@@ -138,7 +138,7 @@ namespace Timeline.Tests.IntegratedTests
                 await client.TestPutByteArrayAsync("users/user1/avatar", mockAvatar.Data, mockAvatar.ContentType);
                 await client.TestDeleteAsync("users/user1/avatar");
                 await client.TestPutByteArrayAssertErrorAsync("users/usernotexist/avatar", new[] { (byte)0x00 }, "image/png", errorCode: ErrorCodes.NotExist.User);
-                await client.TestDeleteAsync("users/usernotexist/avatar");
+                await client.TestDeleteAssertErrorAsync("users/usernotexist/avatar");
             }
 
             // bad username check

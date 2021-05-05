@@ -202,7 +202,6 @@ namespace Timeline.Controllers
                 }
             }
 
-
             try
             {
                 var post = await _postService.CreatePostAsync(timelineId, userId, createRequest);
