@@ -1,12 +1,9 @@
 const path = require("path");
-const webpack = require("webpack");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const config = require("./webpack.common");
 
 config.mode("development");
-
-config.target('web'); // Remove this after https://github.com/webpack/webpack-dev-server/issues/2758 is fixed.
 
 config.module
   .rule("ts")
