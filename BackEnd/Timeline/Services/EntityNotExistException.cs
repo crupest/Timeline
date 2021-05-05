@@ -15,7 +15,7 @@ namespace Timeline.Services
         public EntityNotExistException() : base() { }
         public EntityNotExistException(string? message) : base(message) { }
         public EntityNotExistException(string? message, Exception? inner) : base(message, inner) { }
-        public EntityNotExistException(EntityType entityType, IDictionary<string, object> constraints, string? message = null, Exception? inner = null)
+        public EntityNotExistException(EntityType entityType, IDictionary<string, object>? constraints = null, string? message = null, Exception? inner = null)
             : base(entityType, constraints, message ?? Resource.ExceptionEntityNotExist, inner)
         {
 

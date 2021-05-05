@@ -43,6 +43,8 @@
             public const int Timeline = 2_001_00_02;
             public const int TimelinePost = 2_001_00_03;
             public const int TimelinePostData = 2_001_00_04;
+            public const int BookmarkTimeline = 2_001_00_05;
+            public const int HighlightTimeline = 2_001_00_06;
         }
 
         public static class Conflict
@@ -52,6 +54,8 @@
             public const int Timeline = 2_002_00_02;
             public const int TimelinePost = 2_002_00_03;
             public const int TimelinePostData = 2_002_00_04;
+            public const int BookmarkTimeline = 2_002_00_05;
+            public const int HighlightTimeline = 2_002_00_06;
         }
 
         public static class TokenController

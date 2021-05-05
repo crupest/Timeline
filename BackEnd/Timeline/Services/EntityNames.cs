@@ -7,5 +7,7 @@
         public const string Timeline = "Timeline";
         public const string TimelinePost = "TimelinePost";
         public const string TimelinePostData = "TimelinePostData";
+        public const string BookmarkTimeline = "BookmarkTimeline";
+        public const string HighlightTimeline = "HighlightTimeline";
     }
 }

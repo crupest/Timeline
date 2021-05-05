@@ -92,16 +92,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult> Move([FromBody] HttpBookmarkTimelineMoveRequest request)
         {
-            try
-            {
-                var timelineId = await _timelineService.GetTimelineIdByNameAsync(request.Timeline);
-                await _service.MoveBookmarkAsync(GetUserId(), timelineId, request.NewPosition!.Value);
-                return Ok();
-            }
-            catch (InvalidBookmarkException)
-            {
-                return BadRequest(new CommonResponse(ErrorCodes.BookmarkTimelineController.NonBookmark, "You can't move a non-bookmark timeline."));
-            }
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(request.Timeline);
+            await _service.MoveBookmarkAsync(GetUserId(), timelineId, request.NewPosition!.Value);
+            return OkWithCommonResponse();
         }
     }
 }

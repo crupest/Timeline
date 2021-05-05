@@ -81,7 +81,10 @@ namespace Timeline.Services.Api
 
             var entity = await _database.HighlightTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId);
 
-            if (entity == null) throw new InvalidHighlightTimelineException("You can't move a non-highlight timeline.");
+            if (entity is null)
+            {
+                throw new EntityNotExistException(EntityTypes.HighlightTimeline);
+            }
 
             var oldPosition = entity.Order;
 

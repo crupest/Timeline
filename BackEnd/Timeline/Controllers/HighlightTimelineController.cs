@@ -93,16 +93,9 @@ namespace Timeline.Controllers
         [ProducesResponseType(403)]
         public async Task<ActionResult> Move([FromBody] HttpHighlightTimelineMoveRequest body)
         {
-            try
-            {
-                var timelineId = await _timelineService.GetTimelineIdByNameAsync(body.Timeline);
-                await _service.MoveHighlightTimelineAsync(timelineId, body.NewPosition!.Value);
-                return Ok();
-            }
-            catch (InvalidHighlightTimelineException)
-            {
-                return BadRequest(new CommonResponse(ErrorCodes.HighlightTimelineController.NonHighlight, "Can't move a non-highlight timeline."));
-            }
+            var timelineId = await _timelineService.GetTimelineIdByNameAsync(body.Timeline);
+            await _service.MoveHighlightTimelineAsync(timelineId, body.NewPosition!.Value);
+            return OkWithCommonResponse();
         }
     }
 }
