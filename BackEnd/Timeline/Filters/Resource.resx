@@ -126,4 +126,16 @@
   <data name="MessageEntityNotExist" xml:space="preserve">
     <value>The entity you operate on does not exist. Entity type is {0}. Constraints are {1}.</value>
   </data>
+  <data name="MessageImageBadSize" xml:space="preserve">
+    <value>Image is not a square.</value>
+  </data>
+  <data name="MessageImageDecodeFailed" xml:space="preserve">
+    <value>Image decode failed.</value>
+  </data>
+  <data name="MessageImageFormatUnmatch" xml:space="preserve">
+    <value>Specified image format does not match the actual one .</value>
+  </data>
+  <data name="MessageImageUnknownError" xml:space="preserve">
+    <value>Unknown error happened to image.</value>
+  </data>
 </root>

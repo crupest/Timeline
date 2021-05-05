@@ -66,7 +66,7 @@ namespace Timeline.Services.Timeline
         /// <exception cref="ArgumentException">Thrown when <paramref name="request"/> is of invalid format.</exception>
         /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
         /// <exception cref="EntityNotExistException">Thrown if user of <paramref name="authorId"/> does not exist.</exception>
-        /// <exception cref="ImageException">Thrown if data is not a image. Validated by <see cref="ImageService"/>.</exception>
+        /// <exception cref="TimelinePostCreateDataException">Thrown if data is illegal.</exception>
         Task<TimelinePostEntity> CreatePostAsync(long timelineId, long authorId, TimelinePostCreateRequest request);
 
         /// <summary>
