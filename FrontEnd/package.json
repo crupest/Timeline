@@ -1,8 +1,8 @@
 {
   "name": "timeline",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
-  "homepage": "https://crupest.xyz",
+  "homepage": "https://timeline.crupest.life",
   "keywords": [],
   "description": "Timeline app.",
   "dependencies": {
@@ -64,7 +64,6 @@
     "@babel/preset-react": "^7.13.13",
     "@babel/preset-typescript": "^7.13.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
-    "@types/classnames": "^2.3.1",
     "@types/lodash": "^4.14.168",
     "@types/node": "^15.0.2",
     "@types/react": "^17.0.5",
