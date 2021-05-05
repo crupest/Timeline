@@ -40,7 +40,7 @@ config.resolve.set("fallback", {
 });
 
 config.devServer
-  .contentBase(path.resolve(__dirname, "public/"))
+  .set("static", path.resolve(__dirname, "public/"))
   .port(3000)
   .historyApiFallback(true)
   .hot(true);

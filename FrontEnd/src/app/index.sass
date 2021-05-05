@@ -15,6 +15,10 @@
 
 @import './views/admin/admin'
 
+:root
+  --primary-color: #007bff
+  --text-on-primary-color: #ffffff
+
 small
   line-height: 1.2
 
@@ -73,7 +77,7 @@ textarea
   background: $gray-100
   transition: all 0.3s
   &:hover
-    border-color: $primary
+    border-color: var(--primary)
 
 .full-viewport-center-child
   position: fixed
