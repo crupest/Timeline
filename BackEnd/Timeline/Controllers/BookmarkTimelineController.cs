@@ -16,7 +16,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class BookmarkTimelineController : Controller
+    public class BookmarkTimelineController : MyControllerBase
     {
         private readonly IBookmarkTimelineService _service;
         private readonly ITimelineService _timelineService;
@@ -44,7 +44,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
-            var ids = await _service.GetBookmarksAsync(this.GetUserId());
+            var ids = await _service.GetBookmarksAsync(GetUserId());
             var timelines = await _timelineService.GetTimelineList(ids);
             return await Map(timelines);
         }
@@ -61,7 +61,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonPutResponse>> Put([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var create = await _service.AddBookmarkAsync(this.GetUserId(), timelineId);
+            var create = await _service.AddBookmarkAsync(GetUserId(), timelineId);
             return CommonPutResponse.Create(create);
         }
 
@@ -77,7 +77,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonDeleteResponse>> Delete([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var delete = await _service.RemoveBookmarkAsync(this.GetUserId(), timelineId);
+            var delete = await _service.RemoveBookmarkAsync(GetUserId(), timelineId);
             return CommonDeleteResponse.Create(delete);
         }
 
@@ -95,7 +95,7 @@ namespace Timeline.Controllers
             try
             {
                 var timelineId = await _timelineService.GetTimelineIdByNameAsync(request.Timeline);
-                await _service.MoveBookmarkAsync(this.GetUserId(), timelineId, request.NewPosition!.Value);
+                await _service.MoveBookmarkAsync(GetUserId(), timelineId, request.NewPosition!.Value);
                 return Ok();
             }
             catch (InvalidBookmarkException)

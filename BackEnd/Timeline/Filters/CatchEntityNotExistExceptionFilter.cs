@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Linq;
 using Timeline.Models.Http;
 using Timeline.Services;
 
@@ -28,7 +29,14 @@ namespace Timeline.Filters
                 }
                 else if (HttpMethods.IsDelete(context.HttpContext.Request.Method))
                 {
-                    context.Result = new OkObjectResult(CommonDeleteResponse.NotExist());
+                    if (context.ActionDescriptor.EndpointMetadata.OfType<NotEntityDeleteAttribute>().Any())
+                    {
+                        context.Result = new BadRequestObjectResult(MakeCommonResponse(e));
+                    }
+                    else
+                    {
+                        context.Result = new OkObjectResult(CommonDeleteResponse.NotExist());
+                    }
                 }
                 else
                 {

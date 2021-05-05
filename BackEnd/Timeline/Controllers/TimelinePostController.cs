@@ -22,7 +22,7 @@ namespace Timeline.Controllers
     [ApiController]
     [Route("timelines/{timeline}/posts")]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class TimelinePostController : Controller
+    public class TimelinePostController : MyControllerBase
     {
         private readonly ITimelineService _timelineService;
         private readonly ITimelinePostService _postService;
@@ -39,7 +39,7 @@ namespace Timeline.Controllers
             _markdownProcessor = markdownProcessor;
         }
 
-        private bool UserHasAllTimelineManagementPermission => this.UserHasPermission(UserPermission.AllTimelineManagement);
+        private bool UserHasAllTimelineManagementPermission => UserHasPermission(UserPermission.AllTimelineManagement);
 
         private Task<HttpTimelinePost> Map(TimelinePostEntity post)
         {
@@ -66,9 +66,9 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalUserId()))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             var posts = await _postService.GetPostsAsync(timelineId, modifiedSince, includeDeleted ?? false);
@@ -91,9 +91,9 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalUserId()))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             var post = await _postService.GetPostAsync(timelineId, postId);
@@ -137,9 +137,9 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, this.GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalUserId()))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             return await DataCacheHelper.GenerateActionResult(this,
@@ -171,11 +171,11 @@ namespace Timeline.Controllers
         public async Task<ActionResult<HttpTimelinePost>> Post([FromRoute][GeneralTimelineName] string timeline, [FromBody] HttpTimelinePostCreateRequest body)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var userId = this.GetUserId();
+            var userId = GetUserId();
 
             if (!UserHasAllTimelineManagementPermission && !await _timelineService.IsMemberOfAsync(timelineId, userId))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             var createRequest = new TimelinePostCreateRequest()
@@ -232,9 +232,9 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, this.GetUserId(), true))
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, GetUserId(), true))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             var entity = await _postService.PatchPostAsync(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
@@ -259,14 +259,14 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, this.GetUserId(), true))
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, GetUserId(), true))
             {
-                return this.ForbidWithMessage();
+                return ForbidWithCommonResponse();
             }
 
             await _postService.DeletePostAsync(timelineId, post);
 
-            return this.Delete();
+            return DeleteWithCommonDeleteResponse();
         }
     }
 }

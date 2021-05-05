@@ -17,7 +17,7 @@ namespace Timeline.Controllers
     [Route("token")]
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class TokenController : Controller
+    public class TokenController : MyControllerBase
     {
         private readonly IUserTokenManager _userTokenManager;
         private readonly IGenericMapper _mapper;
@@ -57,11 +57,11 @@ namespace Timeline.Controllers
             }
             catch (EntityNotExistException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.CreateBadCredential, Resource.MessageTokenCreateBadCredential);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.CreateBadCredential, Resource.MessageTokenCreateBadCredential);
             }
             catch (BadPasswordException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.CreateBadCredential, Resource.MessageTokenCreateBadCredential);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.CreateBadCredential, Resource.MessageTokenCreateBadCredential);
             }
         }
 
@@ -85,19 +85,19 @@ namespace Timeline.Controllers
             }
             catch (UserTokenTimeExpiredException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyTimeExpired, Resource.MessageTokenVerifyTimeExpired);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyTimeExpired, Resource.MessageTokenVerifyTimeExpired);
             }
             catch (UserTokenVersionExpiredException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyOldVersion, Resource.MessageTokenVerifyOldVersion);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyOldVersion, Resource.MessageTokenVerifyOldVersion);
             }
             catch (UserTokenBadFormatException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyBadFormat, Resource.MessageTokenVerifyBadFormat);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyBadFormat, Resource.MessageTokenVerifyBadFormat);
             }
             catch (UserTokenUserNotExistException)
             {
-                return this.BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyUserNotExist, Resource.MessageTokenVerifyUserNotExist);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyUserNotExist, Resource.MessageTokenVerifyUserNotExist);
             }
         }
     }

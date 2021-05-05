@@ -41,7 +41,7 @@ namespace Timeline.Services.Mapper
 
         public async Task<HttpTimeline> MapAsync(TimelineEntity entity, IUrlHelper urlHelper, ClaimsPrincipal? user)
         {
-            var userId = user.GetUserId();
+            var userId = user.GetOptionalUserId();
 
             await _database.Entry(entity).Reference(e => e.Owner).LoadAsync();
             await _database.Entry(entity).Collection(e => e.Members).Query().Include(m => m.User).LoadAsync();
@@ -99,7 +99,7 @@ namespace Timeline.Services.Mapper
 
         public async Task<HttpTimelinePost> MapAsync(TimelinePostEntity entity, IUrlHelper urlHelper, ClaimsPrincipal? user)
         {
-            var userId = user.GetUserId();
+            var userId = user.GetOptionalUserId();
 
             await _database.Entry(entity).Reference(e => e.Timeline).LoadAsync();
             await _database.Entry(entity).Collection(p => p.DataList).LoadAsync();

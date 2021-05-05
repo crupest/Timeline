@@ -16,7 +16,7 @@ namespace Timeline.Controllers
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
     [Route("search")]
-    public class SearchController : Controller
+    public class SearchController : MyControllerBase
     {
         private readonly ISearchService _service;
         private readonly IGenericMapper _mapper;

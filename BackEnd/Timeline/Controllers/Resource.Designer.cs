@@ -70,6 +70,15 @@ namespace Timeline.Controllers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t get username..
+        /// </summary>
+        internal static string ExceptionNoUsername {
+            get {
+                return ResourceManager.GetString("ExceptionNoUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have no permission to access this..
         /// </summary>
         internal static string MessageForbid {
@@ -147,6 +156,15 @@ namespace Timeline.Controllers {
         internal static string MessageOldPasswordWrong {
             get {
                 return ResourceManager.GetString("MessageOldPasswordWrong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation succeeded..
+        /// </summary>
+        internal static string MessageOperationSucceeded {
+            get {
+                return ResourceManager.GetString("MessageOperationSucceeded", resourceCulture);
             }
         }
         

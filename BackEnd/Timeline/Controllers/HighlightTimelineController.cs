@@ -17,7 +17,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
-    public class HighlightTimelineController : Controller
+    public class HighlightTimelineController : MyControllerBase
     {
         private readonly IHighlightTimelineService _service;
         private readonly ITimelineService _timelineService;
@@ -61,7 +61,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonPutResponse>> Put([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var create = await _service.AddHighlightTimelineAsync(timelineId, this.GetUserId());
+            var create = await _service.AddHighlightTimelineAsync(timelineId, GetUserId());
             return CommonPutResponse.Create(create);
         }
 
@@ -78,7 +78,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonDeleteResponse>> Delete([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var delete = await _service.RemoveHighlightTimelineAsync(timelineId, this.GetUserId());
+            var delete = await _service.RemoveHighlightTimelineAsync(timelineId, GetUserId());
             return CommonDeleteResponse.Create(delete);
         }
 
