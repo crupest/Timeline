@@ -68,7 +68,10 @@ namespace Timeline.Services.Api
 
             var entity = await _database.BookmarkTimelines.SingleOrDefaultAsync(t => t.TimelineId == timelineId && t.UserId == userId);
 
-            if (entity == null) throw new InvalidBookmarkException("You can't move a non-bookmark timeline.");
+            if (entity is null)
+            {
+                throw new EntityNotExistException(EntityTypes.BookmarkTimeline);
+            }
 
             var oldPosition = entity.Rank;
 

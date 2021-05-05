@@ -56,7 +56,7 @@ namespace Timeline.Services.Api
         /// <param name="newPosition">New position. Starts at 1.</param>
         /// <exception cref="EntityNotExistException">Thrown when user does not exist.</exception>
         /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
-        /// <exception cref="InvalidBookmarkException">Thrown when the timeline is not a bookmark.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when the timeline is not a bookmark.</exception>
         Task MoveBookmarkAsync(long userId, long timelineId, long newPosition);
     }
 }

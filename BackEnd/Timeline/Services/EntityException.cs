@@ -10,11 +10,12 @@ namespace Timeline.Services
         public EntityException() { }
         public EntityException(string? message) : base(message) { }
         public EntityException(string? message, Exception? inner) : base(message, inner) { }
-        public EntityException(EntityType entityType, IDictionary<string, object> constraints, string? message = null, Exception? inner = null)
+        public EntityException(EntityType entityType, IDictionary<string, object>? constraints = null, string? message = null, Exception? inner = null)
             : base(message, inner)
         {
             EntityType = entityType;
-            Constraints = constraints;
+            if (constraints is not null)
+                Constraints = constraints;
         }
         protected EntityException(
           System.Runtime.Serialization.SerializationInfo info,

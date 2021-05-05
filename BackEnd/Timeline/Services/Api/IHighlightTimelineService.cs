@@ -49,7 +49,7 @@ namespace Timeline.Services.Api
         /// <param name="timelineId">The timeline name.</param>
         /// <param name="newPosition">The new position. Starts at 1.</param>
         /// <exception cref="EntityNotExistException">Thrown when timeline with given id does not exist.</exception>
-        /// <exception cref="InvalidHighlightTimelineException">Thrown when given timeline is not a highlight timeline.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when given timeline is not a highlight timeline.</exception>
         /// <remarks>
         /// If <paramref name="newPosition"/> is smaller than 1. Then move the timeline to head.
         /// If <paramref name="newPosition"/> is bigger than total count. Then move the timeline to tail.
