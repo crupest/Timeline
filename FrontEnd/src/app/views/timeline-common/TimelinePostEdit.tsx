@@ -82,7 +82,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
         onChange={onInputChange}
         accept="image/*"
         disabled={disabled}
-        className="mx-3 my-1 d-inline-block"
+        className="mx-3 my-1"
       />
       {file != null && !error && (
         <BlobImage
