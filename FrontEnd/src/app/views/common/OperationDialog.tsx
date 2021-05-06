@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Modal } from "react-bootstrap";
+import { ChromePicker } from "react-color";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
@@ -27,7 +28,7 @@ const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = (props) => {
   return result;
 };
 
-export interface OperationTextInputInfo {
+export interface OperationDialogTextInput {
   type: "text";
   label?: I18nText;
   password?: boolean;
@@ -39,40 +40,51 @@ export interface OperationTextInputInfo {
   helperText?: string;
 }
 
-export interface OperationBoolInputInfo {
+export interface OperationDialogBoolInput {
   type: "bool";
   label: I18nText;
   initValue?: boolean;
 }
 
-export interface OperationSelectInputInfoOption {
+export interface OperationDialogSelectInputOption {
   value: string;
   label: I18nText;
   icon?: React.ReactElement;
 }
 
-export interface OperationSelectInputInfo {
+export interface OperationDialogSelectInput {
   type: "select";
   label: I18nText;
-  options: OperationSelectInputInfoOption[];
+  options: OperationDialogSelectInputOption[];
   initValue?: string;
 }
 
-export type OperationInputInfo =
-  | OperationTextInputInfo
-  | OperationBoolInputInfo
-  | OperationSelectInputInfo;
+export interface OperationDialogColorInput {
+  type: "color";
+  label?: I18nText;
+  initValue?: string | null;
+  disableAlpha?: boolean;
+  canBeNull?: boolean;
+}
 
-type MapOperationInputInfoValueType<T> = T extends OperationTextInputInfo
+export type OperationDialogInput =
+  | OperationDialogTextInput
+  | OperationDialogBoolInput
+  | OperationDialogSelectInput
+  | OperationDialogColorInput;
+
+type MapOperationInputInfoValueType<T> = T extends OperationDialogTextInput
   ? string
-  : T extends OperationBoolInputInfo
+  : T extends OperationDialogBoolInput
   ? boolean
-  : T extends OperationSelectInputInfo
+  : T extends OperationDialogSelectInput
   ? string
+  : T extends OperationDialogColorInput
+  ? string | null
   : never;
 
 type MapOperationInputInfoValueTypeList<
-  Tuple extends readonly OperationInputInfo[]
+  Tuple extends readonly OperationDialogInput[]
 > = {
   [Index in keyof Tuple]: MapOperationInputInfoValueType<Tuple[Index]>;
 } & { length: Tuple["length"] };
@@ -94,7 +106,7 @@ const isNoError = (error: OperationInputError): boolean => {
 
 export interface OperationDialogProps<
   TData,
-  OperationInputInfoList extends readonly OperationInputInfo[]
+  OperationInputInfoList extends readonly OperationDialogInput[]
 > {
   open: boolean;
   close: () => void;
@@ -116,18 +128,18 @@ export interface OperationDialogProps<
 
 const OperationDialog = <
   TData,
-  OperationInputInfoList extends readonly OperationInputInfo[]
+  OperationInputInfoList extends readonly OperationDialogInput[]
 >(
   props: OperationDialogProps<TData, OperationInputInfoList>
 ): React.ReactElement => {
   const inputScheme = (props.inputScheme ??
-    []) as readonly OperationInputInfo[];
+    []) as readonly OperationDialogInput[];
 
   const { t } = useTranslation();
 
   type Step =
-    | "input"
-    | "process"
+    | { type: "input" }
+    | { type: "process" }
     | {
         type: "success";
         data: TData;
@@ -136,14 +148,20 @@ const OperationDialog = <
         type: "failure";
         data: unknown;
       };
-  const [step, setStep] = useState<Step>("input");
-  const [values, setValues] = useState<(boolean | string)[]>(
+  const [step, setStep] = useState<Step>({ type: "input" });
+
+  type ValueType = boolean | string | null | undefined;
+
+  const [values, setValues] = useState<ValueType[]>(
     inputScheme.map((i) => {
       if (i.type === "bool") {
         return i.initValue ?? false;
       } else if (i.type === "text" || i.type === "select") {
         return i.initValue ?? "";
-      } else {
+      } else if (i.type === "color") {
+        return i.initValue ?? null;
+      }
+      {
         throw new UiLogicError("Unknown input scheme.");
       }
     })
@@ -154,13 +172,9 @@ const OperationDialog = <
   const [inputError, setInputError] = useState<OperationInputError>();
 
   const close = (): void => {
-    if (step !== "process") {
+    if (step.type !== "process") {
       props.close();
-      if (
-        typeof step === "object" &&
-        step.type === "success" &&
-        props.onSuccessAndClose
-      ) {
+      if (step.type === "success" && props.onSuccessAndClose) {
         props.onSuccessAndClose(step.data);
       }
     } else {
@@ -169,7 +183,7 @@ const OperationDialog = <
   };
 
   const onConfirm = (): void => {
-    setStep("process");
+    setStep({ type: "process" });
     props
       .onProcess(
         (values as unknown) as MapOperationInputInfoValueTypeList<OperationInputInfoList>
@@ -191,8 +205,8 @@ const OperationDialog = <
   };
 
   let body: React.ReactNode;
-  if (step === "input" || step === "process") {
-    const process = step === "process";
+  if (step.type === "input" || step.type === "process") {
+    const process = step.type === "process";
 
     let inputPrompt =
       typeof props.inputPrompt === "function"
@@ -200,7 +214,7 @@ const OperationDialog = <
         : convertI18nText(props.inputPrompt, t);
     inputPrompt = <h6>{inputPrompt}</h6>;
 
-    const validate = (values: (string | boolean)[]): boolean => {
+    const validate = (values: ValueType[]): boolean => {
       const { inputValidator } = props;
       if (inputValidator != null) {
         const result = inputValidator(
@@ -212,7 +226,7 @@ const OperationDialog = <
       return true;
     };
 
-    const updateValue = (index: number, newValue: string | boolean): void => {
+    const updateValue = (index: number, newValue: ValueType): void => {
       const oldValues = values;
       const newValues = oldValues.slice();
       newValues[index] = newValue;
@@ -299,6 +313,35 @@ const OperationDialog = <
                       );
                     })}
                   </Form.Control>
+                </Form.Group>
+              );
+            } else if (item.type === "color") {
+              return (
+                <Form.Group key={index}>
+                  {item.canBeNull ? (
+                    <Form.Check<"input">
+                      type="checkbox"
+                      checked={value !== null}
+                      onChange={(event) => {
+                        if (event.currentTarget.checked) {
+                          updateValue(index, "#007bff");
+                        } else {
+                          updateValue(index, null);
+                        }
+                      }}
+                      label={convertI18nText(item.label, t)}
+                      disabled={process}
+                    />
+                  ) : (
+                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
+                  )}
+                  {value !== null && (
+                    <ChromePicker
+                      color={value as string}
+                      onChange={(result) => updateValue(index, result.hex)}
+                      disableAlpha={item.disableAlpha}
+                    />
+                  )}
                 </Form.Group>
               );
             }

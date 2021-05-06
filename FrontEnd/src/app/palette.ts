@@ -95,9 +95,11 @@ const paletteSubject: BehaviorSubject<Palette> = new BehaviorSubject<Palette>(
 export const palette$: Observable<Palette> = paletteSubject.asObservable();
 
 palette$.subscribe((palette) => {
-  let styleTag = document.getElementById("timeline-palette-css");
+  const styleTagId = "timeline-palette-css";
+  let styleTag = document.getElementById(styleTagId);
   if (styleTag == null) {
     styleTag = document.createElement("style");
+    styleTag.id = styleTagId;
     document.head.append(styleTag);
   }
   styleTag.innerHTML = generatePaletteCSS(palette);
