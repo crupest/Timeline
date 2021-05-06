@@ -130,7 +130,7 @@ const LoginPage: React.FC = (_) => {
           />
         </Form.Group>
         {error ? <p className="text-danger">{t(error)}</p> : null}
-        <div className="text-right">
+        <div className="text-end">
           <LoadingButton
             loading={process}
             variant="primary"

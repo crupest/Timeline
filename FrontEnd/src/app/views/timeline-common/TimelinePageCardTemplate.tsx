@@ -50,7 +50,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
       <small className="mt-1 d-block">
         {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
       </small>
-      <div className="text-right mt-2">
+      <div className="text-end mt-2">
         <i
           className={classnames(
             timeline.isHighlight ? "bi-star-fill" : "bi-star",
