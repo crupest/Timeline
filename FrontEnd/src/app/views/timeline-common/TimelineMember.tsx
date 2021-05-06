@@ -31,15 +31,16 @@ const TimelineMemberItem: React.FC<{
           </Row>
         </Col>
         {onAction ? (
-          <Button
-            className="align-self-center"
-            variant={add ? "success" : "danger"}
-            onClick={() => {
-              onAction(user.username);
-            }}
-          >
-            {t(`timeline.member.${add ? "add" : "remove"}`)}
-          </Button>
+          <Col xs="auto">
+            <Button
+              variant={add ? "success" : "danger"}
+              onClick={() => {
+                onAction(user.username);
+              }}
+            >
+              {t(`timeline.member.${add ? "add" : "remove"}`)}
+            </Button>
+          </Col>
         ) : null}
       </Row>
     </ListGroup.Item>
