@@ -20,15 +20,15 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
           <>
             <h3 className="text-primary d-inline-block align-middle">
               {timeline.title}
-              <small className="ml-3 text-secondary">{timeline.name}</small>
+              <small className="ms-3 text-secondary">{timeline.name}</small>
             </h3>
             <div className="align-middle">
               <UserAvatar
                 username={timeline.owner.username}
-                className="avatar small rounded-circle mr-3"
+                className="avatar small rounded-circle me-3"
               />
               {timeline.owner.nickname}
-              <small className="ml-3 text-secondary">
+              <small className="ms-3 text-secondary">
                 @{timeline.owner.username}
               </small>
             </div>

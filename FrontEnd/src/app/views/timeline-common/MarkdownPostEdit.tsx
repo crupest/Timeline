@@ -108,7 +108,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
           ) : (
             <>
               <FlatButton
-                className="mr-2"
+                className="me-2"
                 variant="danger"
                 onClick={() => {
                   if (canLeave) {
@@ -166,8 +166,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                     />
                   </div>
                 ))}
-                <Form.File
-                  label={t("chooseImage")}
+                <Form.Control
+                  type="file"
                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     const { files } = event.currentTarget;
