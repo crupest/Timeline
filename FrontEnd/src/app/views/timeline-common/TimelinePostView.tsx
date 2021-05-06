@@ -55,7 +55,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
       <div ref={cardRef} className="timeline-item-card" style={cardStyle}>
         {post.editable ? (
           <i
-            className="bi-chevron-down text-info icon-button float-right"
+            className="bi-chevron-down text-info icon-button float-end"
             onClick={(e) => {
               setOperationMaskVisible(true);
               e.stopPropagation();
@@ -63,15 +63,15 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
           />
         ) : null}
         <div className="timeline-item-header">
-          <span className="mr-2">
+          <span className="me-2">
             <span>
               <Link to={"/users/" + props.post.author.username}>
                 <UserAvatar
                   username={post.author.username}
-                  className="timeline-avatar mr-1"
+                  className="timeline-avatar me-1"
                 />
               </Link>
-              <small className="text-dark mr-2">{post.author.nickname}</small>
+              <small className="text-dark me-2">{post.author.nickname}</small>
               <small className="text-secondary white-space-no-wrap">
                 {new Date(post.time).toLocaleTimeString()}
               </small>
