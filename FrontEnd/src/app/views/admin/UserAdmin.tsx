@@ -205,7 +205,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
   return (
     <ListGroup.Item className="admin-user-item">
       <i
-        className="bi-pencil-square float-right icon-button text-warning"
+        className="bi-pencil-square float-end icon-button text-warning"
         onClick={() => setEditMaskVisible(true)}
       />
       <h4 className="text-primary">{user.username}</h4>

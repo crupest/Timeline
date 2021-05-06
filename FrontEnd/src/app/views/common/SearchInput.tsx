@@ -39,8 +39,8 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
 
   return (
     <Form
-      inline
       className={classnames(
+        "d-flex",
         alwaysOneline ? "flex-nowrap" : "flex-sm-nowrap",
         props.className
       )}
