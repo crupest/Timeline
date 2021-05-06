@@ -93,7 +93,7 @@ const SettingsPage: React.FC = (_) => {
                 {t("settings.languageSecondary")}
               </small>
             </Col>
-            <Col xs="auto" className="ml-auto">
+            <Col xs="auto" className="ms-auto">
               <Form.Control
                 as="select"
                 value={language}

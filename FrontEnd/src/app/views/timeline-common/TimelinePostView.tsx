@@ -63,15 +63,15 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
           />
         ) : null}
         <div className="timeline-item-header">
-          <span className="mr-2">
+          <span className="me-2">
             <span>
               <Link to={"/users/" + props.post.author.username}>
                 <UserAvatar
                   username={post.author.username}
-                  className="timeline-avatar mr-1"
+                  className="timeline-avatar me-1"
                 />
               </Link>
-              <small className="text-dark mr-2">{post.author.nickname}</small>
+              <small className="text-dark me-2">{post.author.nickname}</small>
               <small className="text-secondary white-space-no-wrap">
                 {new Date(post.time).toLocaleTimeString()}
               </small>

@@ -54,7 +54,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
         <i
           className={classnames(
             timeline.isHighlight ? "bi-star-fill" : "bi-star",
-            "icon-button text-yellow mr-3"
+            "icon-button text-yellow me-3"
           )}
           onClick={
             user?.hasHighlightTimelineAdministrationPermission
@@ -77,7 +77,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
           <i
             className={classnames(
               timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
-              "icon-button text-yellow mr-3"
+              "icon-button text-yellow me-3"
             )}
             onClick={() => {
               getHttpBookmarkClient()
@@ -94,7 +94,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
           />
         ) : null}
         <i
-          className={"icon-button bi-people text-primary mr-3"}
+          className={"icon-button bi-people text-primary me-3"}
           onClick={() => setDialog("member")}
         />
         {manageItems != null ? (

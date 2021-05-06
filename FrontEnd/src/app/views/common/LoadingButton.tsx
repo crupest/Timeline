@@ -16,7 +16,7 @@ const LoadingButton: React.FC<{ loading?: boolean } & ButtonProps> = ({
       {otherProps.children}
       {loading ? (
         <Spinner
-          className="ml-1"
+          className="ms-1"
           variant={variant}
           animation="grow"
           size="sm"

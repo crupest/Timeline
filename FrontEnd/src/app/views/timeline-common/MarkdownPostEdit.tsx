@@ -108,7 +108,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
           ) : (
             <>
               <FlatButton
-                className="mr-2"
+                className="me-2"
                 variant="danger"
                 onClick={() => {
                   if (canLeave) {
