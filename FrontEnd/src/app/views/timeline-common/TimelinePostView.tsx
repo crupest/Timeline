@@ -55,7 +55,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
       <div ref={cardRef} className="timeline-item-card" style={cardStyle}>
         {post.editable ? (
           <i
-            className="bi-chevron-down text-info icon-button float-right"
+            className="bi-chevron-down text-info icon-button float-end"
             onClick={(e) => {
               setOperationMaskVisible(true);
               e.stopPropagation();

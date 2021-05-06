@@ -77,8 +77,8 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
 
   return (
     <>
-      <Form.File
-        label={t("chooseImage")}
+      <Form.Control
+        type="file"
         onChange={onInputChange}
         accept="image/*"
         disabled={disabled}
