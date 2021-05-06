@@ -40,7 +40,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   return (
     <Form
       className={classnames(
-        "d-flex",
+        "cru-search-input",
         alwaysOneline ? "flex-nowrap" : "flex-sm-nowrap",
         props.className
       )}
