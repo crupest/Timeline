@@ -12,4 +12,6 @@ import "./i18n";
 
 import App from "./App";
 
+import "./palette";
+
 ReactDOM.render(<App />, document.getElementById("app"));
