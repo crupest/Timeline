@@ -11,6 +11,7 @@ import Timeline from "./Timeline";
 import TimelinePostEdit from "./TimelinePostEdit";
 
 import useReverseScrollPositionRemember from "@/utilities/useReverseScrollPositionRemember";
+import { generatePalette, setPalette } from "@/palette";
 
 export interface TimelinePageCardProps {
   timeline: HttpTimelineInfo;
@@ -74,6 +75,12 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
       subscribe = false;
     };
   }, [timelineName, reloadKey]);
+
+  React.useEffect(() => {
+    if (timeline != null && timeline.color != null) {
+      return setPalette(generatePalette({ primary: timeline.color }));
+    }
+  }, [timeline]);
 
   const [bottomSpaceHeight, setBottomSpaceHeight] = React.useState<number>(0);
 

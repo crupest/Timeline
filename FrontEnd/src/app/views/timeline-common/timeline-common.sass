@@ -9,28 +9,20 @@
 
 $timeline-line-width: 7px
 $timeline-line-node-radius: 18px
-$timeline-line-color: $primary
-$timeline-line-color-current: #36c2e6
+$timeline-line-color: var(--tl-primary-color)
+$timeline-line-color-current: var(--tl-primary-enhance-color)
 
 @keyframes timeline-line-node-noncurrent
-  from
-    background: $timeline-line-color
-
   to
-    background: color.adjust($timeline-line-color, $lightness: +10%)
-    box-shadow: 0 0 20px 3px color.adjust($timeline-line-color, $lightness: +10%, $alpha: -0.1)
+    box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color)
 
 @keyframes timeline-line-node-current
-  from
-    background: $timeline-line-color-current
-
   to
-    background: color.adjust($timeline-line-color-current, $lightness: +10%)
-    box-shadow: 0 0 20px 3px color.adjust($timeline-line-color-current, $lightness: +10%, $alpha: -0.1)
+    box-shadow: 0 0 20px 3px var(--tl-primary-enhance-lighter-color)
 
 @keyframes timeline-line-node-loading
   to
-    box-shadow: 0 0 20px 3px color.adjust($timeline-line-color, $lightness: +20%)
+    box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color)
 
 @keyframes timeline-line-node-loading-edge
   from
@@ -100,6 +92,7 @@ $timeline-line-color-current: #36c2e6
     width: $timeline-line-node-radius + 2
     height: $timeline-line-node-radius + 2
     position: absolute
+    background: $timeline-line-color
     left: -1px
     top: -1px
     border-radius: 50%
@@ -126,6 +119,7 @@ $timeline-line-color-current: #36c2e6
       &.end
         background: $timeline-line-color-current
     .node
+      background: $timeline-line-color-current
       animation-name: timeline-line-node-current
 
   &.loading
