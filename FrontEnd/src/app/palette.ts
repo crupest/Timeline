@@ -34,7 +34,10 @@ export function generatePaletteColor(color: string): PaletteColor {
   const c = Color(color);
   return {
     color: c.toString(),
-    inactive: (c.isLight() ? darkenBy(c, 0.2) : lightenBy(c, 0.2)).toString(),
+    inactive: (c.lightness() > 60
+      ? darkenBy(c, 0.1)
+      : lightenBy(c, 0.2)
+    ).toString(),
     lighter: lightenBy(c, 0.1).fade(0.1).toString(),
     darker: darkenBy(c, 0.1).toString(),
   };
@@ -58,7 +61,7 @@ export function generatePalette(options: {
     primaryEnhance: generatePaletteColor(pe.toString()),
     secondary: generatePaletteColor(s.toString()),
     textPrimary: generatePaletteColor("#111111"),
-    textOnPrimary: generatePaletteColor(p.isLight() ? "black" : "white"),
+    textOnPrimary: generatePaletteColor(p.lightness() > 60 ? "black" : "white"),
     danger: generatePaletteColor("red"),
     success: generatePaletteColor("green"),
   };
