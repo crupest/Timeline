@@ -46,20 +46,20 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
       )}
     >
       <Form.Control
-        className="mr-sm-2 flex-grow-1"
+        className="me-sm-2 flex-grow-1"
         value={props.value}
         onChange={onInputChange}
         onKeyPress={onInputKeyPress}
         placeholder={props.placeholder}
       />
       {props.additionalButton ? (
-        <div className="mt-2 mt-sm-0 flex-shrink-0 order-sm-last ml-sm-2">
+        <div className="mt-2 mt-sm-0 flex-shrink-0 order-sm-last ms-sm-2">
           {props.additionalButton}
         </div>
       ) : null}
       <div
         className={classnames(
-          alwaysOneline ? "mt-0 ml-2" : "mt-2 mt-sm-0 ml-auto ml-sm-0",
+          alwaysOneline ? "mt-0 ms-2" : "mt-2 mt-sm-0 ms-auto ms-sm-0",
           "flex-shrink-0"
         )}
       >

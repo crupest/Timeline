@@ -35,7 +35,7 @@ const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
         </div>
       </div>
       <Link to={url}>
-        <i className="icon-button bi-arrow-right ml-3" />
+        <i className="icon-button bi-arrow-right ms-3" />
       </Link>
     </div>
   );

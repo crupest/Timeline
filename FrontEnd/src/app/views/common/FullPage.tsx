@@ -20,7 +20,7 @@ const FullPage: React.FC<FullPageProps> = ({
     >
       <div className="cru-full-page-top-bar">
         <i
-          className="icon-button bi-arrow-left text-white ml-3"
+          className="icon-button bi-arrow-left text-white ms-3"
           onClick={onBack}
         />
       </div>

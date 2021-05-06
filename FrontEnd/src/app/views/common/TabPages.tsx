@@ -61,7 +61,7 @@ const TabPages: React.FC<TabPagesProps> = ({
           </Nav.Item>
         ))}
         {actions != null && (
-          <div className="ml-auto cru-tab-pages-action-area">{actions}</div>
+          <div className="ms-auto cru-tab-pages-action-area">{actions}</div>
         )}
       </Nav>
       <div className={pageContainerClassName} style={pageContainerStyle}>

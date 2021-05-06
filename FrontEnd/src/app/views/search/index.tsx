@@ -23,16 +23,16 @@ const TimelineSearchResultItemView: React.FC<{
       <h4>
         <Link to={link} className="mb-2 text-primary">
           {timeline.title}
-          <small className="ml-3 text-secondary">{timeline.name}</small>
+          <small className="ms-3 text-secondary">{timeline.name}</small>
         </Link>
       </h4>
       <div>
         <UserAvatar
           username={timeline.owner.username}
-          className="timeline-search-result-item-avatar mr-2"
+          className="timeline-search-result-item-avatar me-2"
         />
         {timeline.owner.nickname}
-        <small className="ml-3 text-secondary">
+        <small className="ms-3 text-secondary">
           @{timeline.owner.username}
         </small>
       </div>

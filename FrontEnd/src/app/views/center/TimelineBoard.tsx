@@ -47,7 +47,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
         <TimelineLogo className="icon" />
       )}
       <span className="title">{title}</span>
-      <small className="ml-2 text-secondary">{name}</small>
+      <small className="ms-2 text-secondary">{name}</small>
       <span className="flex-grow-1"></span>
       {actions != null ? (
         <div className="right">
