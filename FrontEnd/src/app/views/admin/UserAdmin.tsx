@@ -3,7 +3,7 @@ import classnames from "classnames";
 import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
 
 import OperationDialog, {
-  OperationBoolInputInfo,
+  OperationDialogBoolInput,
 } from "../common/OperationDialog";
 
 import { AuthUser } from "@/services/user";
@@ -145,7 +145,7 @@ const UserPermissionModifyDialog: React.FC<
           0<UsernameLabel>{username}</UsernameLabel>2
         </Trans>
       )}
-      inputScheme={kUserPermissionList.map<OperationBoolInputInfo>(
+      inputScheme={kUserPermissionList.map<OperationDialogBoolInput>(
         (permission, index) => ({
           type: "bool",
           label: permission,

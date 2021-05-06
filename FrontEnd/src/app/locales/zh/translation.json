@@ -85,7 +85,8 @@
       "title": "修改时间线属性",
       "titleField": "标题",
       "visibility": "可见性",
-      "description": "描述"
+      "description": "描述",
+      "color": "颜色"
     },
     "member": {
       "noUserAvailableToAdd": "搜索结果显示没有可以添加为成员的用户。",

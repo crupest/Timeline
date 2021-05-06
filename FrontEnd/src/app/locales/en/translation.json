@@ -85,7 +85,8 @@
       "title": "Change Timeline Properties",
       "titleField": "Title",
       "visibility": "Visibility",
-      "description": "Description"
+      "description": "Description",
+      "color": "Color"
     },
     "member": {
       "noUserAvailableToAdd": "Sorry, no user available to be a member in search result.",

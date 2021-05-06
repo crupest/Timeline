@@ -31,30 +31,39 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
   return (
     <OperationDialog
       title={"timeline.dialogChangeProperty.title"}
-      inputScheme={[
-        {
-          type: "text",
-          label: "timeline.dialogChangeProperty.titleField",
-          initValue: timeline.title,
-        },
-        {
-          type: "select",
-          label: "timeline.dialogChangeProperty.visibility",
-          options: kTimelineVisibilities.map((v) => ({
-            label: labelMap[v],
-            value: v,
-          })),
-          initValue: timeline.visibility,
-        },
-        {
-          type: "text",
-          label: "timeline.dialogChangeProperty.description",
-          initValue: timeline.description,
-        },
-      ]}
+      inputScheme={
+        [
+          {
+            type: "text",
+            label: "timeline.dialogChangeProperty.titleField",
+            initValue: timeline.title,
+          },
+          {
+            type: "select",
+            label: "timeline.dialogChangeProperty.visibility",
+            options: kTimelineVisibilities.map((v) => ({
+              label: labelMap[v],
+              value: v,
+            })),
+            initValue: timeline.visibility,
+          },
+          {
+            type: "text",
+            label: "timeline.dialogChangeProperty.description",
+            initValue: timeline.description,
+          },
+          {
+            type: "color",
+            label: "timeline.dialogChangeProperty.color",
+            initValue: timeline.color ?? null,
+            disableAlpha: true,
+            canBeNull: true,
+          },
+        ] as const
+      }
       open={props.open}
       close={props.close}
-      onProcess={([newTitle, newVisibility, newDescription]) => {
+      onProcess={([newTitle, newVisibility, newDescription, newColor]) => {
         const req: HttpTimelinePatchRequest = {};
         if (newTitle !== timeline.title) {
           req.title = newTitle;
@@ -64,6 +73,10 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
         }
         if (newDescription !== timeline.description) {
           req.description = newDescription;
+        }
+        const nc = newColor ?? "#007bff";
+        if (nc !== timeline.color) {
+          req.color = nc;
         }
         return getHttpTimelineClient()
           .patchTimeline(timeline.name, req)

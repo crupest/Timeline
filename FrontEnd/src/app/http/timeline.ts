@@ -72,6 +72,7 @@ export interface HttpTimelinePostPostRequest {
 export interface HttpTimelinePatchRequest {
   name?: string;
   title?: string;
+  color?: string;
   visibility?: TimelineVisibility;
   description?: string;
 }
