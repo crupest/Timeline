@@ -1,9 +1,8 @@
 import React from "react";
 
 let on = false;
-let recordDisabled = false;
 
-function getScrollPosition(): number {
+export function getReverseScrollPosition(): number {
   if (document.documentElement.scrollHeight <= window.innerHeight) {
     return 0;
   } else {
@@ -15,27 +14,23 @@ function getScrollPosition(): number {
   }
 }
 
-let scrollPosition = getScrollPosition();
-
-function scrollToRecordPosition(): void {
+export function scrollToReverseScrollPosition(reversePosition: number): void {
   if (document.documentElement.scrollHeight <= window.innerHeight) return;
   document.documentElement.scrollTop =
-    document.documentElement.scrollHeight - window.innerHeight - scrollPosition;
+    document.documentElement.scrollHeight -
+    window.innerHeight -
+    reversePosition;
 }
 
+let scrollPosition = getReverseScrollPosition();
+
 const scrollListener = (): void => {
-  if (recordDisabled) return;
-  scrollPosition = getScrollPosition();
+  scrollPosition = getReverseScrollPosition();
 };
 
 const resizeObserver = new ResizeObserver(() => {
-  scrollToRecordPosition();
+  scrollToReverseScrollPosition(scrollPosition);
 });
-
-export function setRecordDisabled(disabled: boolean): void {
-  recordDisabled = disabled;
-  if (!disabled) scrollToRecordPosition();
-}
 
 export default function useReverseScrollPositionRemember(): void {
   React.useEffect(() => {

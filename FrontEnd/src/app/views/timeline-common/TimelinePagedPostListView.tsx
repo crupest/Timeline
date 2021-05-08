@@ -1,11 +1,14 @@
 import React from "react";
 import { fromEvent } from "rxjs";
-import { filter, throttleTime } from "rxjs/operators";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
 
+import {
+  getReverseScrollPosition,
+  scrollToReverseScrollPosition,
+} from "@/utilities/useReverseScrollPositionRemember";
+
 import TimelinePostListView from "./TimelinePostListView";
-import { setRecordDisabled } from "@/utilities/useReverseScrollPositionRemember";
 
 export interface TimelinePagedPostListViewProps {
   className?: string;
@@ -27,31 +30,24 @@ const TimelinePagedPostListView: React.FC<TimelinePagedPostListViewProps> = (
       : posts.slice(-lastViewCount);
   }, [posts, lastViewCount]);
 
-  const scrollTopHandler = React.useRef<() => void>();
+  const lastScrollPosition = React.useRef<number | null>(null);
 
   React.useEffect(() => {
-    scrollTopHandler.current = () => {
-      if (lastViewCount < posts.length) {
-        setRecordDisabled(true);
-        setLastViewCount(lastViewCount + 10);
-        setTimeout(() => {
-          setRecordDisabled(false);
-        }, 500);
-      }
-    };
-  }, [lastViewCount, posts]);
+    if (lastScrollPosition.current != null) {
+      scrollToReverseScrollPosition(lastScrollPosition.current);
+      lastScrollPosition.current = null;
+    }
 
-  React.useEffect(() => {
-    const subscription = fromEvent(window, "scroll")
-      .pipe(
-        filter(() => window.scrollY === 0),
-        throttleTime(800)
-      )
-      .subscribe(() => {
-        scrollTopHandler.current?.();
+    if (lastViewCount < posts.length) {
+      const subscription = fromEvent(window, "scroll").subscribe(() => {
+        if (window.scrollY === 0) {
+          lastScrollPosition.current = getReverseScrollPosition();
+          setLastViewCount(lastViewCount + 10);
+        }
       });
-    return () => subscription.unsubscribe();
-  }, []);
+      return () => subscription.unsubscribe();
+    }
+  }, [lastViewCount, posts]);
 
   return (
     <TimelinePostListView
