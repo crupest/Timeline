@@ -22,9 +22,10 @@ export interface TimelineProps {
 const Timeline: React.FC<TimelineProps> = (props) => {
   const { timelineName, className, style, reloadKey, onReload } = props;
 
-  const [state, setState] = React.useState<
-    "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
-  >("loading");
+  const [state, setState] =
+    React.useState<
+      "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
+    >("loading");
   const [posts, setPosts] = React.useState<HttpTimelinePostInfo[]>([]);
 
   React.useEffect(() => {

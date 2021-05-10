@@ -40,9 +40,8 @@ export interface ImageCropperProps {
 const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
   const { clip, imageUrl, onChange, imageElementCallback, className } = props;
 
-  const [oldState, setOldState] = React.useState<ImageCropperSavedState | null>(
-    null
-  );
+  const [oldState, setOldState] =
+    React.useState<ImageCropperSavedState | null>(null);
   const [imageInfo, setImageInfo] = React.useState<ImageInfo | null>(null);
 
   const normalizeClip = (c: Clip | null | undefined): NormailizedClip => {
