@@ -49,9 +49,10 @@ const SearchPage: React.FC = () => {
   const queryParam = searchParams.get("q");
 
   const [searchText, setSearchText] = React.useState<string>("");
-  const [state, setState] = React.useState<
-    HttpTimelineInfo[] | "init" | "loading" | "network-error" | "error"
-  >("init");
+  const [state, setState] =
+    React.useState<
+      HttpTimelineInfo[] | "init" | "loading" | "network-error" | "error"
+    >("init");
 
   const [forceResearchKey, setForceResearchKey] = React.useState<number>(0);
 
