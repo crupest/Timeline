@@ -100,7 +100,7 @@
     "postcss": "^8.2.14",
     "postcss-loader": "^5.2.0",
     "postcss-preset-env": "^6.7.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "querystring-es3": "^0.2.1",
     "react-refresh": "^0.10.0",
     "sass": "^1.32.12",
