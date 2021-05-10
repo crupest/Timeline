@@ -24,10 +24,8 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
   const { post, className, style, cardStyle, onDeleted } = props;
   const current = props.current === true;
 
-  const [
-    operationMaskVisible,
-    setOperationMaskVisible,
-  ] = React.useState<boolean>(false);
+  const [operationMaskVisible, setOperationMaskVisible] =
+    React.useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

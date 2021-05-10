@@ -24,22 +24,21 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
   const [file, setFile] = React.useState<File | null>(null);
   const [fileUrl, setFileUrl] = React.useState<string | null>(null);
   const [clip, setClip] = React.useState<Clip | null>(null);
-  const [
-    cropImgElement,
-    setCropImgElement,
-  ] = React.useState<HTMLImageElement | null>(null);
+  const [cropImgElement, setCropImgElement] =
+    React.useState<HTMLImageElement | null>(null);
   const [resultBlob, setResultBlob] = React.useState<Blob | null>(null);
   const [resultUrl, setResultUrl] = React.useState<string | null>(null);
 
-  const [state, setState] = React.useState<
-    | "select"
-    | "crop"
-    | "processcrop"
-    | "preview"
-    | "uploading"
-    | "success"
-    | "error"
-  >("select");
+  const [state, setState] =
+    React.useState<
+      | "select"
+      | "crop"
+      | "processcrop"
+      | "preview"
+      | "uploading"
+      | "success"
+      | "error"
+    >("select");
 
   const [message, setMessage] = useState<
     string | { type: "custom"; text: string } | null

@@ -19,12 +19,10 @@ const HomeV2: React.FC = () => {
 
   const [navText, setNavText] = React.useState<string>("");
 
-  const [highlightTimelineState, setHighlightTimelineState] = React.useState<
-    "loading" | "done" | "error"
-  >("loading");
-  const [highlightTimelines, setHighlightTimelines] = React.useState<
-    HttpTimelineInfo[] | undefined
-  >();
+  const [highlightTimelineState, setHighlightTimelineState] =
+    React.useState<"loading" | "done" | "error">("loading");
+  const [highlightTimelines, setHighlightTimelines] =
+    React.useState<HttpTimelineInfo[] | undefined>();
 
   React.useEffect(() => {
     if (highlightTimelineState === "loading") {

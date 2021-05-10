@@ -34,10 +34,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
 
   const [process, setProcess] = React.useState<boolean>(false);
 
-  const [
-    showLeaveConfirmDialog,
-    setShowLeaveConfirmDialog,
-  ] = React.useState<boolean>(false);
+  const [showLeaveConfirmDialog, setShowLeaveConfirmDialog] =
+    React.useState<boolean>(false);
 
   const [text, _setText] = React.useState<string>("");
   const [images, _setImages] = React.useState<{ file: File; url: string }[]>(
