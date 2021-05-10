@@ -55,25 +55,24 @@ const UsernameLabel: React.FC = (props) => {
   return <span style={{ color: "blue" }}>{props.children}</span>;
 };
 
-const UserDeleteDialog: React.FC<
-  DialogProps<{ username: string }, unknown>
-> = ({ open, close, data: { username }, onSuccess }) => {
-  return (
-    <OperationDialog
-      open={open}
-      close={close}
-      title="admin:user.dialog.delete.title"
-      themeColor="danger"
-      inputPrompt={() => (
-        <Trans i18nKey="admin:user.dialog.delete.prompt">
-          0<UsernameLabel>{username}</UsernameLabel>2
-        </Trans>
-      )}
-      onProcess={() => getHttpUserClient().delete(username)}
-      onSuccessAndClose={onSuccess}
-    />
-  );
-};
+const UserDeleteDialog: React.FC<DialogProps<{ username: string }, unknown>> =
+  ({ open, close, data: { username }, onSuccess }) => {
+    return (
+      <OperationDialog
+        open={open}
+        close={close}
+        title="admin:user.dialog.delete.title"
+        themeColor="danger"
+        inputPrompt={() => (
+          <Trans i18nKey="admin:user.dialog.delete.prompt">
+            0<UsernameLabel>{username}</UsernameLabel>2
+          </Trans>
+        )}
+        onProcess={() => getHttpUserClient().delete(username)}
+        onSuccessAndClose={onSuccess}
+      />
+    );
+  };
 
 const UserModifyDialog: React.FC<
   DialogProps<

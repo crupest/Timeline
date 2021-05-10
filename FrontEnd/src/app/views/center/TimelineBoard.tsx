@@ -111,11 +111,12 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
   timelines,
   editHandler,
 }) => {
-  const [moveState, setMoveState] = React.useState<null | {
-    index: number;
-    offset: number;
-    startPointY: number;
-  }>(null);
+  const [moveState, setMoveState] =
+    React.useState<null | {
+      index: number;
+      offset: number;
+      startPointY: number;
+    }>(null);
 
   return (
     <>
@@ -306,9 +307,8 @@ const TimelineBoard: React.FC<TimelineBoardProps> = ({
   load,
   editHandler,
 }) => {
-  const [timelines, setTimelines] = React.useState<
-    HttpTimelineInfo[] | "offline" | "loading"
-  >("loading");
+  const [timelines, setTimelines] =
+    React.useState<HttpTimelineInfo[] | "offline" | "loading">("loading");
 
   React.useEffect(() => {
     let subscribe = true;

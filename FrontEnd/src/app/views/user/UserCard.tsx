@@ -7,9 +7,8 @@ import UserAvatar from "../common/user/UserAvatar";
 const UserCard: React.FC<TimelinePageCardProps> = (props) => {
   const { timeline } = props;
 
-  const [dialog, setDialog] = React.useState<"member" | "property" | null>(
-    null
-  );
+  const [dialog, setDialog] =
+    React.useState<"member" | "property" | null>(null);
 
   return (
     <>
