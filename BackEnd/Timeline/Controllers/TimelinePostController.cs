@@ -57,12 +57,14 @@ namespace Timeline.Controllers
         /// <param name="timeline">The name of the timeline.</param>
         /// <param name="modifiedSince">If set, only posts modified since the time will return.</param>
         /// <param name="includeDeleted">If set to true, deleted post will also return.</param>
+        /// <param name="page">Page number, starting from 0. Null to get all.</param>
+        /// <param name="numberPerPage">Post number per page. Default is 20.</param>
         /// <returns>The post list.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<HttpTimelinePost>>> List([FromRoute][GeneralTimelineName] string timeline, [FromQuery] DateTime? modifiedSince, [FromQuery] bool? includeDeleted)
+        public async Task<ActionResult<List<HttpTimelinePost>>> List([FromRoute][GeneralTimelineName] string timeline, [FromQuery] DateTime? modifiedSince, [FromQuery] bool? includeDeleted, [FromQuery][Range(0, int.MaxValue)] int? page, [FromQuery][Range(1, int.MaxValue)] int? numberPerPage)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
@@ -71,7 +73,7 @@ namespace Timeline.Controllers
                 return ForbidWithCommonResponse();
             }
 
-            var posts = await _postService.GetPostsAsync(timelineId, modifiedSince, includeDeleted ?? false);
+            var posts = await _postService.GetPostsAsync(timelineId, modifiedSince, includeDeleted ?? false, page, numberPerPage);
 
             var result = await Map(posts);
             return result;

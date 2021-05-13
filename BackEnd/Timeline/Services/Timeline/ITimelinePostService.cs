@@ -16,9 +16,11 @@ namespace Timeline.Services.Timeline
         /// <param name="timelineId">The id of the timeline.</param>
         /// <param name="modifiedSince">The time that posts have been modified since.</param>
         /// <param name="includeDeleted">Whether include deleted posts.</param>
+        /// <param name="page">The page number. Starts from 0. If null, do not do pagination.</param>
+        /// <param name="numberPerPage">Count of entities per page. If null, 20.</param>
         /// <returns>A list of all posts.</returns>
         /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
-        Task<List<TimelinePostEntity>> GetPostsAsync(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false);
+        Task<List<TimelinePostEntity>> GetPostsAsync(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false, int? page = null, int? numberPerPage = null);
 
         /// <summary>
         /// Get a post of a timeline.

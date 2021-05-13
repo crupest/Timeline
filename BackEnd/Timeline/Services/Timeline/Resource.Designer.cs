@@ -106,6 +106,24 @@ namespace Timeline.Services.Timeline {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Number per page can&apos;t be zero or negative..
+        /// </summary>
+        internal static string ExceptionNumberPerPageZeroOrNegative {
+            get {
+                return ResourceManager.GetString("ExceptionNumberPerPageZeroOrNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page number can&apos;t be negative..
+        /// </summary>
+        internal static string ExceptionPageNegative {
+            get {
+                return ResourceManager.GetString("ExceptionPageNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image validation failed..
         /// </summary>
         internal static string ExceptionPostDataImageInvalid {

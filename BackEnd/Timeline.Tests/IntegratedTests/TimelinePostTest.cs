@@ -634,5 +634,23 @@ namespace Timeline.Tests.IntegratedTests
                 await client.TestDeleteAsync($"timelines/{generator(1)}/posts/{post.Id}");
             }
         }
+
+        [Theory]
+        [MemberData(nameof(TimelineNameGeneratorTestData))]
+        public async Task Post_List_Pagination_Test(TimelineNameGenerator generator)
+        {
+            using var client = await CreateClientAsUser();
+            var posts = new List<HttpTimelinePost>();
+            for (int i = 0; i < 50; i++)
+            {
+                var post = await client.TestPostAsync<HttpTimelinePost>($"timelines/{generator(1)}/posts", CreateTextPostRequest(i.ToString()));
+                posts.Add(post);
+            }
+
+            {
+                var p = await client.TestGetAsync<List<HttpTimelinePost>>($"timelines/{generator(1)}/posts?page=2&numberPerPage=10");
+                p.Should().BeEquivalentTo(posts.Skip(10).Take(10));
+            }
+        }
     }
 }
