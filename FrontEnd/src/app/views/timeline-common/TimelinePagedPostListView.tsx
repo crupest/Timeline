@@ -3,11 +3,6 @@ import { fromEvent } from "rxjs";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
 
-import {
-  getReverseScrollPosition,
-  scrollToReverseScrollPosition,
-} from "@/utilities/useReverseScrollPositionRemember";
-
 import TimelinePostListView from "./TimelinePostListView";
 
 export interface TimelinePagedPostListViewProps {
@@ -30,18 +25,10 @@ const TimelinePagedPostListView: React.FC<TimelinePagedPostListViewProps> = (
       : posts.slice(-lastViewCount);
   }, [posts, lastViewCount]);
 
-  const lastScrollPosition = React.useRef<number | null>(null);
-
   React.useEffect(() => {
-    if (lastScrollPosition.current != null) {
-      scrollToReverseScrollPosition(lastScrollPosition.current);
-      lastScrollPosition.current = null;
-    }
-
     if (lastViewCount < posts.length) {
       const subscription = fromEvent(window, "scroll").subscribe(() => {
         if (window.scrollY === 0) {
-          lastScrollPosition.current = getReverseScrollPosition();
           setLastViewCount(lastViewCount + 10);
         }
       });
