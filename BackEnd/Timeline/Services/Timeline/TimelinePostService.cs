@@ -64,8 +64,14 @@ namespace Timeline.Services.Timeline
             });
         }
 
-        public async Task<List<TimelinePostEntity>> GetPostsAsync(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false)
+        public async Task<List<TimelinePostEntity>> GetPostsAsync(long timelineId, DateTime? modifiedSince = null, bool includeDeleted = false, int? page = null, int? numberPerPage = null)
         {
+            if (page.HasValue && page < 0)
+                throw new ArgumentOutOfRangeException(nameof(page), Resource.ExceptionPageNegative);
+            if (numberPerPage.HasValue && numberPerPage <= 0)
+                throw new ArgumentOutOfRangeException(nameof(numberPerPage), Resource.ExceptionNumberPerPageZeroOrNegative);
+
+
             await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
 
             modifiedSince = modifiedSince?.MyToUtc();
@@ -83,6 +89,12 @@ namespace Timeline.Services.Timeline
             }
 
             query = query.OrderBy(p => p.Time);
+
+            if (page.HasValue)
+            {
+                var npp = numberPerPage.GetValueOrDefault(20);
+                query = query.Skip(npp * (page.Value - 1)).Take(npp);
+            }
 
             return await query.ToListAsync();
         }
