@@ -17,10 +17,15 @@ export function getReverseScrollPosition(): number {
 export function scrollToReverseScrollPosition(reversePosition: number): void {
   if (document.documentElement.scrollHeight <= window.innerHeight) return;
 
+  const old = document.documentElement.style.scrollBehavior;
+  document.documentElement.style.scrollBehavior = "auto";
+
   window.scrollTo(
     0,
     document.documentElement.scrollHeight - window.innerHeight - reversePosition
   );
+
+  document.documentElement.style.scrollBehavior = old;
 }
 
 let scrollPosition = getReverseScrollPosition();
