@@ -1,16 +1,20 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Timeline.SignalRHub;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class TimelineHubTest : BaseTimelineTest
     {
+        public TimelineHubTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+
+        }
+
         private HubConnection CreateConnection(string? token)
         {
             return new HubConnectionBuilder().WithUrl($"http://localhost/api/hub/timeline{(token is null ? "" : "?token=" + token)}",

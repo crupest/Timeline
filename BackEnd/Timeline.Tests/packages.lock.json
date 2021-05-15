@@ -17,6 +17,16 @@
           "System.Configuration.ConfigurationManager": "4.4.0"
         }
       },
+      "MartinCostello.Logging.XUnit": {
+        "type": "Direct",
+        "requested": "[0.1.1, )",
+        "resolved": "0.1.1",
+        "contentHash": "/frXt3o7WZqRivt9gMS8jpD5XD8kk1QccNAzc6mCq+Hqx8tBQC0PeQKwnowR+eyC25MHXhY802zCjV9HR63/3g==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "2.0.0",
+          "xunit.abstractions": "2.0.1"
+        }
+      },
       "Microsoft.AspNet.WebApi.Client": {
         "type": "Direct",
         "requested": "[5.2.7, )",

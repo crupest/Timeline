@@ -8,6 +8,7 @@ using Timeline.Models.Http;
 using Timeline.Services.User;
 using Timeline.Tests.Helpers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
@@ -17,19 +18,19 @@ namespace Timeline.Tests.IntegratedTests
 
         protected int TestUserCount { get; }
 
-        public IntegratedTestBase() : this(1)
+        public IntegratedTestBase(ITestOutputHelper testOutputHelper) : this(1, testOutputHelper)
         {
 
         }
 
-        public IntegratedTestBase(int userCount)
+        public IntegratedTestBase(int userCount, ITestOutputHelper testOutputHelper)
         {
             if (userCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(userCount), userCount, "User count can't be negative.");
 
             TestUserCount = userCount;
 
-            TestApp = new TestApplication();
+            TestApp = new TestApplication(testOutputHelper);
         }
 
         protected virtual Task OnInitializeAsync()

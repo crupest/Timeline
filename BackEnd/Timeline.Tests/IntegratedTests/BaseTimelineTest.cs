@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class BaseTimelineTest : IntegratedTestBase
     {
-        public BaseTimelineTest() : base(3)
+        public BaseTimelineTest(ITestOutputHelper testOutputHelper) : base(3, testOutputHelper)
         {
         }
 

@@ -53,11 +53,9 @@ namespace Timeline.Tests.IntegratedTests
             };
         }
 
-        private readonly ITestOutputHelper _outputHelper;
-
-        public TimelinePostTest(ITestOutputHelper outputHelper)
+        public TimelinePostTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _outputHelper = outputHelper;
+
         }
 
         [Theory]

@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Timeline.Services.User;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class TokenTest : IntegratedTestBase
     {
+        public TokenTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+
+        }
+
         private const string CreateTokenUrl = "token/create";
         private const string VerifyTokenUrl = "token/verify";
 

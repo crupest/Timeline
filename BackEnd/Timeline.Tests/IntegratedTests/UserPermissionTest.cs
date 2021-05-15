@@ -5,12 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Services.User;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class UserPermissionTest : IntegratedTestBase
     {
-        public UserPermissionTest() : base(3) { }
+        public UserPermissionTest(ITestOutputHelper testOutputHelper) : base(3, testOutputHelper) { }
 
         [Fact]
         public async Task RootUserShouldReturnAllPermissions()
