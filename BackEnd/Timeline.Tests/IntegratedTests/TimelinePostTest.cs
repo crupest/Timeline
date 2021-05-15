@@ -19,7 +19,7 @@ namespace Timeline.Tests.IntegratedTests
 {
     public class TimelinePostTest : BaseTimelineTest
     {
-        private static HttpTimelinePostCreateRequest CreateTextPostRequest(string text, DateTime? time = null, string? color = null)
+        public static HttpTimelinePostCreateRequest CreateTextPostRequest(string text, DateTime? time = null, string? color = null)
         {
             return new HttpTimelinePostCreateRequest()
             {

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +15,7 @@ using Timeline.Models.Validation;
 using Timeline.Services.Mapper;
 using Timeline.Services.Timeline;
 using Timeline.Services.User;
+using Timeline.SignalRHub;
 
 namespace Timeline.Controllers
 {
@@ -24,6 +27,8 @@ namespace Timeline.Controllers
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TimelinePostController : MyControllerBase
     {
+        private readonly ILogger<TimelinePostController> _logger;
+
         private readonly ITimelineService _timelineService;
         private readonly ITimelinePostService _postService;
 
@@ -31,12 +36,16 @@ namespace Timeline.Controllers
 
         private readonly MarkdownProcessor _markdownProcessor;
 
-        public TimelinePostController(ITimelineService timelineService, ITimelinePostService timelinePostService, IGenericMapper mapper, MarkdownProcessor markdownProcessor)
+        private readonly IHubContext<TimelineHub> _timelineHubContext;
+
+        public TimelinePostController(ILogger<TimelinePostController> logger, ITimelineService timelineService, ITimelinePostService timelinePostService, IGenericMapper mapper, MarkdownProcessor markdownProcessor, IHubContext<TimelineHub> timelineHubContext)
         {
+            _logger = logger;
             _timelineService = timelineService;
             _postService = timelinePostService;
             _mapper = mapper;
             _markdownProcessor = markdownProcessor;
+            _timelineHubContext = timelineHubContext;
         }
 
         private bool UserHasAllTimelineManagementPermission => UserHasPermission(UserPermission.AllTimelineManagement);
@@ -207,6 +216,11 @@ namespace Timeline.Controllers
             try
             {
                 var post = await _postService.CreatePostAsync(timelineId, userId, createRequest);
+
+                var group = TimelineHub.GenerateTimelinePostChangeListeningGroupName(timeline);
+                await _timelineHubContext.Clients.Group(group).SendAsync(nameof(ITimelineClient.OnTimelinePostChanged), timeline);
+                _logger.LogInformation("Notify group {0} of timeline post change.", group);
+
                 var result = await Map(post);
                 return result;
             }

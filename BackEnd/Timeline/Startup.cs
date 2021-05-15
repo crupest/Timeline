@@ -26,6 +26,7 @@ using Timeline.Services.Mapper;
 using Timeline.Services.Timeline;
 using Timeline.Services.Token;
 using Timeline.Services.User;
+using Timeline.SignalRHub;
 using Timeline.Swagger;
 
 namespace Timeline
@@ -84,6 +85,8 @@ namespace Timeline
             {
                 options.InvalidModelStateResponseFactory = InvalidModelResponseFactory.Factory;
             });
+
+            services.AddSignalR();
 
             services.AddAuthentication(AuthenticationConstants.Scheme)
                 .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>(AuthenticationConstants.Scheme, AuthenticationConstants.DisplayName, o => { });
@@ -154,6 +157,7 @@ namespace Timeline
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<TimelineHub>("api/hub/timeline");
             });
 
             UnknownEndpointMiddleware.Attach(app);
