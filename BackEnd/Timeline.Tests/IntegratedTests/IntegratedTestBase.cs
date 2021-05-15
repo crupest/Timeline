@@ -105,6 +105,14 @@ namespace Timeline.Tests.IntegratedTests
             return Task.FromResult(client);
         }
 
+        public async Task<string> CreateTokenWithCredentialAsync(string username, string password)
+        {
+            var client = await CreateDefaultClient();
+            var res = await client.TestPostAsync<HttpCreateTokenResponse>("token/create",
+                new HttpCreateTokenRequest { Username = username, Password = password });
+            return res.Token;
+        }
+
         public async Task<HttpClient> CreateClientWithCredential(string username, string password, bool setApiBase = true)
         {
             var client = await CreateDefaultClient(setApiBase);
@@ -113,6 +121,14 @@ namespace Timeline.Tests.IntegratedTests
             var token = res.Token;
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
             return client;
+        }
+
+        public Task<string> CreateTokenAsync(int userNumber)
+        {
+            if (userNumber == 0)
+                return CreateTokenWithCredentialAsync("admin", "adminpw");
+            else
+                return CreateTokenWithCredentialAsync($"user{userNumber}", $"user{userNumber}pw");
         }
 
         public Task<HttpClient> CreateClientAs(int userNumber, bool setApiBase = true)

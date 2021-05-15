@@ -49,19 +49,19 @@
 
     <ItemGroup>
         <Compile Update="Auth\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Controllers\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Filters\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Models\Http\Resource.Designer.cs">
             <DesignTime>True</DesignTime>
@@ -69,122 +69,122 @@
             <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Models\Validation\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Routes\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\DatabaseManagement\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\Data\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\Imaging\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\Mapper\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\Timeline\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\Token\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\User\Avatar\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
         <Compile Update="Services\User\Resource.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resource.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resource.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
         <EmbeddedResource Update="Auth\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Controllers\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Filters\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Models\Http\Resource.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Models\Validation\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Routes\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\DatabaseManagement\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Data\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Imaging\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Mapper\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Timeline\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\Token\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\User\Avatar\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Services\User\Resource.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.IO;
@@ -45,6 +47,11 @@ namespace Timeline.Tests.Helpers
             Host.Dispose();
 
             Directory.Delete(WorkDirectory, true);
+        }
+
+        public TestServer Server
+        {
+            get => (TestServer)Host.Services.GetRequiredService<IServer>();
         }
     }
 }
