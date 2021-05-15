@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class UserTest : IntegratedTestBase
     {
+        public UserTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+
+        }
+
+
         [Fact]
         public async Task UserListShouldHaveUniqueId()
         {

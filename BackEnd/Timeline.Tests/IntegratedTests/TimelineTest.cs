@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class TimelineTest : BaseTimelineTest
     {
+        public TimelineTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+
+        }
+
         [Fact]
         public async Task TimelineGet_Should_Work()
         {

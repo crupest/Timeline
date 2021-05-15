@@ -4,16 +4,25 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Timeline.Configs;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.Helpers
 {
     public class TestApplication : IAsyncLifetime
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public TestApplication(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         public IHost Host { get; private set; } = default!;
 
         public string WorkDirectory { get; private set; } = default!;
@@ -24,6 +33,11 @@ namespace Timeline.Tests.Helpers
             Directory.CreateDirectory(WorkDirectory);
 
             Host = await Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddXUnit(_testOutputHelper);
+                })
                 .ConfigureAppConfiguration((context, config) =>
                 {
                     config.AddInMemoryCollection(new Dictionary<string, string>

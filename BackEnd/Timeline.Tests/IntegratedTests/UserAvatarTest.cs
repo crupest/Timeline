@@ -14,11 +14,17 @@ using System.Threading.Tasks;
 using Timeline.Models;
 using Timeline.Tests.Helpers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class UserAvatarTest : IntegratedTestBase
     {
+        public UserAvatarTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+
+        }
+
         [Fact]
         public async Task Test()
         {

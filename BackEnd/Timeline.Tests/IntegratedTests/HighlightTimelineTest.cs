@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
     public class HighlightTimelineTest : IntegratedTestBase
     {
+        public HighlightTimelineTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+
+        }
+
         [Fact]
         public async Task PermissionTest()
         {
