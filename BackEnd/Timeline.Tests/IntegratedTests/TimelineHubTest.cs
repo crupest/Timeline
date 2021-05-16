@@ -17,8 +17,12 @@ namespace Timeline.Tests.IntegratedTests
 
         private HubConnection CreateConnection(string? token)
         {
-            return new HubConnectionBuilder().WithUrl($"http://localhost/api/hub/timeline{(token is null ? "" : "?token=" + token)}",
-              options => options.HttpMessageHandlerFactory = _ => TestApp.Server.CreateHandler()).Build();
+            return new HubConnectionBuilder().WithUrl("http://localhost/api/hub/timeline",
+              options =>
+              {
+                  options.HttpMessageHandlerFactory = _ => TestApp.Server.CreateHandler();
+                  options.AccessTokenProvider = token is null ? null : () => Task.FromResult(token);
+              }).Build();
         }
 
         [Theory]
