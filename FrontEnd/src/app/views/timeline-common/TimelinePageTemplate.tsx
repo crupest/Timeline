@@ -109,10 +109,12 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
   const cardCollapseLocalStorageKey = `timeline.${timelineName}.cardCollapse`;
 
   const [cardCollapse, setCardCollapse] = React.useState<boolean>(true);
+
   React.useEffect(() => {
-    const savedCollapse =
-      window.localStorage.getItem(cardCollapseLocalStorageKey) === "true";
-    setCardCollapse(savedCollapse);
+    const savedCollapse = window.localStorage.getItem(
+      cardCollapseLocalStorageKey
+    );
+    setCardCollapse(savedCollapse == null ? true : savedCollapse === "true");
   }, [cardCollapseLocalStorageKey]);
 
   const toggleCardCollapse = (): void => {
