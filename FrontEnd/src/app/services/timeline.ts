@@ -22,13 +22,11 @@ export const timelineVisibilityTooltipTranslationMap: Record<
   Private: "timeline.visibilityTooltip.private",
 };
 
-function generateTimelineHubUrl(token: string | null): string {
-  return `/api/hub/timeline${token == null ? "" : "?token=" + token}`;
-}
-
 function createTimelineHubConnection(token: string | null): HubConnection {
   return new HubConnectionBuilder()
-    .withUrl(generateTimelineHubUrl(token))
+    .withUrl("/api/hub/timeline", {
+      accessTokenFactory: token == null ? undefined : () => token,
+    })
     .withAutomaticReconnect()
     .build();
 }
