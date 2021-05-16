@@ -7,6 +7,8 @@ import {
 } from "@/http/common";
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
+import { getTimelinePostUpdate$ } from "@/services/timeline";
+
 import TimelinePagedPostListView from "./TimelinePagedPostListView";
 import TimelineTop from "./TimelineTop";
 import TimelineLoading from "./TimelineLoading";
@@ -32,6 +34,18 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     setState("loading");
     setPosts([]);
   }, [timelineName]);
+
+  React.useEffect(() => {
+    if (timelineName != null && state === "loaded") {
+      const timelinePostUpdate$ = getTimelinePostUpdate$(timelineName);
+      const subscription = timelinePostUpdate$.subscribe(() => {
+        onReload();
+      });
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [timelineName, state, onReload]);
 
   React.useEffect(() => {
     if (timelineName != null) {
