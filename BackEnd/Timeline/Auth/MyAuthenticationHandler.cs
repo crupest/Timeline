@@ -100,6 +100,17 @@ namespace Timeline.Auth
                 }
             }
 
+            {
+                var token = Request.Query["access_token"];
+                var path = Context.Request.Path;
+
+                if (!string.IsNullOrEmpty(token) && path.StartsWithSegments("/api/hub"))
+                {
+                    _logger.LogInformation(Resource.LogTokenFoundInQuery, "access_token", token);
+                    return token;
+                }
+            }
+
             // not found anywhere then return null
             return null;
         }
