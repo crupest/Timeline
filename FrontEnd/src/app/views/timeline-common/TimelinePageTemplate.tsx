@@ -12,7 +12,6 @@ import TimelinePostEdit from "./TimelinePostEdit";
 
 import useReverseScrollPositionRemember from "@/utilities/useReverseScrollPositionRemember";
 import { generatePalette, setPalette } from "@/palette";
-import { getTimelinePostUpdate as getTimelinePostUpdate$ } from "@/services/timeline";
 
 export interface TimelinePageCardProps {
   timeline: HttpTimelineInfo;
@@ -91,17 +90,6 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
   const reloadTimeline = (): void => {
     setTimelineReloadKey((old) => old + 1);
   };
-
-  React.useEffect(() => {
-    const timelinePostUpdate$ = getTimelinePostUpdate$(timelineName);
-    const subscription = timelinePostUpdate$.subscribe(() => {
-      setTimelineReloadKey((old) => old + 1);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [timelineName]);
 
   const onPostEditHeightChange = React.useCallback((height: number): void => {
     setBottomSpaceHeight(height);
