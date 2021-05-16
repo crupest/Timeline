@@ -1,5 +1,6 @@
 import rawAxios, { AxiosError, AxiosResponse } from "axios";
 import { Base64 } from "js-base64";
+import { BehaviorSubject, Observable } from "rxjs";
 
 export const apiBaseUrl = "/api";
 
@@ -44,14 +45,14 @@ axios.interceptors.response.use(undefined, convertToNetworkError);
 axios.interceptors.response.use(undefined, convertToForbiddenError);
 axios.interceptors.response.use(undefined, convertToNotFoundError);
 
-let _token: string | null = null;
+const tokenSubject = new BehaviorSubject<string | null>(null);
 
 export function getHttpToken(): string | null {
-  return _token;
+  return tokenSubject.value;
 }
 
 export function setHttpToken(token: string | null): void {
-  _token = token;
+  tokenSubject.next(token);
 
   if (token == null) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -61,6 +62,8 @@ export function setHttpToken(token: string | null): void {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   }
 }
+
+export const token$: Observable<string | null> = tokenSubject.asObservable();
 
 export function base64(blob: Blob | string): Promise<string> {
   if (typeof blob === "string") {
