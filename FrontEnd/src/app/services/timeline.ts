@@ -22,8 +22,13 @@ export const timelineVisibilityTooltipTranslationMap: Record<
 
 export function getTimelinePostUpdate$(
   timelineName: string
-): Observable<string> {
+): Observable<{ update: boolean; state: HubConnectionState }> {
   return new Observable((subscriber) => {
+    subscriber.next({
+      update: false,
+      state: HubConnectionState.Connecting,
+    });
+
     const token = getHttpToken();
     const connection = new HubConnectionBuilder()
       .withUrl("/api/hub/timeline", {
@@ -34,17 +39,38 @@ export function getTimelinePostUpdate$(
 
     const handler = (tn: string): void => {
       if (timelineName === tn) {
-        subscriber.next(tn);
+        subscriber.next({ update: true, state: connection.state });
       }
     };
 
+    connection.onclose(() => {
+      subscriber.next({
+        update: false,
+        state: HubConnectionState.Disconnected,
+      });
+    });
+
+    connection.onreconnecting(() => {
+      subscriber.next({
+        update: false,
+        state: HubConnectionState.Reconnecting,
+      });
+    });
+
+    connection.onreconnected(() => {
+      subscriber.next({
+        update: false,
+        state: HubConnectionState.Connected,
+      });
+    });
+
     connection.on("OnTimelinePostChanged", handler);
 
-    void connection
-      .start()
-      .then(() =>
-        connection.invoke("SubscribeTimelinePostChange", timelineName)
-      );
+    void connection.start().then(() => {
+      subscriber.next({ update: false, state: HubConnectionState.Connected });
+
+      return connection.invoke("SubscribeTimelinePostChange", timelineName);
+    });
 
     return () => {
       connection.off("OnTimelinePostChanged", handler);
