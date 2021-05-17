@@ -55,7 +55,6 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
               type: "color",
               label: "timeline.dialogChangeProperty.color",
               initValue: timeline.color ?? null,
-              disableAlpha: true,
               canBeNull: true,
             },
           ] as const

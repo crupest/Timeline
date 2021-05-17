@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Modal } from "react-bootstrap";
-import { ChromePicker } from "react-color";
+import { TwitterPicker } from "react-color";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
@@ -63,7 +63,6 @@ export interface OperationDialogColorInput {
   type: "color";
   label?: I18nText;
   initValue?: string | null;
-  disableAlpha?: boolean;
   canBeNull?: boolean;
 }
 
@@ -336,10 +335,9 @@ const OperationDialog = <
                     <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
                   )}
                   {value !== null && (
-                    <ChromePicker
+                    <TwitterPicker
                       color={value as string}
                       onChange={(result) => updateValue(index, result.hex)}
-                      disableAlpha={item.disableAlpha}
                     />
                   )}
                 </Form.Group>
