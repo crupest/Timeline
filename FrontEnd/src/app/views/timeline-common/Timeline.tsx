@@ -1,4 +1,5 @@
 import React from "react";
+import { HubConnectionState } from "@microsoft/signalr";
 
 import {
   HttpForbiddenError,
@@ -19,6 +20,7 @@ export interface TimelineProps {
   timelineName?: string;
   reloadKey: number;
   onReload: () => void;
+  onConnectionStateChanged?: (state: HubConnectionState) => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
@@ -35,17 +37,29 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     setPosts([]);
   }, [timelineName]);
 
+  const onConnectionStateChanged =
+    React.useRef<((state: HubConnectionState) => void) | null>(null);
+
+  React.useEffect(() => {
+    onConnectionStateChanged.current = props.onConnectionStateChanged ?? null;
+  }, [props.onConnectionStateChanged]);
+
   React.useEffect(() => {
     if (timelineName != null && state === "loaded") {
       const timelinePostUpdate$ = getTimelinePostUpdate$(timelineName);
-      const subscription = timelinePostUpdate$.subscribe(() => {
-        onReload();
-      });
+      const subscription = timelinePostUpdate$.subscribe(
+        ({ update, state }) => {
+          if (update) {
+            onReload();
+          }
+          onConnectionStateChanged.current?.(state);
+        }
+      );
       return () => {
         subscription.unsubscribe();
       };
     }
-  }, [timelineName, state, onReload]);
+  }, [timelineName, state, onReload, onConnectionStateChanged]);
 
   React.useEffect(() => {
     if (timelineName != null) {
