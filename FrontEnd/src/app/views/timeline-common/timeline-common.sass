@@ -228,3 +228,32 @@ $timeline-line-color-current: var(--tl-primary-enhance-color)
   position: absolute
   right: 10px
   top: 2px
+
+.connection-status-badge
+  font-size: 0.8em
+  border-radius: 5px
+  padding: 0.1em 1em
+  background-color: rgb(234 242 255)
+
+  &::before
+    width: 10px
+    height: 10px
+    border-radius: 50%
+    display: inline-block
+    content: ''
+    margin-right: 0.6em
+
+  &.success
+    color: #006100
+    &::before
+      background-color: #006100
+
+  &.warning
+    color: #e4a700
+    &::before
+      background-color: #e4a700
+
+  &.danger
+    color: #fd1616
+    &::before
+      background-color: #fd1616

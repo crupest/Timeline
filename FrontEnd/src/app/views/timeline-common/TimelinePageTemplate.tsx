@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Container } from "react-bootstrap";
+import { HubConnectionState } from "@microsoft/signalr";
 
 import { HttpNetworkError, HttpNotFoundError } from "@/http/common";
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
@@ -17,6 +18,7 @@ export interface TimelinePageCardProps {
   timeline: HttpTimelineInfo;
   collapse: boolean;
   toggleCollapse: () => void;
+  connectionStatus: HubConnectionState;
   className?: string;
   onReload: () => void;
 }
@@ -39,6 +41,9 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
       "loading"
     );
   const [timeline, setTimeline] = React.useState<HttpTimelineInfo | null>(null);
+
+  const [connectionStatus, setConnectionStatus] =
+    React.useState<HubConnectionState>(HubConnectionState.Connecting);
 
   useReverseScrollPositionRemember();
 
@@ -135,6 +140,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           collapse={cardCollapse}
           toggleCollapse={toggleCardCollapse}
           onReload={onReload}
+          connectionStatus={connectionStatus}
         />
       ) : null}
       <Container
@@ -158,6 +164,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
                 timelineName={timeline?.name}
                 reloadKey={timelineReloadKey}
                 onReload={reloadTimeline}
+                onConnectionStateChanged={setConnectionStatus}
               />
             );
           }

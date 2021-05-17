@@ -24,7 +24,7 @@ export interface TimelineProps {
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timelineName, className, style, reloadKey, onReload } = props;
+  const { timelineName, className, style, reloadKey } = props;
 
   const [state, setState] =
     React.useState<
@@ -36,6 +36,12 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     setState("loading");
     setPosts([]);
   }, [timelineName]);
+
+  const onReload = React.useRef<() => void>(props.onReload);
+
+  React.useEffect(() => {
+    onReload.current = props.onReload;
+  }, [props.onReload]);
 
   const onConnectionStateChanged =
     React.useRef<((state: HubConnectionState) => void) | null>(null);
@@ -50,7 +56,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       const subscription = timelinePostUpdate$.subscribe(
         ({ update, state }) => {
           if (update) {
-            onReload();
+            onReload.current();
           }
           onConnectionStateChanged.current?.(state);
         }
@@ -59,7 +65,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         subscription.unsubscribe();
       };
     }
-  }, [timelineName, state, onReload, onConnectionStateChanged]);
+  }, [timelineName, state]);
 
   React.useEffect(() => {
     if (timelineName != null) {
@@ -125,7 +131,10 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       return (
         <>
           <TimelineTop height={40} />
-          <TimelinePagedPostListView posts={posts} onReload={onReload} />
+          <TimelinePagedPostListView
+            posts={posts}
+            onReload={onReload.current}
+          />
         </>
       );
   }

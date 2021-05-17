@@ -10,6 +10,13 @@
     "network": "Network error.",
     "unknown": "Unknown error."
   },
+  "connectionState": {
+    "Connected": "Connected",
+    "Connecting": "Connecting",
+    "Disconnected": "Disconnected",
+    "Disconnecting": "Disconnecting",
+    "Reconnecting": "Reconnecting"
+  },
   "serviceWorker": {
     "availableOffline": "Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉",
     "upgradePrompt": "App is getting a new version!",

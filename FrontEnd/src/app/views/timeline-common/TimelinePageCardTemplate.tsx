@@ -16,6 +16,7 @@ import { TimelinePageCardProps } from "./TimelinePageTemplate";
 import CollapseButton from "./CollapseButton";
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
+import ConnectionStatusBadge from "./ConnectionStatusBadge";
 import { MenuItems, PopupMenu } from "../common/Menu";
 import FullPage from "../common/FullPage";
 
@@ -32,6 +33,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
   toggleCollapse,
   infoArea,
   manageItems,
+  connectionStatus,
   onReload,
   className,
   dialog,
@@ -113,6 +115,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
         style={{ zIndex: collapse ? 1029 : 1031 }}
       >
         <div className="float-end d-flex align-items-center">
+          <ConnectionStatusBadge status={connectionStatus} className="me-2" />
           <CollapseButton collapse={collapse} onClick={toggleCollapse} />
         </div>
         {isSmallScreen ? (
