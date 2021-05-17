@@ -10,6 +10,13 @@
     "network": "网络错误。",
     "unknown": "未知错误。"
   },
+  "connectionState": {
+    "Connected": "已连接",
+    "Connecting": "正在连接",
+    "Disconnected": "已断开连接",
+    "Disconnecting": "正在断开连接",
+    "Reconnecting": "正在重新连接"
+  },
   "serviceWorker": {
     "availableOffline": "Timeline 已经缓存在本地，你可以离线使用它。🎉🎉🎉",
     "upgradePrompt": "App 有新版本！",
