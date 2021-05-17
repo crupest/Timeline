@@ -35,10 +35,6 @@ config.module
 
 config.devtool("eval-cheap-module-source-map");
 
-config.resolve.set("fallback", {
-  querystring: require.resolve("querystring-es3"),
-});
-
 config.devServer
   .contentBase(path.resolve(__dirname, "public/"))
   .port(3000)
