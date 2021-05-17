@@ -1,7 +1,7 @@
 import { TimelineVisibility } from "@/http/timeline";
 import XRegExp from "xregexp";
 import { Observable } from "rxjs";
-import { HubConnectionBuilder } from "@microsoft/signalr";
+import { HubConnectionBuilder, HubConnectionState } from "@microsoft/signalr";
 
 import { getHttpToken } from "@/http/common";
 
@@ -49,9 +49,11 @@ export function getTimelinePostUpdate$(
     return () => {
       connection.off("OnTimelinePostChanged", handler);
 
-      void connection
-        .invoke("UnsubscribeTimelinePostChange", timelineName)
-        .then(() => connection.stop());
+      if (connection.state === HubConnectionState.Connected) {
+        void connection
+          .invoke("UnsubscribeTimelinePostChange", timelineName)
+          .then(() => connection.stop());
+      }
     };
   });
 }
