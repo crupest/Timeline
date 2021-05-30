@@ -67,7 +67,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
   }, []);
 
   React.useEffect(() => {
-    window.onbeforeunload = (): void | string => {
+    window.onbeforeunload = (): unknown => {
       if (!canLeave) {
         return t("timeline.confirmLeave");
       }
