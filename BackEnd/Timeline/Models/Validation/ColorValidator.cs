@@ -4,8 +4,22 @@ namespace Timeline.Models.Validation
 {
     public class ColorValidator : Validator<string>
     {
+        public bool PermitEmpty { get; set; } = false;
+        public bool PermitDefault { get; set; } = false;
+        public string DefaultValue { get; set; } = "default";
+
         protected override (bool, string) DoValidate(string value)
         {
+            if (PermitEmpty && value.Length == 0)
+            {
+                return (true, GetSuccessMessage());
+            }
+
+            if (PermitDefault && value == DefaultValue)
+            {
+                return (true, GetSuccessMessage());
+            }
+
             if (!value.StartsWith('#'))
             {
                 return (false, "Color must starts with '#'.");
@@ -32,9 +46,29 @@ namespace Timeline.Models.Validation
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
     public class ColorAttribute : ValidateWithAttribute
     {
+        private ColorValidator Validator => (ColorValidator)_validator;
+
         public ColorAttribute() : base(typeof(ColorValidator))
         {
 
+        }
+
+        public bool PermitEmpty
+        {
+            get => Validator.PermitEmpty;
+            set => Validator.PermitEmpty = value;
+        }
+
+        public bool PermitDefault
+        {
+            get => Validator.PermitDefault;
+            set => Validator.PermitDefault = value;
+        }
+
+        public string DefaultValue
+        {
+            get => Validator.DefaultValue;
+            set => Validator.DefaultValue = value;
         }
     }
 }

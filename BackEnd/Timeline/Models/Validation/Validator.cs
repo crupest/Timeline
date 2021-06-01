@@ -77,7 +77,7 @@ namespace Timeline.Models.Validation
         AllowMultiple = false)]
     public class ValidateWithAttribute : ValidationAttribute
     {
-        private readonly IValidator _validator;
+        protected readonly IValidator _validator;
 
         /// <summary>
         /// Create with a given validator.
