@@ -438,5 +438,17 @@ namespace Timeline.Tests.IntegratedTests
                 timeline.Postable.Should().Be(false);
             }
         }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("default")]
+        public async Task Patch_Timeline_Color_Default(string value)
+        {
+            using var client = await CreateClientAsUser();
+            var timeline = await client.TestPatchAsync<HttpTimeline>("timelines/t1", new HttpTimelinePatchRequest { Color = "#111111" });
+            timeline.Color.Should().NotBeNull();
+            var timeline2 = await client.TestPatchAsync<HttpTimeline>("timelines/t1", new HttpTimelinePatchRequest { Color = value });
+            timeline2.Color.Should().BeNull();
+        }
     }
 }

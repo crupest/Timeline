@@ -23,7 +23,7 @@ namespace Timeline.Services.Timeline
         private readonly IClock _clock;
 
         private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
-        private readonly ColorValidator _colorValidator = new ColorValidator();
+        private readonly ColorValidator _colorValidator = new ColorValidator() { PermitDefault = true, PermitEmpty = true };
 
         public TimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IBasicUserService userService, IClock clock)
             : base(loggerFactory, database, userService, clock)
@@ -119,7 +119,14 @@ namespace Timeline.Services.Timeline
             if (newProperties.Color is not null)
             {
                 changed = true;
-                entity.Color = newProperties.Color;
+                if (newProperties.Color.Length == 0 || newProperties.Color == "default")
+                {
+                    entity.Color = null;
+                }
+                else
+                {
+                    entity.Color = newProperties.Color;
+                }
             }
 
             if (changed)
