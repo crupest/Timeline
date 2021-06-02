@@ -13,7 +13,7 @@ namespace Timeline.Models.Http
         /// <summary>
         /// Change the color. Null for not change.
         /// </summary>
-        [Color]
+        [Color(PermitEmpty = true, PermitDefault = true)]
         public string? Color { get; set; }
     }
 }
