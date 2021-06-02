@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Timeline.SignalRHub;
 using Xunit;
@@ -33,12 +34,15 @@ namespace Timeline.Tests.IntegratedTests
 
             await using var connection = CreateConnection(token);
 
+            using SemaphoreSlim semaphore = new SemaphoreSlim(0);
+
             var changed = false;
 
             connection.On<string>(nameof(ITimelineClient.OnTimelinePostChanged), (timelineName) =>
             {
                 timelineName.Should().Be(generator(1));
                 changed = true;
+                semaphore.Release();
             });
 
             await connection.StartAsync();
@@ -47,11 +51,13 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("aaa"));
+            await semaphore.WaitAsync();
             changed.Should().BeFalse();
 
             await connection.InvokeAsync(nameof(TimelineHub.SubscribeTimelinePostChange), generator(1));
 
             await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("bbb"));
+            await semaphore.WaitAsync();
             changed.Should().BeTrue();
 
             changed = false;
