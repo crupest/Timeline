@@ -17,7 +17,7 @@ namespace Timeline.Tests.IntegratedTests
 
         private HubConnection CreateConnection(string? token)
         {
-            return new HubConnectionBuilder().WithUrl("http://localhost/api/hub/timeline",
+            return new HubConnectionBuilder().WithUrl("ws://localhost/api/hub/timeline",
               options =>
               {
                   options.HttpMessageHandlerFactory = _ => TestApp.Server.CreateHandler();
@@ -47,13 +47,11 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateClientAsUser();
 
             await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("aaa"));
-            await Task.Delay(1);
             changed.Should().BeFalse();
 
             await connection.InvokeAsync(nameof(TimelineHub.SubscribeTimelinePostChange), generator(1));
 
             await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("bbb"));
-            await Task.Delay(1);
             changed.Should().BeTrue();
 
             changed = false;
@@ -61,7 +59,6 @@ namespace Timeline.Tests.IntegratedTests
             await connection.InvokeAsync(nameof(TimelineHub.UnsubscribeTimelinePostChange), generator(1));
 
             await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("ccc"));
-            await Task.Delay(1);
             changed.Should().BeFalse();
         }
 
