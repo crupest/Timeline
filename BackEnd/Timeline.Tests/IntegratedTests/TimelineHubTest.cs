@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Timeline.SignalRHub;
 using Xunit;
@@ -17,7 +18,7 @@ namespace Timeline.Tests.IntegratedTests
 
         private HubConnection CreateConnection(string? token)
         {
-            return new HubConnectionBuilder().WithUrl("http://localhost/api/hub/timeline",
+            return new HubConnectionBuilder().WithUrl("ws://localhost/api/hub/timeline",
               options =>
               {
                   options.HttpMessageHandlerFactory = _ => TestApp.Server.CreateHandler();
@@ -33,36 +34,42 @@ namespace Timeline.Tests.IntegratedTests
 
             await using var connection = CreateConnection(token);
 
+            await connection.StartAsync();
+            connection.State.Should().Be(HubConnectionState.Connected);
+
+            using SemaphoreSlim semaphore = new SemaphoreSlim(0);
+
             var changed = false;
 
             connection.On<string>(nameof(ITimelineClient.OnTimelinePostChanged), (timelineName) =>
             {
                 timelineName.Should().Be(generator(1));
                 changed = true;
+                semaphore.Release();
             });
 
-            await connection.StartAsync();
-            connection.State.Should().Be(HubConnectionState.Connected);
+            await Task.Run(async () =>
+            {
+                using var client = await CreateClientAsUser();
 
-            using var client = await CreateClientAsUser();
+                await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("aaa"));
 
-            await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("aaa"));
-            await Task.Delay(1);
-            changed.Should().BeFalse();
+                changed.Should().BeFalse();
 
-            await connection.InvokeAsync(nameof(TimelineHub.SubscribeTimelinePostChange), generator(1));
+                await connection.InvokeAsync(nameof(TimelineHub.SubscribeTimelinePostChange), generator(1));
 
-            await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("bbb"));
-            await Task.Delay(1);
-            changed.Should().BeTrue();
+                await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("bbb"));
+                await semaphore.WaitAsync();
+                changed.Should().BeTrue();
 
-            changed = false;
+                changed = false;
 
-            await connection.InvokeAsync(nameof(TimelineHub.UnsubscribeTimelinePostChange), generator(1));
+                await connection.InvokeAsync(nameof(TimelineHub.UnsubscribeTimelinePostChange), generator(1));
 
-            await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("ccc"));
-            await Task.Delay(1);
-            changed.Should().BeFalse();
+                await client.TestPostAsync($"timelines/{generator(1)}/posts", TimelinePostTest.CreateTextPostRequest("ccc"));
+                changed.Should().BeFalse();
+
+            });
         }
 
         [Fact]

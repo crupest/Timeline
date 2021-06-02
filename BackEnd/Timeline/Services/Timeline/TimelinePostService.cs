@@ -26,6 +26,7 @@ namespace Timeline.Services.Timeline
         private readonly IImageService _imageValidator;
         private readonly IClock _clock;
         private readonly ColorValidator _colorValidator = new ColorValidator();
+        private readonly ColorValidator _colorValidatorAllowEmptyAndDefault = new ColorValidator() { PermitEmpty = true, PermitDefault = true };
 
         public TimelinePostService(ILogger<TimelinePostService> logger, DatabaseContext database, IBasicTimelineService basicTimelineService, IBasicUserService basicUserService, IDataManager dataManager, IImageService imageValidator, IClock clock)
         {
@@ -38,9 +39,9 @@ namespace Timeline.Services.Timeline
             _clock = clock;
         }
 
-        private void CheckColor(string color, string paramName)
+        private void CheckColor(string color, string paramName, bool allowEmptyOrDefault)
         {
-            if (!_colorValidator.Validate(color, out var message))
+            if (!(allowEmptyOrDefault ? _colorValidatorAllowEmptyAndDefault : _colorValidator).Validate(color, out var message))
                 throw new ArgumentException(string.Format(Resource.ExceptionColorInvalid, message), paramName);
         }
 
@@ -166,7 +167,7 @@ namespace Timeline.Services.Timeline
                 throw new ArgumentNullException(nameof(request));
 
             if (request.Color is not null)
-                CheckColor(request.Color, nameof(request));
+                CheckColor(request.Color, nameof(request), false);
 
             if (request.DataList is null)
                 throw new ArgumentException(Resource.ExceptionDataListNull, nameof(request));
@@ -269,7 +270,7 @@ namespace Timeline.Services.Timeline
                 throw new ArgumentNullException(nameof(request));
 
             if (request.Color is not null)
-                CheckColor(request.Color, nameof(request));
+                CheckColor(request.Color, nameof(request), true);
 
             request.Time = request.Time?.MyToUtc();
 
@@ -287,7 +288,16 @@ namespace Timeline.Services.Timeline
                 entity.Time = request.Time.Value;
 
             if (request.Color is not null)
-                entity.Color = request.Color;
+            {
+                if (request.Color.Length == 0 || request.Color == "default")
+                {
+                    entity.Color = null;
+                }
+                else
+                {
+                    entity.Color = request.Color;
+                }
+            }
 
             entity.LastUpdated = _clock.GetCurrentTime();
 
