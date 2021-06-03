@@ -7,24 +7,12 @@ const config = new Config();
 config.entry("index").add(path.resolve(__dirname, "src/app/index.tsx"));
 
 config.module
-  .rule("ts")
-  .test(/\.ts(x?)$/)
+  .rule("jsts")
+  .test(/\.[jt]sx?$/)
   .exclude.add(/node_modules/)
-  .end()
-  .use("babel")
-  .loader("babel-loader")
   .end()
   .use("ts")
   .loader("ts-loader")
-  .end();
-
-config.module
-  .rule("js")
-  .test(/\.js(x?)$/)
-  .exclude.add(/node_modules/)
-  .end()
-  .use("babel")
-  .loader("babel-loader")
   .end();
 
 config.module

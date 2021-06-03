@@ -1,22 +1,18 @@
 const path = require("path");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const ReactRefreshTypeScript = require("react-refresh-typescript");
 
 const config = require("./webpack.common");
 
 config.mode("development");
 
 config.module
-  .rule("ts")
-  .use("babel")
+  .rule("jsts")
+  .use("ts")
   .options({
-    plugins: ["react-refresh/babel"],
-  });
-
-config.module
-  .rule("js")
-  .use("babel")
-  .options({
-    plugins: ["react-refresh/babel"],
+    getCustomTransformers: () => ({
+      before: [ReactRefreshTypeScript()],
+    }),
   });
 
 config.module
@@ -35,11 +31,7 @@ config.module
 
 config.devtool("eval-cheap-module-source-map");
 
-config.devServer
-  .contentBase(path.resolve(__dirname, "public/"))
-  .port(3000)
-  .historyApiFallback(true)
-  .hot(true);
+config.devServer.port(3000).historyApiFallback(true).hot(true);
 
 config.plugin("react-refresh").use(new ReactRefreshWebpackPlugin());
 

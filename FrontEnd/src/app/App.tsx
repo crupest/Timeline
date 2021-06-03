@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import AppBar from "./views/common/AppBar";
@@ -23,7 +23,7 @@ const LazyAdmin = React.lazy(
   () => import(/* webpackChunkName: "admin" */ "./views/admin/Admin")
 );
 
-const App: React.FC = () => {
+function App(): ReactElement | null {
   const user = useRawUser();
 
   React.useEffect(() => {
@@ -82,6 +82,6 @@ const App: React.FC = () => {
       </React.Suspense>
     );
   }
-};
+}
 
 export default App;
