@@ -1,7 +1,8 @@
 import React from "react";
-import { fromEvent } from "rxjs";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
+
+import useScrollToTop from "@/utilities/useScrollToTop";
 
 import TimelinePostListView from "./TimelinePostListView";
 
@@ -25,16 +26,9 @@ const TimelinePagedPostListView: React.FC<TimelinePagedPostListViewProps> = (
       : posts.slice(-lastViewCount);
   }, [posts, lastViewCount]);
 
-  React.useEffect(() => {
-    if (lastViewCount < posts.length) {
-      const subscription = fromEvent(window, "scroll").subscribe(() => {
-        if (window.scrollY === 0) {
-          setLastViewCount(lastViewCount + 10);
-        }
-      });
-      return () => subscription.unsubscribe();
-    }
-  }, [lastViewCount, posts]);
+  useScrollToTop(() => {
+    setLastViewCount(lastViewCount + 10);
+  }, lastViewCount < posts.length);
 
   return (
     <TimelinePostListView
