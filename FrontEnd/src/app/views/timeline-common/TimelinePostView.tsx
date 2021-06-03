@@ -28,15 +28,18 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
     React.useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const cardRef = React.useRef<HTMLDivElement>(null!);
+  const cardRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     const cardIntersectionObserver = new IntersectionObserver(([e]) => {
       if (e.intersectionRatio > 0) {
-        cardRef.current.style.animationName = "timeline-post-enter";
+        if (cardRef.current != null) {
+          cardRef.current.style.animationName = "timeline-post-enter";
+        }
       }
     });
-    cardIntersectionObserver.observe(cardRef.current);
+    if (cardRef.current) {
+      cardIntersectionObserver.observe(cardRef.current);
+    }
 
     return () => {
       cardIntersectionObserver.disconnect();

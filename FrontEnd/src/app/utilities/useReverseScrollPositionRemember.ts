@@ -2,6 +2,10 @@ import React from "react";
 
 let on = false;
 
+let reverseScrollPosition = getReverseScrollPosition();
+let reverseScrollToPosition: number | null = null;
+let lastScrollPosition = window.scrollY;
+
 export function getReverseScrollPosition(): number {
   if (document.documentElement.scrollHeight <= window.innerHeight) {
     return 0;
@@ -20,22 +24,47 @@ export function scrollToReverseScrollPosition(reversePosition: number): void {
   const old = document.documentElement.style.scrollBehavior;
   document.documentElement.style.scrollBehavior = "auto";
 
-  window.scrollTo(
-    0,
-    document.documentElement.scrollHeight - window.innerHeight - reversePosition
-  );
+  const newPosition =
+    document.documentElement.scrollHeight -
+    window.innerHeight -
+    reversePosition;
+
+  reverseScrollToPosition = newPosition;
+
+  window.scrollTo(0, newPosition);
 
   document.documentElement.style.scrollBehavior = old;
 }
 
-let scrollPosition = getReverseScrollPosition();
-
 const scrollListener = (): void => {
-  scrollPosition = getReverseScrollPosition();
+  if (
+    reverseScrollToPosition != null &&
+    Math.abs(window.scrollY - reverseScrollToPosition) > 50
+  ) {
+    console.log(
+      `Reverse scroll position coerce. Required: ${reverseScrollToPosition}. Actual: ${window.scrollY}.`
+    );
+    scrollToReverseScrollPosition(reverseScrollPosition);
+    return;
+  }
+  if (
+    reverseScrollToPosition == null &&
+    Math.abs(window.scrollY - lastScrollPosition) > 1000
+  ) {
+    console.log(
+      `Scroll jump detected. New: ${window.scrollY}. Old: ${lastScrollPosition}.`
+    );
+    scrollToReverseScrollPosition(reverseScrollPosition);
+    return;
+  }
+
+  reverseScrollToPosition = null;
+  lastScrollPosition = window.scrollY;
+  reverseScrollPosition = getReverseScrollPosition();
 };
 
 const resizeObserver = new ResizeObserver(() => {
-  scrollToReverseScrollPosition(scrollPosition);
+  scrollToReverseScrollPosition(reverseScrollPosition);
 });
 
 export default function useReverseScrollPositionRemember(): void {
