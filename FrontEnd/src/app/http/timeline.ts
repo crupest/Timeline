@@ -77,6 +77,11 @@ export interface HttpTimelinePatchRequest {
   description?: string;
 }
 
+export interface HttpTimelinePostPatchRequest {
+  time?: string;
+  color?: string;
+}
+
 export class HttpTimelineNameConflictError extends Error {
   constructor(public innerError?: AxiosError) {
     super();
@@ -100,6 +105,11 @@ export interface IHttpTimelineClient {
   postPost(
     timelineName: string,
     req: HttpTimelinePostPostRequest
+  ): Promise<HttpTimelinePostInfo>;
+  patchPost(
+    timelineName: string,
+    postId: number,
+    req: HttpTimelinePostPatchRequest
   ): Promise<HttpTimelinePostInfo>;
   deletePost(timelineName: string, postId: number): Promise<void>;
 }
@@ -184,6 +194,19 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     return axios
       .post<HttpTimelinePostInfo>(
         `${apiBaseUrl}/timelines/${timelineName}/posts`,
+        req
+      )
+      .then(extractResponseData);
+  }
+
+  patchPost(
+    timelineName: string,
+    postId: number,
+    req: HttpTimelinePostPatchRequest
+  ): Promise<HttpTimelinePostInfo> {
+    return axios
+      .patch<HttpTimelinePostInfo>(
+        `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}`,
         req
       )
       .then(extractResponseData);

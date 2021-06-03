@@ -5,6 +5,8 @@
   "image": "Image",
   "done": "Done",
   "preview": "Preview",
+  "delete": "Delete",
+  "changeProperty": "Change Property",
   "loadFailReload": "Load failed, <1>click here to reload</1>.",
   "error": {
     "network": "Network error.",
@@ -94,6 +96,11 @@
       "visibility": "Visibility",
       "description": "Description",
       "color": "Color"
+    },
+    "changePostPropertyDialog": {
+      "title": "Change Post Properties",
+      "time": "Date and time",
+      "timeEmpty": "You must select a time."
     },
     "member": {
       "noUserAvailableToAdd": "Sorry, no user available to be a member in search result.",

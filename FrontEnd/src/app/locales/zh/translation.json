@@ -6,6 +6,8 @@
   "done": "完成",
   "preview": "预览",
   "loadFailReload": "加载失败，<1>点击重试</1>。",
+  "delete": "删除",
+  "changeProperty": "修改属性",
   "error": {
     "network": "网络错误。",
     "unknown": "未知错误。"
@@ -94,6 +96,11 @@
       "visibility": "可见性",
       "description": "描述",
       "color": "颜色"
+    },
+    "changePostPropertyDialog": {
+      "title": "修改消息属性",
+      "time": "时间",
+      "timeEmpty": "你必须选择一个时间。"
     },
     "member": {
       "noUserAvailableToAdd": "搜索结果显示没有可以添加为成员的用户。",
