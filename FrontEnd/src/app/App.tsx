@@ -13,7 +13,7 @@ import TimelinePage from "./views/timeline";
 import Search from "./views/search";
 import AlertHost from "./views/common/alert/AlertHost";
 
-import { userService, useRawUser } from "./services/user";
+import { useRawUser } from "./services/user";
 
 const NoMatch: React.FC = () => {
   return <div>Ah-oh, 404!</div>;
@@ -25,10 +25,6 @@ const LazyAdmin = React.lazy(
 
 function App(): ReactElement | null {
   const user = useRawUser();
-
-  React.useEffect(() => {
-    void userService.checkLoginState();
-  }, []);
 
   if (user === undefined) {
     return <LoadingPage />;

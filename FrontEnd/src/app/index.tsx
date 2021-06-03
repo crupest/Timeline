@@ -14,4 +14,8 @@ import App from "./App";
 
 import "./palette";
 
+import { userService } from "./services/user";
+
+void userService.checkLoginState();
+
 ReactDOM.render(<App />, document.getElementById("app"));

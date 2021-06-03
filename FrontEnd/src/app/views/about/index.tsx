@@ -44,10 +44,6 @@ const frontendCredits: {
     name: "pepjs",
     url: "https://github.com/jquery/PEP",
   },
-  {
-    name: "react-inlinesvg",
-    url: "https://github.com/gilbarbara/react-inlinesvg",
-  },
 ];
 
 const backendCredits: {
