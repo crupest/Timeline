@@ -25,10 +25,6 @@ const frontendCredits: {
     url: "https://react-bootstrap.github.io",
   },
   {
-    name: "babeljs",
-    url: "https://babeljs.io",
-  },
-  {
     name: "webpack",
     url: "https://webpack.js.org",
   },
