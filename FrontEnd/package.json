@@ -68,7 +68,7 @@
     "@types/react-router": "^5.1.13",
     "@types/react-router-bootstrap": "^0.24.5",
     "@types/react-router-dom": "^5.1.7",
-    "@types/remarkable": "^2.0.1",
+    "@types/remarkable": "^2.0.2",
     "@types/webpack-env": "^1.16.0",
     "@types/xregexp": "^4.4.0",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
