@@ -11,7 +11,7 @@
 
         <SpaRoot>ClientApp\</SpaRoot>
 
-        <Version>0.3.0</Version>
+        <Version>0.4.0</Version>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
 
