@@ -66,11 +66,18 @@ export interface OperationDialogColorInput {
   canBeNull?: boolean;
 }
 
+export interface OperationDialogDateTimeInput {
+  type: "datetime";
+  label?: I18nText;
+  initValue?: string;
+}
+
 export type OperationDialogInput =
   | OperationDialogTextInput
   | OperationDialogBoolInput
   | OperationDialogSelectInput
-  | OperationDialogColorInput;
+  | OperationDialogColorInput
+  | OperationDialogDateTimeInput;
 
 type MapOperationInputInfoValueType<T> = T extends OperationDialogTextInput
   ? string
@@ -80,7 +87,19 @@ type MapOperationInputInfoValueType<T> = T extends OperationDialogTextInput
   ? string
   : T extends OperationDialogColorInput
   ? string | null
+  : T extends OperationDialogDateTimeInput
+  ? string
   : never;
+
+const defaultValueMap: {
+  [T in OperationDialogInput as T["type"]]: MapOperationInputInfoValueType<T>;
+} = {
+  bool: false,
+  color: null,
+  datetime: "",
+  select: "",
+  text: "",
+};
 
 type MapOperationInputInfoValueTypeList<
   Tuple extends readonly OperationDialogInput[]
@@ -153,14 +172,9 @@ const OperationDialog = <
 
   const [values, setValues] = useState<ValueType[]>(
     inputScheme.map((i) => {
-      if (i.type === "bool") {
-        return i.initValue ?? false;
-      } else if (i.type === "text" || i.type === "select") {
-        return i.initValue ?? "";
-      } else if (i.type === "color") {
-        return i.initValue ?? null;
-      }
-      {
+      if (i.type in defaultValueMap) {
+        return i.initValue ?? defaultValueMap[i.type];
+      } else {
         throw new UiLogicError("Unknown input scheme.");
       }
     })
@@ -339,6 +353,29 @@ const OperationDialog = <
                       color={value as string}
                       onChange={(result) => updateValue(index, result.hex)}
                     />
+                  )}
+                </Form.Group>
+              );
+            } else if (item.type === "datetime") {
+              return (
+                <Form.Group key={index}>
+                  {item.label && (
+                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
+                  )}
+                  <Form.Control
+                    type="datetime-local"
+                    value={value as string}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      updateValue(index, v);
+                    }}
+                    isInvalid={error != null}
+                    disabled={process}
+                  />
+                  {error != null && (
+                    <Form.Control.Feedback type="invalid">
+                      {error}
+                    </Form.Control.Feedback>
                   )}
                 </Form.Group>
               );

@@ -1,6 +1,7 @@
 import React from "react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
@@ -10,6 +11,7 @@ import UserAvatar from "../common/user/UserAvatar";
 import TimelineLine from "./TimelineLine";
 import TimelinePostContentView from "./TimelinePostContentView";
 import TimelinePostDeleteConfirmDialog from "./TimelinePostDeleteConfirmDialog";
+import PostPropertyChangeDialog from "./PostPropertyChangeDialog";
 
 export interface TimelinePostViewProps {
   post: HttpTimelinePostInfo;
@@ -17,16 +19,20 @@ export interface TimelinePostViewProps {
   className?: string;
   style?: React.CSSProperties;
   cardStyle?: React.CSSProperties;
-  onDeleted?: () => void;
+  onChanged: (post: HttpTimelinePostInfo) => void;
+  onDeleted: () => void;
 }
 
 const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
-  const { post, className, style, cardStyle, onDeleted } = props;
+  const { post, className, style, cardStyle, onChanged, onDeleted } = props;
   const current = props.current === true;
+
+  const { t } = useTranslation();
 
   const [operationMaskVisible, setOperationMaskVisible] =
     React.useState<boolean>(false);
-  const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
+  const [dialog, setDialog] =
+    React.useState<"delete" | "changeproperty" | null>(null);
 
   const cardRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -84,25 +90,36 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         </div>
         {operationMaskVisible ? (
           <div
-            className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-center align-items-center"
+            className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-around align-items-center"
             onClick={() => {
               setOperationMaskVisible(false);
             }}
           >
-            <i
-              className="bi-trash text-danger icon-button large"
+            <span
+              className="tl-color-primary"
               onClick={(e) => {
-                setDeleteDialog(true);
+                setDialog("changeproperty");
                 e.stopPropagation();
               }}
-            />
+            >
+              {t("changeProperty")}
+            </span>
+            <span
+              className="tl-color-danger"
+              onClick={(e) => {
+                setDialog("delete");
+                e.stopPropagation();
+              }}
+            >
+              {t("delete")}
+            </span>
           </div>
         ) : null}
       </div>
-      {deleteDialog ? (
+      {dialog === "delete" ? (
         <TimelinePostDeleteConfirmDialog
           onClose={() => {
-            setDeleteDialog(false);
+            setDialog(null);
             setOperationMaskVisible(false);
           }}
           onConfirm={() => {
@@ -115,6 +132,15 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
                 });
               });
           }}
+        />
+      ) : dialog === "changeproperty" ? (
+        <PostPropertyChangeDialog
+          onClose={() => {
+            setDialog(null);
+            setOperationMaskVisible(false);
+          }}
+          post={post}
+          onSuccess={onChanged}
         />
       ) : null}
     </div>
