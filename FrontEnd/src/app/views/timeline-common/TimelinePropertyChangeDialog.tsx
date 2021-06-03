@@ -72,7 +72,7 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
           if (newDescription !== timeline.description) {
             req.description = newDescription;
           }
-          const nc = newColor ?? "#007bff";
+          const nc = newColor ?? "";
           if (nc !== timeline.color) {
             req.color = nc;
           }
