@@ -41,9 +41,6 @@ const scrollListener = (): void => {
     reverseScrollToPosition != null &&
     Math.abs(window.scrollY - reverseScrollToPosition) > 50
   ) {
-    console.log(
-      `Reverse scroll position coerce. Required: ${reverseScrollToPosition}. Actual: ${window.scrollY}.`
-    );
     scrollToReverseScrollPosition(reverseScrollPosition);
     return;
   }
@@ -51,9 +48,6 @@ const scrollListener = (): void => {
     reverseScrollToPosition == null &&
     Math.abs(window.scrollY - lastScrollPosition) > 1000
   ) {
-    console.log(
-      `Scroll jump detected. New: ${window.scrollY}. Old: ${lastScrollPosition}.`
-    );
     scrollToReverseScrollPosition(reverseScrollPosition);
     return;
   }

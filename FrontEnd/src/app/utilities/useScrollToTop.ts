@@ -1,6 +1,6 @@
 import React from "react";
 import { fromEvent } from "rxjs";
-import { filter, throttleTime, tap } from "rxjs/operators";
+import { filter, throttleTime } from "rxjs/operators";
 
 function useScrollToTop(
   handler: () => void,
@@ -23,11 +23,6 @@ function useScrollToTop(
   React.useEffect(() => {
     const subscription = fromEvent(window, "scroll")
       .pipe(
-        tap(() => {
-          console.log(
-            `Scroll event fired: ${window.scrollY}, time: ${Date.now()}.`
-          );
-        }),
         filter(() => {
           return window.scrollY <= option.maxOffset;
         }),
@@ -35,7 +30,6 @@ function useScrollToTop(
       )
       .subscribe(() => {
         if (enable) {
-          console.log(`Fire scroll to top event, time: ${Date.now()}.`);
           handlerRef.current?.();
         }
       });
