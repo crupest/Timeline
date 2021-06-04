@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Modal } from "react-bootstrap";
 import { TwitterPicker } from "react-color";
+import moment from "moment";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
@@ -79,26 +80,39 @@ export type OperationDialogInput =
   | OperationDialogColorInput
   | OperationDialogDateTimeInput;
 
-type MapOperationInputInfoValueType<T> = T extends OperationDialogTextInput
-  ? string
-  : T extends OperationDialogBoolInput
-  ? boolean
-  : T extends OperationDialogSelectInput
-  ? string
-  : T extends OperationDialogColorInput
-  ? string | null
-  : T extends OperationDialogDateTimeInput
-  ? string
-  : never;
+interface OperationInputTypeStringToValueTypeMap {
+  text: string;
+  bool: boolean;
+  select: string;
+  color: string | null;
+  datetime: string;
+}
 
-const defaultValueMap: {
-  [T in OperationDialogInput as T["type"]]: MapOperationInputInfoValueType<T>;
+type MapOperationInputTypeStringToValueType<Type> =
+  Type extends keyof OperationInputTypeStringToValueTypeMap
+    ? OperationInputTypeStringToValueTypeMap[Type]
+    : never;
+
+type MapOperationInputInfoValueType<T> = T extends OperationDialogInput
+  ? MapOperationInputTypeStringToValueType<T["type"]>
+  : T;
+
+const initValueMapperMap: {
+  [T in OperationDialogInput as T["type"]]: (
+    item: T
+  ) => MapOperationInputInfoValueType<T>;
 } = {
-  bool: false,
-  color: null,
-  datetime: "",
-  select: "",
-  text: "",
+  bool: (item) => item.initValue ?? false,
+  color: (item) => item.initValue ?? null,
+  datetime: (item) => {
+    if (item.initValue != null) {
+      return moment(item.initValue).format("YYYY-MM-DDTHH:mm:ss");
+    } else {
+      return "";
+    }
+  },
+  select: (item) => item.initValue ?? item.options[0].value,
+  text: (item) => item.initValue ?? "",
 };
 
 type MapOperationInputInfoValueTypeList<
@@ -171,9 +185,13 @@ const OperationDialog = <
   type ValueType = boolean | string | null | undefined;
 
   const [values, setValues] = useState<ValueType[]>(
-    inputScheme.map((i) => {
-      if (i.type in defaultValueMap) {
-        return i.initValue ?? defaultValueMap[i.type];
+    inputScheme.map((item) => {
+      if (item.type in initValueMapperMap) {
+        return (
+          initValueMapperMap[item.type] as (
+            i: OperationDialogInput
+          ) => ValueType
+        )(item);
       } else {
         throw new UiLogicError("Unknown input scheme.");
       }
@@ -199,7 +217,11 @@ const OperationDialog = <
     setStep({ type: "process" });
     props
       .onProcess(
-        values as unknown as MapOperationInputInfoValueTypeList<OperationInputInfoList>
+        values.map((v, index) => {
+          if (inputScheme[index].type === "datetime" && v !== "")
+            return new Date(v as string).toISOString();
+          else return v;
+        }) as unknown as MapOperationInputInfoValueTypeList<OperationInputInfoList>
       )
       .then(
         (d) => {
