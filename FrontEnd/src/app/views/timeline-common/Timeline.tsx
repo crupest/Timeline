@@ -26,10 +26,9 @@ export interface TimelineProps {
 const Timeline: React.FC<TimelineProps> = (props) => {
   const { timelineName, className, style, reloadKey } = props;
 
-  const [state, setState] =
-    React.useState<
-      "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
-    >("loading");
+  const [state, setState] = React.useState<
+    "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
+  >("loading");
   const [posts, setPosts] = React.useState<HttpTimelinePostInfo[]>([]);
 
   React.useEffect(() => {
@@ -43,8 +42,9 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     onReload.current = props.onReload;
   }, [props.onReload]);
 
-  const onConnectionStateChanged =
-    React.useRef<((state: HubConnectionState) => void) | null>(null);
+  const onConnectionStateChanged = React.useRef<
+    ((state: HubConnectionState) => void) | null
+  >(null);
 
   React.useEffect(() => {
     onConnectionStateChanged.current = props.onConnectionStateChanged ?? null;

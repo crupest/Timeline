@@ -40,10 +40,9 @@ const SettingsPage: React.FC = (_) => {
   const user = useUser();
   const history = useHistory();
 
-  const [dialog, setDialog] =
-    useState<
-      null | "changepassword" | "changeavatar" | "changenickname" | "logout"
-    >(null);
+  const [dialog, setDialog] = useState<
+    null | "changepassword" | "changeavatar" | "changenickname" | "logout"
+  >(null);
 
   const language = i18n.language.slice(0, 2);
 
