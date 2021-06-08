@@ -9,8 +9,9 @@ import TimelineDeleteDialog from "./TimelineDeleteDialog";
 const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
   const { timeline } = props;
 
-  const [dialog, setDialog] =
-    React.useState<"member" | "property" | "delete" | null>(null);
+  const [dialog, setDialog] = React.useState<
+    "member" | "property" | "delete" | null
+  >(null);
 
   return (
     <>
