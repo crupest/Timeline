@@ -31,8 +31,9 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
 
   const [operationMaskVisible, setOperationMaskVisible] =
     React.useState<boolean>(false);
-  const [dialog, setDialog] =
-    React.useState<"delete" | "changeproperty" | null>(null);
+  const [dialog, setDialog] = React.useState<
+    "delete" | "changeproperty" | null
+  >(null);
 
   const cardRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {

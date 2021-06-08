@@ -36,10 +36,9 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
 
   const { t } = useTranslation();
 
-  const [state, setState] =
-    React.useState<"loading" | "done" | "offline" | "notexist" | "error">(
-      "loading"
-    );
+  const [state, setState] = React.useState<
+    "loading" | "done" | "offline" | "notexist" | "error"
+  >("loading");
   const [timeline, setTimeline] = React.useState<HttpTimelineInfo | null>(null);
 
   const [connectionStatus, setConnectionStatus] =
