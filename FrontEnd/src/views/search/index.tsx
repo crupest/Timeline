@@ -16,7 +16,7 @@ import "./index.css";
 const TimelineSearchResultItemView: React.FC<{
   timeline: HttpTimelineInfo;
 }> = ({ timeline }) => {
-  const link = timeline.name.startsWith("src")
+  const link = timeline.name.startsWith("@")
     ? `users/${timeline.owner.username}`
     : `timelines/${timeline.name}`;
 
