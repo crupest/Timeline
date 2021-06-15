@@ -133,18 +133,13 @@
   animation-name: timeline-line-node-loading;
 }
 
-.timeline-item.timeline-post-edit {
-  padding-bottom: 0;
-}
-
-.timeline-top {
-  position: relative;
-  text-align: right;
-}
-
 .timeline-item {
   position: relative;
   padding: 0.5em;
+}
+
+.timeline-item.timeline-post-edit {
+  padding-bottom: 0;
 }
 
 .timeline-item-card {
@@ -267,37 +262,4 @@
   position: absolute;
   right: 10px;
   top: 2px;
-}
-
-.connection-status-badge {
-  font-size: 0.8em;
-  border-radius: 5px;
-  padding: 0.1em 1em;
-  background-color: #eaf2ff;
-}
-.connection-status-badge::before {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-  content: "";
-  margin-right: 0.6em;
-}
-.connection-status-badge.success {
-  color: #006100;
-}
-.connection-status-badge.success::before {
-  background-color: #006100;
-}
-.connection-status-badge.warning {
-  color: #e4a700;
-}
-.connection-status-badge.warning::before {
-  background-color: #e4a700;
-}
-.connection-status-badge.danger {
-  color: #fd1616;
-}
-.connection-status-badge.danger::before {
-  background-color: #fd1616;
 }

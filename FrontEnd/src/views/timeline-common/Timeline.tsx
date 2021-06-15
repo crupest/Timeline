@@ -1,5 +1,6 @@
 import React from "react";
 import { HubConnectionState } from "@microsoft/signalr";
+import classnames from "classnames";
 
 import {
   HttpForbiddenError,
@@ -14,19 +15,22 @@ import {
 
 import { getTimelinePostUpdate$ } from "@/services/timeline";
 
+import useValueWithRef from "@/utilities/useValueWithRef";
+
 import TimelinePagedPostListView from "./TimelinePagedPostListView";
-import TimelineTop from "./TimelineTop";
+import TimelineEmptyItem from "./TimelineEmptyItem";
 import TimelineLoading from "./TimelineLoading";
+import TimelinePostEdit from "./TimelinePostEdit";
 
 import "./index.css";
-import TimelinePostEdit from "./TimelinePostEdit";
 
 export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
-  timelineName?: string;
+  timelineName: string;
   reloadKey: number;
   onReload: () => void;
+  onTimelineLoaded?: (timeline: HttpTimelineInfo) => void;
   onConnectionStateChanged?: (state: HubConnectionState) => void;
 }
 
@@ -45,19 +49,11 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     setPosts([]);
   }, [timelineName]);
 
-  const onReload = React.useRef<() => void>(props.onReload);
-
-  React.useEffect(() => {
-    onReload.current = props.onReload;
-  }, [props.onReload]);
-
-  const onConnectionStateChanged = React.useRef<
-    ((state: HubConnectionState) => void) | null
-  >(null);
-
-  React.useEffect(() => {
-    onConnectionStateChanged.current = props.onConnectionStateChanged ?? null;
-  }, [props.onConnectionStateChanged]);
+  const onReload = useValueWithRef(props.onReload);
+  const onTimelineLoaded = useValueWithRef(props.onTimelineLoaded);
+  const onConnectionStateChanged = useValueWithRef(
+    props.onConnectionStateChanged
+  );
 
   React.useEffect(() => {
     if (timelineName != null && state === "loaded") {
@@ -74,7 +70,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         subscription.unsubscribe();
       };
     }
-  }, [timelineName, state]);
+  }, [timelineName, state, onReload, onConnectionStateChanged]);
 
   React.useEffect(() => {
     if (timelineName != null) {
@@ -90,6 +86,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
             setTimeline(t);
             setPosts(p);
             setState("loaded");
+            onTimelineLoaded.current?.(t);
           }
         },
         (error) => {
@@ -112,7 +109,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         subscribe = false;
       };
     }
-  }, [timelineName, reloadKey]);
+  }, [timelineName, reloadKey, onTimelineLoaded]);
 
   switch (state) {
     case "loading":
@@ -143,8 +140,8 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       );
     default:
       return (
-        <>
-          <TimelineTop height={40} />
+        <div style={style} className={classnames("timeline", className)}>
+          <TimelineEmptyItem height={40} />
           <TimelinePagedPostListView
             posts={posts}
             onReload={onReload.current}
@@ -152,15 +149,9 @@ const Timeline: React.FC<TimelineProps> = (props) => {
           {timeline?.postable ? (
             <TimelinePostEdit timeline={timeline} onPosted={onReload.current} />
           ) : (
-            <TimelineTop
-              lineProps={{
-                startSegmentLength: 20,
-                center: "none",
-                current: true,
-              }}
-            />
+            <TimelineEmptyItem startSegmentLength={20} center="none" current />
           )}
-        </>
+        </div>
       );
   }
 };
