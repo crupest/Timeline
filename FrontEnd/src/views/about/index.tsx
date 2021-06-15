@@ -4,6 +4,8 @@ import { useTranslation, Trans } from "react-i18next";
 import authorAvatarUrl from "./author-avatar.png";
 import githubLogoUrl from "./github.png";
 
+import "./index.css";
+
 const frontendCredits: {
   name: string;
   url: string;

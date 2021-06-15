@@ -4,6 +4,8 @@ import { useParams } from "react-router";
 import TimelinePageTemplate from "../timeline-common/TimelinePageTemplate";
 import UserCard from "./UserCard";
 
+import "./index.css";
+
 const UserPage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
 

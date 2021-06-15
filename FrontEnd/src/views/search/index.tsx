@@ -11,6 +11,8 @@ import { HttpTimelineInfo } from "@/http/timeline";
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
 
+import "./index.css";
+
 const TimelineSearchResultItemView: React.FC<{
   timeline: HttpTimelineInfo;
 }> = ({ timeline }) => {

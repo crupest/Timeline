@@ -8,6 +8,8 @@ import SearchInput from "../common/SearchInput";
 import TimelineListView from "./TimelineListView";
 import WebsiteIntroduction from "./WebsiteIntroduction";
 
+import "./index.css";
+
 const highlightTimelineMessageMap = {
   loading: "home.loadingHighlightTimelines",
   done: "home.loadedHighlightTimelines",

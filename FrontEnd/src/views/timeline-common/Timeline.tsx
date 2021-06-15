@@ -1,5 +1,5 @@
 import React from "react";
-import { HubConnectionState } from "srcmicrosoft/signalr";
+import { HubConnectionState } from "@microsoft/signalr";
 
 import {
   HttpForbiddenError,
@@ -13,6 +13,8 @@ import { getTimelinePostUpdate$ } from "@/services/timeline";
 import TimelinePagedPostListView from "./TimelinePagedPostListView";
 import TimelineTop from "./TimelineTop";
 import TimelineLoading from "./TimelineLoading";
+
+import "./index.css";
 
 export interface TimelineProps {
   className?: string;

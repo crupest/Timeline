@@ -1,0 +1,24 @@
+.change-avatar-cropper-row {
+  max-height: 400px;
+}
+
+.change-avatar-img {
+  min-width: 50%;
+  max-width: 100%;
+  max-height: 400px;
+}
+
+.settings-item {
+  padding: 0.5em 1em;
+  transition: background 0.3s;
+  border-bottom: 1px solid #e9ecef;
+}
+.settings-item.first {
+  border-top: 1px solid #e9ecef;
+}
+.settings-item.clickable {
+  cursor: pointer;
+}
+.settings-item:hover {
+  background: #dee2e6;
+}
