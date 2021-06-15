@@ -22,6 +22,8 @@ import Card from "../common/Card";
 import MarkdownPostEdit from "./MarkdownPostEdit";
 import TimelineLine from "./TimelineLine";
 
+import "./TimelinePostEdit.css";
+
 interface TimelinePostEditTextProps {
   text: string;
   disabled: boolean;
