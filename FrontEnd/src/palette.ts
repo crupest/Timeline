@@ -13,9 +13,9 @@ function darkenBy(color: Color, ratio: number): Color {
 
 export interface PaletteColor {
   color: string;
-  inactive: string;
   lighter: string;
   darker: string;
+  inactive: string;
   [key: string]: string;
 }
 
@@ -39,9 +39,9 @@ export function generatePaletteColor(color: string): PaletteColor {
     color: c.toString(),
     inactive: (c.lightness() > 60
       ? darkenBy(c, 0.1)
-      : lightenBy(c, 0.2)
+      : lightenBy(c, 0.1)
     ).toString(),
-    lighter: lightenBy(c, 0.1).fade(0.1).toString(),
+    lighter: lightenBy(c, 0.1).toString(),
     darker: darkenBy(c, 0.1).toString(),
   };
 }
@@ -89,21 +89,28 @@ export function generatePaletteCSS(palette: Palette): string {
     .join("")}}`;
 }
 
-const paletteSubject: BehaviorSubject<Palette> = new BehaviorSubject<Palette>(
-  generatePalette({ primary: "#007bff" })
-);
+const paletteSubject: BehaviorSubject<Palette | null> =
+  new BehaviorSubject<Palette | null>(null);
 
-export const palette$: Observable<Palette> = paletteSubject.asObservable();
+export const palette$: Observable<Palette | null> =
+  paletteSubject.asObservable();
 
 palette$.subscribe((palette) => {
   const styleTagId = "timeline-palette-css";
-  let styleTag = document.getElementById(styleTagId);
-  if (styleTag == null) {
-    styleTag = document.createElement("style");
-    styleTag.id = styleTagId;
-    document.head.append(styleTag);
+  if (palette != null) {
+    let styleTag = document.getElementById(styleTagId);
+    if (styleTag == null) {
+      styleTag = document.createElement("style");
+      styleTag.id = styleTagId;
+      document.head.append(styleTag);
+    }
+    styleTag.innerHTML = generatePaletteCSS(palette);
+  } else {
+    const styleTag = document.getElementById(styleTagId);
+    if (styleTag != null) {
+      styleTag.parentElement?.removeChild(styleTag);
+    }
   }
-  styleTag.innerHTML = generatePaletteCSS(palette);
 });
 
 export function setPalette(palette: Palette): () => void {
