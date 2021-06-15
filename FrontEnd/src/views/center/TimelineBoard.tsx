@@ -35,7 +35,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
   actions,
 }) => {
   const { name, title } = timeline;
-  const isPersonal = name.startsWith("src");
+  const isPersonal = name.startsWith("@");
   const url = isPersonal
     ? `/users/${timeline.owner.username}`
     : `/timelines/${name}`;

@@ -13,7 +13,7 @@ interface TimelineListItemProps {
 const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
   const url = React.useMemo(
     () =>
-      timeline.name.startsWith("src")
+      timeline.name.startsWith("@")
         ? `/users/${timeline.owner.username}`
         : `/timelines/${timeline.name}`,
     [timeline]
