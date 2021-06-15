@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
@@ -28,8 +27,6 @@ export interface TimelinePostViewProps {
 const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
   const { post, className, style, cardStyle, onChanged, onDeleted } = props;
   const current = props.current === true;
-
-  const { t } = useTranslation();
 
   const [operationMaskVisible, setOperationMaskVisible] =
     React.useState<boolean>(false);
