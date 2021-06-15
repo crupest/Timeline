@@ -27,7 +27,7 @@ const TimelineMemberItem: React.FC<{
         <Col>
           <Row>{user.nickname}</Row>
           <Row>
-            <small>{"src" + user.username}</small>
+            <small>{"@" + user.username}</small>
           </Row>
         </Col>
         {onAction ? (
