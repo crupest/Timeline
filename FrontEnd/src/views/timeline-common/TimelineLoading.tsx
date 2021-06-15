@@ -1,10 +1,10 @@
 import React from "react";
 
-import TimelineTop from "./TimelineTop";
+import TimelineEmptyItem from "./TimelineEmptyItem";
 
 const TimelineLoading: React.FC = () => {
   return (
-    <TimelineTop
+    <TimelineEmptyItem
       className="timeline-top-loading-enter"
       height={100}
       lineProps={{

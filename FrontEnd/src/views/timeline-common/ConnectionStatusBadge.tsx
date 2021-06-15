@@ -3,6 +3,8 @@ import classnames from "classnames";
 import { HubConnectionState } from "@microsoft/signalr";
 import { useTranslation } from "react-i18next";
 
+import "./ConnectionStatusBadge.css";
+
 export interface ConnectionStatusBadgeProps {
   status: HubConnectionState;
   className?: string;

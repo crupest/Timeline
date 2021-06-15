@@ -53,7 +53,7 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
   }, [posts]);
 
   return (
-    <div style={style} className={classnames("timeline", className)}>
+    <>
       {groupedPosts.map((group) => {
         return (
           <Fragment key={group.date.toDateString()}>
@@ -71,7 +71,7 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
           </Fragment>
         );
       })}
-    </div>
+    </>
   );
 };
 
