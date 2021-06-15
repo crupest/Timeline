@@ -196,7 +196,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   return (
     <div
-      className={classnames("timeline-item current", className)}
+      className={classnames("timeline-item timeline-post-edit", className)}
       style={style}
     >
       <TimelineLine center="node" current />
