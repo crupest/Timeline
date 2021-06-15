@@ -1,9 +1,9 @@
-import { TimelineVisibility } from "http/timeline";
+import { TimelineVisibility } from "@/http/timeline";
 import XRegExp from "xregexp";
 import { Observable } from "rxjs";
 import { HubConnectionBuilder, HubConnectionState } from "@microsoft/signalr";
 
-import { getHttpToken } from "http/common";
+import { getHttpToken } from "@/http/common";
 
 const timelineNameReg = XRegExp("^[-_\\p{L}]*$", "u");
 

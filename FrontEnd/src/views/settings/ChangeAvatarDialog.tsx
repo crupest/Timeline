@@ -7,7 +7,7 @@ import { UiLogicError } from "@/common";
 
 import { useUserLoggedIn } from "@/services/user";
 
-import { getHttpUserClient } from "http/user";
+import { getHttpUserClient } from "@/http/user";
 
 import ImageCropper, { Clip, applyClipToImage } from "../common/ImageCropper";
 

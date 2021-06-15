@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import classnames from "classnames";
 
-import { HttpTimelinePostInfo } from "http/timeline";
+import { HttpTimelinePostInfo } from "@/http/timeline";
 
 import TimelinePostView from "./TimelinePostView";
 import TimelineDateLabel from "./TimelineDateLabel";

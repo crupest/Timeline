@@ -4,8 +4,8 @@ import { Remarkable } from "remarkable";
 
 import { UiLogicError } from "@/common";
 
-import { HttpNetworkError } from "http/common";
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "http/timeline";
+import { HttpNetworkError } from "@/http/common";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import { useUser } from "@/services/user";
 

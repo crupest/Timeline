@@ -2,8 +2,8 @@ import React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 
-import { getHttpHighlightClient } from "http/highlight";
-import { getHttpBookmarkClient } from "http/bookmark";
+import { getHttpHighlightClient } from "@/http/highlight";
+import { getHttpBookmarkClient } from "@/http/bookmark";
 
 import { useUser } from "@/services/user";
 import { pushAlert } from "@/services/alert";

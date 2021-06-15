@@ -3,7 +3,7 @@ import classnames from "classnames";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "http/timeline";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import { pushAlert } from "@/services/alert";
 

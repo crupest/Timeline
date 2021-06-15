@@ -4,12 +4,12 @@ import { Container, ListGroup, Modal, Row, Col, Button } from "react-bootstrap";
 
 import { convertI18nText, I18nText } from "@/common";
 
-import { HttpUser } from "http/user";
-import { getHttpSearchClient } from "http/search";
+import { HttpUser } from "@/http/user";
+import { getHttpSearchClient } from "@/http/search";
 
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
-import { getHttpTimelineClient, HttpTimelineInfo } from "http/timeline";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 const TimelineMemberItem: React.FC<{
   user: HttpUser;
@@ -27,7 +27,7 @@ const TimelineMemberItem: React.FC<{
         <Col>
           <Row>{user.nickname}</Row>
           <Row>
-            <small>{"@" + user.username}</small>
+            <small>{"src" + user.username}</small>
           </Row>
         </Col>
         {onAction ? (

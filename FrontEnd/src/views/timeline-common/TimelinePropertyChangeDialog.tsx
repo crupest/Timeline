@@ -6,7 +6,7 @@ import {
   HttpTimelinePatchRequest,
   kTimelineVisibilities,
   TimelineVisibility,
-} from "http/timeline";
+} from "@/http/timeline";
 
 import OperationDialog from "../common/OperationDialog";
 

@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Container } from "react-bootstrap";
 import { HubConnectionState } from "@microsoft/signalr";
 
-import { HttpNetworkError, HttpNotFoundError } from "http/common";
-import { getHttpTimelineClient, HttpTimelineInfo } from "http/timeline";
+import { HttpNetworkError, HttpNotFoundError } from "@/http/common";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 import { getAlertHost } from "@/services/alert";
 

@@ -3,12 +3,12 @@ import { BehaviorSubject, Observable } from "rxjs";
 
 import { UiLogicError } from "@/common";
 
-import { HttpNetworkError, setHttpToken } from "http/common";
+import { HttpNetworkError, setHttpToken } from "@/http/common";
 import {
   getHttpTokenClient,
   HttpCreateTokenBadCredentialError,
-} from "http/token";
-import { getHttpUserClient, HttpUser, UserPermission } from "http/user";
+} from "@/http/token";
+import { getHttpUserClient, HttpUser, UserPermission } from "@/http/user";
 
 import { pushAlert } from "./alert";
 

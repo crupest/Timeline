@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "react-bootstrap";
 
-import { HttpTimelineInfo } from "http/timeline";
+import { HttpTimelineInfo } from "@/http/timeline";
 
 import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
@@ -34,7 +34,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
   actions,
 }) => {
   const { name, title } = timeline;
-  const isPersonal = name.startsWith("@");
+  const isPersonal = name.startsWith("src");
   const url = isPersonal
     ? `/users/${timeline.owner.username}`
     : `/timelines/${name}`;

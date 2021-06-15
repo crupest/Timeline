@@ -2,7 +2,7 @@ import React from "react";
 import { useHistory } from "react-router";
 import { Trans } from "react-i18next";
 
-import { getHttpTimelineClient, HttpTimelineInfo } from "http/timeline";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 import OperationDialog from "../common/OperationDialog";
 

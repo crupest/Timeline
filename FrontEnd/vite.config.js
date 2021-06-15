@@ -7,6 +7,9 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [reactRefresh()],
+  resolve: {
+    alias: [{ find: "@", replacement: "/src" }],
+  },
   server: {
     port: 13000,
     proxy: {

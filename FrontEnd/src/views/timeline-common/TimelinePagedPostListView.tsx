@@ -1,6 +1,6 @@
 import React from "react";
 
-import { HttpTimelinePostInfo } from "http/timeline";
+import { HttpTimelinePostInfo } from "@/http/timeline";
 
 import useScrollToTop from "@/utilities/useScrollToTop";
 

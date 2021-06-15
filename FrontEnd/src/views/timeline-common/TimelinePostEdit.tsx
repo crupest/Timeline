@@ -10,10 +10,10 @@ import {
   HttpTimelineInfo,
   HttpTimelinePostInfo,
   HttpTimelinePostPostRequestData,
-} from "http/timeline";
+} from "@/http/timeline";
 
 import { pushAlert } from "@/services/alert";
-import { base64 } from "http/common";
+import { base64 } from "@/http/common";
 
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/LoadingButton";
@@ -138,7 +138,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
     (kind === "text" && text.length !== 0) ||
     (kind === "image" && image != null);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  // eslint-disable-next-line srctypescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
 
   const notifyHeightChange = (): void => {

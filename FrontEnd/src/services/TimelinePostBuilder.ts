@@ -2,8 +2,8 @@ import { Remarkable } from "remarkable";
 
 import { UiLogicError } from "@/common";
 
-import { base64 } from "http/common";
-import { HttpTimelinePostPostRequest } from "http/timeline";
+import { base64 } from "@/http/common";
+import { HttpTimelinePostPostRequest } from "@/http/timeline";
 
 export default class TimelinePostBuilder {
   private _onChange: () => void;

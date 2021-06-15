@@ -2,7 +2,7 @@ import React from "react";
 
 import { convertI18nText, I18nText } from "@/common";
 
-import { HttpTimelineInfo } from "http/timeline";
+import { HttpTimelineInfo } from "@/http/timeline";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -13,7 +13,7 @@ interface TimelineListItemProps {
 const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
   const url = React.useMemo(
     () =>
-      timeline.name.startsWith("@")
+      timeline.name.startsWith("src")
         ? `/users/${timeline.owner.username}`
         : `/timelines/${timeline.name}`,
     [timeline]

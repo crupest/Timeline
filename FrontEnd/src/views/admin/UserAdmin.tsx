@@ -12,7 +12,7 @@ import {
   HttpUser,
   kUserPermissionList,
   UserPermission,
-} from "http/user";
+} from "@/http/user";
 import { Trans, useTranslation } from "react-i18next";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
