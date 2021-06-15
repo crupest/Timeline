@@ -81,59 +81,6 @@ textarea {
   color: #ffc107;
 }
 
-.text-button {
-  background: transparent;
-  border: none;
-}
-.text-button.primary {
-  color: #0d6efd;
-}
-.text-button.primary:hover {
-  color: #599bfe;
-}
-.text-button.secondary {
-  color: #6c757d;
-}
-.text-button.secondary:hover {
-  color: #939ba2;
-}
-.text-button.success {
-  color: #198754;
-}
-.text-button.success:hover {
-  color: #25c87c;
-}
-.text-button.info {
-  color: #0dcaf0;
-}
-.text-button.info:hover {
-  color: #54dbf6;
-}
-.text-button.warning {
-  color: #ffc107;
-}
-.text-button.warning:hover {
-  color: #ffd454;
-}
-.text-button.danger {
-  color: #dc3545;
-}
-.text-button.danger:hover {
-  color: #e77681;
-}
-.text-button.light {
-  color: #f8f9fa;
-}
-.text-button.light:hover {
-  color: white;
-}
-.text-button.dark {
-  color: #212529;
-}
-.text-button.dark:hover {
-  color: #434b53;
-}
-
 .touch-action-none {
   touch-action: none;
 }
