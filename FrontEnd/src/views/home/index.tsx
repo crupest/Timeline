@@ -1,8 +1,8 @@
 import React from "react";
 import { useHistory } from "react-router";
 
-import { HttpTimelineInfo } from "http/timeline";
-import { getHttpHighlightClient } from "http/highlight";
+import { HttpTimelineInfo } from "@/http/timeline";
+import { getHttpHighlightClient } from "@/http/highlight";
 
 import SearchInput from "../common/SearchInput";
 import TimelineListView from "./TimelineListView";

@@ -14,7 +14,7 @@ const UserPage: React.FC = () => {
   return (
     <>
       <TimelinePageTemplate
-        timelineName={`@${username}`}
+        timelineName={`src${username}`}
         notFoundI18nKey="timeline.userNotExist"
         reloadKey={reloadKey}
         onReload={() => setReloadKey(reloadKey + 1)}

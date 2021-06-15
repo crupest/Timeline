@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 import { pushAlert } from "@/services/alert";
 import { useUserLoggedIn } from "@/services/user";
 
-import { getHttpTimelineClient } from "http/timeline";
-import { getHttpBookmarkClient } from "http/bookmark";
-import { getHttpHighlightClient } from "http/highlight";
+import { getHttpTimelineClient } from "@/http/timeline";
+import { getHttpBookmarkClient } from "@/http/bookmark";
+import { getHttpHighlightClient } from "@/http/highlight";
 
 import TimelineBoard from "./TimelineBoard";
 

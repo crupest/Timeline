@@ -1,12 +1,12 @@
 import React from "react";
-import { HubConnectionState } from "@microsoft/signalr";
+import { HubConnectionState } from "srcmicrosoft/signalr";
 
 import {
   HttpForbiddenError,
   HttpNetworkError,
   HttpNotFoundError,
-} from "http/common";
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "http/timeline";
+} from "@/http/common";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import { getTimelinePostUpdate$ } from "@/services/timeline";
 

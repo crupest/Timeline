@@ -3,7 +3,7 @@ import { useHistory } from "react-router";
 
 import { validateTimelineName } from "@/services/timeline";
 import OperationDialog from "../common/OperationDialog";
-import { getHttpTimelineClient, HttpTimelineInfo } from "http/timeline";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 interface TimelineCreateDialogProps {
   open: boolean;

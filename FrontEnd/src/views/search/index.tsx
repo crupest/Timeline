@@ -4,9 +4,9 @@ import { Container, Row } from "react-bootstrap";
 import { useHistory, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 
-import { HttpNetworkError } from "http/common";
-import { getHttpSearchClient } from "http/search";
-import { HttpTimelineInfo } from "http/timeline";
+import { HttpNetworkError } from "@/http/common";
+import { getHttpSearchClient } from "@/http/search";
+import { HttpTimelineInfo } from "@/http/timeline";
 
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
@@ -14,7 +14,7 @@ import UserAvatar from "../common/user/UserAvatar";
 const TimelineSearchResultItemView: React.FC<{
   timeline: HttpTimelineInfo;
 }> = ({ timeline }) => {
-  const link = timeline.name.startsWith("@")
+  const link = timeline.name.startsWith("src")
     ? `users/${timeline.owner.username}`
     : `timelines/${timeline.name}`;
 
@@ -33,7 +33,7 @@ const TimelineSearchResultItemView: React.FC<{
         />
         {timeline.owner.nickname}
         <small className="ms-3 text-secondary">
-          @{timeline.owner.username}
+          src{timeline.owner.username}
         </small>
       </div>
     </div>

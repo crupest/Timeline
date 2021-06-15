@@ -1,6 +1,6 @@
 import React from "react";
 
-import { getHttpUserClient } from "http/user";
+import { getHttpUserClient } from "@/http/user";
 
 export interface UserAvatarProps
   extends React.ImgHTMLAttributes<HTMLImageElement> {

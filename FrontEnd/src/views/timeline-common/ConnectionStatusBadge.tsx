@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-import { HubConnectionState } from "@microsoft/signalr";
+import { HubConnectionState } from "srcmicrosoft/signalr";
 import { useTranslation } from "react-i18next";
 
 export interface ConnectionStatusBadgeProps {

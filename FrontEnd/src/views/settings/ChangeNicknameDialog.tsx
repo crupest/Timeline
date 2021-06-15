@@ -1,4 +1,4 @@
-import { getHttpUserClient } from "http/user";
+import { getHttpUserClient } from "@/http/user";
 import { useUserLoggedIn } from "@/services/user";
 import React from "react";
 

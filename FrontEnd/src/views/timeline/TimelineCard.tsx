@@ -29,7 +29,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
               />
               {timeline.owner.nickname}
               <small className="ms-3 text-secondary">
-                @{timeline.owner.username}
+                src{timeline.owner.username}
               </small>
             </div>
           </>

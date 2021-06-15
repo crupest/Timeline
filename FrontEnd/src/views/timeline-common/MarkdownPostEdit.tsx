@@ -4,7 +4,7 @@ import { Form, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Prompt } from "react-router";
 
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "http/timeline";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import FlatButton from "../common/FlatButton";
 import TabPages from "../common/TabPages";
