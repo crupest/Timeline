@@ -47,6 +47,10 @@ small {
   font-size: 1.6rem;
 }
 
+.icon-button.primary-enhance {
+  color: var(--tl-primary-enhance-color)
+}
+
 .cursor-pointer {
   cursor: pointer;
 }

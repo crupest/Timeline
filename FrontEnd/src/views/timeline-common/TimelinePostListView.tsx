@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-import classnames from "classnames";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
 
@@ -15,14 +14,12 @@ function dateEqual(left: Date, right: Date): boolean {
 }
 
 export interface TimelinePostListViewProps {
-  className?: string;
-  style?: React.CSSProperties;
   posts: HttpTimelinePostInfo[];
   onReload: () => void;
 }
 
 const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
-  const { className, style, posts, onReload } = props;
+  const { posts, onReload } = props;
 
   const groupedPosts = React.useMemo<
     {
