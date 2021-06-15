@@ -3,10 +3,21 @@
  */
 
 import reactRefresh from "@vitejs/plugin-react-refresh";
+import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [reactRefresh()],
+  plugins: [
+    reactRefresh(),
+    VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
+      base: "/",
+      manifest: false,
+      includeAssets: "**",
+    }),
+  ],
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
   },

@@ -13,6 +13,7 @@ import "./index.css";
 
 import "./i18n";
 import "./palette";
+import "./service-worker";
 
 import App from "./App";
 
