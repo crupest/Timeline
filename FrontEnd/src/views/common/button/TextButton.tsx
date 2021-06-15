@@ -5,9 +5,9 @@ import classNames from "classnames";
 import { convertI18nText, I18nText } from "@/common";
 import { PaletteColorType } from "@/palette";
 
-import "./FlatButton.css";
+import "./TextButton.css";
 
-function _FlatButton(
+function _TextButton(
   {
     text,
     color,
@@ -24,7 +24,7 @@ function _FlatButton(
   return (
     <button
       ref={ref}
-      className={classNames("cru-flat-button", color ?? "primary")}
+      className={classNames("cru-text-button", color ?? "primary")}
       onClick={onClick}
     >
       {convertI18nText(text, t)}
@@ -32,5 +32,5 @@ function _FlatButton(
   );
 }
 
-const FlatButton = React.forwardRef(_FlatButton);
-export default FlatButton;
+const TextButton = React.forwardRef(_TextButton);
+export default TextButton;

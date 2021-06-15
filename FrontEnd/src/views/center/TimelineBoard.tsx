@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { Spinner } from "react-bootstrap";
 
 import { HttpTimelineInfo } from "@/http/timeline";
@@ -219,8 +218,6 @@ interface TimelineBoardUIProps {
 
 const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
   const { title, timelines, className, editHandler } = props;
-
-  const { t } = useTranslation();
 
   const editable = editHandler != null;
 

@@ -19,18 +19,19 @@ export interface PaletteColor {
   [key: string]: string;
 }
 
-export interface Palette {
-  primary: PaletteColor;
-  primaryEnhance: PaletteColor;
-  secondary: PaletteColor;
-  textPrimary: PaletteColor;
-  textOnPrimary: PaletteColor;
-  danger: PaletteColor;
-  success: PaletteColor;
-  [key: string]: PaletteColor;
-}
+const paletteColorList = [
+  "primary",
+  "primary-enhance",
+  "secondary",
+  "text-primary",
+  "text-on-primary",
+  "danger",
+  "success",
+] as const;
 
-export type PaletteColorType = keyof Palette;
+export type PaletteColorType = typeof paletteColorList[number];
+
+export type Palette = Record<PaletteColorType, PaletteColor>;
 
 export function generatePaletteColor(color: string): PaletteColor {
   const c = Color(color);
@@ -60,26 +61,24 @@ export function generatePalette(options: {
 
   return {
     primary: generatePaletteColor(p.toString()),
-    primaryEnhance: generatePaletteColor(pe.toString()),
+    "primary-enhance": generatePaletteColor(pe.toString()),
     secondary: generatePaletteColor(s.toString()),
-    textPrimary: generatePaletteColor("#111111"),
-    textOnPrimary: generatePaletteColor(p.lightness() > 60 ? "black" : "white"),
+    "text-primary": generatePaletteColor("#111111"),
+    "text-on-primary": generatePaletteColor(
+      p.lightness() > 60 ? "black" : "white"
+    ),
     danger: generatePaletteColor("red"),
     success: generatePaletteColor("green"),
   };
 }
 
 export function generatePaletteCSS(palette: Palette): string {
-  function toSnakeCase(s: string): string {
-    return s.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-  }
-
   const colors: [string, string][] = [];
-  for (const paletteColorName in palette) {
-    const paletteColor = palette[paletteColorName];
+  for (const colorType of paletteColorList) {
+    const paletteColor = palette[colorType];
     for (const variant in paletteColor) {
-      let key = `--tl-${toSnakeCase(paletteColorName)}`;
-      if (variant !== "color") key += `-${toSnakeCase(variant)}`;
+      let key = `--tl-${colorType}`;
+      if (variant !== "color") key += `-${variant}`;
       key += "-color";
       colors.push([key, paletteColor[variant]]);
     }

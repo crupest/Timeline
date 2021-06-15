@@ -14,6 +14,7 @@ import {
   UserPermission,
 } from "@/http/user";
 import { Trans, useTranslation } from "react-i18next";
+import TextButton from "../common/button/TextButton";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
@@ -230,15 +231,16 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
         className={classnames("edit-mask", !editMaskVisible && "d-none")}
         onClick={() => setEditMaskVisible(false)}
       >
-        <button className="text-button primary" onClick={on[kModify]}>
-          {t("admin:user.modify")}
-        </button>
-        <button className="text-button primary" onClick={on[kModifyPermission]}>
-          {t("admin:user.modifyPermissions")}
-        </button>
-        <button className="text-button danger" onClick={on[kDelete]}>
-          {t("admin:user.delete")}
-        </button>
+        <TextButton text="admin:user.modify" onClick={on[kModify]} />
+        <TextButton
+          text="admin:user.modifyPermissions"
+          onClick={on[kModifyPermission]}
+        />
+        <TextButton
+          text="admin:user.delete"
+          color="danger"
+          onClick={on[kDelete]}
+        />
       </div>
     </ListGroup.Item>
   );
