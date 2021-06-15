@@ -166,10 +166,6 @@ namespace Timeline
             {
                 app.UseSpa(spa =>
                 {
-                    if (_frontEndMode == FrontEndMode.Proxy)
-                    {
-                        spa.UseProxyToSpaDevelopmentServer(new UriBuilder("http", "localhost", 3000).Uri);
-                    }
                 });
             }
         }
