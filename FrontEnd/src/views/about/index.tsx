@@ -4,6 +4,8 @@ import { useTranslation, Trans } from "react-i18next";
 import authorAvatarUrl from "./author-avatar.png";
 import githubLogoUrl from "./github.png";
 
+import Card from "../common/Card";
+
 import "./index.css";
 
 const frontendCredits: {
@@ -68,7 +70,7 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="px-2 mb-4">
-      <div className="container mt-4 py-3 cru-card">
+      <Card className="container mt-4 py-3">
         <h4 id="author-info">{t("about.author.title")}</h4>
         <div>
           <div className="d-flex">
@@ -102,8 +104,8 @@ const AboutPage: React.FC = () => {
             </a>
           </p>
         </div>
-      </div>
-      <div className="container mt-4 py-3 cru-card">
+      </Card>
+      <Card className="container mt-4 py-3">
         <h4>{t("about.site.title")}</h4>
         <p>
           <Trans i18nKey="about.site.content">
@@ -120,8 +122,8 @@ const AboutPage: React.FC = () => {
             {t("about.site.repo")}
           </a>
         </p>
-      </div>
-      <div className="container mt-4 py-3 cru-card">
+      </Card>
+      <Card className="container mt-4 py-3">
         <h4>{t("about.credits.title")}</h4>
         <p>{t("about.credits.content")}</p>
         <p>{t("about.credits.frontend")}</p>
@@ -150,7 +152,7 @@ const AboutPage: React.FC = () => {
           })}
           <li>...</li>
         </ul>
-      </div>
+      </Card>
     </div>
   );
 };

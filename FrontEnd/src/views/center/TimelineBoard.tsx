@@ -9,6 +9,7 @@ import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
 import LoadFailReload from "../common/LoadFailReload";
 import FlatButton from "../common/button/FlatButton";
+import Card from "../common/Card";
 
 interface TimelineBoardItemProps {
   timeline: HttpTimelineInfo;
@@ -224,7 +225,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
   const [editing, setEditing] = React.useState<boolean>(false);
 
   return (
-    <div className={classnames("timeline-board", className)}>
+    <Card className={classnames("timeline-board", className)}>
       <div className="timeline-board-header">
         {title != null && <h3>{title}</h3>}
         {editable &&
@@ -280,7 +281,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
           );
         }
       })()}
-    </div>
+    </Card>
   );
 };
 

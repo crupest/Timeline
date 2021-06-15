@@ -8,6 +8,7 @@ import { useUser, userService } from "@/services/user";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
+import Card from "../common/Card";
 
 import "./index.css";
 
@@ -52,7 +53,7 @@ const SettingsPage: React.FC = (_) => {
     <>
       <Container>
         {user ? (
-          <div className="cru-card my-3 py-3">
+          <Card className="my-3 py-3">
             <h3 className="px-3 mb-3 text-primary">
               {t("settings.subheaders.account")}
             </h3>
@@ -82,9 +83,9 @@ const SettingsPage: React.FC = (_) => {
             >
               {t("settings.logout")}
             </div>
-          </div>
+          </Card>
         ) : null}
-        <div className="cru-card my-3 py-3">
+        <Card className="my-3 py-3">
           <h3 className="px-3 mb-3 text-primary">
             {t("settings.subheaders.customization")}
           </h3>
@@ -108,7 +109,7 @@ const SettingsPage: React.FC = (_) => {
               </Form.Control>
             </Col>
           </Row>
-        </div>
+        </Card>
       </Container>
       {(() => {
         switch (dialog) {
