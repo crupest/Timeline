@@ -152,6 +152,11 @@
   opacity: 0;
 }
 
+.timeline-post-edit .timeline-item-card {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 .timeline-post-edit {
   position: sticky;
   bottom: 0;
