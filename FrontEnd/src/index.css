@@ -39,8 +39,6 @@ small {
   font-size: 1.6rem;
 }
 
-
-
 .cursor-pointer {
   cursor: pointer;
 }
@@ -52,7 +50,6 @@ textarea {
 .white-space-no-wrap {
   white-space: nowrap;
 }
-
 
 .full-viewport-center-child {
   position: fixed;
