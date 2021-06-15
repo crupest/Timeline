@@ -12,10 +12,14 @@ function _TextButton(
     text,
     color,
     onClick,
+    className,
+    style,
   }: {
     text: I18nText;
     color?: PaletteColorType;
     onClick?: () => void;
+    className?: string;
+    style?: React.CSSProperties;
   },
   ref: React.ForwardedRef<HTMLButtonElement>
 ): React.ReactElement | null {
@@ -24,8 +28,9 @@ function _TextButton(
   return (
     <button
       ref={ref}
-      className={classNames("cru-text-button", color ?? "primary")}
+      className={classNames("cru-text-button", color ?? "primary", className)}
       onClick={onClick}
+      style={style}
     >
       {convertI18nText(text, t)}
     </button>

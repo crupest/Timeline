@@ -6,7 +6,7 @@ import { Prompt } from "react-router";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
-import FlatButton from "../common/FlatButton";
+import FlatButton from "../common/button/FlatButton";
 import TabPages from "../common/TabPages";
 import TimelinePostBuilder from "@/services/TimelinePostBuilder";
 import ConfirmDialog from "../common/ConfirmDialog";
@@ -106,8 +106,9 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
           ) : (
             <>
               <FlatButton
+                text="operationDialog.cancel"
                 className="me-2"
-                variant="danger"
+                color="danger"
                 onClick={() => {
                   if (canLeave) {
                     onClose();
@@ -115,12 +116,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                     setShowLeaveConfirmDialog(true);
                   }
                 }}
-              >
-                {t("operationDialog.cancel")}
-              </FlatButton>
-              <FlatButton onClick={send} disabled={!canSend}>
-                {t("timeline.send")}
-              </FlatButton>
+              />
+              {canSend && <FlatButton text="timeline.send" onClick={send} />}
             </>
           )
         }
