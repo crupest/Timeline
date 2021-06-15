@@ -1,0 +1,19 @@
+.admin-user-item {
+  position: relative;
+}
+.admin-user-item .edit-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: #ffffffc5;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.admin-user-item .edit-mask button {
+  margin: 0.5em 2em;
+}

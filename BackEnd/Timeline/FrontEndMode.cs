@@ -4,7 +4,6 @@
     {
         Disable,
         Mock,
-        Proxy,
         Normal
     }
 }
