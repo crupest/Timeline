@@ -150,7 +150,6 @@
 .timeline-item-card {
   position: relative;
   padding: 0.3em 0.5em 1em 4em;
-  transition: background 0.5s, padding-left 0.5s;
   animation: 0.6s forwards;
   opacity: 0;
 }
