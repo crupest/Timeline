@@ -7,10 +7,8 @@ const TimelineLoading: React.FC = () => {
     <TimelineEmptyItem
       className="timeline-top-loading-enter"
       height={100}
-      lineProps={{
-        center: "loading",
-        startSegmentLength: 56,
-      }}
+      center="loading"
+      startSegmentLength={56}
     />
   );
 };
