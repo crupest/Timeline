@@ -53,16 +53,6 @@ textarea {
   white-space: nowrap;
 }
 
-.cru-card {
-  border: 1px solid;
-  border-color: #e9ecef;
-  background: #f8f9fa;
-  transition: all 0.3s;
-}
-
-.cru-card:hover {
-  border-color: var(--tl-primary-color);
-}
 
 .full-viewport-center-child {
   position: fixed;

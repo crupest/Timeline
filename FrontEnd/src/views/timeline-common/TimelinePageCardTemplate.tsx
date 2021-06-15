@@ -19,6 +19,7 @@ import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import ConnectionStatusBadge from "./ConnectionStatusBadge";
 import { MenuItems, PopupMenu } from "../common/Menu";
 import FullPage from "../common/FullPage";
+import Card from "../common/Card";
 
 export interface TimelineCardTemplateProps extends TimelinePageCardProps {
   infoArea: React.ReactElement;
@@ -110,8 +111,8 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
 
   return (
     <>
-      <div
-        className={classnames("cru-card p-2 clearfix", className)}
+      <Card
+        className={classnames("p-2 clearfix", className)}
         style={{ zIndex: collapse ? 1029 : 1031 }}
       >
         <div className="float-end d-flex align-items-center">
@@ -129,7 +130,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
         ) : (
           <div style={{ display: collapse ? "none" : "block" }}>{content}</div>
         )}
-      </div>
+      </Card>
       {(() => {
         if (dialog === "member") {
           return (
