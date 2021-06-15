@@ -1,0 +1,15 @@
+.timeline-search-result-item {
+  border: 1px solid;
+  border-color: #e9ecef;
+  background: #f8f9fa;
+  transition: all 0.3s;
+}
+.timeline-search-result-item:hover {
+  border-color: #0d6efd;
+}
+
+.timeline-search-result-item-avatar {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+}

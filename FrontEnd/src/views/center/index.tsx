@@ -9,6 +9,8 @@ import SearchInput from "../common/SearchInput";
 import CenterBoards from "./CenterBoards";
 import TimelineCreateDialog from "./TimelineCreateDialog";
 
+import "./index.css";
+
 const HomePage: React.FC = () => {
   const history = useHistory();
 

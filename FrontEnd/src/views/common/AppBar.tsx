@@ -9,6 +9,8 @@ import { useUser } from "@/services/user";
 import TimelineLogo from "./TimelineLogo";
 import UserAvatar from "./user/UserAvatar";
 
+import "./index.css";
+
 const AppBar: React.FC = (_) => {
   const { t } = useTranslation();
 

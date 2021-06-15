@@ -9,6 +9,8 @@ import AdminNav from "./AdminNav";
 import UserAdmin from "./UserAdmin";
 import MoreAdmin from "./MoreAdmin";
 
+import "./index.css";
+
 interface AdminProps {
   user: AuthUser;
 }

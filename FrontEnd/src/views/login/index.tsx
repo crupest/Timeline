@@ -8,6 +8,8 @@ import { useUser, userService } from "@/services/user";
 import AppBar from "../common/AppBar";
 import LoadingButton from "../common/LoadingButton";
 
+import "./index.css";
+
 const LoginPage: React.FC = (_) => {
   const { t } = useTranslation();
   const history = useHistory();

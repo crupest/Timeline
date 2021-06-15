@@ -9,6 +9,8 @@ import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
+import "./index.css";
+
 const ConfirmLogoutDialog: React.FC<{
   onClose: () => void;
   onConfirm: () => void;

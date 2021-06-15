@@ -9,6 +9,7 @@ import { HttpTimelineInfo } from "@/http/timeline";
 import TimelineLogo from "../common/TimelineLogo";
 import UserTimelineLogo from "../common/UserTimelineLogo";
 import LoadFailReload from "../common/LoadFailReload";
+import FlatButton from "../common/button/FlatButton";
 
 interface TimelineBoardItemProps {
   timeline: HttpTimelineInfo;
@@ -231,23 +232,19 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
         {title != null && <h3>{title}</h3>}
         {editable &&
           (editing ? (
-            <div
-              className="flat-button text-primary"
+            <FlatButton
+              text="done"
               onClick={() => {
                 setEditing(false);
               }}
-            >
-              {t("done")}
-            </div>
+            />
           ) : (
-            <div
-              className="flat-button text-primary"
+            <FlatButton
+              text="edit"
               onClick={() => {
                 setEditing(true);
               }}
-            >
-              {t("edit")}
-            </div>
+            />
           ))}
       </div>
       {(() => {

@@ -30,6 +30,8 @@ export interface Palette {
   [key: string]: PaletteColor;
 }
 
+export type PaletteColorType = keyof Palette;
+
 export function generatePaletteColor(color: string): PaletteColor {
   const c = Color(color);
   return {

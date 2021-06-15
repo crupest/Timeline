@@ -1,0 +1,155 @@
+.tl-color-primary {
+  color: var(--tl-primary-color);
+}
+
+.tl-color-danger {
+  color: var(--tl-danger-color);
+}
+
+small {
+  line-height: 1.2;
+}
+
+.flex-fix-length {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+}
+
+.avatar.large {
+  width: 100px;
+  height: 100px;
+}
+
+.avatar.small {
+  width: 40px;
+  height: 40px;
+}
+
+.icon-button {
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.icon-button.large {
+  font-size: 1.6rem;
+}
+
+
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+textarea {
+  resize: none;
+}
+
+.white-space-no-wrap {
+  white-space: nowrap;
+}
+
+.cru-card {
+  border: 1px solid;
+  border-color: #e9ecef;
+  background: #f8f9fa;
+  transition: all 0.3s;
+}
+
+.cru-card:hover {
+  border-color: var(--tl-primary-color);
+}
+
+.full-viewport-center-child {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-orange {
+  color: #fd7e14;
+}
+
+.text-yellow {
+  color: #ffc107;
+}
+
+.text-button {
+  background: transparent;
+  border: none;
+}
+.text-button.primary {
+  color: #0d6efd;
+}
+.text-button.primary:hover {
+  color: #599bfe;
+}
+.text-button.secondary {
+  color: #6c757d;
+}
+.text-button.secondary:hover {
+  color: #939ba2;
+}
+.text-button.success {
+  color: #198754;
+}
+.text-button.success:hover {
+  color: #25c87c;
+}
+.text-button.info {
+  color: #0dcaf0;
+}
+.text-button.info:hover {
+  color: #54dbf6;
+}
+.text-button.warning {
+  color: #ffc107;
+}
+.text-button.warning:hover {
+  color: #ffd454;
+}
+.text-button.danger {
+  color: #dc3545;
+}
+.text-button.danger:hover {
+  color: #e77681;
+}
+.text-button.light {
+  color: #f8f9fa;
+}
+.text-button.light:hover {
+  color: white;
+}
+.text-button.dark {
+  color: #212529;
+}
+.text-button.dark:hover {
+  color: #434b53;
+}
+
+.touch-action-none {
+  touch-action: none;
+}
+
+i {
+  line-height: 1;
+}
+
+.markdown-container {
+  white-space: initial;
+}
+.markdown-container img {
+  max-height: 200px;
+  max-width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
