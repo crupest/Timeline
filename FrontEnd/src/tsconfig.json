@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "target": "ES6",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -12,10 +11,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react",
+    "types": ["vite/client"],
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["app/*"]
-    }
-  }
+      "@/*": ["*"]
+    },
+    "lib": ["dom", "dom.iterable", "esnext"]
+  },
+  "include": ["."]
 }
