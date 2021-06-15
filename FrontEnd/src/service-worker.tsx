@@ -4,7 +4,7 @@ import { Button } from "react-bootstrap";
 
 import { pushAlert } from "./services/alert";
 
-if ("serviceWorker" in navigator) {
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
   let isThisTriggerUpgrade = false;
 
   const upgradeSuccessLocalStorageKey = "TIMELINE_UPGRADE_SUCCESS";

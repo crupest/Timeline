@@ -63,7 +63,6 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
                 <TimelinePostView
                   key={post.id}
                   post={post}
-                  current={posts.length - 1 === post.index}
                   onChanged={onReload}
                   onDeleted={onReload}
                 />

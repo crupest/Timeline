@@ -1,3 +1,11 @@
+:root {
+  --tl-background-color: #f8f9fa;
+}
+
+body {
+  background: var(--tl-background-color);
+}
+
 .tl-color-primary {
   color: var(--tl-primary-color);
 }
