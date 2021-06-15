@@ -149,8 +149,16 @@ const Timeline: React.FC<TimelineProps> = (props) => {
             posts={posts}
             onReload={onReload.current}
           />
-          {timeline?.postable && (
+          {timeline?.postable ? (
             <TimelinePostEdit timeline={timeline} onPosted={onReload.current} />
+          ) : (
+            <TimelineTop
+              lineProps={{
+                startSegmentLength: 20,
+                center: "none",
+                current: true,
+              }}
+            />
           )}
         </>
       );
