@@ -87,28 +87,11 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
     }
   }, [timeline]);
 
-  const [bottomSpaceHeight, setBottomSpaceHeight] = React.useState<number>(0);
-
   const [timelineReloadKey, setTimelineReloadKey] = React.useState<number>(0);
 
   const reloadTimeline = (): void => {
     setTimelineReloadKey((old) => old + 1);
   };
-
-  const onPostEditHeightChange = React.useCallback((height: number): void => {
-    setBottomSpaceHeight(height);
-    if (height === 0) {
-      const alertHost = getAlertHost();
-      if (alertHost != null) {
-        alertHost.style.removeProperty("margin-bottom");
-      }
-    } else {
-      const alertHost = getAlertHost();
-      if (alertHost != null) {
-        alertHost.style.marginBottom = `${height}px`;
-      }
-    }
-  }, []);
 
   const cardCollapseLocalStorageKey = `timeline.${timelineName}.cardCollapse`;
 
@@ -142,12 +125,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           connectionStatus={connectionStatus}
         />
       ) : null}
-      <Container
-        className="px-0"
-        style={{
-          minHeight: `calc(100vh - ${56 + bottomSpaceHeight}px)`,
-        }}
-      >
+      <Container className="px-0">
         {(() => {
           if (state === "offline") {
             // TODO: i18n
@@ -169,20 +147,6 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           }
         })()}
       </Container>
-      {timeline != null && timeline.postable ? (
-        <>
-          <div
-            style={{ height: bottomSpaceHeight }}
-            className="flex-fix-length"
-          />
-          <TimelinePostEdit
-            className="fixed-bottom"
-            timeline={timeline}
-            onHeightChange={onPostEditHeightChange}
-            onPosted={reloadTimeline}
-          />
-        </>
-      ) : null}
     </>
   );
 };

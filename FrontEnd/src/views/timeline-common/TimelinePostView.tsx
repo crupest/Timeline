@@ -16,7 +16,6 @@ import PostPropertyChangeDialog from "./PostPropertyChangeDialog";
 
 export interface TimelinePostViewProps {
   post: HttpTimelinePostInfo;
-  current?: boolean;
   className?: string;
   style?: React.CSSProperties;
   cardStyle?: React.CSSProperties;
@@ -26,7 +25,6 @@ export interface TimelinePostViewProps {
 
 const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
   const { post, className, style, cardStyle, onChanged, onDeleted } = props;
-  const current = props.current === true;
 
   const [operationMaskVisible, setOperationMaskVisible] =
     React.useState<boolean>(false);
@@ -55,11 +53,15 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
   return (
     <div
       id={`timeline-post-${post.id}`}
-      className={classnames("timeline-item", current && "current", className)}
+      className={classnames("timeline-item", className)}
       style={style}
     >
-      <TimelineLine center="node" current={current} />
-      <Card ref={cardRef} className="timeline-item-card" style={cardStyle}>
+      <TimelineLine center="node" />
+      <Card
+        ref={cardRef}
+        className="timeline-item-card enter-animation"
+        style={cardStyle}
+      >
         {post.editable ? (
           <i
             className="bi-chevron-down text-info icon-button float-end"

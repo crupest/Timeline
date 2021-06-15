@@ -18,7 +18,9 @@ import { base64 } from "@/http/common";
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/LoadingButton";
 import { PopupMenu } from "../common/Menu";
+import Card from "../common/Card";
 import MarkdownPostEdit from "./MarkdownPostEdit";
+import TimelineLine from "./TimelineLine";
 
 interface TimelinePostEditTextProps {
   text: string;
@@ -110,13 +112,13 @@ const postKindIconClassNameMap: Record<PostKind, string> = {
 
 export interface TimelinePostEditProps {
   className?: string;
+  style?: React.CSSProperties;
   timeline: HttpTimelineInfo;
   onPosted: (newPost: HttpTimelinePostInfo) => void;
-  onHeightChange?: (height: number) => void;
 }
 
 const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
-  const { timeline, onHeightChange, className, onPosted } = props;
+  const { timeline, style, className, onPosted } = props;
 
   const { t } = useTranslation();
 
@@ -137,24 +139,6 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   const canSend =
     (kind === "text" && text.length !== 0) ||
     (kind === "image" && image != null);
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const containerRef = React.useRef<HTMLDivElement>(null!);
-
-  const notifyHeightChange = (): void => {
-    if (onHeightChange) {
-      onHeightChange(containerRef.current.clientHeight);
-    }
-  };
-
-  React.useEffect(() => {
-    notifyHeightChange();
-    return () => {
-      if (onHeightChange) {
-        onHeightChange(0);
-      }
-    };
-  });
 
   const onPostError = (): void => {
     pushAlert({
@@ -212,78 +196,86 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
 
   return (
     <div
-      ref={containerRef}
-      className={classnames("container-fluid bg-light", className)}
+      className={classnames("timeline-item current", className)}
+      style={style}
     >
-      {showMarkdown ? (
-        <MarkdownPostEdit
-          className="w-100"
-          onClose={() => setShowMarkdown(false)}
-          timeline={timeline.name}
-          onPosted={onPosted}
-          onPostError={onPostError}
-        />
-      ) : (
-        <Row>
-          <Col className="px-1 py-1">
-            {(() => {
-              if (kind === "text") {
-                return (
-                  <TimelinePostEditText
-                    className="w-100 h-100 timeline-post-edit"
-                    text={text}
-                    disabled={process}
-                    onChange={(t) => {
-                      setText(t);
-                      window.localStorage.setItem(draftTextLocalStorageKey, t);
-                    }}
-                  />
-                );
-              } else if (kind === "image") {
-                return (
-                  <TimelinePostEditImage
-                    onSelect={setImage}
-                    disabled={process}
-                  />
-                );
-              }
-            })()}
-          </Col>
-          <Col xs="auto" className="align-self-end m-1">
-            <div className="d-block text-center mt-1 mb-2">
-              <PopupMenu
-                items={(["text", "image", "markdown"] as const).map((kind) => ({
-                  type: "button",
-                  text: `timeline.post.type.${kind}`,
-                  iconClassName: postKindIconClassNameMap[kind],
-                  onClick: () => {
-                    if (kind === "markdown") {
-                      setShowMarkdown(true);
-                    } else {
-                      setKind(kind);
-                    }
-                  },
-                }))}
-              >
-                <i
-                  className={classnames(
-                    postKindIconClassNameMap[kind],
-                    "icon-button large"
+      <TimelineLine center="node" current />
+      <Card className="timeline-item-card">
+        {showMarkdown ? (
+          <MarkdownPostEdit
+            className="w-100"
+            onClose={() => setShowMarkdown(false)}
+            timeline={timeline.name}
+            onPosted={onPosted}
+            onPostError={onPostError}
+          />
+        ) : (
+          <Row>
+            <Col className="px-1 py-1">
+              {(() => {
+                if (kind === "text") {
+                  return (
+                    <TimelinePostEditText
+                      className="w-100 h-100 timeline-post-edit"
+                      text={text}
+                      disabled={process}
+                      onChange={(t) => {
+                        setText(t);
+                        window.localStorage.setItem(
+                          draftTextLocalStorageKey,
+                          t
+                        );
+                      }}
+                    />
+                  );
+                } else if (kind === "image") {
+                  return (
+                    <TimelinePostEditImage
+                      onSelect={setImage}
+                      disabled={process}
+                    />
+                  );
+                }
+              })()}
+            </Col>
+            <Col xs="auto" className="align-self-end m-1">
+              <div className="d-block text-center mt-1 mb-2">
+                <PopupMenu
+                  items={(["text", "image", "markdown"] as const).map(
+                    (kind) => ({
+                      type: "button",
+                      text: `timeline.post.type.${kind}`,
+                      iconClassName: postKindIconClassNameMap[kind],
+                      onClick: () => {
+                        if (kind === "markdown") {
+                          setShowMarkdown(true);
+                        } else {
+                          setKind(kind);
+                        }
+                      },
+                    })
                   )}
-                />
-              </PopupMenu>
-            </div>
-            <LoadingButton
-              variant="primary"
-              onClick={onSend}
-              disabled={!canSend}
-              loading={process}
-            >
-              {t("timeline.send")}
-            </LoadingButton>
-          </Col>
-        </Row>
-      )}
+                >
+                  <i
+                    className={classnames(
+                      postKindIconClassNameMap[kind],
+                      "icon-button large"
+                    )}
+                  />
+                </PopupMenu>
+              </div>
+              <LoadingButton
+                variant="primary"
+                onClick={onSend}
+                disabled={!canSend}
+                loading={process}
+              >
+                {t("timeline.send")}
+              </LoadingButton>
+            </Col>
+          </Row>
+        )}
+      </Card>
     </div>
   );
 };

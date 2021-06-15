@@ -6,7 +6,11 @@ import {
   HttpNetworkError,
   HttpNotFoundError,
 } from "@/http/common";
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
+import {
+  getHttpTimelineClient,
+  HttpTimelineInfo,
+  HttpTimelinePostInfo,
+} from "@/http/timeline";
 
 import { getTimelinePostUpdate$ } from "@/services/timeline";
 
@@ -15,6 +19,7 @@ import TimelineTop from "./TimelineTop";
 import TimelineLoading from "./TimelineLoading";
 
 import "./index.css";
+import TimelinePostEdit from "./TimelinePostEdit";
 
 export interface TimelineProps {
   className?: string;
@@ -31,10 +36,12 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   const [state, setState] = React.useState<
     "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
   >("loading");
+  const [timeline, setTimeline] = React.useState<HttpTimelineInfo | null>(null);
   const [posts, setPosts] = React.useState<HttpTimelinePostInfo[]>([]);
 
   React.useEffect(() => {
     setState("loading");
+    setTimeline(null);
     setPosts([]);
   }, [timelineName]);
 
@@ -73,16 +80,20 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     if (timelineName != null) {
       let subscribe = true;
 
-      void getHttpTimelineClient()
-        .listPost(timelineName)
-        .then(
-          (data) => {
-            if (subscribe) {
-              setState("loaded");
-              setPosts(data);
-            }
-          },
-          (error) => {
+      const client = getHttpTimelineClient();
+      Promise.all([
+        client.getTimeline(timelineName),
+        client.listPost(timelineName),
+      ]).then(
+        ([t, p]) => {
+          if (subscribe) {
+            setTimeline(t);
+            setPosts(p);
+            setState("loaded");
+          }
+        },
+        (error) => {
+          if (subscribe) {
             if (error instanceof HttpNetworkError) {
               setState("offline");
             } else if (error instanceof HttpForbiddenError) {
@@ -94,7 +105,8 @@ const Timeline: React.FC<TimelineProps> = (props) => {
               setState("error");
             }
           }
-        );
+        }
+      );
 
       return () => {
         subscribe = false;
@@ -137,6 +149,9 @@ const Timeline: React.FC<TimelineProps> = (props) => {
             posts={posts}
             onReload={onReload.current}
           />
+          {timeline?.postable && (
+            <TimelinePostEdit timeline={timeline} onPosted={onReload.current} />
+          )}
         </>
       );
   }
