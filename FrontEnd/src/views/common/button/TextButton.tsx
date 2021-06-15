@@ -17,7 +17,7 @@ function _TextButton(
   }: {
     text: I18nText;
     color?: PaletteColorType;
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     className?: string;
     style?: React.CSSProperties;
   },

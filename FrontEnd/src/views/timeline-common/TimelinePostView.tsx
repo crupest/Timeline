@@ -8,6 +8,8 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 import { pushAlert } from "@/services/alert";
 
 import UserAvatar from "../common/user/UserAvatar";
+import Card from "../common/Card";
+import FlatButton from "../common/button/FlatButton";
 import TimelineLine from "./TimelineLine";
 import TimelinePostContentView from "./TimelinePostContentView";
 import TimelinePostDeleteConfirmDialog from "./TimelinePostDeleteConfirmDialog";
@@ -60,7 +62,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
       style={style}
     >
       <TimelineLine center="node" current={current} />
-      <div ref={cardRef} className="timeline-item-card" style={cardStyle}>
+      <Card ref={cardRef} className="timeline-item-card" style={cardStyle}>
         {post.editable ? (
           <i
             className="bi-chevron-down text-info icon-button float-end"
@@ -91,32 +93,29 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         </div>
         {operationMaskVisible ? (
           <div
-            className="position-absolute position-lt w-100 h-100 mask d-flex justify-content-around align-items-center"
+            className="timeline-post-item-options-mask d-flex justify-content-around align-items-center"
             onClick={() => {
               setOperationMaskVisible(false);
             }}
           >
-            <span
-              className="tl-color-primary"
+            <FlatButton
+              text="changeProperty"
               onClick={(e) => {
                 setDialog("changeproperty");
                 e.stopPropagation();
               }}
-            >
-              {t("changeProperty")}
-            </span>
-            <span
-              className="tl-color-danger"
+            />
+            <FlatButton
+              text="delete"
+              color="danger"
               onClick={(e) => {
                 setDialog("delete");
                 e.stopPropagation();
               }}
-            >
-              {t("delete")}
-            </span>
+            />
           </div>
         ) : null}
-      </div>
+      </Card>
       {dialog === "delete" ? (
         <TimelinePostDeleteConfirmDialog
           onClose={() => {
