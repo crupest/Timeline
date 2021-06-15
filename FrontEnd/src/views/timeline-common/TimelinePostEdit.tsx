@@ -138,7 +138,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
     (kind === "text" && text.length !== 0) ||
     (kind === "image" && image != null);
 
-  // eslint-disable-next-line srctypescript-eslint/no-non-null-assertion
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const containerRef = React.useRef<HTMLDivElement>(null!);
 
   const notifyHeightChange = (): void => {
