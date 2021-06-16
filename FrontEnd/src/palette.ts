@@ -36,13 +36,12 @@ export type Palette = Record<PaletteColorType, PaletteColor>;
 export function generatePaletteColor(color: string): PaletteColor {
   const c = Color(color);
   return {
-    color: c.toString(),
-    inactive: (c.lightness() > 60
-      ? darkenBy(c, 0.1)
-      : lightenBy(c, 0.1)
-    ).toString(),
-    lighter: lightenBy(c, 0.1).toString(),
-    darker: darkenBy(c, 0.1).toString(),
+    color: c.rgb().toString(),
+    inactive: (c.lightness() > 60 ? darkenBy(c, 0.1) : lightenBy(c, 0.1))
+      .rgb()
+      .toString(),
+    lighter: lightenBy(c, 0.1).rgb().toString(),
+    darker: darkenBy(c, 0.1).rgb().toString(),
   };
 }
 
@@ -84,7 +83,7 @@ export function generatePaletteCSS(palette: Palette): string {
     }
   }
 
-  return `:root {${colors
+  return `html {${colors
     .map(([key, color]) => `${key} : ${color};`)
     .join("")}}`;
 }

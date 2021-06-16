@@ -11,16 +11,19 @@
     box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color);
   }
 }
+
 @keyframes timeline-line-node-current {
   to {
     box-shadow: 0 0 20px 3px var(--tl-primary-enhance-lighter-color);
   }
 }
+
 @keyframes timeline-line-node-loading {
   to {
     box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color);
   }
 }
+
 @keyframes timeline-line-node-loading-edge {
   from {
     transform: rotate(0turn);
@@ -29,16 +32,19 @@
     transform: rotate(1turn);
   }
 }
+
 @keyframes timeline-enter {
   from {
     transform: translate(0, -100vh);
   }
 }
+
 @keyframes timeline-top-loading-enter {
   from {
     transform: translate(0, -100%);
   }
 }
+
 @keyframes timeline-post-enter {
   from {
     transform: translate(0, -100%);
@@ -48,6 +54,7 @@
     opacity: 1;
   }
 }
+
 .timeline-top-loading-enter {
   animation: 1s timeline-top-loading-enter;
 }
@@ -64,11 +71,13 @@
   bottom: 0;
   transition: left 0.5s;
 }
+
 @media (max-width: 575.98px) {
   .timeline-line {
     left: 1em;
   }
 }
+
 .timeline-line .segment {
   width: 7px;
   background: var(--tl-primary-color);
@@ -121,13 +130,16 @@
     var(--tl-primary-enhance-color)
   );
 }
+
 .timeline-line.current .segment.end {
   background: var(--tl-primary-enhance-color);
 }
+
 .timeline-line.current .node {
   background: var(--tl-primary-enhance-color);
   animation-name: timeline-line-node-current;
 }
+
 .timeline-line.loading .node {
   background: var(--tl-primary-color);
   animation-name: timeline-line-node-loading;
