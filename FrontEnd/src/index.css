@@ -2,33 +2,33 @@
   --tl-background-color: #f8f9fa;
 
   --tl-primary-color: rgb(0, 123, 255);
-  --tl-primary-inactive-color: hsl(211.1, 100%, 55%);
-  --tl-primary-lighter-color: hsl(211.1, 100%, 55%);
-  --tl-primary-darker-color: hsl(211.1, 100%, 45%);
-  --tl-primary-enhance-color: hsl(211.1, 100%, 65%);
-  --tl-primary-enhance-inactive-color: hsl(211.1, 100%, 58.5%);
-  --tl-primary-enhance-lighter-color: hsl(211.1, 100%, 68.5%);
-  --tl-primary-enhance-darker-color: hsl(211.1, 100%, 58.5%);
-  --tl-secondary-color: hsl(301.1, 100%, 50%);
-  --tl-secondary-inactive-color: hsl(301.1, 100%, 55%);
-  --tl-secondary-lighter-color: hsl(301.1, 100%, 55%);
-  --tl-secondary-darker-color: hsl(301.1, 100%, 45%);
+  --tl-primary-inactive-color: rgb(26, 136, 255);
+  --tl-primary-lighter-color: rgb(26, 136, 255);
+  --tl-primary-darker-color: rgb(0, 111, 230);
+  --tl-primary-enhance-color: rgb(77, 163, 255);
+  --tl-primary-enhance-inactive-color: rgb(43, 145, 255);
+  --tl-primary-enhance-lighter-color: rgb(94, 172, 255);
+  --tl-primary-enhance-darker-color: rgb(43, 145, 255);
+  --tl-secondary-color: rgb(255, 0, 250);
+  --tl-secondary-inactive-color: rgb(255, 26, 251);
+  --tl-secondary-lighter-color: rgb(255, 26, 251);
+  --tl-secondary-darker-color: rgb(230, 0, 225);
   --tl-text-primary-color: rgb(17, 17, 17);
-  --tl-text-primary-inactive-color: hsl(0, 0%, 16%);
-  --tl-text-primary-lighter-color: hsl(0, 0%, 16%);
-  --tl-text-primary-darker-color: hsl(0, 0%, 6%);
+  --tl-text-primary-inactive-color: rgb(41, 41, 41);
+  --tl-text-primary-lighter-color: rgb(41, 41, 41);
+  --tl-text-primary-darker-color: rgb(15, 15, 15);
   --tl-text-on-primary-color: rgb(255, 255, 255);
-  --tl-text-on-primary-inactive-color: hsl(0, 0%, 90%);
-  --tl-text-on-primary-lighter-color: hsl(0, 0%, 100%);
-  --tl-text-on-primary-darker-color: hsl(0, 0%, 90%);
+  --tl-text-on-primary-inactive-color: rgb(230, 230, 230);
+  --tl-text-on-primary-lighter-color: rgb(255, 255, 255);
+  --tl-text-on-primary-darker-color: rgb(230, 230, 230);
   --tl-danger-color: rgb(255, 0, 0);
-  --tl-danger-inactive-color: hsl(0, 100%, 55%);
-  --tl-danger-lighter-color: hsl(0, 100%, 55%);
-  --tl-danger-darker-color: hsl(0, 100%, 45%);
+  --tl-danger-inactive-color: rgb(255, 26, 26);
+  --tl-danger-lighter-color: rgb(255, 26, 26);
+  --tl-danger-darker-color: rgb(230, 0, 0);
   --tl-success-color: rgb(0, 128, 0);
-  --tl-success-inactive-color: hsl(120, 100%, 32.6%);
-  --tl-success-lighter-color: hsl(120, 100%, 32.6%);
-  --tl-success-darker-color: hsl(120, 100%, 22.6%);
+  --tl-success-inactive-color: rgb(0, 166, 0);
+  --tl-success-lighter-color: rgb(0, 166, 0);
+  --tl-success-darker-color: rgb(0, 115, 0);
 }
 
 body {
