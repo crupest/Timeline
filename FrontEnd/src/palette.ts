@@ -1,6 +1,8 @@
 import Color from "color";
 import { BehaviorSubject, Observable } from "rxjs";
 
+import refreshAnimation from "./utilities/refreshAnimation";
+
 function lightenBy(color: Color, ratio: number): Color {
   const lightness = color.lightness();
   return color.lightness(lightness + (100 - lightness) * ratio);
@@ -83,7 +85,7 @@ export function generatePaletteCSS(palette: Palette): string {
     }
   }
 
-  return `html {${colors
+  return `:root {${colors
     .map(([key, color]) => `${key} : ${color};`)
     .join("")}}`;
 }
@@ -110,6 +112,8 @@ palette$.subscribe((palette) => {
       styleTag.parentElement?.removeChild(styleTag);
     }
   }
+
+  refreshAnimation();
 });
 
 export function setPalette(palette: Palette): () => void {
