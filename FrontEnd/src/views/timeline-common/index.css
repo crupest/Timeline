@@ -254,7 +254,6 @@
 
 .timeline-template-card {
   position: fixed;
-  z-index: 1031;
   top: 56px;
   right: 0;
   margin: 0.5em;
