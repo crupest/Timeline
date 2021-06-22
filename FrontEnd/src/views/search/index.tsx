@@ -35,7 +35,7 @@ const TimelineSearchResultItemView: React.FC<{
         />
         {timeline.owner.nickname}
         <small className="ms-3 text-secondary">
-          src{timeline.owner.username}
+          @{timeline.owner.username}
         </small>
       </div>
     </div>
