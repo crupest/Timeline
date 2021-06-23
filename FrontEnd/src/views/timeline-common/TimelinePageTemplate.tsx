@@ -75,7 +75,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           connectionStatus={connectionStatus}
         />
       ) : null}
-      <Container className="px-0">
+      <Container>
         <Timeline
           timelineName={timelineName}
           reloadKey={reloadKey}
