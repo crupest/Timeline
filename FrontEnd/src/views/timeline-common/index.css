@@ -8,7 +8,6 @@
   z-index: 0;
   position: relative;
   width: 100%;
-  overflow-wrap: break-word;
   animation: 1s timeline-enter;
 }
 
