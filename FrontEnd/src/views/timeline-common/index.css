@@ -1,3 +1,9 @@
+@keyframes timeline-enter {
+  from {
+    transform: translate(0, -100%);
+  }
+}
+
 .timeline {
   z-index: 0;
   position: relative;
@@ -30,12 +36,6 @@
   }
   to {
     transform: rotate(1turn);
-  }
-}
-
-@keyframes timeline-enter {
-  from {
-    transform: translate(0, -100vh);
   }
 }
 
