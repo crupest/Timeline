@@ -29,12 +29,8 @@ const frontendCredits: {
     url: "https://react-bootstrap.github.io",
   },
   {
-    name: "webpack",
-    url: "https://webpack.js.org",
-  },
-  {
-    name: "sass",
-    url: "https://sass-lang.com",
+    name: "vite",
+    url: "https://vitejs.dev",
   },
   {
     name: "eslint",
