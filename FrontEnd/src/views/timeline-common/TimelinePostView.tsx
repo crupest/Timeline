@@ -92,7 +92,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         </div>
         {operationMaskVisible ? (
           <div
-            className="timeline-post-item-options-mask d-flex justify-content-around align-items-center"
+            className="timeline-post-item-options-mask"
             onClick={() => {
               setOperationMaskVisible(false);
             }}

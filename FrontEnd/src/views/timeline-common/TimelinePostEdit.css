@@ -1,3 +1,24 @@
+.timeline-item.timeline-post-edit {
+  padding-bottom: 0;
+}
+
+.timeline-post-edit .timeline-item-card {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+.timeline-post-edit {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+.timeline-post-edit-image {
+  max-width: 100px;
+  max-height: 100px;
+}
+
 .timeline-markdown-post-edit-page {
   overflow: scroll;
   max-height: 300px;

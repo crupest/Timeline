@@ -1,7 +1,11 @@
+:root {
+  --cru-card-border-radius: 8px;
+}
+
 .cru-card {
   border: 1px solid;
   border-color: #e9ecef;
-  border-radius: 8px;
+  border-radius: var(--cru-card-border-radius);
   background: #fefeff;
   transition: all 0.3s;
 }
