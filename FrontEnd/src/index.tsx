@@ -3,7 +3,8 @@ import "core-js/modules/es.promise";
 import "core-js/modules/es.array.iterator";
 import "pepjs";
 
-import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap/dist/css/bootstrap-reboot.css";
+import "bootstrap/dist/css/bootstrap-grid.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import React from "react";

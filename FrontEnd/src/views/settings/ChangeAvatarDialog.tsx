@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AxiosError } from "axios";
-import { Modal, Row, Button } from "react-bootstrap";
 
 import { UiLogicError } from "@/common";
 
@@ -10,6 +9,7 @@ import { useUserLoggedIn } from "@/services/user";
 import { getHttpUserClient } from "@/http/user";
 
 import ImageCropper, { Clip, applyClipToImage } from "../common/ImageCropper";
+import Button from "../common/button/Button";
 
 export interface ChangeAvatarDialogProps {
   open: boolean;
@@ -148,13 +148,13 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       throw new UiLogicError();
     }
     return (
-      <Row className="justify-content-center">
+      <div className="row justify-content-center">
         <img
           className="change-avatar-img"
           src={resultUrl}
           alt={t("settings.dialogChangeAvatar.previewImgAlt")}
         />
-      </Row>
+      </div>
     );
   };
 
@@ -168,15 +168,19 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           return (
             <>
               <Modal.Body className="container">
-                <Row>{t("settings.dialogChangeAvatar.prompt.select")}</Row>
-                <Row>
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.select")}
+                </div>
+                <div className="row">
                   <input type="file" accept="image/*" onChange={onSelectFile} />
-                </Row>
+                </div>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                />
               </Modal.Footer>
             </>
           );
@@ -187,32 +191,37 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           return (
             <>
               <Modal.Body className="container">
-                <Row className="justify-content-center">
+                <div className="row justify-content-center">
                   <ImageCropper
                     clip={clip}
                     onChange={setClip}
                     imageUrl={fileUrl}
                     imageElementCallback={setCropImgElement}
                   />
-                </Row>
-                <Row>{t("settings.dialogChangeAvatar.prompt.crop")}</Row>
+                </div>
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.crop")}
+                </div>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="secondary" onClick={onCropPrevious}>
-                  {t("operationDialog.previousStep")}
-                </Button>
                 <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                />
+                <Button
+                  text="operationDialog.previousStep"
+                  color="secondary"
+                  onClick={onCropPrevious}
+                />
+                <Button
+                  text="operationDialog.nextStep"
                   color="primary"
                   onClick={onCropNext}
                   disabled={
                     cropImgElement == null || clip == null || clip.width === 0
                   }
-                >
-                  {t("operationDialog.nextStep")}
-                </Button>
+                />
               </Modal.Footer>
             </>
           );
@@ -220,17 +229,21 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           return (
             <>
               <Modal.Body className="container">
-                <Row>
+                <div className="row">
                   {t("settings.dialogChangeAvatar.prompt.processingCrop")}
-                </Row>
+                </div>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="secondary" onClick={onPreviewPrevious}>
-                  {t("operationDialog.previousStep")}
-                </Button>
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                />
+                <Button
+                  text="operationDialog.previousStep"
+                  color="secondary"
+                  onClick={onPreviewPrevious}
+                />
               </Modal.Footer>
             </>
           );
@@ -239,18 +252,26 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
             <>
               <Modal.Body className="container">
                 {createPreviewRow()}
-                <Row>{t("settings.dialogChangeAvatar.prompt.preview")}</Row>
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.preview")}
+                </div>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="secondary" onClick={onPreviewPrevious}>
-                  {t("operationDialog.previousStep")}
-                </Button>
-                <Button variant="primary" onClick={upload}>
-                  {t("settings.dialogChangeAvatar.upload")}
-                </Button>
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                />
+                <Button
+                  text="operationDialog.previousStep"
+                  color="secondary"
+                  onClick={onPreviewPrevious}
+                />
+                <Button
+                  text="settings.dialogChangeAvatar.upload"
+                  color="primary"
+                  onClick={upload}
+                />
               </Modal.Footer>
             </>
           );
@@ -259,7 +280,9 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
             <>
               <Modal.Body className="container">
                 {createPreviewRow()}
-                <Row>{t("settings.dialogChangeAvatar.prompt.uploading")}</Row>
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.uploading")}
+                </div>
               </Modal.Body>
               <Modal.Footer></Modal.Footer>
             </>
@@ -268,14 +291,16 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           return (
             <>
               <Modal.Body className="container">
-                <Row className="p-4 text-success">
+                <div className="row p-4 text-success">
                   {t("operationDialog.success")}
-                </Row>
+                </div>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="success" onClick={close}>
-                  {t("operationDialog.ok")}
-                </Button>
+                <Button
+                  text="operationDialog.ok"
+                  color="success"
+                  onClick={close}
+                />
               </Modal.Footer>
             </>
           );
@@ -284,15 +309,19 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
             <>
               <Modal.Body className="container">
                 {createPreviewRow()}
-                <Row className="text-danger">{trueMessage}</Row>
+                <div className="row text-danger">{trueMessage}</div>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="primary" onClick={upload}>
-                  {t("operationDialog.retry")}
-                </Button>
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                />
+                <Button
+                  text="operationDialog.retry"
+                  color="primary"
+                  onClick={upload}
+                />
               </Modal.Footer>
             </>
           );

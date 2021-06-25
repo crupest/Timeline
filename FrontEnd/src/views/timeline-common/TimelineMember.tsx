@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Container, ListGroup, Modal, Row, Col, Button } from "react-bootstrap";
 
 import { convertI18nText, I18nText } from "@/common";
 
@@ -10,6 +9,7 @@ import { getHttpSearchClient } from "@/http/search";
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
+import Button from "../common/button/Button";
 
 const TimelineMemberItem: React.FC<{
   user: HttpUser;
@@ -20,29 +20,28 @@ const TimelineMemberItem: React.FC<{
 
   return (
     <ListGroup.Item className="container">
-      <Row>
-        <Col xs="auto">
+      <div className="row">
+        <div className="col col-auto">
           <UserAvatar username={user.username} className="avatar small" />
-        </Col>
-        <Col>
-          <Row>{user.nickname}</Row>
-          <Row>
+        </div>
+        <div className="col">
+          <div className="row">{user.nickname}</div>
+          <div className="row">
             <small>{"@" + user.username}</small>
-          </Row>
-        </Col>
+          </div>
+        </div>
         {onAction ? (
-          <Col xs="auto">
+          <div className="col col-auto">
             <Button
-              variant={add ? "success" : "danger"}
+              text={`timeline.member.${add ? "add" : "remove"}`}
+              color={add ? "success" : "danger"}
               onClick={() => {
                 onAction(user.username);
               }}
-            >
-              {t(`timeline.member.${add ? "add" : "remove"}`)}
-            </Button>
-          </Col>
+            />
+          </div>
         ) : null}
-      </Row>
+      </div>
     </ListGroup.Item>
   );
 };
@@ -152,7 +151,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
   const members = [timeline.owner, ...timeline.members];
 
   return (
-    <Container className="px-4 py-3">
+    <div className="container px-4 py-3">
       <ListGroup>
         {members.map((member, index) => (
           <TimelineMemberItem
@@ -173,7 +172,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
       {timeline.manageable ? (
         <TimelineMemberUserSearch timeline={timeline} onChange={onChange} />
       ) : null}
-    </Container>
+    </div>
   );
 };
 

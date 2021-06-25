@@ -1,6 +1,7 @@
 import React from "react";
-import { Modal, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+
+import Button from "../common/button/Button";
 
 const TimelinePostDeleteConfirmDialog: React.FC<{
   onClose: () => void;
@@ -17,9 +18,11 @@ const TimelinePostDeleteConfirmDialog: React.FC<{
       </Modal.Header>
       <Modal.Body>{t("timeline.post.deleteDialog.prompt")}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          {t("operationDialog.cancel")}
-        </Button>
+        <Button
+          text="operationDialog.cancel"
+          color="secondary"
+          onClick={onClose}
+        />
         <Button
           variant="danger"
           onClick={() => {

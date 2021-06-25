@@ -1,11 +1,10 @@
 import React from "react";
 import { useHistory } from "react-router";
-import { useTranslation } from "react-i18next";
-import { Row, Container, Button, Col } from "react-bootstrap";
 
 import { useUserLoggedIn } from "@/services/user";
 
 import SearchInput from "../common/SearchInput";
+import Button from "../common/button/Button";
 import CenterBoards from "./CenterBoards";
 import TimelineCreateDialog from "./TimelineCreateDialog";
 
@@ -13,8 +12,6 @@ import "./index.css";
 
 const HomePage: React.FC = () => {
   const history = useHistory();
-
-  const { t } = useTranslation();
 
   const user = useUserLoggedIn();
 
@@ -24,9 +21,9 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <Container>
-        <Row className="my-3 justify-content-center">
-          <Col xs={12} sm={8} lg={6}>
+      <div>
+        <div className="row my-3 justify-content-center">
+          <div className="col col-12 col-sm-8 col-lg-6">
             <SearchInput
               className="justify-content-center"
               value={navText}
@@ -37,20 +34,19 @@ const HomePage: React.FC = () => {
               additionalButton={
                 user != null && (
                   <Button
-                    variant="outline-success"
+                    text="home.createButton"
+                    color="success"
                     onClick={() => {
                       setDialog("create");
                     }}
-                  >
-                    {t("home.createButton")}
-                  </Button>
+                  />
                 )
               }
             />
-          </Col>
-        </Row>
+          </div>
+        </div>
         <CenterBoards />
-      </Container>
+      </div>
       {dialog === "create" && (
         <TimelineCreateDialog
           open

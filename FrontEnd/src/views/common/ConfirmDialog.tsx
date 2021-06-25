@@ -1,7 +1,8 @@
 import { convertI18nText, I18nText } from "@/common";
 import React from "react";
-import { Modal, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+
+import Button from "./button/Button";
 
 const ConfirmDialog: React.FC<{
   onClose: () => void;
@@ -20,18 +21,19 @@ const ConfirmDialog: React.FC<{
       </Modal.Header>
       <Modal.Body>{convertI18nText(body, t)}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          {t("operationDialog.cancel")}
-        </Button>
         <Button
-          variant="danger"
+          text="operationDialog.cancel"
+          color="secondary"
+          onClick={onClose}
+        />
+        <Button
+          text="operationDialog.confirm"
+          color="danger"
           onClick={() => {
             onConfirm();
             onClose();
           }}
-        >
-          {t("operationDialog.confirm")}
-        </Button>
+        />
       </Modal.Footer>
     </Modal>
   );
