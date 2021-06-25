@@ -1,8 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "react-bootstrap";
 
 import { pushAlert } from "./services/alert";
+
+import Button from "./views/common/button/Button";
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   let isThisTriggerUpgrade = false;
@@ -37,12 +38,10 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
             <>
               {t("serviceWorker.externalActivatedPrompt")}
               <Button
-                variant="outline-success"
-                size="sm"
+                text="serviceWorker.reloadNow"
+                color="success"
                 onClick={upgradeReload}
-              >
-                {t("serviceWorker.reloadNow")}
-              </Button>
+              />
             </>
           );
         };
@@ -83,9 +82,11 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
         return (
           <>
             {t("serviceWorker.upgradePrompt")}
-            <Button variant="outline-success" size="sm" onClick={upgrade}>
-              {t("serviceWorker.upgradeNow")}
-            </Button>
+            <Button
+              text="serviceWorker.upgradeNow"
+              color="success"
+              onClick={upgrade}
+            />
           </>
         );
       };

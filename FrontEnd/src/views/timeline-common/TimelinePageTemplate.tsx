@@ -75,7 +75,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           connectionStatus={connectionStatus}
         />
       ) : null}
-      <Container>
+      <div className="container">
         <Timeline
           timelineName={timelineName}
           reloadKey={reloadKey}
@@ -83,7 +83,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           onTimelineLoaded={(t) => setTimeline(t)}
           onConnectionStateChanged={setConnectionStatus}
         />
-      </Container>
+      </div>
     </>
   );
 };

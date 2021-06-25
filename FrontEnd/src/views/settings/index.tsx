@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Container, Form, Row, Col, Button, Modal } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
 
@@ -27,12 +26,16 @@ const ConfirmLogoutDialog: React.FC<{
       </Modal.Header>
       <Modal.Body>{t("settings.dialogConfirmLogout.prompt")}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          {t("operationDialog.cancel")}
-        </Button>
-        <Button variant="danger" onClick={onConfirm}>
-          {t("operationDialog.confirm")}
-        </Button>
+        <Button
+          text="operationDialog.cancel"
+          color="secondary"
+          onClick={onClose}
+        />
+        <Button
+          text="operationDialog.confirm"
+          variant="danger"
+          onClick={onConfirm}
+        />
       </Modal.Footer>
     </Modal>
   );
@@ -51,7 +54,7 @@ const SettingsPage: React.FC = (_) => {
 
   return (
     <>
-      <Container>
+      <div className="container">
         {user ? (
           <Card className="my-3 py-3">
             <h3 className="px-3 mb-3 text-primary">
@@ -89,14 +92,14 @@ const SettingsPage: React.FC = (_) => {
           <h3 className="px-3 mb-3 text-primary">
             {t("settings.subheaders.customization")}
           </h3>
-          <Row className="settings-item first mx-0">
-            <Col xs="12" sm="auto">
+          <div className="row settings-item first mx-0">
+            <div className="col col-12 col-sm-auto">
               <div>{t("settings.languagePrimary")}</div>
               <small className="d-block text-secondary">
                 {t("settings.languageSecondary")}
               </small>
-            </Col>
-            <Col xs="auto" className="ms-auto">
+            </div>
+            <div className="col col-12 col-sm-auto">
               <Form.Control
                 as="select"
                 value={language}
@@ -107,10 +110,10 @@ const SettingsPage: React.FC = (_) => {
                 <option value="zh">中文</option>
                 <option value="en">English</option>
               </Form.Control>
-            </Col>
-          </Row>
+            </div>
+          </div>
         </Card>
-      </Container>
+      </div>
       {(() => {
         switch (dialog) {
           case "changepassword":

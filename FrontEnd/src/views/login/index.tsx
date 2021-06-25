@@ -1,7 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Container, Form } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
 
@@ -79,7 +78,7 @@ const LoginPage: React.FC = (_) => {
   };
 
   return (
-    <Container fluid className="login-container mt-2">
+    <div className="login-container container-fluid mt-2">
       <h1 className="text-center">{t("welcome")}</h1>
       <Form>
         <Form.Group>
@@ -146,7 +145,7 @@ const LoginPage: React.FC = (_) => {
           </LoadingButton>
         </div>
       </Form>
-    </Container>
+    </div>
   );
 };
 

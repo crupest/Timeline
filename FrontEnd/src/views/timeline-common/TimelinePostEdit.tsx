@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
-import { Row, Col, Form } from "react-bootstrap";
 
 import { UiLogicError } from "@/common";
 
@@ -212,8 +211,8 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
             onPostError={onPostError}
           />
         ) : (
-          <Row>
-            <Col className="px-1 py-1">
+          <div className="row">
+            <div className="col px-1 py-1">
               {(() => {
                 if (kind === "text") {
                   return (
@@ -239,8 +238,8 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                   );
                 }
               })()}
-            </Col>
-            <Col xs="auto" className="align-self-end m-1">
+            </div>
+            <div className="col col-auto align-self-end m-1">
               <div className="d-block text-center mt-1 mb-2">
                 <PopupMenu
                   items={(["text", "image", "markdown"] as const).map(
@@ -274,8 +273,8 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
               >
                 {t("timeline.send")}
               </LoadingButton>
-            </Col>
-          </Row>
+            </div>
+          </div>
         )}
       </Card>
     </div>

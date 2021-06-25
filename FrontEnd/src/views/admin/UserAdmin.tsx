@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import classnames from "classnames";
-import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
 
 import OperationDialog, {
   OperationDialogBoolInput,
@@ -14,6 +13,7 @@ import {
   UserPermission,
 } from "@/http/user";
 import { Trans, useTranslation } from "react-i18next";
+import Button from "../common/button/Button";
 import TextButton from "../common/button/TextButton";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
@@ -372,20 +372,19 @@ const UserAdmin: React.FC<UserAdminProps> = () => {
 
     return (
       <>
-        <Row className="justify-content-end my-2">
-          <Col xs="auto">
+        <div className="row justify-content-end my-2">
+          <div className="col col-auto">
             <Button
-              variant="outline-success"
+              text="admin:create"
+              color="success"
               onClick={() =>
                 setDialog({
                   type: "create",
                 })
               }
-            >
-              {t("admin:create")}
-            </Button>
-          </Col>
-        </Row>
+            />
+          </div>
+        </div>
         {userComponents}
         {dialogNode}
       </>
