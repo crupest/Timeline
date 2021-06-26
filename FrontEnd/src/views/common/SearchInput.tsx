@@ -38,14 +38,15 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   );
 
   return (
-    <Form
+    <div
       className={classnames(
         "cru-search-input",
         alwaysOneline ? "flex-nowrap" : "flex-sm-nowrap",
         props.className
       )}
     >
-      <Form.Control
+      <input
+        type="text"
         className="me-sm-2 flex-grow-1"
         value={props.value}
         onChange={onInputChange}
@@ -71,7 +72,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           </Button>
         )}
       </div>
-    </Form>
+    </div>
   );
 };
 

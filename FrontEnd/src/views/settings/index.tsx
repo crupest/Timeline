@@ -7,39 +7,10 @@ import { useUser, userService } from "@/services/user";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
+import ConfirmDialog from "../common/dailog/ConfirmDialog";
 import Card from "../common/Card";
 
 import "./index.css";
-
-const ConfirmLogoutDialog: React.FC<{
-  onClose: () => void;
-  onConfirm: () => void;
-}> = ({ onClose, onConfirm }) => {
-  const { t } = useTranslation();
-
-  return (
-    <Modal show centered onHide={onClose}>
-      <Modal.Header>
-        <Modal.Title className="text-danger">
-          {t("settings.dialogConfirmLogout.title")}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>{t("settings.dialogConfirmLogout.prompt")}</Modal.Body>
-      <Modal.Footer>
-        <Button
-          text="operationDialog.cancel"
-          color="secondary"
-          onClick={onClose}
-        />
-        <Button
-          text="operationDialog.confirm"
-          variant="danger"
-          onClick={onConfirm}
-        />
-      </Modal.Footer>
-    </Modal>
-  );
-};
 
 const SettingsPage: React.FC = (_) => {
   const { i18n, t } = useTranslation();
@@ -100,8 +71,7 @@ const SettingsPage: React.FC = (_) => {
               </small>
             </div>
             <div className="col col-12 col-sm-auto">
-              <Form.Control
-                as="select"
+              <select
                 value={language}
                 onChange={(e) => {
                   void i18n.changeLanguage(e.target.value);
@@ -109,7 +79,7 @@ const SettingsPage: React.FC = (_) => {
               >
                 <option value="zh">中文</option>
                 <option value="en">English</option>
-              </Form.Control>
+              </select>
             </div>
           </div>
         </Card>
@@ -120,7 +90,9 @@ const SettingsPage: React.FC = (_) => {
             return <ChangePasswordDialog open close={() => setDialog(null)} />;
           case "logout":
             return (
-              <ConfirmLogoutDialog
+              <ConfirmDialog
+                title="settings.dialogConfirmLogout.title"
+                body="settings.dialogConfirmLogout.prompt"
                 onClose={() => setDialog(null)}
                 onConfirm={() => {
                   void userService.logout().then(() => {

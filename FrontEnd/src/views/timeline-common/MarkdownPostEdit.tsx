@@ -126,8 +126,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
             id: "text",
             tabText: "edit",
             page: (
-              <Form.Control
-                as="textarea"
+              <textarea
                 value={text}
                 disabled={process}
                 onChange={(event) => {
@@ -161,7 +160,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                     />
                   </div>
                 ))}
-                <Form.Control
+                <input
                   type="file"
                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
