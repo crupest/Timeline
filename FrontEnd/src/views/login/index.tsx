@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useUser, userService } from "@/services/user";
 
 import AppBar from "../common/AppBar";
-import LoadingButton from "../common/LoadingButton";
+import LoadingButton from "../common/button/LoadingButton";
 
 import "./index.css";
 

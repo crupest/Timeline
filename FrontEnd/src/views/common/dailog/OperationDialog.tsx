@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, Button, Modal } from "react-bootstrap";
 import { TwitterPicker } from "react-color";
 import moment from "moment";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
-import LoadingButton from "./LoadingButton";
+import Button from "../button/Button";
+import LoadingButton from "../button/LoadingButton";
+import Dialog from "./Dialog";
 
 interface DefaultErrorPromptProps {
   error?: string;
@@ -141,7 +142,7 @@ export interface OperationDialogProps<
   OperationInputInfoList extends readonly OperationDialogInput[]
 > {
   open: boolean;
-  close: () => void;
+  onClose: () => void;
   title: I18nText | (() => React.ReactNode);
   themeColor?: "danger" | "success" | string;
   onProcess: (
@@ -204,7 +205,7 @@ const OperationDialog = <
 
   const close = (): void => {
     if (step.type !== "process") {
-      props.close();
+      props.onClose();
       if (step.type === "success" && props.onSuccessAndClose) {
         props.onSuccessAndClose(step.data);
       }
@@ -278,7 +279,7 @@ const OperationDialog = <
 
     body = (
       <>
-        <Modal.Body>
+        <div>
           {inputPrompt}
           {inputScheme.map((item, index) => {
             const value = values[index];
@@ -403,11 +404,13 @@ const OperationDialog = <
               );
             }
           })}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={close}>
-            {t("operationDialog.cancel")}
-          </Button>
+        </div>
+        <div>
+          <Button
+            text="operationDialog.cancel"
+            color="secondary"
+            onClick={close}
+          />
           <LoadingButton
             variant={props.themeColor}
             loading={process}
@@ -421,7 +424,7 @@ const OperationDialog = <
           >
             {t("operationDialog.confirm")}
           </LoadingButton>
-        </Modal.Footer>
+        </div>
       </>
     );
   } else {
@@ -439,12 +442,10 @@ const OperationDialog = <
     }
     body = (
       <>
-        <Modal.Body>{content}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={close}>
-            {t("operationDialog.ok")}
-          </Button>
-        </Modal.Footer>
+        <div>{content}</div>
+        <div>
+          <Button text="operationDialog.ok" color="primary" onClick={close} />
+        </div>
       </>
     );
   }
@@ -455,16 +456,16 @@ const OperationDialog = <
       : convertI18nText(props.title, t);
 
   return (
-    <Modal show={props.open} onHide={close}>
-      <Modal.Header
+    <Dialog open={props.open} onClose={close}>
+      <h3
         className={
           props.themeColor != null ? "text-" + props.themeColor : undefined
         }
       >
         {title}
-      </Modal.Header>
+      </h3>
       {body}
-    </Modal>
+    </Dialog>
   );
 };
 

@@ -1,5 +1,4 @@
 import React from "react";
-import { Button, ButtonProps, Spinner } from "react-bootstrap";
 
 const LoadingButton: React.FC<{ loading?: boolean } & ButtonProps> = ({
   loading,

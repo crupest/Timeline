@@ -3,7 +3,7 @@ import { useHistory } from "react-router";
 
 import { userService } from "@/services/user";
 
-import OperationDialog from "../common/OperationDialog";
+import OperationDialog from "../common/dailog/OperationDialog";
 
 export interface ChangePasswordDialogProps {
   open: boolean;
@@ -55,7 +55,7 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
         await userService.changePassword(oldPassword, newPassword);
         setRedirect(true);
       }}
-      close={() => {
+      onClose={() => {
         props.close();
         if (redirect) {
           history.push("/login");

@@ -15,7 +15,7 @@ import { pushAlert } from "@/services/alert";
 import { base64 } from "@/http/common";
 
 import BlobImage from "../common/BlobImage";
-import LoadingButton from "../common/LoadingButton";
+import LoadingButton from "../common/button/LoadingButton";
 import { PopupMenu } from "../common/Menu";
 import Card from "../common/Card";
 import MarkdownPostEdit from "./MarkdownPostEdit";
