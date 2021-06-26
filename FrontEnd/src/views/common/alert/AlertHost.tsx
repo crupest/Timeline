@@ -1,7 +1,6 @@
 import React from "react";
 import without from "lodash/without";
 import { useTranslation } from "react-i18next";
-import { Alert } from "react-bootstrap";
 
 import {
   alertService,
@@ -52,13 +51,7 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
   };
 
   return (
-    <Alert
-      className="m-3"
-      variant={alert.type ?? "primary"}
-      onClick={cancelTimer}
-      onClose={close}
-      dismissible
-    >
+    <div className="m-3" onClick={cancelTimer}>
       {(() => {
         const { message } = alert;
         if (typeof message === "function") {
@@ -66,7 +59,7 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
           return <Message />;
         } else return convertI18nText(message, t);
       })()}
-    </Alert>
+    </div>
   );
 };
 

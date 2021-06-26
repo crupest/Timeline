@@ -1,7 +1,8 @@
 import React, { useCallback } from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
-import { Spinner, Form, Button } from "react-bootstrap";
+
+import LoadingButton from "./button/LoadingButton";
 
 export interface SearchInputProps {
   value: string;
@@ -64,13 +65,9 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           "flex-shrink-0"
         )}
       >
-        {props.loading ? (
-          <Spinner variant="primary" animation="border" />
-        ) : (
-          <Button variant="outline-primary" onClick={props.onButtonClick}>
-            {props.buttonText ?? t("search")}
-          </Button>
-        )}
+        <LoadingButton loading={props.loading} onClick={props.onButtonClick}>
+          {props.buttonText ?? t("search")}
+        </LoadingButton>
       </div>
     </div>
   );

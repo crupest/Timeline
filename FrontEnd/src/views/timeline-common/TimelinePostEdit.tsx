@@ -265,7 +265,6 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                 </PopupMenu>
               </div>
               <LoadingButton
-                variant="primary"
                 onClick={onSend}
                 disabled={!canSend}
                 loading={process}
