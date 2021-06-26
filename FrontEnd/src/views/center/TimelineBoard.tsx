@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
-import { Spinner } from "react-bootstrap";
 
 import { HttpTimelineInfo } from "@/http/timeline";
 
@@ -10,6 +9,7 @@ import UserTimelineLogo from "../common/UserTimelineLogo";
 import LoadFailReload from "../common/LoadFailReload";
 import FlatButton from "../common/button/FlatButton";
 import Card from "../common/Card";
+import Spinner from "../common/Spinner";
 
 interface TimelineBoardItemProps {
   timeline: HttpTimelineInfo;
@@ -249,7 +249,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
         if (timelines === "loading") {
           return (
             <div className="d-flex flex-grow-1 justify-content-center align-items-center">
-              <Spinner variant="primary" animation="border" />
+              <Spinner />
             </div>
           );
         } else if (timelines === "offline") {

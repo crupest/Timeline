@@ -8,7 +8,7 @@
 }
 
 .cru-text-button.primary:hover {
-  color: var(--tl-primary-lighter-color);
+  color: var(--tl-primary-l1-color);
 }
 
 .cru-text-button.secondary {
@@ -16,7 +16,7 @@
 }
 
 .cru-text-button.secondary:hover {
-  color: var(--tl-secondary-lighter-color);
+  color: var(--tl-secondary-l1-color);
 }
 
 .cru-text-button.success {
@@ -24,7 +24,7 @@
 }
 
 .cru-text-button.success:hover {
-  color: var(--tl-success-lighter-color);
+  color: var(--tl-success-l1-color);
 }
 
 .cru-text-button.danger {
@@ -32,5 +32,5 @@
 }
 
 .cru-text-button.danger:hover {
-  color: var(--tl-danger-lighter-color);
+  color: var(--tl-danger-l1-color);
 }

@@ -15,9 +15,18 @@ function darkenBy(color: Color, ratio: number): Color {
 
 export interface PaletteColor {
   color: string;
-  lighter: string;
-  darker: string;
-  inactive: string;
+  l1: string;
+  l2: string;
+  l3: string;
+  d1: string;
+  d2: string;
+  d3: string;
+  f1: string;
+  f2: string;
+  f3: string;
+  r1: string;
+  r2: string;
+  r3: string;
   [key: string]: string;
 }
 
@@ -37,13 +46,34 @@ export type Palette = Record<PaletteColorType, PaletteColor>;
 
 export function generatePaletteColor(color: string): PaletteColor {
   const c = Color(color);
+  const light = c.lightness() > 60;
+  const l1 = lightenBy(c, 0.1).rgb().toString();
+  const l2 = lightenBy(c, 0.2).rgb().toString();
+  const l3 = lightenBy(c, 0.3).rgb().toString();
+  const d1 = darkenBy(c, 0.1).rgb().toString();
+  const d2 = darkenBy(c, 0.2).rgb().toString();
+  const d3 = darkenBy(c, 0.3).rgb().toString();
+  const f1 = light ? l1 : d1;
+  const f2 = light ? l2 : d2;
+  const f3 = light ? l3 : d3;
+  const r1 = light ? d1 : l1;
+  const r2 = light ? d2 : l2;
+  const r3 = light ? d3 : l3;
+
   return {
     color: c.rgb().toString(),
-    inactive: (c.lightness() > 60 ? darkenBy(c, 0.1) : lightenBy(c, 0.1))
-      .rgb()
-      .toString(),
-    lighter: lightenBy(c, 0.1).rgb().toString(),
-    darker: darkenBy(c, 0.1).rgb().toString(),
+    l1,
+    l2,
+    l3,
+    d1,
+    d2,
+    d3,
+    f1,
+    f2,
+    f3,
+    r1,
+    r2,
+    r3,
   };
 }
 
@@ -91,7 +121,10 @@ export function generatePaletteCSS(palette: Palette): string {
 }
 
 const paletteSubject: BehaviorSubject<Palette | null> =
-  new BehaviorSubject<Palette | null>(null);
+  new BehaviorSubject<Palette | null>(
+    // generatePalette({ primary: "rgb(0, 123, 255)" })
+    null
+  );
 
 export const palette$: Observable<Palette | null> =
   paletteSubject.asObservable();

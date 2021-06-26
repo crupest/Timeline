@@ -9,7 +9,7 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 import TimelinePostBuilder from "@/services/TimelinePostBuilder";
 
 import FlatButton from "../common/button/FlatButton";
-import TabPages from "../common/TabPages";
+import TabPages from "../common/tab/TabPages";
 import ConfirmDialog from "../common/dailog/ConfirmDialog";
 import Spinner from "../common/Spinner";
 

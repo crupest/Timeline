@@ -21,7 +21,7 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <div>
+      <div className="container">
         <div className="row my-3 justify-content-center">
           <div className="col col-12 col-sm-8 col-lg-6">
             <SearchInput

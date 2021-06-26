@@ -20,7 +20,7 @@
 }
 
 .cru-flat-button.primary.disabled {
-  color: var(--tl-primary-lighter-color);
+  color: var(--tl-primary-l1-color);
 }
 
 .cru-flat-button.secondary {
@@ -28,7 +28,7 @@
 }
 
 .cru-flat-button.secondary.disabled {
-  color: var(--tl-secondary-lighter-color);
+  color: var(--tl-secondary-l1-color);
 }
 
 .cru-flat-button.success {
@@ -36,7 +36,7 @@
 }
 
 .cru-flat-button.success.disabled {
-  color: var(--tl-success-lighter-color);
+  color: var(--tl-success-l1-color);
 }
 
 .cru-flat-button.danger {
@@ -44,5 +44,5 @@
 }
 
 .cru-flat-button.danger.disabled {
-  color: var(--tl-danger-ligher-color);
+  color: var(--tl-danger-l1-color);
 }

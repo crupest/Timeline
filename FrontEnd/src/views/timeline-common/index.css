@@ -13,19 +13,19 @@
 
 @keyframes timeline-line-node-noncurrent {
   to {
-    box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color);
+    box-shadow: 0 0 20px 3px var(--tl-primary-l1-color);
   }
 }
 
 @keyframes timeline-line-node-current {
   to {
-    box-shadow: 0 0 20px 3px var(--tl-primary-enhance-lighter-color);
+    box-shadow: 0 0 20px 3px var(--tl-primary-enhance-l1-color);
   }
 }
 
 @keyframes timeline-line-node-loading {
   to {
-    box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color);
+    box-shadow: 0 0 20px 3px var(--tl-primary-l1-color);
   }
 }
 
