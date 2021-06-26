@@ -10,6 +10,7 @@ import { getHttpUserClient } from "@/http/user";
 
 import ImageCropper, { Clip, applyClipToImage } from "../common/ImageCropper";
 import Button from "../common/button/Button";
+import Dialog from "../common/dailog/Dialog";
 
 export interface ChangeAvatarDialogProps {
   open: boolean;
@@ -159,29 +160,27 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
   };
 
   return (
-    <Modal show={props.open} onHide={close}>
-      <Modal.Header>
-        <Modal.Title> {t("settings.dialogChangeAvatar.title")}</Modal.Title>
-      </Modal.Header>
+    <Dialog open={props.open} onClose={close}>
+      <h3>{t("settings.dialogChangeAvatar.title")}</h3>
       {(() => {
         if (state === "select") {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 <div className="row">
                   {t("settings.dialogChangeAvatar.prompt.select")}
                 </div>
                 <div className="row">
                   <input type="file" accept="image/*" onChange={onSelectFile} />
                 </div>
-              </Modal.Body>
-              <Modal.Footer>
+              </div>
+              <div>
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
                   onClick={close}
                 />
-              </Modal.Footer>
+              </div>
             </>
           );
         } else if (state === "crop") {
@@ -190,7 +189,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           }
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 <div className="row justify-content-center">
                   <ImageCropper
                     clip={clip}
@@ -202,8 +201,8 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                 <div className="row">
                   {t("settings.dialogChangeAvatar.prompt.crop")}
                 </div>
-              </Modal.Body>
-              <Modal.Footer>
+              </div>
+              <div>
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
@@ -222,18 +221,18 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                     cropImgElement == null || clip == null || clip.width === 0
                   }
                 />
-              </Modal.Footer>
+              </div>
             </>
           );
         } else if (state === "processcrop") {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 <div className="row">
                   {t("settings.dialogChangeAvatar.prompt.processingCrop")}
                 </div>
-              </Modal.Body>
-              <Modal.Footer>
+              </div>
+              <div>
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
@@ -244,19 +243,19 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   color="secondary"
                   onClick={onPreviewPrevious}
                 />
-              </Modal.Footer>
+              </div>
             </>
           );
         } else if (state === "preview") {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 {createPreviewRow()}
                 <div className="row">
                   {t("settings.dialogChangeAvatar.prompt.preview")}
                 </div>
-              </Modal.Body>
-              <Modal.Footer>
+              </div>
+              <div>
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
@@ -272,46 +271,46 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   color="primary"
                   onClick={upload}
                 />
-              </Modal.Footer>
+              </div>
             </>
           );
         } else if (state === "uploading") {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 {createPreviewRow()}
                 <div className="row">
                   {t("settings.dialogChangeAvatar.prompt.uploading")}
                 </div>
-              </Modal.Body>
-              <Modal.Footer></Modal.Footer>
+              </div>
+              <div></div>
             </>
           );
         } else if (state === "success") {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 <div className="row p-4 text-success">
                   {t("operationDialog.success")}
                 </div>
-              </Modal.Body>
-              <Modal.Footer>
+              </div>
+              <div>
                 <Button
                   text="operationDialog.ok"
                   color="success"
                   onClick={close}
                 />
-              </Modal.Footer>
+              </div>
             </>
           );
         } else {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 {createPreviewRow()}
                 <div className="row text-danger">{trueMessage}</div>
-              </Modal.Body>
-              <Modal.Footer>
+              </div>
+              <div>
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
@@ -322,12 +321,12 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   color="primary"
                   onClick={upload}
                 />
-              </Modal.Footer>
+              </div>
             </>
           );
         }
       })()}
-    </Modal>
+    </Dialog>
   );
 };
 

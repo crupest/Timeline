@@ -4,7 +4,7 @@ import { Trans } from "react-i18next";
 
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
-import OperationDialog from "../common/OperationDialog";
+import OperationDialog from "../common/dailog/OperationDialog";
 
 interface TimelineDeleteDialog {
   timeline: HttpTimelineInfo;
@@ -20,7 +20,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
   return (
     <OperationDialog
       open={props.open}
-      close={props.close}
+      onClose={props.close}
       title="timeline.deleteDialog.title"
       themeColor="danger"
       inputPrompt={() => {

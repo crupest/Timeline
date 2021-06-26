@@ -2,7 +2,7 @@ import { getHttpUserClient } from "@/http/user";
 import { useUserLoggedIn } from "@/services/user";
 import React from "react";
 
-import OperationDialog from "../common/OperationDialog";
+import OperationDialog from "../common/dailog/OperationDialog";
 
 export interface ChangeNicknameDialogProps {
   open: boolean;
@@ -24,7 +24,7 @@ const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
           nickname: newNickname,
         });
       }}
-      close={props.close}
+      onClose={props.close}
     />
   );
 };

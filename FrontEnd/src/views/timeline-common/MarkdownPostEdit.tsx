@@ -9,7 +9,7 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 import FlatButton from "../common/button/FlatButton";
 import TabPages from "../common/TabPages";
 import TimelinePostBuilder from "@/services/TimelinePostBuilder";
-import ConfirmDialog from "../common/ConfirmDialog";
+import ConfirmDialog from "../common/dailog/ConfirmDialog";
 
 export interface MarkdownPostEditProps {
   timeline: string;

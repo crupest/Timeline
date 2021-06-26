@@ -3,7 +3,7 @@ import classnames from "classnames";
 
 import OperationDialog, {
   OperationDialogBoolInput,
-} from "../common/OperationDialog";
+} from "../common/dailog/OperationDialog";
 
 import { AuthUser } from "@/services/user";
 import {
@@ -45,7 +45,7 @@ const CreateUserDialog: React.FC<DialogProps<undefined, HttpUser>> = ({
           password,
         })
       }
-      close={close}
+      onClose={close}
       open={open}
       onSuccessAndClose={onSuccess}
     />
@@ -61,7 +61,7 @@ const UserDeleteDialog: React.FC<DialogProps<{ username: string }, unknown>> =
     return (
       <OperationDialog
         open={open}
-        close={close}
+        onClose={close}
         title="admin:user.dialog.delete.title"
         themeColor="danger"
         inputPrompt={() => (
@@ -86,7 +86,7 @@ const UserModifyDialog: React.FC<
   return (
     <OperationDialog
       open={open}
-      close={close}
+      onClose={close}
       title="admin:user.dialog.modify.title"
       themeColor="danger"
       inputPrompt={() => (
@@ -137,7 +137,7 @@ const UserPermissionModifyDialog: React.FC<
   return (
     <OperationDialog
       open={open}
-      close={close}
+      onClose={close}
       title="admin:user.dialog.modifyPermissions.title"
       themeColor="danger"
       inputPrompt={() => (

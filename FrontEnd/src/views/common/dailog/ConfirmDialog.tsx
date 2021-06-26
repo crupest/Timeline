@@ -2,25 +2,23 @@ import { convertI18nText, I18nText } from "@/common";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import Button from "./button/Button";
+import Button from "../button/Button";
+import Dialog from "./Dialog";
 
 const ConfirmDialog: React.FC<{
+  open?: boolean;
   onClose: () => void;
   onConfirm: () => void;
   title: I18nText;
   body: I18nText;
-}> = ({ onClose, onConfirm, title, body }) => {
+}> = ({ open, onClose, onConfirm, title, body }) => {
   const { t } = useTranslation();
 
   return (
-    <Modal onHide={onClose} show centered>
-      <Modal.Header>
-        <Modal.Title className="text-danger">
-          {convertI18nText(title, t)}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>{convertI18nText(body, t)}</Modal.Body>
-      <Modal.Footer>
+    <Dialog onClose={onClose} open={open}>
+      <h3 className="text-danger">{convertI18nText(title, t)}</h3>
+      <p>{convertI18nText(body, t)}</p>
+      <div>
         <Button
           text="operationDialog.cancel"
           color="secondary"
@@ -34,8 +32,8 @@ const ConfirmDialog: React.FC<{
             onClose();
           }}
         />
-      </Modal.Footer>
-    </Modal>
+      </div>
+    </Dialog>
   );
 };
 
