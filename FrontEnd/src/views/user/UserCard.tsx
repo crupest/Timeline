@@ -23,7 +23,7 @@ const UserCard: React.FC<TimelinePageCardProps> = (props) => {
             <div className="align-middle">
               <UserAvatar
                 username={timeline.owner.username}
-                className="avatar small rounded-circle me-3"
+                className="cru-avatar small cru-round me-3"
               />
               {timeline.owner.nickname}
             </div>
