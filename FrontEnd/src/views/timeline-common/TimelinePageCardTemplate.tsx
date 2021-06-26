@@ -18,7 +18,7 @@ import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import ConnectionStatusBadge from "./ConnectionStatusBadge";
 import { MenuItems, PopupMenu } from "../common/Menu";
-import FullPage from "../common/FullPage";
+import FullPageDialog from "../common/dailog/FullPageDialog";
 import Card from "../common/Card";
 
 export interface TimelineCardTemplateProps extends TimelinePageCardProps {
@@ -120,13 +120,13 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
           <CollapseButton collapse={collapse} onClick={toggleCollapse} />
         </div>
         {isSmallScreen ? (
-          <FullPage
+          <FullPageDialog
             onBack={toggleCollapse}
             show={!collapse}
             contentContainerClassName="p-2"
           >
             {content}
-          </FullPage>
+          </FullPageDialog>
         ) : (
           <div style={{ display: collapse ? "none" : "block" }}>{content}</div>
         )}

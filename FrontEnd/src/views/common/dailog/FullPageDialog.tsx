@@ -1,13 +1,13 @@
 import React from "react";
 import classnames from "classnames";
 
-export interface FullPageProps {
+export interface FullPageDialogProps {
   show: boolean;
   onBack: () => void;
   contentContainerClassName?: string;
 }
 
-const FullPage: React.FC<FullPageProps> = ({
+const FullPageDialog: React.FC<FullPageDialogProps> = ({
   show,
   onBack,
   children,
@@ -36,4 +36,4 @@ const FullPage: React.FC<FullPageProps> = ({
   );
 };
 
-export default FullPage;
+export default FullPageDialog;

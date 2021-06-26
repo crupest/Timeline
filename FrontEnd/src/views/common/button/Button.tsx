@@ -6,16 +6,19 @@ import { calculateProps, CommonButtonProps } from "./common";
 import "./Button.css";
 
 function _Button(
-  props: CommonButtonProps & { customButtonClassName?: string },
+  props: CommonButtonProps & {
+    outline?: boolean;
+    customButtonClassName?: string;
+  },
   ref: React.ForwardedRef<HTMLButtonElement>
 ): React.ReactElement | null {
   const { t } = useTranslation();
 
-  const { customButtonClassName, ...otherProps } = props;
+  const { customButtonClassName, outline, ...otherProps } = props;
 
   const { newProps, children } = calculateProps(
     otherProps,
-    customButtonClassName ?? "cru-button",
+    customButtonClassName ?? "cru-button" + (outline ? " outline" : ""),
     t
   );
 

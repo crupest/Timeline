@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 
 import LoadingButton from "./button/LoadingButton";
 
+import "./SearchInput.css";
+
 export interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
