@@ -10,6 +10,11 @@
   background-color: var(--tl-primary-color);
   transition: background-color 1s;
 }
+
+.app-bar .cru-avatar {
+  background-color: white;
+}
+
 .app-bar a {
   color: var(--tl-text-on-primary-r1-color);
   text-decoration: none;

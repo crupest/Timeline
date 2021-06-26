@@ -3,6 +3,8 @@ import classnames from "classnames";
 
 import { UiLogicError } from "@/common";
 
+import "./ImageCropper.css";
+
 export interface Clip {
   left: number;
   top: number;
