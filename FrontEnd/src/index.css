@@ -2,6 +2,8 @@
 @import "bootstrap/dist/css/bootstrap-grid.css";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+@import "./views/common/index.css";
+
 :root {
   --tl-background-color: #f8f9fa;
 
@@ -98,16 +100,24 @@
   --tl-success-r3-color: rgb(0, 243, 0);
 }
 
-body {
-  background: var(--tl-background-color);
-}
-
 .tl-color-primary {
   color: var(--tl-primary-color);
 }
 
+.tl-color-secondary {
+  color: var(--tl-secondary-color);
+}
+
+.tl-color-success {
+  color: var(--tl-success-color);
+}
+
 .tl-color-danger {
   color: var(--tl-danger-color);
+}
+
+body {
+  background: var(--tl-background-color);
 }
 
 small {
@@ -117,21 +127,6 @@ small {
 .flex-fix-length {
   flex-grow: 0;
   flex-shrink: 0;
-}
-
-.avatar {
-  width: 60px;
-  height: 60px;
-}
-
-.avatar.large {
-  width: 100px;
-  height: 100px;
-}
-
-.avatar.small {
-  width: 40px;
-  height: 40px;
 }
 
 .icon-button {
@@ -166,14 +161,6 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.text-orange {
-  color: #fd7e14;
-}
-
-.text-yellow {
-  color: #ffc107;
 }
 
 .touch-action-none {

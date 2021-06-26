@@ -68,7 +68,7 @@ const AppBar: React.FC = (_) => {
                 "/",
                 <UserAvatar
                   username={user.username}
-                  className="avatar small rounded-circle bg-white cursor-pointer ml-auto"
+                  className="cru-avatar small cru-round cursor-pointer ml-auto"
                 />,
                 "app-bar-avatar"
               )
