@@ -1,9 +1,9 @@
 import React from "react";
 import classnames from "classnames";
-import { OverlayTrigger, OverlayTriggerProps, Popover } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import { BootstrapThemeColor, convertI18nText, I18nText } from "@/common";
+import { convertI18nText, I18nText } from "@/common";
+import { PaletteColorType } from "@/palette";
 
 export type MenuItem =
   | {
@@ -13,7 +13,7 @@ export type MenuItem =
       type: "button";
       text: I18nText;
       iconClassName?: string;
-      color?: BootstrapThemeColor;
+      color?: PaletteColorType;
       onClick: () => void;
     };
 
@@ -67,26 +67,14 @@ export default Menu;
 
 export interface PopupMenuProps {
   items: MenuItems;
-  children: OverlayTriggerProps["children"];
+  children: React.ReactElement;
 }
 
 export const PopupMenu: React.FC<PopupMenuProps> = ({ items, children }) => {
   const [show, setShow] = React.useState<boolean>(false);
   const toggle = (): void => setShow(!show);
 
-  return (
-    <OverlayTrigger
-      trigger="click"
-      rootClose
-      overlay={
-        <Popover id="menu-popover">
-          <Menu items={items} onItemClicked={() => setShow(false)} />
-        </Popover>
-      }
-      show={show}
-      onToggle={toggle}
-    >
-      {children}
-    </OverlayTrigger>
-  );
+  // TODO:
+
+  return <Menu items={items} onItemClicked={() => setShow(false)} />;
 };

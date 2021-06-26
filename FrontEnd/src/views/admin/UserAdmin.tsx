@@ -15,6 +15,7 @@ import {
 import { Trans, useTranslation } from "react-i18next";
 import Button from "../common/button/Button";
 import TextButton from "../common/button/TextButton";
+import Spinner from "../common/Spinner";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
@@ -203,7 +204,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
   const [editMaskVisible, setEditMaskVisible] = React.useState<boolean>(false);
 
   return (
-    <ListGroup.Item className="admin-user-item">
+    <div className="admin-user-item">
       <i
         className="bi-pencil-square float-end icon-button text-warning"
         onClick={() => setEditMaskVisible(true)}
@@ -242,7 +243,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
           onClick={on[kDelete]}
         />
       </div>
-    </ListGroup.Item>
+    </div>
   );
 };
 
@@ -251,8 +252,6 @@ interface UserAdminProps {
 }
 
 const UserAdmin: React.FC<UserAdminProps> = () => {
-  const { t } = useTranslation();
-
   type DialogInfo =
     | null
     | {
@@ -390,7 +389,7 @@ const UserAdmin: React.FC<UserAdminProps> = () => {
       </>
     );
   } else {
-    return <Spinner animation="border" />;
+    return <Spinner />;
   }
 };
 

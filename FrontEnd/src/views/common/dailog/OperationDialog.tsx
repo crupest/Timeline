@@ -5,6 +5,8 @@ import moment from "moment";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
+import { PaletteColorType } from "@/palette";
+
 import Button from "../button/Button";
 import LoadingButton from "../button/LoadingButton";
 import Dialog from "./Dialog";
@@ -144,7 +146,7 @@ export interface OperationDialogProps<
   open: boolean;
   onClose: () => void;
   title: I18nText | (() => React.ReactNode);
-  themeColor?: "danger" | "success" | string;
+  themeColor?: PaletteColorType;
   onProcess: (
     inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
   ) => Promise<TData>;
@@ -290,50 +292,42 @@ const OperationDialog = <
 
             if (item.type === "text") {
               return (
-                <Form.Group key={index}>
+                <div key={index}>
                   {item.label && (
-                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
+                    <label>{convertI18nText(item.label, t)}</label>
                   )}
-                  <Form.Control
+                  <input
                     type={item.password === true ? "password" : "text"}
                     value={value as string}
                     onChange={(e) => {
                       const v = e.target.value;
                       updateValue(index, v);
                     }}
-                    isInvalid={error != null}
                     disabled={process}
                   />
-                  {error != null && (
-                    <Form.Control.Feedback type="invalid">
-                      {error}
-                    </Form.Control.Feedback>
-                  )}
-                  {item.helperText && (
-                    <Form.Text>{t(item.helperText)}</Form.Text>
-                  )}
-                </Form.Group>
+                  {error != null && <div>{error}</div>}
+                  {item.helperText && <div>{t(item.helperText)}</div>}
+                </div>
               );
             } else if (item.type === "bool") {
               return (
-                <Form.Group key={index}>
-                  <Form.Check<"input">
+                <div key={index}>
+                  <input
                     type="checkbox"
                     checked={value as boolean}
                     onChange={(event) => {
                       updateValue(index, event.currentTarget.checked);
                     }}
-                    label={convertI18nText(item.label, t)}
                     disabled={process}
                   />
-                </Form.Group>
+                  <label>{convertI18nText(item.label, t)}</label>
+                </div>
               );
             } else if (item.type === "select") {
               return (
-                <Form.Group key={index}>
-                  <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
-                  <Form.Control
-                    as="select"
+                <div key={index}>
+                  <label>{convertI18nText(item.label, t)}</label>
+                  <select
                     value={value as string}
                     onChange={(event) => {
                       updateValue(index, event.target.value);
@@ -348,14 +342,14 @@ const OperationDialog = <
                         </option>
                       );
                     })}
-                  </Form.Control>
-                </Form.Group>
+                  </select>
+                </div>
               );
             } else if (item.type === "color") {
               return (
-                <Form.Group key={index}>
+                <div key={index}>
                   {item.canBeNull ? (
-                    <Form.Check<"input">
+                    <input
                       type="checkbox"
                       checked={value !== null}
                       onChange={(event) => {
@@ -365,42 +359,35 @@ const OperationDialog = <
                           updateValue(index, null);
                         }
                       }}
-                      label={convertI18nText(item.label, t)}
                       disabled={process}
                     />
-                  ) : (
-                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
-                  )}
+                  ) : null}
+                  <label>{convertI18nText(item.label, t)}</label>
                   {value !== null && (
                     <TwitterPicker
                       color={value as string}
                       onChange={(result) => updateValue(index, result.hex)}
                     />
                   )}
-                </Form.Group>
+                </div>
               );
             } else if (item.type === "datetime") {
               return (
-                <Form.Group key={index}>
+                <div key={index}>
                   {item.label && (
-                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
+                    <label>{convertI18nText(item.label, t)}</label>
                   )}
-                  <Form.Control
+                  <input
                     type="datetime-local"
                     value={value as string}
                     onChange={(e) => {
                       const v = e.target.value;
                       updateValue(index, v);
                     }}
-                    isInvalid={error != null}
                     disabled={process}
                   />
-                  {error != null && (
-                    <Form.Control.Feedback type="invalid">
-                      {error}
-                    </Form.Control.Feedback>
-                  )}
-                </Form.Group>
+                  {error != null && <div>{error}</div>}
+                </div>
               );
             }
           })}
@@ -412,7 +399,7 @@ const OperationDialog = <
             onClick={close}
           />
           <LoadingButton
-            variant={props.themeColor}
+            color={props.themeColor}
             loading={process}
             disabled={!canProcess}
             onClick={() => {

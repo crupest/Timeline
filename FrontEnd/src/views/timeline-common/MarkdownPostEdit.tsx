@@ -1,15 +1,17 @@
+/* eslint-disable react/jsx-no-undef */
 import React from "react";
 import classnames from "classnames";
-import { Form, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Prompt } from "react-router";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
+import TimelinePostBuilder from "@/services/TimelinePostBuilder";
+
 import FlatButton from "../common/button/FlatButton";
 import TabPages from "../common/TabPages";
-import TimelinePostBuilder from "@/services/TimelinePostBuilder";
 import ConfirmDialog from "../common/dailog/ConfirmDialog";
+import Spinner from "../common/Spinner";
 
 export interface MarkdownPostEditProps {
   timeline: string;
@@ -102,7 +104,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         pageContainerClassName="py-2"
         actions={
           process ? (
-            <Spinner variant="primary" animation="border" size="sm" />
+            <Spinner />
           ) : (
             <>
               <FlatButton

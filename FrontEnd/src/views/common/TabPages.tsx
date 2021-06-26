@@ -1,5 +1,4 @@
 import React from "react";
-import { Nav } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
@@ -31,6 +30,8 @@ const TabPages: React.FC<TabPagesProps> = ({
   pageContainerClassName,
   pageContainerStyle,
 }) => {
+  // TODO:
+
   if (pages.length === 0) {
     throw new UiLogicError("Page list can't be empty.");
   }
@@ -47,23 +48,6 @@ const TabPages: React.FC<TabPagesProps> = ({
 
   return (
     <div className={className} style={style}>
-      <Nav variant="tabs" className={navClassName} style={navStyle}>
-        {pages.map((page) => (
-          <Nav.Item key={page.id}>
-            <Nav.Link
-              active={tab === page.id}
-              onClick={() => {
-                setTab(page.id);
-              }}
-            >
-              {convertI18nText(page.tabText, t)}
-            </Nav.Link>
-          </Nav.Item>
-        ))}
-        {actions != null && (
-          <div className="ms-auto cru-tab-pages-action-area">{actions}</div>
-        )}
-      </Nav>
       <div className={pageContainerClassName} style={pageContainerStyle}>
         {currentPage.page}
       </div>

@@ -81,67 +81,59 @@ const LoginPage: React.FC = (_) => {
     <div className="login-container container-fluid mt-2">
       <h1 className="text-center">{t("welcome")}</h1>
       <div>
-          <Form.Label htmlFor="username">{t("user.username")}</Form.Label>
-          <Form.Control
-            id="username"
-            disabled={process}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              setUsernameDirty(true);
-            }}
-            value={username}
-            isInvalid={usernameDirty && username === ""}
-          />
-          {usernameDirty && username === "" && (
-            <Form.Control.Feedback type="invalid">
-              {t("login.emptyUsername")}
-            </Form.Control.Feedback>
-          )}
-          <Form.Label htmlFor="password">{t("user.password")}</Form.Label>
-          <Form.Control
-            id="password"
-            type="password"
-            disabled={process}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordDirty(true);
-            }}
-            value={password}
-            onKeyDown={onEnterPressInPassword}
-            isInvalid={passwordDirty && password === ""}
-          />
-          {passwordDirty && password === "" && (
-            <Form.Control.Feedback type="invalid">
-              {t("login.emptyPassword")}
-            </Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group>
-          <Form.Check<"input">
-            id="remember-me"
-            type="checkbox"
-            checked={rememberMe}
-            onChange={(e) => {
-              setRememberMe(e.currentTarget.checked);
-            }}
-            label={t("user.rememberMe")}
-          />
-        </Form.Group>
-        {error ? <p className="text-danger">{t(error)}</p> : null}
-        <div className="text-end">
-          <LoadingButton
-            loading={process}
-            variant="primary"
-            onClick={(e) => {
-              submit();
-              e.preventDefault();
-            }}
-            disabled={username === "" || password === "" ? true : undefined}
-          >
-            {t("user.login")}
-          </LoadingButton>
-        </div>
-      </Form>
+        <label htmlFor="username">{t("user.username")}</label>
+        <input
+          id="username"
+          disabled={process}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            setUsernameDirty(true);
+          }}
+          value={username}
+        />
+        {usernameDirty && username === "" && (
+          <div>{t("login.emptyUsername")}</div>
+        )}
+        <label htmlFor="password">{t("user.password")}</label>
+        <input
+          id="password"
+          type="password"
+          disabled={process}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setPasswordDirty(true);
+          }}
+          value={password}
+          onKeyDown={onEnterPressInPassword}
+        />
+        {passwordDirty && password === "" && (
+          <div>{t("login.emptyPassword")}</div>
+        )}
+      </div>
+      <div>
+        <input
+          id="remember-me"
+          type="checkbox"
+          checked={rememberMe}
+          onChange={(e) => {
+            setRememberMe(e.currentTarget.checked);
+          }}
+        />
+        <label>{t("user.rememberMe")}</label>
+      </div>
+      {error ? <p className="text-danger">{t(error)}</p> : null}
+      <div className="text-end">
+        <LoadingButton
+          loading={process}
+          onClick={(e) => {
+            submit();
+            e.preventDefault();
+          }}
+          disabled={username === "" || password === "" ? true : undefined}
+        >
+          {t("user.login")}
+        </LoadingButton>
+      </div>
     </div>
   );
 };

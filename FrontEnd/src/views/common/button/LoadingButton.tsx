@@ -1,26 +1,19 @@
 import React from "react";
 
-const LoadingButton: React.FC<{ loading?: boolean } & ButtonProps> = ({
+import { CommonButtonProps } from "./common";
+import Button from "./Button";
+import Spinner from "../Spinner";
+
+const LoadingButton: React.FC<{ loading?: boolean } & CommonButtonProps> = ({
   loading,
-  variant,
   disabled,
+  color,
   ...otherProps
 }) => {
   return (
-    <Button
-      variant={variant != null ? `outline-${variant}` : "outline-primary"}
-      disabled={disabled || loading}
-      {...otherProps}
-    >
+    <Button color={color} disabled={disabled || loading} {...otherProps}>
       {otherProps.children}
-      {loading ? (
-        <Spinner
-          className="ms-1"
-          variant={variant}
-          animation="grow"
-          size="sm"
-        />
-      ) : null}
+      {loading ? <Spinner color={color} /> : null}
     </Button>
   );
 };
