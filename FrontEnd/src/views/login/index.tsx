@@ -80,8 +80,7 @@ const LoginPage: React.FC = (_) => {
   return (
     <div className="login-container container-fluid mt-2">
       <h1 className="text-center">{t("welcome")}</h1>
-      <Form>
-        <Form.Group>
+      <div>
           <Form.Label htmlFor="username">{t("user.username")}</Form.Label>
           <Form.Control
             id="username"
@@ -98,8 +97,6 @@ const LoginPage: React.FC = (_) => {
               {t("login.emptyUsername")}
             </Form.Control.Feedback>
           )}
-        </Form.Group>
-        <Form.Group>
           <Form.Label htmlFor="password">{t("user.password")}</Form.Label>
           <Form.Control
             id="password"

@@ -35,8 +35,7 @@ const TimelinePostEditText: React.FC<TimelinePostEditTextProps> = (props) => {
   const { text, disabled, onChange, className, style } = props;
 
   return (
-    <Form.Control
-      as="textarea"
+    <textarea
       value={text}
       disabled={disabled}
       onChange={(event) => {
@@ -80,7 +79,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
 
   return (
     <>
-      <Form.Control
+      <input
         type="file"
         onChange={onInputChange}
         accept="image/*"
