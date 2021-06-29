@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { convertI18nText, I18nText } from "@/common";
 import { PaletteColorType } from "@/palette";
 
+import "./Menu.css";
+
 export type MenuItem =
   | {
       type: "divider";
@@ -19,17 +21,23 @@ export type MenuItem =
 
 export type MenuItems = MenuItem[];
 
-export interface MenuProps {
+export type MenuProps = {
   items: MenuItems;
-  className?: string;
   onItemClicked?: () => void;
-}
+  className?: string;
+  style?: React.CSSProperties;
+};
 
-const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
+export default function _Menu({
+  items,
+  onItemClicked,
+  className,
+  style,
+}: MenuProps): React.ReactElement | null {
   const { t } = useTranslation();
 
   return (
-    <div className={classnames("cru-menu", className)}>
+    <div className={classnames("cru-menu", className)} style={style}>
       {items.map((item, index) => {
         if (item.type === "divider") {
           return <div key={index} className="cru-menu-divider" />;
@@ -61,6 +69,4 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
       })}
     </div>
   );
-};
-
-export default Menu;
+}

@@ -17,7 +17,8 @@ import CollapseButton from "./CollapseButton";
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import ConnectionStatusBadge from "./ConnectionStatusBadge";
-import { MenuItems, PopupMenu } from "../common/menu/Menu";
+import { MenuItems } from "../common/menu/Menu";
+import PopupMenu from "../common/menu/PopupMenu";
 import FullPageDialog from "../common/dailog/FullPageDialog";
 import Card from "../common/Card";
 

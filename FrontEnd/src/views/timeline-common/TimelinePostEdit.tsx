@@ -16,7 +16,7 @@ import { base64 } from "@/http/common";
 
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/button/LoadingButton";
-import { PopupMenu } from "../common/menu/Menu";
+import PopupMenu from "../common/menu/PopupMenu";
 import Card from "../common/Card";
 import MarkdownPostEdit from "./MarkdownPostEdit";
 import TimelineLine from "./TimelineLine";
