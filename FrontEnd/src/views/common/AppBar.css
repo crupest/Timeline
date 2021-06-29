@@ -7,7 +7,7 @@
   top: 0;
   left: 0;
   right: 0;
-  background-color: var(--tl-primary-color);
+  background-color: var(--cru-primary-color);
   transition: background-color 1s;
 }
 
@@ -16,16 +16,16 @@
 }
 
 .app-bar a {
-  color: var(--tl-text-on-primary-r1-color);
+  color: var(--cru-text-on-primary-r1-color);
   text-decoration: none;
   margin: 0 1em;
   transition: color 1s;
 }
 .app-bar a:hover {
-  color: var(--tl-text-on-primary-color);
+  color: var(--cru-text-on-primary-color);
 }
 .app-bar a.active {
-  color: var(--tl-text-on-primary-color);
+  color: var(--cru-text-on-primary-color);
 }
 
 .app-bar-brand {
@@ -62,7 +62,7 @@
   right: 0;
   transform-origin: top;
   transition: transform 0.6s, background-color 1s;
-  background-color: var(--tl-primary-color);
+  background-color: var(--cru-primary-color);
   flex-direction: column;
 }
 .small-screen .app-bar-main-area.app-bar-collapse {
@@ -89,7 +89,7 @@
   margin-left: auto;
   font-size: 2em;
   margin-right: 1em;
-  color: var(--tl-text-on-primary-color);
+  color: var(--cru-text-on-primary-color);
   cursor: pointer;
   user-select: none;
 }

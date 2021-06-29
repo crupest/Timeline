@@ -36,6 +36,8 @@ const paletteColorList = [
   "secondary",
   "text-primary",
   "text-on-primary",
+  "text-on-primary-enhance",
+  "text-on-secondary",
   "danger",
   "success",
 ] as const;
@@ -98,6 +100,12 @@ export function generatePalette(options: {
     "text-on-primary": generatePaletteColor(
       p.lightness() > 60 ? "black" : "white"
     ),
+    "text-on-primary-enhance": generatePaletteColor(
+      pe.lightness() > 60 ? "black" : "white"
+    ),
+    "text-on-secondary": generatePaletteColor(
+      s.lightness() > 60 ? "black" : "white"
+    ),
     danger: generatePaletteColor("red"),
     success: generatePaletteColor("green"),
   };
@@ -108,7 +116,7 @@ export function generatePaletteCSS(palette: Palette): string {
   for (const colorType of paletteColorList) {
     const paletteColor = palette[colorType];
     for (const variant in paletteColor) {
-      let key = `--tl-${colorType}`;
+      let key = `--cru-${colorType}`;
       if (variant !== "color") key += `-${variant}`;
       key += "-color";
       colors.push([key, paletteColor[variant]]);
@@ -122,8 +130,8 @@ export function generatePaletteCSS(palette: Palette): string {
 
 const paletteSubject: BehaviorSubject<Palette | null> =
   new BehaviorSubject<Palette | null>(
-    // generatePalette({ primary: "rgb(0, 123, 255)" })
-    null
+    generatePalette({ primary: "rgb(0, 123, 255)" })
+    // null
   );
 
 export const palette$: Observable<Palette | null> =

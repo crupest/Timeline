@@ -1,3 +1,152 @@
+:root {
+  --cru-primary-color: rgb(255, 105, 0);
+  --cru-primary-l1-color: rgb(255, 120, 26);
+  --cru-primary-l2-color: rgb(255, 135, 51);
+  --cru-primary-l3-color: rgb(255, 150, 77);
+  --cru-primary-d1-color: rgb(230, 95, 0);
+  --cru-primary-d2-color: rgb(204, 84, 0);
+  --cru-primary-d3-color: rgb(179, 74, 0);
+  --cru-primary-f1-color: rgb(230, 95, 0);
+  --cru-primary-f2-color: rgb(204, 84, 0);
+  --cru-primary-f3-color: rgb(179, 74, 0);
+  --cru-primary-r1-color: rgb(255, 120, 26);
+  --cru-primary-r2-color: rgb(255, 135, 51);
+  --cru-primary-r3-color: rgb(255, 150, 77);
+  --cru-primary-enhance-color: rgb(255, 150, 77);
+  --cru-primary-enhance-l1-color: rgb(255, 161, 94);
+  --cru-primary-enhance-l2-color: rgb(255, 171, 112);
+  --cru-primary-enhance-l3-color: rgb(255, 182, 130);
+  --cru-primary-enhance-d1-color: rgb(255, 131, 43);
+  --cru-primary-enhance-d2-color: rgb(255, 111, 10);
+  --cru-primary-enhance-d3-color: rgb(232, 96, 0);
+  --cru-primary-enhance-f1-color: rgb(255, 161, 94);
+  --cru-primary-enhance-f2-color: rgb(255, 171, 112);
+  --cru-primary-enhance-f3-color: rgb(255, 182, 130);
+  --cru-primary-enhance-r1-color: rgb(255, 131, 43);
+  --cru-primary-enhance-r2-color: rgb(255, 111, 10);
+  --cru-primary-enhance-r3-color: rgb(232, 96, 0);
+  --cru-secondary-color: rgb(23, 255, 0);
+  --cru-secondary-l1-color: rgb(46, 255, 26);
+  --cru-secondary-l2-color: rgb(69, 255, 51);
+  --cru-secondary-l3-color: rgb(92, 255, 77);
+  --cru-secondary-d1-color: rgb(20, 230, 0);
+  --cru-secondary-d2-color: rgb(18, 204, 0);
+  --cru-secondary-d3-color: rgb(16, 179, 0);
+  --cru-secondary-f1-color: rgb(20, 230, 0);
+  --cru-secondary-f2-color: rgb(18, 204, 0);
+  --cru-secondary-f3-color: rgb(16, 179, 0);
+  --cru-secondary-r1-color: rgb(46, 255, 26);
+  --cru-secondary-r2-color: rgb(69, 255, 51);
+  --cru-secondary-r3-color: rgb(92, 255, 77);
+  --cru-text-primary-color: rgb(17, 17, 17);
+  --cru-text-primary-l1-color: rgb(41, 41, 41);
+  --cru-text-primary-l2-color: rgb(65, 65, 65);
+  --cru-text-primary-l3-color: rgb(88, 88, 88);
+  --cru-text-primary-d1-color: rgb(15, 15, 15);
+  --cru-text-primary-d2-color: rgb(14, 14, 14);
+  --cru-text-primary-d3-color: rgb(12, 12, 12);
+  --cru-text-primary-f1-color: rgb(15, 15, 15);
+  --cru-text-primary-f2-color: rgb(14, 14, 14);
+  --cru-text-primary-f3-color: rgb(12, 12, 12);
+  --cru-text-primary-r1-color: rgb(41, 41, 41);
+  --cru-text-primary-r2-color: rgb(65, 65, 65);
+  --cru-text-primary-r3-color: rgb(88, 88, 88);
+  --cru-text-on-primary-color: rgb(255, 255, 255);
+  --cru-text-on-primary-l1-color: rgb(255, 255, 255);
+  --cru-text-on-primary-l2-color: rgb(255, 255, 255);
+  --cru-text-on-primary-l3-color: rgb(255, 255, 255);
+  --cru-text-on-primary-d1-color: rgb(230, 230, 230);
+  --cru-text-on-primary-d2-color: rgb(204, 204, 204);
+  --cru-text-on-primary-d3-color: rgb(179, 179, 179);
+  --cru-text-on-primary-f1-color: rgb(255, 255, 255);
+  --cru-text-on-primary-f2-color: rgb(255, 255, 255);
+  --cru-text-on-primary-f3-color: rgb(255, 255, 255);
+  --cru-text-on-primary-r1-color: rgb(230, 230, 230);
+  --cru-text-on-primary-r2-color: rgb(204, 204, 204);
+  --cru-text-on-primary-r3-color: rgb(179, 179, 179);
+  --cru-text-on-primary-enhance-color: rgb(0, 0, 0);
+  --cru-text-on-primary-enhance-l1-color: rgb(26, 26, 26);
+  --cru-text-on-primary-enhance-l2-color: rgb(51, 51, 51);
+  --cru-text-on-primary-enhance-l3-color: rgb(77, 77, 77);
+  --cru-text-on-primary-enhance-d1-color: rgb(0, 0, 0);
+  --cru-text-on-primary-enhance-d2-color: rgb(0, 0, 0);
+  --cru-text-on-primary-enhance-d3-color: rgb(0, 0, 0);
+  --cru-text-on-primary-enhance-f1-color: rgb(0, 0, 0);
+  --cru-text-on-primary-enhance-f2-color: rgb(0, 0, 0);
+  --cru-text-on-primary-enhance-f3-color: rgb(0, 0, 0);
+  --cru-text-on-primary-enhance-r1-color: rgb(26, 26, 26);
+  --cru-text-on-primary-enhance-r2-color: rgb(51, 51, 51);
+  --cru-text-on-primary-enhance-r3-color: rgb(77, 77, 77);
+  --cru-text-on-secondary-color: rgb(255, 255, 255);
+  --cru-text-on-secondary-l1-color: rgb(255, 255, 255);
+  --cru-text-on-secondary-l2-color: rgb(255, 255, 255);
+  --cru-text-on-secondary-l3-color: rgb(255, 255, 255);
+  --cru-text-on-secondary-d1-color: rgb(230, 230, 230);
+  --cru-text-on-secondary-d2-color: rgb(204, 204, 204);
+  --cru-text-on-secondary-d3-color: rgb(179, 179, 179);
+  --cru-text-on-secondary-f1-color: rgb(255, 255, 255);
+  --cru-text-on-secondary-f2-color: rgb(255, 255, 255);
+  --cru-text-on-secondary-f3-color: rgb(255, 255, 255);
+  --cru-text-on-secondary-r1-color: rgb(230, 230, 230);
+  --cru-text-on-secondary-r2-color: rgb(204, 204, 204);
+  --cru-text-on-secondary-r3-color: rgb(179, 179, 179);
+  --cru-danger-color: rgb(255, 0, 0);
+  --cru-danger-l1-color: rgb(255, 26, 26);
+  --cru-danger-l2-color: rgb(255, 51, 51);
+  --cru-danger-l3-color: rgb(255, 77, 77);
+  --cru-danger-d1-color: rgb(230, 0, 0);
+  --cru-danger-d2-color: rgb(204, 0, 0);
+  --cru-danger-d3-color: rgb(179, 0, 0);
+  --cru-danger-f1-color: rgb(230, 0, 0);
+  --cru-danger-f2-color: rgb(204, 0, 0);
+  --cru-danger-f3-color: rgb(179, 0, 0);
+  --cru-danger-r1-color: rgb(255, 26, 26);
+  --cru-danger-r2-color: rgb(255, 51, 51);
+  --cru-danger-r3-color: rgb(255, 77, 77);
+  --cru-success-color: rgb(0, 128, 0);
+  --cru-success-l1-color: rgb(0, 166, 0);
+  --cru-success-l2-color: rgb(0, 204, 0);
+  --cru-success-l3-color: rgb(0, 243, 0);
+  --cru-success-d1-color: rgb(0, 115, 0);
+  --cru-success-d2-color: rgb(0, 102, 0);
+  --cru-success-d3-color: rgb(0, 90, 0);
+  --cru-success-f1-color: rgb(0, 115, 0);
+  --cru-success-f2-color: rgb(0, 102, 0);
+  --cru-success-f3-color: rgb(0, 90, 0);
+  --cru-success-r1-color: rgb(0, 166, 0);
+  --cru-success-r2-color: rgb(0, 204, 0);
+  --cru-success-r3-color: rgb(0, 243, 0);
+}
+
+.tl-color-primary {
+  color: var(--cru-primary-color);
+}
+
+.tl-color-secondary {
+  color: var(--cru-secondary-color);
+}
+
+.tl-color-success {
+  color: var(--cru-success-color);
+}
+
+.tl-color-danger {
+  color: var(--cru-danger-color);
+}
+
+.icon-button {
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.icon-button.large {
+  font-size: 1.6rem;
+}
+
+.icon-button.primary-enhance {
+  color: var(--cru-primary-enhance-color);
+}
+
 .cru-avatar {
   width: 60px;
   height: 60px;
@@ -49,87 +198,13 @@
   left: 0;
   right: 0;
   z-index: 1;
-  background-color: var(--tl-primary-color);
+  background-color: var(--cru-primary-color);
   display: flex;
   align-items: center;
 }
 
 .cru-full-page-content-container {
   overflow: scroll;
-}
-
-.cru-menu {
-  min-width: 200px;
-}
-
-.cru-menu-item {
-  font-size: 1.2em;
-  padding: 0.5em 1.5em;
-  cursor: pointer;
-}
-.cru-menu-item.color-primary {
-  color: #0d6efd;
-}
-.cru-menu-item.color-primary:hover {
-  color: white;
-  background-color: #0d6efd;
-}
-.cru-menu-item.color-secondary {
-  color: #6c757d;
-}
-.cru-menu-item.color-secondary:hover {
-  color: white;
-  background-color: #6c757d;
-}
-.cru-menu-item.color-success {
-  color: #198754;
-}
-.cru-menu-item.color-success:hover {
-  color: white;
-  background-color: #198754;
-}
-.cru-menu-item.color-info {
-  color: #0dcaf0;
-}
-.cru-menu-item.color-info:hover {
-  color: white;
-  background-color: #0dcaf0;
-}
-.cru-menu-item.color-warning {
-  color: #ffc107;
-}
-.cru-menu-item.color-warning:hover {
-  color: white;
-  background-color: #ffc107;
-}
-.cru-menu-item.color-danger {
-  color: #dc3545;
-}
-.cru-menu-item.color-danger:hover {
-  color: white;
-  background-color: #dc3545;
-}
-.cru-menu-item.color-light {
-  color: #f8f9fa;
-}
-.cru-menu-item.color-light:hover {
-  color: white;
-  background-color: #f8f9fa;
-}
-.cru-menu-item.color-dark {
-  color: #212529;
-}
-.cru-menu-item.color-dark:hover {
-  color: white;
-  background-color: #212529;
-}
-
-.cru-menu-item-icon {
-  margin-right: 1em;
-}
-
-.cru-menu-divider {
-  border-top: 1px solid #e9ecef;
 }
 
 .cru-tab-pages-action-area {
