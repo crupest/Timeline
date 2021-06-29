@@ -8,65 +8,65 @@
 }
 
 .cru-button.primary {
-  background-color: var(--tl-primary-color);
+  background-color: var(--cru-primary-color);
 }
 
 .cru-button.primary:hover {
-  background-color: var(--tl-primary-f1-color);
+  background-color: var(--cru-primary-f1-color);
 }
 
 .cru-button.primary:active {
-  background-color: var(--tl-primary-f2-color);
+  background-color: var(--cru-primary-f2-color);
 }
 
 .cru-button.primary.disabled {
-  background-color: var(--tl-primary-f3-color);
+  background-color: var(--cru-primary-f3-color);
 }
 
 .cru-button.secondary {
-  background-color: var(--tl-secondary-color);
+  background-color: var(--cru-secondary-color);
 }
 
 .cru-button.secondary:hover {
-  background-color: var(--tl-secondary-f1-color);
+  background-color: var(--cru-secondary-f1-color);
 }
 
 .cru-button.secondary:active {
-  background-color: var(--tl-secondary-f2-color);
+  background-color: var(--cru-secondary-f2-color);
 }
 
 .cru-button.secondary.disabled {
-  background-color: var(--tl-secondary-f3-color);
+  background-color: var(--cru-secondary-f3-color);
 }
 
 .cru-button.success {
-  background-color: var(--tl-success-color);
+  background-color: var(--cru-success-color);
 }
 
 .cru-button.success:hover {
-  background-color: var(--tl-success-f1-color);
+  background-color: var(--cru-success-f1-color);
 }
 
 .cru-button.success:active {
-  background-color: var(--tl-success-f2-color);
+  background-color: var(--cru-success-f2-color);
 }
 
 .cru-button.success.disabled {
-  background-color: var(--tl-success-f3-color);
+  background-color: var(--cru-success-f3-color);
 }
 
 .cru-button.danger {
-  background-color: var(--tl-danger-color);
+  background-color: var(--cru-danger-color);
 }
 
 .cru-button.danger:hover {
-  background-color: var(--tl-danger-f1-color);
+  background-color: var(--cru-danger-f1-color);
 }
 
 .cru-button.danger:active {
-  background-color: var(--tl-danger-f2-color);
+  background-color: var(--cru-danger-f2-color);
 }
 
 .cru-button.danger.disabled {
-  background-color: var(--tl-danger-f3-color);
+  background-color: var(--cru-danger-f3-color);
 }

@@ -11,5 +11,5 @@
 }
 
 .cru-card:hover {
-  border-color: var(--tl-primary-color);
+  border-color: var(--cru-primary-color);
 }

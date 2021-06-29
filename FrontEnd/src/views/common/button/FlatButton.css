@@ -16,33 +16,33 @@
 }
 
 .cru-flat-button.primary {
-  color: var(--tl-primary-color);
+  color: var(--cru-primary-color);
 }
 
 .cru-flat-button.primary.disabled {
-  color: var(--tl-primary-l1-color);
+  color: var(--cru-primary-l1-color);
 }
 
 .cru-flat-button.secondary {
-  color: var(--tl-secondary-color);
+  color: var(--cru-secondary-color);
 }
 
 .cru-flat-button.secondary.disabled {
-  color: var(--tl-secondary-l1-color);
+  color: var(--cru-secondary-l1-color);
 }
 
 .cru-flat-button.success {
-  color: var(--tl-success-color);
+  color: var(--cru-success-color);
 }
 
 .cru-flat-button.success.disabled {
-  color: var(--tl-success-l1-color);
+  color: var(--cru-success-l1-color);
 }
 
 .cru-flat-button.danger {
-  color: var(--tl-danger-color);
+  color: var(--cru-danger-color);
 }
 
 .cru-flat-button.danger.disabled {
-  color: var(--tl-danger-l1-color);
+  color: var(--cru-danger-l1-color);
 }

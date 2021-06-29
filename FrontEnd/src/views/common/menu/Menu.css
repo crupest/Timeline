@@ -1,0 +1,35 @@
+.cru-menu {
+  min-width: 200px;
+}
+
+.cru-menu-item {
+  font-size: 1.2em;
+  padding: 0.5em 1.5em;
+  cursor: pointer;
+}
+
+.cru-menu-item.color-primary {
+  color: var(--cru-primary-color);
+}
+
+.cru-menu-item.color-primary:hover {
+  color: var(--cru-text-on-primary-color);
+  background-color: var(--cru-primary-color);
+}
+
+.cru-menu-item.color-secondary {
+  color: var(--cru-secondary-color);
+}
+
+.cru-menu-item.color-secondary:hover {
+  color: var(--cru-text-on-secondary-color);
+  background-color: var(--cru-secondary-color);
+}
+
+.cru-menu-item-icon {
+  margin-right: 1em;
+}
+
+.cru-menu-divider {
+  border-top: 1px solid #e9ecef;
+}
