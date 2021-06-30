@@ -18,7 +18,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
       <TimelinePageCardTemplate
         infoArea={
           <>
-            <h3 className="tl-color-primary d-inline-block align-middle">
+            <h3 className="cru-color-primary d-inline-block align-middle">
               {timeline.title}
               <small className="ms-3 text-secondary">{timeline.name}</small>
             </h3>

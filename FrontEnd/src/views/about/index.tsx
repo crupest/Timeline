@@ -77,11 +77,11 @@ const AboutPage: React.FC = () => {
             <div>
               <p>
                 <small>{t("about.author.fullname")}</small>
-                <span className="tl-color-primary">杨宇千</span>
+                <span className="cru-color-primary">杨宇千</span>
               </p>
               <p>
                 <small>{t("about.author.nickname")}</small>
-                <span className="tl-color-primary">crupest</span>
+                <span className="cru-color-primary">crupest</span>
               </p>
               <p>
                 <small>{t("about.author.introduction")}</small>
@@ -105,7 +105,7 @@ const AboutPage: React.FC = () => {
         <h4>{t("about.site.title")}</h4>
         <p>
           <Trans i18nKey="about.site.content">
-            0<span className="tl-color-primary">1</span>2<b>3</b>4
+            0<span className="cru-color-primary">1</span>2<b>3</b>4
             <a href="#author-info">5</a>6
           </Trans>
         </p>

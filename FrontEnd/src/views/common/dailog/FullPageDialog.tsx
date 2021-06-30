@@ -1,5 +1,8 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import classnames from "classnames";
+
+import "./FullPageDialog.css";
 
 export interface FullPageDialogProps {
   show: boolean;
@@ -13,7 +16,7 @@ const FullPageDialog: React.FC<FullPageDialogProps> = ({
   children,
   contentContainerClassName,
 }) => {
-  return (
+  return createPortal(
     <div
       className="cru-full-page"
       style={{ display: show ? undefined : "none" }}
@@ -32,7 +35,9 @@ const FullPageDialog: React.FC<FullPageDialogProps> = ({
       >
         {children}
       </div>
-    </div>
+    </div>,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    document.getElementById("portal")!
   );
 };
 

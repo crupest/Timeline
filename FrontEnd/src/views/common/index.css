@@ -120,20 +120,32 @@
   --cru-success-r3-color: rgb(0, 243, 0);
 }
 
-.tl-color-primary {
+.cru-color-primary {
   color: var(--cru-primary-color);
 }
 
-.tl-color-secondary {
+.cru-color-secondary {
   color: var(--cru-secondary-color);
 }
 
-.tl-color-success {
+.cru-color-success {
   color: var(--cru-success-color);
 }
 
-.tl-color-danger {
+.cru-color-danger {
   color: var(--cru-danger-color);
+}
+
+.cru-text-end {
+  text-align: end;
+}
+
+.cru-float-right {
+  float: right;
+}
+
+.cru-clearfix::after {
+  clear: both;
 }
 
 .icon-button {
@@ -180,33 +192,6 @@
 }
 .cru-skeleton-line.last {
   width: 50%;
-}
-
-.cru-full-page {
-  position: fixed;
-  z-index: 1031;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background-color: white;
-  padding-top: 56px;
-}
-
-.cru-full-page-top-bar {
-  height: 56px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  background-color: var(--cru-primary-color);
-  display: flex;
-  align-items: center;
-}
-
-.cru-full-page-content-container {
-  overflow: scroll;
 }
 
 .cru-tab-pages-action-area {

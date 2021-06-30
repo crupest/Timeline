@@ -54,11 +54,11 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
       <small className="mt-1 d-block">
         {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
       </small>
-      <div className="text-end mt-2">
+      <div className="mt-2 cru-text-end">
         <i
           className={classnames(
             timeline.isHighlight ? "bi-star-fill" : "bi-star",
-            "icon-button text-yellow me-3"
+            "icon-button cru-color-primary me-3"
           )}
           onClick={
             user?.hasHighlightTimelineAdministrationPermission
@@ -81,7 +81,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
           <i
             className={classnames(
               timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
-              "icon-button text-yellow me-3"
+              "icon-button cru-color-primary me-3"
             )}
             onClick={() => {
               getHttpBookmarkClient()
@@ -98,12 +98,12 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
           />
         ) : null}
         <i
-          className={"icon-button bi-people text-primary me-3"}
+          className={"icon-button bi-people cru-color-primary me-3"}
           onClick={() => setDialog("member")}
         />
         {manageItems != null ? (
-          <PopupMenu items={manageItems}>
-            <i className="icon-button bi-three-dots-vertical text-primary" />
+          <PopupMenu items={manageItems} containerClassName="d-inline">
+            <i className="icon-button bi-three-dots-vertical cru-color-primary" />
           </PopupMenu>
         ) : null}
       </div>
@@ -113,10 +113,10 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
   return (
     <>
       <Card
-        className={classnames("p-2 clearfix", className)}
+        className={classnames("p-2 cru-clearfix", className)}
         style={{ zIndex: collapse ? 1029 : 1031 }}
       >
-        <div className="float-end d-flex align-items-center">
+        <div className="cru-float-right ms-3 d-flex align-items-center">
           <ConnectionStatusBadge status={connectionStatus} className="me-2" />
           <CollapseButton collapse={collapse} onClick={toggleCollapse} />
         </div>
@@ -129,7 +129,7 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
             {content}
           </FullPageDialog>
         ) : (
-          <div style={{ display: collapse ? "none" : "block" }}>{content}</div>
+          <div style={{ display: collapse ? "none" : "inline" }}>{content}</div>
         )}
       </Card>
       {(() => {
