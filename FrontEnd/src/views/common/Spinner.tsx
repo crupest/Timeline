@@ -8,12 +8,14 @@ import "./Spinner.css";
 export interface SpinnerProps {
   size?: "sm" | "md" | "lg" | number | string;
   color?: PaletteColorType;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function Spinner(
   props: SpinnerProps
 ): React.ReactElement | null {
-  const { size, color } = props;
+  const { size, color, className, style } = props;
   const calculatedSize =
     size === "sm"
       ? "18px"
@@ -30,8 +32,12 @@ export default function Spinner(
 
   return (
     <span
-      className={classnames("cru-spinner", `cru-color-${calculatedColor}`)}
-      style={{ width: calculatedSize, height: calculatedSize }}
+      className={classnames(
+        "cru-spinner",
+        `cru-color-${calculatedColor}`,
+        className
+      )}
+      style={{ width: calculatedSize, height: calculatedSize, ...style }}
     />
   );
 }

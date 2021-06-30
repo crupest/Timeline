@@ -1,72 +1,81 @@
-.cru-button {
+.cru-button.primary {
+  --cru-button-color: var(--cru-primary-color);
+  --cru-button-f1-color: var(--cru-primary-f1-color);
+  --cru-button-f2-color: var(--cru-primary-f2-color);
+  --cru-button-f3-color: var(--cru-primary-f3-color);
+}
+
+.cru-button.primary-enhance {
+  --cru-button-color: var(--cru-primary-enhance-color);
+  --cru-button-f1-color: var(--cru-primary-enhance-f1-color);
+  --cru-button-f2-color: var(--cru-primary-enhance-f2-color);
+  --cru-button-f3-color: var(--cru-primary-enhance-f3-color);
+}
+
+.cru-button.secondary {
+  --cru-button-color: var(--cru-secondary-color);
+  --cru-button-f1-color: var(--cru-secondary-f1-color);
+  --cru-button-f2-color: var(--cru-secondary-f2-color);
+  --cru-button-f3-color: var(--cru-secondary-f3-color);
+}
+
+.cru-button.success {
+  --cru-button-color: var(--cru-success-color);
+  --cru-button-f1-color: var(--cru-success-f1-color);
+  --cru-button-f2-color: var(--cru-success-f2-color);
+  --cru-button-f3-color: var(--cru-success-f3-color);
+}
+
+.cru-button.danger {
+  --cru-button-color: var(--cru-danger-color);
+  --cru-button-f1-color: var(--cru-danger-f1-color);
+  --cru-button-f2-color: var(--cru-danger-f2-color);
+  --cru-button-f3-color: var(--cru-danger-f3-color);
+}
+
+.cru-button:not(.outline) {
   color: white;
   cursor: pointer;
   padding: 0.2em 0.5em;
   border-radius: 0.2em;
   border: none;
+  transition: all 0.5s;
+  background-color: var(--cru-button-color);
+}
+
+.cru-button:not(.outline):hover {
+  background-color: var(--cru-button-f1-color);
+}
+
+.cru-button:not(.outline):active {
+  background-color: var(--cru-button-f2-color);
+}
+
+.cru-button:not(.outline):disabled {
+  background-color: var(--cru-button-f3-color);
+}
+
+.cru-button.outline {
+  color: var(--cru-button-color);
+  border: var(--cru-button-color) 1px solid;
+  cursor: pointer;
+  padding: 0.2em 0.5em;
+  border-radius: 0.2em;
   transition: all 0.6s;
+  background-color: white;
 }
 
-.cru-button.primary {
-  background-color: var(--cru-primary-color);
+.cru-button.outline:hover {
+  color: var(--cru-button-f1-color);
+  border-color: var(--cru-button-f1-color);
 }
 
-.cru-button.primary:hover {
-  background-color: var(--cru-primary-f1-color);
+.cru-button.outline:active {
+  color: var(--cru-button-f2-color);
+  border-color: var(--cru-button-f2-color);
 }
 
-.cru-button.primary:active {
-  background-color: var(--cru-primary-f2-color);
-}
-
-.cru-button.primary.disabled {
-  background-color: var(--cru-primary-f3-color);
-}
-
-.cru-button.secondary {
-  background-color: var(--cru-secondary-color);
-}
-
-.cru-button.secondary:hover {
-  background-color: var(--cru-secondary-f1-color);
-}
-
-.cru-button.secondary:active {
-  background-color: var(--cru-secondary-f2-color);
-}
-
-.cru-button.secondary.disabled {
-  background-color: var(--cru-secondary-f3-color);
-}
-
-.cru-button.success {
-  background-color: var(--cru-success-color);
-}
-
-.cru-button.success:hover {
-  background-color: var(--cru-success-f1-color);
-}
-
-.cru-button.success:active {
-  background-color: var(--cru-success-f2-color);
-}
-
-.cru-button.success.disabled {
-  background-color: var(--cru-success-f3-color);
-}
-
-.cru-button.danger {
-  background-color: var(--cru-danger-color);
-}
-
-.cru-button.danger:hover {
-  background-color: var(--cru-danger-f1-color);
-}
-
-.cru-button.danger:active {
-  background-color: var(--cru-danger-f2-color);
-}
-
-.cru-button.danger.disabled {
-  background-color: var(--cru-danger-f3-color);
+.cru-button.outline:disabled {
+  color: var(--cru-button-f3-color);
+  border-color: var(--cru-button-f3-color);
 }

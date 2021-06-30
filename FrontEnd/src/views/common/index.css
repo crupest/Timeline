@@ -144,6 +144,14 @@
   float: right;
 }
 
+.cru-align-text-bottom {
+  vertical-align: text-bottom;
+}
+
+.cru-align-middle {
+  vertical-align: middle;
+}
+
 .cru-clearfix::after {
   clear: both;
 }
