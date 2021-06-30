@@ -23,7 +23,7 @@ const FullPageDialog: React.FC<FullPageDialogProps> = ({
     >
       <div className="cru-full-page-top-bar">
         <i
-          className="icon-button bi-arrow-left text-white ms-3"
+          className="icon-button bi-arrow-left ms-3 cru-full-page-back-button"
           onClick={onBack}
         />
       </div>
