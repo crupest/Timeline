@@ -11,9 +11,16 @@ const LoadingButton: React.FC<{ loading?: boolean } & CommonButtonProps> = ({
   ...otherProps
 }) => {
   return (
-    <Button color={color} disabled={disabled || loading} {...otherProps}>
+    <Button
+      color={color}
+      outline
+      disabled={disabled || loading}
+      {...otherProps}
+    >
       {otherProps.children}
-      {loading ? <Spinner color={color} /> : null}
+      {loading ? (
+        <Spinner className="cru-align-text-bottom ms-1" color={color} />
+      ) : null}
     </Button>
   );
 };
