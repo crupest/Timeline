@@ -1,6 +1,6 @@
 - [x] Implement dialog.
 - [x] Implement popup menu.
-- [ ] Implement loading and loading button.
+- [x] Implement loading and loading button.
 - [ ] Implement tabs and tab page.
 - [ ] Improve forms.
 - [ ] Improve buttons.
