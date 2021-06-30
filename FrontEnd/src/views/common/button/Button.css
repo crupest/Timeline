@@ -1,5 +1,6 @@
 .cru-button.primary {
   --cru-button-color: var(--cru-primary-color);
+  --cru-button-t-color: var(--cru-primary-t-color);
   --cru-button-f1-color: var(--cru-primary-f1-color);
   --cru-button-f2-color: var(--cru-primary-f2-color);
   --cru-button-f3-color: var(--cru-primary-f3-color);
@@ -7,6 +8,7 @@
 
 .cru-button.primary-enhance {
   --cru-button-color: var(--cru-primary-enhance-color);
+  --cru-button-t-color: var(--cru-primary-enhance-t-color);
   --cru-button-f1-color: var(--cru-primary-enhance-f1-color);
   --cru-button-f2-color: var(--cru-primary-enhance-f2-color);
   --cru-button-f3-color: var(--cru-primary-enhance-f3-color);
@@ -14,6 +16,7 @@
 
 .cru-button.secondary {
   --cru-button-color: var(--cru-secondary-color);
+  --cru-button-t-color: var(--cru-secondary-t-color);
   --cru-button-f1-color: var(--cru-secondary-f1-color);
   --cru-button-f2-color: var(--cru-secondary-f2-color);
   --cru-button-f3-color: var(--cru-secondary-f3-color);
@@ -21,6 +24,7 @@
 
 .cru-button.success {
   --cru-button-color: var(--cru-success-color);
+  --cru-button-t-color: var(--cru-success-t-color);
   --cru-button-f1-color: var(--cru-success-f1-color);
   --cru-button-f2-color: var(--cru-success-f2-color);
   --cru-button-f3-color: var(--cru-success-f3-color);
@@ -28,13 +32,14 @@
 
 .cru-button.danger {
   --cru-button-color: var(--cru-danger-color);
+  --cru-button-t-color: var(--cru-danger-t-color);
   --cru-button-f1-color: var(--cru-danger-f1-color);
   --cru-button-f2-color: var(--cru-danger-f2-color);
   --cru-button-f3-color: var(--cru-danger-f3-color);
 }
 
 .cru-button:not(.outline) {
-  color: white;
+  color: var(--cru-button-t-color);
   cursor: pointer;
   padding: 0.2em 0.5em;
   border-radius: 0.2em;

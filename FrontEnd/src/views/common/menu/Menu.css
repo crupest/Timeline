@@ -13,7 +13,7 @@
 }
 
 .cru-menu-item.color-primary:hover {
-  color: var(--cru-text-on-primary-color);
+  color: var(--cru-primary-t-color);
   background-color: var(--cru-primary-color);
 }
 

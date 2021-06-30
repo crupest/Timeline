@@ -27,6 +27,10 @@ export interface PaletteColor {
   r1: string;
   r2: string;
   r3: string;
+  t: string;
+  t1: string;
+  t2: string;
+  t3: string;
   [key: string]: string;
 }
 
@@ -34,10 +38,6 @@ const paletteColorList = [
   "primary",
   "primary-enhance",
   "secondary",
-  "text-primary",
-  "text-on-primary",
-  "text-on-primary-enhance",
-  "text-on-secondary",
   "danger",
   "success",
 ] as const;
@@ -61,6 +61,12 @@ export function generatePaletteColor(color: string): PaletteColor {
   const r1 = light ? d1 : l1;
   const r2 = light ? d2 : l2;
   const r3 = light ? d3 : l3;
+  const _t = light ? Color("black") : Color("white");
+  const t = _t.rgb().toString();
+  const _b = light ? lightenBy : darkenBy;
+  const t1 = _b(_t, 0.1).rgb().toString();
+  const t2 = _b(_t, 0.2).rgb().toString();
+  const t3 = _b(_t, 0.3).rgb().toString();
 
   return {
     color: c.rgb().toString(),
@@ -76,6 +82,10 @@ export function generatePaletteColor(color: string): PaletteColor {
     r1,
     r2,
     r3,
+    t,
+    t1,
+    t2,
+    t3,
   };
 }
 
@@ -96,16 +106,6 @@ export function generatePalette(options: {
     primary: generatePaletteColor(p.toString()),
     "primary-enhance": generatePaletteColor(pe.toString()),
     secondary: generatePaletteColor(s.toString()),
-    "text-primary": generatePaletteColor("#111111"),
-    "text-on-primary": generatePaletteColor(
-      p.lightness() > 60 ? "black" : "white"
-    ),
-    "text-on-primary-enhance": generatePaletteColor(
-      pe.lightness() > 60 ? "black" : "white"
-    ),
-    "text-on-secondary": generatePaletteColor(
-      s.lightness() > 60 ? "black" : "white"
-    ),
     danger: generatePaletteColor("red"),
     success: generatePaletteColor("green"),
   };
