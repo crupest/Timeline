@@ -1,0 +1,13 @@
+@keyframes cru-spinner-animation {
+  from {
+    transform: scale(0,0);
+  }
+}
+
+.cru-spinner {
+  display: inline-block;
+  animation: cru-spinner-animation 0.5s infinite alternate;
+  background-color: currentColor;
+  border-radius: 50%;
+  transform-origin: center;
+}

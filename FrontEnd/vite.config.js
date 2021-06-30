@@ -22,7 +22,7 @@ export default defineConfig({
     alias: [{ find: "@", replacement: "/src" }],
   },
   server: {
-    port: 13000,
+    port: 10030,
     proxy: {
       "/api": {
         target: "http://localhost:5000",

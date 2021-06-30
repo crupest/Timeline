@@ -208,7 +208,8 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
 
 interface TimelineBoardUIProps {
   title?: string;
-  timelines: HttpTimelineInfo[] | "offline" | "loading";
+  state: "offline" | "loading" | "loaded";
+  timelines: HttpTimelineInfo[];
   onReload: () => void;
   className?: string;
   editHandler?: {
@@ -218,7 +219,7 @@ interface TimelineBoardUIProps {
 }
 
 const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
-  const { title, timelines, className, editHandler } = props;
+  const { title, state, timelines, className, editHandler } = props;
 
   const editable = editHandler != null;
 
@@ -246,13 +247,13 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
           ))}
       </div>
       {(() => {
-        if (timelines === "loading") {
+        if (state === "loading") {
           return (
             <div className="d-flex flex-grow-1 justify-content-center align-items-center">
               <Spinner />
             </div>
           );
-        } else if (timelines === "offline") {
+        } else if (state === "offline") {
           return (
             <div className="d-flex flex-grow-1 justify-content-center align-items-center">
               <LoadFailReload onReload={props.onReload} />
@@ -301,36 +302,39 @@ const TimelineBoard: React.FC<TimelineBoardProps> = ({
   load,
   editHandler,
 }) => {
-  const [timelines, setTimelines] = React.useState<
-    HttpTimelineInfo[] | "offline" | "loading"
-  >("loading");
+  const [state, setState] = React.useState<"offline" | "loading" | "loaded">(
+    "loading"
+  );
+  const [timelines, setTimelines] = React.useState<HttpTimelineInfo[]>([]);
 
   React.useEffect(() => {
     let subscribe = true;
-    if (timelines === "loading") {
+    if (state === "loading") {
       void load().then(
         (timelines) => {
           if (subscribe) {
+            setState("loaded");
             setTimelines(timelines);
           }
         },
         () => {
-          setTimelines("offline");
+          setState("offline");
         }
       );
     }
     return () => {
       subscribe = false;
     };
-  }, [load, timelines]);
+  }, [load, state]);
 
   return (
     <TimelineBoardUI
       title={title}
       className={className}
+      state={state}
       timelines={timelines}
       onReload={() => {
-        setTimelines("loading");
+        setState("loaded");
       }}
       editHandler={
         typeof timelines === "object" && editHandler != null
