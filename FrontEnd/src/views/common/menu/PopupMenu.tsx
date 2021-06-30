@@ -25,12 +25,24 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     React.useState<HTMLDivElement | null>(null);
   const [popperElement, setPopperElement] =
     React.useState<HTMLDivElement | null>(null);
-  const [arrowElement, setArrowElement] = React.useState<HTMLDivElement | null>(
-    null
-  );
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    modifiers: [{ name: "arrow", options: { element: arrowElement } }],
-  });
+  const { styles, attributes } = usePopper(referenceElement, popperElement);
+
+  React.useEffect(() => {
+    const handler = (event: MouseEvent): void => {
+      let element: HTMLElement | null = event.target as HTMLElement;
+      while (element) {
+        if (element == referenceElement || element == popperElement) {
+          return;
+        }
+        element = element.parentElement;
+      }
+      setShow(false);
+    };
+    document.addEventListener("click", handler);
+    return () => {
+      document.removeEventListener("click", handler);
+    };
+  }, [referenceElement, popperElement]);
 
   return (
     <>
@@ -52,8 +64,12 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
           style={styles.popper}
           {...attributes.popper}
         >
-          <Menu items={items} />
-          <div ref={setArrowElement} style={styles.arrow} />
+          <Menu
+            items={items}
+            onItemClicked={() => {
+              setShow(false);
+            }}
+          />
         </div>
       ) : null}
     </>

@@ -1,3 +1,5 @@
 .cru-popup-menu-menu-container {
-
+  border-radius: 5px;
+  border: var(--cru-primary-color) 1px solid;
+  background-color: var(--cru-background-color);
 }

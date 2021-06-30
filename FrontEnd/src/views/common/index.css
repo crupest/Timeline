@@ -1,4 +1,6 @@
 :root {
+  --cru-background-color: #f8f9fa;
+
   --cru-primary-color: rgb(255, 105, 0);
   --cru-primary-l1-color: rgb(255, 120, 26);
   --cru-primary-l2-color: rgb(255, 135, 51);
