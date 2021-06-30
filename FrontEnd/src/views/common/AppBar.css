@@ -16,16 +16,16 @@
 }
 
 .app-bar a {
-  color: var(--cru-text-on-primary-r1-color);
+  color: var(--cru-primary-t1-color);
   text-decoration: none;
   margin: 0 1em;
   transition: color 1s;
 }
 .app-bar a:hover {
-  color: var(--cru-text-on-primary-color);
+  color: var(--cru-primary-t-color);
 }
 .app-bar a.active {
-  color: var(--cru-text-on-primary-color);
+  color: var(--cru-primary-t-color);
 }
 
 .app-bar-brand {
@@ -89,7 +89,7 @@
   margin-left: auto;
   font-size: 2em;
   margin-right: 1em;
-  color: var(--cru-text-on-primary-color);
+  color: var(--cru-primary-t-color);
   cursor: pointer;
   user-select: none;
 }
