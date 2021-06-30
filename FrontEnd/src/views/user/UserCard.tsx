@@ -16,11 +16,13 @@ const UserCard: React.FC<TimelinePageCardProps> = (props) => {
       <TimelinePageCardTemplate
         infoArea={
           <>
-            <h3 className="cru-color-primary d-inline-block align-middle">
+            <h3 className="cru-color-primary d-inline-block">
               {timeline.title}
-              <small className="ms-3 text-secondary">{timeline.name}</small>
+              <small className="ms-3 cru-color-secondary">
+                {timeline.name}
+              </small>
             </h3>
-            <div className="align-middle">
+            <div>
               <UserAvatar
                 username={timeline.owner.username}
                 className="cru-avatar small cru-round me-3"

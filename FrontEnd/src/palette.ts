@@ -90,7 +90,7 @@ export function generatePalette(options: {
     primaryEnhance == null
       ? lightenBy(p, 0.3).saturate(0.3)
       : Color(primaryEnhance);
-  const s = secondary == null ? p.rotate(90) : Color(secondary);
+  const s = secondary == null ? Color("gray") : Color(secondary);
 
   return {
     primary: generatePaletteColor(p.toString()),
@@ -130,8 +130,8 @@ export function generatePaletteCSS(palette: Palette): string {
 
 const paletteSubject: BehaviorSubject<Palette | null> =
   new BehaviorSubject<Palette | null>(
-    generatePalette({ primary: "rgb(0, 123, 255)" })
-    // null
+    // generatePalette({ primary: "rgb(0, 123, 255)" })
+    null
   );
 
 export const palette$: Observable<Palette | null> =

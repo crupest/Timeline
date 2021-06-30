@@ -23,7 +23,7 @@ import FullPageDialog from "../common/dailog/FullPageDialog";
 import Card from "../common/Card";
 
 export interface TimelineCardTemplateProps extends TimelinePageCardProps {
-  infoArea: React.ReactElement;
+  infoArea: React.ReactNode;
   manageItems?: MenuItems;
   dialog: string | "property" | "member" | null;
   setDialog: (dialog: "property" | "member" | null) => void;

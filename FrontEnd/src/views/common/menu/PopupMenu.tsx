@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React from "react";
+import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 
 import Menu, { MenuItems } from "./Menu";
@@ -57,21 +58,25 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
       >
         {children}
       </div>
-      {show ? (
-        <div
-          ref={setPopperElement}
-          className="cru-popup-menu-menu-container"
-          style={styles.popper}
-          {...attributes.popper}
-        >
-          <Menu
-            items={items}
-            onItemClicked={() => {
-              setShow(false);
-            }}
-          />
-        </div>
-      ) : null}
+      {show
+        ? createPortal(
+            <div
+              ref={setPopperElement}
+              className="cru-popup-menu-menu-container"
+              style={styles.popper}
+              {...attributes.popper}
+            >
+              <Menu
+                items={items}
+                onItemClicked={() => {
+                  setShow(false);
+                }}
+              />
+            </div>,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            document.getElementById("portal")!
+          )
+        : null}
     </>
   );
 };
