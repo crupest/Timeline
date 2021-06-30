@@ -24,3 +24,7 @@
 .cru-full-page-content-container {
   overflow: scroll;
 }
+
+.cru-full-page-back-button {
+  color: var(--cru-text-on-primary-color);
+}
