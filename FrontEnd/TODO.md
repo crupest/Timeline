@@ -8,4 +8,4 @@
 - [x] Login page.
 - [x] Alert.
 - [x] Move prefix `tl` to `cru`.
-- [ ] Fix home page.
+- [x] Fix home page.
