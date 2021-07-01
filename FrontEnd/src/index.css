@@ -25,6 +25,7 @@ textarea {
   resize: none;
   outline: none;
   border-color: var(--cru-background-2-color);
+  -webkit-appearance: none;
 }
 
 textarea:hover {
@@ -42,6 +43,7 @@ input[type="text"] {
   border: 1px solid;
   transition: all 0.5s;
   border-color: var(--cru-background-2-color);
+  -webkit-appearance: none;
 }
 
 input:hover,
