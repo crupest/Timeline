@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
     <>
       <div className="container">
         <div className="row my-3 justify-content-center">
-          <div className="col col-12 col-sm-8 col-lg-6">
+          <div className="col col-12 col-md-8">
             <SearchInput
               className="justify-content-center"
               value={navText}

@@ -50,7 +50,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
     >
       <input
         type="text"
-        className="me-sm-2 flex-grow-1"
+        className="cru-search-input-input me-sm-2 flex-grow-1"
         value={props.value}
         onChange={onInputChange}
         onKeyPress={onInputKeyPress}
