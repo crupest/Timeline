@@ -109,11 +109,9 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
           process ? (
             <Spinner />
           ) : (
-            <>
-              <FlatButton
-                text="operationDialog.cancel"
-                className="me-2"
-                color="danger"
+            <div>
+              <i
+                className="icon-button large bi-x cru-color-danger cru-align-middle me-2"
                 onClick={() => {
                   if (canLeave) {
                     onClose();
@@ -123,7 +121,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                 }}
               />
               {canSend && <FlatButton text="timeline.send" onClick={send} />}
-            </>
+            </div>
           )
         }
         pages={[
