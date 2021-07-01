@@ -13,6 +13,8 @@ import TabPages from "../common/tab/TabPages";
 import ConfirmDialog from "../common/dailog/ConfirmDialog";
 import Spinner from "../common/Spinner";
 
+import "./MarkdownPostEdit.css";
+
 export interface MarkdownPostEditProps {
   timeline: string;
   onPosted: (post: HttpTimelinePostInfo) => void;
@@ -102,6 +104,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         className={className}
         style={style}
         pageContainerClassName="py-2"
+        dense
         actions={
           process ? (
             <Spinner />
@@ -125,12 +128,13 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         }
         pages={[
           {
-            id: "text",
-            tabText: "edit",
+            name: "text",
+            text: "edit",
             page: (
               <textarea
                 value={text}
                 disabled={process}
+                className="cru-fill-parent"
                 onChange={(event) => {
                   getBuilder().setMarkdownText(event.currentTarget.value);
                 }}
@@ -138,8 +142,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
             ),
           },
           {
-            id: "images",
-            tabText: "image",
+            name: "images",
+            text: "image",
             page: (
               <div className="timeline-markdown-post-edit-page">
                 {images.map((image, index) => (
@@ -177,8 +181,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
             ),
           },
           {
-            id: "preview",
-            tabText: "preview",
+            name: "preview",
+            text: "preview",
             page: (
               <div
                 className="markdown-container timeline-markdown-post-edit-page"

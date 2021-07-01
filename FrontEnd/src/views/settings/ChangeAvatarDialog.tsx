@@ -161,7 +161,10 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
 
   return (
     <Dialog open={props.open} onClose={close}>
-      <h3>{t("settings.dialogChangeAvatar.title")}</h3>
+      <h3 className="cru-color-primary">
+        {t("settings.dialogChangeAvatar.title")}
+      </h3>
+      <hr />
       {(() => {
         if (state === "select") {
           return (
@@ -171,10 +174,16 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   {t("settings.dialogChangeAvatar.prompt.select")}
                 </div>
                 <div className="row">
-                  <input type="file" accept="image/*" onChange={onSelectFile} />
+                  <input
+                    className="px-0"
+                    type="file"
+                    accept="image/*"
+                    onChange={onSelectFile}
+                  />
                 </div>
               </div>
-              <div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
@@ -202,15 +211,18 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   {t("settings.dialogChangeAvatar.prompt.crop")}
                 </div>
               </div>
-              <div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
+                  outline
                   onClick={close}
                 />
                 <Button
                   text="operationDialog.previousStep"
                   color="secondary"
+                  outline
                   onClick={onCropPrevious}
                 />
                 <Button
@@ -232,16 +244,19 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   {t("settings.dialogChangeAvatar.prompt.processingCrop")}
                 </div>
               </div>
-              <div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
                   onClick={close}
+                  outline
                 />
                 <Button
                   text="operationDialog.previousStep"
                   color="secondary"
                   onClick={onPreviewPrevious}
+                  outline
                 />
               </div>
             </>
@@ -255,15 +270,18 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   {t("settings.dialogChangeAvatar.prompt.preview")}
                 </div>
               </div>
-              <div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
                 <Button
                   text="operationDialog.cancel"
                   color="secondary"
+                  outline
                   onClick={close}
                 />
                 <Button
                   text="operationDialog.previousStep"
                   color="secondary"
+                  outline
                   onClick={onPreviewPrevious}
                 />
                 <Button
@@ -283,7 +301,6 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   {t("settings.dialogChangeAvatar.prompt.uploading")}
                 </div>
               </div>
-              <div></div>
             </>
           );
         } else if (state === "success") {
@@ -294,7 +311,8 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   {t("operationDialog.success")}
                 </div>
               </div>
-              <div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
                 <Button
                   text="operationDialog.ok"
                   color="success"
@@ -310,6 +328,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                 {createPreviewRow()}
                 <div className="row text-danger">{trueMessage}</div>
               </div>
+              <hr />
               <div>
                 <Button
                   text="operationDialog.cancel"
