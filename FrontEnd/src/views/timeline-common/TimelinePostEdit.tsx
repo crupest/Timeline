@@ -203,7 +203,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       <Card className="timeline-item-card">
         {showMarkdown ? (
           <MarkdownPostEdit
-            className="w-100"
+            className="cru-fill-parent"
             onClose={() => setShowMarkdown(false)}
             timeline={timeline.name}
             onPosted={onPosted}
@@ -216,7 +216,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                 if (kind === "text") {
                   return (
                     <TimelinePostEditText
-                      className="w-100 h-100 timeline-post-edit"
+                      className="cru-fill-parent timeline-post-edit"
                       text={text}
                       disabled={process}
                       onChange={(t) => {
@@ -239,7 +239,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
               })()}
             </div>
             <div className="col col-auto align-self-end m-1">
-              <div className="d-block text-center mt-1 mb-2">
+              <div className="d-block cru-text-center mt-1 mb-2">
                 <PopupMenu
                   items={(["text", "image", "markdown"] as const).map(
                     (kind) => ({

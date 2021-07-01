@@ -1,0 +1,31 @@
+.cru-nav {
+  border-bottom: var(--cru-background-2-color) 1px solid;
+  display: flex;
+}
+
+.cru-nav-item {
+  color: var(--cru-primary-color);
+  border: var(--cru-background-2-color) 0.5px solid;
+  border-bottom: none;
+  padding: 0.5em 1.5em;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  transition: all 0.5s;
+  cursor: pointer;
+}
+
+.cru-nav.dense .cru-nav-item {
+  padding: 0.2em 1em;
+}
+
+.cru-nav-item:hover {
+  background-color: var(--cru-background-1-color);
+}
+
+.cru-nav-item:not(.active) {
+  color: var(--cru-primary-r2-color);
+}
+
+.cru-nav-action-area {
+  margin-left: auto;
+}
