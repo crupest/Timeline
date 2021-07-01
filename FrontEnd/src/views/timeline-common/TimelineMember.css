@@ -1,0 +1,8 @@
+.timeline-member-item {
+  border: var(--cru-background-1-color) solid;
+  border-width: 0.5px 1px;
+}
+
+.timeline-member-item > div {
+  padding: 0.5em;
+}

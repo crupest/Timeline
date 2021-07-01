@@ -12,22 +12,22 @@ import UserAvatar from "../common/user/UserAvatar";
 import Button from "../common/button/Button";
 import Dialog from "../common/dailog/Dialog";
 
+import "./TimelineMember.css";
+
 const TimelineMemberItem: React.FC<{
   user: HttpUser;
   add?: boolean;
   onAction?: (username: string) => void;
 }> = ({ user, add, onAction }) => {
   return (
-    <div className="container">
+    <div className="container timeline-member-item">
       <div className="row">
         <div className="col col-auto">
-          <UserAvatar username={user.username} className="avatar small" />
+          <UserAvatar username={user.username} className="cru-avatar small" />
         </div>
         <div className="col">
           <div className="row">{user.nickname}</div>
-          <div className="row">
-            <small>{"@" + user.username}</small>
-          </div>
+          <small className="row">{"@" + user.username}</small>
         </div>
         {onAction ? (
           <div className="col col-auto">
@@ -130,7 +130,7 @@ const TimelineMemberUserSearch: React.FC<{
           }
         } else if (userSearchState.type === "error") {
           return (
-            <div className="text-danger">
+            <div className="cru-color-danger">
               {convertI18nText(userSearchState.data, t)}
             </div>
           );
