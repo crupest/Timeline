@@ -1,8 +1,9 @@
 - [x] Implement dialog.
 - [x] Implement popup menu.
 - [x] Implement loading and loading button.
-- [ ] Implement tabs and tab page.
+- [x] Implement tabs and tab page.
 - [ ] Improve forms.
-- [ ] Improve buttons.
-- [ ] Improve icon buttons.
+- [x] Improve buttons.
+- [x] Improve icon buttons.
+- [ ] Login page.
 - [x] Move prefix `tl` to `cru`.
