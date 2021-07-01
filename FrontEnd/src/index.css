@@ -25,7 +25,10 @@ textarea {
   resize: none;
   outline: none;
   border-color: var(--cru-background-2-color);
-  -webkit-appearance: none;
+  -webkit-appearance: caret;
+  -moz-appearance: caret;
+  -o-appearance: caret;
+  appearance: caret;
 }
 
 textarea:hover {
@@ -37,22 +40,28 @@ textarea:focus {
 }
 
 input,
-input[type="text"] {
+input[type="text"],
+input[type="password"] {
   resize: none;
   outline: none;
   border: 1px solid;
   transition: all 0.5s;
   border-color: var(--cru-background-2-color);
-  -webkit-appearance: none;
+  -webkit-appearance: caret;
+  -moz-appearance: caret;
+  -o-appearance: caret;
+  appearance: caret;
 }
 
 input:hover,
-input:hover[type="text"] {
+input:hover[type="text"],
+input:hover[type="password"] {
   border-color: var(--cru-primary-r2-color);
 }
 
 input:focus,
-input:focus[type="text"] {
+input:focus[type="text"],
+input:focus[type="password"] {
   border-color: var(--cru-primary-color);
 }
 
