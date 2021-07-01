@@ -15,6 +15,7 @@
 
 .cru-dialog-container {
   max-width: 100%;
+  min-width: 30vw;
 
   margin: auto;
 
