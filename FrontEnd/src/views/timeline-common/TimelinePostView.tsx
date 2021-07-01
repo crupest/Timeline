@@ -119,6 +119,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         <ConfirmDialog
           title="timeline.post.deleteDialog.title"
           body="timeline.post.deleteDialog.prompt"
+          open
           onClose={() => {
             setDialog(null);
             setOperationMaskVisible(false);
