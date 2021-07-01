@@ -1,5 +1,5 @@
 .cru-nav {
-  border-bottom: var(--cru-background-2-color) 1px solid;
+  border-bottom: var(--cru-primary-color) 1px solid;
   display: flex;
 }
 
@@ -22,8 +22,10 @@
   background-color: var(--cru-background-1-color);
 }
 
-.cru-nav-item:not(.active) {
-  color: var(--cru-primary-r2-color);
+.cru-nav-item.active {
+  color: var(--cru-primary-t-color);
+  background-color: var(--cru-primary-color);
+  border-color: var(--cru-primary-color);
 }
 
 .cru-nav-action-area {
