@@ -47,9 +47,9 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
         };
 
         pushAlert({
-          message: Message,
+          customMessage: <Message />,
           dismissTime: "never",
-          type: "warning",
+          type: "primary",
         });
       }
     });
@@ -92,7 +92,7 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
       };
 
       pushAlert({
-        message: UpgradeMessage,
+        customMessage: <UpgradeMessage />,
         dismissTime: "never",
         type: "success",
       });
