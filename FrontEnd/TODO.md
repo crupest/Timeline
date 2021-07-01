@@ -6,4 +6,5 @@
 - [x] Improve buttons.
 - [x] Improve icon buttons.
 - [ ] Login page.
+- [ ] Alert.
 - [x] Move prefix `tl` to `cru`.
