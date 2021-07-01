@@ -20,7 +20,11 @@ export function calculateProps(
 } {
   const { text, color, className, children, ...otherProps } = props;
   const newProps = {
-    className: classNames(buttonClassName, color ?? "primary", className),
+    className: classNames(
+      buttonClassName,
+      color != null ? "cru-" + color : "cru-primary",
+      className
+    ),
     ...otherProps,
   };
 

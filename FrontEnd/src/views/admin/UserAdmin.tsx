@@ -14,8 +14,8 @@ import {
 } from "@/http/user";
 import { Trans, useTranslation } from "react-i18next";
 import Button from "../common/button/Button";
-import TextButton from "../common/button/TextButton";
 import Spinner from "../common/Spinner";
+import FlatButton from "../common/button/FlatButton";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
@@ -232,12 +232,12 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
         className={classnames("edit-mask", !editMaskVisible && "d-none")}
         onClick={() => setEditMaskVisible(false)}
       >
-        <TextButton text="admin:user.modify" onClick={on[kModify]} />
-        <TextButton
+        <FlatButton text="admin:user.modify" onClick={on[kModify]} />
+        <FlatButton
           text="admin:user.modifyPermissions"
           onClick={on[kModifyPermission]}
         />
-        <TextButton
+        <FlatButton
           text="admin:user.delete"
           color="danger"
           onClick={on[kDelete]}

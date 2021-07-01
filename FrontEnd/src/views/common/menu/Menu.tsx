@@ -47,7 +47,7 @@ export default function _Menu({
               key={index}
               className={classnames(
                 "cru-menu-item",
-                `color-${item.color ?? "primary"}`
+                `cru-${item.color ?? "primary"}`
               )}
               onClick={() => {
                 item.onClick();

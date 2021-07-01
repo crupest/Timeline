@@ -7,51 +7,12 @@
   padding: 0.5em 1.5em;
   cursor: pointer;
   transition: all 0.5s;
+  color: var(--cru-theme-color);
 }
 
-.cru-menu-item.color-primary {
-  color: var(--cru-primary-color);
-}
-
-.cru-menu-item.color-primary:hover {
-  color: var(--cru-primary-t-color);
-  background-color: var(--cru-primary-color);
-}
-
-.cru-menu-item.color-secondary {
-  color: var(--cru-secondary-color);
-}
-
-.cru-menu-item.color-secondary:hover {
-  color: var(--cru-secondary-t-color);
-  background-color: var(--cru-secondary-color);
-}
-
-.cru-menu-item.color-primary-enhance {
-  color: var(--cru-primary-enhance-color);
-}
-
-.cru-menu-item.color-primary-enhance:hover {
-  color: var(--cru-primary-enhance-t-color);
-  background-color: var(--cru-primary-enhance-color);
-}
-
-.cru-menu-item.color-success {
-  color: var(--cru-success-color);
-}
-
-.cru-menu-item.color-success:hover {
-  color: var(--cru-success-t-color);
-  background-color: var(--cru-success-color);
-}
-
-.cru-menu-item.color-danger {
-  color: var(--cru-danger-color);
-}
-
-.cru-menu-item.color-danger:hover {
-  color: var(--cru-danger-t-color);
-  background-color: var(--cru-danger-color);
+.cru-menu-item:hover {
+  color: var(--cru-theme-t-color);
+  background-color: var(--cru-theme-color);
 }
 
 .cru-menu-item-icon {
