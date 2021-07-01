@@ -22,7 +22,7 @@
 }
 
 .cru-menu-item.color-secondary:hover {
-  color: var(--cru-text-on-secondary-color);
+  color: var(--cru-secondary-t-color);
   background-color: var(--cru-secondary-color);
 }
 

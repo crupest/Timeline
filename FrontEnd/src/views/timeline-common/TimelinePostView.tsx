@@ -64,7 +64,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
       >
         {post.editable ? (
           <i
-            className="bi-chevron-down icon-button primary-enhance float-end"
+            className="bi-chevron-down icon-button primary-enhance cru-float-right"
             onClick={(e) => {
               setOperationMaskVisible(true);
               e.stopPropagation();

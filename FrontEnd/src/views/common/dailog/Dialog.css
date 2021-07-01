@@ -20,3 +20,12 @@
   padding: 1.5em;
   background-color: white;
 }
+
+.cru-dialog-bottom-area {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cru-dialog-bottom-area > * {
+  margin: 0 0.5em
+}

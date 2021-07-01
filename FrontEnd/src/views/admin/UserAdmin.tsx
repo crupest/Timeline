@@ -206,23 +206,23 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
   return (
     <div className="admin-user-item">
       <i
-        className="bi-pencil-square float-end icon-button text-warning"
+        className="bi-pencil-square float-end icon-button cru-color-warning"
         onClick={() => setEditMaskVisible(true)}
       />
-      <h4 className="text-primary">{user.username}</h4>
-      <div className="text-secondary">
+      <h4 className="cru-color-primary">{user.username}</h4>
+      <div className="cru-color-secondary">
         {t("admin:user.nickname")}
         {user.nickname}
       </div>
-      <div className="text-secondary">
+      <div className="cru-color-secondary">
         {t("admin:user.uniqueId")}
         {user.uniqueId}
       </div>
-      <div className="text-secondary">
+      <div className="cru-color-secondary">
         {t("admin:user.permissions")}
         {user.permissions.map((permission) => {
           return (
-            <span key={permission} className="text-danger">
+            <span key={permission} className="cru-color-danger">
               {permission}{" "}
             </span>
           );

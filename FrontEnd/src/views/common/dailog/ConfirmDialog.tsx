@@ -16,12 +16,15 @@ const ConfirmDialog: React.FC<{
 
   return (
     <Dialog onClose={onClose} open={open}>
-      <h3 className="text-danger">{convertI18nText(title, t)}</h3>
+      <h3 className="cru-color-danger">{convertI18nText(title, t)}</h3>
+      <hr />
       <p>{convertI18nText(body, t)}</p>
-      <div>
+      <hr />
+      <div className="cru-dialog-bottom-area">
         <Button
           text="operationDialog.cancel"
           color="secondary"
+          outline
           onClick={onClose}
         />
         <Button
