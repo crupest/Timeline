@@ -8,12 +8,15 @@
   background-color: rgba(255, 255, 255, 0.92);
 
   display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 2em 0;
+
+  overflow: auto;
 }
 
 .cru-dialog-container {
   max-width: 100%;
+
+  margin: auto;
 
   border: var(--cru-primary-color) 1px solid;
   border-radius: 5px;
@@ -27,5 +30,5 @@
 }
 
 .cru-dialog-bottom-area > * {
-  margin: 0 0.5em
+  margin: 0 0.5em;
 }
