@@ -2,5 +2,5 @@
   z-index: 1040;
   border-radius: 5px;
   border: var(--cru-primary-color) 1px solid;
-  background-color: var(--cru-background-color);
+  background-color: white;
 }
