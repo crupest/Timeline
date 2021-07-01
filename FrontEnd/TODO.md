@@ -5,6 +5,7 @@
 - [ ] Improve forms.
 - [x] Improve buttons.
 - [x] Improve icon buttons.
-- [ ] Login page.
+- [x] Login page.
 - [x] Alert.
 - [x] Move prefix `tl` to `cru`.
+- [ ] Fix home page.

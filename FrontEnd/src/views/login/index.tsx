@@ -79,11 +79,14 @@ const LoginPage: React.FC = (_) => {
 
   return (
     <div className="login-container container-fluid mt-2">
-      <h1 className="text-center">{t("welcome")}</h1>
-      <div>
-        <label htmlFor="username">{t("user.username")}</label>
+      <h1 className="cru-text-center cru-color-primary">{t("welcome")}</h1>
+      <div className="cru-operation-dialog-group">
+        <label className="cru-operation-dialog-label" htmlFor="username">
+          {t("user.username")}
+        </label>
         <input
           id="username"
+          type="text"
           disabled={process}
           onChange={(e) => {
             setUsername(e.target.value);
@@ -92,9 +95,15 @@ const LoginPage: React.FC = (_) => {
           value={username}
         />
         {usernameDirty && username === "" && (
-          <div>{t("login.emptyUsername")}</div>
+          <div className="cru-operation-dialog-error-text">
+            {t("login.emptyUsername")}
+          </div>
         )}
-        <label htmlFor="password">{t("user.password")}</label>
+      </div>
+      <div className="cru-operation-dialog-group">
+        <label className="cru-operation-dialog-label" htmlFor="password">
+          {t("user.password")}
+        </label>
         <input
           id="password"
           type="password"
@@ -107,10 +116,12 @@ const LoginPage: React.FC = (_) => {
           onKeyDown={onEnterPressInPassword}
         />
         {passwordDirty && password === "" && (
-          <div>{t("login.emptyPassword")}</div>
+          <div className="cru-operation-dialog-error-text">
+            {t("login.emptyPassword")}
+          </div>
         )}
       </div>
-      <div>
+      <div className="cru-operation-dialog-group">
         <input
           id="remember-me"
           type="checkbox"
@@ -119,7 +130,9 @@ const LoginPage: React.FC = (_) => {
             setRememberMe(e.currentTarget.checked);
           }}
         />
-        <label>{t("user.rememberMe")}</label>
+        <label className="cru-operation-dialog-inline-label">
+          {t("user.rememberMe")}
+        </label>
       </div>
       {error ? <p className="text-danger">{t(error)}</p> : null}
       <div className="cru-text-end">
