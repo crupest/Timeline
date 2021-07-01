@@ -26,7 +26,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
       inputPrompt={() => {
         return (
           <Trans i18nKey="timeline.deleteDialog.inputPrompt">
-            0<code className="mx-2">{{ name }}</code>2
+            0<code className="mx-2">{{ name: timeline.name }}</code>2
           </Trans>
         );
       }}

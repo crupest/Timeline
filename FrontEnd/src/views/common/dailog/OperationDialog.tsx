@@ -12,6 +12,7 @@ import LoadingButton from "../button/LoadingButton";
 import Dialog from "./Dialog";
 
 import "./OperationDialog.css";
+import classNames from "classnames";
 
 interface DefaultErrorPromptProps {
   error?: string;
@@ -294,9 +295,17 @@ const OperationDialog = <
 
             if (item.type === "text") {
               return (
-                <div key={index}>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
                   {item.label && (
-                    <label>{convertI18nText(item.label, t)}</label>
+                    <label className="cru-operation-dialog-label">
+                      {convertI18nText(item.label, t)}
+                    </label>
                   )}
                   <input
                     type={item.password === true ? "password" : "text"}
@@ -307,8 +316,16 @@ const OperationDialog = <
                     }}
                     disabled={process}
                   />
-                  {error != null && <div>{error}</div>}
-                  {item.helperText && <div>{t(item.helperText)}</div>}
+                  {error != null && (
+                    <div className="cru-operation-dialog-error-text">
+                      {error}
+                    </div>
+                  )}
+                  {item.helperText && (
+                    <div className="cru-operation-dialog-helper-text">
+                      {t(item.helperText)}
+                    </div>
+                  )}
                 </div>
               );
             } else if (item.type === "bool") {
@@ -327,8 +344,16 @@ const OperationDialog = <
               );
             } else if (item.type === "select") {
               return (
-                <div key={index}>
-                  <label>{convertI18nText(item.label, t)}</label>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
+                  <label className="cru-operation-dialog-label">
+                    {convertI18nText(item.label, t)}
+                  </label>
                   <select
                     value={value as string}
                     onChange={(event) => {
@@ -364,10 +389,13 @@ const OperationDialog = <
                       disabled={process}
                     />
                   ) : null}
-                  <label>{convertI18nText(item.label, t)}</label>
+                  <label className="cru-operation-dialog-inline-label">
+                    {convertI18nText(item.label, t)}
+                  </label>
                   {value !== null && (
                     <TwitterPicker
                       color={value as string}
+                      triangle="hide"
                       onChange={(result) => updateValue(index, result.hex)}
                     />
                   )}
@@ -401,6 +429,7 @@ const OperationDialog = <
             color="secondary"
             outline
             onClick={close}
+            disabled={process}
           />
           <LoadingButton
             color={props.themeColor}
@@ -435,7 +464,7 @@ const OperationDialog = <
       <>
         <div>{content}</div>
         <hr />
-        <div>
+        <div className="cru-dialog-bottom-area">
           <Button text="operationDialog.ok" color="primary" onClick={close} />
         </div>
       </>
@@ -451,7 +480,9 @@ const OperationDialog = <
     <Dialog open={props.open} onClose={close}>
       <h3
         className={
-          props.themeColor != null ? "cru-color-" + props.themeColor : undefined
+          props.themeColor != null
+            ? "cru-color-" + props.themeColor
+            : "cru-color-primary"
         }
       >
         {title}
