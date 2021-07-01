@@ -23,6 +23,35 @@ small {
 
 textarea {
   resize: none;
+  outline: none;
+  border-color: var(--cru-background-2-color);
+}
+
+textarea:hover {
+  border-color: var(--cru-primary-r2-color);
+}
+
+textarea:focus {
+  border-color: var(--cru-primary-color);
+}
+
+input,
+input[type="text"] {
+  resize: none;
+  outline: none;
+  border: 1px solid;
+  transition: all 0.5s;
+  border-color: var(--cru-background-2-color);
+}
+
+input:hover,
+input:hover[type="text"] {
+  border-color: var(--cru-primary-r2-color);
+}
+
+input:focus,
+input:focus[type="text"] {
+  border-color: var(--cru-primary-color);
 }
 
 .white-space-no-wrap {

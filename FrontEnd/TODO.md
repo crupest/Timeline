@@ -2,7 +2,7 @@
 - [x] Implement popup menu.
 - [x] Implement loading and loading button.
 - [x] Implement tabs and tab page.
-- [ ] Improve forms.
+- [x] Improve forms.
 - [x] Improve buttons.
 - [x] Improve icon buttons.
 - [x] Login page.
