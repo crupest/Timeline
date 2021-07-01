@@ -18,6 +18,7 @@
 }
 
 .cru-alert-close-button-container {
+  flex-shrink: 0;
   margin-left: auto;
   width: 2em;
   text-align: center;
