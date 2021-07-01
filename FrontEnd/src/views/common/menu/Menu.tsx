@@ -1,9 +1,11 @@
 import React from "react";
 import classnames from "classnames";
-import { OverlayTrigger, OverlayTriggerProps, Popover } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import { BootstrapThemeColor, convertI18nText, I18nText } from "@/common";
+import { convertI18nText, I18nText } from "@/common";
+import { PaletteColorType } from "@/palette";
+
+import "./Menu.css";
 
 export type MenuItem =
   | {
@@ -13,23 +15,29 @@ export type MenuItem =
       type: "button";
       text: I18nText;
       iconClassName?: string;
-      color?: BootstrapThemeColor;
+      color?: PaletteColorType;
       onClick: () => void;
     };
 
 export type MenuItems = MenuItem[];
 
-export interface MenuProps {
+export type MenuProps = {
   items: MenuItems;
-  className?: string;
   onItemClicked?: () => void;
-}
+  className?: string;
+  style?: React.CSSProperties;
+};
 
-const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
+export default function _Menu({
+  items,
+  onItemClicked,
+  className,
+  style,
+}: MenuProps): React.ReactElement | null {
   const { t } = useTranslation();
 
   return (
-    <div className={classnames("cru-menu", className)}>
+    <div className={classnames("cru-menu", className)} style={style}>
       {items.map((item, index) => {
         if (item.type === "divider") {
           return <div key={index} className="cru-menu-divider" />;
@@ -39,7 +47,7 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
               key={index}
               className={classnames(
                 "cru-menu-item",
-                `color-${item.color ?? "primary"}`
+                `cru-${item.color ?? "primary"}`
               )}
               onClick={() => {
                 item.onClick();
@@ -61,32 +69,4 @@ const Menu: React.FC<MenuProps> = ({ items, className, onItemClicked }) => {
       })}
     </div>
   );
-};
-
-export default Menu;
-
-export interface PopupMenuProps {
-  items: MenuItems;
-  children: OverlayTriggerProps["children"];
 }
-
-export const PopupMenu: React.FC<PopupMenuProps> = ({ items, children }) => {
-  const [show, setShow] = React.useState<boolean>(false);
-  const toggle = (): void => setShow(!show);
-
-  return (
-    <OverlayTrigger
-      trigger="click"
-      rootClose
-      overlay={
-        <Popover id="menu-popover">
-          <Menu items={items} onItemClicked={() => setShow(false)} />
-        </Popover>
-      }
-      show={show}
-      onToggle={toggle}
-    >
-      {children}
-    </OverlayTrigger>
-  );
-};

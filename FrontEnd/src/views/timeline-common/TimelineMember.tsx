@@ -1,49 +1,47 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Container, ListGroup, Modal, Row, Col, Button } from "react-bootstrap";
 
 import { convertI18nText, I18nText } from "@/common";
 
 import { HttpUser } from "@/http/user";
 import { getHttpSearchClient } from "@/http/search";
+import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
-import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
+import Button from "../common/button/Button";
+import Dialog from "../common/dailog/Dialog";
+
+import "./TimelineMember.css";
 
 const TimelineMemberItem: React.FC<{
   user: HttpUser;
   add?: boolean;
   onAction?: (username: string) => void;
 }> = ({ user, add, onAction }) => {
-  const { t } = useTranslation();
-
   return (
-    <ListGroup.Item className="container">
-      <Row>
-        <Col xs="auto">
-          <UserAvatar username={user.username} className="avatar small" />
-        </Col>
-        <Col>
-          <Row>{user.nickname}</Row>
-          <Row>
-            <small>{"@" + user.username}</small>
-          </Row>
-        </Col>
+    <div className="container timeline-member-item">
+      <div className="row">
+        <div className="col col-auto">
+          <UserAvatar username={user.username} className="cru-avatar small" />
+        </div>
+        <div className="col">
+          <div className="row">{user.nickname}</div>
+          <small className="row">{"@" + user.username}</small>
+        </div>
         {onAction ? (
-          <Col xs="auto">
+          <div className="col col-auto">
             <Button
-              variant={add ? "success" : "danger"}
+              text={`timeline.member.${add ? "add" : "remove"}`}
+              color={add ? "success" : "danger"}
               onClick={() => {
                 onAction(user.username);
               }}
-            >
-              {t(`timeline.member.${add ? "add" : "remove"}`)}
-            </Button>
-          </Col>
+            />
+          </div>
         ) : null}
-      </Row>
-    </ListGroup.Item>
+      </div>
+    </div>
   );
 };
 
@@ -110,7 +108,7 @@ const TimelineMemberUserSearch: React.FC<{
             return <div>{t("timeline.member.noUserAvailableToAdd")}</div>;
           } else {
             return (
-              <ListGroup className="mt-2">
+              <div className="mt-2">
                 {users.map((user) => (
                   <TimelineMemberItem
                     key={user.username}
@@ -127,12 +125,12 @@ const TimelineMemberUserSearch: React.FC<{
                     }}
                   />
                 ))}
-              </ListGroup>
+              </div>
             );
           }
         } else if (userSearchState.type === "error") {
           return (
-            <div className="text-danger">
+            <div className="cru-color-danger">
               {convertI18nText(userSearchState.data, t)}
             </div>
           );
@@ -152,8 +150,8 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
   const members = [timeline.owner, ...timeline.members];
 
   return (
-    <Container className="px-4 py-3">
-      <ListGroup>
+    <div className="container px-4 py-3">
+      <div>
         {members.map((member, index) => (
           <TimelineMemberItem
             key={member.username}
@@ -169,11 +167,11 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
             }
           />
         ))}
-      </ListGroup>
+      </div>
       {timeline.manageable ? (
         <TimelineMemberUserSearch timeline={timeline} onChange={onChange} />
       ) : null}
-    </Container>
+    </div>
   );
 };
 
@@ -188,8 +186,8 @@ export const TimelineMemberDialog: React.FC<TimelineMemberDialogProps> = (
   props
 ) => {
   return (
-    <Modal show centered onHide={props.onClose}>
+    <Dialog open onClose={props.onClose}>
       <TimelineMember {...props} />
-    </Modal>
+    </Dialog>
   );
 };

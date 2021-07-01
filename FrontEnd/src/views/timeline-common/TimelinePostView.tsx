@@ -9,9 +9,9 @@ import { pushAlert } from "@/services/alert";
 import UserAvatar from "../common/user/UserAvatar";
 import Card from "../common/Card";
 import FlatButton from "../common/button/FlatButton";
+import ConfirmDialog from "../common/dailog/ConfirmDialog";
 import TimelineLine from "./TimelineLine";
 import TimelinePostContentView from "./TimelinePostContentView";
-import TimelinePostDeleteConfirmDialog from "./TimelinePostDeleteConfirmDialog";
 import PostPropertyChangeDialog from "./PostPropertyChangeDialog";
 
 export interface TimelinePostViewProps {
@@ -64,7 +64,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
       >
         {post.editable ? (
           <i
-            className="bi-chevron-down icon-button primary-enhance float-end"
+            className="bi-chevron-down icon-button primary-enhance cru-float-right"
             onClick={(e) => {
               setOperationMaskVisible(true);
               e.stopPropagation();
@@ -116,7 +116,9 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         ) : null}
       </Card>
       {dialog === "delete" ? (
-        <TimelinePostDeleteConfirmDialog
+        <ConfirmDialog
+          title="timeline.post.deleteDialog.title"
+          body="timeline.post.deleteDialog.prompt"
           onClose={() => {
             setDialog(null);
             setOperationMaskVisible(false);

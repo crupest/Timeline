@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Container, Row } from "react-bootstrap";
 import { useHistory, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 
@@ -80,8 +79,8 @@ const SearchPage: React.FC = () => {
   }, [queryParam, forceResearchKey]);
 
   return (
-    <Container className="my-3">
-      <Row className="justify-content-center">
+    <div className="container my-3">
+      <div className="row justify-content-center">
         <SearchInput
           className="col-12 col-sm-9 col-md-6"
           value={searchText}
@@ -95,7 +94,7 @@ const SearchPage: React.FC = () => {
             }
           }}
         />
-      </Row>
+      </div>
       {(() => {
         switch (state) {
           case "init": {
@@ -123,7 +122,7 @@ const SearchPage: React.FC = () => {
           }
         }
       })()}
-    </Container>
+    </div>
   );
 };
 

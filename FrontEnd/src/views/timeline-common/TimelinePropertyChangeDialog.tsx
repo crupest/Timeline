@@ -8,7 +8,7 @@ import {
   TimelineVisibility,
 } from "@/http/timeline";
 
-import OperationDialog from "../common/OperationDialog";
+import OperationDialog from "../common/dailog/OperationDialog";
 
 export interface TimelinePropertyChangeDialogProps {
   open: boolean;
@@ -60,7 +60,7 @@ const TimelinePropertyChangeDialog: React.FC<TimelinePropertyChangeDialogProps> 
           ] as const
         }
         open={props.open}
-        close={props.close}
+        onClose={props.close}
         onProcess={([newTitle, newVisibility, newDescription, newColor]) => {
           const req: HttpTimelinePatchRequest = {};
           if (newTitle !== timeline.title) {

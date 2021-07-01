@@ -13,19 +13,19 @@
 
 @keyframes timeline-line-node-noncurrent {
   to {
-    box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color);
+    box-shadow: 0 0 20px 3px var(--cru-primary-l1-color);
   }
 }
 
 @keyframes timeline-line-node-current {
   to {
-    box-shadow: 0 0 20px 3px var(--tl-primary-enhance-lighter-color);
+    box-shadow: 0 0 20px 3px var(--cru-primary-enhance-l1-color);
   }
 }
 
 @keyframes timeline-line-node-loading {
   to {
-    box-shadow: 0 0 20px 3px var(--tl-primary-lighter-color);
+    box-shadow: 0 0 20px 3px var(--cru-primary-l1-color);
   }
 }
 
@@ -79,7 +79,7 @@
 
 .timeline-line .segment {
   width: 7px;
-  background: var(--tl-primary-color);
+  background: var(--cru-primary-color);
 }
 .timeline-line .segment.start {
   height: 1.8em;
@@ -91,7 +91,7 @@
 .timeline-line .segment.current-end {
   height: 2em;
   flex: 0 0 auto;
-  background: linear-gradient(var(--tl-primary-enhance-color), white);
+  background: linear-gradient(var(--cru-primary-enhance-color), white);
 }
 .timeline-line .node-container {
   flex: 0 0 auto;
@@ -103,7 +103,7 @@
   width: 20px;
   height: 20px;
   position: absolute;
-  background: var(--tl-primary-color);
+  background: var(--cru-primary-color);
   left: -1px;
   top: -1px;
   border-radius: 50%;
@@ -113,7 +113,7 @@
   animation-name: timeline-line-node-noncurrent;
 }
 .timeline-line .node-loading-edge {
-  color: var(--tl-primary-color);
+  color: var(--cru-primary-color);
   width: 38px;
   height: 38px;
   position: absolute;
@@ -125,22 +125,22 @@
 }
 .timeline-line.current .segment.start {
   background: linear-gradient(
-    var(--tl-primary-color),
-    var(--tl-primary-enhance-color)
+    var(--cru-primary-color),
+    var(--cru-primary-enhance-color)
   );
 }
 
 .timeline-line.current .segment.end {
-  background: var(--tl-primary-enhance-color);
+  background: var(--cru-primary-enhance-color);
 }
 
 .timeline-line.current .node {
-  background: var(--tl-primary-enhance-color);
+  background: var(--cru-primary-enhance-color);
   animation-name: timeline-line-node-current;
 }
 
 .timeline-line.loading .node {
-  background: var(--tl-primary-color);
+  background: var(--cru-primary-color);
   animation-name: timeline-line-node-loading;
 }
 
@@ -239,6 +239,7 @@
 
 .timeline-template-card {
   position: fixed;
+  z-index: 1029;
   top: 56px;
   right: 0;
   margin: 0.5em;

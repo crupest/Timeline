@@ -1,5 +1,4 @@
 import React from "react";
-import { Container } from "react-bootstrap";
 import { HubConnectionState } from "@microsoft/signalr";
 
 import { HttpTimelineInfo } from "@/http/timeline";
@@ -75,7 +74,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           connectionStatus={connectionStatus}
         />
       ) : null}
-      <Container>
+      <div className="container">
         <Timeline
           timelineName={timelineName}
           reloadKey={reloadKey}
@@ -83,7 +82,7 @@ const TimelinePageTemplate: React.FC<TimelinePageTemplateProps> = (props) => {
           onTimelineLoaded={(t) => setTimeline(t)}
           onConnectionStateChanged={setConnectionStatus}
         />
-      </Container>
+      </div>
     </>
   );
 };

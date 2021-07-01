@@ -1,0 +1,30 @@
+.cru-full-page {
+  position: fixed;
+  z-index: 1030;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  padding-top: 56px;
+}
+
+.cru-full-page-top-bar {
+  height: 56px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background-color: var(--cru-primary-color);
+  display: flex;
+  align-items: center;
+}
+
+.cru-full-page-content-container {
+  overflow: scroll;
+}
+
+.cru-full-page-back-button {
+  color: var(--cru-primary-t-color);
+}

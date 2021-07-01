@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, Button, Modal } from "react-bootstrap";
 import { TwitterPicker } from "react-color";
 import moment from "moment";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
-import LoadingButton from "./LoadingButton";
+import { PaletteColorType } from "@/palette";
+
+import Button from "../button/Button";
+import LoadingButton from "../button/LoadingButton";
+import Dialog from "./Dialog";
+
+import "./OperationDialog.css";
+import classNames from "classnames";
 
 interface DefaultErrorPromptProps {
   error?: string;
@@ -15,13 +21,13 @@ interface DefaultErrorPromptProps {
 const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = (props) => {
   const { t } = useTranslation();
 
-  let result = <p className="text-danger">{t("operationDialog.error")}</p>;
+  let result = <p className="cru-color-danger">{t("operationDialog.error")}</p>;
 
   if (props.error != null) {
     result = (
       <>
         {result}
-        <p className="text-danger">{props.error}</p>
+        <p className="cru-color-danger">{props.error}</p>
       </>
     );
   }
@@ -45,6 +51,7 @@ export interface OperationDialogBoolInput {
   type: "bool";
   label: I18nText;
   initValue?: boolean;
+  helperText?: string;
 }
 
 export interface OperationDialogSelectInputOption {
@@ -71,6 +78,7 @@ export interface OperationDialogDateTimeInput {
   type: "datetime";
   label?: I18nText;
   initValue?: string;
+  helperText?: string;
 }
 
 export type OperationDialogInput =
@@ -141,9 +149,9 @@ export interface OperationDialogProps<
   OperationInputInfoList extends readonly OperationDialogInput[]
 > {
   open: boolean;
-  close: () => void;
+  onClose: () => void;
   title: I18nText | (() => React.ReactNode);
-  themeColor?: "danger" | "success" | string;
+  themeColor?: PaletteColorType;
   onProcess: (
     inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
   ) => Promise<TData>;
@@ -204,7 +212,7 @@ const OperationDialog = <
 
   const close = (): void => {
     if (step.type !== "process") {
-      props.close();
+      props.onClose();
       if (step.type === "success" && props.onSuccessAndClose) {
         props.onSuccessAndClose(step.data);
       }
@@ -278,7 +286,7 @@ const OperationDialog = <
 
     body = (
       <>
-        <Modal.Body>
+        <div>
           {inputPrompt}
           {inputScheme.map((item, index) => {
             const value = values[index];
@@ -289,50 +297,84 @@ const OperationDialog = <
 
             if (item.type === "text") {
               return (
-                <Form.Group key={index}>
-                  {item.label && (
-                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
                   )}
-                  <Form.Control
+                >
+                  {item.label && (
+                    <label className="cru-operation-dialog-label">
+                      {convertI18nText(item.label, t)}
+                    </label>
+                  )}
+                  <input
                     type={item.password === true ? "password" : "text"}
                     value={value as string}
                     onChange={(e) => {
                       const v = e.target.value;
                       updateValue(index, v);
                     }}
-                    isInvalid={error != null}
                     disabled={process}
                   />
                   {error != null && (
-                    <Form.Control.Feedback type="invalid">
+                    <div className="cru-operation-dialog-error-text">
                       {error}
-                    </Form.Control.Feedback>
+                    </div>
                   )}
                   {item.helperText && (
-                    <Form.Text>{t(item.helperText)}</Form.Text>
+                    <div className="cru-operation-dialog-helper-text">
+                      {t(item.helperText)}
+                    </div>
                   )}
-                </Form.Group>
+                </div>
               );
             } else if (item.type === "bool") {
               return (
-                <Form.Group key={index}>
-                  <Form.Check<"input">
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
+                  <input
                     type="checkbox"
                     checked={value as boolean}
                     onChange={(event) => {
                       updateValue(index, event.currentTarget.checked);
                     }}
-                    label={convertI18nText(item.label, t)}
                     disabled={process}
                   />
-                </Form.Group>
+                  <label className="cru-operation-dialog-inline-label">
+                    {convertI18nText(item.label, t)}
+                  </label>
+                  {error != null && (
+                    <div className="cru-operation-dialog-error-text">
+                      {error}
+                    </div>
+                  )}
+                  {item.helperText && (
+                    <div className="cru-operation-dialog-helper-text">
+                      {t(item.helperText)}
+                    </div>
+                  )}
+                </div>
               );
             } else if (item.type === "select") {
               return (
-                <Form.Group key={index}>
-                  <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
-                  <Form.Control
-                    as="select"
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
+                  <label className="cru-operation-dialog-label">
+                    {convertI18nText(item.label, t)}
+                  </label>
+                  <select
                     value={value as string}
                     onChange={(event) => {
                       updateValue(index, event.target.value);
@@ -347,14 +389,20 @@ const OperationDialog = <
                         </option>
                       );
                     })}
-                  </Form.Control>
-                </Form.Group>
+                  </select>
+                </div>
               );
             } else if (item.type === "color") {
               return (
-                <Form.Group key={index}>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
                   {item.canBeNull ? (
-                    <Form.Check<"input">
+                    <input
                       type="checkbox"
                       checked={value !== null}
                       onChange={(event) => {
@@ -364,52 +412,61 @@ const OperationDialog = <
                           updateValue(index, null);
                         }
                       }}
-                      label={convertI18nText(item.label, t)}
                       disabled={process}
                     />
-                  ) : (
-                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
-                  )}
+                  ) : null}
+                  <label className="cru-operation-dialog-inline-label">
+                    {convertI18nText(item.label, t)}
+                  </label>
                   {value !== null && (
                     <TwitterPicker
                       color={value as string}
+                      triangle="hide"
                       onChange={(result) => updateValue(index, result.hex)}
                     />
                   )}
-                </Form.Group>
+                </div>
               );
             } else if (item.type === "datetime") {
               return (
-                <Form.Group key={index}>
-                  {item.label && (
-                    <Form.Label>{convertI18nText(item.label, t)}</Form.Label>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
                   )}
-                  <Form.Control
+                >
+                  {item.label && (
+                    <label className="cru-operation-dialog-label">
+                      {convertI18nText(item.label, t)}
+                    </label>
+                  )}
+                  <input
                     type="datetime-local"
                     value={value as string}
                     onChange={(e) => {
                       const v = e.target.value;
                       updateValue(index, v);
                     }}
-                    isInvalid={error != null}
                     disabled={process}
                   />
-                  {error != null && (
-                    <Form.Control.Feedback type="invalid">
-                      {error}
-                    </Form.Control.Feedback>
-                  )}
-                </Form.Group>
+                  {error != null && <div>{error}</div>}
+                </div>
               );
             }
           })}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={close}>
-            {t("operationDialog.cancel")}
-          </Button>
+        </div>
+        <hr />
+        <div className="cru-dialog-bottom-area">
+          <Button
+            text="operationDialog.cancel"
+            color="secondary"
+            outline
+            onClick={close}
+            disabled={process}
+          />
           <LoadingButton
-            variant={props.themeColor}
+            color={props.themeColor}
             loading={process}
             disabled={!canProcess}
             onClick={() => {
@@ -421,7 +478,7 @@ const OperationDialog = <
           >
             {t("operationDialog.confirm")}
           </LoadingButton>
-        </Modal.Footer>
+        </div>
       </>
     );
   } else {
@@ -431,7 +488,7 @@ const OperationDialog = <
       content =
         props.successPrompt?.(result.data) ?? t("operationDialog.success");
       if (typeof content === "string")
-        content = <p className="text-success">{content}</p>;
+        content = <p className="cru-color-success">{content}</p>;
     } else {
       content = props.failurePrompt?.(result.data) ?? <DefaultErrorPrompt />;
       if (typeof content === "string")
@@ -439,12 +496,11 @@ const OperationDialog = <
     }
     body = (
       <>
-        <Modal.Body>{content}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={close}>
-            {t("operationDialog.ok")}
-          </Button>
-        </Modal.Footer>
+        <div>{content}</div>
+        <hr />
+        <div className="cru-dialog-bottom-area">
+          <Button text="operationDialog.ok" color="primary" onClick={close} />
+        </div>
       </>
     );
   }
@@ -455,16 +511,19 @@ const OperationDialog = <
       : convertI18nText(props.title, t);
 
   return (
-    <Modal show={props.open} onHide={close}>
-      <Modal.Header
+    <Dialog open={props.open} onClose={close}>
+      <h3
         className={
-          props.themeColor != null ? "text-" + props.themeColor : undefined
+          props.themeColor != null
+            ? "cru-color-" + props.themeColor
+            : "cru-color-primary"
         }
       >
         {title}
-      </Modal.Header>
+      </h3>
+      <hr />
       {body}
-    </Modal>
+    </Dialog>
   );
 };
 

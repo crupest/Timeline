@@ -1,26 +1,29 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import classnames from "classnames";
 
-export interface FullPageProps {
+import "./FullPageDialog.css";
+
+export interface FullPageDialogProps {
   show: boolean;
   onBack: () => void;
   contentContainerClassName?: string;
 }
 
-const FullPage: React.FC<FullPageProps> = ({
+const FullPageDialog: React.FC<FullPageDialogProps> = ({
   show,
   onBack,
   children,
   contentContainerClassName,
 }) => {
-  return (
+  return createPortal(
     <div
       className="cru-full-page"
       style={{ display: show ? undefined : "none" }}
     >
       <div className="cru-full-page-top-bar">
         <i
-          className="icon-button bi-arrow-left text-white ms-3"
+          className="icon-button bi-arrow-left ms-3 cru-full-page-back-button"
           onClick={onBack}
         />
       </div>
@@ -32,8 +35,10 @@ const FullPage: React.FC<FullPageProps> = ({
       >
         {children}
       </div>
-    </div>
+    </div>,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    document.getElementById("portal")!
   );
 };
 
-export default FullPage;
+export default FullPageDialog;

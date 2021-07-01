@@ -2,7 +2,7 @@ import React from "react";
 import { useHistory } from "react-router";
 
 import { validateTimelineName } from "@/services/timeline";
-import OperationDialog from "../common/OperationDialog";
+import OperationDialog from "../common/dailog/OperationDialog";
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
 interface TimelineCreateDialogProps {
@@ -16,7 +16,7 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
   return (
     <OperationDialog
       open={props.open}
-      close={props.close}
+      onClose={props.close}
       themeColor="success"
       title="home.createDialog.title"
       inputScheme={

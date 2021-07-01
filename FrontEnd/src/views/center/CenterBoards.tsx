@@ -1,5 +1,4 @@
 import React from "react";
-import { Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { pushAlert } from "@/services/alert";
@@ -18,10 +17,10 @@ const CenterBoards: React.FC = () => {
 
   return (
     <>
-      <Row className="justify-content-center">
-        <Col xs="12" md="6">
-          <Row>
-            <Col xs="12" className="my-2">
+      <div className="row justify-content-center">
+        <div className="col col-12 col-md-6">
+          <div className="row">
+            <div className="col col-12 my-2">
               <TimelineBoard
                 title={t("home.bookmarkTimeline")}
                 load={() => getHttpBookmarkClient().list()}
@@ -52,8 +51,8 @@ const CenterBoards: React.FC = () => {
                   },
                 }}
               />
-            </Col>
-            <Col xs="12" className="my-2">
+            </div>
+            <div className="col col-12 my-2">
               <TimelineBoard
                 title={t("home.highlightTimeline")}
                 load={() => getHttpHighlightClient().list()}
@@ -88,18 +87,18 @@ const CenterBoards: React.FC = () => {
                     : undefined
                 }
               />
-            </Col>
-          </Row>
-        </Col>
-        <Col xs="12" md="6" className="my-2">
+            </div>
+          </div>
+        </div>
+        <div className="col-12 col-md-6 my-2">
           <TimelineBoard
             title={t("home.relatedTimeline")}
             load={() =>
               getHttpTimelineClient().listTimeline({ relate: user.username })
             }
           />
-        </Col>
-      </Row>
+        </div>
+      </div>
     </>
   );
 };

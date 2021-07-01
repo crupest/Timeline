@@ -9,7 +9,7 @@ import { useUser } from "@/services/user";
 import TimelineLogo from "./TimelineLogo";
 import UserAvatar from "./user/UserAvatar";
 
-import "./index.css";
+import "./AppBar.css";
 
 const AppBar: React.FC = (_) => {
   const { t } = useTranslation();
@@ -68,7 +68,7 @@ const AppBar: React.FC = (_) => {
                 "/",
                 <UserAvatar
                   username={user.username}
-                  className="avatar small rounded-circle bg-white cursor-pointer ml-auto"
+                  className="cru-avatar small cru-round cursor-pointer ml-auto"
                 />,
                 "app-bar-avatar"
               )

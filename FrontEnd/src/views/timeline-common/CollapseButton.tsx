@@ -12,7 +12,7 @@ const CollapseButton: React.FC<{
       onClick={onClick}
       className={classnames(
         collapse ? "bi-arrows-angle-expand" : "bi-arrows-angle-contract",
-        "text-primary icon-button",
+        "cru-color-primary icon-button",
         className
       )}
       style={style}

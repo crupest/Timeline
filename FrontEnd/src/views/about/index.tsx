@@ -72,16 +72,16 @@ const AboutPage: React.FC = () => {
           <div className="d-flex">
             <img
               src={authorAvatarUrl}
-              className="align-self-start avatar large rounded-circle"
+              className="align-self-start cru-avatar large cru-round"
             />
             <div>
               <p>
                 <small>{t("about.author.fullname")}</small>
-                <span className="text-primary">杨宇千</span>
+                <span className="cru-color-primary">杨宇千</span>
               </p>
               <p>
                 <small>{t("about.author.nickname")}</small>
-                <span className="text-primary">crupest</span>
+                <span className="cru-color-primary">crupest</span>
               </p>
               <p>
                 <small>{t("about.author.introduction")}</small>
@@ -96,7 +96,7 @@ const AboutPage: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img src={githubLogoUrl} className="about-link-icon text-body" />
+              <img src={githubLogoUrl} className="about-link-icon" />
             </a>
           </p>
         </div>
@@ -105,7 +105,7 @@ const AboutPage: React.FC = () => {
         <h4>{t("about.site.title")}</h4>
         <p>
           <Trans i18nKey="about.site.content">
-            0<span className="text-primary">1</span>2<b>3</b>4
+            0<span className="cru-color-primary">1</span>2<b>3</b>4
             <a href="#author-info">5</a>6
           </Trans>
         </p>

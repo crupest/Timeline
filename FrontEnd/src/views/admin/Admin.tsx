@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import { Redirect, Route, Switch, useRouteMatch, match } from "react-router";
-import { Container } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 import { AuthUser } from "@/services/user";
@@ -29,7 +28,7 @@ const Admin: React.FC<AdminProps> = ({ user }) => {
             const match = p.match as match<{ name: string }>;
             const name = match.params["name"];
             return (
-              <Container>
+              <div className="container">
                 <AdminNav />
                 {(() => {
                   if (name === "users") {
@@ -38,7 +37,7 @@ const Admin: React.FC<AdminProps> = ({ user }) => {
                     return <MoreAdmin user={user} />;
                   }
                 })()}
-              </Container>
+              </div>
             );
           }}
         </Route>
