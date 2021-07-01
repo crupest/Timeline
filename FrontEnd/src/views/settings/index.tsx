@@ -28,7 +28,7 @@ const SettingsPage: React.FC = (_) => {
       <div className="container">
         {user ? (
           <Card className="my-3 py-3">
-            <h3 className="px-3 mb-3 text-primary">
+            <h3 className="px-3 mb-3 cru-color-primary">
               {t("settings.subheaders.account")}
             </h3>
             <div
@@ -44,13 +44,13 @@ const SettingsPage: React.FC = (_) => {
               {t("settings.changeNickname")}
             </div>
             <div
-              className="settings-item clickable text-danger"
+              className="settings-item clickable cru-color-danger"
               onClick={() => setDialog("changepassword")}
             >
               {t("settings.changePassword")}
             </div>
             <div
-              className="settings-item clickable text-danger"
+              className="settings-item clickable cru-color-danger"
               onClick={() => {
                 setDialog("logout");
               }}
@@ -60,13 +60,13 @@ const SettingsPage: React.FC = (_) => {
           </Card>
         ) : null}
         <Card className="my-3 py-3">
-          <h3 className="px-3 mb-3 text-primary">
+          <h3 className="px-3 mb-3 cru-color-primary">
             {t("settings.subheaders.customization")}
           </h3>
           <div className="row settings-item first mx-0">
             <div className="col col-12 col-sm-auto">
               <div>{t("settings.languagePrimary")}</div>
-              <small className="d-block text-secondary">
+              <small className="d-block cru-color-secondary">
                 {t("settings.languageSecondary")}
               </small>
             </div>
@@ -94,6 +94,7 @@ const SettingsPage: React.FC = (_) => {
                 title="settings.dialogConfirmLogout.title"
                 body="settings.dialogConfirmLogout.prompt"
                 onClose={() => setDialog(null)}
+                open
                 onConfirm={() => {
                   void userService.logout().then(() => {
                     history.push("/");

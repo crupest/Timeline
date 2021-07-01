@@ -48,16 +48,16 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
         <TimelineLogo className="icon" />
       )}
       <span className="title">{title}</span>
-      <small className="ms-2 text-secondary">{name}</small>
+      <small className="ms-2 cru-color-secondary">{name}</small>
       <span className="flex-grow-1"></span>
       {actions != null ? (
         <div className="right">
           <i
-            className="bi-trash icon-button text-danger px-2"
+            className="bi-trash icon-button cru-color-danger px-2"
             onClick={actions.onDelete}
           />
           <i
-            className="bi-grip-vertical icon-button text-gray px-2 touch-action-none"
+            className="bi-grip-vertical icon-button px-2 touch-action-none"
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture(e.pointerId);
               actions.onMove.start(e);

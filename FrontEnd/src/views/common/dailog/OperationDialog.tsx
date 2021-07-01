@@ -11,6 +11,8 @@ import Button from "../button/Button";
 import LoadingButton from "../button/LoadingButton";
 import Dialog from "./Dialog";
 
+import "./OperationDialog.css";
+
 interface DefaultErrorPromptProps {
   error?: string;
 }
@@ -18,13 +20,13 @@ interface DefaultErrorPromptProps {
 const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = (props) => {
   const { t } = useTranslation();
 
-  let result = <p className="text-danger">{t("operationDialog.error")}</p>;
+  let result = <p className="cru-color-danger">{t("operationDialog.error")}</p>;
 
   if (props.error != null) {
     result = (
       <>
         {result}
-        <p className="text-danger">{props.error}</p>
+        <p className="cru-color-danger">{props.error}</p>
       </>
     );
   }
@@ -392,10 +394,12 @@ const OperationDialog = <
             }
           })}
         </div>
-        <div>
+        <hr />
+        <div className="cru-dialog-bottom-area">
           <Button
             text="operationDialog.cancel"
             color="secondary"
+            outline
             onClick={close}
           />
           <LoadingButton
@@ -421,7 +425,7 @@ const OperationDialog = <
       content =
         props.successPrompt?.(result.data) ?? t("operationDialog.success");
       if (typeof content === "string")
-        content = <p className="text-success">{content}</p>;
+        content = <p className="cru-color-success">{content}</p>;
     } else {
       content = props.failurePrompt?.(result.data) ?? <DefaultErrorPrompt />;
       if (typeof content === "string")
@@ -430,6 +434,7 @@ const OperationDialog = <
     body = (
       <>
         <div>{content}</div>
+        <hr />
         <div>
           <Button text="operationDialog.ok" color="primary" onClick={close} />
         </div>
@@ -446,11 +451,12 @@ const OperationDialog = <
     <Dialog open={props.open} onClose={close}>
       <h3
         className={
-          props.themeColor != null ? "text-" + props.themeColor : undefined
+          props.themeColor != null ? "cru-color-" + props.themeColor : undefined
         }
       >
         {title}
       </h3>
+      <hr />
       {body}
     </Dialog>
   );
