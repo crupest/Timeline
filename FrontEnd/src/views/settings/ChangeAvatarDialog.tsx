@@ -150,11 +150,13 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
     }
     return (
       <div className="row justify-content-center">
-        <img
-          className="change-avatar-img"
-          src={resultUrl}
-          alt={t("settings.dialogChangeAvatar.previewImgAlt")}
-        />
+        <div className="col col-auto">
+          <img
+            className="change-avatar-img"
+            src={resultUrl}
+            alt={t("settings.dialogChangeAvatar.previewImgAlt")}
+          />
+        </div>
       </div>
     );
   };
