@@ -1,18 +1,19 @@
 import React from "react";
-import { Nav } from "react-bootstrap";
-import { useTranslation } from "react-i18next";
 
-import { convertI18nText, I18nText, UiLogicError } from "@/common";
+import { I18nText, UiLogicError } from "@/common";
+
+import Tabs from "./Tabs";
 
 export interface TabPage {
-  id: string;
-  tabText: I18nText;
+  name: string;
+  text: I18nText;
   page: React.ReactNode;
 }
 
 export interface TabPagesProps {
   pages: TabPage[];
   actions?: React.ReactNode;
+  dense?: boolean;
   className?: string;
   style?: React.CSSProperties;
   navClassName?: string;
@@ -24,6 +25,7 @@ export interface TabPagesProps {
 const TabPages: React.FC<TabPagesProps> = ({
   pages,
   actions,
+  dense,
   className,
   style,
   navClassName,
@@ -35,11 +37,9 @@ const TabPages: React.FC<TabPagesProps> = ({
     throw new UiLogicError("Page list can't be empty.");
   }
 
-  const { t } = useTranslation();
+  const [tab, setTab] = React.useState<string>(pages[0].name);
 
-  const [tab, setTab] = React.useState<string>(pages[0].id);
-
-  const currentPage = pages.find((p) => p.id === tab);
+  const currentPage = pages.find((p) => p.name === tab);
 
   if (currentPage == null) {
     throw new UiLogicError("Current tab value is bad.");
@@ -47,23 +47,20 @@ const TabPages: React.FC<TabPagesProps> = ({
 
   return (
     <div className={className} style={style}>
-      <Nav variant="tabs" className={navClassName} style={navStyle}>
-        {pages.map((page) => (
-          <Nav.Item key={page.id}>
-            <Nav.Link
-              active={tab === page.id}
-              onClick={() => {
-                setTab(page.id);
-              }}
-            >
-              {convertI18nText(page.tabText, t)}
-            </Nav.Link>
-          </Nav.Item>
-        ))}
-        {actions != null && (
-          <div className="ms-auto cru-tab-pages-action-area">{actions}</div>
-        )}
-      </Nav>
+      <Tabs
+        tabs={pages.map((page) => ({
+          name: page.name,
+          text: page.text,
+          onClick: () => {
+            setTab(page.name);
+          },
+        }))}
+        dense={dense}
+        activeTabName={tab}
+        className={navClassName}
+        style={navStyle}
+        actions={actions}
+      />
       <div className={pageContainerClassName} style={pageContainerStyle}>
         {currentPage.page}
       </div>

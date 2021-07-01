@@ -1,46 +1,11 @@
-:root {
-  --tl-background-color: #f8f9fa;
+@import "bootstrap/dist/css/bootstrap-reboot.css";
+@import "bootstrap/dist/css/bootstrap-grid.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
-  --tl-primary-color: rgb(0, 123, 255);
-  --tl-primary-inactive-color: rgb(26, 136, 255);
-  --tl-primary-lighter-color: rgb(26, 136, 255);
-  --tl-primary-darker-color: rgb(0, 111, 230);
-  --tl-primary-enhance-color: rgb(77, 163, 255);
-  --tl-primary-enhance-inactive-color: rgb(43, 145, 255);
-  --tl-primary-enhance-lighter-color: rgb(94, 172, 255);
-  --tl-primary-enhance-darker-color: rgb(43, 145, 255);
-  --tl-secondary-color: rgb(255, 0, 250);
-  --tl-secondary-inactive-color: rgb(255, 26, 251);
-  --tl-secondary-lighter-color: rgb(255, 26, 251);
-  --tl-secondary-darker-color: rgb(230, 0, 225);
-  --tl-text-primary-color: rgb(17, 17, 17);
-  --tl-text-primary-inactive-color: rgb(41, 41, 41);
-  --tl-text-primary-lighter-color: rgb(41, 41, 41);
-  --tl-text-primary-darker-color: rgb(15, 15, 15);
-  --tl-text-on-primary-color: rgb(255, 255, 255);
-  --tl-text-on-primary-inactive-color: rgb(230, 230, 230);
-  --tl-text-on-primary-lighter-color: rgb(255, 255, 255);
-  --tl-text-on-primary-darker-color: rgb(230, 230, 230);
-  --tl-danger-color: rgb(255, 0, 0);
-  --tl-danger-inactive-color: rgb(255, 26, 26);
-  --tl-danger-lighter-color: rgb(255, 26, 26);
-  --tl-danger-darker-color: rgb(230, 0, 0);
-  --tl-success-color: rgb(0, 128, 0);
-  --tl-success-inactive-color: rgb(0, 166, 0);
-  --tl-success-lighter-color: rgb(0, 166, 0);
-  --tl-success-darker-color: rgb(0, 115, 0);
-}
+@import "./views/common/index.css";
 
 body {
-  background: var(--tl-background-color);
-}
-
-.tl-color-primary {
-  color: var(--tl-primary-color);
-}
-
-.tl-color-danger {
-  color: var(--tl-danger-color);
+  background: var(--cru-background-color);
 }
 
 small {
@@ -52,40 +17,41 @@ small {
   flex-shrink: 0;
 }
 
-.avatar {
-  width: 60px;
-  height: 60px;
-}
-
-.avatar.large {
-  width: 100px;
-  height: 100px;
-}
-
-.avatar.small {
-  width: 40px;
-  height: 40px;
-}
-
-.icon-button {
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-.icon-button.large {
-  font-size: 1.6rem;
-}
-
-.icon-button.primary-enhance {
-  color: var(--tl-primary-enhance-color);
-}
-
 .cursor-pointer {
   cursor: pointer;
 }
 
 textarea {
   resize: none;
+  outline: none;
+  border-color: var(--cru-background-2-color);
+}
+
+textarea:hover {
+  border-color: var(--cru-primary-r2-color);
+}
+
+textarea:focus {
+  border-color: var(--cru-primary-color);
+}
+
+input,
+input[type="text"] {
+  resize: none;
+  outline: none;
+  border: 1px solid;
+  transition: all 0.5s;
+  border-color: var(--cru-background-2-color);
+}
+
+input:hover,
+input:hover[type="text"] {
+  border-color: var(--cru-primary-r2-color);
+}
+
+input:focus,
+input:focus[type="text"] {
+  border-color: var(--cru-primary-color);
 }
 
 .white-space-no-wrap {
@@ -99,14 +65,6 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.text-orange {
-  color: #fd7e14;
-}
-
-.text-yellow {
-  color: #ffc107;
 }
 
 .touch-action-none {

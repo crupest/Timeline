@@ -56,7 +56,7 @@ const HomeV2: React.FC = () => {
   return (
     <>
       <SearchInput
-        className="mx-2 my-3 float-sm-end"
+        className="mx-2 my-3 home-search"
         value={navText}
         onChange={setNavText}
         onButtonClick={() => {

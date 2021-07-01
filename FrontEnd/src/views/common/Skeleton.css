@@ -1,0 +1,14 @@
+.cru-skeleton {
+  padding: 0 1em;
+}
+
+.cru-skeleton-line {
+  height: 1em;
+  background-color: #e6e6e6;
+  margin: 0.7em 0;
+  border-radius: 0.2em;
+}
+
+.cru-skeleton-line.last {
+  width: 50%;
+}

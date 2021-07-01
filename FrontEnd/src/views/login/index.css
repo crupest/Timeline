@@ -1,3 +1,8 @@
 .login-container {
-  max-width: 600px;
+  max-width: 25em;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+  width: 100%;
 }

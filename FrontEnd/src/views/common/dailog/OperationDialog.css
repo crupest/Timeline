@@ -1,0 +1,26 @@
+.cru-operation-dialog-group {
+  display: block;
+  margin: 0.4em 0;
+}
+
+.cru-operation-dialog-label {
+  display: block;
+  font-size: 0.8em;
+  color: var(--cru-primary-color);
+}
+
+.cru-operation-dialog-inline-label {
+  margin-inline-start: 0.5em;
+}
+
+.cru-operation-dialog-error-text {
+  display: block;
+  font-size: 0.8em;
+  color: var(--cru-danger-color);
+}
+
+.cru-operation-dialog-helper-text {
+  display: block;
+  font-size: 0.8em;
+  color: var(--cru-primary-color);
+}

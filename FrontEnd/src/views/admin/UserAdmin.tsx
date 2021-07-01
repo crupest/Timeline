@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import classnames from "classnames";
-import { ListGroup, Row, Col, Spinner, Button } from "react-bootstrap";
 
 import OperationDialog, {
   OperationDialogBoolInput,
-} from "../common/OperationDialog";
+} from "../common/dailog/OperationDialog";
 
 import { AuthUser } from "@/services/user";
 import {
@@ -14,7 +13,9 @@ import {
   UserPermission,
 } from "@/http/user";
 import { Trans, useTranslation } from "react-i18next";
-import TextButton from "../common/button/TextButton";
+import Button from "../common/button/Button";
+import Spinner from "../common/Spinner";
+import FlatButton from "../common/button/FlatButton";
 
 interface DialogProps<TData = undefined, TReturn = undefined> {
   open: boolean;
@@ -45,7 +46,7 @@ const CreateUserDialog: React.FC<DialogProps<undefined, HttpUser>> = ({
           password,
         })
       }
-      close={close}
+      onClose={close}
       open={open}
       onSuccessAndClose={onSuccess}
     />
@@ -61,7 +62,7 @@ const UserDeleteDialog: React.FC<DialogProps<{ username: string }, unknown>> =
     return (
       <OperationDialog
         open={open}
-        close={close}
+        onClose={close}
         title="admin:user.dialog.delete.title"
         themeColor="danger"
         inputPrompt={() => (
@@ -86,7 +87,7 @@ const UserModifyDialog: React.FC<
   return (
     <OperationDialog
       open={open}
-      close={close}
+      onClose={close}
       title="admin:user.dialog.modify.title"
       themeColor="danger"
       inputPrompt={() => (
@@ -137,7 +138,7 @@ const UserPermissionModifyDialog: React.FC<
   return (
     <OperationDialog
       open={open}
-      close={close}
+      onClose={close}
       title="admin:user.dialog.modifyPermissions.title"
       themeColor="danger"
       inputPrompt={() => (
@@ -203,25 +204,25 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
   const [editMaskVisible, setEditMaskVisible] = React.useState<boolean>(false);
 
   return (
-    <ListGroup.Item className="admin-user-item">
+    <div className="admin-user-item">
       <i
-        className="bi-pencil-square float-end icon-button text-warning"
+        className="bi-pencil-square float-end icon-button cru-color-warning"
         onClick={() => setEditMaskVisible(true)}
       />
-      <h4 className="text-primary">{user.username}</h4>
-      <div className="text-secondary">
+      <h4 className="cru-color-primary">{user.username}</h4>
+      <div className="cru-color-secondary">
         {t("admin:user.nickname")}
         {user.nickname}
       </div>
-      <div className="text-secondary">
+      <div className="cru-color-secondary">
         {t("admin:user.uniqueId")}
         {user.uniqueId}
       </div>
-      <div className="text-secondary">
+      <div className="cru-color-secondary">
         {t("admin:user.permissions")}
         {user.permissions.map((permission) => {
           return (
-            <span key={permission} className="text-danger">
+            <span key={permission} className="cru-color-danger">
               {permission}{" "}
             </span>
           );
@@ -231,18 +232,18 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
         className={classnames("edit-mask", !editMaskVisible && "d-none")}
         onClick={() => setEditMaskVisible(false)}
       >
-        <TextButton text="admin:user.modify" onClick={on[kModify]} />
-        <TextButton
+        <FlatButton text="admin:user.modify" onClick={on[kModify]} />
+        <FlatButton
           text="admin:user.modifyPermissions"
           onClick={on[kModifyPermission]}
         />
-        <TextButton
+        <FlatButton
           text="admin:user.delete"
           color="danger"
           onClick={on[kDelete]}
         />
       </div>
-    </ListGroup.Item>
+    </div>
   );
 };
 
@@ -251,8 +252,6 @@ interface UserAdminProps {
 }
 
 const UserAdmin: React.FC<UserAdminProps> = () => {
-  const { t } = useTranslation();
-
   type DialogInfo =
     | null
     | {
@@ -372,26 +371,25 @@ const UserAdmin: React.FC<UserAdminProps> = () => {
 
     return (
       <>
-        <Row className="justify-content-end my-2">
-          <Col xs="auto">
+        <div className="row justify-content-end my-2">
+          <div className="col col-auto">
             <Button
-              variant="outline-success"
+              text="admin:create"
+              color="success"
               onClick={() =>
                 setDialog({
                   type: "create",
                 })
               }
-            >
-              {t("admin:create")}
-            </Button>
-          </Col>
-        </Row>
+            />
+          </div>
+        </div>
         {userComponents}
         {dialogNode}
       </>
     );
   } else {
-    return <Spinner animation="border" />;
+    return <Spinner />;
   }
 };
 

@@ -1,13 +1,5 @@
 import { TFunction } from "i18next";
 
-export type BootstrapThemeColor =
-  | "primary"
-  | "secondary"
-  | "success"
-  | "danger"
-  | "warning"
-  | "info";
-
 // This error is thrown when ui goes wrong with bad logic.
 // Such as a variable should not be null, but it does.
 // This error should never occur. If it does, it indicates there is some logic bug in codes.

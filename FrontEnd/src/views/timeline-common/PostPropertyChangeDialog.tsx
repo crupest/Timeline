@@ -2,7 +2,7 @@ import React from "react";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
-import OperationDialog from "../common/OperationDialog";
+import OperationDialog from "../common/dailog/OperationDialog";
 
 function PostPropertyChangeDialog(props: {
   onClose: () => void;
@@ -14,7 +14,7 @@ function PostPropertyChangeDialog(props: {
   return (
     <OperationDialog
       title="timeline.changePostPropertyDialog.title"
-      close={onClose}
+      onClose={onClose}
       open
       inputScheme={[
         {

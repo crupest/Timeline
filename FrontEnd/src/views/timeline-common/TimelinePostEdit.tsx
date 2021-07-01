@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
-import { Row, Col, Form } from "react-bootstrap";
 
 import { UiLogicError } from "@/common";
 
@@ -16,8 +15,8 @@ import { pushAlert } from "@/services/alert";
 import { base64 } from "@/http/common";
 
 import BlobImage from "../common/BlobImage";
-import LoadingButton from "../common/LoadingButton";
-import { PopupMenu } from "../common/Menu";
+import LoadingButton from "../common/button/LoadingButton";
+import PopupMenu from "../common/menu/PopupMenu";
 import Card from "../common/Card";
 import MarkdownPostEdit from "./MarkdownPostEdit";
 import TimelineLine from "./TimelineLine";
@@ -36,8 +35,7 @@ const TimelinePostEditText: React.FC<TimelinePostEditTextProps> = (props) => {
   const { text, disabled, onChange, className, style } = props;
 
   return (
-    <Form.Control
-      as="textarea"
+    <textarea
       value={text}
       disabled={disabled}
       onChange={(event) => {
@@ -81,7 +79,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
 
   return (
     <>
-      <Form.Control
+      <input
         type="file"
         onChange={onInputChange}
         accept="image/*"
@@ -205,20 +203,20 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       <Card className="timeline-item-card">
         {showMarkdown ? (
           <MarkdownPostEdit
-            className="w-100"
+            className="cru-fill-parent"
             onClose={() => setShowMarkdown(false)}
             timeline={timeline.name}
             onPosted={onPosted}
             onPostError={onPostError}
           />
         ) : (
-          <Row>
-            <Col className="px-1 py-1">
+          <div className="row">
+            <div className="col px-1 py-1">
               {(() => {
                 if (kind === "text") {
                   return (
                     <TimelinePostEditText
-                      className="w-100 h-100 timeline-post-edit"
+                      className="cru-fill-parent timeline-post-edit"
                       text={text}
                       disabled={process}
                       onChange={(t) => {
@@ -239,9 +237,9 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                   );
                 }
               })()}
-            </Col>
-            <Col xs="auto" className="align-self-end m-1">
-              <div className="d-block text-center mt-1 mb-2">
+            </div>
+            <div className="col col-auto align-self-end m-1">
+              <div className="d-block cru-text-center mt-1 mb-2">
                 <PopupMenu
                   items={(["text", "image", "markdown"] as const).map(
                     (kind) => ({
@@ -267,15 +265,14 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                 </PopupMenu>
               </div>
               <LoadingButton
-                variant="primary"
                 onClick={onSend}
                 disabled={!canSend}
                 loading={process}
               >
                 {t("timeline.send")}
               </LoadingButton>
-            </Col>
-          </Row>
+            </div>
+          </div>
         )}
       </Card>
     </div>

@@ -1,12 +1,11 @@
 import React from "react";
 import { useHistory } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Container, Form } from "react-bootstrap";
 
 import { useUser, userService } from "@/services/user";
 
 import AppBar from "../common/AppBar";
-import LoadingButton from "../common/LoadingButton";
+import LoadingButton from "../common/button/LoadingButton";
 
 import "./index.css";
 
@@ -79,74 +78,76 @@ const LoginPage: React.FC = (_) => {
   };
 
   return (
-    <Container fluid className="login-container mt-2">
-      <h1 className="text-center">{t("welcome")}</h1>
-      <Form>
-        <Form.Group>
-          <Form.Label htmlFor="username">{t("user.username")}</Form.Label>
-          <Form.Control
-            id="username"
-            disabled={process}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              setUsernameDirty(true);
-            }}
-            value={username}
-            isInvalid={usernameDirty && username === ""}
-          />
-          {usernameDirty && username === "" && (
-            <Form.Control.Feedback type="invalid">
-              {t("login.emptyUsername")}
-            </Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group>
-          <Form.Label htmlFor="password">{t("user.password")}</Form.Label>
-          <Form.Control
-            id="password"
-            type="password"
-            disabled={process}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordDirty(true);
-            }}
-            value={password}
-            onKeyDown={onEnterPressInPassword}
-            isInvalid={passwordDirty && password === ""}
-          />
-          {passwordDirty && password === "" && (
-            <Form.Control.Feedback type="invalid">
-              {t("login.emptyPassword")}
-            </Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group>
-          <Form.Check<"input">
-            id="remember-me"
-            type="checkbox"
-            checked={rememberMe}
-            onChange={(e) => {
-              setRememberMe(e.currentTarget.checked);
-            }}
-            label={t("user.rememberMe")}
-          />
-        </Form.Group>
-        {error ? <p className="text-danger">{t(error)}</p> : null}
-        <div className="text-end">
-          <LoadingButton
-            loading={process}
-            variant="primary"
-            onClick={(e) => {
-              submit();
-              e.preventDefault();
-            }}
-            disabled={username === "" || password === "" ? true : undefined}
-          >
-            {t("user.login")}
-          </LoadingButton>
-        </div>
-      </Form>
-    </Container>
+    <div className="login-container container-fluid mt-2">
+      <h1 className="cru-text-center cru-color-primary">{t("welcome")}</h1>
+      <div className="cru-operation-dialog-group">
+        <label className="cru-operation-dialog-label" htmlFor="username">
+          {t("user.username")}
+        </label>
+        <input
+          id="username"
+          type="text"
+          disabled={process}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            setUsernameDirty(true);
+          }}
+          value={username}
+        />
+        {usernameDirty && username === "" && (
+          <div className="cru-operation-dialog-error-text">
+            {t("login.emptyUsername")}
+          </div>
+        )}
+      </div>
+      <div className="cru-operation-dialog-group">
+        <label className="cru-operation-dialog-label" htmlFor="password">
+          {t("user.password")}
+        </label>
+        <input
+          id="password"
+          type="password"
+          disabled={process}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setPasswordDirty(true);
+          }}
+          value={password}
+          onKeyDown={onEnterPressInPassword}
+        />
+        {passwordDirty && password === "" && (
+          <div className="cru-operation-dialog-error-text">
+            {t("login.emptyPassword")}
+          </div>
+        )}
+      </div>
+      <div className="cru-operation-dialog-group">
+        <input
+          id="remember-me"
+          type="checkbox"
+          checked={rememberMe}
+          onChange={(e) => {
+            setRememberMe(e.currentTarget.checked);
+          }}
+        />
+        <label className="cru-operation-dialog-inline-label">
+          {t("user.rememberMe")}
+        </label>
+      </div>
+      {error ? <p className="text-danger">{t(error)}</p> : null}
+      <div className="cru-text-end">
+        <LoadingButton
+          loading={process}
+          onClick={(e) => {
+            submit();
+            e.preventDefault();
+          }}
+          disabled={username === "" || password === "" ? true : undefined}
+        >
+          {t("user.login")}
+        </LoadingButton>
+      </div>
+    </div>
   );
 };
 

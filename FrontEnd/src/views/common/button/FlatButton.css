@@ -5,44 +5,14 @@
   border: none;
   background-color: transparent;
   transition: all 0.6s;
+  color: var(--cru-theme-color);
+}
+
+.cru-flat-button.disabled {
+  color: var(--cru-theme-l1-color);
+  cursor: default;
 }
 
 .cru-flat-button:hover:not(.disabled) {
   background-color: #e9ecef;
-}
-
-.cru-flat-button.disabled {
-  cursor: default;
-}
-
-.cru-flat-button.primary {
-  color: var(--tl-primary-color);
-}
-
-.cru-flat-button.primary.disabled {
-  color: var(--tl-primary-lighter-color);
-}
-
-.cru-flat-button.secondary {
-  color: var(--tl-secondary-color);
-}
-
-.cru-flat-button.secondary.disabled {
-  color: var(--tl-secondary-lighter-color);
-}
-
-.cru-flat-button.success {
-  color: var(--tl-success-color);
-}
-
-.cru-flat-button.success.disabled {
-  color: var(--tl-success-lighter-color);
-}
-
-.cru-flat-button.danger {
-  color: var(--tl-danger-color);
-}
-
-.cru-flat-button.danger.disabled {
-  color: var(--tl-danger-ligher-color);
 }

@@ -71,3 +71,9 @@
 .home-timeline-list-loading-head {
   animation: 1s infinite home-timeline-list-loading-head-animation;
 }
+
+@media (min-width: 576px) {
+  .home-search {
+    float: right;
+  }
+}

@@ -1,7 +1,10 @@
 import React, { useCallback } from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
-import { Spinner, Form, Button } from "react-bootstrap";
+
+import LoadingButton from "./button/LoadingButton";
+
+import "./SearchInput.css";
 
 export interface SearchInputProps {
   value: string;
@@ -38,14 +41,15 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
   );
 
   return (
-    <Form
+    <div
       className={classnames(
         "cru-search-input",
         alwaysOneline ? "flex-nowrap" : "flex-sm-nowrap",
         props.className
       )}
     >
-      <Form.Control
+      <input
+        type="text"
         className="me-sm-2 flex-grow-1"
         value={props.value}
         onChange={onInputChange}
@@ -63,15 +67,11 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           "flex-shrink-0"
         )}
       >
-        {props.loading ? (
-          <Spinner variant="primary" animation="border" />
-        ) : (
-          <Button variant="outline-primary" onClick={props.onButtonClick}>
-            {props.buttonText ?? t("search")}
-          </Button>
-        )}
+        <LoadingButton loading={props.loading} onClick={props.onButtonClick}>
+          {props.buttonText ?? t("search")}
+        </LoadingButton>
       </div>
-    </Form>
+    </div>
   );
 };
 

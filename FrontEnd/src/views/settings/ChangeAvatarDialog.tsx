@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AxiosError } from "axios";
-import { Modal, Row, Button } from "react-bootstrap";
 
 import { UiLogicError } from "@/common";
 
@@ -10,6 +9,8 @@ import { useUserLoggedIn } from "@/services/user";
 import { getHttpUserClient } from "@/http/user";
 
 import ImageCropper, { Clip, applyClipToImage } from "../common/ImageCropper";
+import Button from "../common/button/Button";
+import Dialog from "../common/dailog/Dialog";
 
 export interface ChangeAvatarDialogProps {
   open: boolean;
@@ -148,36 +149,49 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       throw new UiLogicError();
     }
     return (
-      <Row className="justify-content-center">
-        <img
-          className="change-avatar-img"
-          src={resultUrl}
-          alt={t("settings.dialogChangeAvatar.previewImgAlt")}
-        />
-      </Row>
+      <div className="row justify-content-center">
+        <div className="col col-auto">
+          <img
+            className="change-avatar-img"
+            src={resultUrl}
+            alt={t("settings.dialogChangeAvatar.previewImgAlt")}
+          />
+        </div>
+      </div>
     );
   };
 
   return (
-    <Modal show={props.open} onHide={close}>
-      <Modal.Header>
-        <Modal.Title> {t("settings.dialogChangeAvatar.title")}</Modal.Title>
-      </Modal.Header>
+    <Dialog open={props.open} onClose={close}>
+      <h3 className="cru-color-primary">
+        {t("settings.dialogChangeAvatar.title")}
+      </h3>
+      <hr />
       {(() => {
         if (state === "select") {
           return (
             <>
-              <Modal.Body className="container">
-                <Row>{t("settings.dialogChangeAvatar.prompt.select")}</Row>
-                <Row>
-                  <input type="file" accept="image/*" onChange={onSelectFile} />
-                </Row>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-              </Modal.Footer>
+              <div className="container">
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.select")}
+                </div>
+                <div className="row">
+                  <input
+                    className="px-0"
+                    type="file"
+                    accept="image/*"
+                    onChange={onSelectFile}
+                  />
+                </div>
+              </div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                />
+              </div>
             </>
           );
         } else if (state === "crop") {
@@ -186,119 +200,154 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           }
           return (
             <>
-              <Modal.Body className="container">
-                <Row className="justify-content-center">
+              <div className="container">
+                <div className="row justify-content-center">
                   <ImageCropper
                     clip={clip}
                     onChange={setClip}
                     imageUrl={fileUrl}
                     imageElementCallback={setCropImgElement}
                   />
-                </Row>
-                <Row>{t("settings.dialogChangeAvatar.prompt.crop")}</Row>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="secondary" onClick={onCropPrevious}>
-                  {t("operationDialog.previousStep")}
-                </Button>
+                </div>
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.crop")}
+                </div>
+              </div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
                 <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  outline
+                  onClick={close}
+                />
+                <Button
+                  text="operationDialog.previousStep"
+                  color="secondary"
+                  outline
+                  onClick={onCropPrevious}
+                />
+                <Button
+                  text="operationDialog.nextStep"
                   color="primary"
                   onClick={onCropNext}
                   disabled={
                     cropImgElement == null || clip == null || clip.width === 0
                   }
-                >
-                  {t("operationDialog.nextStep")}
-                </Button>
-              </Modal.Footer>
+                />
+              </div>
             </>
           );
         } else if (state === "processcrop") {
           return (
             <>
-              <Modal.Body className="container">
-                <Row>
+              <div className="container">
+                <div className="row">
                   {t("settings.dialogChangeAvatar.prompt.processingCrop")}
-                </Row>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="secondary" onClick={onPreviewPrevious}>
-                  {t("operationDialog.previousStep")}
-                </Button>
-              </Modal.Footer>
+                </div>
+              </div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                  outline
+                />
+                <Button
+                  text="operationDialog.previousStep"
+                  color="secondary"
+                  onClick={onPreviewPrevious}
+                  outline
+                />
+              </div>
             </>
           );
         } else if (state === "preview") {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 {createPreviewRow()}
-                <Row>{t("settings.dialogChangeAvatar.prompt.preview")}</Row>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="secondary" onClick={onPreviewPrevious}>
-                  {t("operationDialog.previousStep")}
-                </Button>
-                <Button variant="primary" onClick={upload}>
-                  {t("settings.dialogChangeAvatar.upload")}
-                </Button>
-              </Modal.Footer>
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.preview")}
+                </div>
+              </div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  outline
+                  onClick={close}
+                />
+                <Button
+                  text="operationDialog.previousStep"
+                  color="secondary"
+                  outline
+                  onClick={onPreviewPrevious}
+                />
+                <Button
+                  text="settings.dialogChangeAvatar.upload"
+                  color="primary"
+                  onClick={upload}
+                />
+              </div>
             </>
           );
         } else if (state === "uploading") {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 {createPreviewRow()}
-                <Row>{t("settings.dialogChangeAvatar.prompt.uploading")}</Row>
-              </Modal.Body>
-              <Modal.Footer></Modal.Footer>
+                <div className="row">
+                  {t("settings.dialogChangeAvatar.prompt.uploading")}
+                </div>
+              </div>
             </>
           );
         } else if (state === "success") {
           return (
             <>
-              <Modal.Body className="container">
-                <Row className="p-4 text-success">
+              <div className="container">
+                <div className="row p-4 text-success">
                   {t("operationDialog.success")}
-                </Row>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="success" onClick={close}>
-                  {t("operationDialog.ok")}
-                </Button>
-              </Modal.Footer>
+                </div>
+              </div>
+              <hr />
+              <div className="cru-dialog-bottom-area">
+                <Button
+                  text="operationDialog.ok"
+                  color="success"
+                  onClick={close}
+                />
+              </div>
             </>
           );
         } else {
           return (
             <>
-              <Modal.Body className="container">
+              <div className="container">
                 {createPreviewRow()}
-                <Row className="text-danger">{trueMessage}</Row>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={close}>
-                  {t("operationDialog.cancel")}
-                </Button>
-                <Button variant="primary" onClick={upload}>
-                  {t("operationDialog.retry")}
-                </Button>
-              </Modal.Footer>
+                <div className="row text-danger">{trueMessage}</div>
+              </div>
+              <hr />
+              <div>
+                <Button
+                  text="operationDialog.cancel"
+                  color="secondary"
+                  onClick={close}
+                />
+                <Button
+                  text="operationDialog.retry"
+                  color="primary"
+                  onClick={upload}
+                />
+              </div>
             </>
           );
         }
       })()}
-    </Modal>
+    </Dialog>
   );
 };
 

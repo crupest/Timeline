@@ -1,15 +1,19 @@
+/* eslint-disable react/jsx-no-undef */
 import React from "react";
 import classnames from "classnames";
-import { Form, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Prompt } from "react-router";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
-import FlatButton from "../common/button/FlatButton";
-import TabPages from "../common/TabPages";
 import TimelinePostBuilder from "@/services/TimelinePostBuilder";
-import ConfirmDialog from "../common/ConfirmDialog";
+
+import FlatButton from "../common/button/FlatButton";
+import TabPages from "../common/tab/TabPages";
+import ConfirmDialog from "../common/dailog/ConfirmDialog";
+import Spinner from "../common/Spinner";
+
+import "./MarkdownPostEdit.css";
 
 export interface MarkdownPostEditProps {
   timeline: string;
@@ -100,9 +104,10 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         className={className}
         style={style}
         pageContainerClassName="py-2"
+        dense
         actions={
           process ? (
-            <Spinner variant="primary" animation="border" size="sm" />
+            <Spinner />
           ) : (
             <>
               <FlatButton
@@ -123,13 +128,13 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         }
         pages={[
           {
-            id: "text",
-            tabText: "edit",
+            name: "text",
+            text: "edit",
             page: (
-              <Form.Control
-                as="textarea"
+              <textarea
                 value={text}
                 disabled={process}
+                className="cru-fill-parent"
                 onChange={(event) => {
                   getBuilder().setMarkdownText(event.currentTarget.value);
                 }}
@@ -137,8 +142,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
             ),
           },
           {
-            id: "images",
-            tabText: "image",
+            name: "images",
+            text: "image",
             page: (
               <div className="timeline-markdown-post-edit-page">
                 {images.map((image, index) => (
@@ -161,7 +166,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                     />
                   </div>
                 ))}
-                <Form.Control
+                <input
                   type="file"
                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,8 +181,8 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
             ),
           },
           {
-            id: "preview",
-            tabText: "preview",
+            name: "preview",
+            text: "preview",
             page: (
               <div
                 className="markdown-container timeline-markdown-post-edit-page"
@@ -191,6 +196,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         <ConfirmDialog
           onClose={() => setShowLeaveConfirmDialog(false)}
           onConfirm={onClose}
+          open
           title="timeline.dropDraft"
           body="timeline.confirmLeave"
         />

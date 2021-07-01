@@ -1,0 +1,24 @@
+.cru-menu {
+  min-width: 200px;
+}
+
+.cru-menu-item {
+  font-size: 1em;
+  padding: 0.5em 1.5em;
+  cursor: pointer;
+  transition: all 0.5s;
+  color: var(--cru-theme-color);
+}
+
+.cru-menu-item:hover {
+  color: var(--cru-theme-t-color);
+  background-color: var(--cru-theme-color);
+}
+
+.cru-menu-item-icon {
+  margin-right: 1em;
+}
+
+.cru-menu-divider {
+  border-top: 1px solid #e9ecef;
+}

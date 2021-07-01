@@ -1,0 +1,35 @@
+.cru-dialog-overlay {
+  position: fixed;
+  z-index: 1040;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.92);
+
+  display: flex;
+  padding: 2em 0;
+
+  overflow: auto;
+}
+
+.cru-dialog-container {
+  max-width: 100%;
+  min-width: 30vw;
+
+  margin: auto;
+
+  border: var(--cru-primary-color) 1px solid;
+  border-radius: 5px;
+  padding: 1.5em;
+  background-color: white;
+}
+
+.cru-dialog-bottom-area {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cru-dialog-bottom-area > * {
+  margin: 0 0.5em;
+}

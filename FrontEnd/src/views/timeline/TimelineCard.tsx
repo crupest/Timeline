@@ -18,18 +18,20 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
       <TimelinePageCardTemplate
         infoArea={
           <>
-            <h3 className="tl-color-primary d-inline-block align-middle">
+            <h3 className="cru-color-primary d-inline-block align-middle">
               {timeline.title}
-              <small className="ms-3 text-secondary">{timeline.name}</small>
+              <small className="ms-3 cru-color-secondary">
+                {timeline.name}
+              </small>
             </h3>
-            <div className="align-middle">
+            <div>
               <UserAvatar
                 username={timeline.owner.username}
-                className="avatar small rounded-circle me-3"
+                className="cru-avatar small cru-round me-3"
               />
               {timeline.owner.nickname}
-              <small className="ms-3 text-secondary">
-                src{timeline.owner.username}
+              <small className="ms-3 cru-color-secondary">
+                @{timeline.owner.username}
               </small>
             </div>
           </>
