@@ -92,6 +92,106 @@
   --cru-success-t3-color: rgb(179, 179, 179);
 }
 
+.cru-primary {
+  --cru-theme-color: var(--cru-primary-color);
+  --cru-theme-l1-color: var(--cru-primary-l1-color);
+  --cru-theme-l2-color: var(--cru-primary-l2-color);
+  --cru-theme-l3-color: var(--cru-primary-l3-color);
+  --cru-theme-d1-color: var(--cru-primary-d1-color);
+  --cru-theme-d2-color: var(--cru-primary-d2-color);
+  --cru-theme-d3-color: var(--cru-primary-d3-color);
+  --cru-theme-f1-color: var(--cru-primary-f1-color);
+  --cru-theme-f2-color: var(--cru-primary-f2-color);
+  --cru-theme-f3-color: var(--cru-primary-f3-color);
+  --cru-theme-r1-color: var(--cru-primary-r1-color);
+  --cru-theme-r2-color: var(--cru-primary-r2-color);
+  --cru-theme-r3-color: var(--cru-primary-r3-color);
+  --cru-theme-t-color: var(--cru-primary-t-color);
+  --cru-theme-t1-color: var(--cru-primary-t1-color);
+  --cru-theme-t2-color: var(--cru-primary-t2-color);
+  --cru-theme-t3-color: var(--cru-primary-t3-color);
+}
+
+.cru-primary-enhance {
+  --cru-theme-color: var(--cru-primary-enhance-color);
+  --cru-theme-l1-color: var(--cru-primary-enhance-l1-color);
+  --cru-theme-l2-color: var(--cru-primary-enhance-l2-color);
+  --cru-theme-l3-color: var(--cru-primary-enhance-l3-color);
+  --cru-theme-d1-color: var(--cru-primary-enhance-d1-color);
+  --cru-theme-d2-color: var(--cru-primary-enhance-d2-color);
+  --cru-theme-d3-color: var(--cru-primary-enhance-d3-color);
+  --cru-theme-f1-color: var(--cru-primary-enhance-f1-color);
+  --cru-theme-f2-color: var(--cru-primary-enhance-f2-color);
+  --cru-theme-f3-color: var(--cru-primary-enhance-f3-color);
+  --cru-theme-r1-color: var(--cru-primary-enhance-r1-color);
+  --cru-theme-r2-color: var(--cru-primary-enhance-r2-color);
+  --cru-theme-r3-color: var(--cru-primary-enhance-r3-color);
+  --cru-theme-t-color: var(--cru-primary-enhance-t-color);
+  --cru-theme-t1-color: var(--cru-primary-enhance-t1-color);
+  --cru-theme-t2-color: var(--cru-primary-enhance-t2-color);
+  --cru-theme-t3-color: var(--cru-primary-enhance-t3-color);
+}
+
+.cru-secondary {
+  --cru-theme-color: var(--cru-secondary-color);
+  --cru-theme-l1-color: var(--cru-secondary-l1-color);
+  --cru-theme-l2-color: var(--cru-secondary-l2-color);
+  --cru-theme-l3-color: var(--cru-secondary-l3-color);
+  --cru-theme-d1-color: var(--cru-secondary-d1-color);
+  --cru-theme-d2-color: var(--cru-secondary-d2-color);
+  --cru-theme-d3-color: var(--cru-secondary-d3-color);
+  --cru-theme-f1-color: var(--cru-secondary-f1-color);
+  --cru-theme-f2-color: var(--cru-secondary-f2-color);
+  --cru-theme-f3-color: var(--cru-secondary-f3-color);
+  --cru-theme-r1-color: var(--cru-secondary-r1-color);
+  --cru-theme-r2-color: var(--cru-secondary-r2-color);
+  --cru-theme-r3-color: var(--cru-secondary-r3-color);
+  --cru-theme-t-color: var(--cru-secondary-t-color);
+  --cru-theme-t1-color: var(--cru-secondary-t1-color);
+  --cru-theme-t2-color: var(--cru-secondary-t2-color);
+  --cru-theme-t3-color: var(--cru-secondary-t3-color);
+}
+
+.cru-success {
+  --cru-theme-color: var(--cru-success-color);
+  --cru-theme-l1-color: var(--cru-success-l1-color);
+  --cru-theme-l2-color: var(--cru-success-l2-color);
+  --cru-theme-l3-color: var(--cru-success-l3-color);
+  --cru-theme-d1-color: var(--cru-success-d1-color);
+  --cru-theme-d2-color: var(--cru-success-d2-color);
+  --cru-theme-d3-color: var(--cru-success-d3-color);
+  --cru-theme-f1-color: var(--cru-success-f1-color);
+  --cru-theme-f2-color: var(--cru-success-f2-color);
+  --cru-theme-f3-color: var(--cru-success-f3-color);
+  --cru-theme-r1-color: var(--cru-success-r1-color);
+  --cru-theme-r2-color: var(--cru-success-r2-color);
+  --cru-theme-r3-color: var(--cru-success-r3-color);
+  --cru-theme-t-color: var(--cru-success-t-color);
+  --cru-theme-t1-color: var(--cru-success-t1-color);
+  --cru-theme-t2-color: var(--cru-success-t2-color);
+  --cru-theme-t3-color: var(--cru-success-t3-color);
+}
+
+.cru-danger {
+  --cru-theme-color: var(--cru-danger-color);
+  --cru-theme-l1-color: var(--cru-danger-l1-color);
+  --cru-theme-l2-color: var(--cru-danger-l2-color);
+  --cru-theme-l3-color: var(--cru-danger-l3-color);
+  --cru-theme-d1-color: var(--cru-danger-d1-color);
+  --cru-theme-d2-color: var(--cru-danger-d2-color);
+  --cru-theme-d3-color: var(--cru-danger-d3-color);
+  --cru-theme-f1-color: var(--cru-danger-f1-color);
+  --cru-theme-f2-color: var(--cru-danger-f2-color);
+  --cru-theme-f3-color: var(--cru-danger-f3-color);
+  --cru-theme-r1-color: var(--cru-danger-r1-color);
+  --cru-theme-r2-color: var(--cru-danger-r2-color);
+  --cru-theme-r3-color: var(--cru-danger-r3-color);
+  --cru-theme-t-color: var(--cru-danger-t-color);
+  --cru-theme-t1-color: var(--cru-danger-t1-color);
+  --cru-theme-t2-color: var(--cru-danger-t2-color);
+  --cru-theme-t3-color: var(--cru-danger-t3-color);
+}
+
 .cru-color-primary {
   color: var(--cru-primary-color);
 }

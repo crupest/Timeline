@@ -1,11 +1,13 @@
 import React from "react";
 import pull from "lodash/pull";
 
-import { BootstrapThemeColor, I18nText } from "@/common";
+import { I18nText } from "@/common";
+import { PaletteColorType } from "@/palette";
 
 export interface AlertInfo {
-  type?: BootstrapThemeColor;
-  message: React.FC<unknown> | I18nText;
+  type?: PaletteColorType;
+  message?: I18nText;
+  customMessage?: React.ReactElement;
   dismissTime?: number | "never";
 }
 
@@ -54,10 +56,4 @@ export const alertService = new AlertService();
 
 export function pushAlert(alert: AlertInfo): void {
   alertService.push(alert);
-}
-
-export const kAlertHostId = "alert-host";
-
-export function getAlertHost(): HTMLElement | null {
-  return document.getElementById(kAlertHostId);
 }

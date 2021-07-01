@@ -1,14 +1,12 @@
 import React from "react";
 import without from "lodash/without";
 import { useTranslation } from "react-i18next";
+import classNames from "classnames";
 
-import {
-  alertService,
-  AlertInfoEx,
-  kAlertHostId,
-  AlertInfo,
-} from "@/services/alert";
+import { alertService, AlertInfoEx, AlertInfo } from "@/services/alert";
 import { convertI18nText } from "@/common";
+
+import "./alert.css";
 
 interface AutoCloseAlertProps {
   alert: AlertInfo;
@@ -51,22 +49,35 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
   };
 
   return (
-    <div className="m-3" onClick={cancelTimer}>
-      {(() => {
-        const { message } = alert;
-        if (typeof message === "function") {
-          const Message = message;
-          return <Message />;
-        } else return convertI18nText(message, t);
-      })()}
+    <div
+      className={classNames(
+        "m-3 cru-alert",
+        "cru-" + (alert.type ?? "primary")
+      )}
+      onClick={cancelTimer}
+    >
+      <div className="cru-alert-content">
+        {(() => {
+          const { message, customMessage } = alert;
+          if (customMessage != null) {
+            return customMessage;
+          } else {
+            return convertI18nText(message, t);
+          }
+        })()}
+      </div>
+      <div className="cru-alert-close-button-container">
+        <i
+          className={classNames("icon-button bi-x cru-alert-close-button")}
+          onClick={close}
+        />
+      </div>
     </div>
   );
 };
 
 const AlertHost: React.FC = () => {
   const [alerts, setAlerts] = React.useState<AlertInfoEx[]>([]);
-
-  // react guarantee that state setters are stable, so we don't need to add it to dependency list
 
   React.useEffect(() => {
     const consume = (alert: AlertInfoEx): void => {
@@ -80,7 +91,7 @@ const AlertHost: React.FC = () => {
   }, []);
 
   return (
-    <div id={kAlertHostId} className="alert-container">
+    <div className="alert-container">
       {alerts.map((alert) => {
         return (
           <AutoCloseAlert

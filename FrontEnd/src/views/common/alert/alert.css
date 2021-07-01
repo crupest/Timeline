@@ -2,3 +2,31 @@
   position: fixed;
   z-index: 1040;
 }
+
+.cru-alert {
+  border-radius: 5px;
+  border: var(--cru-theme-color) 1px solid;
+  color: var(--cru-theme-t-color);
+  background-color: var(--cru-theme-r1-color);
+
+  display: flex;
+  overflow: hidden;
+}
+
+.cru-alert-content {
+  padding: 0.5em 2em;
+}
+
+.cru-alert-close-button-container {
+  margin-left: auto;
+  width: 2em;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--cru-theme-t-color);
+}
+
+.cru-alert-close-button {
+  color: var(--cru-theme-color);
+}
