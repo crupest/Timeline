@@ -51,6 +51,7 @@ export interface OperationDialogBoolInput {
   type: "bool";
   label: I18nText;
   initValue?: boolean;
+  helperText?: string;
 }
 
 export interface OperationDialogSelectInputOption {
@@ -77,6 +78,7 @@ export interface OperationDialogDateTimeInput {
   type: "datetime";
   label?: I18nText;
   initValue?: string;
+  helperText?: string;
 }
 
 export type OperationDialogInput =
@@ -330,7 +332,13 @@ const OperationDialog = <
               );
             } else if (item.type === "bool") {
               return (
-                <div key={index}>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
                   <input
                     type="checkbox"
                     checked={value as boolean}
@@ -339,7 +347,19 @@ const OperationDialog = <
                     }}
                     disabled={process}
                   />
-                  <label>{convertI18nText(item.label, t)}</label>
+                  <label className="cru-operation-dialog-inline-label">
+                    {convertI18nText(item.label, t)}
+                  </label>
+                  {error != null && (
+                    <div className="cru-operation-dialog-error-text">
+                      {error}
+                    </div>
+                  )}
+                  {item.helperText && (
+                    <div className="cru-operation-dialog-helper-text">
+                      {t(item.helperText)}
+                    </div>
+                  )}
                 </div>
               );
             } else if (item.type === "select") {
@@ -374,7 +394,13 @@ const OperationDialog = <
               );
             } else if (item.type === "color") {
               return (
-                <div key={index}>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
                   {item.canBeNull ? (
                     <input
                       type="checkbox"
@@ -403,9 +429,17 @@ const OperationDialog = <
               );
             } else if (item.type === "datetime") {
               return (
-                <div key={index}>
+                <div
+                  key={index}
+                  className={classNames(
+                    "cru-operation-dialog-group",
+                    error != null ? "error" : null
+                  )}
+                >
                   {item.label && (
-                    <label>{convertI18nText(item.label, t)}</label>
+                    <label className="cru-operation-dialog-label">
+                      {convertI18nText(item.label, t)}
+                    </label>
                   )}
                   <input
                     type="datetime-local"
