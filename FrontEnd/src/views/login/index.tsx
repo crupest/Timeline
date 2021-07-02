@@ -134,7 +134,7 @@ const LoginPage: React.FC = (_) => {
           {t("user.rememberMe")}
         </label>
       </div>
-      {error ? <p className="text-danger">{t(error)}</p> : null}
+      {error ? <p className="cru-color-danger">{t(error)}</p> : null}
       <div className="cru-text-end">
         <LoadingButton
           loading={process}
