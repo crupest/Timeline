@@ -39,9 +39,7 @@ textarea:focus {
   border-color: var(--cru-primary-color);
 }
 
-input,
-input[type="text"],
-input[type="password"] {
+input:not([type=checkbox]):not([type=radio]) {
   resize: none;
   outline: none;
   border: 1px solid;
@@ -53,15 +51,11 @@ input[type="password"] {
   appearance: caret;
 }
 
-input:hover,
-input:hover[type="text"],
-input:hover[type="password"] {
+input:hover:not([type=checkbox]):not([type=radio]) {
   border-color: var(--cru-primary-r2-color);
 }
 
-input:focus,
-input:focus[type="text"],
-input:focus[type="password"] {
+input:focus:not([type=checkbox]):not([type=radio]) {
   border-color: var(--cru-primary-color);
 }
 
