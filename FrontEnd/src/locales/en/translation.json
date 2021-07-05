@@ -146,8 +146,7 @@
     "login": "login",
     "rememberMe": "Remember Me",
     "welcomeBack": "Welcome back!",
-    "verifyTokenFailed": "User login info is expired. Please login again!",
-    "verifyTokenFailedNetwork": "Verifying user login info failed. Please check your network and refresh page!"
+    "tokenInvalid": "Your authentication token is not valid any more. Please log in again!"
   },
   "login": {
     "emptyUsername": "Username can't be empty.",

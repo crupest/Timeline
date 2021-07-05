@@ -14,8 +14,4 @@ import "./service-worker";
 
 import App from "./App";
 
-import { userService } from "./services/user";
-
-void userService.checkLoginState();
-
 ReactDOM.render(<App />, document.getElementById("app"));
