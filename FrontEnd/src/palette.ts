@@ -130,8 +130,7 @@ export function generatePaletteCSS(palette: Palette): string {
 
 const paletteSubject: BehaviorSubject<Palette | null> =
   new BehaviorSubject<Palette | null>(
-    // generatePalette({ primary: "rgb(0, 123, 255)" })
-    null
+    generatePalette({ primary: "rgb(0, 123, 255)" })
   );
 
 export const palette$: Observable<Palette | null> =
