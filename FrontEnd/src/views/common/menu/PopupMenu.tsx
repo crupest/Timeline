@@ -3,6 +3,8 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 
+import useClickOutside from "@/utilities/useClickOutside";
+
 import Menu, { MenuItems } from "./Menu";
 
 import "./PopupMenu.css";
@@ -28,22 +30,7 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     React.useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement);
 
-  React.useEffect(() => {
-    const handler = (event: MouseEvent): void => {
-      let element: HTMLElement | null = event.target as HTMLElement;
-      while (element) {
-        if (element == referenceElement || element == popperElement) {
-          return;
-        }
-        element = element.parentElement;
-      }
-      setShow(false);
-    };
-    document.addEventListener("click", handler);
-    return () => {
-      document.removeEventListener("click", handler);
-    };
-  }, [referenceElement, popperElement]);
+  useClickOutside(popperElement, () => setShow(false));
 
   return (
     <>

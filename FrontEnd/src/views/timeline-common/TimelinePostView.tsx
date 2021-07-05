@@ -6,6 +6,8 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import { pushAlert } from "@/services/alert";
 
+import useClickOutside from "@/utilities/useClickOutside";
+
 import UserAvatar from "../common/user/UserAvatar";
 import Card from "../common/Card";
 import FlatButton from "../common/button/FlatButton";
@@ -31,6 +33,12 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
   const [dialog, setDialog] = React.useState<
     "delete" | "changeproperty" | null
   >(null);
+
+  const [maskElement, setMaskElement] = React.useState<HTMLElement | null>(
+    null
+  );
+
+  useClickOutside(maskElement, () => setOperationMaskVisible(false));
 
   const cardRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -92,6 +100,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         </div>
         {operationMaskVisible ? (
           <div
+            ref={setMaskElement}
             className="timeline-post-item-options-mask"
             onClick={() => {
               setOperationMaskVisible(false);
