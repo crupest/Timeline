@@ -14,6 +14,7 @@ import {
 } from "@/http/timeline";
 
 import { getTimelinePostUpdate$ } from "@/services/timeline";
+import { useUser } from "@/services/user";
 
 import useValueWithRef from "@/utilities/useValueWithRef";
 
@@ -37,6 +38,8 @@ export interface TimelineProps {
 
 const Timeline: React.FC<TimelineProps> = (props) => {
   const { timelineName, className, style, reloadKey } = props;
+
+  const user = useUser();
 
   const [state, setState] = React.useState<
     "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
@@ -149,8 +152,10 @@ const Timeline: React.FC<TimelineProps> = (props) => {
           />
           {timeline?.postable ? (
             <TimelinePostEdit timeline={timeline} onPosted={onReload.current} />
-          ) : (
+          ) : user == null ? (
             <TimelinePostEditNoLogin />
+          ) : (
+            <TimelineEmptyItem startSegmentLength={20} center="none" current />
           )}
         </div>
       );
