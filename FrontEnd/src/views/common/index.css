@@ -198,6 +198,10 @@
   color: var(--cru-primary-color);
 }
 
+.cru-color-primary-enhance {
+  color: var(--cru-primary-enhance-color);
+}
+
 .cru-color-secondary {
   color: var(--cru-secondary-color);
 }
