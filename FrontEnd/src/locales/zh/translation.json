@@ -80,6 +80,7 @@
     "sendPostFailed": "发送消息失败。",
     "dropDraft": "放弃草稿",
     "confirmLeave": "确定要离开吗？所有输入的内容将会丢失。",
+    "postNoLogin": "<l>登陆</l>后即可发表消息！",
     "visibility": {
       "public": "对所有人公开",
       "register": "仅注册可见",

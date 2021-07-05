@@ -80,6 +80,7 @@
     "sendPostFailed": "Failed to send post.",
     "dropDraft": "Drop Draft",
     "confirmLeave": "Are you sure to leave? All content you typed would be lost.",
+    "postNoLogin": "Please <l>login</l> to send post.",
     "visibility": {
       "public": "public to everyone",
       "register": "only registed people can see",
