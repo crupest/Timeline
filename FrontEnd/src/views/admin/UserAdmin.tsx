@@ -206,19 +206,19 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
   return (
     <div className="admin-user-item">
       <i
-        className="bi-pencil-square float-end icon-button cru-color-warning"
+        className="bi-pencil-square cru-float-right icon-button cru-color-primary-enhance"
         onClick={() => setEditMaskVisible(true)}
       />
-      <h4 className="cru-color-primary">{user.username}</h4>
-      <div className="cru-color-secondary">
+      <h5 className="cru-color-primary">{user.username}</h5>
+      <small className="d-block cru-color-secondary">
         {t("admin:user.nickname")}
         {user.nickname}
-      </div>
-      <div className="cru-color-secondary">
+      </small>
+      <small className="d-block cru-color-secondary">
         {t("admin:user.uniqueId")}
         {user.uniqueId}
-      </div>
-      <div className="cru-color-secondary">
+      </small>
+      <small className="d-block cru-color-secondary">
         {t("admin:user.permissions")}
         {user.permissions.map((permission) => {
           return (
@@ -227,7 +227,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
             </span>
           );
         })}
-      </div>
+      </small>
       <div
         className={classnames("edit-mask", !editMaskVisible && "d-none")}
         onClick={() => setEditMaskVisible(false)}

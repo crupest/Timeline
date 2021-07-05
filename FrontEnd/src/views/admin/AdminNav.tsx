@@ -3,13 +3,14 @@ import { useRouteMatch } from "react-router";
 
 import Tabs from "../common/tab/Tabs";
 
-const AdminNav: React.FC = () => {
+const AdminNav: React.FC<{ className?: string }> = ({ className }) => {
   const match = useRouteMatch<{ name: string }>();
 
   const name = match.params.name;
 
   return (
     <Tabs
+      className={className}
       activeTabName={name}
       tabs={[
         {

@@ -1,19 +1,33 @@
 .admin-user-item {
   position: relative;
+  border: var(--cru-primary-color) solid;
+  border-width: 1px 1px 0;
+  padding: 1em;
 }
+
+.admin-user-item:last-of-type {
+  border-bottom-width: 1px;
+}
+
 .admin-user-item .edit-mask {
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  background: #ffffffc5;
+  background: rgba(255, 255, 255, 0.9);
   position: absolute;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
-  flex-direction: column;
 }
+
+@media (max-width: 576px) {
+  .admin-user-item .edit-mask {
+    flex-direction: column;
+  }
+}
+
 .admin-user-item .edit-mask button {
   margin: 0.5em 2em;
 }

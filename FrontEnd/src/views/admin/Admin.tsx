@@ -29,7 +29,7 @@ const Admin: React.FC<AdminProps> = ({ user }) => {
             const name = match.params["name"];
             return (
               <div className="container">
-                <AdminNav />
+                <AdminNav className="mt-2" />
                 {(() => {
                   if (name === "users") {
                     return <UserAdmin user={user} />;
