@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 
 import { UiLogicError } from "@/common";
 
-import { HttpNetworkError, setHttpToken } from "@/http/common";
+import { HttpNetworkError, setHttpToken, axios } from "@/http/common";
 import {
   getHttpTokenClient,
   HttpCreateTokenBadCredentialError,
@@ -11,6 +11,7 @@ import {
 import { getHttpUserClient, HttpUser, UserPermission } from "@/http/user";
 
 import { pushAlert } from "./alert";
+import { AxiosError } from "axios";
 
 interface IAuthUser extends HttpUser {
   token: string;
@@ -58,24 +59,16 @@ export class UserService {
     this.userSubject.subscribe((u) => {
       setHttpToken(u?.token ?? null);
     });
-  }
 
-  private userSubject = new BehaviorSubject<AuthUser | null | undefined>(
-    undefined
-  );
-
-  get user$(): Observable<AuthUser | null | undefined> {
-    return this.userSubject;
-  }
-
-  get currentUser(): AuthUser | null | undefined {
-    return this.userSubject.value;
-  }
-
-  async checkLoginState(): Promise<AuthUser | null> {
-    if (this.currentUser !== undefined) {
-      console.warn("Already checked user. Can't check twice.");
-    }
+    axios.interceptors.response.use(undefined, (e: AxiosError) => {
+      if (e.isAxiosError && e.response && e.response.status === 401) {
+        this.userSubject.next(null);
+        pushAlert({
+          type: "danger",
+          message: "user.tokenInvalid",
+        });
+      }
+    });
 
     const savedUserString = localStorage.getItem(USER_STORAGE_KEY);
 
@@ -89,41 +82,39 @@ export class UserService {
         ? null
         : new AuthUser(savedAuthUserData, savedAuthUserData.token);
 
-    if (savedUser == null) {
-      this.userSubject.next(null);
-      return null;
-    }
+    if (savedUser != null) {
+      this.userSubject.next(savedUser);
 
-    this.userSubject.next(savedUser);
-
-    const savedToken = savedUser.token;
-    try {
-      const res = await getHttpTokenClient().verify({ token: savedToken });
-      const user = new AuthUser(res.user, savedToken);
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-      this.userSubject.next(user);
-      pushAlert({
-        type: "success",
-        message: "user.welcomeBack",
-      });
-      return user;
-    } catch (error) {
-      if (error instanceof HttpNetworkError) {
-        pushAlert({
-          type: "danger",
-          message: "user.verifyTokenFailedNetwork",
-        });
-        return savedUser;
-      } else {
-        localStorage.removeItem(USER_STORAGE_KEY);
-        this.userSubject.next(null);
-        pushAlert({
-          type: "danger",
-          message: "user.verifyTokenFailed",
-        });
-        return null;
-      }
+      getHttpTokenClient()
+        .verify({ token: savedUser.token })
+        .then(
+          (res) => {
+            const user = new AuthUser(res.user, savedUser.token);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+            this.userSubject.next(user);
+          },
+          (error) => {
+            if (!(error instanceof HttpNetworkError)) {
+              localStorage.removeItem(USER_STORAGE_KEY);
+              this.userSubject.next(null);
+              pushAlert({
+                type: "danger",
+                message: "user.tokenInvalid",
+              });
+            }
+          }
+        );
     }
+  }
+
+  private userSubject = new BehaviorSubject<AuthUser | null>(null);
+
+  get user$(): Observable<AuthUser | null> {
+    return this.userSubject;
+  }
+
+  get currentUser(): AuthUser | null {
+    return this.userSubject.value;
   }
 
   async login(
@@ -180,38 +171,10 @@ export class UserService {
 
 export const userService = new UserService();
 
-export function useRawUser(): AuthUser | null | undefined {
-  const [user, setUser] = useState<AuthUser | null | undefined>(
-    userService.currentUser
-  );
-  useEffect(() => {
-    const subscription = userService.user$.subscribe((u) => setUser(u));
-    return () => {
-      subscription.unsubscribe();
-    };
-  });
-  return user;
-}
-
 export function useUser(): AuthUser | null {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    const initUser = userService.currentUser;
-    if (initUser === undefined) {
-      throw new UiLogicError(
-        "This is a logic error in user module. Current user can't be undefined in useUser."
-      );
-    }
-    return initUser;
-  });
+  const [user, setUser] = useState<AuthUser | null>(userService.currentUser);
   useEffect(() => {
-    const sub = userService.user$.subscribe((u) => {
-      if (u === undefined) {
-        throw new UiLogicError(
-          "This is a logic error in user module. User emitted can't be undefined later."
-        );
-      }
-      setUser(u);
-    });
+    const sub = userService.user$.subscribe((u) => setUser(u));
     return () => {
       sub.unsubscribe();
     };

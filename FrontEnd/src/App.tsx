@@ -13,7 +13,7 @@ import TimelinePage from "./views/timeline";
 import Search from "./views/search";
 import AlertHost from "./views/common/alert/AlertHost";
 
-import { useRawUser } from "./services/user";
+import { useUser } from "./services/user";
 
 const NoMatch: React.FC = () => {
   return <div>Ah-oh, 404!</div>;
@@ -24,60 +24,56 @@ const LazyAdmin = React.lazy(
 );
 
 function App(): ReactElement | null {
-  const user = useRawUser();
+  const user = useUser();
 
-  if (user === undefined) {
-    return <LoadingPage />;
-  } else {
-    return (
-      <React.Suspense fallback={<LoadingPage />}>
-        <Router>
-          <AppBar />
-          <div style={{ height: 56 }} />
-          <Switch>
-            <Route exact path="/">
-              {user == null ? <Home /> : <Center />}
+  return (
+    <React.Suspense fallback={<LoadingPage />}>
+      <Router>
+        <AppBar />
+        <div style={{ height: 56 }} />
+        <Switch>
+          <Route exact path="/">
+            {user == null ? <Home /> : <Center />}
+          </Route>
+          <Route exact path="/home">
+            <Home />
+          </Route>
+          {user != null ? (
+            <Route exact path="/center">
+              <Center />
             </Route>
-            <Route exact path="/home">
-              <Home />
+          ) : null}
+          <Route exact path="/login">
+            <Login />
+          </Route>
+          <Route path="/settings">
+            <Settings />
+          </Route>
+          <Route path="/about">
+            <About />
+          </Route>
+          <Route path="/timelines/:name">
+            <TimelinePage />
+          </Route>
+          <Route path="/users/:username">
+            <User />
+          </Route>
+          <Route path="/search">
+            <Search />
+          </Route>
+          {user && user.hasAdministrationPermission && (
+            <Route path="/admin">
+              <LazyAdmin user={user} />
             </Route>
-            {user != null ? (
-              <Route exact path="/center">
-                <Center />
-              </Route>
-            ) : null}
-            <Route exact path="/login">
-              <Login />
-            </Route>
-            <Route path="/settings">
-              <Settings />
-            </Route>
-            <Route path="/about">
-              <About />
-            </Route>
-            <Route path="/timelines/:name">
-              <TimelinePage />
-            </Route>
-            <Route path="/users/:username">
-              <User />
-            </Route>
-            <Route path="/search">
-              <Search />
-            </Route>
-            {user && user.hasAdministrationPermission && (
-              <Route path="/admin">
-                <LazyAdmin user={user} />
-              </Route>
-            )}
-            <Route>
-              <NoMatch />
-            </Route>
-          </Switch>
-          <AlertHost />
-        </Router>
-      </React.Suspense>
-    );
-  }
+          )}
+          <Route>
+            <NoMatch />
+          </Route>
+        </Switch>
+        <AlertHost />
+      </Router>
+    </React.Suspense>
+  );
 }
 
 export default App;
