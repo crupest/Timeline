@@ -5,6 +5,7 @@
 
   --cru-disable-color: #ced4da;
 
+  /*
   --cru-primary-color: rgb(0, 123, 255);
   --cru-primary-l1-color: rgb(26, 136, 255);
   --cru-primary-l2-color: rgb(51, 149, 255);
@@ -90,6 +91,7 @@
   --cru-success-t1-color: rgb(230, 230, 230);
   --cru-success-t2-color: rgb(204, 204, 204);
   --cru-success-t3-color: rgb(179, 179, 179);
+  */
 }
 
 .cru-primary {
