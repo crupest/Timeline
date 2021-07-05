@@ -21,6 +21,7 @@ import TimelinePagedPostListView from "./TimelinePagedPostListView";
 import TimelineEmptyItem from "./TimelineEmptyItem";
 import TimelineLoading from "./TimelineLoading";
 import TimelinePostEdit from "./TimelinePostEdit";
+import TimelinePostEditNoLogin from "./TimelinePostEditNoLogin";
 
 import "./index.css";
 
@@ -149,7 +150,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
           {timeline?.postable ? (
             <TimelinePostEdit timeline={timeline} onPosted={onReload.current} />
           ) : (
-            <TimelineEmptyItem startSegmentLength={20} center="none" current />
+            <TimelinePostEditNoLogin />
           )}
         </div>
       );

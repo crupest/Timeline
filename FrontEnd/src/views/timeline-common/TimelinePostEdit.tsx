@@ -17,9 +17,8 @@ import { base64 } from "@/http/common";
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/button/LoadingButton";
 import PopupMenu from "../common/menu/PopupMenu";
-import Card from "../common/Card";
 import MarkdownPostEdit from "./MarkdownPostEdit";
-import TimelineLine from "./TimelineLine";
+import TimelinePostEditCard from "./TimelinePostEditCard";
 
 import "./TimelinePostEdit.css";
 
@@ -195,87 +194,76 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   };
 
   return (
-    <div
-      className={classnames("timeline-item timeline-post-edit", className)}
-      style={style}
-    >
-      <TimelineLine center="node" current />
-      <Card className="timeline-item-card">
-        {showMarkdown ? (
-          <MarkdownPostEdit
-            className="cru-fill-parent"
-            onClose={() => setShowMarkdown(false)}
-            timeline={timeline.name}
-            onPosted={onPosted}
-            onPostError={onPostError}
-          />
-        ) : (
-          <div className="row">
-            <div className="col px-1 py-1">
-              {(() => {
-                if (kind === "text") {
-                  return (
-                    <TimelinePostEditText
-                      className="cru-fill-parent timeline-post-edit"
-                      text={text}
-                      disabled={process}
-                      onChange={(t) => {
-                        setText(t);
-                        window.localStorage.setItem(
-                          draftTextLocalStorageKey,
-                          t
-                        );
-                      }}
-                    />
-                  );
-                } else if (kind === "image") {
-                  return (
-                    <TimelinePostEditImage
-                      onSelect={setImage}
-                      disabled={process}
-                    />
-                  );
-                }
-              })()}
-            </div>
-            <div className="col col-auto align-self-end m-1">
-              <div className="d-block cru-text-center mt-1 mb-2">
-                <PopupMenu
-                  items={(["text", "image", "markdown"] as const).map(
-                    (kind) => ({
-                      type: "button",
-                      text: `timeline.post.type.${kind}`,
-                      iconClassName: postKindIconClassNameMap[kind],
-                      onClick: () => {
-                        if (kind === "markdown") {
-                          setShowMarkdown(true);
-                        } else {
-                          setKind(kind);
-                        }
-                      },
-                    })
-                  )}
-                >
-                  <i
-                    className={classnames(
-                      postKindIconClassNameMap[kind],
-                      "icon-button large"
-                    )}
+    <TimelinePostEditCard className={className} style={style}>
+      {showMarkdown ? (
+        <MarkdownPostEdit
+          className="cru-fill-parent"
+          onClose={() => setShowMarkdown(false)}
+          timeline={timeline.name}
+          onPosted={onPosted}
+          onPostError={onPostError}
+        />
+      ) : (
+        <div className="row">
+          <div className="col px-1 py-1">
+            {(() => {
+              if (kind === "text") {
+                return (
+                  <TimelinePostEditText
+                    className="cru-fill-parent timeline-post-edit"
+                    text={text}
+                    disabled={process}
+                    onChange={(t) => {
+                      setText(t);
+                      window.localStorage.setItem(draftTextLocalStorageKey, t);
+                    }}
                   />
-                </PopupMenu>
-              </div>
-              <LoadingButton
-                onClick={onSend}
-                disabled={!canSend}
-                loading={process}
-              >
-                {t("timeline.send")}
-              </LoadingButton>
-            </div>
+                );
+              } else if (kind === "image") {
+                return (
+                  <TimelinePostEditImage
+                    onSelect={setImage}
+                    disabled={process}
+                  />
+                );
+              }
+            })()}
           </div>
-        )}
-      </Card>
-    </div>
+          <div className="col col-auto align-self-end m-1">
+            <div className="d-block cru-text-center mt-1 mb-2">
+              <PopupMenu
+                items={(["text", "image", "markdown"] as const).map((kind) => ({
+                  type: "button",
+                  text: `timeline.post.type.${kind}`,
+                  iconClassName: postKindIconClassNameMap[kind],
+                  onClick: () => {
+                    if (kind === "markdown") {
+                      setShowMarkdown(true);
+                    } else {
+                      setKind(kind);
+                    }
+                  },
+                }))}
+              >
+                <i
+                  className={classnames(
+                    postKindIconClassNameMap[kind],
+                    "icon-button large"
+                  )}
+                />
+              </PopupMenu>
+            </div>
+            <LoadingButton
+              onClick={onSend}
+              disabled={!canSend}
+              loading={process}
+            >
+              {t("timeline.send")}
+            </LoadingButton>
+          </div>
+        </div>
+      )}
+    </TimelinePostEditCard>
   );
 };
 
