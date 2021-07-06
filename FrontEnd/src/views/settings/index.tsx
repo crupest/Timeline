@@ -84,32 +84,29 @@ const SettingsPage: React.FC = (_) => {
           </div>
         </Card>
       </div>
-      {(() => {
-        switch (dialog) {
-          case "changepassword":
-            return <ChangePasswordDialog open close={() => setDialog(null)} />;
-          case "logout":
-            return (
-              <ConfirmDialog
-                title="settings.dialogConfirmLogout.title"
-                body="settings.dialogConfirmLogout.prompt"
-                onClose={() => setDialog(null)}
-                open
-                onConfirm={() => {
-                  void userService.logout().then(() => {
-                    history.push("/");
-                  });
-                }}
-              />
-            );
-          case "changeavatar":
-            return <ChangeAvatarDialog open close={() => setDialog(null)} />;
-          case "changenickname":
-            return <ChangeNicknameDialog open close={() => setDialog(null)} />;
-          default:
-            return null;
-        }
-      })()}
+      <ChangePasswordDialog
+        open={dialog === "changepassword"}
+        close={() => setDialog(null)}
+      />
+      <ConfirmDialog
+        title="settings.dialogConfirmLogout.title"
+        body="settings.dialogConfirmLogout.prompt"
+        onClose={() => setDialog(null)}
+        open={dialog === "logout"}
+        onConfirm={() => {
+          void userService.logout().then(() => {
+            history.push("/");
+          });
+        }}
+      />
+      <ChangeAvatarDialog
+        open={dialog === "changeavatar"}
+        close={() => setDialog(null)}
+      />
+      <ChangeNicknameDialog
+        open={dialog === "changenickname"}
+        close={() => setDialog(null)}
+      />
     </>
   );
 };

@@ -6,29 +6,17 @@ import OperationDialog, {
 } from "../common/dailog/OperationDialog";
 
 import { AuthUser } from "@/services/user";
-import {
-  getHttpUserClient,
-  HttpUser,
-  kUserPermissionList,
-  UserPermission,
-} from "@/http/user";
+import { getHttpUserClient, HttpUser, kUserPermissionList } from "@/http/user";
 import { Trans, useTranslation } from "react-i18next";
 import Button from "../common/button/Button";
 import Spinner from "../common/Spinner";
 import FlatButton from "../common/button/FlatButton";
 
-interface DialogProps<TData = undefined, TReturn = undefined> {
+const CreateUserDialog: React.FC<{
   open: boolean;
   close: () => void;
-  data: TData;
-  onSuccess: (data: TReturn) => void;
-}
-
-const CreateUserDialog: React.FC<DialogProps<undefined, HttpUser>> = ({
-  open,
-  close,
-  onSuccess,
-}) => {
+  onSuccess: (user: HttpUser) => void;
+}> = ({ open, close, onSuccess }) => {
   return (
     <OperationDialog
       title="admin:user.dialog.create.title"
@@ -57,33 +45,35 @@ const UsernameLabel: React.FC = (props) => {
   return <span style={{ color: "blue" }}>{props.children}</span>;
 };
 
-const UserDeleteDialog: React.FC<DialogProps<{ username: string }, unknown>> =
-  ({ open, close, data: { username }, onSuccess }) => {
-    return (
-      <OperationDialog
-        open={open}
-        onClose={close}
-        title="admin:user.dialog.delete.title"
-        themeColor="danger"
-        inputPrompt={() => (
-          <Trans i18nKey="admin:user.dialog.delete.prompt">
-            0<UsernameLabel>{username}</UsernameLabel>2
-          </Trans>
-        )}
-        onProcess={() => getHttpUserClient().delete(username)}
-        onSuccessAndClose={onSuccess}
-      />
-    );
-  };
+const UserDeleteDialog: React.FC<{
+  open: boolean;
+  close: () => void;
+  user: HttpUser;
+  onSuccess: () => void;
+}> = ({ open, close, user, onSuccess }) => {
+  return (
+    <OperationDialog
+      open={open}
+      onClose={close}
+      title="admin:user.dialog.delete.title"
+      themeColor="danger"
+      inputPrompt={() => (
+        <Trans i18nKey="admin:user.dialog.delete.prompt">
+          0<UsernameLabel>{user.username}</UsernameLabel>2
+        </Trans>
+      )}
+      onProcess={() => getHttpUserClient().delete(user.username)}
+      onSuccessAndClose={onSuccess}
+    />
+  );
+};
 
-const UserModifyDialog: React.FC<
-  DialogProps<
-    {
-      oldUser: HttpUser;
-    },
-    HttpUser
-  >
-> = ({ open, close, data: { oldUser }, onSuccess }) => {
+const UserModifyDialog: React.FC<{
+  open: boolean;
+  close: () => void;
+  user: HttpUser;
+  onSuccess: () => void;
+}> = ({ open, close, user, onSuccess }) => {
   return (
     <OperationDialog
       open={open}
@@ -92,7 +82,7 @@ const UserModifyDialog: React.FC<
       themeColor="danger"
       inputPrompt={() => (
         <Trans i18nKey="admin:user.dialog.modify.prompt">
-          0<UsernameLabel>{oldUser.username}</UsernameLabel>2
+          0<UsernameLabel>{user.username}</UsernameLabel>2
         </Trans>
       )}
       inputScheme={
@@ -100,21 +90,21 @@ const UserModifyDialog: React.FC<
           {
             type: "text",
             label: "admin:user.username",
-            initValue: oldUser.username,
+            initValue: user.username,
           },
           { type: "text", label: "admin:user.password" },
           {
             type: "text",
             label: "admin:user.nickname",
-            initValue: oldUser.nickname,
+            initValue: user.nickname,
           },
         ] as const
       }
       onProcess={([username, password, nickname]) =>
-        getHttpUserClient().patch(oldUser.username, {
-          username: username !== oldUser.username ? username : undefined,
+        getHttpUserClient().patch(user.username, {
+          username: username !== user.username ? username : undefined,
           password: password !== "" ? password : undefined,
-          nickname: nickname !== oldUser.nickname ? nickname : undefined,
+          nickname: nickname !== user.nickname ? nickname : undefined,
         })
       }
       onSuccessAndClose={onSuccess}
@@ -122,17 +112,14 @@ const UserModifyDialog: React.FC<
   );
 };
 
-const UserPermissionModifyDialog: React.FC<
-  DialogProps<
-    {
-      username: string;
-      permissions: UserPermission[];
-    },
-    UserPermission[]
-  >
-> = ({ open, close, data: { username, permissions }, onSuccess }) => {
+const UserPermissionModifyDialog: React.FC<{
+  open: boolean;
+  close: () => void;
+  user: HttpUser;
+  onSuccess: () => void;
+}> = ({ open, close, user, onSuccess }) => {
   const oldPermissionBoolList: boolean[] = kUserPermissionList.map(
-    (permission) => permissions.includes(permission)
+    (permission) => user.permissions.includes(permission)
   );
 
   return (
@@ -143,7 +130,7 @@ const UserPermissionModifyDialog: React.FC<
       themeColor="danger"
       inputPrompt={() => (
         <Trans i18nKey="admin:user.dialog.modifyPermissions.prompt">
-          0<UsernameLabel>{username}</UsernameLabel>2
+          0<UsernameLabel>{user.username}</UsernameLabel>2
         </Trans>
       )}
       inputScheme={kUserPermissionList.map<OperationDialogBoolInput>(
@@ -160,90 +147,102 @@ const UserPermissionModifyDialog: React.FC<
           const permission = kUserPermissionList[index];
           if (oldValue === newValue) continue;
           if (newValue) {
-            await getHttpUserClient().putUserPermission(username, permission);
+            await getHttpUserClient().putUserPermission(
+              user.username,
+              permission
+            );
           } else {
             await getHttpUserClient().deleteUserPermission(
-              username,
+              user.username,
               permission
             );
           }
         }
         return newPermissionBoolList;
       }}
-      onSuccessAndClose={(newPermissionBoolList: boolean[]) => {
-        const permissions: UserPermission[] = [];
-        for (let index = 0; index < kUserPermissionList.length; index++) {
-          if (newPermissionBoolList[index]) {
-            permissions.push(kUserPermissionList[index]);
-          }
-        }
-        onSuccess(permissions);
-      }}
+      onSuccessAndClose={onSuccess}
     />
   );
 };
 
-const kModify = "modify";
-const kModifyPermission = "permission";
-const kDelete = "delete";
-
-type TModify = typeof kModify;
-type TModifyPermission = typeof kModifyPermission;
-type TDelete = typeof kDelete;
-
-type ContextMenuItem = TModify | TModifyPermission | TDelete;
-
 interface UserItemProps {
-  on: { [key in ContextMenuItem]: () => void };
   user: HttpUser;
+  onChange: () => void;
 }
 
-const UserItem: React.FC<UserItemProps> = ({ user, on }) => {
+const UserItem: React.FC<UserItemProps> = ({ user, onChange }) => {
   const { t } = useTranslation();
+
+  const [dialog, setDialog] = useState<
+    "delete" | "modify" | "permission" | null
+  >(null);
 
   const [editMaskVisible, setEditMaskVisible] = React.useState<boolean>(false);
 
   return (
-    <div className="admin-user-item">
-      <i
-        className="bi-pencil-square cru-float-right icon-button cru-color-primary-enhance"
-        onClick={() => setEditMaskVisible(true)}
-      />
-      <h5 className="cru-color-primary">{user.username}</h5>
-      <small className="d-block cru-color-secondary">
-        {t("admin:user.nickname")}
-        {user.nickname}
-      </small>
-      <small className="d-block cru-color-secondary">
-        {t("admin:user.uniqueId")}
-        {user.uniqueId}
-      </small>
-      <small className="d-block cru-color-secondary">
-        {t("admin:user.permissions")}
-        {user.permissions.map((permission) => {
-          return (
-            <span key={permission} className="cru-color-danger">
-              {permission}{" "}
-            </span>
-          );
-        })}
-      </small>
-      <div
-        className={classnames("edit-mask", !editMaskVisible && "d-none")}
-        onClick={() => setEditMaskVisible(false)}
-      >
-        <FlatButton text="admin:user.modify" onClick={on[kModify]} />
-        <FlatButton
-          text="admin:user.modifyPermissions"
-          onClick={on[kModifyPermission]}
+    <>
+      <div className="admin-user-item">
+        <i
+          className="bi-pencil-square cru-float-right icon-button cru-color-primary-enhance"
+          onClick={() => setEditMaskVisible(true)}
         />
-        <FlatButton
-          text="admin:user.delete"
-          color="danger"
-          onClick={on[kDelete]}
-        />
+        <h5 className="cru-color-primary">{user.username}</h5>
+        <small className="d-block cru-color-secondary">
+          {t("admin:user.nickname")}
+          {user.nickname}
+        </small>
+        <small className="d-block cru-color-secondary">
+          {t("admin:user.uniqueId")}
+          {user.uniqueId}
+        </small>
+        <small className="d-block cru-color-secondary">
+          {t("admin:user.permissions")}
+          {user.permissions.map((permission) => {
+            return (
+              <span key={permission} className="cru-color-danger">
+                {permission}{" "}
+              </span>
+            );
+          })}
+        </small>
+        <div
+          className={classnames("edit-mask", !editMaskVisible && "d-none")}
+          onClick={() => setEditMaskVisible(false)}
+        >
+          <FlatButton
+            text="admin:user.modify"
+            onClick={() => setDialog("modify")}
+          />
+          <FlatButton
+            text="admin:user.modifyPermissions"
+            onClick={() => setDialog("permission")}
+          />
+          <FlatButton
+            text="admin:user.delete"
+            color="danger"
+            onClick={() => setDialog("delete")}
+          />
+        </div>
       </div>
-    </div>
+      <UserDeleteDialog
+        open={dialog === "delete"}
+        close={() => setDialog(null)}
+        user={user}
+        onSuccess={onChange}
+      />
+      <UserModifyDialog
+        open={dialog === "modify"}
+        close={() => setDialog(null)}
+        user={user}
+        onSuccess={onChange}
+      />
+      <UserPermissionModifyDialog
+        open={dialog === "permission"}
+        close={() => setDialog(null)}
+        user={user}
+        onSuccess={onChange}
+      />
+    </>
   );
 };
 
@@ -252,24 +251,8 @@ interface UserAdminProps {
 }
 
 const UserAdmin: React.FC<UserAdminProps> = () => {
-  type DialogInfo =
-    | null
-    | {
-        type: "create";
-      }
-    | {
-        type: TModify;
-        user: HttpUser;
-      }
-    | {
-        type: TModifyPermission;
-        username: string;
-        permissions: UserPermission[];
-      }
-    | { type: TDelete; username: string };
-
   const [users, setUsers] = useState<HttpUser[] | null>(null);
-  const [dialog, setDialog] = useState<DialogInfo>(null);
+  const [dialog, setDialog] = useState<"create" | null>(null);
   const [usersVersion, setUsersVersion] = useState<number>(0);
   const updateUsers = (): void => {
     setUsersVersion(usersVersion + 1);
@@ -289,83 +272,10 @@ const UserAdmin: React.FC<UserAdminProps> = () => {
     };
   }, [usersVersion]);
 
-  let dialogNode: React.ReactNode;
-  if (dialog) {
-    switch (dialog.type) {
-      case "create":
-        dialogNode = (
-          <CreateUserDialog
-            open
-            close={() => setDialog(null)}
-            data={undefined}
-            onSuccess={updateUsers}
-          />
-        );
-        break;
-      case kDelete:
-        dialogNode = (
-          <UserDeleteDialog
-            open
-            close={() => setDialog(null)}
-            data={{ username: dialog.username }}
-            onSuccess={updateUsers}
-          />
-        );
-        break;
-      case kModify:
-        dialogNode = (
-          <UserModifyDialog
-            open
-            close={() => setDialog(null)}
-            data={{ oldUser: dialog.user }}
-            onSuccess={updateUsers}
-          />
-        );
-        break;
-      case kModifyPermission:
-        dialogNode = (
-          <UserPermissionModifyDialog
-            open
-            close={() => setDialog(null)}
-            data={{
-              username: dialog.username,
-              permissions: dialog.permissions,
-            }}
-            onSuccess={updateUsers}
-          />
-        );
-        break;
-    }
-  }
-
   if (users) {
     const userComponents = users.map((user) => {
       return (
-        <UserItem
-          key={user.username}
-          user={user}
-          on={{
-            modify: () => {
-              setDialog({
-                type: "modify",
-                user,
-              });
-            },
-            permission: () => {
-              setDialog({
-                type: kModifyPermission,
-                username: user.username,
-                permissions: user.permissions,
-              });
-            },
-            delete: () => {
-              setDialog({
-                type: "delete",
-                username: user.username,
-              });
-            },
-          }}
-        />
+        <UserItem key={user.username} user={user} onChange={updateUsers} />
       );
     });
 
@@ -376,16 +286,16 @@ const UserAdmin: React.FC<UserAdminProps> = () => {
             <Button
               text="admin:create"
               color="success"
-              onClick={() =>
-                setDialog({
-                  type: "create",
-                })
-              }
+              onClick={() => setDialog("create")}
             />
           </div>
         </div>
         {userComponents}
-        {dialogNode}
+        <CreateUserDialog
+          open={dialog === "create"}
+          close={() => setDialog(null)}
+          onSuccess={updateUsers}
+        />
       </>
     );
   } else {

@@ -58,17 +58,11 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
         setDialog={setDialog}
         {...props}
       />
-      {(() => {
-        if (dialog === "delete") {
-          return (
-            <TimelineDeleteDialog
-              timeline={timeline}
-              open
-              close={() => setDialog(null)}
-            />
-          );
-        }
-      })()}
+      <TimelineDeleteDialog
+        timeline={timeline}
+        open={dialog === "delete"}
+        close={() => setDialog(null)}
+      />
     </>
   );
 };

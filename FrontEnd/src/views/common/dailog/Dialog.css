@@ -33,3 +33,23 @@
 .cru-dialog-bottom-area > * {
   margin: 0 0.5em;
 }
+
+.cru-dialog-enter .cru-dialog-container {
+  transform: scale(0, 0);
+  opacity: 0;
+  transform-origin: center;
+}
+
+.cru-dialog-enter-active .cru-dialog-container {
+  transform: scale(1, 1);
+  opacity: 1;
+  transition: transform 0.3s, opacity 0.3s;
+  transform-origin: center;
+}
+
+.cru-dialog-exit-active .cru-dialog-container {
+  transition: transform 0.3s, opacity 0.3s;
+  transform: scale(0, 0);
+  opacity: 0;
+  transform-origin: center;
+}

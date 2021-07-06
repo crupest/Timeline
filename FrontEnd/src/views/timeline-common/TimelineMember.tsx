@@ -186,7 +186,7 @@ export const TimelineMemberDialog: React.FC<TimelineMemberDialogProps> = (
   props
 ) => {
   return (
-    <Dialog open onClose={props.onClose}>
+    <Dialog open={props.open} onClose={props.onClose}>
       <TimelineMember {...props} />
     </Dialog>
   );

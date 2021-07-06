@@ -124,36 +124,34 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
           </div>
         ) : null}
       </Card>
-      {dialog === "delete" ? (
-        <ConfirmDialog
-          title="timeline.post.deleteDialog.title"
-          body="timeline.post.deleteDialog.prompt"
-          open
-          onClose={() => {
-            setDialog(null);
-            setOperationMaskVisible(false);
-          }}
-          onConfirm={() => {
-            void getHttpTimelineClient()
-              .deletePost(post.timelineName, post.id)
-              .then(onDeleted, () => {
-                pushAlert({
-                  type: "danger",
-                  message: "timeline.deletePostFailed",
-                });
+      <ConfirmDialog
+        title="timeline.post.deleteDialog.title"
+        body="timeline.post.deleteDialog.prompt"
+        open={dialog === "delete"}
+        onClose={() => {
+          setDialog(null);
+          setOperationMaskVisible(false);
+        }}
+        onConfirm={() => {
+          void getHttpTimelineClient()
+            .deletePost(post.timelineName, post.id)
+            .then(onDeleted, () => {
+              pushAlert({
+                type: "danger",
+                message: "timeline.deletePostFailed",
               });
-          }}
-        />
-      ) : dialog === "changeproperty" ? (
-        <PostPropertyChangeDialog
-          onClose={() => {
-            setDialog(null);
-            setOperationMaskVisible(false);
-          }}
-          post={post}
-          onSuccess={onChanged}
-        />
-      ) : null}
+            });
+        }}
+      />
+      <PostPropertyChangeDialog
+        open={dialog === "changeproperty"}
+        onClose={() => {
+          setDialog(null);
+          setOperationMaskVisible(false);
+        }}
+        post={post}
+        onSuccess={onChanged}
+      />
     </div>
   );
 };
