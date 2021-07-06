@@ -28,3 +28,21 @@
 .cru-full-page-back-button {
   color: var(--cru-primary-t-color);
 }
+
+.cru-full-page-enter {
+  transform: translate(100%, 0);
+}
+
+.cru-full-page-enter-active {
+  transform: none;
+  transition: transform 0.3s;
+}
+
+.cru-full-page-exit-active {
+  transition: transform 0.3s;
+  transform: translate(100%, 0);
+}
+
+.cru-full-page-exit-done {
+  display: none;
+}
