@@ -190,15 +190,13 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
           },
         ]}
       />
-      {showLeaveConfirmDialog && (
-        <ConfirmDialog
-          onClose={() => setShowLeaveConfirmDialog(false)}
-          onConfirm={onClose}
-          open
-          title="timeline.dropDraft"
-          body="timeline.confirmLeave"
-        />
-      )}
+      <ConfirmDialog
+        onClose={() => setShowLeaveConfirmDialog(false)}
+        onConfirm={onClose}
+        open={showLeaveConfirmDialog}
+        title="timeline.dropDraft"
+        body="timeline.confirmLeave"
+      />
     </>
   );
 };

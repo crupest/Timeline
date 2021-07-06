@@ -18,7 +18,13 @@ const FullPageDialog: React.FC<FullPageDialogProps> = ({
   contentContainerClassName,
 }) => {
   return createPortal(
-    <CSSTransition in={show} timeout={300} classNames="cru-full-page">
+    <CSSTransition
+      mountOnEnter
+      unmountOnExit
+      in={show}
+      timeout={300}
+      classNames="cru-full-page"
+    >
       <div className="cru-full-page">
         <div className="cru-full-page-top-bar">
           <i

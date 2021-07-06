@@ -134,27 +134,18 @@ const TimelinePageCardTemplate: React.FC<TimelineCardTemplateProps> = ({
           <div style={{ display: collapse ? "none" : "inline" }}>{content}</div>
         )}
       </Card>
-      {(() => {
-        if (dialog === "member") {
-          return (
-            <TimelineMemberDialog
-              timeline={timeline}
-              onClose={() => setDialog(null)}
-              open
-              onChange={onReload}
-            />
-          );
-        } else if (dialog === "property") {
-          return (
-            <TimelinePropertyChangeDialog
-              timeline={timeline}
-              close={() => setDialog(null)}
-              open
-              onChange={onReload}
-            />
-          );
-        }
-      })()}
+      <TimelineMemberDialog
+        timeline={timeline}
+        onClose={() => setDialog(null)}
+        open={dialog === "member"}
+        onChange={onReload}
+      />
+      <TimelinePropertyChangeDialog
+        timeline={timeline}
+        close={() => setDialog(null)}
+        open={dialog === "property"}
+        onChange={onReload}
+      />
     </>
   );
 };

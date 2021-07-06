@@ -6,7 +6,7 @@ import Button from "../button/Button";
 import Dialog from "./Dialog";
 
 const ConfirmDialog: React.FC<{
-  open?: boolean;
+  open: boolean;
   onClose: () => void;
   onConfirm: () => void;
   title: I18nText;

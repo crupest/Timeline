@@ -47,14 +47,12 @@ const HomePage: React.FC = () => {
         </div>
         <CenterBoards />
       </div>
-      {dialog === "create" && (
-        <TimelineCreateDialog
-          open
-          close={() => {
-            setDialog(null);
-          }}
-        />
-      )}
+      <TimelineCreateDialog
+        open={dialog === "create"}
+        close={() => {
+          setDialog(null);
+        }}
+      />
     </>
   );
 };

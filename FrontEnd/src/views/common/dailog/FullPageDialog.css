@@ -42,7 +42,3 @@
   transition: transform 0.3s;
   transform: translate(100%, 0);
 }
-
-.cru-full-page-exit-done {
-  display: none;
-}
