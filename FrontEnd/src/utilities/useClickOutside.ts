@@ -2,7 +2,8 @@ import React from "react";
 
 export default function useClickOutside(
   element: HTMLElement | null | undefined,
-  onClickOutside: () => void
+  onClickOutside: () => void,
+  nextTick?: boolean
 ): void {
   const onClickOutsideRef = React.useRef<() => void>(onClickOutside);
 
@@ -22,10 +23,16 @@ export default function useClickOutside(
         }
         onClickOutsideRef.current();
       };
-      document.addEventListener("click", handler);
+      if (nextTick) {
+        setTimeout(() => {
+          document.addEventListener("click", handler);
+        });
+      } else {
+        document.addEventListener("click", handler);
+      }
       return () => {
         document.removeEventListener("click", handler);
       };
     }
-  }, [element]);
+  }, [element, nextTick]);
 }

@@ -30,7 +30,7 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     React.useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement);
 
-  useClickOutside(popperElement, () => setShow(false));
+  useClickOutside(popperElement, () => setShow(false), true);
 
   return (
     <>
