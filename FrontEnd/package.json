@@ -56,7 +56,7 @@
     "@types/react-dom": "^17.0.8",
     "@types/react-responsive": "^8.0.2",
     "@types/react-router": "^5.1.15",
-    "@types/react-router-dom": "^5.1.7",
+    "@types/react-router-dom": "^5.1.8",
     "@types/react-transition-group": "^4.4.1",
     "@types/remarkable": "^2.0.2",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
