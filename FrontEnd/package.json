@@ -37,7 +37,7 @@
     "workbox-precaching": "^6.2.0",
     "workbox-routing": "^6.2.0",
     "workbox-strategies": "^6.2.0",
-    "workbox-window": "^6.1.1",
+    "workbox-window": "^6.2.0",
     "xregexp": "^5.1.0"
   },
   "scripts": {
