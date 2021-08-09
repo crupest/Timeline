@@ -32,7 +32,7 @@
     "regenerator-runtime": "^0.13.9",
     "remarkable": "^2.0.1",
     "rxjs": "^7.3.0",
-    "workbox-cacheable-response": "^6.2.0",
+    "workbox-cacheable-response": "^6.2.2",
     "workbox-expiration": "^6.2.2",
     "workbox-precaching": "^6.2.2",
     "workbox-routing": "^6.2.2",
