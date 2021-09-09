@@ -16,7 +16,7 @@
     "core-js": "^3.17.2",
     "i18next": "^20.6.0",
     "i18next-browser-languagedetector": "^6.1.2",
-    "js-base64": "^3.6.1",
+    "js-base64": "^3.7.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "pepjs": "^0.5.3",
