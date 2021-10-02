@@ -14,7 +14,7 @@
     "classnames": "^2.3.1",
     "color": "^4.0.1",
     "core-js": "^3.18.1",
-    "i18next": "^21.0.2",
+    "i18next": "^21.2.3",
     "i18next-browser-languagedetector": "^6.1.2",
     "js-base64": "^3.7.2",
     "lodash": "^4.17.21",
