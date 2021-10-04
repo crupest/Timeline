@@ -31,7 +31,7 @@
     "react-transition-group": "^4.4.2",
     "regenerator-runtime": "^0.13.9",
     "remarkable": "^2.0.1",
-    "rxjs": "^7.3.0",
+    "rxjs": "^7.3.1",
     "workbox-cacheable-response": "^6.3.0",
     "workbox-expiration": "^6.3.0",
     "workbox-precaching": "^6.3.0",
