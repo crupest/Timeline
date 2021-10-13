@@ -50,7 +50,7 @@
   "devDependencies": {
     "@types/color": "^3.0.2",
     "@types/lodash": "^4.14.175",
-    "@types/node": "^16.10.2",
+    "@types/node": "^16.10.4",
     "@types/react": "^17.0.26",
     "@types/react-color": "^3.0.5",
     "@types/react-dom": "^17.0.9",
