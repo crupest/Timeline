@@ -27,7 +27,7 @@
     "react-popper": "^2.2.5",
     "react-responsive": "^8.2.0",
     "react-router": "^5.2.0",
-    "react-router-dom": "^5.3.0",
+    "react-router-dom": "^6.0.1",
     "react-transition-group": "^4.4.2",
     "regenerator-runtime": "^0.13.9",
     "remarkable": "^2.0.1",
