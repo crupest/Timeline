@@ -51,7 +51,7 @@ export const i18nPromise = i18n
     fallbackLng: false,
     lowerCaseLng: true,
 
-    debug: process.env.NODE_ENV === "development",
+    debug: import.meta.env.DEV,
 
     interpolation: {
       escapeValue: false, // not needed for react!!
