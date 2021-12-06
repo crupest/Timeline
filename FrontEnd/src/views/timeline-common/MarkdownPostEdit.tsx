@@ -2,7 +2,6 @@
 import React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
-import { Prompt } from "react-router-dom";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
@@ -99,7 +98,6 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
 
   return (
     <>
-      <Prompt when={!canLeave} message={t("timeline.confirmLeave")} />
       <TabPages
         className={className}
         style={style}
