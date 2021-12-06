@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { useUser, userService } from "@/services/user";
@@ -15,7 +15,7 @@ import "./index.css";
 const SettingsPage: React.FC = (_) => {
   const { i18n, t } = useTranslation();
   const user = useUser();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [dialog, setDialog] = useState<
     null | "changepassword" | "changeavatar" | "changenickname" | "logout"
@@ -95,7 +95,7 @@ const SettingsPage: React.FC = (_) => {
         open={dialog === "logout"}
         onConfirm={() => {
           void userService.logout().then(() => {
-            history.push("/");
+            navigate("/");
           });
         }}
       />

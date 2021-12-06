@@ -1,12 +1,12 @@
 import React from "react";
-import { useRouteMatch } from "react-router";
+import { useParams } from "react-router-dom";
 
 import Tabs from "../common/tab/Tabs";
 
 const AdminNav: React.FC<{ className?: string }> = ({ className }) => {
-  const match = useRouteMatch<{ name: string }>();
+  const params = useParams();
 
-  const name = match.params.name;
+  const name = params.name;
 
   return (
     <Tabs

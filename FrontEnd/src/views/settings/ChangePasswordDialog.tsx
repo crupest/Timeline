@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 import { userService } from "@/services/user";
 
@@ -11,7 +11,7 @@ export interface ChangePasswordDialogProps {
 }
 
 const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [redirect, setRedirect] = useState<boolean>(false);
 
@@ -58,7 +58,7 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
       onClose={() => {
         props.close();
         if (redirect) {
-          history.push("/login");
+          navigate("/login");
         }
       }}
     />

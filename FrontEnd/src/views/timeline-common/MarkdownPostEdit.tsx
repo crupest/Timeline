@@ -2,7 +2,7 @@
 import React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
-import { Prompt } from "react-router";
+import { Prompt } from "react-router-dom";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 

@@ -1,11 +1,17 @@
 import React from "react";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
+
+import { UiLogicError } from "@/common";
 
 import TimelinePageTemplate from "../timeline-common/TimelinePageTemplate";
 import TimelineCard from "./TimelineCard";
 
 const TimelinePage: React.FC = () => {
-  const { name } = useParams<{ name: string }>();
+  const { name } = useParams();
+
+  if (name == null) {
+    throw new UiLogicError("No route param 'name'.");
+  }
 
   const [reloadKey, setReloadKey] = React.useState<number>(0);
 

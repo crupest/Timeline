@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import AppBar from "./views/common/AppBar";
 import LoadingPage from "./views/common/LoadingPage";
@@ -11,6 +11,7 @@ import About from "./views/about";
 import User from "./views/user";
 import TimelinePage from "./views/timeline";
 import Search from "./views/search";
+import Admin from "./views/admin";
 import AlertHost from "./views/common/alert/AlertHost";
 
 import { useUser } from "./services/user";
@@ -19,59 +20,29 @@ const NoMatch: React.FC = () => {
   return <div>Ah-oh, 404!</div>;
 };
 
-const LazyAdmin = React.lazy(
-  () => import(/* webpackChunkName: "admin" */ "./views/admin/Admin")
-);
-
 function App(): ReactElement | null {
   const user = useUser();
 
   return (
     <React.Suspense fallback={<LoadingPage />}>
-      <Router>
+      <BrowserRouter>
         <AppBar />
         <div style={{ height: 56 }} />
-        <Switch>
-          <Route exact path="/">
-            {user == null ? <Home /> : <Center />}
-          </Route>
-          <Route exact path="/home">
-            <Home />
-          </Route>
-          {user != null ? (
-            <Route exact path="/center">
-              <Center />
-            </Route>
-          ) : null}
-          <Route exact path="/login">
-            <Login />
-          </Route>
-          <Route path="/settings">
-            <Settings />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/timelines/:name">
-            <TimelinePage />
-          </Route>
-          <Route path="/users/:username">
-            <User />
-          </Route>
-          <Route path="/search">
-            <Search />
-          </Route>
-          {user && user.hasAdministrationPermission && (
-            <Route path="/admin">
-              <LazyAdmin user={user} />
-            </Route>
-          )}
-          <Route>
-            <NoMatch />
-          </Route>
-        </Switch>
+        <Routes>
+          <Route index element={user == null ? <Home /> : <Center />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/center" element={<Center />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/timelines/:name" element={<TimelinePage />} />
+          <Route path="/users/:username" element={<User />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route element={<NoMatch />} />
+        </Routes>
         <AlertHost />
-      </Router>
+      </BrowserRouter>
     </React.Suspense>
   );
 }

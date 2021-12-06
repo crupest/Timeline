@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 import { validateTimelineName } from "@/services/timeline";
 import OperationDialog from "../common/dailog/OperationDialog";
@@ -11,7 +11,7 @@ interface TimelineCreateDialogProps {
 }
 
 const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <OperationDialog
@@ -43,7 +43,7 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
         getHttpTimelineClient().postTimeline({ name })
       }
       onSuccessAndClose={(timeline: HttpTimelineInfo) => {
-        history.push(`timelines/${timeline.name}`);
+        navigate(`timelines/${timeline.name}`);
       }}
       failurePrompt={(e) => `${e as string}`}
     />
