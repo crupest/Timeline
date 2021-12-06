@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
@@ -13,7 +13,7 @@ interface TimelineDeleteDialog {
 }
 
 const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { timeline } = props;
 
@@ -46,7 +46,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
         return getHttpTimelineClient().deleteTimeline(timeline.name);
       }}
       onSuccessAndClose={() => {
-        history.replace("/");
+        navigate("/", { replace: true });
       }}
     />
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { useUser, userService } from "@/services/user";
@@ -11,7 +11,9 @@ import "./index.css";
 
 const LoginPage: React.FC = (_) => {
   const { t } = useTranslation();
-  const history = useHistory();
+
+  const navigate = useNavigate();
+
   const [username, setUsername] = React.useState<string>("");
   const [usernameDirty, setUsernameDirty] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>("");
@@ -24,12 +26,12 @@ const LoginPage: React.FC = (_) => {
 
   React.useEffect(() => {
     if (user != null) {
-      const id = setTimeout(() => history.push("/"), 3000);
+      const id = setTimeout(() => navigate("/"), 3000);
       return () => {
         clearTimeout(id);
       };
     }
-  }, [history, user]);
+  }, [navigate, user]);
 
   if (user != null) {
     return (
@@ -59,9 +61,9 @@ const LoginPage: React.FC = (_) => {
       .then(
         () => {
           if (history.length === 0) {
-            history.push("/");
+            navigate("/");
           } else {
-            history.goBack();
+            navigate(-1);
           }
         },
         (e: Error) => {

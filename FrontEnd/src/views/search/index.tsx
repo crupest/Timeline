@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory, useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import { HttpNetworkError } from "@/http/common";
@@ -44,7 +44,7 @@ const TimelineSearchResultItemView: React.FC<{
 const SearchPage: React.FC = () => {
   const { t } = useTranslation();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const queryParam = searchParams.get("q");
@@ -90,7 +90,7 @@ const SearchPage: React.FC = () => {
             if (queryParam === searchText) {
               setForceResearchKey((old) => old + 1);
             } else {
-              history.push(`/search?q=${searchText}`);
+              navigate(`/search?q=${searchText}`);
             }
           }}
         />

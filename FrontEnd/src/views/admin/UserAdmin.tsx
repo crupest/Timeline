@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import classnames from "classnames";
+
+import { getHttpUserClient, HttpUser, kUserPermissionList } from "@/http/user";
 
 import OperationDialog, {
   OperationDialogBoolInput,
 } from "../common/dailog/OperationDialog";
-
-import { AuthUser } from "@/services/user";
-import { getHttpUserClient, HttpUser, kUserPermissionList } from "@/http/user";
-import { Trans, useTranslation } from "react-i18next";
 import Button from "../common/button/Button";
 import Spinner from "../common/Spinner";
 import FlatButton from "../common/button/FlatButton";
@@ -246,11 +245,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, onChange }) => {
   );
 };
 
-interface UserAdminProps {
-  user: AuthUser;
-}
-
-const UserAdmin: React.FC<UserAdminProps> = () => {
+const UserAdmin: React.FC = () => {
   const [users, setUsers] = useState<HttpUser[] | null>(null);
   const [dialog, setDialog] = useState<"create" | null>(null);
   const [usersVersion, setUsersVersion] = useState<number>(0);

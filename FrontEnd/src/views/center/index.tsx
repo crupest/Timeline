@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 import { useUserLoggedIn } from "@/services/user";
 
@@ -11,7 +11,7 @@ import TimelineCreateDialog from "./TimelineCreateDialog";
 import "./index.css";
 
 const HomePage: React.FC = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const user = useUserLoggedIn();
 
@@ -29,7 +29,7 @@ const HomePage: React.FC = () => {
               value={navText}
               onChange={setNavText}
               onButtonClick={() => {
-                history.push(`search?q=${navText}`);
+                navigate(`search?q=${navText}`);
               }}
               additionalButton={
                 user != null && (

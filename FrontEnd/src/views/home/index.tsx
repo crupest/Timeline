@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 import { HttpTimelineInfo } from "@/http/timeline";
 import { getHttpHighlightClient } from "@/http/highlight";
@@ -17,7 +17,7 @@ const highlightTimelineMessageMap = {
 } as const;
 
 const HomeV2: React.FC = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [navText, setNavText] = React.useState<string>("");
 
@@ -60,7 +60,7 @@ const HomeV2: React.FC = () => {
         value={navText}
         onChange={setNavText}
         onButtonClick={() => {
-          history.push(`search?q=${navText}`);
+          navigate(`search?q=${navText}`);
         }}
         alwaysOneline
       />
