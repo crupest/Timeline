@@ -1,7 +1,7 @@
 import React from "react";
+import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink } from "react-router-dom";
-import classnames from "classnames";
 import { useMediaQuery } from "react-responsive";
 
 import { useUser } from "@/services/user";
@@ -30,9 +30,8 @@ const AppBar: React.FC = (_) => {
   ): React.ReactNode => (
     <NavLink
       to={link}
-      activeClassName="active"
       onClick={collapse}
-      className={className}
+      className={({ isActive }) => classnames(className, isActive && "active")}
     >
       {label}
     </NavLink>
