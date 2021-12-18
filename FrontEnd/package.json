@@ -67,6 +67,6 @@
     "prettier": "^2.5.1",
     "typescript": "^4.5.4",
     "vite": "^2.7.3",
-    "vite-plugin-pwa": "^0.11.11"
+    "vite-plugin-pwa": "^0.11.12"
   }
 }
