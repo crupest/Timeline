@@ -47,7 +47,7 @@
     "lint:fix": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx --fix"
   },
   "devDependencies": {
-    "@types/color": "^3.0.2",
+    "@types/color": "^3.0.3",
     "@types/lodash": "^4.14.178",
     "@types/node": "^17.0.13",
     "@types/react": "^17.0.38",
