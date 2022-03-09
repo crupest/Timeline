@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-undef */
 import React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
@@ -118,7 +117,9 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                   }
                 }}
               />
-              {canSend && <FlatButton text="timeline.send" onClick={send} />}
+              {canSend && (
+                <FlatButton text="timeline.send" onClick={() => void send()} />
+              )}
             </div>
           )
         }
