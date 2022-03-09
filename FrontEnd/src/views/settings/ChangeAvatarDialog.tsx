@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AxiosError } from "axios";
 
-import { UiLogicError } from "@/common";
+import { convertI18nText, I18nText, UiLogicError } from "@/common";
 
-import { useUserLoggedIn } from "@/services/user";
+import { useUser } from "@/services/user";
 
 import { getHttpUserClient } from "@/http/user";
 
@@ -20,7 +20,7 @@ export interface ChangeAvatarDialogProps {
 const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
   const { t } = useTranslation();
 
-  const user = useUserLoggedIn();
+  const user = useUser();
 
   const [file, setFile] = React.useState<File | null>(null);
   const [fileUrl, setFileUrl] = React.useState<string | null>(null);
@@ -40,16 +40,11 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
     | "error"
   >("select");
 
-  const [message, setMessage] = useState<
-    string | { type: "custom"; text: string } | null
-  >("settings.dialogChangeAvatar.prompt.select");
+  const [message, setMessage] = useState<I18nText>(
+    "settings.dialogChangeAvatar.prompt.select"
+  );
 
-  const trueMessage =
-    message == null
-      ? null
-      : typeof message === "string"
-      ? t(message)
-      : message.text;
+  const trueMessage = convertI18nText(message, t);
 
   const closeDialog = props.close;
 
@@ -130,6 +125,10 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       throw new UiLogicError();
     }
 
+    if (user == null) {
+      throw new UiLogicError();
+    }
+
     setState("uploading");
     getHttpUserClient()
       .putAvatar(user.username, resultBlob)
@@ -139,10 +138,10 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
         },
         (e: unknown) => {
           setState("error");
-          setMessage({ type: "custom", text: (e as AxiosError).message });
+          setMessage({ type: "custom", value: (e as AxiosError).message });
         }
       );
-  }, [user.username, resultBlob]);
+  }, [user, resultBlob]);
 
   const createPreviewRow = (): React.ReactElement => {
     if (resultUrl == null) {

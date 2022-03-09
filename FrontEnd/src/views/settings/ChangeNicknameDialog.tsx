@@ -1,5 +1,5 @@
 import { getHttpUserClient } from "@/http/user";
-import { useUserLoggedIn } from "@/services/user";
+import { useUser } from "@/services/user";
 import React from "react";
 
 import OperationDialog from "../common/dailog/OperationDialog";
@@ -10,7 +10,9 @@ export interface ChangeNicknameDialogProps {
 }
 
 const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
-  const user = useUserLoggedIn();
+  const user = useUser();
+
+  if (user == null) return null;
 
   return (
     <OperationDialog
