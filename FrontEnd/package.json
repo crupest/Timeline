@@ -6,7 +6,7 @@
   "keywords": [],
   "description": "Timeline app.",
   "dependencies": {
-    "@microsoft/signalr": "^6.0.2",
+    "@microsoft/signalr": "^6.0.3",
     "@popperjs/core": "^2.11.2",
     "axios": "^0.26.0",
     "bootstrap": "^5.1.3",
