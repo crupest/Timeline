@@ -27,9 +27,9 @@ namespace Timeline.Services.Mapper
                 nickname: string.IsNullOrEmpty(entity.Nickname) ? entity.Username : entity.Nickname,
                 permissions: (await _userPermissionService.GetPermissionsOfUserAsync(entity.Id, false)).ToStringList(),
                 links: new HttpUserLinks(
-                    self: urlHelper.ActionLink(nameof(UserController.Get), nameof(UserController)[0..^nameof(Controller).Length], new { entity.Username }),
-                    avatar: urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController)[0..^nameof(Controller).Length], new { entity.Username }),
-                    timeline: urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = "@" + entity.Username })
+                    self: urlHelper.ActionLink(nameof(UserController.Get), nameof(UserController)[0..^nameof(Controller).Length], new { entity.Username })!,
+                    avatar: urlHelper.ActionLink(nameof(UserAvatarController.Get), nameof(UserAvatarController)[0..^nameof(Controller).Length], new { entity.Username })!,
+                    timeline: urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = "@" + entity.Username })!
                 )
             );
         }

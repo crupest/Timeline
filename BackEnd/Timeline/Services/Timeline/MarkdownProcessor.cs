@@ -40,7 +40,7 @@ namespace Timeline.Services.Timeline
                     nameof(TimelinePostController.DataGet),
                     nameof(TimelinePostController)[0..^nameof(Controller).Length],
                     new { timeline, post, data_index = dataIndex }
-                )
+                )!
             );
         }
 
