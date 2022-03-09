@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Timeline.Services.Token
 {
@@ -10,7 +11,7 @@ namespace Timeline.Services.Token
         /// <param name="tokenInfo">The info to generate token.</param>
         /// <returns>Return the generated token.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="tokenInfo"/> is null.</exception>
-        string GenerateToken(UserTokenInfo tokenInfo);
+        Task<string> GenerateTokenAsync(UserTokenInfo tokenInfo);
 
         /// <summary>
         /// Verify a token and get the saved info. Do not validate lifetime!!!
@@ -23,6 +24,6 @@ namespace Timeline.Services.Token
         /// If this method throw <see cref="UserTokenBadFormatException"/>, it usually means the token is not created by this service.
         /// Do not check expire time in this method, only check whether it is present.
         /// </remarks>
-        UserTokenInfo VerifyToken(string token);
+        Task<UserTokenInfo> ValidateTokenAsync(string token);
     }
 }

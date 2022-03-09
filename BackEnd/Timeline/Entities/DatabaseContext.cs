@@ -19,6 +19,7 @@ namespace Timeline.Entities
             modelBuilder.Entity<UserEntity>().Property(e => e.LastModified).HasDefaultValueSql("datetime('now', 'utc')");
             modelBuilder.Entity<DataEntity>().HasIndex(e => e.Tag).IsUnique();
             modelBuilder.Entity<TimelineEntity>().Property(e => e.UniqueId).HasDefaultValueSql("lower(hex(randomblob(16)))");
+            modelBuilder.Entity<UserTokenEntity>().HasIndex(e => e.Token).IsUnique();
 
             modelBuilder.ApplyUtcDateTimeConverter();
         }
@@ -34,6 +35,7 @@ namespace Timeline.Entities
         public DbSet<BookmarkTimelineEntity> BookmarkTimelines { get; set; } = default!;
 
         public DbSet<JwtTokenEntity> JwtToken { get; set; } = default!;
+        public DbSet<UserTokenEntity> UserTokens { get; set; } = default!;
         public DbSet<DataEntity> Data { get; set; } = default!;
 
         public DbSet<MigrationEntity> Migrations { get; set; } = default!;

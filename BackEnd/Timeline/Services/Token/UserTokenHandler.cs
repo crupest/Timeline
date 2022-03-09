@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Timeline.Configs;
 using Timeline.Entities;
 
@@ -35,7 +36,7 @@ namespace Timeline.Services.Token
             _tokenSecurityKey = new SymmetricSecurityKey(key);
         }
 
-        public string GenerateToken(UserTokenInfo tokenInfo)
+        public Task<string> GenerateTokenAsync(UserTokenInfo tokenInfo)
         {
             if (tokenInfo == null)
                 throw new ArgumentNullException(nameof(tokenInfo));
@@ -60,11 +61,11 @@ namespace Timeline.Services.Token
             var token = _tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = _tokenHandler.WriteToken(token);
 
-            return tokenString;
+            return Task.FromResult(tokenString);
         }
 
 
-        public UserTokenInfo VerifyToken(string token)
+        public Task<UserTokenInfo> ValidateTokenAsync(string token)
         {
             if (token == null)
                 throw new ArgumentNullException(nameof(token));
@@ -100,12 +101,12 @@ namespace Timeline.Services.Token
                 if (exp is null)
                     throw new JwtUserTokenBadFormatException(token, JwtUserTokenBadFormatException.ErrorKind.NoExp);
 
-                return new UserTokenInfo
+                return Task.FromResult(new UserTokenInfo
                 {
                     Id = id,
                     Version = version,
                     ExpireAt = EpochTime.DateTime(exp.Value)
-                };
+                });
             }
             catch (Exception e) when (e is SecurityTokenException || e is ArgumentException)
             {
