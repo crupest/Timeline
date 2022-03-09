@@ -38,7 +38,7 @@ namespace Timeline.Services.Token
             var userId = await _userService.VerifyCredential(username, password);
             var user = await _userService.GetUserAsync(userId);
 
-            var token = _userTokenService.GenerateToken(new UserTokenInfo
+            var token = await _userTokenService.GenerateTokenAsync(new UserTokenInfo
             {
                 Id = user.Id,
                 Version = user.Version,
@@ -60,7 +60,7 @@ namespace Timeline.Services.Token
 
             try
             {
-                tokenInfo = _userTokenService.VerifyToken(token);
+                tokenInfo = await _userTokenService.ValidateTokenAsync(token);
             }
             catch (UserTokenBadFormatException e)
             {
