@@ -4,7 +4,7 @@ import { initReactI18next } from "react-i18next";
 
 const backend: BackendModule = {
   type: "backend",
-  async read(language, namespace, callback) {
+  read(language, namespace, callback) {
     function error(message: string): void {
       callback(new Error(message), false);
     }
@@ -36,7 +36,7 @@ const backend: BackendModule = {
     })();
 
     if (promise) {
-      success((await promise).default);
+      void promise.then((d) => success(d.default));
     }
   },
   init() {}, // eslint-disable-line @typescript-eslint/no-empty-function
