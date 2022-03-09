@@ -22,7 +22,7 @@ namespace Timeline.Tests.IntegratedTests
               options =>
               {
                   options.HttpMessageHandlerFactory = _ => TestApp.Server.CreateHandler();
-                  options.AccessTokenProvider = token is null ? null : () => Task.FromResult(token);
+                  options.AccessTokenProvider = token is null ? null : () => Task.FromResult<string?>(token);
               }).Build();
         }
 
