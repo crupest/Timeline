@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Services;
 using Timeline.Services.User;
@@ -60,32 +61,32 @@ namespace Timeline.Tests.Services
             await _service.AddPermissionToUserAsync(2, UserPermission.AllTimelineManagement);
             {
                 var permission = await _service.GetPermissionsOfUserAsync(2);
-                permission.Should().BeEquivalentTo(UserPermission.AllTimelineManagement);
+                permission.Should().BeEquivalentTo(new UserPermissions(UserPermission.AllTimelineManagement));
             }
             await _service.AddPermissionToUserAsync(2, UserPermission.HighlightTimelineManagement);
             {
                 var permission = await _service.GetPermissionsOfUserAsync(2);
-                permission.Should().BeEquivalentTo(UserPermission.AllTimelineManagement, UserPermission.HighlightTimelineManagement);
+                permission.Should().BeEquivalentTo(new UserPermissions(UserPermission.AllTimelineManagement, UserPermission.HighlightTimelineManagement));
             }
 
             // Add duplicate permission should work.
             await _service.AddPermissionToUserAsync(2, UserPermission.HighlightTimelineManagement);
             {
                 var permission = await _service.GetPermissionsOfUserAsync(2);
-                permission.Should().BeEquivalentTo(UserPermission.AllTimelineManagement, UserPermission.HighlightTimelineManagement);
+                permission.Should().BeEquivalentTo(new UserPermissions(UserPermission.AllTimelineManagement, UserPermission.HighlightTimelineManagement));
             }
 
             await _service.RemovePermissionFromUserAsync(2, UserPermission.HighlightTimelineManagement);
             {
                 var permission = await _service.GetPermissionsOfUserAsync(2);
-                permission.Should().BeEquivalentTo(UserPermission.AllTimelineManagement);
+                permission.Should().BeEquivalentTo(new UserPermissions(UserPermission.AllTimelineManagement));
             }
 
             // Remove non-owned permission should work.
             await _service.RemovePermissionFromUserAsync(2, UserPermission.HighlightTimelineManagement);
             {
                 var permission = await _service.GetPermissionsOfUserAsync(2);
-                permission.Should().BeEquivalentTo(UserPermission.AllTimelineManagement);
+                permission.Should().BeEquivalentTo(new UserPermissions(UserPermission.AllTimelineManagement));
             }
         }
 
