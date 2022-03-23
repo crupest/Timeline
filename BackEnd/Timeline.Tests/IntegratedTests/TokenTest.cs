@@ -1,10 +1,8 @@
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
-using Timeline.Services.User;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -80,48 +78,12 @@ namespace Timeline.Tests.IntegratedTests
         }
 
         [Fact]
-        public async Task VerifyToken_BadFormat()
+        public async Task VerifyToken_Invalid()
         {
             using var client = await CreateDefaultClient();
             await client.TestPostAssertErrorAsync(VerifyTokenUrl,
                 new HttpVerifyTokenRequest { Token = "bad token hahaha" },
-                errorCode: ErrorCodes.TokenController.VerifyBadFormat);
-        }
-
-        [Fact]
-        public async Task VerifyToken_OldVersion()
-        {
-            using var client = await CreateDefaultClient();
-            var token = (await CreateUserTokenAsync(client, "user1", "user1pw")).Token;
-
-            using (var scope = TestApp.Host.Services.CreateScope()) // UserService is scoped.
-            {
-                // create a user for test
-                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                var id = await userService.GetUserIdByUsernameAsync("user1");
-                await userService.ModifyUserAsync(id, new ModifyUserParams { Password = "user1pw" });
-            }
-
-            await client.TestPostAssertErrorAsync(VerifyTokenUrl,
-                new HttpVerifyTokenRequest { Token = token },
-                errorCode: ErrorCodes.TokenController.VerifyOldVersion);
-        }
-
-        [Fact]
-        public async Task VerifyToken_UserNotExist()
-        {
-            using var client = await CreateDefaultClient();
-            var token = (await CreateUserTokenAsync(client, "user1", "user1pw")).Token;
-
-            using (var scope = TestApp.Host.Services.CreateScope()) // UserDeleteService is scoped.
-            {
-                var userService = scope.ServiceProvider.GetRequiredService<IUserDeleteService>();
-                await userService.DeleteUserAsync("user1");
-            }
-
-            await client.TestPostAssertErrorAsync(VerifyTokenUrl,
-                new HttpVerifyTokenRequest { Token = token },
-                errorCode: ErrorCodes.TokenController.VerifyUserNotExist);
+                errorCode: ErrorCodes.TokenController.VerifyInvalid);
         }
 
         //[Fact]

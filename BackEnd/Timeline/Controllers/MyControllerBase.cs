@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Models.Http;
+using Timeline.Services;
 using Timeline.Services.User;
 
 namespace Timeline.Controllers
@@ -15,24 +18,30 @@ namespace Timeline.Controllers
             return User.HasPermission(permission);
         }
 
-        protected string? GetOptionalUsername()
-        {
-            return User.GetOptionalName();
-        }
-
-        protected string GetUsername()
-        {
-            return GetOptionalUsername() ?? throw new InvalidOperationException(Resource.ExceptionNoUsername);
-        }
-
-        protected long? GetOptionalUserId()
+        protected long? GetOptionalAuthUserId()
         {
             return User.GetOptionalUserId();
         }
 
-        protected long GetUserId()
+        protected long GetAuthUserId()
         {
-            return GetOptionalUserId() ?? throw new InvalidOperationException(Resource.ExceptionNoUserId);
+            return GetOptionalAuthUserId() ?? throw new InvalidOperationException(Resource.ExceptionNoUserId);
+        }
+
+        protected async Task<bool> CheckIsSelf(string username)
+        {
+            var authUserId = GetOptionalAuthUserId();
+            if (!authUserId.HasValue) return false;
+            try
+            {
+                var userService = HttpContext.RequestServices.GetRequiredService<IUserService>();
+                var id = await userService.GetUserIdByUsernameAsync(username);
+                return authUserId == id;
+            }
+            catch (EntityNotExistException)
+            {
+                return false;
+            }
         }
         #endregion auth
 

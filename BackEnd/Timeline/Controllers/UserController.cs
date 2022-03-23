@@ -7,6 +7,7 @@ using Timeline.Auth;
 using Timeline.Filters;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
+using Timeline.Services;
 using Timeline.Services.Mapper;
 using Timeline.Services.User;
 
@@ -103,7 +104,7 @@ namespace Timeline.Controllers
             }
             else
             {
-                if (GetUsername() != username)
+                if (!await CheckIsSelf(username))
                     return ForbidWithCommonResponse(Resource.MessageForbidNotAdministratorOrOwner);
 
                 if (body.Username is not null)
@@ -112,7 +113,7 @@ namespace Timeline.Controllers
                 if (body.Password is not null)
                     return ForbidWithCommonResponse(Resource.MessageForbidNotAdministrator);
 
-                var user = await _userService.ModifyUserAsync(GetUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
+                var user = await _userService.ModifyUserAsync(GetAuthUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
                 return await _mapper.MapAsync<HttpUser>(user, Url, User);
             }
         }
@@ -152,7 +153,7 @@ namespace Timeline.Controllers
         {
             try
             {
-                await _userService.ChangePassword(GetUserId(), request.OldPassword, request.NewPassword);
+                await _userService.ChangePassword(GetAuthUserId(), request.OldPassword, request.NewPassword);
                 return OkWithCommonResponse();
             }
             catch (BadPasswordException)

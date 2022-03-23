@@ -24,5 +24,8 @@ namespace Timeline.Entities
 
         [Column("create_at")]
         public DateTime? CreateAt { get; set; }
+
+        [Column("deleted")]
+        public bool Deleted { get; set; }
     }
 }

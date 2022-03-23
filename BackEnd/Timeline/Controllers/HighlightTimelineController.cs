@@ -61,7 +61,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonPutResponse>> Put([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var create = await _service.AddHighlightTimelineAsync(timelineId, GetUserId());
+            var create = await _service.AddHighlightTimelineAsync(timelineId, GetAuthUserId());
             return CommonPutResponse.Create(create);
         }
 
@@ -78,7 +78,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonDeleteResponse>> Delete([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var delete = await _service.RemoveHighlightTimelineAsync(timelineId, GetUserId());
+            var delete = await _service.RemoveHighlightTimelineAsync(timelineId, GetAuthUserId());
             return CommonDeleteResponse.Create(delete);
         }
 
