@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services.Timeline;
+using Timeline.Services.Token;
 using Timeline.Services.User;
 using Timeline.Tests.Helpers;
 using Xunit;
@@ -19,6 +21,8 @@ namespace Timeline.Tests.Services
         protected TestClock Clock { get; } = new TestClock();
         protected UserService UserService { get; private set; } = default!;
         protected TimelineService TimelineService { get; private set; } = default!;
+        protected Mock<IUserTokenService> UserTokenServiceMock { get; private set; } = default!;
+        protected IUserTokenService UserTokenService { get; private set; } = default!;
 
         protected long UserId { get; private set; }
         protected long AdminId { get; private set; }
@@ -34,7 +38,11 @@ namespace Timeline.Tests.Services
             await TestDatabase.InitializeAsync();
             Database = TestDatabase.CreateContext(_testOutputHelper);
 
-            UserService = new UserService(NullLogger<UserService>.Instance, Database, new PasswordService(), Clock);
+            UserTokenServiceMock = new();
+            UserTokenServiceMock.SetReturnsDefault(Task.CompletedTask);
+            UserTokenService = UserTokenServiceMock.Object;
+
+            UserService = new UserService(NullLogger<UserService>.Instance, Database, new PasswordService(), UserTokenService, Clock);
             TimelineService = new TimelineService(NullLoggerFactory.Instance, Database, UserService, Clock);
 
             UserId = await UserService.GetUserIdByUsernameAsync("user");

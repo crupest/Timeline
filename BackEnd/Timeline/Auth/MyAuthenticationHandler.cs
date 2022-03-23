@@ -41,11 +41,8 @@ namespace Timeline.Auth
         {
             return e switch
             {
-                UserTokenTimeExpiredException => ErrorCodes.Common.Token.TimeExpired,
-                UserTokenVersionExpiredException => ErrorCodes.Common.Token.VersionExpired,
-                UserTokenBadFormatException => ErrorCodes.Common.Token.BadFormat,
-                UserTokenUserNotExistException => ErrorCodes.Common.Token.UserNotExist,
-                _ => ErrorCodes.Common.Token.Unknown
+                UserTokenExpiredException => ErrorCodes.Common.Token.TimeExpired,
+                _ => ErrorCodes.Common.Token.Invalid
             };
         }
 
@@ -53,25 +50,22 @@ namespace Timeline.Auth
         {
             return errorCode switch
             {
-                ErrorCodes.Common.Token.TimeExpired => Resource.MessageTokenTimeExpired,
-                ErrorCodes.Common.Token.VersionExpired => Resource.MessageTokenVersionExpired,
-                ErrorCodes.Common.Token.BadFormat => Resource.MessageTokenBadFormat,
-                ErrorCodes.Common.Token.UserNotExist => Resource.MessageTokenUserNotExist,
-                _ => Resource.MessageTokenUnknownError
+                ErrorCodes.Common.Token.TimeExpired => Resource.MessageTokenExpired,
+                _ => Resource.MessageTokenInvalid
             };
         }
 
         private readonly ILogger<MyAuthenticationHandler> _logger;
-        private readonly IUserTokenManager _userTokenManager;
+        private readonly IUserTokenService _userTokenService;
         private readonly IUserPermissionService _userPermissionService;
 
         private readonly IOptionsMonitor<JsonOptions> _jsonOptions;
 
-        public MyAuthenticationHandler(IOptionsMonitor<MyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserTokenManager userTokenManager, IUserPermissionService userPermissionService, IOptionsMonitor<JsonOptions> jsonOptions)
+        public MyAuthenticationHandler(IOptionsMonitor<MyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IUserTokenService userTokenService, IUserPermissionService userPermissionService, IOptionsMonitor<JsonOptions> jsonOptions)
             : base(options, logger, encoder, clock)
         {
             _logger = logger.CreateLogger<MyAuthenticationHandler>();
-            _userTokenManager = userTokenManager;
+            _userTokenService = userTokenService;
             _userPermissionService = userPermissionService;
             _jsonOptions = jsonOptions;
         }
@@ -126,13 +120,12 @@ namespace Timeline.Auth
 
             try
             {
-                var user = await _userTokenManager.VerifyTokenAsync(token);
+                var userTokenInfo = await _userTokenService.ValidateTokenAsync(token);
 
                 var identity = new ClaimsIdentity(AuthenticationConstants.Scheme);
-                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
-                identity.AddClaim(new Claim(identity.NameClaimType, user.Username, ClaimValueTypes.String));
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userTokenInfo.UserId.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64));
 
-                var permissions = await _userPermissionService.GetPermissionsOfUserAsync(user.Id);
+                var permissions = await _userPermissionService.GetPermissionsOfUserAsync(userTokenInfo.UserId);
                 identity.AddClaims(permissions.Select(permission => new Claim(AuthenticationConstants.PermissionClaimName, permission.ToString(), ClaimValueTypes.String)));
 
                 var principal = new ClaimsPrincipal();
@@ -161,7 +154,7 @@ namespace Timeline.Auth
             if (properties.Items.TryGetValue(TokenErrorCodeKey, out var tokenErrorCode))
             {
                 if (!int.TryParse(tokenErrorCode, out var errorCode))
-                    errorCode = ErrorCodes.Common.Token.Unknown;
+                    throw new Exception("A logic error: failed to parse token error code.");
                 body = new CommonResponse(errorCode, GetTokenErrorMessageFromErrorCode(errorCode));
             }
             else

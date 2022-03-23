@@ -61,7 +61,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Put([FromRoute][Username] string username, [FromBody] ByteData body)
         {
-            if (!UserHasPermission(UserPermission.UserManagement) && GetUsername() != username)
+            if (!UserHasPermission(UserPermission.UserManagement) && !await CheckIsSelf(username))
             {
                 return ForbidWithCommonResponse(Resource.MessageForbidNotAdministratorOrOwner);
             }
@@ -91,7 +91,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete([FromRoute][Username] string username)
         {
-            if (!UserHasPermission(UserPermission.UserManagement) && User.Identity!.Name != username)
+            if (!UserHasPermission(UserPermission.UserManagement) && !await CheckIsSelf(username))
             {
                 return ForbidWithCommonResponse(Resource.MessageForbidNotAdministratorOrOwner);
             }

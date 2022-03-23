@@ -19,13 +19,15 @@ namespace Timeline.Controllers
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TokenController : MyControllerBase
     {
-        private readonly IUserTokenManager _userTokenManager;
+        private readonly IUserService _userService;
+        private readonly IUserTokenService _userTokenService;
         private readonly IGenericMapper _mapper;
         private readonly IClock _clock;
 
-        public TokenController(IUserTokenManager userTokenManager, IGenericMapper mapper, IClock clock)
+        public TokenController(IUserService userService, IUserTokenService userTokenService, IGenericMapper mapper, IClock clock)
         {
-            _userTokenManager = userTokenManager;
+            _userService = userService;
+            _userTokenService = userTokenService;
             _mapper = mapper;
             _clock = clock;
         }
@@ -47,12 +49,14 @@ namespace Timeline.Controllers
                 if (request.Expire is not null)
                     expireTime = _clock.GetCurrentTime().AddDays(request.Expire.Value);
 
-                var result = await _userTokenManager.CreateTokenAsync(request.Username, request.Password, expireTime);
+                var userId = await _userService.VerifyCredential(request.Username, request.Password);
+                var token = await _userTokenService.CreateTokenAsync(userId, expireTime);
+                var user = await _userService.GetUserAsync(userId);
 
                 return new HttpCreateTokenResponse
                 {
-                    Token = result.Token,
-                    User = await _mapper.MapAsync<HttpUser>(result.User, Url, User)
+                    Token = token,
+                    User = await _mapper.MapAsync<HttpUser>(user, Url, User)
                 };
             }
             catch (EntityNotExistException)
@@ -77,27 +81,20 @@ namespace Timeline.Controllers
         {
             try
             {
-                var result = await _userTokenManager.VerifyTokenAsync(request.Token);
+                var tokenInfo = await _userTokenService.ValidateTokenAsync(request.Token);
+                var user = await _userService.GetUserAsync(tokenInfo.UserId);
                 return new HttpVerifyTokenResponse
                 {
-                    User = await _mapper.MapAsync<HttpUser>(result, Url, User)
+                    User = await _mapper.MapAsync<HttpUser>(user, Url, User)
                 };
             }
-            catch (UserTokenTimeExpiredException)
+            catch (UserTokenExpiredException)
             {
-                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyTimeExpired, Resource.MessageTokenVerifyTimeExpired);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyExpired, Resource.MessageTokenVerifyExpired);
             }
-            catch (UserTokenVersionExpiredException)
+            catch (UserTokenException)
             {
-                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyOldVersion, Resource.MessageTokenVerifyOldVersion);
-            }
-            catch (UserTokenBadFormatException)
-            {
-                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyBadFormat, Resource.MessageTokenVerifyBadFormat);
-            }
-            catch (UserTokenUserNotExistException)
-            {
-                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyUserNotExist, Resource.MessageTokenVerifyUserNotExist);
+                return BadRequestWithCommonResponse(ErrorCodes.TokenController.VerifyInvalid, Resource.MessageTokenVerifyInvalid);
             }
         }
     }

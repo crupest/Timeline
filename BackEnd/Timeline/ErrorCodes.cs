@@ -29,10 +29,7 @@
             public static class Token
             {
                 public const int TimeExpired = 1_000_21_01;
-                public const int VersionExpired = 1_000_21_02;
-                public const int BadFormat = 1_000_21_03;
-                public const int UserNotExist = 1_000_21_04;
-                public const int Unknown = 1_000_21_05;
+                public const int Invalid = 1_000_21_02;
             }
         }
 
@@ -61,10 +58,8 @@
         public static class TokenController
         {
             public const int CreateBadCredential = 1_101_01_01;
-            public const int VerifyBadFormat = 1_101_02_01;
-            public const int VerifyUserNotExist = 1_101_02_02;
-            public const int VerifyOldVersion = 1_101_02_03;
-            public const int VerifyTimeExpired = 1_101_02_04;
+            public const int VerifyInvalid = 1_101_02_02;
+            public const int VerifyExpired = 1_101_02_03;
         }
 
         public static class UserController

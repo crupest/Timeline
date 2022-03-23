@@ -3,9 +3,10 @@
     public class TokenOptions
     {
         /// <summary>
-        /// Set the default value of expire offset of jwt token.
-        /// Unit is second. Default is 3600 * 24 seconds, aka 1 day.
+        /// The length of the generated secure random token counted in byte.
+        /// Note the byte will be converted to hex form when used.
+        /// Default is 32 byte long.
         /// </summary>
-        public long DefaultExpireSeconds { get; set; } = 3600 * 24;
+        public long? TokenLength { get; set; }
     }
 }

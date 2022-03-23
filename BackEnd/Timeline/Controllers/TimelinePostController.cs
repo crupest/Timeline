@@ -77,7 +77,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalAuthUserId()))
             {
                 return ForbidWithCommonResponse();
             }
@@ -102,7 +102,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalAuthUserId()))
             {
                 return ForbidWithCommonResponse();
             }
@@ -148,7 +148,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalAuthUserId()))
             {
                 return ForbidWithCommonResponse();
             }
@@ -182,7 +182,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<HttpTimelinePost>> Post([FromRoute][GeneralTimelineName] string timeline, [FromBody] HttpTimelinePostCreateRequest body)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var userId = GetUserId();
+            var userId = GetAuthUserId();
 
             if (!UserHasAllTimelineManagementPermission && !await _timelineService.IsMemberOfAsync(timelineId, userId))
             {
@@ -247,7 +247,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, GetUserId(), true))
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, GetAuthUserId(), true))
             {
                 return ForbidWithCommonResponse();
             }
@@ -274,7 +274,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, GetUserId(), true))
+            if (!UserHasAllTimelineManagementPermission && !await _postService.HasPostModifyPermissionAsync(timelineId, post, GetAuthUserId(), true))
             {
                 return ForbidWithCommonResponse();
             }

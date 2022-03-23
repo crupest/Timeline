@@ -44,7 +44,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(401)]
         public async Task<ActionResult<List<HttpTimeline>>> List()
         {
-            var ids = await _service.GetBookmarksAsync(GetUserId());
+            var ids = await _service.GetBookmarksAsync(GetAuthUserId());
             var timelines = await _timelineService.GetTimelineList(ids);
             return await Map(timelines);
         }
@@ -61,7 +61,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonPutResponse>> Put([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var create = await _service.AddBookmarkAsync(GetUserId(), timelineId);
+            var create = await _service.AddBookmarkAsync(GetAuthUserId(), timelineId);
             return CommonPutResponse.Create(create);
         }
 
@@ -77,7 +77,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult<CommonDeleteResponse>> Delete([GeneralTimelineName] string timeline)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(timeline);
-            var delete = await _service.RemoveBookmarkAsync(GetUserId(), timelineId);
+            var delete = await _service.RemoveBookmarkAsync(GetAuthUserId(), timelineId);
             return CommonDeleteResponse.Create(delete);
         }
 
@@ -93,7 +93,7 @@ namespace Timeline.Controllers
         public async Task<ActionResult> Move([FromBody] HttpBookmarkTimelineMoveRequest request)
         {
             var timelineId = await _timelineService.GetTimelineIdByNameAsync(request.Timeline);
-            await _service.MoveBookmarkAsync(GetUserId(), timelineId, request.NewPosition!.Value);
+            await _service.MoveBookmarkAsync(GetAuthUserId(), timelineId, request.NewPosition!.Value);
             return OkWithCommonResponse();
         }
     }

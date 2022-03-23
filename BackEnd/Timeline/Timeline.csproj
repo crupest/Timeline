@@ -18,6 +18,9 @@
         <NoWarn>1591</NoWarn>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'Dev' " />
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'Staging' " />
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'Dev-Mock' " />
     <ItemGroup>
         <Content Include="default-avatar.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

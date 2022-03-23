@@ -135,19 +135,10 @@
   <data name="MessageNoToken" xml:space="preserve">
     <value>You must use a token to authenticate to access this resource.</value>
   </data>
-  <data name="MessageTokenBadFormat" xml:space="preserve">
-    <value>The token is of bad format. It might not be created by this server.</value>
+  <data name="MessageTokenInvalid" xml:space="preserve">
+    <value>The token is invalid.</value>
   </data>
-  <data name="MessageTokenTimeExpired" xml:space="preserve">
-    <value>The token is out of date and expired. Please create a new one.</value>
-  </data>
-  <data name="MessageTokenUnknownError" xml:space="preserve">
-    <value>A unknown error occured when verify token.</value>
-  </data>
-  <data name="MessageTokenUserNotExist" xml:space="preserve">
-    <value>The owner of the token does not exist. It might have been deleted.</value>
-  </data>
-  <data name="MessageTokenVersionExpired" xml:space="preserve">
-    <value>The token is of old version and expired. Please create a new one.</value>
+  <data name="MessageTokenExpired" xml:space="preserve">
+    <value>The token is expired. Please create a new one.</value>
   </data>
 </root>

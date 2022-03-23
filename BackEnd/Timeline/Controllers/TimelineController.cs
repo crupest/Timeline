@@ -142,7 +142,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !await _service.HasManagePermissionAsync(timelineId, GetUserId()))
+            if (!UserHasAllTimelineManagementPermission && !await _service.HasManagePermissionAsync(timelineId, GetAuthUserId()))
             {
                 return ForbidWithCommonResponse();
             }
@@ -168,7 +168,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetAuthUserId())))
             {
                 return ForbidWithCommonResponse();
             }
@@ -194,7 +194,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetUserId())))
+            if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetAuthUserId())))
             {
                 return ForbidWithCommonResponse();
             }
@@ -216,7 +216,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<HttpTimeline>> TimelineCreate([FromBody] HttpTimelineCreateRequest body)
         {
-            var userId = GetUserId();
+            var userId = GetAuthUserId();
 
             var timeline = await _service.CreateTimelineAsync(body.Name, userId);
             var result = await Map(timeline);
@@ -240,7 +240,7 @@ namespace Timeline.Controllers
             {
                 var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
 
-                if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetUserId())))
+                if (!UserHasAllTimelineManagementPermission && !(await _service.HasManagePermissionAsync(timelineId, GetAuthUserId())))
                 {
                     return ForbidWithCommonResponse();
                 }
