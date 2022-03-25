@@ -11,11 +11,11 @@ namespace Timeline.Services.Api
     public class HighlightTimelineService : IHighlightTimelineService
     {
         private readonly DatabaseContext _database;
-        private readonly IBasicUserService _userService;
-        private readonly IBasicTimelineService _timelineService;
+        private readonly IUserService _userService;
+        private readonly ITimelineService _timelineService;
         private readonly IClock _clock;
 
-        public HighlightTimelineService(DatabaseContext database, IBasicUserService userService, IBasicTimelineService timelineService, IClock clock)
+        public HighlightTimelineService(DatabaseContext database, IUserService userService, ITimelineService timelineService, IClock clock)
         {
             _database = database;
             _userService = userService;

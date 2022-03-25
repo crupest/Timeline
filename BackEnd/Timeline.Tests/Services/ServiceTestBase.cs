@@ -43,7 +43,7 @@ namespace Timeline.Tests.Services
             UserTokenService = UserTokenServiceMock.Object;
 
             UserService = new UserService(NullLogger<UserService>.Instance, Database, new PasswordService(), UserTokenService, Clock);
-            TimelineService = new TimelineService(NullLoggerFactory.Instance, Database, UserService, Clock);
+            TimelineService = new TimelineService(NullLogger<TimelineService>.Instance, Database, UserService, Clock);
 
             UserId = await UserService.GetUserIdByUsernameAsync("user");
             AdminId = await UserService.GetUserIdByUsernameAsync("admin");

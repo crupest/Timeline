@@ -9,7 +9,6 @@ namespace Timeline.Services.User
         public static IServiceCollection AddUserServices(this IServiceCollection services)
         {
             services.TryAddTransient<IPasswordService, PasswordService>();
-            services.TryAddScoped<IBasicUserService, BasicUserService>();
             services.TryAddScoped<IUserService, UserService>();
             services.TryAddScoped<IUserDeleteService, UserDeleteService>();
             services.TryAddScoped<IUserPermissionService, UserPermissionService>();
