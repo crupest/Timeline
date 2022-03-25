@@ -20,15 +20,15 @@ namespace Timeline.Services.Timeline
     {
         private readonly ILogger<TimelinePostService> _logger;
         private readonly DatabaseContext _database;
-        private readonly IBasicTimelineService _basicTimelineService;
-        private readonly IBasicUserService _basicUserService;
+        private readonly ITimelineService _basicTimelineService;
+        private readonly IUserService _basicUserService;
         private readonly IDataManager _dataManager;
         private readonly IImageService _imageValidator;
         private readonly IClock _clock;
         private readonly ColorValidator _colorValidator = new ColorValidator();
         private readonly ColorValidator _colorValidatorAllowEmptyAndDefault = new ColorValidator() { PermitEmpty = true, PermitDefault = true };
 
-        public TimelinePostService(ILogger<TimelinePostService> logger, DatabaseContext database, IBasicTimelineService basicTimelineService, IBasicUserService basicUserService, IDataManager dataManager, IImageService imageValidator, IClock clock)
+        public TimelinePostService(ILogger<TimelinePostService> logger, DatabaseContext database, ITimelineService basicTimelineService, IUserService basicUserService, IDataManager dataManager, IImageService imageValidator, IClock clock)
         {
             _logger = logger;
             _database = database;

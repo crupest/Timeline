@@ -12,23 +12,23 @@ using Timeline.Services.User;
 namespace Timeline.Services.Timeline
 {
 
-    public class TimelineService : BasicTimelineService, ITimelineService
+    public class TimelineService : ITimelineService
     {
         private readonly ILogger<TimelineService> _logger;
 
         private readonly DatabaseContext _database;
 
-        private readonly IBasicUserService _userService;
+        private readonly IUserService _userService;
 
         private readonly IClock _clock;
 
+        private readonly GeneralTimelineNameValidator _generalTimelineNameValidator = new GeneralTimelineNameValidator();
         private readonly TimelineNameValidator _timelineNameValidator = new TimelineNameValidator();
         private readonly ColorValidator _colorValidator = new ColorValidator() { PermitDefault = true, PermitEmpty = true };
 
-        public TimelineService(ILoggerFactory loggerFactory, DatabaseContext database, IBasicUserService userService, IClock clock)
-            : base(loggerFactory, database, userService, clock)
+        public TimelineService(ILogger<TimelineService> logger, DatabaseContext database, IUserService userService, IClock clock)
         {
-            _logger = loggerFactory.CreateLogger<TimelineService>();
+            _logger = logger;
             _database = database;
             _userService = userService;
             _clock = clock;
@@ -49,6 +49,105 @@ namespace Timeline.Services.Timeline
                 throw new ArgumentException(string.Format(Resource.ExceptionTimelineNameBadFormat, message), paramName);
             }
         }
+
+        protected TimelineEntity CreateNewTimelineEntity(string? name, long ownerId)
+        {
+            var currentTime = _clock.GetCurrentTime();
+
+            return new TimelineEntity
+            {
+                Name = name,
+                NameLastModified = currentTime,
+                OwnerId = ownerId,
+                Visibility = TimelineVisibility.Register,
+                CreateTime = currentTime,
+                LastModified = currentTime,
+                CurrentPostLocalId = 0,
+                Members = new List<TimelineMemberEntity>()
+            };
+        }
+
+        protected static EntityNotExistException CreateTimelineNotExistException(string name, Exception? inner = null)
+        {
+            return new EntityNotExistException(EntityTypes.Timeline, new Dictionary<string, object>
+            {
+                ["name"] = name
+            }, null, inner);
+        }
+
+        protected static EntityNotExistException CreateTimelineNotExistException(long id)
+        {
+            return new EntityNotExistException(EntityTypes.Timeline, new Dictionary<string, object>
+            {
+                ["id"] = id
+            });
+        }
+
+        protected void CheckGeneralTimelineName(string timelineName, string? paramName)
+        {
+            if (!_generalTimelineNameValidator.Validate(timelineName, out var message))
+                throw new ArgumentException(string.Format(Resource.ExceptionGeneralTimelineNameBadFormat, message), paramName);
+        }
+
+        public async Task<bool> CheckTimelineExistenceAsync(long id)
+        {
+            return await _database.Timelines.AnyAsync(t => t.Id == id);
+        }
+
+        public async Task<long> GetTimelineIdByNameAsync(string timelineName)
+        {
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
+
+            CheckGeneralTimelineName(timelineName, nameof(timelineName));
+
+            var name = TimelineHelper.ExtractTimelineName(timelineName, out var isPersonal);
+
+            if (isPersonal)
+            {
+                var username = name;
+                long userId;
+                try
+                {
+                    userId = await _userService.GetUserIdByUsernameAsync(username);
+                }
+                catch (EntityNotExistException e)
+                {
+                    throw CreateTimelineNotExistException(timelineName, e);
+                }
+
+                var timelineEntity = await _database.Timelines.Where(t => t.OwnerId == userId && t.Name == null).Select(t => new { t.Id }).SingleOrDefaultAsync();
+
+                if (timelineEntity != null)
+                {
+                    return timelineEntity.Id;
+                }
+                else
+                {
+                    var newTimelineEntity = CreateNewTimelineEntity(null, userId);
+                    _database.Timelines.Add(newTimelineEntity);
+                    await _database.SaveChangesAsync();
+
+                    _logger.LogInformation(Resource.LogPersonalTimelineAutoCreate, username);
+
+                    return newTimelineEntity.Id;
+                }
+            }
+            else
+            {
+                var timelineEntity = await _database.Timelines.Where(t => t.Name == timelineName).Select(t => new { t.Id }).SingleOrDefaultAsync();
+
+                if (timelineEntity == null)
+                {
+                    throw CreateTimelineNotExistException(timelineName);
+                }
+                else
+                {
+                    return timelineEntity.Id;
+                }
+            }
+        }
+
 
         public async Task<TimelineEntity> GetTimelineAsync(long id)
         {

@@ -11,12 +11,12 @@ using Timeline.Services.Token;
 
 namespace Timeline.Services.User
 {
-    public class UserService : BasicUserService, IUserService
+    public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
         private readonly IClock _clock;
 
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseContext _database;
 
         private readonly IPasswordService _passwordService;
 
@@ -25,10 +25,10 @@ namespace Timeline.Services.User
         private readonly UsernameValidator _usernameValidator = new UsernameValidator();
         private readonly NicknameValidator _nicknameValidator = new NicknameValidator();
 
-        public UserService(ILogger<UserService> logger, DatabaseContext databaseContext, IPasswordService passwordService, IUserTokenService userTokenService, IClock clock) : base(databaseContext)
+        public UserService(ILogger<UserService> logger, DatabaseContext database, IPasswordService passwordService, IUserTokenService userTokenService, IClock clock)
         {
             _logger = logger;
-            _databaseContext = databaseContext;
+            _database = database;
             _passwordService = passwordService;
             _userTokenService = userTokenService;
             _clock = clock;
@@ -58,15 +58,56 @@ namespace Timeline.Services.User
             }
         }
 
+        private static EntityNotExistException CreateUserNotExistException(string username)
+        {
+            throw new EntityNotExistException(EntityTypes.User, new Dictionary<string, object> { ["username"] = username });
+        }
+
+        private static EntityNotExistException CreateUserNotExistException(long userId)
+        {
+            throw new EntityNotExistException(EntityTypes.User, new Dictionary<string, object> { ["id"] = userId });
+        }
+
         private static EntityAlreadyExistException CreateUsernameConflictException(string username)
         {
             throw new EntityAlreadyExistException(EntityTypes.User,
                 new Dictionary<string, object> { ["username"] = username });
         }
 
+        public async Task<bool> CheckUserExistenceAsync(long id)
+        {
+            return await _database.Users.AnyAsync(u => u.Id == id);
+        }
+
+        public async Task<long> GetUserIdByUsernameAsync(string username)
+        {
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+
+            if (!_usernameValidator.Validate(username, out var message))
+                throw new ArgumentException(message);
+
+            var entity = await _database.Users.Where(user => user.Username == username).Select(u => new { u.Id }).SingleOrDefaultAsync();
+
+            if (entity == null)
+                throw CreateUserNotExistException(username);
+
+            return entity.Id;
+        }
+
+        public async Task<DateTime> GetUsernameLastModifiedTimeAsync(long userId)
+        {
+            var entity = await _database.Users.Where(u => u.Id == userId).Select(u => new { u.UsernameChangeTime }).SingleOrDefaultAsync();
+
+            if (entity is null)
+                throw CreateUserNotExistException(userId);
+
+            return entity.UsernameChangeTime;
+        }
+
         public async Task<UserEntity> GetUserAsync(long id)
         {
-            var user = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+            var user = await _database.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
             if (user is null)
                 throw CreateUserNotExistException(id);
@@ -76,7 +117,7 @@ namespace Timeline.Services.User
 
         public async Task<List<UserEntity>> GetUsersAsync()
         {
-            return await _databaseContext.Users.ToListAsync();
+            return await _database.Users.ToListAsync();
         }
 
         public async Task<UserEntity> CreateUserAsync(CreateUserParams param)
@@ -92,7 +133,7 @@ namespace Timeline.Services.User
             if (param.Nickname is not null)
                 CheckNicknameFormat(param.Nickname, nameof(param));
 
-            var conflict = await _databaseContext.Users.AnyAsync(u => u.Username == param.Username);
+            var conflict = await _database.Users.AnyAsync(u => u.Username == param.Username);
             if (conflict)
                 throw CreateUsernameConflictException(param.Username);
 
@@ -103,8 +144,8 @@ namespace Timeline.Services.User
                 Nickname = param.Nickname,
                 Version = 1
             };
-            _databaseContext.Users.Add(newEntity);
-            await _databaseContext.SaveChangesAsync();
+            _database.Users.Add(newEntity);
+            await _database.SaveChangesAsync();
             _logger.LogInformation(Resource.LogUserCreated, param.Username, newEntity.Id);
 
             return newEntity;
@@ -124,7 +165,7 @@ namespace Timeline.Services.User
                     CheckNicknameFormat(param.Nickname, nameof(param));
             }
 
-            var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+            var entity = await _database.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
             if (entity is null)
                 throw CreateUserNotExistException(id);
 
@@ -136,7 +177,7 @@ namespace Timeline.Services.User
                 var username = param.Username;
                 if (username is not null && username != entity.Username)
                 {
-                    var conflict = await _databaseContext.Users.AnyAsync(u => u.Username == username);
+                    var conflict = await _database.Users.AnyAsync(u => u.Username == username);
                     if (conflict)
                         throw CreateUsernameConflictException(username);
 
@@ -164,7 +205,7 @@ namespace Timeline.Services.User
                     entity.LastModified = now;
                 }
 
-                await _databaseContext.SaveChangesAsync();
+                await _database.SaveChangesAsync();
                 _logger.LogInformation(Resource.LogUserModified, entity.Username, id);
 
                 if (password is not null)
@@ -185,7 +226,7 @@ namespace Timeline.Services.User
             CheckUsernameFormat(username, nameof(username));
             CheckPasswordFormat(password, nameof(password));
 
-            var entity = await _databaseContext.Users.Where(u => u.Username == username).Select(u => new { u.Id, u.Password }).SingleOrDefaultAsync();
+            var entity = await _database.Users.Where(u => u.Username == username).Select(u => new { u.Id, u.Password }).SingleOrDefaultAsync();
 
             if (entity is null)
             {
@@ -211,7 +252,7 @@ namespace Timeline.Services.User
             CheckPasswordFormat(oldPassword, nameof(oldPassword));
             CheckPasswordFormat(newPassword, nameof(newPassword));
 
-            var entity = await _databaseContext.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
+            var entity = await _database.Users.Where(u => u.Id == id).SingleOrDefaultAsync();
 
             if (entity is null)
                 throw CreateUserNotExistException(id);
@@ -221,7 +262,7 @@ namespace Timeline.Services.User
 
             entity.Password = _passwordService.HashPassword(newPassword);
             entity.Version += 1;
-            await _databaseContext.SaveChangesAsync();
+            await _database.SaveChangesAsync();
             _logger.LogInformation(Resource.LogChangePassowrd, entity.Username, id);
 
             await _userTokenService.RevokeAllTokenByUserIdAsync(id);

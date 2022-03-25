@@ -1,8 +1,9 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Timeline.Services
 {
-    public class EntityType
+    public class EntityType : IEquatable<EntityType>
     {
         public EntityType(string name)
         {
@@ -29,6 +30,24 @@ namespace Timeline.Services
                 if (field is not null) return (int)field.GetRawConstantValue()!;
                 return ErrorCodes.Conflict.Default;
             }
+        }
+
+        public bool Equals(EntityType? other)
+        {
+            if (other is null)
+                return false;
+
+            return other.Name.Equals(other.Name);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as EntityType);
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
         }
     }
 }

@@ -12,10 +12,10 @@ namespace Timeline.Services.Api
     public class BookmarkTimelineService : IBookmarkTimelineService
     {
         private readonly DatabaseContext _database;
-        private readonly IBasicUserService _userService;
-        private readonly IBasicTimelineService _timelineService;
+        private readonly IUserService _userService;
+        private readonly ITimelineService _timelineService;
 
-        public BookmarkTimelineService(DatabaseContext database, IBasicUserService userService, IBasicTimelineService timelineService)
+        public BookmarkTimelineService(DatabaseContext database, IUserService userService, ITimelineService timelineService)
         {
             _database = database;
             _userService = userService;

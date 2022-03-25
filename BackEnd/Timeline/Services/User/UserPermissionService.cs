@@ -8,19 +8,19 @@ namespace Timeline.Services.User
     public class UserPermissionService : IUserPermissionService
     {
         private readonly DatabaseContext _database;
-        private readonly IBasicUserService _basicUserService;
+        private readonly IUserService _userService;
 
-        public UserPermissionService(DatabaseContext database, IBasicUserService basicUserService)
+        public UserPermissionService(DatabaseContext database, IUserService userService)
         {
             _database = database;
-            _basicUserService = basicUserService;
+            _userService = userService;
         }
 
         private async Task CheckUserExistence(long userId, bool checkUserExistence)
         {
             if (checkUserExistence)
             {
-                await _basicUserService.ThrowIfUserNotExist(userId);
+                await _userService.ThrowIfUserNotExist(userId);
             }
         }
 

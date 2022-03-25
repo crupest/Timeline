@@ -15,7 +15,7 @@ namespace Timeline.Services.User.Avatar
     {
         private readonly ILogger<UserAvatarService> _logger;
         private readonly DatabaseContext _database;
-        private readonly IBasicUserService _basicUserService;
+        private readonly IUserService _userService;
         private readonly IDefaultUserAvatarProvider _defaultUserAvatarProvider;
         private readonly IImageService _imageService;
         private readonly IDataManager _dataManager;
@@ -24,7 +24,7 @@ namespace Timeline.Services.User.Avatar
         public UserAvatarService(
             ILogger<UserAvatarService> logger,
             DatabaseContext database,
-            IBasicUserService basicUserService,
+            IUserService basicUserService,
             IDefaultUserAvatarProvider defaultUserAvatarProvider,
             IImageService imageValidator,
             IDataManager dataManager,
@@ -32,7 +32,7 @@ namespace Timeline.Services.User.Avatar
         {
             _logger = logger;
             _database = database;
-            _basicUserService = basicUserService;
+            _userService = basicUserService;
             _defaultUserAvatarProvider = defaultUserAvatarProvider;
             _imageService = imageValidator;
             _dataManager = dataManager;
@@ -41,7 +41,7 @@ namespace Timeline.Services.User.Avatar
 
         public async Task<ICacheableDataDigest> GetAvatarDigestAsync(long userId)
         {
-            var usernameChangeTime = await _basicUserService.GetUsernameLastModifiedTimeAsync(userId);
+            var usernameChangeTime = await _userService.GetUsernameLastModifiedTimeAsync(userId);
 
             var entity = await _database.UserAvatars.Where(a => a.UserId == userId).Select(a => new { a.DataTag, a.LastModified }).SingleOrDefaultAsync();
 
@@ -63,7 +63,7 @@ namespace Timeline.Services.User.Avatar
 
         public async Task<ByteData> GetAvatarAsync(long userId)
         {
-            await _basicUserService.ThrowIfUserNotExist(userId);
+            await _userService.ThrowIfUserNotExist(userId);
 
             var entity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
 
@@ -91,7 +91,7 @@ namespace Timeline.Services.User.Avatar
 
             await _imageService.ValidateAsync(avatar.Data, avatar.ContentType, true);
 
-            await _basicUserService.ThrowIfUserNotExist(userId);
+            await _userService.ThrowIfUserNotExist(userId);
 
             var entity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
 
@@ -133,7 +133,7 @@ namespace Timeline.Services.User.Avatar
 
         public async Task DeleteAvatarAsync(long userId)
         {
-            await _basicUserService.ThrowIfUserNotExist(userId);
+            await _userService.ThrowIfUserNotExist(userId);
 
             var entity = await _database.UserAvatars.Where(a => a.UserId == userId).SingleOrDefaultAsync();
 

@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Timeline.Services.User
 {
-    public static class BasicUserServiceExtensions
+    public static class UserServiceExtensions
     {
-        public static async Task ThrowIfUserNotExist(this IBasicUserService service, long userId)
+        public static async Task ThrowIfUserNotExist(this IUserService service, long userId)
         {
             if (!await service.CheckUserExistenceAsync(userId))
             {
