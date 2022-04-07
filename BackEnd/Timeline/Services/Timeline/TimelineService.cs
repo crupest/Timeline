@@ -84,6 +84,15 @@ namespace Timeline.Services.Timeline
             });
         }
 
+        protected static EntityNotExistException CreateTimelineNotExistException(long ownerId, string timelineName)
+        {
+            return new EntityNotExistException(EntityTypes.Timeline, new Dictionary<string, object>
+            {
+                [nameof(ownerId)] = ownerId,
+                [nameof(timelineName)] = timelineName
+            });
+        }
+
         protected void CheckGeneralTimelineName(string timelineName, string? paramName)
         {
             if (!_generalTimelineNameValidator.Validate(timelineName, out var message))
@@ -378,6 +387,10 @@ namespace Timeline.Services.Timeline
                 throw new ArgumentNullException(nameof(timelineName));
 
             CheckTimelineName(timelineName, nameof(timelineName));
+            if (timelineName == "self")
+            {
+                throw new ArgumentException("Timeline name can't be 'self'.");
+            }
 
             var conflict = await _database.Timelines.AnyAsync(t => t.OwnerId == ownerId && t.Name == timelineName);
 
@@ -405,14 +418,25 @@ namespace Timeline.Services.Timeline
             _logger.LogWarning(Resource.LogTimelineDelete, id);
         }
 
-        public Task<long> GetTimelineIdAsync(long ownerId, string timelineName)
+        public async Task<long> GetTimelineIdAsync(long ownerId, string timelineName)
         {
-            throw new NotImplementedException();
+            if (timelineName is null)
+                throw new ArgumentNullException(nameof(timelineName));
+            CheckTimelineName(timelineName, nameof(timelineName));
+
+            string? tn = timelineName == "self" ? null : timelineName;
+
+            var entity = await _database.Timelines.Where(t => t.OwnerId == ownerId && t.Name == tn).SingleOrDefaultAsync();
+            if (entity is null)
+                throw CreateTimelineNotExistException(ownerId, timelineName);
+
+            return entity.Id;
         }
 
-        public Task<long> GetTimelineIdAsync(string ownerUsername, string timelineName)
+        public async Task<long> GetTimelineIdAsync(string ownerUsername, string timelineName)
         {
-            throw new NotImplementedException();
+            var ownerId = await _userService.GetUserIdByUsernameAsync(ownerUsername);
+            return await GetTimelineIdAsync(ownerId, timelineName);
         }
     }
 }
