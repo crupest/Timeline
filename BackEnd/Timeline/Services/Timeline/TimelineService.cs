@@ -34,11 +34,12 @@ namespace Timeline.Services.Timeline
             _clock = clock;
         }
 
-        private static EntityAlreadyExistException CreateTimelineConflictException(string name)
+        private static EntityAlreadyExistException CreateTimelineConflictException(long ownerId, string timelineName)
         {
             return new EntityAlreadyExistException(EntityTypes.Timeline, new Dictionary<string, object>
             {
-                ["name"] = name
+                [nameof(ownerId)] = ownerId,
+                [nameof(timelineName)] = timelineName
             });
         }
 
@@ -190,10 +191,10 @@ namespace Timeline.Services.Timeline
 
             if (newProperties.Name is not null)
             {
-                var conflict = await _database.Timelines.AnyAsync(t => t.Name == newProperties.Name);
+                var conflict = await _database.Timelines.AnyAsync(t => t.OwnerId == entity.OwnerId && t.Name == newProperties.Name);
 
                 if (conflict)
-                    throw CreateTimelineConflictException(newProperties.Name);
+                    throw CreateTimelineConflictException(entity.OwnerId, newProperties.Name);
 
                 entity.Name = newProperties.Name;
 
@@ -371,23 +372,23 @@ namespace Timeline.Services.Timeline
             return entities;
         }
 
-        public async Task<TimelineEntity> CreateTimelineAsync(string name, long owner)
+        public async Task<TimelineEntity> CreateTimelineAsync(long ownerId, string timelineName)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (timelineName == null)
+                throw new ArgumentNullException(nameof(timelineName));
 
-            CheckTimelineName(name, nameof(name));
+            CheckTimelineName(timelineName, nameof(timelineName));
 
-            var conflict = await _database.Timelines.AnyAsync(t => t.Name == name);
+            var conflict = await _database.Timelines.AnyAsync(t => t.OwnerId == ownerId && t.Name == timelineName);
 
             if (conflict)
-                throw CreateTimelineConflictException(name);
+                throw CreateTimelineConflictException(ownerId, timelineName);
 
-            var entity = CreateNewTimelineEntity(name, owner);
+            var entity = CreateNewTimelineEntity(timelineName, ownerId);
 
             _database.Timelines.Add(entity);
             await _database.SaveChangesAsync();
-            _logger.LogInformation(Resource.LogTimelineCreate, name, entity.Id);
+            _logger.LogInformation(Resource.LogTimelineCreate, timelineName, entity.Id);
 
             return entity;
         }
