@@ -138,4 +138,7 @@
   <data name="MessageImageUnknownError" xml:space="preserve">
     <value>Unknown error happened to image.</value>
   </data>
+  <data name="MessageMultipleTimeline" xml:space="preserve">
+    <value>Multiple timeline with the name exists. Please use new api.</value>
+  </data>
 </root>
