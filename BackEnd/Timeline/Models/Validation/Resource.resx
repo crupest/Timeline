@@ -120,6 +120,9 @@
   <data name="CantBeNull" xml:space="preserve">
     <value>it can't be null</value>
   </data>
+  <data name="NameDisallowed" xml:space="preserve">
+    <value>this special value is not allowed</value>
+  </data>
   <data name="NameCantBeEmpty" xml:space="preserve">
     <value>name can't be empty</value>
   </data>

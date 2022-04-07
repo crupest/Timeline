@@ -117,13 +117,21 @@ namespace Timeline.Controllers
         /// <returns>The timeline info.</returns>
         [HttpGet("{timeline}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<HttpTimeline>> TimelineGet([FromRoute][GeneralTimelineName] string timeline)
         {
-            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
-            var t = await _service.GetTimelineAsync(timelineId);
-            var result = await Map(t);
-            return result;
+            try
+            {
+                var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
+                var t = await _service.GetTimelineAsync(timelineId);
+                var result = await Map(t);
+                return result;
+            }
+            catch (MultipleTimelineException)
+            {
+                return BadRequestWithCommonResponse(ErrorCodes.TimelineController.MultipleTimelineWithSameName, Resource.MessageMultipleTimeline);
+            }
         }
 
         /// <summary>

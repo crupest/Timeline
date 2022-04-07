@@ -112,6 +112,15 @@ namespace Timeline.Controllers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiple timeline with the name exists. Please use new api to get timeline..
+        /// </summary>
+        internal static string MessageMultipleTimeline {
+            get {
+                return ResourceManager.GetString("MessageMultipleTimeline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The old password is wrong..
         /// </summary>
         internal static string MessageOldPasswordWrong {

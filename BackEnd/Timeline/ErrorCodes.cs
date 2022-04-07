@@ -79,6 +79,7 @@
         public static class TimelineController
         {
             public const int QueryRelateNotExist = 1_104_04_01;
+            public const int MultipleTimelineWithSameName = 1_104_04_02;
         }
 
         public static class HighlightTimelineController

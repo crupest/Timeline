@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Timeline.Models.Validation
@@ -7,10 +8,17 @@ namespace Timeline.Models.Validation
     {
         private static Regex UniqueIdRegex { get; } = new Regex(@"^[a-zA-Z0-9]{32}$");
 
+        public List<string> DisallowedNames { get; set; } = new List<string>();
+
         public const int MaxLength = 26;
 
         protected override (bool, string) DoValidate(string value)
         {
+            if (DisallowedNames.Contains(value))
+            {
+                return (false, Resource.NameDisallowed);
+            }
+
             if (value.Length == 0)
             {
                 return (false, Resource.NameCantBeEmpty);
