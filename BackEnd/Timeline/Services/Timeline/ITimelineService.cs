@@ -19,16 +19,37 @@ namespace Timeline.Services.Timeline
         Task<bool> CheckTimelineExistenceAsync(long id);
 
         /// <summary>
-        /// Get the timeline id by name.
+        /// Get the timeline id by name. Deprecated now because different users can have timeline with the same name now.
         /// </summary>
         /// <param name="timelineName">Timeline name.</param>
         /// <returns>Id of the timeline.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
         /// <exception cref="ArgumentException">Throw when <paramref name="timelineName"/> is of bad format.</exception>
-        /// <exception cref="EntityNotExistException">
-        /// Thrown when timeline with name <paramref name="timelineName"/> does not exist.
-        /// </exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline with name <paramref name="timelineName"/> does not exist.</exception>
+        /// <exception cref="MultipleTimelineException">Thrown when multiple timelines have that name.</exception>
         Task<long> GetTimelineIdByNameAsync(string timelineName);
+
+        /// <summary>
+        /// Get timeline id by owner id and timeline name.
+        /// </summary>
+        /// <param name="ownerId">The timeline owner id.</param>
+        /// <param name="timelineName">The timeline name.</param>
+        /// <returns>A task contains timeline id.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="timelineName"/> is not a valid name.</exception>
+        Task<long> GetTimelineIdAsync(long ownerId, string timelineName);
+
+        /// <summary>
+        /// Get timeline id by owner username and timeline name.
+        /// </summary>
+        /// <param name="ownerUsername">The timeline owner id.</param>
+        /// <param name="timelineName">The timeline name.</param>
+        /// <returns>A task contains timeline id.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="ownerUsername"/> is null or <paramref name="timelineName"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="ownerUsername"/> is not a valid username or <paramref name="timelineName"/> is not a valid timeline name.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when user with given username does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when timeline with given name does not exist.</exception>
+        Task<long> GetTimelineIdAsync(string ownerUsername, string timelineName);
 
         /// <summary>
         /// Get the timeline info.
