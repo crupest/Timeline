@@ -10,9 +10,9 @@
       },
       "FluentAssertions": {
         "type": "Direct",
-        "requested": "[6.5.1, )",
-        "resolved": "6.5.1",
-        "contentHash": "hdY/upTFYEc7SFJQ+pKsMZP1J5bELh9feB8kXzk6FKAGE/tvAPDzHd76Z+nIYdgnqkocthaDUq+tKPsGD0um2A==",
+        "requested": "[6.6.0, )",
+        "resolved": "6.6.0",
+        "contentHash": "gBsgPrNRkzUQfnxZSKnU0oVILIc5dr+dmdKXscyYKD5URcwNVQ72a7uuCvTyBzRZW98MZQNolSYC0y/MQTJ03A==",
         "dependencies": {
           "System.Configuration.ConfigurationManager": "4.4.0"
         }
@@ -130,8 +130,8 @@
       },
       "Markdig": {
         "type": "Transitive",
-        "resolved": "0.28.0",
-        "contentHash": "gT6Sm14OaKQDwus5wFoI/v+Zxrgd2r70pkfq6dC1mIZaK1rvdEHtfnf3nD/Q/clrPFcvBIxZag79NXFjMkxhmA=="
+        "resolved": "0.28.1",
+        "contentHash": "70CneXw2N/1t7v6OfZJqMKLPRB1YWTPddEIcHT/P6IL6X1zsXELIu/DHVt96kr83PIVLznMuXoFK6b9N9KTODg=="
       },
       "Microsoft.AspNetCore.Connections.Abstractions": {
         "type": "Transitive",
@@ -1755,7 +1755,7 @@
         "dependencies": {
           "AutoMapper": "11.0.1",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0",
-          "Markdig": "0.28.0",
+          "Markdig": "0.28.1",
           "Microsoft.AspNetCore.SpaServices.Extensions": "6.0.3",
           "Microsoft.EntityFrameworkCore": "6.0.3",
           "Microsoft.EntityFrameworkCore.Analyzers": "6.0.3",

@@ -135,15 +135,19 @@ namespace Timeline.Services.Timeline
             }
             else
             {
-                var timelineEntity = await _database.Timelines.Where(t => t.Name == timelineName).Select(t => new { t.Id }).SingleOrDefaultAsync();
+                var timelineEntities = await _database.Timelines.Where(t => t.Name == timelineName).Select(t => new { t.Id }).ToListAsync();
 
-                if (timelineEntity == null)
+                if (timelineEntities.Count == 0)
                 {
                     throw CreateTimelineNotExistException(timelineName);
                 }
+                else if (timelineEntities.Count == 1)
+                {
+                    return timelineEntities[0].Id;
+                }
                 else
                 {
-                    return timelineEntity.Id;
+                    throw new MultipleTimelineException(String.Format("Multiple timelines have name '{}'.", timelineName));
                 }
             }
         }
@@ -398,6 +402,16 @@ namespace Timeline.Services.Timeline
             _database.Timelines.Remove(entity);
             await _database.SaveChangesAsync();
             _logger.LogWarning(Resource.LogTimelineDelete, id);
+        }
+
+        public Task<long> GetTimelineIdAsync(long ownerId, string timelineName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<long> GetTimelineIdAsync(string ownerUsername, string timelineName)
+        {
+            throw new NotImplementedException();
         }
     }
 }
