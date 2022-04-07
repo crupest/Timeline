@@ -218,7 +218,7 @@ namespace Timeline.Controllers
         {
             var userId = GetAuthUserId();
 
-            var timeline = await _service.CreateTimelineAsync(body.Name, userId);
+            var timeline = await _service.CreateTimelineAsync(userId, body.Name);
             var result = await Map(timeline);
             return result;
         }

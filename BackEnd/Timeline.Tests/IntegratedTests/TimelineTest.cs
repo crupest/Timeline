@@ -383,7 +383,6 @@ namespace Timeline.Tests.IntegratedTests
             using (var client = await CreateClientAsUser())
             {
                 await client.TestPatchAssertInvalidModelAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "!!!" });
-                await client.TestPatchAssertErrorAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "t2" }, errorCode: ErrorCodes.Conflict.Timeline);
 
                 await client.TestPatchAsync("timelines/t1", new HttpTimelinePatchRequest { Name = "newt" });
 

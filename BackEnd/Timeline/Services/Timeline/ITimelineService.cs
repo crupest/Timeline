@@ -142,14 +142,14 @@ namespace Timeline.Services.Timeline
         /// <summary>
         /// Create a timeline.
         /// </summary>
-        /// <param name="timelineName">The name of the timeline.</param>
         /// <param name="ownerId">The id of owner of the timeline.</param>
+        /// <param name="timelineName">The name of the timeline.</param>
         /// <returns>The info of the new timeline.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="timelineName"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when timeline name is invalid.</exception>
         /// <exception cref="EntityAlreadyExistException">Thrown when the timeline already exists.</exception>
         /// <exception cref="EntityNotExistException">Thrown when the owner user does not exist.</exception>
-        Task<TimelineEntity> CreateTimelineAsync(string timelineName, long ownerId);
+        Task<TimelineEntity> CreateTimelineAsync(long ownerId, string timelineName);
 
         /// <summary>
         /// Delete a timeline.
