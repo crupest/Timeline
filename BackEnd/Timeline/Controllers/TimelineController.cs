@@ -21,6 +21,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [Route("timelines")]
+    [CatchMultipleTimelineException]
     [ProducesErrorResponseType(typeof(CommonResponse))]
     public class TimelineController : MyControllerBase
     {
@@ -121,17 +122,10 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<HttpTimeline>> TimelineGet([FromRoute][GeneralTimelineName] string timeline)
         {
-            try
-            {
-                var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
-                var t = await _service.GetTimelineAsync(timelineId);
-                var result = await Map(t);
-                return result;
-            }
-            catch (MultipleTimelineException)
-            {
-                return BadRequestWithCommonResponse(ErrorCodes.TimelineController.MultipleTimelineWithSameName, Resource.MessageMultipleTimeline);
-            }
+            var timelineId = await _service.GetTimelineIdByNameAsync(timeline);
+            var t = await _service.GetTimelineAsync(timelineId);
+            var result = await Map(t);
+            return result;
         }
 
         /// <summary>

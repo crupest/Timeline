@@ -159,7 +159,4 @@
   <data name="MessageUsernameConflict" xml:space="preserve">
     <value>A user with given username already exists.</value>
   </data>
-  <data name="MessageMultipleTimeline" xml:space="preserve">
-    <value>Multiple timeline with the name exists. Please use new api to get timeline.</value>
-  </data>
 </root>
