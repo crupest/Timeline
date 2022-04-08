@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Timeline.Entities;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
+using Timeline.Services;
 using Timeline.Services.Mapper;
 using Timeline.Services.Timeline;
 using Timeline.Services.User;
@@ -91,7 +92,15 @@ namespace Timeline.Controllers
                 return Forbid();
             }
 
-            var userId = await _userService.GetUserIdByUsernameAsync(member);
+            long userId;
+            try
+            {
+                userId = await _userService.GetUserIdByUsernameAsync(member);
+            }
+            catch (EntityNotExistException e) when (e.EntityType.Equals(EntityTypes.User))
+            {
+                return UnprocessableEntity(new CommonResponse(ErrorCodes.Common.InvalidModel, "Member username does not exist."));
+            }
             await _timelineService.AddMemberAsync(timelineId, userId);
             return NoContent();
         }
@@ -111,7 +120,15 @@ namespace Timeline.Controllers
                 return Forbid();
             }
 
-            var userId = await _userService.GetUserIdByUsernameAsync(member);
+            long userId;
+            try
+            {
+                userId = await _userService.GetUserIdByUsernameAsync(member);
+            }
+            catch (EntityNotExistException e) when (e.EntityType.Equals(EntityTypes.User))
+            {
+                return UnprocessableEntity(new CommonResponse(ErrorCodes.Common.InvalidModel, "Member username does not exist."));
+            }
             await _timelineService.RemoveMemberAsync(timelineId, userId);
             return NoContent();
         }
