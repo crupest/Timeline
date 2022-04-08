@@ -54,6 +54,32 @@ namespace Timeline.Tests.IntegratedTests2
                 Name = "!!!"
             }, expectedStatusCode: HttpStatusCode.UnprocessableEntity);
         }
+
+        [Fact]
+        public async Task DifferentUserCreateSameName()
+        {
+            using var userClient = CreateClientAsUser();
+            await userClient.TestJsonSendAsync<HttpTimeline>(HttpMethod.Post, "v2/timelines", new HttpTimelineCreateRequest
+            {
+                Name = "hello"
+            }, expectedStatusCode: HttpStatusCode.Created);
+
+            using var adminClient = CreateClientAsAdmin();
+            await adminClient.TestJsonSendAsync<HttpTimeline>(HttpMethod.Post, "v2/timelines", new HttpTimelineCreateRequest
+            {
+                Name = "hello"
+            }, expectedStatusCode: HttpStatusCode.Created);
+        }
+
+        [Fact]
+        public async Task CreateWithoutLogin()
+        {
+            using var client = CreateDefaultClient();
+            await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Post, "v2/timelines", new HttpTimelineCreateRequest
+            {
+                Name = "hello"
+            }, expectedStatusCode: HttpStatusCode.Unauthorized);
+        }
     }
 }
 
