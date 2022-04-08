@@ -309,7 +309,7 @@ namespace Timeline.Services.Timeline
 
         public async Task<bool> HasReadPermissionAsync(long timelineId, long? visitorId)
         {
-            var entity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.Visibility }).SingleOrDefaultAsync();
+            var entity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId, t.Visibility }).SingleOrDefaultAsync();
 
             if (entity is null)
                 throw CreateTimelineNotExistException(timelineId);
@@ -323,6 +323,10 @@ namespace Timeline.Services.Timeline
             if (visitorId == null)
             {
                 return false;
+            }
+            else if (visitorId == entity.OwnerId)
+            {
+                return true;
             }
             else
             {
