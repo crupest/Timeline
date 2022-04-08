@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Timeline.Entities;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services.Mapper;
@@ -16,15 +17,18 @@ namespace Timeline.Controllers
     {
         private ITimelineService _timelineService;
         private IGenericMapper _mapper;
-        private TimelineMapper _timelineMapper;
         private IUserService _userService;
 
-        public TimelineV2Controller(ITimelineService timelineService, IGenericMapper mapper, TimelineMapper timelineMapper, IUserService userService)
+        public TimelineV2Controller(ITimelineService timelineService, IGenericMapper mapper, IUserService userService)
         {
             _timelineService = timelineService;
             _mapper = mapper;
-            _timelineMapper = timelineMapper;
             _userService = userService;
+        }
+
+        private Task<HttpTimeline> MapAsync(TimelineEntity entity)
+        {
+            return _mapper.MapAsync<HttpTimeline>(entity, Url, User);
         }
 
         [HttpGet("{owner}/{timeline}")]
@@ -32,7 +36,7 @@ namespace Timeline.Controllers
         {
             var timelineId = await _timelineService.GetTimelineIdAsync(owner, timeline);
             var t = await _timelineService.GetTimelineAsync(timelineId);
-            return await _timelineMapper.MapAsync(t, Url, User);
+            return await MapAsync(t);
         }
 
         [HttpPatch("{owner}/{timeline}")]
@@ -51,7 +55,7 @@ namespace Timeline.Controllers
             }
             await _timelineService.ChangePropertyAsync(timelineId, _mapper.AutoMapperMap<TimelineChangePropertyParams>(body));
             var t = await _timelineService.GetTimelineAsync(timelineId);
-            return await _timelineMapper.MapAsync(t, Url, User);
+            return await MapAsync(t);
         }
 
         [HttpDelete("{owner}/{timeline}")]
@@ -123,8 +127,8 @@ namespace Timeline.Controllers
             var authUserId = GetAuthUserId();
             var authUser = await _userService.GetUserAsync(authUserId);
             var timeline = await _timelineService.CreateTimelineAsync(authUserId, body.Name);
-            var result = await _timelineMapper.MapAsync(timeline, Url, User);
-            return CreatedAtAction(nameof(GetAsync), new { owner = authUser.Username, timeline = body.Name }, result);
+            var result = await MapAsync(timeline);
+            return CreatedAtAction("Get", new { owner = authUser.Username, timeline = body.Name }, result);
         }
     }
 }
