@@ -12,9 +12,9 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests2
 {
-    public class TimelinePostTest1 : IntegratedTestBase
+    public class TimelinePostTest2 : IntegratedTestBase
     {
-        public TimelinePostTest1(ITestOutputHelper testOutput) : base(testOutput)
+        public TimelinePostTest2(ITestOutputHelper testOutput) : base(testOutput)
         {
         }
 
@@ -69,46 +69,55 @@ namespace Timeline.Tests.IntegratedTests2
         }
 
         [Fact]
-        public async Task ListTest()
+        public async Task PostNotLogin()
         {
-            using var client = CreateClientAsUser();
-            var posts = await client.TestJsonSendAsync<List<HttpTimelinePost>>(HttpMethod.Get, "v2/timelines/user/hello/posts");
-            posts.Should().HaveCount(3);
+            using var client = CreateDefaultClient();
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/timelines/user/hello/posts", new HttpTimelinePostCreateRequest
+            {
+                DataList = new List<HttpTimelinePostCreateRequestData>
+                {
+                    new HttpTimelinePostCreateRequestData
+                    {
+                        ContentType = MimeTypes.TextPlain,
+                        Data = Convert.ToBase64String(Encoding.UTF8.GetBytes("hello3"))
+                    }
+                }
+            }, expectedStatusCode: HttpStatusCode.Unauthorized);
         }
 
         [Fact]
-        public async Task GetTest()
-        {
-            using var client = CreateClientAsUser();
-            await client.TestJsonSendAsync<HttpTimelinePost>(HttpMethod.Get, "v2/timelines/user/hello/posts/1");
-        }
-
-        [Fact]
-        public async Task ListAndGetForbid()
+        public async Task PostForbid()
         {
             await CreateUserAsync("user2", "user2pw");
             var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts", expectedStatusCode: HttpStatusCode.Forbidden);
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts/1", expectedStatusCode: HttpStatusCode.Forbidden);
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/timelines/user/hello/posts", new HttpTimelinePostCreateRequest
+            {
+                DataList = new List<HttpTimelinePostCreateRequestData>
+                {
+                    new HttpTimelinePostCreateRequestData
+                    {
+                        ContentType = MimeTypes.TextPlain,
+                        Data = Convert.ToBase64String(Encoding.UTF8.GetBytes("hello3"))
+                    }
+                }
+            }, expectedStatusCode: HttpStatusCode.Forbidden);
         }
 
         [Fact]
-        public async Task ListAndGetForbidForNoAuth()
+        public async Task PostNotExist()
         {
-            var client = CreateDefaultClient();
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts", expectedStatusCode: HttpStatusCode.Forbidden);
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts/1", expectedStatusCode: HttpStatusCode.Forbidden);
-        }
-
-        [Fact]
-        public async Task ListAndGetNotFound()
-        {
-            var client = CreateClientAsUser();
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/user/notexist/posts", expectedStatusCode: HttpStatusCode.NotFound);
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/user/notexist/posts/1", expectedStatusCode: HttpStatusCode.NotFound);
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/notexist/notexist/posts", expectedStatusCode: HttpStatusCode.NotFound);
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/notexist/notexist/posts/1", expectedStatusCode: HttpStatusCode.NotFound);
-            await client.TestJsonSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts/4", expectedStatusCode: HttpStatusCode.NotFound);
+            using var client = CreateClientAsUser();
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/timelines/user/notexist/posts", new HttpTimelinePostCreateRequest
+            {
+                DataList = new List<HttpTimelinePostCreateRequestData>
+                {
+                    new HttpTimelinePostCreateRequestData
+                    {
+                        ContentType = MimeTypes.TextPlain,
+                        Data = Convert.ToBase64String(Encoding.UTF8.GetBytes("hello3"))
+                    }
+                }
+            }, expectedStatusCode: HttpStatusCode.NotFound);
         }
     }
 }
