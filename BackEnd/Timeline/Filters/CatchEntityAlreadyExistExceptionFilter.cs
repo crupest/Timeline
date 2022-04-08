@@ -21,7 +21,14 @@ namespace Timeline.Filters
         {
             if (context.Exception is EntityAlreadyExistException e)
             {
-                context.Result = new BadRequestObjectResult(MakeCommonResponse(e));
+                if (context.HttpContext.Request.Path.StartsWithSegments("/api/v2"))
+                {
+                    context.Result = new UnprocessableEntityObjectResult(new CommonResponse(ErrorCodes.Conflict.Default, "An entity with given key already exists."));
+                }
+                else
+                {
+                    context.Result = new BadRequestObjectResult(MakeCommonResponse(e));
+                }
             }
         }
     }

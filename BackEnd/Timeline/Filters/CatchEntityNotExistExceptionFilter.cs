@@ -23,24 +23,31 @@ namespace Timeline.Filters
         {
             if (context.Exception is EntityNotExistException e)
             {
-                if (HttpMethods.IsGet(context.HttpContext.Request.Method))
+                if (context.HttpContext.Request.Path.StartsWithSegments("/api/v2"))
                 {
-                    context.Result = new NotFoundObjectResult(MakeCommonResponse(e));
-                }
-                else if (HttpMethods.IsDelete(context.HttpContext.Request.Method))
-                {
-                    if (context.ActionDescriptor.EndpointMetadata.OfType<NotEntityDeleteAttribute>().Any())
-                    {
-                        context.Result = new BadRequestObjectResult(MakeCommonResponse(e));
-                    }
-                    else
-                    {
-                        context.Result = new OkObjectResult(CommonDeleteResponse.NotExist());
-                    }
+                    context.Result = new NotFoundObjectResult(new CommonResponse(ErrorCodes.NotExist.Default, "The entity does not exist."));
                 }
                 else
                 {
-                    context.Result = new BadRequestObjectResult(MakeCommonResponse(e));
+                    if (HttpMethods.IsGet(context.HttpContext.Request.Method))
+                    {
+                        context.Result = new NotFoundObjectResult(MakeCommonResponse(e));
+                    }
+                    else if (HttpMethods.IsDelete(context.HttpContext.Request.Method))
+                    {
+                        if (context.ActionDescriptor.EndpointMetadata.OfType<NotEntityDeleteAttribute>().Any())
+                        {
+                            context.Result = new BadRequestObjectResult(MakeCommonResponse(e));
+                        }
+                        else
+                        {
+                            context.Result = new OkObjectResult(CommonDeleteResponse.NotExist());
+                        }
+                    }
+                    else
+                    {
+                        context.Result = new BadRequestObjectResult(MakeCommonResponse(e));
+                    }
                 }
             }
         }

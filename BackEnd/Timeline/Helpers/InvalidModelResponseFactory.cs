@@ -8,6 +8,11 @@ namespace Timeline.Helpers
     {
         public static IActionResult Factory(ActionContext context)
         {
+            if (context.HttpContext.Request.Path.StartsWithSegments("/api/v2"))
+            {
+                return new UnprocessableEntityObjectResult(new CommonResponse(ErrorCodes.Common.InvalidModel, "Request is of bad format."));
+            }
+
             var modelState = context.ModelState;
 
             var messageBuilder = new StringBuilder();
