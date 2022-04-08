@@ -89,30 +89,5 @@ namespace Timeline.Tests.IntegratedTests2
             await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Get, "v2/timelines/notexist/notexist", expectedStatusCode: HttpStatusCode.NotFound);
             await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Get, "v2/timelines/user/notexist", expectedStatusCode: HttpStatusCode.NotFound);
         }
-
-        [Fact]
-        public async Task PatchTest()
-        {
-            using var client = CreateClientAsUser();
-            var a = await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Post, "v2/timelines", new HttpTimelineCreateRequest
-            {
-                Name = "hello"
-            }, expectedStatusCode: HttpStatusCode.Created);
-
-            var b = await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Patch, "v2/timelines/user/hello", new HttpTimelinePatchRequest
-            {
-                Name = "hello2",
-                Title = "Hello",
-                Description = "A Description.",
-                Visibility = TimelineVisibility.Public,
-                Color = "#FFFFFF"
-            });
-
-            b.Name.Should().Be("hello2");
-            b.Title.Should().Be("Hello");
-            b.Description.Should().Be("A Description.");
-            b.Visibility.Should().Be(TimelineVisibility.Public);
-            b.Color.Should().Be("#FFFFFF");
-        }
     }
 }
