@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
+using Timeline.Tests.Helpers;
 
 namespace Timeline.Tests.IntegratedTests
 {

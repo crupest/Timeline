@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Timeline.Models.Converters;
 
-namespace Timeline.Tests.IntegratedTests
+namespace Timeline.Tests.Helpers
 {
     public static class CommonJsonSerializeOptions
     {
