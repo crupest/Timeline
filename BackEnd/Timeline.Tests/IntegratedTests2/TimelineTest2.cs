@@ -10,10 +10,10 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests2
 {
-    public class TimelinePatchAndDeleteTest : IntegratedTestBase
+    public class TimelineTest2 : IntegratedTestBase
     {
 
-        public TimelinePatchAndDeleteTest(ITestOutputHelper testOutput) : base(testOutput)
+        public TimelineTest2(ITestOutputHelper testOutput) : base(testOutput)
         {
         }
 
