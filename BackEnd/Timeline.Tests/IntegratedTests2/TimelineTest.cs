@@ -29,6 +29,31 @@ namespace Timeline.Tests.IntegratedTests2
             a.Name.Should().Be(b.Name);
             a.UniqueId.Should().Be(b.UniqueId);
         }
+
+        [Fact]
+        public async Task CreateSameName()
+        {
+            using var client = CreateClientAsUser();
+            await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Post, "v2/timelines", new HttpTimelineCreateRequest
+            {
+                Name = "hello"
+            }, expectedStatusCode: HttpStatusCode.Created);
+
+            await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Post, "v2/timelines", new HttpTimelineCreateRequest
+            {
+                Name = "hello"
+            }, expectedStatusCode: HttpStatusCode.UnprocessableEntity);
+        }
+
+        [Fact]
+        public async Task CreateInvalid()
+        {
+            using var client = CreateClientAsUser();
+            await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Post, "v2/timelines", new HttpTimelineCreateRequest
+            {
+                Name = "!!!"
+            }, expectedStatusCode: HttpStatusCode.UnprocessableEntity);
+        }
     }
 }
 
