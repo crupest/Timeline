@@ -1,10 +1,9 @@
-﻿using FluentAssertions;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Timeline.Models.Http;
+using FluentAssertions;
 using Timeline.Tests.Helpers;
 
 namespace Timeline.Tests.IntegratedTests2

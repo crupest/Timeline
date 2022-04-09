@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Helpers.Cache;
 using Timeline.Models;
-using Timeline.Services.Imaging;
 
 namespace Timeline.Services.Timeline
 {
@@ -56,6 +55,28 @@ namespace Timeline.Services.Timeline
         /// <exception cref="EntityNotExistException">Thrown when post of <paramref name="postId"/> does not exist or has been deleted.</exception>
         /// <exception cref="EntityNotExistException">Thrown when data of that index does not exist.</exception>
         Task<ByteData> GetPostDataAsync(long timelineId, long postId, long dataIndex);
+
+        /// <summary>
+        /// Get posts of a timeline.
+        /// </summary>
+        /// <param name="timelineId">The timeline id.</param>
+        /// <param name="modifiedSince">If not null, only posts modified since (including) the time will be returned.</param>
+        /// <param name="page">The page to get. Starts from 1.</param>
+        /// <param name="numberPerPage">Number per page.</param>
+        /// <returns>A task containing a page of post entity.</returns>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
+        Task<Page<TimelinePostEntity>> GetPostsV2Async(long timelineId, DateTime? modifiedSince = null, int? page = null, int? numberPerPage = null);
+
+        /// <summary>
+        /// Get a post of a timeline.
+        /// </summary>
+        /// <param name="timelineId">The timeline id.</param>
+        /// <param name="postId">The post id.</param>
+        /// <returns>A task containing a post entity.</returns>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when post does not exist.</exception>
+        /// <exception cref="EntityDeletedException">Thrown when post is deleted.</exception>
+        Task<TimelinePostEntity> GetPostV2Async(long timelineId, long postId);
 
         /// <summary>
         /// Create a new post in timeline.

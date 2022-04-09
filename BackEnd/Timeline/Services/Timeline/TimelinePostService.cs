@@ -20,8 +20,8 @@ namespace Timeline.Services.Timeline
     {
         private readonly ILogger<TimelinePostService> _logger;
         private readonly DatabaseContext _database;
-        private readonly ITimelineService _basicTimelineService;
-        private readonly IUserService _basicUserService;
+        private readonly ITimelineService _timelineService;
+        private readonly IUserService _userService;
         private readonly IDataManager _dataManager;
         private readonly IImageService _imageValidator;
         private readonly IClock _clock;
@@ -32,8 +32,8 @@ namespace Timeline.Services.Timeline
         {
             _logger = logger;
             _database = database;
-            _basicTimelineService = basicTimelineService;
-            _basicUserService = basicUserService;
+            _timelineService = basicTimelineService;
+            _userService = basicUserService;
             _dataManager = dataManager;
             _imageValidator = imageValidator;
             _clock = clock;
@@ -55,6 +55,15 @@ namespace Timeline.Services.Timeline
             });
         }
 
+        private static EntityNotExistException CreatePostDeletedException(long timelineId, long postId)
+        {
+            return new EntityNotExistException(EntityTypes.TimelinePost, new Dictionary<string, object>
+            {
+                ["timeline-id"] = timelineId,
+                ["post-id"] = postId,
+            });
+        }
+
         private static EntityNotExistException CreatePostDataNotExistException(long timelineId, long postId, long dataIndex)
         {
             return new EntityNotExistException(EntityTypes.TimelinePost, new Dictionary<string, object>
@@ -73,7 +82,7 @@ namespace Timeline.Services.Timeline
                 throw new ArgumentOutOfRangeException(nameof(numberPerPage), Resource.ExceptionNumberPerPageZeroOrNegative);
 
 
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             modifiedSince = modifiedSince?.MyToUtc();
 
@@ -102,7 +111,7 @@ namespace Timeline.Services.Timeline
 
         public async Task<TimelinePostEntity> GetPostAsync(long timelineId, long postId, bool includeDeleted = false)
         {
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var post = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
@@ -121,7 +130,7 @@ namespace Timeline.Services.Timeline
 
         public async Task<ICacheableDataDigest> GetPostDataDigestAsync(long timelineId, long postId, long dataIndex)
         {
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
 
@@ -141,7 +150,7 @@ namespace Timeline.Services.Timeline
 
         public async Task<ByteData> GetPostDataAsync(long timelineId, long postId, long dataIndex)
         {
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
 
@@ -215,8 +224,8 @@ namespace Timeline.Services.Timeline
 
             request.Time = request.Time?.MyToUtc();
 
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
-            await _basicUserService.ThrowIfUserNotExist(authorId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
+            await _userService.ThrowIfUserNotExist(authorId);
 
             var currentTime = _clock.GetCurrentTime();
             var finalTime = request.Time ?? currentTime;
@@ -274,7 +283,7 @@ namespace Timeline.Services.Timeline
 
             request.Time = request.Time?.MyToUtc();
 
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var entity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
@@ -309,7 +318,7 @@ namespace Timeline.Services.Timeline
 
         public async Task DeletePostAsync(long timelineId, long postId)
         {
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var entity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
 
@@ -351,7 +360,7 @@ namespace Timeline.Services.Timeline
 
         public async Task<bool> HasPostModifyPermissionAsync(long timelineId, long postId, long modifierId, bool throwOnPostNotExist = false)
         {
-            await _basicTimelineService.ThrowIfTimelineNotExist(timelineId);
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
 
             var timelineEntity = await _database.Timelines.Where(t => t.Id == timelineId).Select(t => new { t.OwnerId }).SingleAsync();
 
@@ -371,6 +380,59 @@ namespace Timeline.Services.Timeline
             }
 
             return timelineEntity.OwnerId == modifierId || postEntity.AuthorId == modifierId;
+        }
+
+        public async Task<Page<TimelinePostEntity>> GetPostsV2Async(long timelineId, DateTime? modifiedSince = null, int? page = null, int? numberPerPage = null)
+        {
+            if (page.HasValue && page < 0)
+                throw new ArgumentOutOfRangeException(nameof(page), Resource.ExceptionPageNegative);
+            if (numberPerPage.HasValue && numberPerPage <= 0)
+                throw new ArgumentOutOfRangeException(nameof(numberPerPage), Resource.ExceptionNumberPerPageZeroOrNegative);
+
+
+            var timeline = await _timelineService.GetTimelineAsync(timelineId);
+
+            modifiedSince = modifiedSince?.MyToUtc();
+
+            IQueryable<TimelinePostEntity> query = _database.TimelinePosts.Where(p => p.TimelineId == timelineId);
+
+            if (modifiedSince.HasValue)
+            {
+                query = query.Where(p => p.LastUpdated >= modifiedSince || (p.Author != null && p.Author.UsernameChangeTime >= modifiedSince));
+            }
+
+            query = query.OrderBy(p => p.Time);
+
+            var pageNumber = page.GetValueOrDefault(1);
+            var pageSize = numberPerPage.GetValueOrDefault(20);
+
+            if (pageNumber > 1)
+            {
+                query = query.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+            }
+
+            var items = await query.ToListAsync();
+
+            return new Page<TimelinePostEntity>(pageNumber, pageSize, timeline.CurrentPostLocalId, items);
+        }
+
+        public async Task<TimelinePostEntity> GetPostV2Async(long timelineId, long postId)
+        {
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
+
+            var post = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).SingleOrDefaultAsync();
+
+            if (post is null)
+            {
+                throw CreatePostNotExistException(timelineId, postId, false);
+            }
+
+            if (post.Deleted)
+            {
+                throw CreatePostDeletedException(timelineId, postId);
+            }
+
+            return post;
         }
     }
 }
