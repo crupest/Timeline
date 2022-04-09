@@ -72,8 +72,9 @@ namespace Timeline.Tests.IntegratedTests2
         public async Task ListTest()
         {
             using var client = CreateClientAsUser();
-            var posts = await client.TestJsonSendAsync<List<HttpTimelinePost>>(HttpMethod.Get, "v2/timelines/user/hello/posts");
-            posts.Should().HaveCount(3);
+            var posts = await client.TestJsonSendAsync<Page<HttpTimelinePost>>(HttpMethod.Get, "v2/timelines/user/hello/posts");
+            posts.TotalCount.Should().Be(3);
+            posts.Items.Should().HaveCount(3);
         }
 
         [Fact]

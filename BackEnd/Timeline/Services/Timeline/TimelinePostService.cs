@@ -55,9 +55,9 @@ namespace Timeline.Services.Timeline
             });
         }
 
-        private static EntityNotExistException CreatePostDeletedException(long timelineId, long postId)
+        private static EntityDeletedException CreatePostDeletedException(long timelineId, long postId)
         {
-            return new EntityNotExistException(EntityTypes.TimelinePost, new Dictionary<string, object>
+            return new EntityDeletedException(EntityTypes.TimelinePost, new Dictionary<string, object>
             {
                 ["timeline-id"] = timelineId,
                 ["post-id"] = postId,
