@@ -79,6 +79,32 @@ namespace Timeline.Services.Timeline
         Task<TimelinePostEntity> GetPostV2Async(long timelineId, long postId);
 
         /// <summary>
+        /// Get a data digest of a post.
+        /// </summary>
+        /// <param name="timelineId">The timeline id.</param>
+        /// <param name="postId">The post id.</param>
+        /// <param name="dataIndex">The index of the data.</param>
+        /// <returns>The data digest.</returns>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when post of <paramref name="postId"/> does not exist.</exception>
+        /// <exception cref="EntityDeletedException">Thrown when post is deleted.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when data of that index does not exist.</exception>
+        Task<ICacheableDataDigest> GetPostDataDigestV2Async(long timelineId, long postId, long dataIndex);
+
+        /// <summary>
+        /// Get a data of a post.
+        /// </summary>
+        /// <param name="timelineId">The timeline id.</param>
+        /// <param name="postId">The post id.</param>
+        /// <param name="dataIndex">The index of the data.</param>
+        /// <returns>The data.</returns>
+        /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when post of <paramref name="postId"/> does not exist.</exception>
+        /// <exception cref="EntityDeletedException">Thrown when post is deleted.</exception>
+        /// <exception cref="EntityNotExistException">Thrown when data of that index does not exist.</exception>
+        Task<ByteData> GetPostDataV2Async(long timelineId, long postId, long dataIndex);
+
+        /// <summary>
         /// Create a new post in timeline.
         /// </summary>
         /// <param name="timelineId">The id of the timeline to create post against.</param>

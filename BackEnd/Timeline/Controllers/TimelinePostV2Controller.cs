@@ -80,6 +80,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status410Gone)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult<ByteData>> DataIndexGetAsync([FromRoute][Username] string owner, [FromRoute][TimelineName] string timeline, [FromRoute] long post)
         {
@@ -92,6 +93,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status304NotModified)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status410Gone)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         public async Task<ActionResult> DataGetAsync([FromRoute][Username] string owner, [FromRoute][TimelineName] string timeline, [FromRoute] long post, [FromRoute(Name = "data_index")][Range(0, 100)] long dataIndex)
         {
@@ -103,10 +105,10 @@ namespace Timeline.Controllers
             }
 
             return await DataCacheHelper.GenerateActionResult(this,
-                () => _postService.GetPostDataDigestAsync(timelineId, post, dataIndex),
+                () => _postService.GetPostDataDigestV2Async(timelineId, post, dataIndex),
                 async () =>
                 {
-                    var data = await _postService.GetPostDataAsync(timelineId, post, dataIndex);
+                    var data = await _postService.GetPostDataV2Async(timelineId, post, dataIndex);
                     if (data.ContentType == MimeTypes.TextMarkdown)
                     {
                         return new ByteData(_markdownProcessor.Process(data.Data, Url, timeline, post), data.ContentType);
