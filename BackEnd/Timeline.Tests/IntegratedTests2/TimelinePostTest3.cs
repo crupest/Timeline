@@ -70,6 +70,15 @@ namespace Timeline.Tests.IntegratedTests2
         }
 
         [Fact]
+        public async Task PostDataGetDeleted()
+        {
+            using var client = CreateClientAsUser();
+            await client.TestSendAsync(HttpMethod.Delete, "v2/timelines/user/hello/posts/1", expectedStatusCode: HttpStatusCode.NoContent);
+            await client.TestSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts/1/data", expectedStatusCode: HttpStatusCode.Gone);
+            await client.TestSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts/1/data/1", expectedStatusCode: HttpStatusCode.Gone);
+        }
+
+        [Fact]
         public async Task PostDataGetNotExist()
         {
             using var client = CreateClientAsUser();

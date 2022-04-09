@@ -434,5 +434,47 @@ namespace Timeline.Services.Timeline
 
             return post;
         }
+
+        public async Task<ICacheableDataDigest> GetPostDataDigestV2Async(long timelineId, long postId, long dataIndex)
+        {
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
+
+            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
+
+            if (postEntity is null)
+                throw CreatePostNotExistException(timelineId, postId, false);
+
+            if (postEntity.Deleted)
+                throw CreatePostDeletedException(timelineId, postId);
+
+            var dataEntity = await _database.TimelinePostData.Where(d => d.PostId == postEntity.Id && d.Index == dataIndex).SingleOrDefaultAsync();
+
+            if (dataEntity is null)
+                throw CreatePostDataNotExistException(timelineId, postId, dataIndex);
+
+            return new CacheableDataDigest(dataEntity.DataTag, dataEntity.LastUpdated);
+        }
+
+        public async Task<ByteData> GetPostDataV2Async(long timelineId, long postId, long dataIndex)
+        {
+            await _timelineService.ThrowIfTimelineNotExist(timelineId);
+
+            var postEntity = await _database.TimelinePosts.Where(p => p.TimelineId == timelineId && p.LocalId == postId).Select(p => new { p.Id, p.Deleted }).SingleOrDefaultAsync();
+
+            if (postEntity is null)
+                throw CreatePostNotExistException(timelineId, postId, false);
+
+            if (postEntity.Deleted)
+                throw CreatePostDeletedException(timelineId, postId);
+
+            var dataEntity = await _database.TimelinePostData.Where(d => d.PostId == postEntity.Id && d.Index == dataIndex).SingleOrDefaultAsync();
+
+            if (dataEntity is null)
+                throw CreatePostDataNotExistException(timelineId, postId, dataIndex);
+
+            var data = await _dataManager.GetEntryAndCheck(dataEntity.DataTag, $"Timeline {timelineId}, post {postId}, data {dataIndex} requires this data.");
+
+            return new ByteData(data, dataEntity.Kind);
+        }
     }
 }
