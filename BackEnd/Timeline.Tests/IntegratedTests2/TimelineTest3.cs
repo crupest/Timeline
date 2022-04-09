@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Timeline.Models;
 using Timeline.Models.Http;
 using Xunit;
 using Xunit.Abstractions;
