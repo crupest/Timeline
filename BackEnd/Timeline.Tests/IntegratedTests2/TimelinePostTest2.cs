@@ -124,6 +124,7 @@ namespace Timeline.Tests.IntegratedTests2
         {
             using var client = CreateClientAsUser();
             await client.TestSendAsync(HttpMethod.Delete, "v2/timelines/user/hello/posts/1", expectedStatusCode: HttpStatusCode.NoContent);
+            await client.TestSendAsync(HttpMethod.Get, "v2/timelines/user/hello/posts/1", expectedStatusCode: HttpStatusCode.Gone);
         }
 
         [Fact]

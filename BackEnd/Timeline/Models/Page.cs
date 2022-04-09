@@ -23,6 +23,11 @@ namespace Timeline.Models
         public long TotalPageCount { get; set; }
         public long TotalCount { get; set; }
         public List<T> Items { get; set; } = new List<T>();
+
+        public Page<U> WithItems<U>(List<U> items)
+        {
+            return new Page<U>(PageNumber, PageSize, TotalCount, items);
+        }
     }
 }
 
