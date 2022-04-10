@@ -114,7 +114,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         subscribe = false;
       };
     }
-  }, [timelineName, reloadKey, onTimelineLoaded]);
+  }, [timelineOwner, timelineName, reloadKey, onTimelineLoaded]);
 
   switch (state) {
     case "loading":

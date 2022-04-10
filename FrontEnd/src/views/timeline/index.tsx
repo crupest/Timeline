@@ -71,6 +71,7 @@ const TimelinePage: React.FC = () => {
       ) : null}
       <div className="container">
         <Timeline
+          timelineOwner={ownerUsername}
           timelineName={timelineName}
           reloadKey={reloadKey}
           onReload={reload}

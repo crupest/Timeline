@@ -134,7 +134,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         }}
         onConfirm={() => {
           void getHttpTimelineClient()
-            .deletePost(post.timelineName, post.id)
+            .deletePost(post.timelineOwnerV2, post.timelineNameV2, post.id)
             .then(onDeleted, () => {
               pushAlert({
                 type: "danger",

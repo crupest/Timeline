@@ -54,7 +54,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
     <>
       <h3 className="cru-color-primary d-inline-block align-middle">
         {timeline.title}
-        <small className="ms-3 cru-color-secondary">{timeline.name}</small>
+        <small className="ms-3 cru-color-secondary">{timeline.nameV2}</small>
       </h3>
       <div>
         <UserAvatar
@@ -80,7 +80,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
             user?.hasHighlightTimelineAdministrationPermission
               ? () => {
                   getHttpHighlightClient()
-                    [timeline.isHighlight ? "delete" : "put"](timeline.name)
+                    [timeline.isHighlight ? "delete" : "put"](timeline.nameV2)
                     .then(onReload, () => {
                       pushAlert({
                         message: timeline.isHighlight
@@ -101,7 +101,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
             )}
             onClick={() => {
               getHttpBookmarkClient()
-                [timeline.isBookmark ? "delete" : "put"](timeline.name)
+                [timeline.isBookmark ? "delete" : "put"](timeline.nameV2)
                 .then(onReload, () => {
                   pushAlert({
                     message: timeline.isBookmark

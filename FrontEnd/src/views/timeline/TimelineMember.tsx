@@ -116,7 +116,11 @@ const TimelineMemberUserSearch: React.FC<{
                     add
                     onAction={() => {
                       void getHttpTimelineClient()
-                        .memberPut(timeline.name, user.username)
+                        .memberPut(
+                          timeline.owner.username,
+                          timeline.nameV2,
+                          user.username
+                        )
                         .then(() => {
                           setUserSearchText("");
                           setUserSearchState({ type: "init" });
@@ -160,7 +164,11 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
               timeline.manageable && index !== 0
                 ? () => {
                     void getHttpTimelineClient()
-                      .memberDelete(timeline.name, member.username)
+                      .memberDelete(
+                        timeline.owner.username,
+                        timeline.nameV2,
+                        member.username
+                      )
                       .then(onChange);
                   }
                 : undefined

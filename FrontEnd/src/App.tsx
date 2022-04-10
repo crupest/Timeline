@@ -34,10 +34,10 @@ function App(): ReactElement | null {
           <Route path="/login" element={<Login />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/about" element={<About />} />
-          <Route path="/:owner" element={<TimelinePage />} />
-          <Route path="/:owner/:timeline" element={<TimelinePage />} />
           <Route path="/search" element={<Search />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/:owner" element={<TimelinePage />} />
+          <Route path="/:owner/:timeline" element={<TimelinePage />} />
           <Route element={<NoMatch />} />
         </Routes>
         <AlertHost />
