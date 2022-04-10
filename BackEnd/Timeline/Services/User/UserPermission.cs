@@ -13,6 +13,7 @@
         /// <summary>
         /// This permission allow to add or remove highlight timelines.
         /// </summary>
-        HighlightTimelineManagement
+        HighlightTimelineManagement,
+        UserBookmarkManagement,
     }
 }
