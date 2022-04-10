@@ -14,6 +14,7 @@ import Spinner from "../common/Spinner";
 import "./MarkdownPostEdit.css";
 
 export interface MarkdownPostEditProps {
+  owner: string;
   timeline: string;
   onPosted: (post: HttpTimelinePostInfo) => void;
   onPostError: () => void;
@@ -23,6 +24,7 @@ export interface MarkdownPostEditProps {
 }
 
 const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
+  owner: ownerUsername,
   timeline: timelineName,
   onPosted,
   onClose,
@@ -84,9 +86,13 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
     setProcess(true);
     try {
       const dataList = await getBuilder().build();
-      const post = await getHttpTimelineClient().postPost(timelineName, {
-        dataList,
-      });
+      const post = await getHttpTimelineClient().postPost(
+        ownerUsername,
+        timelineName,
+        {
+          dataList,
+        }
+      );
       onPosted(post);
       onClose();
     } catch (e) {

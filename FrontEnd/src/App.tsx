@@ -8,7 +8,6 @@ import Home from "./views/home";
 import Login from "./views/login";
 import Settings from "./views/settings";
 import About from "./views/about";
-import User from "./views/user";
 import TimelinePage from "./views/timeline";
 import Search from "./views/search";
 import Admin from "./views/admin";
@@ -35,8 +34,8 @@ function App(): ReactElement | null {
           <Route path="/login" element={<Login />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/about" element={<About />} />
-          <Route path="/timelines/:name" element={<TimelinePage />} />
-          <Route path="/users/:username" element={<User />} />
+          <Route path="/:owner" element={<TimelinePage />} />
+          <Route path="/:owner/:timeline" element={<TimelinePage />} />
           <Route path="/search" element={<Search />} />
           <Route path="/admin" element={<Admin />} />
           <Route element={<NoMatch />} />

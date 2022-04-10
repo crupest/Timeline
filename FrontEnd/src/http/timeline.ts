@@ -6,7 +6,7 @@ import {
   axios,
   apiBaseUrl,
   extractResponseData,
-  convertToIfErrorCodeIs,
+  convertToIfStatusCodeIs,
   getHttpToken,
 } from "./common";
 import { HttpUser } from "./user";
@@ -18,7 +18,7 @@ export type TimelineVisibility = typeof kTimelineVisibilities[number];
 export interface HttpTimelineInfo {
   uniqueId: string;
   title: string;
-  name: string;
+  nameV2: string;
   description: string;
   owner: HttpUser;
   visibility: TimelineVisibility;
@@ -54,7 +54,8 @@ export interface HttpTimelinePostInfo {
   dataList: HttpTimelinePostDataDigest[];
   color: string;
   lastUpdated: string;
-  timelineName: string;
+  timelineOwnerV2: string;
+  timelineNameV2: string;
   editable: boolean;
 }
 
@@ -90,28 +91,57 @@ export class HttpTimelineNameConflictError extends Error {
 
 export interface IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]>;
-  getTimeline(timelineName: string): Promise<HttpTimelineInfo>;
+  getTimeline(
+    ownerUsername: string,
+    timelineName: string
+  ): Promise<HttpTimelineInfo>;
   postTimeline(req: HttpTimelinePostRequest): Promise<HttpTimelineInfo>;
   patchTimeline(
+    ownerUsername: string,
     timelineName: string,
     req: HttpTimelinePatchRequest
   ): Promise<HttpTimelineInfo>;
-  deleteTimeline(timelineName: string): Promise<void>;
-  memberPut(timelineName: string, username: string): Promise<void>;
-  memberDelete(timelineName: string, username: string): Promise<void>;
-  listPost(timelineName: string): Promise<HttpTimelinePostInfo[]>;
-  generatePostDataUrl(timelineName: string, postId: number): string;
-  getPostDataAsString(timelineName: string, postId: number): Promise<string>;
+  deleteTimeline(ownerUsername: string, timelineName: string): Promise<void>;
+  memberPut(
+    ownerUsername: string,
+    timelineName: string,
+    username: string
+  ): Promise<void>;
+  memberDelete(
+    ownerUsername: string,
+    timelineName: string,
+    username: string
+  ): Promise<void>;
+  listPost(
+    ownerUsername: string,
+    timelineName: string
+  ): Promise<HttpTimelinePostInfo[]>;
+  generatePostDataUrl(
+    ownerUsername: string,
+    timelineName: string,
+    postId: number
+  ): string;
+  getPostDataAsString(
+    ownerUsername: string,
+    timelineName: string,
+    postId: number
+  ): Promise<string>;
   postPost(
+    ownerUsername: string,
     timelineName: string,
     req: HttpTimelinePostPostRequest
   ): Promise<HttpTimelinePostInfo>;
   patchPost(
+    ownerUsername: string,
     timelineName: string,
     postId: number,
     req: HttpTimelinePostPatchRequest
   ): Promise<HttpTimelinePostInfo>;
-  deletePost(timelineName: string, postId: number): Promise<void>;
+  deletePost(
+    ownerUsername: string,
+    timelineName: string,
+    postId: number
+  ): Promise<void>;
 }
 
 export class HttpTimelineClient implements IHttpTimelineClient {
@@ -123,63 +153,97 @@ export class HttpTimelineClient implements IHttpTimelineClient {
       .then(extractResponseData);
   }
 
-  getTimeline(timelineName: string): Promise<HttpTimelineInfo> {
+  getTimeline(
+    ownerUsername: string,
+    timelineName: string
+  ): Promise<HttpTimelineInfo> {
     return axios
-      .get<HttpTimelineInfo>(`${apiBaseUrl}/timelines/${timelineName}`)
+      .get<HttpTimelineInfo>(
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}`
+      )
       .then(extractResponseData);
   }
 
   postTimeline(req: HttpTimelinePostRequest): Promise<HttpTimelineInfo> {
     return axios
-      .post<HttpTimelineInfo>(`${apiBaseUrl}/timelines`, req)
+      .post<HttpTimelineInfo>(`${apiBaseUrl}/v2/timelines`, req)
       .then(extractResponseData)
-      .catch(convertToIfErrorCodeIs(11040101, HttpTimelineNameConflictError));
+      .catch(convertToIfStatusCodeIs(422, HttpTimelineNameConflictError));
   }
 
   patchTimeline(
+    ownerUsername: string,
     timelineName: string,
     req: HttpTimelinePatchRequest
   ): Promise<HttpTimelineInfo> {
     return axios
-      .patch<HttpTimelineInfo>(`${apiBaseUrl}/timelines/${timelineName}`, req)
-      .then(extractResponseData);
-  }
-
-  deleteTimeline(timelineName: string): Promise<void> {
-    return axios.delete(`${apiBaseUrl}/timelines/${timelineName}`).then();
-  }
-
-  memberPut(timelineName: string, username: string): Promise<void> {
-    return axios
-      .put(`${apiBaseUrl}/timelines/${timelineName}/members/${username}`)
-      .then();
-  }
-
-  memberDelete(timelineName: string, username: string): Promise<void> {
-    return axios
-      .delete(`${apiBaseUrl}/timelines/${timelineName}/members/${username}`)
-      .then();
-  }
-
-  listPost(timelineName: string): Promise<HttpTimelinePostInfo[]> {
-    return axios
-      .get<HttpTimelinePostInfo[]>(
-        `${apiBaseUrl}/timelines/${timelineName}/posts`
+      .patch<HttpTimelineInfo>(
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}`,
+        req
       )
       .then(extractResponseData);
   }
 
-  generatePostDataUrl(timelineName: string, postId: number): string {
+  deleteTimeline(ownerUsername: string, timelineName: string): Promise<void> {
+    return axios
+      .delete(`${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}`)
+      .then();
+  }
+
+  memberPut(
+    ownerUsername: string,
+    timelineName: string,
+    username: string
+  ): Promise<void> {
+    return axios
+      .put(
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/members/${username}`
+      )
+      .then();
+  }
+
+  memberDelete(
+    ownerUsername: string,
+    timelineName: string,
+    username: string
+  ): Promise<void> {
+    return axios
+      .delete(
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/members/${username}`
+      )
+      .then();
+  }
+
+  listPost(
+    ownerUsername: string,
+    timelineName: string
+  ): Promise<HttpTimelinePostInfo[]> {
+    return axios
+      .get<HttpTimelinePostInfo[]>(
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts`
+      )
+      .then(extractResponseData);
+  }
+
+  generatePostDataUrl(
+    ownerUsername: string,
+    timelineName: string,
+    postId: number
+  ): string {
     return applyQueryParameters(
-      `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}/data`,
+      `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts/${postId}/data`,
       { token: getHttpToken() }
     );
   }
 
-  getPostDataAsString(timelineName: string, postId: number): Promise<string> {
+  getPostDataAsString(
+    ownerUsername: string,
+    timelineName: string,
+    postId: number
+  ): Promise<string> {
     return axios
       .get<string>(
-        `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}/data`,
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts/${postId}/data`,
         {
           responseType: "text",
         }
@@ -188,33 +252,41 @@ export class HttpTimelineClient implements IHttpTimelineClient {
   }
 
   postPost(
+    ownerUsername: string,
     timelineName: string,
     req: HttpTimelinePostPostRequest
   ): Promise<HttpTimelinePostInfo> {
     return axios
       .post<HttpTimelinePostInfo>(
-        `${apiBaseUrl}/timelines/${timelineName}/posts`,
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts`,
         req
       )
       .then(extractResponseData);
   }
 
   patchPost(
+    ownerUsername: string,
     timelineName: string,
     postId: number,
     req: HttpTimelinePostPatchRequest
   ): Promise<HttpTimelinePostInfo> {
     return axios
       .patch<HttpTimelinePostInfo>(
-        `${apiBaseUrl}/timelines/${timelineName}/posts/${postId}`,
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts/${postId}`,
         req
       )
       .then(extractResponseData);
   }
 
-  deletePost(timelineName: string, postId: number): Promise<void> {
+  deletePost(
+    ownerUsername: string,
+    timelineName: string,
+    postId: number
+  ): Promise<void> {
     return axios
-      .delete(`${apiBaseUrl}/timelines/${timelineName}/posts/${postId}`)
+      .delete(
+        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts/${postId}`
+      )
       .then();
   }
 }

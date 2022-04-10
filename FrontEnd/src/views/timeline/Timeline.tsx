@@ -29,6 +29,7 @@ import "./index.css";
 export interface TimelineProps {
   className?: string;
   style?: React.CSSProperties;
+  timelineOwner: string;
   timelineName: string;
   reloadKey: number;
   onReload: () => void;
@@ -37,7 +38,7 @@ export interface TimelineProps {
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timelineName, className, style, reloadKey } = props;
+  const { timelineOwner, timelineName, className, style, reloadKey } = props;
 
   const user = useUser();
 
@@ -82,8 +83,8 @@ const Timeline: React.FC<TimelineProps> = (props) => {
 
       const client = getHttpTimelineClient();
       Promise.all([
-        client.getTimeline(timelineName),
-        client.listPost(timelineName),
+        client.getTimeline(timelineOwner, timelineName),
+        client.listPost(timelineOwner, timelineName),
       ]).then(
         ([t, p]) => {
           if (subscribe) {
