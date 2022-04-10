@@ -10,6 +10,8 @@ namespace Timeline.Services.Api
 
         Task<TimelineBookmark> GetBookmarkAsync(long userId, long timelineId);
 
+        Task<TimelineBookmark> GetBookmarkAtAsync(long userId, int position);
+
         Task<TimelineBookmark> AddBookmarkAsync(long userId, long timelineId, int? position = null);
 
         Task DeleteBookmarkAsync(long userId, long timelineId);

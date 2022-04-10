@@ -29,6 +29,15 @@ namespace Timeline.Services.Api
             var user = await _userService.GetUserAsync(userId);
             var timeline = await _timelineService.GetTimelineAsync(timelineId);
 
+            if (await _databaseContext.BookmarkTimelines.AnyAsync(b => b.UserId == userId && b.TimelineId == timelineId))
+            {
+                throw new EntityAlreadyExistException(EntityTypes.BookmarkTimeline, new Dictionary<string, object>
+                {
+                    {"user-id", userId },
+                    {"timeline-id", timelineId }
+                });
+            }
+
             var count = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId).CountAsync();
 
             if (position.HasValue)
@@ -92,7 +101,8 @@ namespace Timeline.Services.Api
         public async Task<TimelineBookmark> GetBookmarkAsync(long userId, long timelineId)
         {
             var user = await _userService.GetUserAsync(userId);
-            var timeline = await _timelineService.GetTimelineAsync(timelineId); var entity = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId && b.TimelineId == timelineId).SingleOrDefaultAsync();
+            var timeline = await _timelineService.GetTimelineAsync(timelineId);
+            var entity = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId && b.TimelineId == timelineId).SingleOrDefaultAsync();
 
             if (entity is null)
             {
@@ -102,6 +112,25 @@ namespace Timeline.Services.Api
                     { "timeline-id", timelineId }
                 });
             }
+
+            return new TimelineBookmark(user.Username, timeline.Name is null ? "self" : timeline.Name, (int)entity.Rank);
+        }
+
+        public async Task<TimelineBookmark> GetBookmarkAtAsync(long userId, int position)
+        {
+            var user = await _userService.GetUserAsync(userId);
+            var entity = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId && b.Rank == position).SingleOrDefaultAsync();
+
+            if (entity is null)
+            {
+                throw new EntityNotExistException(EntityTypes.BookmarkTimeline, new Dictionary<string, object>
+                {
+                    { "user-id", userId },
+                    { "position", position }
+                });
+            }
+
+            var timeline = await _timelineService.GetTimelineAsync(entity.TimelineId);
 
             return new TimelineBookmark(user.Username, timeline.Name is null ? "self" : timeline.Name, (int)entity.Rank);
         }
