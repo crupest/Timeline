@@ -34,6 +34,8 @@ namespace Timeline.Entities
         public DbSet<HighlightTimelineEntity> HighlightTimelines { get; set; } = default!;
         public DbSet<BookmarkTimelineEntity> BookmarkTimelines { get; set; } = default!;
 
+        public DbSet<UserConfigurationEntity> UserConfigurations { get; set; } = default!;
+
         public DbSet<JwtTokenEntity> JwtToken { get; set; } = default!;
         public DbSet<UserTokenEntity> UserTokens { get; set; } = default!;
         public DbSet<DataEntity> Data { get; set; } = default!;

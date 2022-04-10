@@ -15,6 +15,12 @@ namespace Timeline.Services.Api
         Task DeleteBookmarkAsync(long userId, long timelineId);
 
         Task<TimelineBookmark> MoveBookmarkAsync(long userId, long timelineId, int position);
+
+        Task<TimelineVisibility> GetBookmarkVisibilityAsync(long userId);
+
+        Task SetBookmarkVisibilityAsync(long userId, TimelineVisibility visibility);
+
+        Task<bool> CanReadBookmarksAsync(long userId, long? visitorId);
     }
 }
 

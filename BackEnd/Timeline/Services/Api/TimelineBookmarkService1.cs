@@ -69,6 +69,14 @@ namespace Timeline.Services.Api
             return new TimelineBookmark(user.Username, timeline.Name is null ? "self" : timeline.Name, position.Value);
         }
 
+        public async Task<bool> CanReadBookmarksAsync(long userId, long? visitorId)
+        {
+            var visibility = await GetBookmarkVisibilityAsync(userId);
+            if (visibility == TimelineVisibility.Public) return true;
+            else if (visibility == TimelineVisibility.Register) return visitorId is not null;
+            else return userId == visitorId;
+        }
+
         public async Task DeleteBookmarkAsync(long userId, long timelineId)
         {
             var entity = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId && b.TimelineId == timelineId).SingleOrDefaultAsync();
@@ -118,6 +126,14 @@ namespace Timeline.Services.Api
             return new Page<TimelineBookmark>(page, pageSize, totalCount, items);
         }
 
+        public async Task<TimelineVisibility> GetBookmarkVisibilityAsync(long userId)
+        {
+            await _userService.CheckUserExistenceAsync(userId);
+            var configEntity = await _databaseContext.UserConfigurations.Where(c => c.UserId == userId).SingleOrDefaultAsync();
+            if (configEntity is null) return TimelineVisibility.Private;
+            return configEntity.BookmarkVisibility;
+        }
+
         public async Task<TimelineBookmark> MoveBookmarkAsync(long userId, long timelineId, int position)
         {
             var user = await _userService.GetUserAsync(userId);
@@ -161,6 +177,27 @@ namespace Timeline.Services.Api
             }
 
             return new TimelineBookmark(user.Username, timeline.Name is null ? "self" : timeline.Name, (int)entity.Rank);
+        }
+
+        public async Task SetBookmarkVisibilityAsync(long userId, TimelineVisibility visibility)
+        {
+            await _userService.CheckUserExistenceAsync(userId);
+            var configEntity = await _databaseContext.UserConfigurations.Where(c => c.UserId == userId).SingleOrDefaultAsync();
+            if (configEntity is null)
+            {
+                configEntity = new UserConfigurationEntity
+                {
+                    UserId = userId,
+                    BookmarkVisibility = visibility
+                };
+                _databaseContext.UserConfigurations.Add(configEntity);
+            }
+            else
+            {
+                configEntity.BookmarkVisibility = visibility;
+            }
+
+            await _databaseContext.SaveChangesAsync();
         }
     }
 }
