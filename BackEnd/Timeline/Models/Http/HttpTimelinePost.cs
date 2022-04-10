@@ -11,7 +11,7 @@ namespace Timeline.Models.Http
     {
         public HttpTimelinePost() { }
 
-        public HttpTimelinePost(long id, List<HttpTimelinePostDataDigest> dataList, bool deleted, DateTime time, HttpUser? author, string? color, DateTime lastUpdated, string timelineName, bool editable)
+        public HttpTimelinePost(long id, List<HttpTimelinePostDataDigest> dataList, bool deleted, DateTime time, HttpUser? author, string? color, DateTime lastUpdated, string timelineOwnerV2, string timelineNameV2, string timelineName, bool editable)
         {
             Id = id;
             DataList = dataList;
@@ -20,6 +20,8 @@ namespace Timeline.Models.Http
             Author = author;
             Color = color;
             LastUpdated = lastUpdated;
+            TimelineOwnerV2 = timelineOwnerV2;
+            TimelineNameV2 = timelineNameV2;
             TimelineName = timelineName;
             Editable = editable;
         }
@@ -54,6 +56,14 @@ namespace Timeline.Models.Http
         /// Last updated time.
         /// </summary>
         public DateTime LastUpdated { get; set; } = default!;
+        /// <summary>
+        /// Timeline owner username.
+        /// </summary>
+        public string TimelineOwnerV2 { get; set; } = default!;
+        /// <summary>
+        /// Timeline name.
+        /// </summary>
+        public string TimelineNameV2 { get; set; } = default!;
         /// <summary>
         /// Timeline name.
         /// </summary>

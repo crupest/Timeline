@@ -77,6 +77,7 @@ namespace Timeline.Services.Mapper
                 uniqueId: entity.UniqueId,
                 title: string.IsNullOrEmpty(entity.Title) ? timelineName : entity.Title,
                 name: timelineName,
+                nameV2: entity.Name is null ? "self" : entity.Name,
                 nameLastModifed: entity.NameLastModified,
                 description: entity.Description ?? "",
                 owner: await _userMapper.MapAsync(entity.Owner, urlHelper, user),
@@ -137,6 +138,8 @@ namespace Timeline.Services.Mapper
                     color: entity.Color,
                     deleted: entity.Deleted,
                     lastUpdated: entity.LastUpdated,
+                    timelineOwnerV2: entity.Timeline.Owner.Username,
+                    timelineNameV2: entity.Timeline.Name is null ? "self" : entity.Timeline.Name,
                     timelineName: CalculateTimelineName(entity.Timeline),
                     editable: editable
                 );

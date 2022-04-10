@@ -10,11 +10,12 @@ namespace Timeline.Models.Http
     {
         public HttpTimeline() { }
 
-        public HttpTimeline(string uniqueId, string title, string name, DateTime nameLastModifed, string description, HttpUser owner, TimelineVisibility visibility, List<HttpUser> members, string? color, DateTime createTime, DateTime lastModified, bool isHighlight, bool isBookmark, bool manageable, bool postable, HttpTimelineLinks links)
+        public HttpTimeline(string uniqueId, string title, string name, string nameV2, DateTime nameLastModifed, string description, HttpUser owner, TimelineVisibility visibility, List<HttpUser> members, string? color, DateTime createTime, DateTime lastModified, bool isHighlight, bool isBookmark, bool manageable, bool postable, HttpTimelineLinks links)
         {
             UniqueId = uniqueId;
             Title = title;
             Name = name;
+            NameV2 = nameV2;
             NameLastModifed = nameLastModifed;
             Description = description;
             Owner = owner;
@@ -42,6 +43,10 @@ namespace Timeline.Models.Http
         /// Name of timeline.
         /// </summary>
         public string Name { get; set; } = default!;
+        /// <summary>
+        /// Name of timeline.
+        /// </summary>
+        public string NameV2 { get; set; } = default!;
         /// <summary>
         /// Last modified time of timeline name.
         /// </summary>

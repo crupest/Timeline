@@ -25,9 +25,14 @@ function PostPropertyChangeDialog(props: {
         },
       ]}
       onProcess={([time]) => {
-        return getHttpTimelineClient().patchPost(post.timelineName, post.id, {
-          time: time === "" ? undefined : new Date(time).toISOString(),
-        });
+        return getHttpTimelineClient().patchPost(
+          post.timelineOwnerV2,
+          post.timelineNameV2,
+          post.id,
+          {
+            time: time === "" ? undefined : new Date(time).toISOString(),
+          }
+        );
       }}
       onSuccessAndClose={onSuccess}
     />
