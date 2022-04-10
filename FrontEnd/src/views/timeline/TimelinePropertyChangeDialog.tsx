@@ -78,7 +78,7 @@ const TimelinePropertyChangeDialog: React.FC<
           req.color = nc;
         }
         return getHttpTimelineClient()
-          .patchTimeline(timeline.name, req)
+          .patchTimeline(timeline.owner.username, timeline.nameV2, req)
           .then(onChange);
       }}
     />

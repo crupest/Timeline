@@ -15,16 +15,15 @@ import "./index.css";
 const TimelineSearchResultItemView: React.FC<{
   timeline: HttpTimelineInfo;
 }> = ({ timeline }) => {
-  const link = timeline.name.startsWith("@")
-    ? `users/${timeline.owner.username}`
-    : `timelines/${timeline.name}`;
-
   return (
     <div className="timeline-search-result-item my-2 p-3">
       <h4>
-        <Link to={link} className="mb-2 text-primary">
+        <Link
+          to={`${timeline.owner.username}/${timeline.nameV2}`}
+          className="mb-2 text-primary"
+        >
           {timeline.title}
-          <small className="ms-3 text-secondary">{timeline.name}</small>
+          <small className="ms-3 text-secondary">{timeline.nameV2}</small>
         </Link>
       </h4>
       <div>
@@ -117,7 +116,10 @@ const SearchPage: React.FC = () => {
               return <div>{t("searchPage.noResult")}</div>;
             }
             return state.map((t) => (
-              <TimelineSearchResultItemView key={t.name} timeline={t} />
+              <TimelineSearchResultItemView
+                key={`${t.owner.username}/${t.nameV2}`}
+                timeline={t}
+              />
             ));
           }
         }

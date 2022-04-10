@@ -11,14 +11,6 @@ interface TimelineListItemProps {
 }
 
 const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
-  const url = React.useMemo(
-    () =>
-      timeline.name.startsWith("@")
-        ? `/users/${timeline.owner.username}`
-        : `/timelines/${timeline.name}`,
-    [timeline]
-  );
-
   return (
     <div className="home-timeline-list-item home-timeline-list-item-timeline">
       <svg className="home-timeline-list-item-line" viewBox="0 0 120 100">
@@ -34,7 +26,7 @@ const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
           <small className="text-secondary">{timeline.description}</small>
         </div>
       </div>
-      <Link to={url}>
+      <Link to={`${timeline.owner.username}/${timeline.nameV2}`}>
         <i className="icon-button bi-arrow-right ms-3" />
       </Link>
     </div>
@@ -91,7 +83,7 @@ const TimelineListView: React.FC<TimelineListViewProps> = ({
         <h3>{convertI18nText(headerText, t)}</h3>
       </div>
       {timelines != null
-        ? timelines.map((t) => <TimelineListItem key={t.name} timeline={t} />)
+        ? timelines.map((t) => <TimelineListItem key={t.nameV2} timeline={t} />)
         : null}
       <TimelineListArrow />
     </div>

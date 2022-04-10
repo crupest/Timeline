@@ -26,7 +26,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
       inputPrompt={() => {
         return (
           <Trans i18nKey="timeline.deleteDialog.inputPrompt">
-            0<code className="mx-2">{{ name: timeline.name }}</code>2
+            0<code className="mx-2">{{ name: timeline.nameV2 }}</code>2
           </Trans>
         );
       }}
@@ -36,14 +36,17 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
         },
       ]}
       inputValidator={([value]) => {
-        if (value !== timeline.name) {
+        if (value !== timeline.nameV2) {
           return { 0: "timeline.deleteDialog.notMatch" };
         } else {
           return null;
         }
       }}
       onProcess={() => {
-        return getHttpTimelineClient().deleteTimeline(timeline.name);
+        return getHttpTimelineClient().deleteTimeline(
+          timeline.owner.username,
+          timeline.nameV2
+        );
       }}
       onSuccessAndClose={() => {
         navigate("/", { replace: true });

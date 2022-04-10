@@ -2,8 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import { validateTimelineName } from "@/services/timeline";
-import OperationDialog from "../common/dailog/OperationDialog";
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
+
+import OperationDialog from "../common/dailog/OperationDialog";
+import { useUserLoggedIn } from "@/services/user";
 
 interface TimelineCreateDialogProps {
   open: boolean;
@@ -12,6 +14,8 @@ interface TimelineCreateDialogProps {
 
 const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
   const navigate = useNavigate();
+
+  const user = useUserLoggedIn();
 
   return (
     <OperationDialog
@@ -43,7 +47,7 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
         getHttpTimelineClient().postTimeline({ name })
       }
       onSuccessAndClose={(timeline: HttpTimelineInfo) => {
-        navigate(`timelines/${timeline.name}`);
+        navigate(`${user.username}/${timeline.nameV2}`);
       }}
       failurePrompt={(e) => `${e as string}`}
     />

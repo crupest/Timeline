@@ -129,7 +129,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   const [text, setText] = React.useState<string>("");
   const [image, setImage] = React.useState<File | null>(null);
 
-  const draftTextLocalStorageKey = `timeline.${timeline.name}.postDraft.text`;
+  const draftTextLocalStorageKey = `timeline.${timeline.owner.username}.${timeline.nameV2}.postDraft.text`;
 
   React.useEffect(() => {
     setText(window.localStorage.getItem(draftTextLocalStorageKey) ?? "");
@@ -173,7 +173,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
     }
 
     getHttpTimelineClient()
-      .postPost(timeline.name, {
+      .postPost(timeline.owner.username, timeline.nameV2, {
         dataList: [requestData],
       })
       .then(
@@ -199,7 +199,8 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
         <MarkdownPostEdit
           className="cru-fill-parent"
           onClose={() => setShowMarkdown(false)}
-          timeline={timeline.name}
+          owner={timeline.owner.username}
+          timeline={timeline.nameV2}
           onPosted={onPosted}
           onPostError={onPostError}
         />

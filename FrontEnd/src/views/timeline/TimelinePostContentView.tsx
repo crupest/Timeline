@@ -27,7 +27,7 @@ const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
     setError(null);
 
     void getHttpTimelineClient()
-      .getPostDataAsString(post.timelineName, post.id)
+      .getPostDataAsString(post.timelineOwnerV2, post.timelineNameV2, post.id)
       .then(
         (data) => {
           if (subscribe) setText(data);
@@ -46,7 +46,7 @@ const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
     return () => {
       subscribe = false;
     };
-  }, [post.timelineName, post.id, reloadKey]);
+  }, [post.timelineOwnerV2, post.timelineNameV2, post.id, reloadKey]);
 
   if (error != null) {
     return (
@@ -75,7 +75,8 @@ const ImageView: React.FC<TimelinePostContentViewProps> = (props) => {
   return (
     <img
       src={getHttpTimelineClient().generatePostDataUrl(
-        post.timelineName,
+        post.timelineOwnerV2,
+        post.timelineNameV2,
         post.id
       )}
       className={classnames(className, "timeline-content-image")}
@@ -110,7 +111,7 @@ const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
     setError(null);
 
     void getHttpTimelineClient()
-      .getPostDataAsString(post.timelineName, post.id)
+      .getPostDataAsString(post.timelineOwnerV2, post.timelineNameV2, post.id)
       .then(
         (data) => {
           if (subscribe) setMarkdown(data);
@@ -129,7 +130,7 @@ const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
     return () => {
       subscribe = false;
     };
-  }, [post.timelineName, post.id, reloadKey]);
+  }, [post.timelineOwnerV2, post.timelineNameV2, post.id, reloadKey]);
 
   const markdownHtml = React.useMemo<string | null>(() => {
     if (markdown == null) return null;
