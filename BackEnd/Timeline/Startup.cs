@@ -116,6 +116,8 @@ namespace Timeline
             services.AddScoped<IBookmarkTimelineService, BookmarkTimelineService>();
             services.AddScoped<ISearchService, SearchService>();
 
+            services.AddScoped<ITimelineBookmarkService1, TimelineBookmarkService1>();
+
             services.AddOpenApiDocs();
 
             if (_frontEndMode == FrontEndMode.Mock)
