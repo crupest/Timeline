@@ -27,10 +27,10 @@ namespace Timeline.Tests.IntegratedTests2
         }
 
         [Fact]
-        public async Task CreateAndGet()
+        public async Task CreateGetList()
         {
             using var client = CreateClientAsUser();
-            var a = await client.TestJsonSendAsync<TimelineBookmark>(HttpMethod.Post, "users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
+            var a = await client.TestJsonSendAsync<TimelineBookmark>(HttpMethod.Post, "v2/users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
             {
                 TimelineOwner = "user",
                 TimelineName = "hello"
@@ -40,10 +40,63 @@ namespace Timeline.Tests.IntegratedTests2
             a.TimelineName.Should().Be("hello");
             a.Position.Should().Be(1);
 
-            var b = await client.TestJsonSendAsync<TimelineBookmark>(HttpMethod.Get, "users/user/bookmarks/1");
+            var b = await client.TestJsonSendAsync<TimelineBookmark>(HttpMethod.Get, "v2/users/user/bookmarks/1");
             b.TimelineName.Should().Be("hello");
             b.TimelineOwner.Should().Be("user");
             b.Position.Should().Be(1);
+
+            var c = await client.TestJsonSendAsync<Page<TimelineBookmark>>(HttpMethod.Get, "v2/users/user/bookmarks");
+            c.TotalCount.Should().Be(1);
+            c.Items.Should().ContainSingle();
+            c.Items[0].TimelineOwner.Should().Be("user");
+            c.Items[0].TimelineName.Should().Be("hello");
+            c.Items[0].Position.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task CreateUserNotExist()
+        {
+            using var client = CreateClientAsUser();
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/users/notexist/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "user",
+                TimelineName = "hello"
+            }, expectedStatusCode: HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task CreateTimelineNotExist()
+        {
+            using var client = CreateClientAsUser();
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "user",
+                TimelineName = "notexist"
+            }, expectedStatusCode: HttpStatusCode.UnprocessableEntity);
+
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "notexist",
+                TimelineName = "notexist"
+            }, expectedStatusCode: HttpStatusCode.UnprocessableEntity);
+        }
+
+        [Fact]
+        public async Task CreateAlreadyExist()
+        {
+            using var client = CreateClientAsUser();
+
+            await client.TestJsonSendAsync<TimelineBookmark>(HttpMethod.Post, "v2/users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "user",
+                TimelineName = "hello"
+            }, expectedStatusCode: HttpStatusCode.Created);
+
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "user",
+                TimelineName = "hello"
+            }, expectedStatusCode: HttpStatusCode.UnprocessableEntity);
         }
     }
 }

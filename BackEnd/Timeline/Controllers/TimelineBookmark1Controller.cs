@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Timeline.Models;
 using Timeline.Models.Http;
+using Timeline.Services;
 using Timeline.Services.Api;
 using Timeline.Services.Timeline;
 using Timeline.Services.User;
@@ -11,14 +12,14 @@ using Timeline.Services.User;
 namespace Timeline.Controllers
 {
     [ApiController]
-    [Route("users/{username}/bookmarks")]
-    public class TimelineBookmark1Controller : MyControllerBase
+    [Route("v2/users/{username}/bookmarks")]
+    public class TimelineBookmarkV2Controller : MyControllerBase
     {
         private readonly IUserService _userService;
         private readonly ITimelineService _timelineService;
         private readonly ITimelineBookmarkService1 _timelineBookmarkService;
 
-        public TimelineBookmark1Controller(IUserService userService, ITimelineService timelineService, ITimelineBookmarkService1 timelineBookmarkService)
+        public TimelineBookmarkV2Controller(IUserService userService, ITimelineService timelineService, ITimelineBookmarkService1 timelineBookmarkService)
         {
             _userService = userService;
             _timelineService = timelineService;
@@ -68,7 +69,15 @@ namespace Timeline.Controllers
             {
                 return Forbid();
             }
-            var timelineId = await _timelineService.GetTimelineIdAsync(body.TimelineOwner, body.TimelineName);
+            long timelineId;
+            try
+            {
+                timelineId = await _timelineService.GetTimelineIdAsync(body.TimelineOwner, body.TimelineName);
+            }
+            catch (EntityNotExistException)
+            {
+                return UnprocessableEntity();
+            }
             var bookmark = await _timelineBookmarkService.AddBookmarkAsync(userId, timelineId, body.Position);
             return CreatedAtAction("Get", new { username, index = bookmark.Position }, bookmark);
         }
