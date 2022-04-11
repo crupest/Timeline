@@ -8,6 +8,7 @@ import {
   extractResponseData,
   convertToIfStatusCodeIs,
   getHttpToken,
+  Page,
 } from "./common";
 import { HttpUser } from "./user";
 
@@ -115,7 +116,7 @@ export interface IHttpTimelineClient {
   listPost(
     ownerUsername: string,
     timelineName: string
-  ): Promise<HttpTimelinePostInfo[]>;
+  ): Promise<Page<HttpTimelinePostInfo>>;
   generatePostDataUrl(
     ownerUsername: string,
     timelineName: string,
@@ -217,9 +218,9 @@ export class HttpTimelineClient implements IHttpTimelineClient {
   listPost(
     ownerUsername: string,
     timelineName: string
-  ): Promise<HttpTimelinePostInfo[]> {
+  ): Promise<Page<HttpTimelinePostInfo>> {
     return axios
-      .get<HttpTimelinePostInfo[]>(
+      .get<Page<HttpTimelinePostInfo>>(
         `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts`
       )
       .then(extractResponseData);

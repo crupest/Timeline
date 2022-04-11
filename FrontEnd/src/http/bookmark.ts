@@ -1,36 +1,93 @@
-import { axios, apiBaseUrl, extractResponseData } from "./common";
+import { applyQueryParameters } from "@/utilities/url";
+import { axios, apiBaseUrl, extractResponseData, Page } from "./common";
 
-import { HttpTimelineInfo } from "./timeline";
-
-export interface HttpHighlightMoveRequest {
-  timeline: string;
-  newPosition: number;
+export interface TimelineBookmark {
+  timelineOwner: string;
+  timelineName: string;
+  position: number;
 }
 
 export interface IHttpBookmarkClient {
-  list(): Promise<HttpTimelineInfo[]>;
-  put(timeline: string): Promise<void>;
-  delete(timeline: string): Promise<void>;
-  move(req: HttpHighlightMoveRequest): Promise<void>;
+  list(
+    username: string,
+    page?: number,
+    pageSize?: number
+  ): Promise<Page<TimelineBookmark>>;
+  post(
+    username: string,
+    timelineOwner: string,
+    timelineName: string
+  ): Promise<TimelineBookmark>;
+  delete(
+    username: string,
+    timelineOwner: string,
+    timelineName: string
+  ): Promise<void>;
+  move(
+    username: string,
+    timelineOwner: string,
+    timelineName: string,
+    position: number
+  ): Promise<TimelineBookmark>;
 }
 
 export class HttpHighlightClient implements IHttpBookmarkClient {
-  list(): Promise<HttpTimelineInfo[]> {
+  list(
+    username: string,
+    page?: number,
+    pageSize?: number
+  ): Promise<Page<TimelineBookmark>> {
+    const url = applyQueryParameters(
+      `${apiBaseUrl}/v2/users/${username}/bookmarks`,
+      { page, pageSize }
+    );
+
+    return axios.get<Page<TimelineBookmark>>(url).then(extractResponseData);
+  }
+
+  post(
+    username: string,
+    timelineOwner: string,
+    timelineName: string
+  ): Promise<TimelineBookmark> {
+    const url = `${apiBaseUrl}/v2/users/${username}/bookmarks`;
+
     return axios
-      .get<HttpTimelineInfo[]>(`${apiBaseUrl}/bookmarks`)
+      .post<TimelineBookmark>(url, {
+        timelineOwner,
+        timelineName,
+      })
       .then(extractResponseData);
   }
 
-  put(timeline: string): Promise<void> {
-    return axios.put(`${apiBaseUrl}/bookmarks/${timeline}`).then();
+  delete(
+    username: string,
+    timelineOwner: string,
+    timelineName: string
+  ): Promise<void> {
+    const url = `${apiBaseUrl}/v2/users/${username}/bookmarks/delete`;
+
+    return axios.post(url, {
+      timelineOwner,
+      timelineName,
+    });
   }
 
-  delete(timeline: string): Promise<void> {
-    return axios.delete(`${apiBaseUrl}/bookmarks/${timeline}`).then();
-  }
+  move(
+    username: string,
+    timelineOwner: string,
+    timelineName: string,
+    position: number
+  ): Promise<TimelineBookmark> {
+    const url = `${apiBaseUrl}/v2/users/${username}/bookmarks/move`;
 
-  move(req: HttpHighlightMoveRequest): Promise<void> {
-    return axios.post(`${apiBaseUrl}/bookmarkop/move`, req).then();
+    return axios
+      .post<TimelineBookmark>(url, {
+        timelineOwner,
+        timelineName,
+        position,
+      })
+      .then(extractResponseData);
   }
 }
 

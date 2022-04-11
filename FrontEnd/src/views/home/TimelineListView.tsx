@@ -1,13 +1,13 @@
 import React from "react";
-
-import { convertI18nText, I18nText } from "@/common";
-
-import { HttpTimelineInfo } from "@/http/timeline";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+import { convertI18nText, I18nText } from "@/common";
+
+import { TimelineBookmark } from "@/http/bookmark";
+
 interface TimelineListItemProps {
-  timeline: HttpTimelineInfo;
+  timeline: TimelineBookmark;
 }
 
 const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
@@ -21,12 +21,9 @@ const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
         />
       </svg>
       <div>
-        <div>{timeline.title}</div>
-        <div>
-          <small className="text-secondary">{timeline.description}</small>
-        </div>
+        {timeline.timelineOwner}/{timeline.timelineName}
       </div>
-      <Link to={`${timeline.owner.username}/${timeline.nameV2}`}>
+      <Link to={`${timeline.timelineOwner}/${timeline.timelineName}`}>
         <i className="icon-button bi-arrow-right ms-3" />
       </Link>
     </div>
@@ -60,7 +57,7 @@ const TimelineListArrow: React.FC = () => {
 
 interface TimelineListViewProps {
   headerText?: I18nText;
-  timelines?: HttpTimelineInfo[];
+  timelines?: TimelineBookmark[];
 }
 
 const TimelineListView: React.FC<TimelineListViewProps> = ({
@@ -83,7 +80,12 @@ const TimelineListView: React.FC<TimelineListViewProps> = ({
         <h3>{convertI18nText(headerText, t)}</h3>
       </div>
       {timelines != null
-        ? timelines.map((t) => <TimelineListItem key={t.nameV2} timeline={t} />)
+        ? timelines.map((t) => (
+            <TimelineListItem
+              key={`${t.timelineOwner}/${t.timelineName}`}
+              timeline={t}
+            />
+          ))
         : null}
       <TimelineListArrow />
     </div>

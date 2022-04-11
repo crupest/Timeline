@@ -1,14 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { HttpTimelineInfo } from "@/http/timeline";
-import { getHttpHighlightClient } from "@/http/highlight";
+import { Page } from "@/http/common";
+import { getHttpBookmarkClient, TimelineBookmark } from "@/http/bookmark";
 
 import SearchInput from "../common/SearchInput";
 import TimelineListView from "./TimelineListView";
 import WebsiteIntroduction from "./WebsiteIntroduction";
 
 import "./index.css";
+
+const highlightTimelineUsername = "crupest";
 
 const highlightTimelineMessageMap = {
   loading: "home.loadingHighlightTimelines",
@@ -25,14 +27,14 @@ const HomeV2: React.FC = () => {
     "loading" | "done" | "error"
   >("loading");
   const [highlightTimelines, setHighlightTimelines] = React.useState<
-    HttpTimelineInfo[] | undefined
+    Page<TimelineBookmark> | undefined
   >();
 
   React.useEffect(() => {
     if (highlightTimelineState === "loading") {
       let subscribe = true;
-      void getHttpHighlightClient()
-        .list()
+      void getHttpBookmarkClient()
+        .list(highlightTimelineUsername)
         .then(
           (data) => {
             if (subscribe) {
@@ -67,7 +69,7 @@ const HomeV2: React.FC = () => {
       <WebsiteIntroduction className="m-2" />
       <TimelineListView
         headerText={highlightTimelineMessageMap[highlightTimelineState]}
-        timelines={highlightTimelines}
+        timelines={highlightTimelines?.items}
       />
     </>
   );

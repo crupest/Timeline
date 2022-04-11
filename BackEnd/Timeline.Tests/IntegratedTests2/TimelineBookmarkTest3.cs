@@ -186,7 +186,6 @@ namespace Timeline.Tests.IntegratedTests2
                 TimelineName = "hello",
                 Position = 2
             }, expectedStatusCode: HttpStatusCode.NotFound);
-
         }
     }
 }
