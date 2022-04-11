@@ -54,6 +54,15 @@ namespace Timeline.Tests.IntegratedTests2
         }
 
         [Fact]
+        public async Task ListGetNotExist()
+        {
+            using var client = CreateClientAsUser();
+
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/notexist/bookmarks", expectedStatusCode: HttpStatusCode.NotFound);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/notexist/bookmarks/1", expectedStatusCode: HttpStatusCode.NotFound);
+        }
+
+        [Fact]
         public async Task CreateUserNotExist()
         {
             using var client = CreateClientAsUser();
