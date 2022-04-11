@@ -205,7 +205,7 @@ namespace Timeline.Services.Api
                 await transaction.CommitAsync();
             }
 
-            return new TimelineBookmark(user.Username, timeline.Name is null ? "self" : timeline.Name, (int)entity.Rank);
+            return new TimelineBookmark(user.Username, timeline.Name is null ? "self" : timeline.Name, position);
         }
 
         public async Task SetBookmarkVisibilityAsync(long userId, TimelineVisibility visibility)
