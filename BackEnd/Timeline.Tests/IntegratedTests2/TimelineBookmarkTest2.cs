@@ -65,7 +65,7 @@ namespace Timeline.Tests.IntegratedTests2
         public async Task OtherUserCantSeePrivate()
         {
             await CreateUserAsync("user2", "user2pw");
-            var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
+            using var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
             await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.Forbidden);
             await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.Forbidden);
         }
@@ -92,7 +92,7 @@ namespace Timeline.Tests.IntegratedTests2
         {
             await ChangeVisibilityAsync(TimelineVisibility.Register);
             await CreateUserAsync("user2", "user2pw");
-            var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
+            using var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
             await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
             await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
         }
@@ -120,7 +120,7 @@ namespace Timeline.Tests.IntegratedTests2
         {
             await ChangeVisibilityAsync(TimelineVisibility.Public);
             await CreateUserAsync("user2", "user2pw");
-            var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
+            using var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
             await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
             await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
         }
