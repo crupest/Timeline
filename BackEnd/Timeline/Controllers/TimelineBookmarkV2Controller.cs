@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Timeline.Models;
 using Timeline.Models.Http;
+using Timeline.Models.Validation;
 using Timeline.Services;
 using Timeline.Services.Api;
 using Timeline.Services.Timeline;
@@ -31,7 +32,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpGet]
-        public async Task<ActionResult<Page<TimelineBookmark>>> ListAsync([FromRoute] string username, [FromQuery] int? page, [FromQuery] int? pageSize)
+        public async Task<ActionResult<Page<TimelineBookmark>>> ListAsync([FromRoute][Username] string username, [FromQuery] int? page, [FromQuery] int? pageSize)
         {
             var userId = await _userService.GetUserIdByUsernameAsync(username);
             if (!UserHasPermission(UserPermission.UserBookmarkManagement) && !await _timelineBookmarkService.CanReadBookmarksAsync(userId, GetOptionalAuthUserId()))
@@ -46,7 +47,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpGet("{index}")]
-        public async Task<ActionResult<TimelineBookmark>> GetAsync([FromRoute] string username, [FromRoute] int index)
+        public async Task<ActionResult<TimelineBookmark>> GetAsync([FromRoute][Username] string username, [FromRoute] int index)
         {
             var userId = await _userService.GetUserIdByUsernameAsync(username);
             if (!UserHasPermission(UserPermission.UserBookmarkManagement) && !await _timelineBookmarkService.CanReadBookmarksAsync(userId, GetOptionalAuthUserId()))
@@ -62,7 +63,8 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [Authorize]
-        public async Task<ActionResult<TimelineBookmark>> CreateAsync([FromRoute] string username, [FromBody] HttpTimelineBookmarkCreateRequest body)
+        [HttpPost]
+        public async Task<ActionResult<TimelineBookmark>> CreateAsync([FromRoute][Username] string username, [FromBody] HttpTimelineBookmarkCreateRequest body)
         {
             var userId = await _userService.GetUserIdByUsernameAsync(username);
             if (!UserHasPermission(UserPermission.UserBookmarkManagement) && GetAuthUserId() != userId)
@@ -80,6 +82,35 @@ namespace Timeline.Controllers
             }
             var bookmark = await _timelineBookmarkService.AddBookmarkAsync(userId, timelineId, body.Position);
             return CreatedAtAction("Get", new { username, index = bookmark.Position }, bookmark);
+        }
+
+        [HttpGet("visibility")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult<HttpTimelineBookmarkVisibility>> GetVisibilityAsync([FromRoute][Username] string username)
+        {
+            var userId = await _userService.GetUserIdByUsernameAsync(username);
+            var visibility = await _timelineBookmarkService.GetBookmarkVisibilityAsync(userId);
+            return Ok(new HttpTimelineBookmarkVisibility { Visibility = visibility });
+        }
+
+        [HttpPut("visibility")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> PutVisibilityAsync([FromRoute][Username] string username, [FromBody] HttpTimelineBookmarkVisibility body)
+        {
+            var userId = await _userService.GetUserIdByUsernameAsync(username);
+            if (!UserHasPermission(UserPermission.UserBookmarkManagement) && GetAuthUserId() != userId)
+            {
+                return Forbid();
+            }
+            await _timelineBookmarkService.SetBookmarkVisibilityAsync(userId, body.Visibility);
+            return NoContent();
         }
     }
 }

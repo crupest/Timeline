@@ -12,7 +12,7 @@ namespace Timeline.Tests.IntegratedTests2
 
     public static class HttpClientTestExtensions
     {
-        public static async Task<HttpResponseMessage> TestSendAsync(this HttpClient client, HttpMethod method, string url, HttpContent? body = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK, RequestSetupAsync? requestSetup = null)
+        public static async Task<HttpResponseMessage> TestSendAsync(this HttpClient client, HttpMethod method, string url, HttpContent? body = null, HttpStatusCode? expectedStatusCode = null, RequestSetupAsync? requestSetup = null)
         {
             using var req = new HttpRequestMessage
             {
@@ -23,7 +23,14 @@ namespace Timeline.Tests.IntegratedTests2
             var task = requestSetup?.Invoke(req);
             if (task is not null) await task;
             var res = await client.SendAsync(req);
-            res.StatusCode.Should().Be(expectedStatusCode);
+            if (expectedStatusCode is null)
+            {
+                ((int)res.StatusCode).Should().BeGreaterThanOrEqualTo(200).And.BeLessThan(300);
+            }
+            else
+            {
+                res.StatusCode.Should().Be(expectedStatusCode.Value);
+            }
             return res;
         }
 
@@ -34,13 +41,13 @@ namespace Timeline.Tests.IntegratedTests2
             return body!;
         }
 
-        public static async Task TestJsonSendAsync(this HttpClient client, HttpMethod method, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK, RequestSetupAsync? requestSetup = null)
+        public static async Task TestJsonSendAsync(this HttpClient client, HttpMethod method, string url, object? jsonBody = null, HttpStatusCode? expectedStatusCode = null, RequestSetupAsync? requestSetup = null)
         {
             using JsonContent? reqContent = jsonBody is null ? null : JsonContent.Create(jsonBody, options: CommonJsonSerializeOptions.Options);
             await client.TestSendAsync(method, url, reqContent, expectedStatusCode, requestSetup);
         }
 
-        public static async Task<T> TestJsonSendAsync<T>(this HttpClient client, HttpMethod method, string url, object? jsonBody = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK, RequestSetupAsync? requestSetup = null)
+        public static async Task<T> TestJsonSendAsync<T>(this HttpClient client, HttpMethod method, string url, object? jsonBody = null, HttpStatusCode? expectedStatusCode = null, RequestSetupAsync? requestSetup = null)
         {
             using JsonContent? reqContent = jsonBody == null ? null : JsonContent.Create(jsonBody, options: CommonJsonSerializeOptions.Options);
             var res = await client.TestSendAsync(method, url, reqContent, expectedStatusCode, requestSetup);
