@@ -23,7 +23,6 @@ namespace Timeline.Tests.IntegratedTests2
             {
                 Name = "hello"
             }, expectedStatusCode: HttpStatusCode.Created);
-
         }
 
         [Fact]
