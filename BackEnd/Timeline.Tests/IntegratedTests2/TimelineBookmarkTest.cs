@@ -106,6 +106,42 @@ namespace Timeline.Tests.IntegratedTests2
                 TimelineName = "hello"
             }, expectedStatusCode: HttpStatusCode.UnprocessableEntity);
         }
+
+        [Fact]
+        public async Task AnonymousCreateUnauthorized()
+        {
+            using var client = CreateDefaultClient();
+
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "user",
+                TimelineName = "hello"
+            }, expectedStatusCode: HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async Task OtherCreateForbid()
+        {
+            using var client = CreateClientAsUser();
+
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/users/admin/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "user",
+                TimelineName = "hello"
+            }, expectedStatusCode: HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task AdminCanCreate()
+        {
+            using var client = CreateClientAsAdmin();
+
+            await client.TestJsonSendAsync(HttpMethod.Post, "v2/users/user/bookmarks", new HttpTimelineBookmarkCreateRequest
+            {
+                TimelineOwner = "user",
+                TimelineName = "hello"
+            });
+        }
     }
 }
 
