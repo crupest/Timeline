@@ -29,3 +29,5 @@ export function convertI18nText(
     return text.value;
   }
 }
+
+export const highlightTimelineUsername = "crupest";

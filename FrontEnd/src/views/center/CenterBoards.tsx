@@ -1,12 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
+import { highlightTimelineUsername } from "@/common";
+
 import { pushAlert } from "@/services/alert";
 import { useUserLoggedIn } from "@/services/user";
 
 import { getHttpTimelineClient } from "@/http/timeline";
 import { getHttpBookmarkClient } from "@/http/bookmark";
-import { getHttpHighlightClient } from "@/http/highlight";
 
 import TimelineBoard from "./TimelineBoard";
 
@@ -23,11 +24,15 @@ const CenterBoards: React.FC = () => {
             <div className="col col-12 my-2">
               <TimelineBoard
                 title={t("home.bookmarkTimeline")}
-                load={() => getHttpBookmarkClient().list()}
+                load={() =>
+                  getHttpBookmarkClient()
+                    .list(user.username)
+                    .then((p) => p.items)
+                }
                 editHandler={{
-                  onDelete: (timeline) => {
+                  onDelete: (owner, timeline) => {
                     return getHttpBookmarkClient()
-                      .delete(timeline)
+                      .delete(user.username, owner, timeline)
                       .catch((e) => {
                         pushAlert({
                           message: "home.message.deleteBookmarkFail",
@@ -36,10 +41,13 @@ const CenterBoards: React.FC = () => {
                         throw e;
                       });
                   },
-                  onMove: (timeline, index, offset) => {
+                  onMove: (owner, timeline, index, offset) => {
                     return getHttpBookmarkClient()
                       .move(
-                        { timeline, newPosition: index + offset + 1 } // +1 because backend contract: index starts at 1
+                        user.username,
+                        owner,
+                        timeline,
+                        index + offset + 1 // +1 because backend contract: index starts at 1
                       )
                       .catch((e) => {
                         pushAlert({
@@ -47,7 +55,8 @@ const CenterBoards: React.FC = () => {
                           type: "danger",
                         });
                         throw e;
-                      });
+                      })
+                      .then();
                   },
                 }}
               />
@@ -55,13 +64,17 @@ const CenterBoards: React.FC = () => {
             <div className="col col-12 my-2">
               <TimelineBoard
                 title={t("home.highlightTimeline")}
-                load={() => getHttpHighlightClient().list()}
+                load={() =>
+                  getHttpBookmarkClient()
+                    .list(highlightTimelineUsername)
+                    .then((p) => p.items)
+                }
                 editHandler={
-                  user.hasHighlightTimelineAdministrationPermission
+                  user.username === highlightTimelineUsername
                     ? {
-                        onDelete: (timeline) => {
-                          return getHttpHighlightClient()
-                            .delete(timeline)
+                        onDelete: (owner, timeline) => {
+                          return getHttpBookmarkClient()
+                            .delete(highlightTimelineUsername, owner, timeline)
                             .catch((e) => {
                               pushAlert({
                                 message: "home.message.deleteHighlightFail",
@@ -70,18 +83,22 @@ const CenterBoards: React.FC = () => {
                               throw e;
                             });
                         },
-                        onMove: (timeline, index, offset) => {
-                          return getHttpHighlightClient()
+                        onMove: (owner, timeline, index, offset) => {
+                          return getHttpBookmarkClient()
                             .move(
-                              { timeline, newPosition: index + offset + 1 } // +1 because backend contract: index starts at 1
+                              highlightTimelineUsername,
+                              owner,
+                              timeline,
+                              index + offset + 1 // +1 because backend contract: index starts at 1
                             )
                             .catch((e) => {
                               pushAlert({
-                                message: "home.message.moveHighlightFail",
+                                message: "home.message.moveBookmarkFail",
                                 type: "danger",
                               });
                               throw e;
-                            });
+                            })
+                            .then();
                         },
                       }
                     : undefined
@@ -94,7 +111,15 @@ const CenterBoards: React.FC = () => {
           <TimelineBoard
             title={t("home.relatedTimeline")}
             load={() =>
-              getHttpTimelineClient().listTimeline({ relate: user.username })
+              getHttpTimelineClient()
+                .listTimeline({ relate: user.username })
+                .then((l) =>
+                  l.map((t, index) => ({
+                    timelineOwner: t.owner.username,
+                    timelineName: t.nameV2,
+                    position: index + 1,
+                  }))
+                )
             }
           />
         </div>

@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+import { highlightTimelineUsername } from "@/common";
+
 import { Page } from "@/http/common";
 import { getHttpBookmarkClient, TimelineBookmark } from "@/http/bookmark";
 
@@ -9,8 +11,6 @@ import TimelineListView from "./TimelineListView";
 import WebsiteIntroduction from "./WebsiteIntroduction";
 
 import "./index.css";
-
-const highlightTimelineUsername = "crupest";
 
 const highlightTimelineMessageMap = {
   loading: "home.loadingHighlightTimelines",
