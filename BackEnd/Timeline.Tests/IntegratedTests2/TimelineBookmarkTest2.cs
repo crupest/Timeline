@@ -31,6 +31,12 @@ namespace Timeline.Tests.IntegratedTests2
             }, expectedStatusCode: HttpStatusCode.Created);
         }
 
+        private async Task ChangeVisibilityAsync(TimelineVisibility visibility)
+        {
+            using var client = CreateClientAsUser();
+            await client.TestJsonSendAsync(HttpMethod.Put, "v2/users/user/bookmarks/visibility", new HttpTimelineBookmarkVisibility { Visibility = visibility }, expectedStatusCode: HttpStatusCode.NoContent);
+        }
+
         [Fact]
         public async Task ChangeVisibilityShouldWork()
         {
@@ -45,6 +51,87 @@ namespace Timeline.Tests.IntegratedTests2
             await client.TestJsonSendAsync(HttpMethod.Put, "v2/users/user/bookmarks/visibility", new HttpTimelineBookmarkVisibility { Visibility = TimelineVisibility.Public }, expectedStatusCode: HttpStatusCode.NoContent);
             var c = await client.TestJsonSendAsync<HttpTimelineBookmarkVisibility>(HttpMethod.Get, "v2/users/user/bookmarks/visibility", expectedStatusCode: HttpStatusCode.OK);
             c.Visibility.Should().Be(TimelineVisibility.Public);
+        }
+
+        [Fact]
+        public async Task AnonymousCantSeePrivate()
+        {
+            using var client = CreateDefaultClient();
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.Forbidden);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task OtherUserCantSeePrivate()
+        {
+            await CreateUserAsync("user2", "user2pw");
+            var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.Forbidden);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task AdminCanSeePrivate()
+        {
+            using var client = CreateClientAsAdmin();
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task AnonymousCantSeeRegister()
+        {
+            await ChangeVisibilityAsync(TimelineVisibility.Register);
+            using var client = CreateDefaultClient();
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.Forbidden);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task OtherUserCanSeeRegister()
+        {
+            await ChangeVisibilityAsync(TimelineVisibility.Register);
+            await CreateUserAsync("user2", "user2pw");
+            var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task AdminCanSeeRegister()
+        {
+            await ChangeVisibilityAsync(TimelineVisibility.Register);
+            using var client = CreateClientAsAdmin();
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task AnonymousCanSeePublic()
+        {
+            await ChangeVisibilityAsync(TimelineVisibility.Public);
+            using var client = CreateDefaultClient();
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task OtherUserCanSeePublic()
+        {
+            await ChangeVisibilityAsync(TimelineVisibility.Public);
+            await CreateUserAsync("user2", "user2pw");
+            var client = CreateClientWithToken(await CreateTokenWithCredentialAsync("user2", "user2pw"));
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task AdminCanSeePublic()
+        {
+            await ChangeVisibilityAsync(TimelineVisibility.Public);
+            using var client = CreateClientAsAdmin();
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks", expectedStatusCode: HttpStatusCode.OK);
+            await client.TestJsonSendAsync(HttpMethod.Get, "v2/users/user/bookmarks/1", expectedStatusCode: HttpStatusCode.OK);
         }
     }
 }
