@@ -8,7 +8,6 @@ import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
 import { useUser } from "@/services/user";
 import { pushAlert } from "@/services/alert";
 import { HttpTimelineInfo } from "@/http/timeline";
-import { getHttpHighlightClient } from "@/http/highlight";
 import { getHttpBookmarkClient } from "@/http/bookmark";
 
 import UserAvatar from "../common/user/UserAvatar";
@@ -71,28 +70,6 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
         {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
       </small>
       <div className="mt-2 cru-text-end">
-        <i
-          className={classnames(
-            timeline.isHighlight ? "bi-star-fill" : "bi-star",
-            "icon-button cru-color-primary me-3"
-          )}
-          onClick={
-            user?.hasHighlightTimelineAdministrationPermission
-              ? () => {
-                  getHttpHighlightClient()
-                    [timeline.isHighlight ? "delete" : "put"](timeline.nameV2)
-                    .then(onReload, () => {
-                      pushAlert({
-                        message: timeline.isHighlight
-                          ? "timeline.removeHighlightFail"
-                          : "timeline.addHighlightFail",
-                        type: "danger",
-                      });
-                    });
-                }
-              : undefined
-          }
-        />
         {user != null ? (
           <i
             className={classnames(
@@ -101,7 +78,11 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
             )}
             onClick={() => {
               getHttpBookmarkClient()
-                [timeline.isBookmark ? "delete" : "put"](timeline.nameV2)
+                [timeline.isBookmark ? "delete" : "post"](
+                  user.username,
+                  timeline.owner.username,
+                  timeline.nameV2
+                )
                 .then(onReload, () => {
                   pushAlert({
                     message: timeline.isBookmark

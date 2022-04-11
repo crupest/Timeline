@@ -2,7 +2,7 @@ import React from "react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
 
-import { HttpTimelineInfo } from "@/http/timeline";
+import { TimelineBookmark } from "@/http/bookmark";
 
 import TimelineLogo from "../common/TimelineLogo";
 import LoadFailReload from "../common/LoadFailReload";
@@ -11,7 +11,7 @@ import Card from "../common/Card";
 import Spinner from "../common/Spinner";
 
 interface TimelineBoardItemProps {
-  timeline: HttpTimelineInfo;
+  timeline: TimelineBookmark;
   // In height.
   offset?: number;
   // In px.
@@ -33,15 +33,12 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
   offset,
   actions,
 }) => {
-  const { title } = timeline;
-
   const content = (
     <>
       <TimelineLogo className="icon" />
-      <span className="title">{title}</span>
-      <small className="ms-2 cru-color-secondary">
-        {timeline.owner.username}/{timeline.nameV2}
-      </small>
+      <span className="title">
+        {timeline.timelineOwner}/{timeline.timelineName}
+      </span>
       <span className="flex-grow-1"></span>
       {actions != null ? (
         <div className="right">
@@ -83,7 +80,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
 
   return actions == null ? (
     <Link
-      to={`${timeline.owner.username}/${timeline.nameV2}`}
+      to={`${timeline.timelineOwner}/${timeline.timelineName}`}
       className="timeline-board-item"
     >
       {content}
@@ -96,7 +93,7 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
 };
 
 interface TimelineBoardItemContainerProps {
-  timelines: HttpTimelineInfo[];
+  timelines: TimelineBookmark[];
   editHandler?: {
     // offset may exceed index range plusing index.
     onMove: (
@@ -156,7 +153,7 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
 
         return (
           <TimelineBoardItem
-            key={`${timeline.owner.username}/${timeline.nameV2}`}
+            key={timeline.timelineOwner + "/" + timeline.timelineName}
             timeline={timeline}
             offset={offset}
             arbitraryOffset={arbitraryOffset}
@@ -165,8 +162,8 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
                 ? {
                     onDelete: () => {
                       editHandler.onDelete(
-                        timeline.owner.username,
-                        timeline.nameV2
+                        timeline.timelineOwner,
+                        timeline.timelineName
                       );
                     },
                     onMove: {
@@ -192,8 +189,8 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
                             moveState.offset / height
                           );
                           editHandler.onMove(
-                            timeline.owner.username,
-                            timeline.nameV2,
+                            timeline.timelineOwner,
+                            timeline.timelineName,
                             moveState.index,
                             offsetCount
                           );
@@ -214,7 +211,7 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
 interface TimelineBoardUIProps {
   title?: string;
   state: "offline" | "loading" | "loaded";
-  timelines: HttpTimelineInfo[];
+  timelines: TimelineBookmark[];
   onReload: () => void;
   className?: string;
   editHandler?: {
@@ -299,10 +296,15 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
 export interface TimelineBoardProps {
   title?: string;
   className?: string;
-  load: () => Promise<HttpTimelineInfo[]>;
+  load: () => Promise<TimelineBookmark[]>;
   editHandler?: {
-    onMove: (timeline: string, index: number, offset: number) => Promise<void>;
-    onDelete: (timeline: string) => Promise<void>;
+    onMove: (
+      owner: string,
+      timeline: string,
+      index: number,
+      offset: number
+    ) => Promise<void>;
+    onDelete: (owner: string, timeline: string) => Promise<void>;
   };
 }
 
@@ -315,7 +317,7 @@ const TimelineBoard: React.FC<TimelineBoardProps> = ({
   const [state, setState] = React.useState<"offline" | "loading" | "loaded">(
     "loading"
   );
-  const [timelines, setTimelines] = React.useState<HttpTimelineInfo[]>([]);
+  const [timelines, setTimelines] = React.useState<TimelineBookmark[]>([]);
 
   React.useEffect(() => {
     let subscribe = true;
@@ -354,20 +356,23 @@ const TimelineBoard: React.FC<TimelineBoardProps> = ({
                 const [t] = newTimelines.splice(index, 1);
                 newTimelines.splice(index + offset, 0, t);
                 setTimelines(newTimelines);
-                editHandler.onMove(timeline, index, offset).then(null, () => {
-                  setTimelines(timelines);
-                });
+                editHandler
+                  .onMove(owner, timeline, index, offset)
+                  .then(null, () => {
+                    setTimelines(timelines);
+                  });
               },
               onDelete: (owner, timeline) => {
                 const newTimelines = timelines.slice();
                 newTimelines.splice(
                   timelines.findIndex(
-                    (t) => t.owner.username === owner && t.nameV2 === timeline
+                    (t) =>
+                      t.timelineOwner === owner && t.timelineName === timeline
                   ),
                   1
                 );
                 setTimelines(newTimelines);
-                editHandler.onDelete(timeline).then(null, () => {
+                editHandler.onDelete(owner, timeline).then(null, () => {
                   setTimelines(timelines);
                 });
               },

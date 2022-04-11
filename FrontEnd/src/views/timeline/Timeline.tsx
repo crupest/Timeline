@@ -89,7 +89,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         ([t, p]) => {
           if (subscribe) {
             setTimeline(t);
-            setPosts(p);
+            setPosts(p.items);
             setState("loaded");
             onTimelineLoaded.current?.(t);
           }
