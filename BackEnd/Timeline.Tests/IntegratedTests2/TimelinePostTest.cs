@@ -12,9 +12,9 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests2
 {
-    public class TimelinePostTest1 : IntegratedTestBase
+    public class TimelinePostTest : IntegratedTestBase
     {
-        public TimelinePostTest1(ITestOutputHelper testOutput) : base(testOutput)
+        public TimelinePostTest(ITestOutputHelper testOutput) : base(testOutput)
         {
         }
 

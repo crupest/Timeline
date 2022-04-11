@@ -84,6 +84,66 @@ namespace Timeline.Controllers
             return CreatedAtAction("Get", new { username, index = bookmark.Position }, bookmark);
         }
 
+        [Authorize]
+        [HttpPost("delete")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> DeleteAsync([FromRoute][Username] string username, [FromBody] HttpTimelinebookmarkDeleteRequest body)
+        {
+            var userId = await _userService.GetUserIdByUsernameAsync(username);
+            if (!UserHasPermission(UserPermission.UserBookmarkManagement) && GetAuthUserId() != userId)
+            {
+                return Forbid();
+            }
+
+            long timelineId;
+            try
+            {
+                timelineId = await _timelineService.GetTimelineIdAsync(body.TimelineOwner, body.TimelineName);
+            }
+            catch (EntityNotExistException)
+            {
+                return UnprocessableEntity();
+            }
+
+            await _timelineBookmarkService.DeleteBookmarkAsync(userId, timelineId);
+
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpPost("move")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult<TimelineBookmark>> MoveAsync([FromRoute][Username] string username, [FromBody] HttpTimelineBookmarkMoveRequest body)
+        {
+            var userId = await _userService.GetUserIdByUsernameAsync(username);
+            if (!UserHasPermission(UserPermission.UserBookmarkManagement) && GetAuthUserId() != userId)
+            {
+                return Forbid();
+            }
+
+            long timelineId;
+            try
+            {
+                timelineId = await _timelineService.GetTimelineIdAsync(body.TimelineOwner, body.TimelineName);
+            }
+            catch (EntityNotExistException)
+            {
+                return UnprocessableEntity();
+            }
+
+            var bookmark = await _timelineBookmarkService.MoveBookmarkAsync(userId, timelineId, body.Position!.Value);
+
+            return Ok(bookmark);
+        }
+
         [HttpGet("visibility")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
