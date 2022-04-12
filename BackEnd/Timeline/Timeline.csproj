@@ -199,4 +199,10 @@
           <LastGenOutput>Resource.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Controllers\V2\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Controllers\V2\" />
+    </ItemGroup>
 </Project>

@@ -14,11 +14,11 @@ using Timeline.Services.Timeline;
 using Timeline.Services.User;
 using Timeline.SignalRHub;
 
-namespace Timeline.Controllers
+namespace Timeline.Controllers.V2
 {
     [ApiController]
     [Route("v2/timelines/{owner}/{timeline}/posts")]
-    public class TimelinePostV2Controller : MyControllerBase
+    public class TimelinePostV2Controller : V2ControllerBase
     {
         private readonly ITimelineService _timelineService;
         private readonly ITimelinePostService _postService;

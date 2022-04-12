@@ -10,11 +10,11 @@ using Timeline.Services.Mapper;
 using Timeline.Services.Timeline;
 using Timeline.Services.User;
 
-namespace Timeline.Controllers
+namespace Timeline.Controllers.V2
 {
     [ApiController]
     [Route("v2/timelines")]
-    public class TimelineV2Controller : MyControllerBase
+    public class TimelineV2Controller : V2ControllerBase
     {
         private ITimelineService _timelineService;
         private IGenericMapper _mapper;
