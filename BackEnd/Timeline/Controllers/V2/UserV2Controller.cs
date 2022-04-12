@@ -7,7 +7,6 @@ using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
-using Timeline.Services.Mapper;
 using Timeline.Services.User;
 
 namespace Timeline.Controllers.V2
@@ -22,14 +21,12 @@ namespace Timeline.Controllers.V2
         private readonly IUserService _userService;
         private readonly IUserPermissionService _userPermissionService;
         private readonly IUserDeleteService _userDeleteService;
-        private readonly IGenericMapper _mapper;
 
-        public UserV2Controller(IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService, IGenericMapper mapper)
+        public UserV2Controller(IUserService userService, IUserPermissionService userPermissionService, IUserDeleteService userDeleteService)
         {
             _userService = userService;
             _userPermissionService = userPermissionService;
             _userDeleteService = userDeleteService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace Timeline.Controllers.V2
         public async Task<ActionResult<Page<HttpUser>>> ListAsync([FromQuery][PositiveInteger] int? page, [FromQuery][PositiveInteger] int? pageSize)
         {
             var p = await _userService.GetUsersV2Async(page ?? 1, pageSize ?? 20);
-            var items = await _mapper.MapListAsync<HttpUser>(p.Items, Url, User);
+            var items = await MapListAsync<HttpUser>(p.Items);
             return p.WithItems(items);
         }
 
@@ -59,7 +56,7 @@ namespace Timeline.Controllers.V2
         {
             var user = await _userService.CreateUserAsync(
                 new CreateUserParams(body.Username, body.Password) { Nickname = body.Nickname });
-            return CreatedAtAction("Get", new { username = body.Username }, await _mapper.MapAsync<HttpUser>(user, Url, User));
+            return CreatedAtAction("Get", new { username = body.Username }, await MapAsync<HttpUser>(user));
         }
 
         /// <summary>
@@ -75,7 +72,7 @@ namespace Timeline.Controllers.V2
         {
             var id = await _userService.GetUserIdByUsernameAsync(username);
             var user = await _userService.GetUserAsync(id);
-            return await _mapper.MapAsync<HttpUser>(user, Url, User);
+            return await MapAsync<HttpUser>(user);
         }
 
         /// <summary>
@@ -96,8 +93,8 @@ namespace Timeline.Controllers.V2
             var userId = await _userService.GetUserIdByUsernameAsync(username);
             if (UserHasPermission(UserPermission.UserManagement))
             {
-                var user = await _userService.ModifyUserAsync(userId, _mapper.AutoMapperMap<ModifyUserParams>(body));
-                return await _mapper.MapAsync<HttpUser>(user, Url, User);
+                var user = await _userService.ModifyUserAsync(userId, AutoMapperMap<ModifyUserParams>(body));
+                return await MapAsync<HttpUser>(user);
             }
             else
             {
@@ -110,8 +107,8 @@ namespace Timeline.Controllers.V2
                 if (body.Password is not null)
                     return Forbid();
 
-                var user = await _userService.ModifyUserAsync(GetAuthUserId(), _mapper.AutoMapperMap<ModifyUserParams>(body));
-                return await _mapper.MapAsync<HttpUser>(user, Url, User);
+                var user = await _userService.ModifyUserAsync(GetAuthUserId(), AutoMapperMap<ModifyUserParams>(body));
+                return await MapAsync<HttpUser>(user);
             }
         }
 
