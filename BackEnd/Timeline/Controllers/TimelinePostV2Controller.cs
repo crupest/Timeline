@@ -43,14 +43,15 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<Page<HttpTimelinePost>>> ListAsync([FromRoute][Username] string owner, [FromRoute][TimelineName] string timeline, [FromQuery] DateTime? modifiedSince, [FromQuery][Range(0, int.MaxValue)] int? page, [FromQuery][Range(1, int.MaxValue)] int? numberPerPage)
+        public async Task<ActionResult<Page<HttpTimelinePost>>> ListAsync([FromRoute][Username] string owner, [FromRoute][TimelineName] string timeline, [FromQuery] DateTime? modifiedSince,
+                                                                          [FromQuery][PositiveInteger] int? page, [FromQuery][PositiveInteger] int? pageSize)
         {
             var timelineId = await _timelineService.GetTimelineIdAsync(owner, timeline);
             if (!UserHasPermission(UserPermission.AllTimelineManagement) && !await _timelineService.HasReadPermissionAsync(timelineId, GetOptionalAuthUserId()))
             {
                 return Forbid();
             }
-            var postPage = await _postService.GetPostsV2Async(timelineId, modifiedSince, page, numberPerPage);
+            var postPage = await _postService.GetPostsV2Async(timelineId, modifiedSince, page, pageSize);
             var items = await _mapper.MapListAsync<HttpTimelinePost>(postPage.Items, Url, User);
             return postPage.WithItems(items);
         }

@@ -133,7 +133,9 @@ export interface IHttpTimelineClient {
   ): Promise<void>;
   listPost(
     ownerUsername: string,
-    timelineName: string
+    timelineName: string,
+    page?: number,
+    pageSize?: number
   ): Promise<Page<HttpTimelineGenericPostInfo>>;
   generatePostDataUrl(
     ownerUsername: string,
@@ -235,11 +237,19 @@ export class HttpTimelineClient implements IHttpTimelineClient {
 
   listPost(
     ownerUsername: string,
-    timelineName: string
+    timelineName: string,
+    page?: number,
+    pageSize?: number
   ): Promise<Page<HttpTimelineGenericPostInfo>> {
     return axios
       .get<Page<HttpTimelineGenericPostInfo>>(
-        `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts`
+        applyQueryParameters(
+          `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts`,
+          {
+            page,
+            pageSize,
+          }
+        )
       )
       .then(extractResponseData);
   }
