@@ -9,7 +9,6 @@ using Timeline.Helpers.Cache;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
-using Timeline.Services.Mapper;
 using Timeline.Services.Timeline;
 using Timeline.Services.User;
 using Timeline.SignalRHub;
@@ -23,17 +22,14 @@ namespace Timeline.Controllers.V2
         private readonly ITimelineService _timelineService;
         private readonly ITimelinePostService _postService;
 
-        private readonly IGenericMapper _mapper;
-
         private readonly MarkdownProcessor _markdownProcessor;
 
         private readonly IHubContext<TimelineHub> _timelineHubContext;
 
-        public TimelinePostV2Controller(ITimelineService timelineService, ITimelinePostService timelinePostService, IGenericMapper mapper, MarkdownProcessor markdownProcessor, IHubContext<TimelineHub> timelineHubContext)
+        public TimelinePostV2Controller(ITimelineService timelineService, ITimelinePostService timelinePostService, MarkdownProcessor markdownProcessor, IHubContext<TimelineHub> timelineHubContext)
         {
             _timelineService = timelineService;
             _postService = timelinePostService;
-            _mapper = mapper;
             _markdownProcessor = markdownProcessor;
             _timelineHubContext = timelineHubContext;
         }
@@ -52,7 +48,7 @@ namespace Timeline.Controllers.V2
                 return Forbid();
             }
             var postPage = await _postService.GetPostsV2Async(timelineId, modifiedSince, page, pageSize);
-            var items = await _mapper.MapListAsync<HttpTimelinePost>(postPage.Items, Url, User);
+            var items = await MapListAsync<HttpTimelinePost>(postPage.Items);
             return postPage.WithItems(items);
         }
 
@@ -70,7 +66,7 @@ namespace Timeline.Controllers.V2
                 return Forbid();
             }
             var post = await _postService.GetPostV2Async(timelineId, postId);
-            var result = await _mapper.MapAsync<HttpTimelinePost>(post, Url, User);
+            var result = await MapAsync<HttpTimelinePost>(post);
             return result;
         }
 
@@ -164,7 +160,7 @@ namespace Timeline.Controllers.V2
                 var group = TimelineHub.GenerateTimelinePostChangeListeningGroupName(timeline);
                 await _timelineHubContext.Clients.Group(group).SendAsync(nameof(ITimelineClient.OnTimelinePostChanged), timeline);
 
-                var result = await _mapper.MapAsync<HttpTimelinePost>(post, Url, User);
+                var result = await MapAsync<HttpTimelinePost>(post);
                 return CreatedAtAction("Get", new { owner = owner, timeline = timeline, post = post.LocalId }, result);
             }
             catch (TimelinePostCreateDataException e)
@@ -189,7 +185,7 @@ namespace Timeline.Controllers.V2
             }
 
             var entity = await _postService.PatchPostAsync(timelineId, post, new TimelinePostPatchRequest { Time = body.Time, Color = body.Color });
-            var result = await _mapper.MapAsync<HttpTimelinePost>(entity, Url, User);
+            var result = await MapAsync<HttpTimelinePost>(entity);
 
             return Ok(result);
         }

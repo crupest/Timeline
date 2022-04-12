@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Timeline.Entities;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
 using Timeline.Services;
-using Timeline.Services.Mapper;
 using Timeline.Services.Timeline;
 using Timeline.Services.User;
 
@@ -17,19 +15,12 @@ namespace Timeline.Controllers.V2
     public class TimelineV2Controller : V2ControllerBase
     {
         private ITimelineService _timelineService;
-        private IGenericMapper _mapper;
         private IUserService _userService;
 
-        public TimelineV2Controller(ITimelineService timelineService, IGenericMapper mapper, IUserService userService)
+        public TimelineV2Controller(ITimelineService timelineService, IUserService userService)
         {
             _timelineService = timelineService;
-            _mapper = mapper;
             _userService = userService;
-        }
-
-        private Task<HttpTimeline> MapAsync(TimelineEntity entity)
-        {
-            return _mapper.MapAsync<HttpTimeline>(entity, Url, User);
         }
 
         [HttpGet("{owner}/{timeline}")]
@@ -37,7 +28,7 @@ namespace Timeline.Controllers.V2
         {
             var timelineId = await _timelineService.GetTimelineIdAsync(owner, timeline);
             var t = await _timelineService.GetTimelineAsync(timelineId);
-            return await MapAsync(t);
+            return await MapAsync<HttpTimeline>(t);
         }
 
         [HttpPatch("{owner}/{timeline}")]
@@ -54,9 +45,9 @@ namespace Timeline.Controllers.V2
             {
                 return Forbid();
             }
-            await _timelineService.ChangePropertyAsync(timelineId, _mapper.AutoMapperMap<TimelineChangePropertyParams>(body));
+            await _timelineService.ChangePropertyAsync(timelineId, AutoMapperMap<TimelineChangePropertyParams>(body));
             var t = await _timelineService.GetTimelineAsync(timelineId);
-            return await MapAsync(t);
+            return await MapAsync<HttpTimeline>(t);
         }
 
         [HttpDelete("{owner}/{timeline}")]
@@ -144,7 +135,7 @@ namespace Timeline.Controllers.V2
             var authUserId = GetAuthUserId();
             var authUser = await _userService.GetUserAsync(authUserId);
             var timeline = await _timelineService.CreateTimelineAsync(authUserId, body.Name);
-            var result = await MapAsync(timeline);
+            var result = await MapAsync<HttpTimeline>(timeline);
             return CreatedAtAction("Get", new { owner = authUser.Username, timeline = body.Name }, result);
         }
     }
