@@ -10,11 +10,11 @@ using Timeline.Services.Api;
 using Timeline.Services.Timeline;
 using Timeline.Services.User;
 
-namespace Timeline.Controllers
+namespace Timeline.Controllers.V2
 {
     [ApiController]
     [Route("v2/users/{username}/bookmarks")]
-    public class TimelineBookmarkV2Controller : MyControllerBase
+    public class TimelineBookmarkV2Controller : V2ControllerBase
     {
         private readonly IUserService _userService;
         private readonly ITimelineService _timelineService;

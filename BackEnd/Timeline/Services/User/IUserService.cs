@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Models;
 
 namespace Timeline.Services.User
 {
@@ -45,6 +46,8 @@ namespace Timeline.Services.User
         /// </summary>
         /// <returns>The user info of users.</returns>
         Task<List<UserEntity>> GetUsersAsync();
+
+        Task<Page<UserEntity>> GetUsersV2Async(int page, int pageSize);
 
         /// <summary>
         /// Create a user with given info.

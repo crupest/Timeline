@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Timeline.Entities;
+using Timeline.Models;
 using Timeline.Models.Validation;
 using Timeline.Services.Token;
 
@@ -266,6 +267,18 @@ namespace Timeline.Services.User
             _logger.LogInformation(Resource.LogChangePassowrd, entity.Username, id);
 
             await _userTokenService.RevokeAllTokenByUserIdAsync(id);
+        }
+
+        public async Task<Page<UserEntity>> GetUsersV2Async(int page, int pageSize)
+        {
+            if (page <= 0) throw new ArgumentOutOfRangeException(nameof(page));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            var items = await _database.Users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var totalCount = await _database.Users.CountAsync();
+
+            return new Page<UserEntity>(page, pageSize, totalCount, items);
         }
     }
 }
