@@ -6,6 +6,7 @@ using Timeline.Auth;
 using Timeline.Models;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
+using Timeline.Services;
 using Timeline.Services.Mapper;
 using Timeline.Services.User;
 
@@ -132,6 +133,10 @@ namespace Timeline.Controllers.V2
             try
             {
                 await _userDeleteService.DeleteUserAsync(username);
+                return NoContent();
+            }
+            catch (EntityNotExistException)
+            {
                 return NoContent();
             }
             catch (InvalidOperationOnRootUserException)
