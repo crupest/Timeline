@@ -99,7 +99,7 @@ namespace Timeline.Controllers.V2
             }
             catch (EntityNotExistException e) when (e.EntityType.Equals(EntityTypes.User))
             {
-                return UnprocessableEntity(new CommonResponse(ErrorCodes.Common.InvalidModel, "Member username does not exist."));
+                return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidRequest, "Member username does not exist."));
             }
             await _timelineService.AddMemberAsync(timelineId, userId);
             return NoContent();
@@ -127,7 +127,7 @@ namespace Timeline.Controllers.V2
             }
             catch (EntityNotExistException e) when (e.EntityType.Equals(EntityTypes.User))
             {
-                return UnprocessableEntity(new CommonResponse(ErrorCodes.Common.InvalidModel, "Member username does not exist."));
+                return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidRequest, "Member username does not exist."));
             }
             await _timelineService.RemoveMemberAsync(timelineId, userId);
             return NoContent();

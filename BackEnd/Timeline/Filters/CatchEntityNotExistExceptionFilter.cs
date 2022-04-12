@@ -25,7 +25,7 @@ namespace Timeline.Filters
             {
                 if (context.HttpContext.Request.Path.StartsWithSegments("/api/v2"))
                 {
-                    context.Result = new NotFoundObjectResult(new CommonResponse(ErrorCodes.NotExist.Default, "The entity does not exist."));
+                    context.Result = new NotFoundResult();
                 }
                 else
                 {

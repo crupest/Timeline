@@ -9,7 +9,7 @@ namespace Timeline.Filters
     {
         public void OnException(ExceptionContext context)
         {
-            if (context.Exception is EntityDeletedException e)
+            if (context.Exception is EntityDeletedException)
             {
                 context.Result = new StatusCodeResult(StatusCodes.Status410Gone);
             }

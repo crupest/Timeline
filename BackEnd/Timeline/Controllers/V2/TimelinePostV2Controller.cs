@@ -144,7 +144,7 @@ namespace Timeline.Controllers.V2
                 var data = body.DataList[i];
 
                 if (data is null)
-                    return UnprocessableEntity(new CommonResponse(ErrorCodes.Common.InvalidModel, $"Data at index {i} is null."));
+                    return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidRequest, $"Data at index {i} is null."));
 
                 try
                 {
@@ -153,7 +153,7 @@ namespace Timeline.Controllers.V2
                 }
                 catch (FormatException)
                 {
-                    return UnprocessableEntity(new CommonResponse(ErrorCodes.Common.InvalidModel, $"Data at index {i} is not a valid base64 string."));
+                    return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidRequest, $"Data at index {i} is not a valid base64 string."));
                 }
             }
 
@@ -169,7 +169,7 @@ namespace Timeline.Controllers.V2
             }
             catch (TimelinePostCreateDataException e)
             {
-                return UnprocessableEntity(new CommonResponse(ErrorCodes.Common.InvalidModel, $"Data at index {e.Index} is invalid. {e.Message}"));
+                return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidRequest, $"Data at index {e.Index} is invalid. {e.Message}"));
             }
         }
 
