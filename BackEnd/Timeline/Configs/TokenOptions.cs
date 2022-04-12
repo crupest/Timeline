@@ -3,9 +3,8 @@
     public class TokenOptions
     {
         /// <summary>
-        /// The length of the generated secure random token counted in byte.
-        /// Note the byte will be converted to hex form when used.
-        /// Default is 32 byte long.
+        /// The length of the token.
+        /// Default is 16.
         /// </summary>
         public long? TokenLength { get; set; }
     }
