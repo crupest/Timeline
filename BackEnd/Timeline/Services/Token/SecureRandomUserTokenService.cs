@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -33,13 +34,23 @@ namespace Timeline.Services.Token
             _secureRandom.Dispose();
         }
 
+        private static readonly char[] AlphaDigitString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
         private string GenerateSecureRandomTokenString()
         {
             var option = _optionMonitor.CurrentValue;
-            var tokenLength = option.TokenLength ?? 32;
+            var tokenLength = option.TokenLength ?? 16;
             var buffer = new byte[tokenLength];
             _secureRandom.GetBytes(buffer);
-            return Convert.ToHexString(buffer);
+
+            StringBuilder stringBuilder = new();
+
+            foreach (byte b in buffer)
+            {
+                stringBuilder.Append(AlphaDigitString[b % AlphaDigitString.Length]);
+            }
+
+            return stringBuilder.ToString();
         }
 
         /// <inheritdoc/>
