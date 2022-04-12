@@ -90,7 +90,7 @@ namespace Timeline.Controllers.V2
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<HttpUser>> Patch([FromBody] HttpUserPatchRequest body, [FromRoute][Username] string username)
+        public async Task<ActionResult<HttpUser>> PatchAsync([FromBody] HttpUserPatchRequest body, [FromRoute][Username] string username)
         {
             var userId = await _userService.GetUserIdByUsernameAsync(username);
             if (UserHasPermission(UserPermission.UserManagement))
@@ -114,6 +114,8 @@ namespace Timeline.Controllers.V2
             }
         }
 
+        private const string RootUserInvalidOperationMessage = "Can't do this operation on root user.";
+
         /// <summary>
         /// Delete a user and all his related data. You have to be administrator.
         /// </summary>
@@ -125,7 +127,7 @@ namespace Timeline.Controllers.V2
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<CommonDeleteResponse>> Delete([FromRoute][Username] string username)
+        public async Task<ActionResult> DeleteAsync([FromRoute][Username] string username)
         {
             try
             {
@@ -134,7 +136,7 @@ namespace Timeline.Controllers.V2
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return UnprocessableEntity();
+                return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidOperation, RootUserInvalidOperationMessage));
             }
         }
 
@@ -144,7 +146,7 @@ namespace Timeline.Controllers.V2
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<CommonResponse>> PutUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
+        public async Task<ActionResult> PutUserPermissionAsync([FromRoute][Username] string username, [FromRoute] UserPermission permission)
         {
             try
             {
@@ -154,17 +156,17 @@ namespace Timeline.Controllers.V2
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return UnprocessableEntity();
+                return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidOperation, RootUserInvalidOperationMessage));
             }
         }
 
         [HttpDelete("{username}/permissions/{permission}"), PermissionAuthorize(UserPermission.UserManagement)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        public async Task<ActionResult<CommonResponse>> DeleteUserPermission([FromRoute][Username] string username, [FromRoute] UserPermission permission)
+        public async Task<ActionResult> DeleteUserPermissionAsync([FromRoute][Username] string username, [FromRoute] UserPermission permission)
         {
             try
             {
@@ -174,7 +176,7 @@ namespace Timeline.Controllers.V2
             }
             catch (InvalidOperationOnRootUserException)
             {
-                return UnprocessableEntity();
+                return UnprocessableEntity(new ErrorResponse(ErrorResponse.InvalidOperation, RootUserInvalidOperationMessage));
             }
         }
     }

@@ -23,7 +23,7 @@ namespace Timeline.Filters
             {
                 if (context.HttpContext.Request.Path.StartsWithSegments("/api/v2"))
                 {
-                    context.Result = new UnprocessableEntityObjectResult(new CommonResponse(ErrorCodes.Conflict.Default, "An entity with given key already exists."));
+                    context.Result = new UnprocessableEntityObjectResult(new ErrorResponse(ErrorResponse.EntityExist, "An entity with given key already exists."));
                 }
                 else
                 {
