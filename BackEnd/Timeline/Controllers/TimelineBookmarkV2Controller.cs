@@ -32,7 +32,8 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpGet]
-        public async Task<ActionResult<Page<TimelineBookmark>>> ListAsync([FromRoute][Username] string username, [FromQuery] int? page, [FromQuery] int? pageSize)
+        public async Task<ActionResult<Page<TimelineBookmark>>> ListAsync([FromRoute][Username] string username,
+                                                                          [FromQuery][PositiveInteger] int? page, [FromQuery][PositiveInteger] int? pageSize)
         {
             var userId = await _userService.GetUserIdByUsernameAsync(username);
             if (!UserHasPermission(UserPermission.UserBookmarkManagement) && !await _timelineBookmarkService.CanReadBookmarksAsync(userId, GetOptionalAuthUserId()))
@@ -47,7 +48,7 @@ namespace Timeline.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpGet("{index}")]
-        public async Task<ActionResult<TimelineBookmark>> GetAsync([FromRoute][Username] string username, [FromRoute] int index)
+        public async Task<ActionResult<TimelineBookmark>> GetAsync([FromRoute][Username] string username, [FromRoute][PositiveInteger] int index)
         {
             var userId = await _userService.GetUserIdByUsernameAsync(username);
             if (!UserHasPermission(UserPermission.UserBookmarkManagement) && !await _timelineBookmarkService.CanReadBookmarksAsync(userId, GetOptionalAuthUserId()))
