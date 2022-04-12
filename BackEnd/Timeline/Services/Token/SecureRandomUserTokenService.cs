@@ -81,7 +81,7 @@ namespace Timeline.Services.Token
 
             var currentTime = _clock.GetCurrentTime();
 
-            if (entity.ExpireAt.HasValue && entity.ExpireAt > currentTime)
+            if (entity.ExpireAt.HasValue && entity.ExpireAt.Value <= currentTime)
             {
                 throw new UserTokenExpiredException(token, entity.ExpireAt.Value, currentTime);
             }

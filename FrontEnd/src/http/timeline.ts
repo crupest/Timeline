@@ -50,6 +50,7 @@ export interface HttpTimelinePostDataDigest {
 
 export interface HttpTimelinePostInfo {
   id: number;
+  deleted: false;
   time: string;
   author: HttpUser;
   dataList: HttpTimelinePostDataDigest[];
@@ -59,6 +60,23 @@ export interface HttpTimelinePostInfo {
   timelineNameV2: string;
   editable: boolean;
 }
+
+export interface HttpTimelineDeletedPostInfo {
+  id: number;
+  deleted: true;
+  time: string;
+  author?: HttpUser;
+  dataList: HttpTimelinePostDataDigest[];
+  color?: string;
+  lastUpdated: string;
+  timelineOwnerV2: string;
+  timelineNameV2: string;
+  editable: boolean;
+}
+
+export type HttpTimelineGenericPostInfo =
+  | HttpTimelinePostInfo
+  | HttpTimelineDeletedPostInfo;
 
 export interface HttpTimelinePostPostRequestData {
   contentType: string;
@@ -116,7 +134,7 @@ export interface IHttpTimelineClient {
   listPost(
     ownerUsername: string,
     timelineName: string
-  ): Promise<Page<HttpTimelinePostInfo>>;
+  ): Promise<Page<HttpTimelineGenericPostInfo>>;
   generatePostDataUrl(
     ownerUsername: string,
     timelineName: string,
@@ -218,9 +236,9 @@ export class HttpTimelineClient implements IHttpTimelineClient {
   listPost(
     ownerUsername: string,
     timelineName: string
-  ): Promise<Page<HttpTimelinePostInfo>> {
+  ): Promise<Page<HttpTimelineGenericPostInfo>> {
     return axios
-      .get<Page<HttpTimelinePostInfo>>(
+      .get<Page<HttpTimelineGenericPostInfo>>(
         `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts`
       )
       .then(extractResponseData);
