@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -81,7 +81,7 @@ namespace Timeline.Services.Token
         }
 
         /// <inheritdoc/>
-        public async Task<UserTokenInfo> ValidateTokenAsync(string token)
+        public async Task<UserTokenInfo> ValidateTokenAsync(string token, bool checkLifetime = true)
         {
             var entity = await _databaseContext.UserTokens.Where(t => t.Token == token && !t.Deleted).SingleOrDefaultAsync();
 
@@ -92,7 +92,7 @@ namespace Timeline.Services.Token
 
             var currentTime = _clock.GetCurrentTime();
 
-            if (entity.ExpireAt.HasValue && entity.ExpireAt.Value <= currentTime)
+            if (checkLifetime && entity.ExpireAt.HasValue && entity.ExpireAt.Value <= currentTime)
             {
                 throw new UserTokenExpiredException(token, entity.ExpireAt.Value, currentTime);
             }

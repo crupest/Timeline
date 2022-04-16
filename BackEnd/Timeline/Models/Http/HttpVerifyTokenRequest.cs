@@ -1,11 +1,8 @@
-using Timeline.Controllers;
+﻿using Timeline.Controllers;
 
 namespace Timeline.Models.Http
 {
-    /// <summary>
-    /// Request model for <see cref="TokenController.Verify(HttpVerifyTokenRequest)"/>.
-    /// </summary>
-    public class HttpVerifyTokenRequest
+    public class HttpVerifyOrRevokeTokenRequest
     {
         /// <summary>
         /// The token to verify.

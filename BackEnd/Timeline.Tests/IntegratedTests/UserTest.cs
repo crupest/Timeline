@@ -98,7 +98,7 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var token = userClient.DefaultRequestHeaders.Authorization!.Parameter!;
                 // Token should expire.
-                await userClient.TestPostAssertErrorAsync("token/verify", new HttpVerifyTokenRequest() { Token = token });
+                await userClient.TestPostAssertErrorAsync("token/verify", new HttpVerifyOrRevokeTokenRequest() { Token = token });
             }
 
             {
