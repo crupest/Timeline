@@ -26,6 +26,15 @@ namespace Timeline.Tests.IntegratedTests2
         }
 
         [Fact]
+        public async Task UserPatchNotFound()
+        {
+            await AdminClient.TestJsonSendAsync(HttpMethod.Patch, "v2/users/notexist", new HttpUserPatchRequest
+            {
+                Nickname = "nick"
+            }, expectedStatusCode: HttpStatusCode.NotFound);
+        }
+
+        [Fact]
         public async Task UserPatchUnauthorize()
         {
             await DefaultClient.TestJsonSendAsync(HttpMethod.Patch, "v2/users/user", new HttpUserPatchRequest
