@@ -17,11 +17,12 @@ namespace Timeline.Services.Token
         /// Verify a token and get the info of the token.
         /// </summary>
         /// <param name="token">The token to verify.</param>
+        /// <param name="checkLifetime">Whether to check lifetime of token.</param>
         /// <returns>The info of the token.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="token"/> is null.</exception>
         /// <exception cref="UserTokenException">Thrown when the token is not valid for reasons other than expired.</exception>
-        /// <exception cref="UserTokenExpiredException">Thrown when the token is expired.</exception>
-        Task<UserTokenInfo> ValidateTokenAsync(string token);
+        /// <exception cref="UserTokenExpiredException">Thrown when <paramref name="checkLifetime"/> is true and the token is expired.</exception>
+        Task<UserTokenInfo> ValidateTokenAsync(string token, bool checkLifetime = true);
 
         /// <summary>
         /// Revoke a token to make it no longer valid.

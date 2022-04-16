@@ -74,7 +74,7 @@ namespace Timeline.Tests.IntegratedTests
         public async Task VerifyToken_InvalidModel()
         {
             using var client = await CreateDefaultClient();
-            await client.TestPostAssertInvalidModelAsync(VerifyTokenUrl, new HttpVerifyTokenRequest { Token = null! });
+            await client.TestPostAssertInvalidModelAsync(VerifyTokenUrl, new HttpVerifyOrRevokeTokenRequest { Token = null! });
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateDefaultClient();
             await client.TestPostAssertErrorAsync(VerifyTokenUrl,
-                new HttpVerifyTokenRequest { Token = "bad token hahaha" },
+                new HttpVerifyOrRevokeTokenRequest { Token = "bad token hahaha" },
                 errorCode: ErrorCodes.TokenController.VerifyInvalid);
         }
 
@@ -110,7 +110,7 @@ namespace Timeline.Tests.IntegratedTests
             using var client = await CreateDefaultClient();
             var createTokenResult = await CreateUserTokenAsync(client, "user1", "user1pw");
             var body = await client.TestPostAsync<HttpVerifyTokenResponse>(VerifyTokenUrl,
-                new HttpVerifyTokenRequest { Token = createTokenResult.Token });
+                new HttpVerifyOrRevokeTokenRequest { Token = createTokenResult.Token });
             body.User.Should().BeEquivalentTo(await client.GetUserAsync("user1"));
         }
     }
