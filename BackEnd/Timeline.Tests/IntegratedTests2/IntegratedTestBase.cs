@@ -20,6 +20,10 @@ namespace Timeline.Tests.IntegratedTests2
         protected string NormalUserToken { get; set; } = default!;
         protected string AdminUserToken { get; set; } = default!;
 
+        protected HttpClient DefaultClient { get; set; } = default!;
+        protected HttpClient UserClient { get; set; } = default!;
+        protected HttpClient AdminClient { get; set; } = default!;
+
         public IntegratedTestBase(ITestOutputHelper testOutputHelper) : this(1, testOutputHelper)
         {
 
@@ -83,6 +87,9 @@ namespace Timeline.Tests.IntegratedTests2
             await CreateInitUsersAsync();
             NormalUserToken = await CreateTokenWithCredentialAsync("user", "userpw");
             AdminUserToken = await CreateTokenWithCredentialAsync("admin", "adminpw");
+            DefaultClient = CreateDefaultClient();
+            UserClient = CreateClientAsUser();
+            AdminClient = CreateClientAsAdmin();
             await OnInitializeAsync();
             OnInitialize();
         }
@@ -91,6 +98,9 @@ namespace Timeline.Tests.IntegratedTests2
         {
             await OnDisposeAsync();
             OnDispose();
+            DefaultClient.Dispose();
+            UserClient.Dispose();
+            AdminClient.Dispose();
             await TestApp.DisposeAsync();
         }
 
