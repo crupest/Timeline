@@ -201,8 +201,10 @@
     </ItemGroup>
     <ItemGroup>
       <None Remove="Controllers\V2\" />
+      <None Remove="Services\User\RegisterCode\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Controllers\V2\" />
+      <Folder Include="Services\User\RegisterCode\" />
     </ItemGroup>
 </Project>
