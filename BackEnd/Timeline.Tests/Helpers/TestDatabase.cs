@@ -1,11 +1,9 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Services;
-using Timeline.Services.Token;
 using Timeline.Services.User;
 using Xunit;
 using Xunit.Abstractions;
@@ -26,10 +24,7 @@ namespace Timeline.Tests.Helpers
             using var context = CreateContext();
             await context.Database.MigrateAsync();
 
-            var mockUserTokenManager = new Mock<IUserTokenService>();
-            mockUserTokenManager.SetReturnsDefault(Task.CompletedTask);
-
-            var userService = new UserService(NullLogger<UserService>.Instance, context, new PasswordService(), mockUserTokenManager.Object, new Clock());
+            var userService = new UserService(NullLogger<UserService>.Instance, context, new PasswordService(), new Clock());
 
             await userService.ModifyUserAsync(
                 await userService.GetUserIdByUsernameAsync("administrator"),
