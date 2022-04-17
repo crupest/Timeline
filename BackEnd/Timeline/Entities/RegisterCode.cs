@@ -10,10 +10,10 @@ namespace Timeline.Entities
         public long Id { get; set; }
 
         [Column("owner_id")]
-        public long OwnerId { get; set; }
+        public long? OwnerId { get; set; }
 
         [ForeignKey(nameof(OwnerId))]
-        public UserEntity Owner { get; set; } = default!;
+        public UserEntity? Owner { get; set; } = default!;
 
         [Column("code")]
         public string Code { get; set; } = default!;

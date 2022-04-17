@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Timeline.Entities
 {
@@ -35,6 +35,9 @@ namespace Timeline.Entities
         public DbSet<BookmarkTimelineEntity> BookmarkTimelines { get; set; } = default!;
 
         public DbSet<UserConfigurationEntity> UserConfigurations { get; set; } = default!;
+
+        public DbSet<RegisterCode> RegisterCodes { get; set; } = default!;
+        public DbSet<UserRegisterInfo> UserRegisterInfos { get; set; } = default!;
 
         public DbSet<JwtTokenEntity> JwtToken { get; set; } = default!;
         public DbSet<UserTokenEntity> UserTokens { get; set; } = default!;
