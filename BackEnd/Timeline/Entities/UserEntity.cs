@@ -37,9 +37,6 @@ namespace Timeline.Entities
         [Column("last_modified")]
         public DateTime LastModified { get; set; }
 
-        [Column("register_code")]
-        public string? RegisterCode { get; set; }
-
         public UserAvatarEntity? Avatar { get; set; }
 
 #pragma warning disable CA2227 // Collection properties should be read only
