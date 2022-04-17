@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
@@ -93,12 +93,6 @@ namespace Timeline.Tests.IntegratedTests
             {
                 var body = await client.GetUserAsync("newuser");
                 body.Nickname.Should().Be("aaa");
-            }
-
-            {
-                var token = userClient.DefaultRequestHeaders.Authorization!.Parameter!;
-                // Token should expire.
-                await userClient.TestPostAssertErrorAsync("token/verify", new HttpVerifyOrRevokeTokenRequest() { Token = token });
             }
 
             {
@@ -294,7 +288,6 @@ namespace Timeline.Tests.IntegratedTests
         {
             using var client = await CreateClientAsUser();
             await client.TestPostAsync(changePasswordUrl, new HttpChangePasswordRequest { OldPassword = "user1pw", NewPassword = "newpw" });
-            await client.TestPatchAssertUnauthorizedAsync("users/user1", new HttpUserPatchRequest { });
             (await CreateClientWithCredential("user1", "newpw")).Dispose();
         }
 

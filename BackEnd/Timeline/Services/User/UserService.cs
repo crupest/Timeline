@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Timeline.Entities;
 using Timeline.Models;
 using Timeline.Models.Validation;
-using Timeline.Services.Token;
 
 namespace Timeline.Services.User
 {
@@ -21,17 +20,14 @@ namespace Timeline.Services.User
 
         private readonly IPasswordService _passwordService;
 
-        private readonly IUserTokenService _userTokenService;
-
         private readonly UsernameValidator _usernameValidator = new UsernameValidator();
         private readonly NicknameValidator _nicknameValidator = new NicknameValidator();
 
-        public UserService(ILogger<UserService> logger, DatabaseContext database, IPasswordService passwordService, IUserTokenService userTokenService, IClock clock)
+        public UserService(ILogger<UserService> logger, DatabaseContext database, IPasswordService passwordService, IClock clock)
         {
             _logger = logger;
             _database = database;
             _passwordService = passwordService;
-            _userTokenService = userTokenService;
             _clock = clock;
         }
 
@@ -208,11 +204,6 @@ namespace Timeline.Services.User
 
                 await _database.SaveChangesAsync();
                 _logger.LogInformation(Resource.LogUserModified, entity.Username, id);
-
-                if (password is not null)
-                {
-                    await _userTokenService.RevokeAllTokenByUserIdAsync(id);
-                }
             }
 
             return entity;
@@ -265,8 +256,6 @@ namespace Timeline.Services.User
             entity.Version += 1;
             await _database.SaveChangesAsync();
             _logger.LogInformation(Resource.LogChangePassowrd, entity.Username, id);
-
-            await _userTokenService.RevokeAllTokenByUserIdAsync(id);
         }
 
         public async Task<Page<UserEntity>> GetUsersV2Async(int page, int pageSize)

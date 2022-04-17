@@ -1,27 +1,25 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading.Tasks;
 using Timeline.Entities;
-using Timeline.Services.Timeline;
 using Timeline.Services.User;
 using Timeline.Tests.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Timeline.Tests.Services
+namespace Timeline.Tests.ServiceTests
 {
     public abstract class ServiceTestBase : IAsyncLifetime
     {
+        private readonly ITestOutputHelper? _testOutputHelper;
+
         protected TestDatabase TestDatabase { get; }
         protected DatabaseContext Database { get; private set; } = default!;
 
-        private readonly ITestOutputHelper? _testOutputHelper;
-
         protected TestClock Clock { get; } = new TestClock();
         protected UserService UserService { get; private set; } = default!;
-        protected TimelineService TimelineService { get; private set; } = default!;
 
-        protected long UserId { get; private set; }
         protected long AdminId { get; private set; }
+        protected long UserId { get; private set; }
 
         protected ServiceTestBase(ITestOutputHelper? testOutputHelper = null)
         {
@@ -35,10 +33,9 @@ namespace Timeline.Tests.Services
             Database = TestDatabase.CreateContext(_testOutputHelper);
 
             UserService = new UserService(NullLogger<UserService>.Instance, Database, new PasswordService(), Clock);
-            TimelineService = new TimelineService(NullLogger<TimelineService>.Instance, Database, UserService, Clock);
 
-            UserId = await UserService.GetUserIdByUsernameAsync("user");
             AdminId = await UserService.GetUserIdByUsernameAsync("admin");
+            UserId = await UserService.GetUserIdByUsernameAsync("user");
 
             await OnInitializeAsync();
             OnInitialize();

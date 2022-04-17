@@ -31,8 +31,14 @@
     </ItemGroup>
     <ItemGroup>
       <None Remove="V2\" />
+      <None Remove="ServiceTest\" />
+      <None Remove="ServiceTests\User\" />
+      <None Remove="ServiceTests\User\RegisterCode\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="IntegratedTests2\" />
+      <Folder Include="ServiceTests\" />
+      <Folder Include="ServiceTests\User\" />
+      <Folder Include="ServiceTests\User\RegisterCode\" />
     </ItemGroup>
 </Project>
