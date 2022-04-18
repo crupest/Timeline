@@ -46,6 +46,18 @@ namespace Timeline.Services.User.RegisterCode
         Task<UserRegisterInfo?> GetUserRegisterInfoAsync(long userId);
 
         /// <summary>
+        /// Create a user with register code.
+        /// </summary>
+        /// <param name="userParams">The params to create user with.</param>
+        /// <param name="registerCode">The user code.</param>
+        /// <returns>The created user.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="userParams"/> or <paramref name="registerCode"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="userParams"/> is invalid.</exception>
+        /// <exception cref="EntityAlreadyExistException">Thrown when username already exist.</exception>
+        /// <exception cref="InvalidRegisterCodeException">Thrown when register code is invalid.</exception>
+        Task<UserEntity> RegisterUserWithCode(CreateUserParams userParams, string registerCode);
+
+        /// <summary>
         /// Get the list of user register info of the specified introducer.
         /// </summary>
         /// <param name="introducerId"></param>

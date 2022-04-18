@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Timeline.Services.User;
 using Timeline.Services.User.RegisterCode;
 using Xunit;
 
@@ -12,7 +13,7 @@ namespace Timeline.Tests.ServiceTests.User.RegisterCode
 
         protected override void OnInitialize()
         {
-            _registerCodeService = new RegisterCodeService(Database, UserService);
+            _registerCodeService = new RegisterCodeService(Database, UserService, Clock);
         }
 
         protected override void OnDispose()
@@ -88,6 +89,21 @@ namespace Timeline.Tests.ServiceTests.User.RegisterCode
             c.RegisterCode.Should().Be(registerCode);
             c.IntroducerId.Should().Be(AdminId);
             c.RegisterTime.Should().Be(dateTime);
+        }
+
+        [Fact]
+        public async Task RegisterUserTest()
+        {
+            var registerCode = await _registerCodeService.CreateNewCodeAsync(AdminId);
+
+            var a = await _registerCodeService.RegisterUserWithCode(new CreateUserParams("user2", "user2pw"), registerCode);
+            a.Should().NotBeNull();
+
+            await _registerCodeService.CreateNewCodeAsync(AdminId);
+
+            await _registerCodeService.Awaiting(s => s.RegisterUserWithCode(new CreateUserParams("user3", "user3pw"), registerCode))
+                .Should().ThrowAsync<InvalidRegisterCodeException>();
+
         }
     }
 }
