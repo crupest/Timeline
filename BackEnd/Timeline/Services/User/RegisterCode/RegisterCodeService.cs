@@ -12,16 +12,22 @@ namespace Timeline.Services.User.RegisterCode
     public class RegisterCodeService : IRegisterCodeService, IDisposable
     {
         private readonly DatabaseContext _databaseContext;
+        private readonly IUserService _userService;
+
         private readonly RandomNumberGenerator _randomNumberGenerator;
 
-        public RegisterCodeService(DatabaseContext databaseContext)
+        public RegisterCodeService(DatabaseContext databaseContext, IUserService userService)
         {
             _databaseContext = databaseContext;
+            _userService = userService;
+
             _randomNumberGenerator = RandomNumberGenerator.Create();
         }
 
-        public async Task<string> CreateNewCode(long userId)
+        public async Task<string> CreateNewCodeAsync(long userId)
         {
+            await _userService.CheckUserExistenceAsync(userId);
+
             var oldEntity = await _databaseContext.RegisterCodes.Where(r => r.OwnerId == userId && r.Enabled).SingleOrDefaultAsync();
 
             if (oldEntity is not null)
@@ -42,9 +48,24 @@ namespace Timeline.Services.User.RegisterCode
             return newEntity.Code;
         }
 
-        public Task<UserRegisterInfo> CreateRegisterInfo(long userId, long introducerId, string registerCode, DateTime registerTime)
+        public async Task<UserRegisterInfo> CreateRegisterInfoAsync(long userId, string registerCode, DateTime registerTime)
         {
-            throw new NotImplementedException();
+            await _userService.CheckUserExistenceAsync(userId);
+
+            var introducerId = await GetCodeOwnerAsync(registerCode, false);
+
+            var entity = new UserRegisterInfo()
+            {
+                UserId = userId,
+                IntroducerId = introducerId,
+                RegisterCode = registerCode,
+                RegisterTime = registerTime
+            };
+
+            _databaseContext.UserRegisterInfos.Add(entity);
+            await _databaseContext.SaveChangesAsync();
+
+            return entity;
         }
 
         public void Dispose()
@@ -52,7 +73,7 @@ namespace Timeline.Services.User.RegisterCode
             _randomNumberGenerator.Dispose();
         }
 
-        public async Task<long?> GetCodeOwner(string code, bool onlyEnabled = true)
+        public async Task<long?> GetCodeOwnerAsync(string code, bool onlyEnabled = true)
         {
             var entity = await _databaseContext.RegisterCodes.Where(r => r.Code == code).SingleOrDefaultAsync();
             if (entity is null) return null;
@@ -60,18 +81,21 @@ namespace Timeline.Services.User.RegisterCode
             return entity.OwnerId;
         }
 
-        public async Task<string?> GetCurrentCode(long userId)
+        public async Task<string?> GetCurrentCodeAsync(long userId)
         {
+            await _userService.CheckUserExistenceAsync(userId);
+
             var entity = await _databaseContext.RegisterCodes.Where(r => r.OwnerId == userId && r.Enabled).SingleOrDefaultAsync();
             return entity?.Code;
         }
 
-        public Task<UserRegisterInfo?> GetUserRegisterInfo(long userId)
+        public async Task<UserRegisterInfo?> GetUserRegisterInfoAsync(long userId)
         {
-            throw new NotImplementedException();
+            await _userService.CheckUserExistenceAsync(userId);
+            return await _databaseContext.UserRegisterInfos.Where(i => i.UserId == userId).SingleOrDefaultAsync();
         }
 
-        public Task<List<UserRegisterInfo>> GetUserRegisterInfoOfIntroducer(long introducerId)
+        public Task<List<UserRegisterInfo>> GetUserRegisterInfoOfIntroducerAsync(long introducerId)
         {
             throw new NotImplementedException();
         }
