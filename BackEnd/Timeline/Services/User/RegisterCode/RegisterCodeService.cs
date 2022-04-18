@@ -14,12 +14,16 @@ namespace Timeline.Services.User.RegisterCode
         private readonly DatabaseContext _databaseContext;
         private readonly IUserService _userService;
 
+        private readonly IClock _clock;
+
         private readonly RandomNumberGenerator _randomNumberGenerator;
 
-        public RegisterCodeService(DatabaseContext databaseContext, IUserService userService)
+        public RegisterCodeService(DatabaseContext databaseContext, IUserService userService, IClock clock)
         {
             _databaseContext = databaseContext;
             _userService = userService;
+
+            _clock = clock;
 
             _randomNumberGenerator = RandomNumberGenerator.Create();
         }
@@ -98,6 +102,20 @@ namespace Timeline.Services.User.RegisterCode
         public Task<List<UserRegisterInfo>> GetUserRegisterInfoOfIntroducerAsync(long introducerId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<UserEntity> RegisterUserWithCode(CreateUserParams userParams, string registerCode)
+        {
+            var registerCodeOwner = await GetCodeOwnerAsync(registerCode);
+            if (registerCodeOwner is null)
+            {
+                throw new InvalidRegisterCodeException("Register code is invalid.");
+            }
+
+            var user = await _userService.CreateUserAsync(userParams);
+            await CreateRegisterInfoAsync(user.Id, registerCode, _clock.GetCurrentTime());
+
+            return user;
         }
     }
 }
