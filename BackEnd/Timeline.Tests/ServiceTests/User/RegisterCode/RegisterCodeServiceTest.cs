@@ -99,6 +99,11 @@ namespace Timeline.Tests.ServiceTests.User.RegisterCode
             var a = await _registerCodeService.RegisterUserWithCode(new CreateUserParams("user2", "user2pw"), registerCode);
             a.Should().NotBeNull();
 
+            var b = await _registerCodeService.GetUserRegisterInfoAsync(a.Id);
+            b.Should().NotBeNull();
+            b!.RegisterCode.Should().Be(registerCode);
+            b.IntroducerId.Should().Be(AdminId);
+
             await _registerCodeService.CreateNewCodeAsync(AdminId);
 
             await _registerCodeService.Awaiting(s => s.RegisterUserWithCode(new CreateUserParams("user3", "user3pw"), registerCode))
