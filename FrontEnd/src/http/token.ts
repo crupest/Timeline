@@ -1,13 +1,17 @@
 // Don't use axios in common because it will contains
 // authorization header, which shouldn't be used in token apis.
-import axios, { AxiosError } from "axios";
+import originalAxios, { AxiosError } from "axios";
 
 import {
   apiBaseUrl,
   convertToIfErrorCodeIs,
   extractResponseData,
+  configureAxios,
 } from "./common";
 import { HttpUser } from "./user";
+
+const axios = originalAxios.create();
+configureAxios(axios);
 
 export interface HttpCreateTokenRequest {
   username: string;
@@ -42,7 +46,7 @@ export interface IHttpTokenClient {
 export class HttpTokenClient implements IHttpTokenClient {
   create(req: HttpCreateTokenRequest): Promise<HttpCreateTokenResponse> {
     return axios
-      .post<HttpCreateTokenResponse>(`${apiBaseUrl}/token/create`, req)
+      .post<HttpCreateTokenResponse>(`${apiBaseUrl}/token/create`, req, {})
       .then(extractResponseData)
       .catch(
         convertToIfErrorCodeIs(11010101, HttpCreateTokenBadCredentialError)

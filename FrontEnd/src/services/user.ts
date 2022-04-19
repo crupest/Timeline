@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BehaviorSubject, Observable } from "rxjs";
+import { AxiosError } from "axios";
 
 import { UiLogicError } from "@/common";
 
@@ -11,7 +12,6 @@ import {
 import { getHttpUserClient, HttpUser, UserPermission } from "@/http/user";
 
 import { pushAlert } from "./alert";
-import { AxiosError } from "axios";
 
 interface IAuthUser extends HttpUser {
   token: string;
@@ -67,6 +67,8 @@ export class UserService {
           type: "danger",
           message: "user.tokenInvalid",
         });
+      } else {
+        throw e;
       }
     });
 
