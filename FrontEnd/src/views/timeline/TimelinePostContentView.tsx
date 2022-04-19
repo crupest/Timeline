@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-import { Remarkable } from "remarkable";
+import { marked } from "marked";
 
 import { UiLogicError } from "@/common";
 
@@ -88,17 +88,6 @@ const ImageView: React.FC<TimelinePostContentViewProps> = (props) => {
 const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
   const { post, className, style } = props;
 
-  const _remarkable = React.useRef<Remarkable>();
-
-  const getRemarkable = (): Remarkable => {
-    if (_remarkable.current) {
-      return _remarkable.current;
-    } else {
-      _remarkable.current = new Remarkable();
-      return _remarkable.current;
-    }
-  };
-
   const [markdown, setMarkdown] = React.useState<string | null>(null);
   const [error, setError] = React.useState<"offline" | "error" | null>(null);
 
@@ -134,7 +123,7 @@ const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
 
   const markdownHtml = React.useMemo<string | null>(() => {
     if (markdown == null) return null;
-    return getRemarkable().render(markdown);
+    return marked.parse(markdown);
   }, [markdown]);
 
   if (error != null) {
