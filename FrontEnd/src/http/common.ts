@@ -1,12 +1,31 @@
-import rawAxios, { AxiosError, AxiosResponse } from "axios";
+import axios, { Axios, AxiosError, AxiosResponse } from "axios";
 import { Base64 } from "js-base64";
+import { identity } from "lodash";
 import { BehaviorSubject, Observable } from "rxjs";
+
+export { axios };
 
 export const apiBaseUrl = "/api";
 
-export const axios = rawAxios.create();
+export class HttpNetworkError extends Error {
+  constructor(public innerError?: AxiosError) {
+    super();
+  }
+}
 
-function convertToNetworkError(error: AxiosError): never {
+export class HttpForbiddenError extends Error {
+  constructor(public innerError?: AxiosError) {
+    super();
+  }
+}
+
+export class HttpNotFoundError extends Error {
+  constructor(public innerError?: AxiosError) {
+    super();
+  }
+}
+
+function convertNetworkError(error: AxiosError): never {
   if (error.isAxiosError && error.response == null) {
     throw new HttpNetworkError(error);
   } else {
@@ -14,7 +33,7 @@ function convertToNetworkError(error: AxiosError): never {
   }
 }
 
-function convertToForbiddenError(error: AxiosError): never {
+function convertForbiddenError(error: AxiosError): never {
   if (
     error.isAxiosError &&
     error.response != null &&
@@ -26,7 +45,7 @@ function convertToForbiddenError(error: AxiosError): never {
   }
 }
 
-function convertToNotFoundError(error: AxiosError): never {
+function convertNotFoundError(error: AxiosError): never {
   if (
     error.isAxiosError &&
     error.response != null &&
@@ -38,12 +57,13 @@ function convertToNotFoundError(error: AxiosError): never {
   }
 }
 
-rawAxios.interceptors.response.use(undefined, convertToNetworkError);
-rawAxios.interceptors.response.use(undefined, convertToForbiddenError);
-rawAxios.interceptors.response.use(undefined, convertToNotFoundError);
-axios.interceptors.response.use(undefined, convertToNetworkError);
-axios.interceptors.response.use(undefined, convertToForbiddenError);
-axios.interceptors.response.use(undefined, convertToNotFoundError);
+export function configureAxios(axios: Axios): void {
+  axios.interceptors.response.use(identity, convertNetworkError);
+  axios.interceptors.response.use(identity, convertForbiddenError);
+  axios.interceptors.response.use(identity, convertNotFoundError);
+}
+
+configureAxios(axios);
 
 const tokenSubject = new BehaviorSubject<string | null>(null);
 
@@ -104,24 +124,6 @@ export function extractErrorCode(
     }
   }
   return null;
-}
-
-export class HttpNetworkError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
-}
-
-export class HttpForbiddenError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
-}
-
-export class HttpNotFoundError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
 }
 
 export class NotModified {}
