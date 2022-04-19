@@ -1,29 +1,37 @@
-import { Remarkable } from "remarkable";
+import { marked } from "marked";
 
 import { UiLogicError } from "@/common";
 
 import { base64 } from "@/http/common";
 import { HttpTimelinePostPostRequest } from "@/http/timeline";
 
+class TimelinePostMarkedRenderer extends marked.Renderer {
+  constructor(private _images: { file: File; url: string }[]) {
+    super();
+  }
+
+  image(href: string | null, title: string | null, text: string): string {
+    if (href != null) {
+      const i = parseInt(href);
+      if (!isNaN(i) && i > 0 && i <= this._images.length) {
+        href = this._images[i - 1].url;
+      }
+    }
+    return this.image(href, title, text);
+  }
+}
+
 export default class TimelinePostBuilder {
   private _onChange: () => void;
   private _text = "";
   private _images: { file: File; url: string }[] = [];
-  private _md: Remarkable = new Remarkable();
+  private _markedOptions: marked.MarkedOptions;
 
   constructor(onChange: () => void) {
     this._onChange = onChange;
-    const oldImageRenderer = this._md.renderer.rules.image;
-    this._md.renderer.rules.image = ((
-      _t: TimelinePostBuilder
-    ): Remarkable.Rule<Remarkable.ImageToken, string> =>
-      function (tokens, idx, options /*, env */) {
-        const i = parseInt(tokens[idx].src);
-        if (!isNaN(i) && i > 0 && i <= _t._images.length) {
-          tokens[idx].src = _t._images[i - 1].url;
-        }
-        return oldImageRenderer(tokens, idx, options);
-      })(this);
+    this._markedOptions = {
+      renderer: new TimelinePostMarkedRenderer(this._images),
+    };
   }
 
   setMarkdownText(text: string): void {
@@ -87,7 +95,7 @@ export default class TimelinePostBuilder {
   }
 
   renderHtml(): string {
-    return this._md.render(this._text);
+    return marked.parse(this._text);
   }
 
   dispose(): void {
