@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
@@ -137,6 +138,14 @@ namespace Timeline.Tests.IntegratedTests2
         public HttpClient CreateClientAsUser()
         {
             return CreateClientWithToken(NormalUserToken);
+        }
+
+        public async Task TestOnlySelfAndAdminCanCall(HttpMethod httpMethod, string selfResourceUrl, string otherResourceUrl, object? body)
+        {
+            await DefaultClient.TestJsonSendAsync(httpMethod, selfResourceUrl, body, expectedStatusCode: HttpStatusCode.Unauthorized);
+            await UserClient.TestJsonSendAsync(httpMethod, selfResourceUrl, body);
+            await UserClient.TestJsonSendAsync(httpMethod, otherResourceUrl, body, expectedStatusCode: HttpStatusCode.Forbidden);
+            await AdminClient.TestJsonSendAsync(httpMethod, selfResourceUrl, body);
         }
     }
 }
