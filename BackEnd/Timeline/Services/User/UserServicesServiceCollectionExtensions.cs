@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Timeline.Services.User.Avatar;
+using Timeline.Services.User.RegisterCode;
 
 namespace Timeline.Services.User
 {
@@ -14,6 +15,8 @@ namespace Timeline.Services.User
             services.TryAddScoped<IUserPermissionService, UserPermissionService>();
 
             services.AddUserAvatarServices();
+
+            services.TryAddScoped<IRegisterCodeService, RegisterCodeService>();
 
             return services;
         }
