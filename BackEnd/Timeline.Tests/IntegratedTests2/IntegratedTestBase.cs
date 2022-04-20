@@ -14,16 +14,16 @@ namespace Timeline.Tests.IntegratedTests2
 {
     public abstract class IntegratedTestBase : IAsyncLifetime
     {
-        protected TestApplication TestApp { get; }
+        public TestApplication TestApp { get; }
 
-        protected int TestUserCount { get; }
+        public int TestUserCount { get; }
 
-        protected string NormalUserToken { get; set; } = default!;
-        protected string AdminUserToken { get; set; } = default!;
+        public string NormalUserToken { get; set; } = default!;
+        public string AdminUserToken { get; set; } = default!;
 
-        protected HttpClient DefaultClient { get; set; } = default!;
-        protected HttpClient UserClient { get; set; } = default!;
-        protected HttpClient AdminClient { get; set; } = default!;
+        public HttpClient DefaultClient { get; set; } = default!;
+        public HttpClient UserClient { get; set; } = default!;
+        public HttpClient AdminClient { get; set; } = default!;
 
         public IntegratedTestBase(ITestOutputHelper testOutputHelper) : this(1, testOutputHelper)
         {
@@ -140,12 +140,6 @@ namespace Timeline.Tests.IntegratedTests2
             return CreateClientWithToken(NormalUserToken);
         }
 
-        public async Task TestOnlySelfAndAdminCanCall(HttpMethod httpMethod, string selfResourceUrl, string otherResourceUrl, object? body)
-        {
-            await DefaultClient.TestJsonSendAsync(httpMethod, selfResourceUrl, body, expectedStatusCode: HttpStatusCode.Unauthorized);
-            await UserClient.TestJsonSendAsync(httpMethod, selfResourceUrl, body);
-            await UserClient.TestJsonSendAsync(httpMethod, otherResourceUrl, body, expectedStatusCode: HttpStatusCode.Forbidden);
-            await AdminClient.TestJsonSendAsync(httpMethod, selfResourceUrl, body);
-        }
+
     }
 }
