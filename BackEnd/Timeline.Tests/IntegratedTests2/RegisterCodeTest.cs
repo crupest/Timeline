@@ -52,8 +52,8 @@ namespace Timeline.Tests.IntegratedTests2
         [Fact]
         public async Task PermissionTest()
         {
-            await TestOnlySelfAndAdminCanCall(HttpMethod.Get, "v2/users/user/registercode", "v2/users/admin/registercode", null);
-            await TestOnlySelfAndAdminCanCall(HttpMethod.Post, "v2/users/user/renewregistercode", "v2/users/admin/renewregistercode", null);
+            await this.TestOnlySelfAndAdminCanCall(HttpMethod.Get, "v2/users/user/registercode", "v2/users/admin/registercode", null);
+            await this.TestOnlySelfAndAdminCanCall(HttpMethod.Post, "v2/users/user/renewregistercode", "v2/users/admin/renewregistercode", null);
         }
     }
 }
