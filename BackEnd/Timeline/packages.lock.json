@@ -23,9 +23,9 @@
       },
       "Markdig": {
         "type": "Direct",
-        "requested": "[0.28.1, )",
-        "resolved": "0.28.1",
-        "contentHash": "70CneXw2N/1t7v6OfZJqMKLPRB1YWTPddEIcHT/P6IL6X1zsXELIu/DHVt96kr83PIVLznMuXoFK6b9N9KTODg=="
+        "requested": "[0.30.0, )",
+        "resolved": "0.30.0",
+        "contentHash": "wpuC7a5W/c9bsAzQs8Pxuo2S1KlLDIL3stOHpWW7UwGneYbdh3fByPCAyGmsu5FzPsJsqpbjVSYU5RLKkwk2lA=="
       },
       "Microsoft.AspNetCore.SpaServices.Extensions": {
         "type": "Direct",
@@ -93,9 +93,9 @@
       },
       "SixLabors.ImageSharp": {
         "type": "Direct",
-        "requested": "[2.1.0, )",
-        "resolved": "2.1.0",
-        "contentHash": "H8npUDq3VRagzRsJVxaNoUSMmD+kjAs7sR1Ip85eWbN5c0O1medMw/FiQ32dSNfWz/gVrc+xHs3es9SFlAiNBw==",
+        "requested": "[2.1.1, )",
+        "resolved": "2.1.1",
+        "contentHash": "oNHMT8+yUR9dyuU2r7fwsXvvS4OnfCs9N5i2y2p9iBxp3nvEZbe/hZWrOGfD7MX2lxOAlWzlhzj0q2uFwP8avg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "5.0.0",
           "System.Text.Encoding.CodePages": "5.0.0"
