@@ -3,7 +3,7 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 
-import useClickOutside from "@/utilities/useClickOutside";
+import { useClickOutside } from "@/utilities/hooks";
 
 import Menu, { MenuItems } from "./Menu";
 

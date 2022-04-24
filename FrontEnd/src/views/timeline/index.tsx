@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { UiLogicError } from "@/common";
 
-import useReverseScrollPositionRemember from "@/utilities/useReverseScrollPositionRemember";
+import { useReverseScrollPositionRemember } from "@/utilities/hooks";
 
 import Timeline from "./Timeline";
 

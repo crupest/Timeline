@@ -2,7 +2,7 @@ import React from "react";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
 
-import useScrollToTop from "@/utilities/useScrollToTop";
+import { useScrollToTop } from "@/utilities/hooks";
 
 import TimelinePostListView from "./TimelinePostListView";
 

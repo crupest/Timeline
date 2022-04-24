@@ -5,7 +5,7 @@ import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
 import { pushAlert } from "@/services/alert";
 
-import useClickOutside from "@/utilities/useClickOutside";
+import { useClickOutside } from "@/utilities/hooks";
 
 import UserAvatar from "../common/user/UserAvatar";
 import Card from "../common/Card";
