@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import classnames from "classnames";
 import { HubConnectionState } from "@microsoft/signalr";
 
-import { useIsSmallScreen } from "@/utilities/mediaQuery";
+import { useIsSmallScreen } from "@/utilities/hooks";
 import { timelineVisibilityTooltipTranslationMap } from "@/services/timeline";
 import { useUser } from "@/services/user";
 import { pushAlert } from "@/services/alert";
