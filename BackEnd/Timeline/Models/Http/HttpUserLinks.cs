@@ -8,11 +8,10 @@
     {
         public HttpUserLinks() { }
 
-        public HttpUserLinks(string self, string avatar, string timeline)
+        public HttpUserLinks(string self, string avatar)
         {
             Self = self;
             Avatar = avatar;
-            Timeline = timeline;
         }
 
         /// <summary>
@@ -23,9 +22,5 @@
         /// Avatar url.
         /// </summary>
         public string Avatar { get; set; } = default!;
-        /// <summary>
-        /// Personal timeline url.
-        /// </summary>
-        public string Timeline { get; set; } = default!;
     }
 }
