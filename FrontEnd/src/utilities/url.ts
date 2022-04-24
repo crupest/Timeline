@@ -13,5 +13,12 @@ export function applyQueryParameters<T>(url: string, query: T): string {
       console.error("Unknown query parameter type. Param: ", value);
     }
   }
-  return url + "?" + params.toString();
+
+  const p = params.toString();
+
+  if (p == "") {
+    return url;
+  }
+
+  return url + "?" + p;
 }
