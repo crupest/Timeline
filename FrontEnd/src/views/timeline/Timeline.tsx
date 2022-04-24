@@ -1,6 +1,6 @@
 import React from "react";
-import { HubConnectionState } from "@microsoft/signalr";
 import classnames from "classnames";
+import { HubConnectionState } from "@microsoft/signalr";
 
 import {
   HttpForbiddenError,
@@ -13,16 +13,15 @@ import {
   HttpTimelinePostInfo,
 } from "@/http/timeline";
 
-import { getTimelinePostUpdate$ } from "@/services/timeline";
 import { useUser } from "@/services/user";
-
-import useValueWithRef from "@/utilities/useValueWithRef";
+import { getTimelinePostUpdate$ } from "@/services/timeline";
 
 import TimelinePagedPostListView from "./TimelinePagedPostListView";
 import TimelineEmptyItem from "./TimelineEmptyItem";
 import TimelineLoading from "./TimelineLoading";
 import TimelinePostEdit from "./TimelinePostEdit";
 import TimelinePostEditNoLogin from "./TimelinePostEditNoLogin";
+import TimelineCard from "./TimelineCard";
 
 import "./index.css";
 
@@ -31,143 +30,170 @@ export interface TimelineProps {
   style?: React.CSSProperties;
   timelineOwner: string;
   timelineName: string;
-  reloadKey: number;
-  onReload: () => void;
-  onTimelineLoaded?: (timeline: HttpTimelineInfo) => void;
-  onConnectionStateChanged?: (state: HubConnectionState) => void;
 }
 
 const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timelineOwner, timelineName, className, style, reloadKey } = props;
+  const { timelineOwner, timelineName, className, style } = props;
 
   const user = useUser();
 
-  const [state, setState] = React.useState<
-    "loading" | "loaded" | "offline" | "notexist" | "forbid" | "error"
-  >("loading");
   const [timeline, setTimeline] = React.useState<HttpTimelineInfo | null>(null);
-  const [posts, setPosts] = React.useState<HttpTimelinePostInfo[]>([]);
-
-  React.useEffect(() => {
-    setState("loading");
-    setTimeline(null);
-    setPosts([]);
-  }, [timelineName]);
-
-  const onReload = useValueWithRef(props.onReload);
-  const onTimelineLoaded = useValueWithRef(props.onTimelineLoaded);
-  const onConnectionStateChanged = useValueWithRef(
-    props.onConnectionStateChanged
+  const [posts, setPosts] = React.useState<HttpTimelinePostInfo[] | null>(null);
+  const [signalrState, setSignalrState] = React.useState<HubConnectionState>(
+    HubConnectionState.Connecting
   );
+  const [error, setError] = React.useState<
+    "offline" | "forbid" | "notfound" | "error" | null
+  >(null);
+
+  const [timelineReloadKey, setTimelineReloadKey] = React.useState(0);
+  const [postsReloadKey, setPostsReloadKey] = React.useState(0);
+
+  const updateTimeline = (): void => setTimelineReloadKey((o) => o + 1);
+  const updatePosts = (): void => setPostsReloadKey((o) => o + 1);
 
   React.useEffect(() => {
-    if (timelineName != null && state === "loaded") {
-      const timelinePostUpdate$ = getTimelinePostUpdate$(
-        timelineOwner,
-        timelineName
-      );
-      const subscription = timelinePostUpdate$.subscribe(
-        ({ update, state }) => {
-          if (update) {
-            onReload.current();
-          }
-          onConnectionStateChanged.current?.(state);
-        }
-      );
-      return () => {
-        subscription.unsubscribe();
-      };
-    }
-  }, [timelineOwner, timelineName, state, onReload, onConnectionStateChanged]);
+    setTimeline(null);
+    setPosts(null);
+    setError(null);
+    setSignalrState(HubConnectionState.Connecting);
+  }, [timelineOwner, timelineName]);
 
   React.useEffect(() => {
     if (timelineName != null) {
       let subscribe = true;
 
-      const client = getHttpTimelineClient();
-      Promise.all([
-        client.getTimeline(timelineOwner, timelineName),
-        client.listPost(timelineOwner, timelineName),
-      ]).then(
-        ([t, p]) => {
-          if (subscribe) {
-            setTimeline(t);
-            setPosts(
-              p.items.filter(
-                (p): p is HttpTimelinePostInfo => p.deleted === false
-              )
-            );
-            setState("loaded");
-            onTimelineLoaded.current?.(t);
-          }
-        },
-        (error) => {
-          if (subscribe) {
-            if (error instanceof HttpNetworkError) {
-              setState("offline");
-            } else if (error instanceof HttpForbiddenError) {
-              setState("forbid");
-            } else if (error instanceof HttpNotFoundError) {
-              setState("notexist");
-            } else {
-              console.error(error);
-              setState("error");
+      getHttpTimelineClient()
+        .getTimeline(timelineOwner, timelineName)
+        .then(
+          (t) => {
+            if (subscribe) {
+              setTimeline(t);
+            }
+          },
+          (error) => {
+            if (subscribe) {
+              if (error instanceof HttpNetworkError) {
+                setError("offline");
+              } else if (error instanceof HttpForbiddenError) {
+                setError("forbid");
+              } else if (error instanceof HttpNotFoundError) {
+                setError("notfound");
+              } else {
+                console.error(error);
+                setError("error");
+              }
             }
           }
-        }
-      );
+        );
 
       return () => {
         subscribe = false;
       };
     }
-  }, [timelineOwner, timelineName, reloadKey, onTimelineLoaded]);
+  }, [timelineOwner, timelineName, timelineReloadKey]);
 
-  switch (state) {
-    case "loading":
-      return <TimelineLoading />;
-    case "offline":
-      return (
-        <div className={className} style={style}>
-          Offline.
-        </div>
+  React.useEffect(() => {
+    let subscribe = true;
+    void getHttpTimelineClient()
+      .listPost(timelineOwner, timelineName)
+      .then(
+        (ps) => {
+          if (subscribe) {
+            setPosts(
+              ps.items.filter(
+                (p): p is HttpTimelinePostInfo => p.deleted === false
+              )
+            );
+          }
+        },
+        (error) => {
+          if (subscribe) {
+            if (error instanceof HttpNetworkError) {
+              setError("offline");
+            } else if (error instanceof HttpForbiddenError) {
+              setError("forbid");
+            } else if (error instanceof HttpNotFoundError) {
+              setError("notfound");
+            } else {
+              console.error(error);
+              setError("error");
+            }
+          }
+        }
       );
-    case "notexist":
-      return (
-        <div className={className} style={style}>
-          Not exist.
-        </div>
-      );
-    case "forbid":
-      return (
-        <div className={className} style={style}>
-          Forbid.
-        </div>
-      );
-    case "error":
-      return (
-        <div className={className} style={style}>
-          Error.
-        </div>
-      );
-    default:
-      return (
+    return () => {
+      subscribe = false;
+    };
+  }, [timelineOwner, timelineName, postsReloadKey]);
+
+  React.useEffect(() => {
+    const timelinePostUpdate$ = getTimelinePostUpdate$(
+      timelineOwner,
+      timelineName
+    );
+    const subscription = timelinePostUpdate$.subscribe(({ update, state }) => {
+      if (update) {
+        setPostsReloadKey((o) => o + 1);
+      }
+      setSignalrState(state);
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [timelineOwner, timelineName]);
+
+  if (error === "offline") {
+    return (
+      <div className={className} style={style}>
+        Offline.
+      </div>
+    );
+  } else if (error === "notfound") {
+    return (
+      <div className={className} style={style}>
+        Not exist.
+      </div>
+    );
+  } else if (error === "forbid") {
+    return (
+      <div className={className} style={style}>
+        Forbid.
+      </div>
+    );
+  } else if (error === "error") {
+    return (
+      <div className={className} style={style}>
+        Error.
+      </div>
+    );
+  }
+  return (
+    <>
+      {timeline == null && posts == null && <TimelineLoading />}
+      {timeline && (
+        <TimelineCard
+          className="timeline-card"
+          timeline={timeline}
+          connectionStatus={signalrState}
+          onReload={updateTimeline}
+        />
+      )}
+      {posts && (
         <div style={style} className={classnames("timeline", className)}>
           <TimelineEmptyItem height={40} />
-          <TimelinePagedPostListView
-            posts={posts}
-            onReload={onReload.current}
-          />
+          <TimelinePagedPostListView posts={posts} onReload={updatePosts} />
           {timeline?.postable ? (
-            <TimelinePostEdit timeline={timeline} onPosted={onReload.current} />
+            <TimelinePostEdit timeline={timeline} onPosted={updatePosts} />
           ) : user == null ? (
             <TimelinePostEditNoLogin />
           ) : (
             <TimelineEmptyItem startSegmentLength={20} center="none" current />
           )}
         </div>
-      );
-  }
+      )}
+    </>
+  );
 };
 
 export default Timeline;

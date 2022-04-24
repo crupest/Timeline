@@ -237,7 +237,7 @@
   margin-right: 0.6em;
 }
 
-.timeline-template-card {
+.timeline-card {
   position: fixed;
   z-index: 1029;
   top: 56px;
