@@ -60,7 +60,7 @@ namespace Timeline.Services.Timeline
                     "DataGet",
                     "TimelinePostV2",
                     new { owner, timeline, post, data_index = dataIndex }
-                )!
+                ) ?? throw new Exception("Failed to generate post data link.")
             );
         }
 
