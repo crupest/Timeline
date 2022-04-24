@@ -27,6 +27,7 @@ namespace Timeline.Controllers
     [Route("timelines/{timeline}/posts")]
     [CatchMultipleTimelineException]
     [ProducesErrorResponseType(typeof(CommonResponse))]
+    [Obsolete("Use v2 api.")]
     public class TimelinePostController : MyControllerBase
     {
         private readonly ILogger<TimelinePostController> _logger;

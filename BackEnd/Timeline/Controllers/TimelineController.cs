@@ -23,6 +23,7 @@ namespace Timeline.Controllers
     [Route("timelines")]
     [CatchMultipleTimelineException]
     [ProducesErrorResponseType(typeof(CommonResponse))]
+    [Obsolete("Ues v2 api.")]
     public class TimelineController : MyControllerBase
     {
         private readonly IUserService _userService;

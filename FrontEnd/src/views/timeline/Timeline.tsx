@@ -62,7 +62,10 @@ const Timeline: React.FC<TimelineProps> = (props) => {
 
   React.useEffect(() => {
     if (timelineName != null && state === "loaded") {
-      const timelinePostUpdate$ = getTimelinePostUpdate$(timelineName);
+      const timelinePostUpdate$ = getTimelinePostUpdate$(
+        timelineOwner,
+        timelineName
+      );
       const subscription = timelinePostUpdate$.subscribe(
         ({ update, state }) => {
           if (update) {
@@ -75,7 +78,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         subscription.unsubscribe();
       };
     }
-  }, [timelineName, state, onReload, onConnectionStateChanged]);
+  }, [timelineOwner, timelineName, state, onReload, onConnectionStateChanged]);
 
   React.useEffect(() => {
     if (timelineName != null) {

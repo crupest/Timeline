@@ -21,7 +21,8 @@ export const timelineVisibilityTooltipTranslationMap: Record<
 };
 
 export function getTimelinePostUpdate$(
-  timelineName: string
+  owner: string,
+  timeline: string
 ): Observable<{ update: boolean; state: HubConnectionState }> {
   return new Observable((subscriber) => {
     subscriber.next({
@@ -37,8 +38,11 @@ export function getTimelinePostUpdate$(
       .withAutomaticReconnect()
       .build();
 
-    const handler = (tn: string): void => {
-      if (timelineName === tn) {
+    const o = owner;
+    const t = timeline;
+
+    const handler = (owner: string, timeline: string): void => {
+      if (owner === o && timeline === t) {
         subscriber.next({ update: true, state: connection.state });
       }
     };
@@ -64,12 +68,16 @@ export function getTimelinePostUpdate$(
       });
     });
 
-    connection.on("OnTimelinePostChanged", handler);
+    connection.on("OnTimelinePostChangedV2", handler);
 
     void connection.start().then(() => {
       subscriber.next({ update: false, state: HubConnectionState.Connected });
 
-      return connection.invoke("SubscribeTimelinePostChange", timelineName);
+      return connection.invoke(
+        "SubscribeTimelinePostChangeV2",
+        owner,
+        timeline
+      );
     });
 
     return () => {
@@ -77,7 +85,7 @@ export function getTimelinePostUpdate$(
 
       if (connection.state === HubConnectionState.Connected) {
         void connection
-          .invoke("UnsubscribeTimelinePostChange", timelineName)
+          .invoke("UnsubscribeTimelinePostChangeV2", owner, timeline)
           .then(() => connection.stop());
       }
     };
