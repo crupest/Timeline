@@ -1,4 +1,4 @@
-using Markdig;
+﻿using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -31,6 +31,7 @@ namespace Timeline.Services.Timeline
             return writer.ToString();
         }
 
+        [Obsolete("Use overload with 'owner'.")]
         /// <summary>Convert data url to true url with post id.</summary>
         public string Process(string text, IUrlHelper url, string timeline, long post)
         {
@@ -44,9 +45,28 @@ namespace Timeline.Services.Timeline
             );
         }
 
+        [Obsolete("Use overload with 'owner'.")]
         public byte[] Process(byte[] data, IUrlHelper url, string timeline, long post)
         {
             return Encoding.UTF8.GetBytes(Process(Encoding.UTF8.GetString(data), url, timeline, post));
+        }
+
+        /// <summary>Convert data url to true url with post id.</summary>
+        public string Process(string text, IUrlHelper url, string owner, string timeline, long post)
+        {
+            return Process(
+                text,
+                dataIndex => url.ActionLink(
+                    "DataGet",
+                    "TimelinePostV2",
+                    new { owner, timeline, post, data_index = dataIndex }
+                )!
+            );
+        }
+
+        public byte[] Process(byte[] data, IUrlHelper url, string owner, string timeline, long post)
+        {
+            return Encoding.UTF8.GetBytes(Process(Encoding.UTF8.GetString(data), url, owner, timeline, post));
         }
     }
 }

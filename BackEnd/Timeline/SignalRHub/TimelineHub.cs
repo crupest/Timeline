@@ -20,11 +20,18 @@ namespace Timeline.SignalRHub
             _timelineService = timelineService;
         }
 
+        [Obsolete("Use overload with owner.")]
         public static string GenerateTimelinePostChangeListeningGroupName(string timelineName)
         {
             return $"timeline-post-change-{timelineName}";
         }
 
+        public static string GenerateTimelinePostChangeListeningGroupName(string owner, string timeline)
+        {
+            return $"v2-timeline-post-change-{owner}/{timeline}";
+        }
+
+        [Obsolete("Use v2.")]
         public async Task SubscribeTimelinePostChange(string timelineName)
         {
             try
@@ -48,9 +55,40 @@ namespace Timeline.SignalRHub
             }
         }
 
+        public async Task SubscribeTimelinePostChangeV2(string owner, string timeline)
+        {
+            try
+            {
+                var timelineId = await _timelineService.GetTimelineIdAsync(owner, timeline);
+                var user = Context.User;
+                if (!user.HasPermission(UserPermission.AllTimelineManagement) && !await _timelineService.HasReadPermissionAsync(timelineId, user.GetOptionalUserId()))
+                    throw new HubException(Resource.MessageForbidden);
+
+                var group = GenerateTimelinePostChangeListeningGroupName(owner, timeline);
+                await Groups.AddToGroupAsync(Context.ConnectionId, group);
+                _logger.LogInformation(Resource.LogSubscribeTimelinePostChange, Context.ConnectionId, group);
+            }
+            catch (ArgumentException)
+            {
+                throw new HubException(Resource.MessageTimelineNameInvalid);
+            }
+            catch (EntityNotExistException)
+            {
+                throw new HubException(Resource.MessageTimelineNotExist);
+            }
+        }
+
+        [Obsolete("Use v2.")]
         public async Task UnsubscribeTimelinePostChange(string timelineName)
         {
             var group = GenerateTimelinePostChangeListeningGroupName(timelineName);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
+            _logger.LogInformation(Resource.LogUnsubscribeTimelinePostChange, Context.ConnectionId, group);
+        }
+
+        public async Task UnsubscribeTimelinePostChangeV2(string owner, string timeline)
+        {
+            var group = GenerateTimelinePostChangeListeningGroupName(owner, timeline);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
             _logger.LogInformation(Resource.LogUnsubscribeTimelinePostChange, Context.ConnectionId, group);
         }

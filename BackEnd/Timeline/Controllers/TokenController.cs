@@ -17,6 +17,7 @@ namespace Timeline.Controllers
     [Route("token")]
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
+    [Obsolete("Ues v2 api.")]
     public class TokenController : MyControllerBase
     {
         private readonly IUserService _userService;

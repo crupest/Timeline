@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using Timeline.Filters;
 using Timeline.Helpers.Cache;
@@ -17,6 +18,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
+    [Obsolete("Ues v2 api.")]
     public class UserAvatarController : MyControllerBase
     {
         private readonly IUserService _userService;

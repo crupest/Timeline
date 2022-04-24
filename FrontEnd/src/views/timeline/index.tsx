@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 import { UiLogicError } from "@/common";
 import { HttpTimelineInfo } from "@/http/timeline";
-import useReverseScrollPositionRemember from "@/utilities/useReverseScrollPositionRemember";
 import { generatePalette, setPalette } from "@/palette";
 
 import Timeline from "./Timeline";
@@ -28,8 +27,6 @@ const TimelinePage: React.FC = () => {
 
   const [connectionStatus, setConnectionStatus] =
     React.useState<HubConnectionState>(HubConnectionState.Connecting);
-
-  useReverseScrollPositionRemember();
 
   React.useEffect(() => {
     if (timeline != null && timeline.color != null) {

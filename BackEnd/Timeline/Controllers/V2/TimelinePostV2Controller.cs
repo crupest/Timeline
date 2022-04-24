@@ -107,7 +107,7 @@ namespace Timeline.Controllers.V2
                     var data = await _postService.GetPostDataV2Async(timelineId, post, dataIndex);
                     if (data.ContentType == MimeTypes.TextMarkdown)
                     {
-                        return new ByteData(_markdownProcessor.Process(data.Data, Url, timeline, post), data.ContentType);
+                        return new ByteData(_markdownProcessor.Process(data.Data, Url, owner, timeline, post), data.ContentType);
                     }
                     return data;
                 }
@@ -157,8 +157,8 @@ namespace Timeline.Controllers.V2
             {
                 var post = await _postService.CreatePostAsync(timelineId, GetAuthUserId(), createRequest);
 
-                var group = TimelineHub.GenerateTimelinePostChangeListeningGroupName(timeline);
-                await _timelineHubContext.Clients.Group(group).SendAsync(nameof(ITimelineClient.OnTimelinePostChanged), timeline);
+                var group = TimelineHub.GenerateTimelinePostChangeListeningGroupName(owner, timeline);
+                await _timelineHubContext.Clients.Group(group).SendAsync(nameof(ITimelineClient.OnTimelinePostChangedV2), timeline);
 
                 var result = await MapAsync<HttpTimelinePost>(post);
                 return CreatedAtAction("Get", new { owner = owner, timeline = timeline, post = post.LocalId }, result);

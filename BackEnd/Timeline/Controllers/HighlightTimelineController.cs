@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
@@ -17,6 +18,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
+    [Obsolete("Use v2 bookmark instead.")]
     public class HighlightTimelineController : MyControllerBase
     {
         private readonly IHighlightTimelineService _service;

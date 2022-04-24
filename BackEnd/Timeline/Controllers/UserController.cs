@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Auth;
 using Timeline.Filters;
 using Timeline.Models.Http;
 using Timeline.Models.Validation;
-using Timeline.Services;
 using Timeline.Services.Mapper;
 using Timeline.Services.User;
 
@@ -18,6 +18,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
+    [Obsolete("Ues v2 api.")]
     public class UserController : MyControllerBase
     {
         private readonly IUserService _userService;

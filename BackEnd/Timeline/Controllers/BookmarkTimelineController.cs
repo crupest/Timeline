@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Entities;
@@ -16,6 +17,7 @@ namespace Timeline.Controllers
     /// </summary>
     [ApiController]
     [ProducesErrorResponseType(typeof(CommonResponse))]
+    [Obsolete("Use v2 api.")]
     public class BookmarkTimelineController : MyControllerBase
     {
         private readonly IBookmarkTimelineService _service;
