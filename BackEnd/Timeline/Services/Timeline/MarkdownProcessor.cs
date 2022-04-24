@@ -31,8 +31,8 @@ namespace Timeline.Services.Timeline
             return writer.ToString();
         }
 
-        [Obsolete("Use overload with 'owner'.")]
         /// <summary>Convert data url to true url with post id.</summary>
+        [Obsolete("Use overload with 'owner'.")]
         public string Process(string text, IUrlHelper url, string timeline, long post)
         {
             return Process(

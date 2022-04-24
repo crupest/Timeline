@@ -73,11 +73,14 @@ namespace Timeline.Services.Mapper
                 postable = await _timelineService.IsMemberOfAsync(entity.Id, userId.Value);
             }
 
+            var nameV2 = entity.Name is null ? "self" : entity.Name;
+            var ownerUsername = entity.Owner.Username;
+
             return new HttpTimeline(
                 uniqueId: entity.UniqueId,
                 title: string.IsNullOrEmpty(entity.Title) ? timelineName : entity.Title,
                 name: timelineName,
-                nameV2: entity.Name is null ? "self" : entity.Name,
+                nameV2: nameV2,
                 nameLastModifed: entity.NameLastModified,
                 description: entity.Description ?? "",
                 owner: await _userMapper.MapAsync(entity.Owner, urlHelper, user),
@@ -91,12 +94,16 @@ namespace Timeline.Services.Mapper
                 manageable: manageable,
                 postable: postable,
                 links: new HttpTimelineLinks(
-                    self: urlHelper.ActionLink(nameof(TimelineController.TimelineGet), nameof(TimelineController)[0..^nameof(Controller).Length], new { timeline = timelineName })!,
-                    posts: urlHelper.ActionLink(nameof(TimelinePostController.List), nameof(TimelinePostController)[0..^nameof(Controller).Length], new { timeline = timelineName })!
+                    self: urlHelper.ActionLink("Get", "TimelineV2", new { owner = ownerUsername, timeline = nameV2 }) ?? throw Exception("Failed to generate link for timeline self."),
+                    posts: urlHelper.ActionLink("List", "TimelinePostV2", new { owner = ownerUsername, timeline = nameV2 }) ?? throw Exception("Failed to generate link for timeline posts.")
                 )
             );
         }
 
+        private System.Exception Exception(string v)
+        {
+            throw new System.NotImplementedException();
+        }
 
         public async Task<HttpTimelinePost> MapAsync(TimelinePostEntity entity, IUrlHelper urlHelper, ClaimsPrincipal? user)
         {
