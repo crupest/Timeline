@@ -22,28 +22,24 @@ import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 
 export interface TimelinePageCardProps {
   timeline: HttpTimelineInfo;
-  collapse: boolean;
-  toggleCollapse: () => void;
   connectionStatus: HubConnectionState;
   className?: string;
   onReload: () => void;
 }
 
 const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
-  const {
-    timeline,
-    collapse,
-    toggleCollapse,
-    connectionStatus,
-    onReload,
-    className,
-  } = props;
+  const { timeline, connectionStatus, onReload, className } = props;
 
   const { t } = useTranslation();
 
   const [dialog, setDialog] = React.useState<
     "member" | "property" | "delete" | null
   >(null);
+
+  const [collapse, setCollapse] = React.useState(false);
+  const toggleCollapse = (): void => {
+    setCollapse((o) => !o);
+  };
 
   const isSmallScreen = useIsSmallScreen();
 
