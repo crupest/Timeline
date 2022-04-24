@@ -6,7 +6,7 @@ function useScrollToTop(
   handler: () => void,
   enable = true,
   option = {
-    maxOffset: 50,
+    maxOffset: 5,
     throttle: 1000,
   }
 ): void {

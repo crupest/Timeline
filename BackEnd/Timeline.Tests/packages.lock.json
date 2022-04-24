@@ -130,8 +130,8 @@
       },
       "Markdig": {
         "type": "Transitive",
-        "resolved": "0.28.1",
-        "contentHash": "70CneXw2N/1t7v6OfZJqMKLPRB1YWTPddEIcHT/P6IL6X1zsXELIu/DHVt96kr83PIVLznMuXoFK6b9N9KTODg=="
+        "resolved": "0.30.2",
+        "contentHash": "rm5rfHGP0BZtcB31CmQeWLLPdpG6xA6xN92x2KcNrl+9MPJONq9u4dfG7VgnTOxdjDnuEkX6GCxMYS+LpoKGOQ=="
       },
       "Microsoft.AspNetCore.Connections.Abstractions": {
         "type": "Transitive",
@@ -749,8 +749,8 @@
       },
       "SixLabors.ImageSharp": {
         "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "H8npUDq3VRagzRsJVxaNoUSMmD+kjAs7sR1Ip85eWbN5c0O1medMw/FiQ32dSNfWz/gVrc+xHs3es9SFlAiNBw==",
+        "resolved": "2.1.1",
+        "contentHash": "oNHMT8+yUR9dyuU2r7fwsXvvS4OnfCs9N5i2y2p9iBxp3nvEZbe/hZWrOGfD7MX2lxOAlWzlhzj0q2uFwP8avg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "5.0.0",
           "System.Text.Encoding.CodePages": "5.0.0"
@@ -1755,13 +1755,13 @@
         "dependencies": {
           "AutoMapper": "11.0.1",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0",
-          "Markdig": "0.28.1",
+          "Markdig": "0.30.2",
           "Microsoft.AspNetCore.SpaServices.Extensions": "6.0.4",
           "Microsoft.EntityFrameworkCore": "6.0.4",
           "Microsoft.EntityFrameworkCore.Analyzers": "6.0.4",
           "Microsoft.EntityFrameworkCore.Sqlite": "6.0.4",
           "NSwag.AspNetCore": "13.15.10",
-          "SixLabors.ImageSharp": "2.1.0",
+          "SixLabors.ImageSharp": "2.1.1",
           "System.IdentityModel.Tokens.Jwt": "6.17.0"
         }
       }
