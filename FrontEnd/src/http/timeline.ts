@@ -6,7 +6,6 @@ import {
   axios,
   apiBaseUrl,
   extractResponseData,
-  convertToIfStatusCodeIs,
   getHttpToken,
   Page,
 } from "./common";
@@ -186,8 +185,14 @@ export class HttpTimelineClient implements IHttpTimelineClient {
   postTimeline(req: HttpTimelinePostRequest): Promise<HttpTimelineInfo> {
     return axios
       .post<HttpTimelineInfo>(`${apiBaseUrl}/v2/timelines`, req)
-      .then(extractResponseData)
-      .catch(convertToIfStatusCodeIs(422, HttpTimelineNameConflictError));
+      .then(extractResponseData, (error: AxiosError) => {
+        const statusCode = error.response?.status;
+        if (statusCode === 422) {
+          throw new HttpTimelineNameConflictError(error);
+        } else {
+          throw error;
+        }
+      });
   }
 
   patchTimeline(
