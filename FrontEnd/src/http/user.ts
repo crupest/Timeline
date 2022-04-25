@@ -1,13 +1,6 @@
 import { AxiosError } from "axios";
 
-import {
-  axios,
-  apiBaseUrl,
-  extractResponseData,
-  convertToIfStatusCodeIs,
-  convertToIfErrorCodeIs,
-  extractEtag,
-} from "./common";
+import { axios, apiBaseUrl, extractResponseData, extractEtag } from "./common";
 
 export const kUserManagement = "UserManagement";
 export const kAllTimelineManagement = "AllTimelineManagement";
@@ -44,12 +37,6 @@ export interface HttpCreateUserRequest {
   password: string;
 }
 
-export class HttpUserNotExistError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
-}
-
 export class HttpChangePasswordBadCredentialError extends Error {
   constructor(public innerError?: AxiosError) {
     super();
@@ -64,7 +51,6 @@ export interface IHttpUserClient {
   delete(username: string): Promise<void>;
   generateAvatarUrl(username: string): string;
   putAvatar(username: string, data: Blob): Promise<string>;
-  changePassword(req: HttpChangePasswordRequest): Promise<void>;
   putUserPermission(
     username: string,
     permission: UserPermission
@@ -73,46 +59,46 @@ export interface IHttpUserClient {
     username: string,
     permission: UserPermission
   ): Promise<void>;
+  changePassword(req: HttpChangePasswordRequest): Promise<void>;
 }
 
 export class HttpUserClient implements IHttpUserClient {
   list(): Promise<HttpUser[]> {
     return axios
-      .get<HttpUser[]>(`${apiBaseUrl}/users`)
+      .get<HttpUser[]>(`${apiBaseUrl}/v2/users`)
       .then(extractResponseData);
   }
 
   get(username: string): Promise<HttpUser> {
     return axios
-      .get<HttpUser>(`${apiBaseUrl}/users/${username}`)
-      .then(extractResponseData)
-      .catch(convertToIfStatusCodeIs(404, HttpUserNotExistError));
+      .get<HttpUser>(`${apiBaseUrl}/v2/users/${username}`)
+      .then(extractResponseData);
   }
 
   post(req: HttpCreateUserRequest): Promise<HttpUser> {
     return axios
-      .post<HttpUser>(`${apiBaseUrl}/users`, req)
+      .post<HttpUser>(`${apiBaseUrl}/v2/users`, req)
       .then(extractResponseData)
       .then();
   }
 
   patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser> {
     return axios
-      .patch<HttpUser>(`${apiBaseUrl}/users/${username}`, req)
+      .patch<HttpUser>(`${apiBaseUrl}/v2/users/${username}`, req)
       .then(extractResponseData);
   }
 
   delete(username: string): Promise<void> {
-    return axios.delete(`${apiBaseUrl}/users/${username}`).then();
+    return axios.delete(`${apiBaseUrl}/v2/users/${username}`).then();
   }
 
   generateAvatarUrl(username: string): string {
-    return `${apiBaseUrl}/users/${username}/avatar`;
+    return `${apiBaseUrl}/v2/users/${username}/avatar`;
   }
 
   putAvatar(username: string, data: Blob): Promise<string> {
     return axios
-      .put(`${apiBaseUrl}/users/${username}/avatar`, data, {
+      .put(`${apiBaseUrl}/v2/users/${username}/avatar`, data, {
         headers: {
           "Content-Type": data.type,
         },
@@ -120,21 +106,12 @@ export class HttpUserClient implements IHttpUserClient {
       .then(extractEtag);
   }
 
-  changePassword(req: HttpChangePasswordRequest): Promise<void> {
-    return axios
-      .post(`${apiBaseUrl}/userop/changepassword`, req)
-      .catch(
-        convertToIfErrorCodeIs(11020201, HttpChangePasswordBadCredentialError)
-      )
-      .then();
-  }
-
   putUserPermission(
     username: string,
     permission: UserPermission
   ): Promise<void> {
     return axios
-      .put(`${apiBaseUrl}/users/${username}/permissions/${permission}`)
+      .put(`${apiBaseUrl}/v2/users/${username}/permissions/${permission}`)
       .then();
   }
 
@@ -143,8 +120,21 @@ export class HttpUserClient implements IHttpUserClient {
     permission: UserPermission
   ): Promise<void> {
     return axios
-      .delete(`${apiBaseUrl}/users/${username}/permissions/${permission}`)
+      .delete(`${apiBaseUrl}/v2/users/${username}/permissions/${permission}`)
       .then();
+  }
+
+  changePassword(req: HttpChangePasswordRequest): Promise<void> {
+    return axios
+      .post(`${apiBaseUrl}/v2/self/changepassword`, req)
+      .then(undefined, (error: AxiosError) => {
+        const statusCode = error.response?.status;
+        if (statusCode === 422) {
+          throw new HttpChangePasswordBadCredentialError(error);
+        } else {
+          throw error;
+        }
+      });
   }
 }
 

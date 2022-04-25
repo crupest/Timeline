@@ -38,7 +38,7 @@ namespace Timeline.Tests.IntegratedTests2
                 Color = "#FFFFFF"
             });
 
-            b.Name.Should().Be("hello2");
+            b.NameV2.Should().Be("hello2");
             b.Title.Should().Be("Hello");
             b.Description.Should().Be("A Description.");
             b.Visibility.Should().Be(TimelineVisibility.Public);

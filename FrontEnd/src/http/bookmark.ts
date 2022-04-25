@@ -1,4 +1,5 @@
-import { applyQueryParameters } from "@/utilities/url";
+import { withQuery } from "@/utilities/url";
+
 import { axios, apiBaseUrl, extractResponseData, Page } from "./common";
 
 export interface TimelineBookmark {
@@ -37,10 +38,10 @@ export class HttpHighlightClient implements IHttpBookmarkClient {
     page?: number,
     pageSize?: number
   ): Promise<Page<TimelineBookmark>> {
-    const url = applyQueryParameters(
-      `${apiBaseUrl}/v2/users/${username}/bookmarks`,
-      { page, pageSize }
-    );
+    const url = withQuery(`${apiBaseUrl}/v2/users/${username}/bookmarks`, {
+      page,
+      pageSize,
+    });
 
     return axios.get<Page<TimelineBookmark>>(url).then(extractResponseData);
   }

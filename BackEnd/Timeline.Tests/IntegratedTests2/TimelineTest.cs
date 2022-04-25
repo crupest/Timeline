@@ -25,7 +25,7 @@ namespace Timeline.Tests.IntegratedTests2
 
             var b = await client.TestJsonSendAsync<HttpTimeline>(HttpMethod.Get, "v2/timelines/user/hello");
 
-            a.Name.Should().Be(b.Name);
+            a.NameV2.Should().Be(b.NameV2);
             a.UniqueId.Should().Be(b.UniqueId);
         }
 

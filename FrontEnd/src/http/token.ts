@@ -2,12 +2,8 @@
 // authorization header, which shouldn't be used in token apis.
 import originalAxios, { AxiosError } from "axios";
 
-import {
-  apiBaseUrl,
-  convertToIfErrorCodeIs,
-  extractResponseData,
-  configureAxios,
-} from "./common";
+import { apiBaseUrl, extractResponseData, configureAxios } from "./common";
+
 import { HttpUser } from "./user";
 
 const axios = originalAxios.create();
@@ -46,16 +42,20 @@ export interface IHttpTokenClient {
 export class HttpTokenClient implements IHttpTokenClient {
   create(req: HttpCreateTokenRequest): Promise<HttpCreateTokenResponse> {
     return axios
-      .post<HttpCreateTokenResponse>(`${apiBaseUrl}/token/create`, req, {})
-      .then(extractResponseData)
-      .catch(
-        convertToIfErrorCodeIs(11010101, HttpCreateTokenBadCredentialError)
-      );
+      .post<HttpCreateTokenResponse>(`${apiBaseUrl}/v2/token/create`, req, {})
+      .then(extractResponseData, (error: AxiosError) => {
+        const statusCode = error.response?.status;
+        if (statusCode === 422) {
+          throw new HttpCreateTokenBadCredentialError(error);
+        } else {
+          throw error;
+        }
+      });
   }
 
   verify(req: HttpVerifyTokenRequest): Promise<HttpVerifyTokenResponse> {
     return axios
-      .post<HttpVerifyTokenResponse>(`${apiBaseUrl}/token/verify`, req)
+      .post<HttpVerifyTokenResponse>(`${apiBaseUrl}/v2/token/verify`, req)
       .then(extractResponseData);
   }
 }

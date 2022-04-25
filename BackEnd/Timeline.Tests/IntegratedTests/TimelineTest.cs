@@ -10,6 +10,7 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
+    [Obsolete("Old test.")]
     public class TimelineTest : BaseTimelineTest
     {
         public TimelineTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Timeline.Models.Http
@@ -14,7 +14,9 @@ namespace Timeline.Models.Http
         {
             UniqueId = uniqueId;
             Title = title;
+#pragma warning disable CS0618 // Type or member is obsolete
             Name = name;
+#pragma warning restore CS0618 // Type or member is obsolete
             NameV2 = nameV2;
             NameLastModifed = nameLastModifed;
             Description = description;
@@ -42,6 +44,7 @@ namespace Timeline.Models.Http
         /// <summary>
         /// Name of timeline.
         /// </summary>
+        [Obsolete("Use NameV2")]
         public string Name { get; set; } = default!;
         /// <summary>
         /// Name of timeline.
