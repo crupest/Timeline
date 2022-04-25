@@ -1,4 +1,4 @@
-export function applyQueryParameters<T>(url: string, query: T): string {
+export function withQuery<T>(url: string, query: T): string {
   if (query == null) return url;
 
   const params = new URLSearchParams();

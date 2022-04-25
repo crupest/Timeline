@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Timeline.Models.Http
@@ -22,7 +22,9 @@ namespace Timeline.Models.Http
             LastUpdated = lastUpdated;
             TimelineOwnerV2 = timelineOwnerV2;
             TimelineNameV2 = timelineNameV2;
+#pragma warning disable CS0618 // Type or member is obsolete
             TimelineName = timelineName;
+#pragma warning restore CS0618 // Type or member is obsolete
             Editable = editable;
         }
 
@@ -67,6 +69,7 @@ namespace Timeline.Models.Http
         /// <summary>
         /// Timeline name.
         /// </summary>
+        [Obsolete("Use TimelineNameV2.")]
         public string TimelineName { get; set; } = default!;
         /// <summary>
         /// True if you can edit this post.

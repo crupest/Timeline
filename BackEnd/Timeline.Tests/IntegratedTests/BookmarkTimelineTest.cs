@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.Http;
@@ -7,6 +8,7 @@ using Xunit.Abstractions;
 
 namespace Timeline.Tests.IntegratedTests
 {
+    [Obsolete("Old test.")]
     public class BookmarkTimelineTest : IntegratedTestBase
     {
         public BookmarkTimelineTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

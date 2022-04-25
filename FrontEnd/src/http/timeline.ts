@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 
-import { applyQueryParameters } from "../utilities/url";
+import { withQuery } from "@/utilities/url";
 
 import {
   axios,
@@ -168,9 +168,7 @@ export interface IHttpTimelineClient {
 export class HttpTimelineClient implements IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]> {
     return axios
-      .get<HttpTimelineInfo[]>(
-        applyQueryParameters(`${apiBaseUrl}/timelines`, query)
-      )
+      .get<HttpTimelineInfo[]>(withQuery(`${apiBaseUrl}/timelines`, query))
       .then(extractResponseData);
   }
 
@@ -243,7 +241,7 @@ export class HttpTimelineClient implements IHttpTimelineClient {
   ): Promise<Page<HttpTimelineGenericPostInfo>> {
     return axios
       .get<Page<HttpTimelineGenericPostInfo>>(
-        applyQueryParameters(
+        withQuery(
           `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts`,
           {
             page,
@@ -259,7 +257,7 @@ export class HttpTimelineClient implements IHttpTimelineClient {
     timelineName: string,
     postId: number
   ): string {
-    return applyQueryParameters(
+    return withQuery(
       `${apiBaseUrl}/v2/timelines/${ownerUsername}/${timelineName}/posts/${postId}/data`,
       { token: getHttpToken() }
     );

@@ -1,7 +1,6 @@
 import axios, { Axios, AxiosError, AxiosResponse } from "axios";
-import { Base64 } from "js-base64";
-import { identity } from "lodash";
 import { BehaviorSubject, Observable } from "rxjs";
+import { identity } from "lodash";
 
 export { axios };
 
@@ -14,7 +13,10 @@ export class HttpNetworkError extends Error {
 }
 
 export class HttpForbiddenError extends Error {
-  constructor(public innerError?: AxiosError) {
+  constructor(
+    public type: "unauthorized" | "forbidden",
+    public innerError?: AxiosError
+  ) {
     super();
   }
 }
@@ -34,23 +36,20 @@ function convertNetworkError(error: AxiosError): never {
 }
 
 function convertForbiddenError(error: AxiosError): never {
-  if (
-    error.isAxiosError &&
-    error.response != null &&
-    (error.response.status == 401 || error.response.status == 403)
-  ) {
-    throw new HttpForbiddenError(error);
+  const statusCode = error.response?.status;
+  if (statusCode === 401 || statusCode === 403) {
+    throw new HttpForbiddenError(
+      statusCode === 401 ? "unauthorized" : "forbidden",
+      error
+    );
   } else {
     throw error;
   }
 }
 
 function convertNotFoundError(error: AxiosError): never {
-  if (
-    error.isAxiosError &&
-    error.response != null &&
-    error.response.status == 404
-  ) {
+  const statusCode = error.response?.status;
+  if (statusCode === 404) {
     throw new HttpNotFoundError(error);
   } else {
     throw error;
@@ -85,47 +84,6 @@ export function setHttpToken(token: string | null): void {
 
 export const token$: Observable<string | null> = tokenSubject.asObservable();
 
-export function base64(blob: Blob | string): Promise<string> {
-  if (typeof blob === "string") {
-    return Promise.resolve(Base64.encode(blob));
-  }
-
-  return new Promise<string>((resolve) => {
-    const reader = new FileReader();
-    reader.onload = function () {
-      resolve((reader.result as string).replace(/^data:.*;base64,/, ""));
-    };
-    reader.readAsDataURL(blob);
-  });
-}
-
-export function extractStatusCode(error: AxiosError): number | null {
-  if (error.isAxiosError) {
-    const code = error?.response?.status;
-    if (typeof code === "number") {
-      return code;
-    }
-  }
-  return null;
-}
-
-export interface CommonErrorResponse {
-  code: number;
-  message: string;
-}
-
-export function extractErrorCode(
-  error: AxiosError<CommonErrorResponse>
-): number | null {
-  if (error.isAxiosError) {
-    const code = error.response?.data?.code;
-    if (typeof code === "number") {
-      return code;
-    }
-  }
-  return null;
-}
-
 export class NotModified {}
 
 export interface BlobWithEtag {
@@ -137,67 +95,9 @@ export function extractResponseData<T>(res: AxiosResponse<T>): T {
   return res.data;
 }
 
-export function catchIfStatusCodeIs<
-  TResult,
-  TErrorHandlerResult extends TResult | PromiseLike<TResult> | null | undefined
->(
-  statusCode: number,
-  errorHandler: (error: AxiosError<CommonErrorResponse>) => TErrorHandlerResult
-): (error: AxiosError<CommonErrorResponse>) => TErrorHandlerResult {
-  return (error: AxiosError<CommonErrorResponse>) => {
-    if (extractStatusCode(error) == statusCode) {
-      return errorHandler(error);
-    } else {
-      throw error;
-    }
-  };
-}
-
-export function convertToIfStatusCodeIs<NewError>(
-  statusCode: number,
-  newErrorType: {
-    new (innerError: AxiosError): NewError;
-  }
-): (error: AxiosError<CommonErrorResponse>) => never {
-  return catchIfStatusCodeIs(statusCode, (error) => {
-    throw new newErrorType(error);
-  });
-}
-
-export function catchIfErrorCodeIs<
-  TResult,
-  TErrorHandlerResult extends TResult | PromiseLike<TResult> | null | undefined
->(
-  errorCode: number,
-  errorHandler: (error: AxiosError<CommonErrorResponse>) => TErrorHandlerResult
-): (error: AxiosError<CommonErrorResponse>) => TErrorHandlerResult {
-  return (error: AxiosError<CommonErrorResponse>) => {
-    if (extractErrorCode(error) == errorCode) {
-      return errorHandler(error);
-    } else {
-      throw error;
-    }
-  };
-}
-export function convertToIfErrorCodeIs<NewError>(
-  errorCode: number,
-  newErrorType: {
-    new (innerError: AxiosError): NewError;
-  }
-): (error: AxiosError<CommonErrorResponse>) => never {
-  return catchIfErrorCodeIs(errorCode, (error) => {
-    throw new newErrorType(error);
-  });
-}
-
-export function convertToNotModified(
-  error: AxiosError<CommonErrorResponse>
-): NotModified {
-  if (
-    error.isAxiosError &&
-    error.response != null &&
-    error.response.status == 304
-  ) {
+export function convertToNotModified(error: AxiosError): NotModified {
+  const statusCode = error.response?.status;
+  if (statusCode == 304) {
     return new NotModified();
   } else {
     throw error;
