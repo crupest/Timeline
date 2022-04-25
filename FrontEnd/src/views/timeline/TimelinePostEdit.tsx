@@ -12,7 +12,8 @@ import {
 } from "@/http/timeline";
 
 import { pushAlert } from "@/services/alert";
-import { base64 } from "@/http/common";
+
+import base64 from "@/utilities/base64";
 
 import BlobImage from "../common/BlobImage";
 import LoadingButton from "../common/button/LoadingButton";

@@ -2,7 +2,8 @@ import { marked } from "marked";
 
 import { UiLogicError } from "@/common";
 
-import { base64 } from "@/http/common";
+import base64 from "@/utilities/base64";
+
 import { HttpTimelinePostPostRequest } from "@/http/timeline";
 
 class TimelinePostMarkedRenderer extends marked.Renderer {
