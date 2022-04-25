@@ -81,7 +81,7 @@ export function getTimelinePostUpdate$(
     });
 
     return () => {
-      connection.off("OnTimelinePostChanged", handler);
+      connection.off("OnTimelinePostChangedV2", handler);
 
       if (connection.state === HubConnectionState.Connected) {
         void connection
