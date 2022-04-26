@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import classnames from "classnames";
 
 import { useUser, userService } from "@/services/user";
 
@@ -11,9 +12,116 @@ import ConfirmDialog from "../common/dailog/ConfirmDialog";
 import Card from "../common/Card";
 
 import "./index.css";
+import { convertI18nText, I18nText } from "@/common";
+import Spinner from "../common/Spinner";
+
+interface SettingSectionProps {
+  title: I18nText;
+}
+
+const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Card className="my-3 py-3">
+      <h3 className="px-3 mb-3 cru-color-primary">
+        {convertI18nText(title, t)}
+      </h3>
+      {children}
+    </Card>
+  );
+};
+
+interface ButtonSettingItemProps {
+  title: I18nText;
+  subtext?: I18nText;
+  onClick: () => void;
+  first?: boolean;
+  danger?: boolean;
+}
+
+const ButtonSettingItem: React.FC<ButtonSettingItemProps> = ({
+  title,
+  subtext,
+  onClick,
+  first,
+  danger,
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <div
+      className={classnames(
+        "settings-item clickable",
+        first && "first",
+        danger && "cru-color-danger"
+      )}
+      onClick={onClick}
+    >
+      {convertI18nText(title, t)}
+      {subtext && (
+        <small className="d-block cru-color-secondary">
+          {convertI18nText(subtext, t)}
+        </small>
+      )}
+    </div>
+  );
+};
+
+interface SelectSettingItemProps {
+  title: I18nText;
+  subtext?: I18nText;
+  options: {
+    value: string;
+    label: I18nText;
+  }[];
+  value?: string;
+  onSelect: (value: string) => void;
+  first?: boolean;
+}
+
+const SelectSettingsItem: React.FC<SelectSettingItemProps> = ({
+  title,
+  subtext,
+  options,
+  value,
+  onSelect,
+  first,
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={classnames("row settings-item mx-0", first && "first")}>
+      <div className="col col-12 col-sm-auto">
+        <div>{convertI18nText(title, t)}</div>
+        <small className="d-block cru-color-secondary">
+          {convertI18nText(subtext, t)}
+        </small>
+      </div>
+      <div className="col col-12 col-sm-auto">
+        {value == null ? (
+          <Spinner />
+        ) : (
+          <select
+            value={value}
+            onChange={(e) => {
+              onSelect(e.target.value);
+            }}
+          >
+            {options.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {convertI18nText(label, t)}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const SettingsPage: React.FC = (_) => {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const user = useUser();
   const navigate = useNavigate();
 
@@ -27,62 +135,57 @@ const SettingsPage: React.FC = (_) => {
     <>
       <div className="container">
         {user ? (
-          <Card className="my-3 py-3">
-            <h3 className="px-3 mb-3 cru-color-primary">
-              {t("settings.subheaders.account")}
-            </h3>
-            <div
-              className="settings-item clickable first"
+          <SettingSection title="settings.subheaders.account">
+            <ButtonSettingItem
+              title="settings.changeAvatar"
               onClick={() => setDialog("changeavatar")}
-            >
-              {t("settings.changeAvatar")}
-            </div>
-            <div
-              className="settings-item clickable"
+              first
+            />
+            <ButtonSettingItem
+              title="settings.changeNickname"
               onClick={() => setDialog("changenickname")}
-            >
-              {t("settings.changeNickname")}
-            </div>
-            <div
-              className="settings-item clickable cru-color-danger"
+            />
+            <ButtonSettingItem
+              title="settings.changePassword"
               onClick={() => setDialog("changepassword")}
-            >
-              {t("settings.changePassword")}
-            </div>
-            <div
-              className="settings-item clickable cru-color-danger"
+              danger
+            />
+            <ButtonSettingItem
+              title="settings.logout"
               onClick={() => {
                 setDialog("logout");
               }}
-            >
-              {t("settings.logout")}
-            </div>
-          </Card>
+              danger
+            />
+          </SettingSection>
         ) : null}
-        <Card className="my-3 py-3">
-          <h3 className="px-3 mb-3 cru-color-primary">
-            {t("settings.subheaders.customization")}
-          </h3>
-          <div className="row settings-item first mx-0">
-            <div className="col col-12 col-sm-auto">
-              <div>{t("settings.languagePrimary")}</div>
-              <small className="d-block cru-color-secondary">
-                {t("settings.languageSecondary")}
-              </small>
-            </div>
-            <div className="col col-12 col-sm-auto">
-              <select
-                value={language}
-                onChange={(e) => {
-                  void i18n.changeLanguage(e.target.value);
-                }}
-              >
-                <option value="zh">中文</option>
-                <option value="en">English</option>
-              </select>
-            </div>
-          </div>
-        </Card>
+        <SettingSection title="settings.subheaders.customization">
+          <SelectSettingsItem
+            title="settings.languagePrimary"
+            subtext="settings.languageSecondary"
+            options={[
+              {
+                value: "zh",
+                label: {
+                  type: "custom",
+                  value: "中文",
+                },
+              },
+              {
+                value: "en",
+                label: {
+                  type: "custom",
+                  value: "English",
+                },
+              },
+            ]}
+            value={language}
+            onSelect={(value) => {
+              void i18n.changeLanguage(value);
+            }}
+            first
+          />
+        </SettingSection>
       </div>
       <ChangePasswordDialog
         open={dialog === "changepassword"}
