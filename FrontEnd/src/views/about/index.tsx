@@ -25,10 +25,6 @@ const frontendCredits: {
     url: "https://getbootstrap.com",
   },
   {
-    name: "react-bootstrap",
-    url: "https://react-bootstrap.github.io",
-  },
-  {
     name: "vite",
     url: "https://vitejs.dev",
   },
