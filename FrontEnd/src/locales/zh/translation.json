@@ -12,6 +12,11 @@
     "network": "网络错误。",
     "unknown": "未知错误。"
   },
+  "visibility": {
+    "private": "仅自己可见",
+    "register": "仅注册用户可见",
+    "public": "对所有人公开"
+  },
   "connectionState": {
     "Connected": "已连接",
     "Connecting": "正在连接",
@@ -162,10 +167,11 @@
     },
     "languagePrimary": "选择显示的语言。",
     "languageSecondary": "您的语言偏好将会存储在本地，下次浏览时将自动使用上次保存的语言选项。",
-    "changePassword": "更改账号的密码。",
-    "logout": "注销此账号。",
-    "changeAvatar": "更改头像。",
-    "changeNickname": "更改昵称。",
+    "changePassword": "更改账号的密码",
+    "logout": "注销此账号",
+    "changeAvatar": "更改头像",
+    "changeNickname": "更改昵称",
+    "changeBookmarkVisibility": "修改书签时间线可见性",
     "dialogChangePassword": {
       "title": "修改密码",
       "prompt": "您正在修改密码，您需要输入正确的旧密码。成功修改后您需要重新登陆，而且以前所有的登录都会失效。",
