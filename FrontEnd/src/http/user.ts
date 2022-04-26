@@ -37,6 +37,10 @@ export interface HttpCreateUserRequest {
   password: string;
 }
 
+export interface HttpBookmarkVisibility {
+  visibility: "Private" | "Register" | "Public";
+}
+
 export class HttpChangePasswordBadCredentialError extends Error {
   constructor(public innerError?: AxiosError) {
     super();
@@ -60,6 +64,12 @@ export interface IHttpUserClient {
     permission: UserPermission
   ): Promise<void>;
   changePassword(req: HttpChangePasswordRequest): Promise<void>;
+
+  getBookmarkVisibility(username: string): Promise<HttpBookmarkVisibility>;
+  putBookmarkVisibility(
+    username: string,
+    req: HttpBookmarkVisibility
+  ): Promise<void>;
 }
 
 export class HttpUserClient implements IHttpUserClient {
@@ -135,6 +145,23 @@ export class HttpUserClient implements IHttpUserClient {
           throw error;
         }
       });
+  }
+
+  getBookmarkVisibility(username: string): Promise<HttpBookmarkVisibility> {
+    return axios
+      .get<HttpBookmarkVisibility>(
+        `${apiBaseUrl}/v2/users/${username}/bookmarks/visibility`
+      )
+      .then(extractResponseData);
+  }
+
+  putBookmarkVisibility(
+    username: string,
+    req: HttpBookmarkVisibility
+  ): Promise<void> {
+    return axios
+      .put(`${apiBaseUrl}/v2/users/${username}/bookmarks/visibility`, req)
+      .then();
   }
 }
 

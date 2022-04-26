@@ -19,6 +19,11 @@
     "Disconnecting": "Disconnecting",
     "Reconnecting": "Reconnecting"
   },
+  "visibility": {
+    "private": "Private For Me",
+    "register": "Only Registered Users",
+    "public": "Public To Everyone"
+  },
   "serviceWorker": {
     "availableOffline": "Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉",
     "upgradePrompt": "App is getting a new version!",
@@ -166,6 +171,7 @@
     "logout": "Log out this account.",
     "changeAvatar": "Change avatar.",
     "changeNickname": "Change nickname.",
+    "changeBookmarkVisibility": "Change bookmark visibility.",
     "dialogChangePassword": {
       "title": "Change Password",
       "prompt": "You are changing your password. You need to input the correct old password. After change, you need to login again and all old login will be invalid.",

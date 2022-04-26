@@ -3,17 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import classnames from "classnames";
 
+import { convertI18nText, I18nText } from "@/common";
 import { useUser, userService } from "@/services/user";
+import { TimelineVisibility } from "@/http/timeline";
 
+import ConfirmDialog from "../common/dailog/ConfirmDialog";
+import Card from "../common/Card";
+import Spinner from "../common/Spinner";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
-import ConfirmDialog from "../common/dailog/ConfirmDialog";
-import Card from "../common/Card";
 
 import "./index.css";
-import { convertI18nText, I18nText } from "@/common";
-import Spinner from "../common/Spinner";
+import { getHttpUserClient } from "@/http/user";
 
 interface SettingSectionProps {
   title: I18nText;
@@ -92,7 +94,7 @@ const SelectSettingsItem: React.FC<SelectSettingItemProps> = ({
 
   return (
     <div className={classnames("row settings-item mx-0", first && "first")}>
-      <div className="col col-12 col-sm-auto">
+      <div className="px-0 col col-12 col-sm-auto">
         <div>{convertI18nText(title, t)}</div>
         <small className="d-block cru-color-secondary">
           {convertI18nText(subtext, t)}
@@ -129,6 +131,21 @@ const SettingsPage: React.FC = (_) => {
     null | "changepassword" | "changeavatar" | "changenickname" | "logout"
   >(null);
 
+  const [bookmarkVisibility, setBookmarkVisibility] =
+    useState<TimelineVisibility>();
+
+  React.useEffect(() => {
+    if (user != null) {
+      void getHttpUserClient()
+        .getBookmarkVisibility(user.username)
+        .then(({ visibility }) => {
+          setBookmarkVisibility(visibility);
+        });
+    } else {
+      setBookmarkVisibility(undefined);
+    }
+  }, [user]);
+
   const language = i18n.language.slice(0, 2);
 
   return (
@@ -144,6 +161,33 @@ const SettingsPage: React.FC = (_) => {
             <ButtonSettingItem
               title="settings.changeNickname"
               onClick={() => setDialog("changenickname")}
+            />
+            <SelectSettingsItem
+              title="settings.changeBookmarkVisibility"
+              options={[
+                {
+                  value: "Private",
+                  label: "visibility.private",
+                },
+                {
+                  value: "Register",
+                  label: "visibility.register",
+                },
+                {
+                  value: "Public",
+                  label: "visibility.public",
+                },
+              ]}
+              value={bookmarkVisibility}
+              onSelect={(value) => {
+                void getHttpUserClient()
+                  .putBookmarkVisibility(user.username, {
+                    visibility: value as TimelineVisibility,
+                  })
+                  .then(() => {
+                    setBookmarkVisibility(value as TimelineVisibility);
+                  });
+              }}
             />
             <ButtonSettingItem
               title="settings.changePassword"
