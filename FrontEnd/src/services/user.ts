@@ -4,11 +4,13 @@ import { AxiosError } from "axios";
 
 import { UiLogicError } from "@/common";
 
-import { HttpNetworkError, setHttpToken, axios } from "@/http/common";
 import {
-  getHttpTokenClient,
-  HttpCreateTokenBadCredentialError,
-} from "@/http/token";
+  HttpNetworkError,
+  setHttpToken,
+  axios,
+  HttpBadRequestError,
+} from "@/http/common";
+import { getHttpTokenClient } from "@/http/token";
 import { getHttpUserClient, HttpUser, UserPermission } from "@/http/user";
 
 import { pushAlert } from "./alert";
@@ -137,7 +139,7 @@ export class UserService {
       }
       this.userSubject.next(user);
     } catch (e) {
-      if (e instanceof HttpCreateTokenBadCredentialError) {
+      if (e instanceof HttpBadRequestError) {
         throw new BadCredentialError();
       } else {
         throw e;

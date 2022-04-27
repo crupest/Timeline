@@ -1,5 +1,3 @@
-import { AxiosError } from "axios";
-
 import { withQuery } from "@/utilities/url";
 
 import {
@@ -101,12 +99,6 @@ export interface HttpTimelinePostPatchRequest {
   color?: string;
 }
 
-export class HttpTimelineNameConflictError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
-}
-
 export interface IHttpTimelineClient {
   listTimeline(query: HttpTimelineListQuery): Promise<HttpTimelineInfo[]>;
   getTimeline(
@@ -185,14 +177,7 @@ export class HttpTimelineClient implements IHttpTimelineClient {
   postTimeline(req: HttpTimelinePostRequest): Promise<HttpTimelineInfo> {
     return axios
       .post<HttpTimelineInfo>(`${apiBaseUrl}/v2/timelines`, req)
-      .then(extractResponseData, (error: AxiosError) => {
-        const statusCode = error.response?.status;
-        if (statusCode === 422) {
-          throw new HttpTimelineNameConflictError(error);
-        } else {
-          throw error;
-        }
-      });
+      .then(extractResponseData);
   }
 
   patchTimeline(

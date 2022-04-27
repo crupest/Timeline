@@ -27,6 +27,12 @@ export class HttpNotFoundError extends Error {
   }
 }
 
+export class HttpBadRequestError extends Error {
+  constructor(public innerError?: AxiosError) {
+    super();
+  }
+}
+
 function convertNetworkError(error: AxiosError): never {
   if (error.isAxiosError && error.response == null) {
     throw new HttpNetworkError(error);
@@ -56,10 +62,20 @@ function convertNotFoundError(error: AxiosError): never {
   }
 }
 
+function convertBadRequestError(error: AxiosError): never {
+  const statusCode = error.response?.status;
+  if (statusCode === 422) {
+    throw new HttpBadRequestError(error);
+  } else {
+    throw error;
+  }
+}
+
 export function configureAxios(axios: Axios): void {
   axios.interceptors.response.use(identity, convertNetworkError);
   axios.interceptors.response.use(identity, convertForbiddenError);
   axios.interceptors.response.use(identity, convertNotFoundError);
+  axios.interceptors.response.use(identity, convertBadRequestError);
 }
 
 configureAxios(axios);
