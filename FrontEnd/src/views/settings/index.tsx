@@ -5,6 +5,7 @@ import classnames from "classnames";
 
 import { convertI18nText, I18nText } from "@/common";
 import { useUser, userService } from "@/services/user";
+import { getHttpUserClient } from "@/http/user";
 import { TimelineVisibility } from "@/http/timeline";
 
 import ConfirmDialog from "../common/dailog/ConfirmDialog";
@@ -15,7 +16,6 @@ import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
 import "./index.css";
-import { getHttpUserClient } from "@/http/user";
 
 interface SettingSectionProps {
   title: I18nText;
