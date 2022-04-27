@@ -1,5 +1,3 @@
-import { AxiosError } from "axios";
-
 import { axios, apiBaseUrl, extractResponseData, extractEtag } from "./common";
 
 export const kUserManagement = "UserManagement";
@@ -39,12 +37,6 @@ export interface HttpCreateUserRequest {
 
 export interface HttpBookmarkVisibility {
   visibility: "Private" | "Register" | "Public";
-}
-
-export class HttpChangePasswordBadCredentialError extends Error {
-  constructor(public innerError?: AxiosError) {
-    super();
-  }
 }
 
 export interface IHttpUserClient {
@@ -135,16 +127,7 @@ export class HttpUserClient implements IHttpUserClient {
   }
 
   changePassword(req: HttpChangePasswordRequest): Promise<void> {
-    return axios
-      .post(`${apiBaseUrl}/v2/self/changepassword`, req)
-      .then(undefined, (error: AxiosError) => {
-        const statusCode = error.response?.status;
-        if (statusCode === 422) {
-          throw new HttpChangePasswordBadCredentialError(error);
-        } else {
-          throw error;
-        }
-      });
+    return axios.post(`${apiBaseUrl}/v2/self/changepassword`, req).then();
   }
 
   getBookmarkVisibility(username: string): Promise<HttpBookmarkVisibility> {
