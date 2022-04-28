@@ -24,6 +24,12 @@
     "register": "Only Registered Users",
     "public": "Public To Everyone"
   },
+  "register": {
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "regsiterCode": "Register Code"
+  },
   "serviceWorker": {
     "availableOffline": "Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉",
     "upgradePrompt": "App is getting a new version!",

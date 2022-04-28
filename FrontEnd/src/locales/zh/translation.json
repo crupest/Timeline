@@ -17,6 +17,12 @@
     "register": "仅注册用户可见",
     "public": "对所有人公开"
   },
+  "register": {
+    "username": "用户名",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "regsiterCode": "注册码"
+  },
   "connectionState": {
     "Connected": "已连接",
     "Connecting": "正在连接",
