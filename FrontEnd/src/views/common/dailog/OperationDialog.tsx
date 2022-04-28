@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TwitterPicker } from "react-color";
+import classNames from "classnames";
 import moment from "moment";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
@@ -12,7 +13,6 @@ import LoadingButton from "../button/LoadingButton";
 import Dialog from "./Dialog";
 
 import "./OperationDialog.css";
-import classNames from "classnames";
 
 interface DefaultErrorPromptProps {
   error?: string;
@@ -42,7 +42,7 @@ export interface OperationDialogTextInput {
   initValue?: string;
   textFieldProps?: Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
-    "type" | "value" | "onChange" | "aria-relevant"
+    "type" | "value" | "onChange"
   >;
   helperText?: string;
 }
