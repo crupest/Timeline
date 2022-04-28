@@ -1,4 +1,5 @@
 import React from "react";
+import InputPanel, { InputPanelError } from "../common/input/InputPanel";
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = React.useState<string>("");
@@ -6,48 +7,37 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = React.useState<string>("");
   const [registerCode, setRegisterCode] = React.useState<string>("");
 
+  const [error, setError] = React.useState<InputPanelError>();
+
   return (
     <div>
-      <div>
-        <label>Username</label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => {
-            setUsername(e.target.value);
-          }}
-        />
-      </div>
-      <div>
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
-      </div>
-      <div>
-        <label>Confirm Password</label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => {
-            setConfirmPassword(e.target.value);
-          }}
-        />
-      </div>
-      <div>
-        <label>Register Code</label>
-        <input
-          type="text"
-          value={registerCode}
-          onChange={(e) => {
-            setRegisterCode(e.target.value);
-          }}
-        />
-      </div>
+      <InputPanel
+        scheme={[
+          {
+            type: "text",
+            label: "register.username",
+          },
+          {
+            type: "text",
+            label: "register.password",
+            password: true,
+          },
+          {
+            type: "text",
+            label: "register.confirmPassword",
+            password: true,
+          },
+          { type: "text", label: "register.registerCode" },
+        ]}
+        values={[username, password, confirmPassword, registerCode]}
+        onChange={(values) => {
+          setUsername(values[0]);
+          setPassword(values[1]);
+          setConfirmPassword(values[2]);
+          setRegisterCode(values[3]);
+        }}
+        error={error}
+      />
     </div>
   );
 };

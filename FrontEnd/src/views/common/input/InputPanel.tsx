@@ -72,7 +72,9 @@ type MapInputListToValueTypeList<Tuple extends readonly Input[]> = {
   [Index in keyof Tuple]: MapInputToValueType<Tuple[Index]>;
 } & { length: Tuple["length"] };
 
-export type OperationInputError = (I18nText | null | undefined)[];
+export type InputPanelError = {
+  [index: number]: I18nText | null | undefined;
+};
 
 export interface InputPanelProps<InputList extends readonly Input[]> {
   scheme: InputList;
@@ -81,7 +83,7 @@ export interface InputPanelProps<InputList extends readonly Input[]> {
     values: MapInputListToValueTypeList<InputList>,
     index: number
   ) => void;
-  error?: OperationInputError;
+  error?: InputPanelError;
   disable?: boolean;
 }
 
