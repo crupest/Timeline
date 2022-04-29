@@ -21,7 +21,13 @@
     "username": "用户名",
     "password": "密码",
     "confirmPassword": "确认密码",
-    "regsiterCode": "注册码"
+    "regsiterCode": "注册码",
+    "error": {
+      "usernameEmpty": "用户名不能为空。",
+      "passwordEmpty": "密码不能为空。",
+      "confirmPasswordWrong": "密码不匹配。",
+      "registerCodeEmpty": "注册码不能为空。"
+    }
   },
   "connectionState": {
     "Connected": "已连接",

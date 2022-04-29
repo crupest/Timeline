@@ -28,7 +28,13 @@
     "username": "Username",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "regsiterCode": "Register Code"
+    "regsiterCode": "Register Code",
+    "error": {
+      "usernameEmpty": "Username can't be empty.",
+      "passwordEmpty": "Password can't be emtpy.",
+      "confirmPasswordWrong": "Password does not match.",
+      "registerCodeEmpty": "Register code can't be empty."
+    }
   },
   "serviceWorker": {
     "availableOffline": "Timeline is now cached in your computer and you can use it offline. 🎉🎉🎉",
