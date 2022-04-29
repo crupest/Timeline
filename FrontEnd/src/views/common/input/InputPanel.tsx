@@ -76,6 +76,14 @@ export type InputPanelError = {
   [index: number]: I18nText | null | undefined;
 };
 
+export function hasError(e: InputPanelError | null | undefined): boolean {
+  if (e == null) return false;
+  for (const key in e) {
+    if (e[key] != null) return true;
+  }
+  return false;
+}
+
 export interface InputPanelProps<InputList extends readonly Input[]> {
   scheme: InputList;
   values: MapInputListToValueTypeList<InputList>;
