@@ -243,19 +243,6 @@
   height: 100%;
 }
 
-.icon-button {
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-.icon-button.large {
-  font-size: 1.6rem;
-}
-
-.icon-button.primary-enhance {
-  color: var(--cru-primary-enhance-color);
-}
-
 .cru-avatar {
   width: 60px;
   height: 60px;

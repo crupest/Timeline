@@ -9,6 +9,7 @@ import LoadFailReload from "../common/LoadFailReload";
 import FlatButton from "../common/button/FlatButton";
 import Card from "../common/Card";
 import Spinner from "../common/Spinner";
+import IconButton from "../common/button/IconButton";
 
 interface TimelineBoardItemProps {
   timeline: TimelineBookmark;
@@ -42,12 +43,15 @@ const TimelineBoardItem: React.FC<TimelineBoardItemProps> = ({
       <span className="flex-grow-1"></span>
       {actions != null ? (
         <div className="right">
-          <i
-            className="bi-trash icon-button cru-color-danger px-2"
+          <IconButton
+            icon="trash"
+            color="danger"
+            className="px-2"
             onClick={actions.onDelete}
           />
-          <i
-            className="bi-grip-vertical icon-button px-2 touch-action-none"
+          <IconButton
+            icon="grip-vertical"
+            className="px-2 touch-action-none"
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture(e.pointerId);
               actions.onMove.start(e);

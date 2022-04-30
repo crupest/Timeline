@@ -14,6 +14,7 @@ import ConfirmDialog from "../common/dailog/ConfirmDialog";
 import TimelineLine from "./TimelineLine";
 import TimelinePostContentView from "./TimelinePostContentView";
 import PostPropertyChangeDialog from "./PostPropertyChangeDialog";
+import IconButton from "../common/button/IconButton";
 
 export interface TimelinePostViewProps {
   post: HttpTimelinePostInfo;
@@ -70,8 +71,10 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
         style={cardStyle}
       >
         {post.editable ? (
-          <i
-            className="bi-chevron-down icon-button primary-enhance cru-float-right"
+          <IconButton
+            icon="chevron-down"
+            color="primary-enhance"
+            className="cru-float-right"
             onClick={(e) => {
               setOperationMaskVisible(true);
               e.stopPropagation();

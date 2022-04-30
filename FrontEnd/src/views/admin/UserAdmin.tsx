@@ -10,6 +10,7 @@ import OperationDialog, {
 import Button from "../common/button/Button";
 import Spinner from "../common/Spinner";
 import FlatButton from "../common/button/FlatButton";
+import IconButton from "../common/button/IconButton";
 
 const CreateUserDialog: React.FC<{
   open: boolean;
@@ -181,8 +182,10 @@ const UserItem: React.FC<UserItemProps> = ({ user, onChange }) => {
   return (
     <>
       <div className="admin-user-item">
-        <i
-          className="bi-pencil-square cru-float-right icon-button cru-color-primary-enhance"
+        <IconButton
+          icon="pencil-square"
+          color="primary-enhance"
+          className="cru-float-right"
           onClick={() => setEditMaskVisible(true)}
         />
         <h5 className="cru-color-primary">{user.username}</h5>

@@ -1,5 +1,6 @@
 import React from "react";
-import classnames from "classnames";
+
+import IconButton from "../common/button/IconButton";
 
 const CollapseButton: React.FC<{
   collapse: boolean;
@@ -8,13 +9,10 @@ const CollapseButton: React.FC<{
   style?: React.CSSProperties;
 }> = ({ collapse, onClick, className, style }) => {
   return (
-    <i
+    <IconButton
+      icon={collapse ? "arrows-angle-expand" : "arrows-angle-contract"}
       onClick={onClick}
-      className={classnames(
-        collapse ? "bi-arrows-angle-expand" : "bi-arrows-angle-contract",
-        "cru-color-primary icon-button",
-        className
-      )}
+      className={className}
       style={style}
     />
   );

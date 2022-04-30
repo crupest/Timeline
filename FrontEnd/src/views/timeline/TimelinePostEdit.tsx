@@ -1,5 +1,4 @@
 import React from "react";
-import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 
 import { UiLogicError } from "@/common";
@@ -20,6 +19,7 @@ import LoadingButton from "../common/button/LoadingButton";
 import PopupMenu from "../common/menu/PopupMenu";
 import MarkdownPostEdit from "./MarkdownPostEdit";
 import TimelinePostEditCard from "./TimelinePostEditCard";
+import IconButton from "../common/button/IconButton";
 
 import "./TimelinePostEdit.css";
 
@@ -104,10 +104,10 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
 
 type PostKind = "text" | "markdown" | "image";
 
-const postKindIconClassNameMap: Record<PostKind, string> = {
-  text: "bi-fonts",
-  markdown: "bi-markdown",
-  image: "bi-image",
+const postKindIconMap: Record<PostKind, string> = {
+  text: "fonts",
+  markdown: "markdown",
+  image: "image",
 };
 
 export interface TimelinePostEditProps {
@@ -237,7 +237,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                 items={(["text", "image", "markdown"] as const).map((kind) => ({
                   type: "button",
                   text: `timeline.post.type.${kind}`,
-                  iconClassName: postKindIconClassNameMap[kind],
+                  iconClassName: postKindIconMap[kind],
                   onClick: () => {
                     if (kind === "markdown") {
                       setShowMarkdown(true);
@@ -247,12 +247,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
                   },
                 }))}
               >
-                <i
-                  className={classnames(
-                    postKindIconClassNameMap[kind],
-                    "icon-button large"
-                  )}
-                />
+                <IconButton large icon={postKindIconMap[kind]} />
               </PopupMenu>
             </div>
             <LoadingButton

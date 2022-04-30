@@ -19,6 +19,7 @@ import ConnectionStatusBadge from "./ConnectionStatusBadge";
 import CollapseButton from "./CollapseButton";
 import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
+import IconButton from "../common/button/IconButton";
 
 export interface TimelinePageCardProps {
   timeline: HttpTimelineInfo;
@@ -67,11 +68,9 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
       </small>
       <div className="mt-2 cru-text-end">
         {user != null ? (
-          <i
-            className={classnames(
-              timeline.isBookmark ? "bi-bookmark-fill" : "bi-bookmark",
-              "icon-button cru-color-primary me-3"
-            )}
+          <IconButton
+            icon={timeline.isBookmark ? "bookmark-fill" : "bookmark"}
+            className="me-3"
             onClick={() => {
               getHttpBookmarkClient()
                 [timeline.isBookmark ? "delete" : "post"](
@@ -90,8 +89,9 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
             }}
           />
         ) : null}
-        <i
-          className={"icon-button bi-people cru-color-primary me-3"}
+        <IconButton
+          icon="people"
+          className="me-3"
           onClick={() => setDialog("member")}
         />
         {timeline.manageable ? (
@@ -112,7 +112,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
             ]}
             containerClassName="d-inline"
           >
-            <i className="icon-button bi-three-dots-vertical cru-color-primary" />
+            <IconButton icon="three-dots-vertical" />
           </PopupMenu>
         ) : null}
       </div>
