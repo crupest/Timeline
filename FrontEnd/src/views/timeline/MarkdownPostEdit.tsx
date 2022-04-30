@@ -10,6 +10,7 @@ import FlatButton from "../common/button/FlatButton";
 import TabPages from "../common/tab/TabPages";
 import ConfirmDialog from "../common/dailog/ConfirmDialog";
 import Spinner from "../common/Spinner";
+import IconButton from "../common/button/IconButton";
 
 import "./MarkdownPostEdit.css";
 
@@ -113,8 +114,11 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
             <Spinner />
           ) : (
             <div>
-              <i
-                className="icon-button large bi-x cru-color-danger cru-align-middle me-2"
+              <IconButton
+                icon="x"
+                color="danger"
+                large
+                className="cru-align-middle me-2"
                 onClick={() => {
                   if (canLeave) {
                     onClose();
@@ -158,9 +162,11 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                       src={image.url}
                       className="timeline-markdown-post-edit-image"
                     />
-                    <i
+                    <IconButton
+                      icon="trash"
+                      color="danger"
                       className={classnames(
-                        "bi-trash text-danger icon-button timeline-markdown-post-edit-image-delete-button",
+                        "timeline-markdown-post-edit-image-delete-button",
                         process && "d-none"
                       )}
                       onClick={() => {

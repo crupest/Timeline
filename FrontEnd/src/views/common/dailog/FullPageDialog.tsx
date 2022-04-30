@@ -4,6 +4,7 @@ import classnames from "classnames";
 import { CSSTransition } from "react-transition-group";
 
 import "./FullPageDialog.css";
+import IconButton from "../button/IconButton";
 
 export interface FullPageDialogProps {
   show: boolean;
@@ -28,8 +29,9 @@ const FullPageDialog: React.FC<FullPageDialogProps> = ({
     >
       <div className="cru-full-page">
         <div className="cru-full-page-top-bar">
-          <i
-            className="icon-button bi-arrow-left ms-3 cru-full-page-back-button"
+          <IconButton
+            icon="arrow-left"
+            className="ms-3 cru-full-page-back-button"
             onClick={onBack}
           />
         </div>

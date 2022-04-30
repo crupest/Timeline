@@ -6,6 +6,8 @@ import classNames from "classnames";
 import { alertService, AlertInfoEx, AlertInfo } from "@/services/alert";
 import { convertI18nText } from "@/common";
 
+import IconButton from "../button/IconButton";
+
 import "./alert.css";
 
 interface AutoCloseAlertProps {
@@ -67,8 +69,9 @@ export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
         })()}
       </div>
       <div className="cru-alert-close-button-container">
-        <i
-          className={classNames("icon-button bi-x cru-alert-close-button")}
+        <IconButton
+          icon="x"
+          className="cru-alert-close-button"
           onClick={close}
         />
       </div>

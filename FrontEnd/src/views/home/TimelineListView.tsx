@@ -6,6 +6,8 @@ import { convertI18nText, I18nText } from "@/common";
 
 import { TimelineBookmark } from "@/http/bookmark";
 
+import IconButton from "../common/button/IconButton";
+
 interface TimelineListItemProps {
   timeline: TimelineBookmark;
 }
@@ -24,7 +26,7 @@ const TimelineListItem: React.FC<TimelineListItemProps> = ({ timeline }) => {
         {timeline.timelineOwner}/{timeline.timelineName}
       </div>
       <Link to={`${timeline.timelineOwner}/${timeline.timelineName}`}>
-        <i className="icon-button bi-arrow-right ms-3" />
+        <IconButton icon="arrow-right" className="ms-3" />
       </Link>
     </div>
   );
