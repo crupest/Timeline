@@ -262,7 +262,7 @@ const UserAdmin: React.FC = () => {
       .list()
       .then((us) => {
         if (subscribe) {
-          setUsers(us);
+          setUsers(us.items);
         }
       });
     return () => {

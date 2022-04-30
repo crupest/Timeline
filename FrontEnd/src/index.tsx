@@ -4,7 +4,7 @@ import "core-js/modules/es.array.iterator";
 import "pepjs";
 
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import "./index.css";
 
@@ -14,4 +14,7 @@ import "./service-worker";
 
 import App from "./App";
 
-ReactDOM.render(<App />, document.getElementById("app"));
+const container = document.getElementById("app");
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const root = createRoot(container!);
+root.render(<App />);

@@ -3,6 +3,8 @@ import classNames from "classnames";
 
 import { PaletteColorType } from "@/palette";
 
+import "./IconButton.css";
+
 export type IconButtonProps = {
   icon: string;
   color?: PaletteColorType;

@@ -1,4 +1,10 @@
-import { axios, apiBaseUrl, extractResponseData, extractEtag } from "./common";
+import {
+  axios,
+  apiBaseUrl,
+  extractResponseData,
+  extractEtag,
+  Page,
+} from "./common";
 
 export const kUserManagement = "UserManagement";
 export const kAllTimelineManagement = "AllTimelineManagement";
@@ -44,7 +50,7 @@ export interface HttpRegisterCode {
 }
 
 export interface IHttpUserClient {
-  list(): Promise<HttpUser[]>;
+  list(): Promise<Page<HttpUser>>;
   get(username: string): Promise<HttpUser>;
   post(req: HttpCreateUserRequest): Promise<HttpUser>;
   patch(username: string, req: HttpUserPatchRequest): Promise<HttpUser>;
@@ -72,9 +78,9 @@ export interface IHttpUserClient {
 }
 
 export class HttpUserClient implements IHttpUserClient {
-  list(): Promise<HttpUser[]> {
+  list(): Promise<Page<HttpUser>> {
     return axios
-      .get<HttpUser[]>(`${apiBaseUrl}/v2/users`)
+      .get<Page<HttpUser>>(`${apiBaseUrl}/v2/users`)
       .then(extractResponseData);
   }
 
