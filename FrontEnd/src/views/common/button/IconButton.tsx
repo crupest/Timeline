@@ -1,9 +1,11 @@
-import classNames from "classnames";
 import React from "react";
+import classNames from "classnames";
+
+import { PaletteColorType } from "@/palette";
 
 export type IconButtonProps = {
   icon: string;
-  color?: string;
+  color?: PaletteColorType;
   large?: boolean;
 } & React.ComponentPropsWithRef<"i">;
 
