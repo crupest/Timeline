@@ -39,6 +39,10 @@ export interface HttpBookmarkVisibility {
   visibility: "Private" | "Register" | "Public";
 }
 
+export interface HttpRegisterCode {
+  registerCode?: string;
+}
+
 export interface IHttpUserClient {
   list(): Promise<HttpUser[]>;
   get(username: string): Promise<HttpUser>;
@@ -62,6 +66,9 @@ export interface IHttpUserClient {
     username: string,
     req: HttpBookmarkVisibility
   ): Promise<void>;
+
+  getRegisterCode(username: string): Promise<HttpRegisterCode>;
+  renewRegisterCode(username: string): Promise<void>;
 }
 
 export class HttpUserClient implements IHttpUserClient {
@@ -144,6 +151,18 @@ export class HttpUserClient implements IHttpUserClient {
   ): Promise<void> {
     return axios
       .put(`${apiBaseUrl}/v2/users/${username}/bookmarks/visibility`, req)
+      .then();
+  }
+
+  getRegisterCode(username: string): Promise<HttpRegisterCode> {
+    return axios
+      .get<HttpRegisterCode>(`${apiBaseUrl}/v2/users/${username}/registercode`)
+      .then(extractResponseData);
+  }
+
+  renewRegisterCode(username: string): Promise<void> {
+    return axios
+      .post(`${apiBaseUrl}/v2/users/${username}/renewregistercode`)
       .then();
   }
 }
