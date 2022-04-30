@@ -6,6 +6,7 @@ import LoadingPage from "./views/common/LoadingPage";
 import Center from "./views/center";
 import Home from "./views/home";
 import Login from "./views/login";
+import Register from "./views/register";
 import Settings from "./views/settings";
 import About from "./views/about";
 import TimelinePage from "./views/timeline";
@@ -32,6 +33,7 @@ function App(): ReactElement | null {
           <Route path="/home" element={<Home />} />
           <Route path="/center" element={<Center />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/about" element={<About />} />
           <Route path="/search" element={<Search />} />
