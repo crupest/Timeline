@@ -65,7 +65,7 @@ namespace Timeline.Services.Timeline
         /// <param name="numberPerPage">Number per page.</param>
         /// <returns>A task containing a page of post entity.</returns>
         /// <exception cref="EntityNotExistException">Thrown when timeline does not exist.</exception>
-        Task<Page<TimelinePostEntity>> GetPostsV2Async(long timelineId, DateTime? modifiedSince = null, int? page = null, int? numberPerPage = null);
+        Task<Page<TimelinePostEntity>> GetPostsV2Async(long timelineId, int page, int numberPerPage, DateTime? modifiedSince = null);
 
         /// <summary>
         /// Get a post of a timeline.

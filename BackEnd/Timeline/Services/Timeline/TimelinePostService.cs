@@ -382,13 +382,12 @@ namespace Timeline.Services.Timeline
             return timelineEntity.OwnerId == modifierId || postEntity.AuthorId == modifierId;
         }
 
-        public async Task<Page<TimelinePostEntity>> GetPostsV2Async(long timelineId, DateTime? modifiedSince = null, int? page = null, int? numberPerPage = null)
+        public async Task<Page<TimelinePostEntity>> GetPostsV2Async(long timelineId, int page, int pageSize, DateTime? modifiedSince = null)
         {
-            if (page.HasValue && page < 0)
-                throw new ArgumentOutOfRangeException(nameof(page), Resource.ExceptionPageNegative);
-            if (numberPerPage.HasValue && numberPerPage <= 0)
-                throw new ArgumentOutOfRangeException(nameof(numberPerPage), Resource.ExceptionNumberPerPageZeroOrNegative);
-
+            if (page <= 0)
+                throw new ArgumentOutOfRangeException(nameof(page));
+            if (pageSize <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
 
             var timeline = await _timelineService.GetTimelineAsync(timelineId);
 
@@ -401,19 +400,11 @@ namespace Timeline.Services.Timeline
                 query = query.Where(p => p.LastUpdated >= modifiedSince || (p.Author != null && p.Author.UsernameChangeTime >= modifiedSince));
             }
 
-            query = query.OrderBy(p => p.Time);
-
-            var pageNumber = page.GetValueOrDefault(1);
-            var pageSize = numberPerPage.GetValueOrDefault(20);
-
-            if (pageNumber > 1)
-            {
-                query = query.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
-            }
+            query = query.OrderBy(p => p.Time).Skip(pageSize * (page - 1)).Take(pageSize);
 
             var items = await query.ToListAsync();
 
-            return new Page<TimelinePostEntity>(pageNumber, pageSize, timeline.CurrentPostLocalId, items);
+            return new Page<TimelinePostEntity>(page, pageSize, timeline.CurrentPostLocalId, items);
         }
 
         public async Task<TimelinePostEntity> GetPostV2Async(long timelineId, long postId)

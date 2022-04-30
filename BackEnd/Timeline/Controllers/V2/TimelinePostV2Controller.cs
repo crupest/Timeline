@@ -47,7 +47,7 @@ namespace Timeline.Controllers.V2
             {
                 return Forbid();
             }
-            var postPage = await _postService.GetPostsV2Async(timelineId, modifiedSince, page, pageSize);
+            var postPage = await _postService.GetPostsV2Async(timelineId, page ?? 1, pageSize ?? 20, modifiedSince);
             var items = await MapListAsync<HttpTimelinePost>(postPage.Items);
             return postPage.WithItems(items);
         }
