@@ -40,7 +40,7 @@ const CreateUserDialog: React.FC<{
   );
 };
 
-const UsernameLabel: React.FC = (props) => {
+const UsernameLabel: React.FC<{ children: React.ReactNode }> = (props) => {
   return <span style={{ color: "blue" }}>{props.children}</span>;
 };
 

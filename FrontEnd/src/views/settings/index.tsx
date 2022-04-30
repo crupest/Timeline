@@ -19,6 +19,7 @@ import "./index.css";
 
 interface SettingSectionProps {
   title: I18nText;
+  children: React.ReactNode;
 }
 
 const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => {
