@@ -9,6 +9,7 @@ export interface FullPageDialogProps {
   show: boolean;
   onBack: () => void;
   contentContainerClassName?: string;
+  children: React.ReactNode;
 }
 
 const FullPageDialog: React.FC<FullPageDialogProps> = ({
