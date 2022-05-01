@@ -1,5 +1,6 @@
 import React from "react";
 import classnames from "classnames";
+import { useScrollToBottom } from "@/utilities/hooks";
 import { HubConnectionState } from "@microsoft/signalr";
 
 import {
@@ -16,14 +17,14 @@ import {
 import { useUser } from "@/services/user";
 import { getTimelinePostUpdate$ } from "@/services/timeline";
 
-import TimelinePagedPostListView from "./TimelinePagedPostListView";
+import TimelinePostListView from "./TimelinePostListView";
 import TimelineEmptyItem from "./TimelineEmptyItem";
 import TimelineLoading from "./TimelineLoading";
 import TimelinePostEdit from "./TimelinePostEdit";
 import TimelinePostEditNoLogin from "./TimelinePostEditNoLogin";
 import TimelineCard from "./TimelineCard";
 
-import "./index.css";
+import "./Timeline.css";
 
 export interface TimelineProps {
   className?: string;
@@ -46,6 +47,9 @@ const Timeline: React.FC<TimelineProps> = (props) => {
     "offline" | "forbid" | "notfound" | "error" | null
   >(null);
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [totalPage, setTotalPage] = React.useState(0);
+
   const [timelineReloadKey, setTimelineReloadKey] = React.useState(0);
   const [postsReloadKey, setPostsReloadKey] = React.useState(0);
 
@@ -60,71 +64,50 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, [timelineOwner, timelineName]);
 
   React.useEffect(() => {
-    if (timelineName != null) {
-      let subscribe = true;
-
-      getHttpTimelineClient()
-        .getTimeline(timelineOwner, timelineName)
-        .then(
-          (t) => {
-            if (subscribe) {
-              setTimeline(t);
-            }
-          },
-          (error) => {
-            if (subscribe) {
-              if (error instanceof HttpNetworkError) {
-                setError("offline");
-              } else if (error instanceof HttpForbiddenError) {
-                setError("forbid");
-              } else if (error instanceof HttpNotFoundError) {
-                setError("notfound");
-              } else {
-                console.error(error);
-                setError("error");
-              }
-            }
-          }
-        );
-
-      return () => {
-        subscribe = false;
-      };
-    }
-  }, [timelineOwner, timelineName, timelineReloadKey]);
-
-  React.useEffect(() => {
-    let subscribe = true;
-    void getHttpTimelineClient()
-      .listPost(timelineOwner, timelineName)
+    getHttpTimelineClient()
+      .getTimeline(timelineOwner, timelineName)
       .then(
-        (ps) => {
-          if (subscribe) {
-            setPosts(
-              ps.items.filter(
-                (p): p is HttpTimelinePostInfo => p.deleted === false
-              )
-            );
-          }
+        (t) => {
+          setTimeline(t);
         },
         (error) => {
-          if (subscribe) {
-            if (error instanceof HttpNetworkError) {
-              setError("offline");
-            } else if (error instanceof HttpForbiddenError) {
-              setError("forbid");
-            } else if (error instanceof HttpNotFoundError) {
-              setError("notfound");
-            } else {
-              console.error(error);
-              setError("error");
-            }
+          if (error instanceof HttpNetworkError) {
+            setError("offline");
+          } else if (error instanceof HttpForbiddenError) {
+            setError("forbid");
+          } else if (error instanceof HttpNotFoundError) {
+            setError("notfound");
+          } else {
+            console.error(error);
+            setError("error");
           }
         }
       );
-    return () => {
-      subscribe = false;
-    };
+  }, [timelineOwner, timelineName, timelineReloadKey]);
+
+  React.useEffect(() => {
+    getHttpTimelineClient()
+      .listPost(timelineOwner, timelineName, 1)
+      .then(
+        (page) => {
+          setPosts(
+            page.items.filter((p): p is HttpTimelinePostInfo => !p.deleted)
+          );
+          setTotalPage(page.totalPageCount);
+        },
+        (error) => {
+          if (error instanceof HttpNetworkError) {
+            setError("offline");
+          } else if (error instanceof HttpForbiddenError) {
+            setError("forbid");
+          } else if (error instanceof HttpNotFoundError) {
+            setError("notfound");
+          } else {
+            console.error(error);
+            setError("error");
+          }
+        }
+      );
   }, [timelineOwner, timelineName, postsReloadKey]);
 
   React.useEffect(() => {
@@ -142,6 +125,33 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       subscription.unsubscribe();
     };
   }, [timelineOwner, timelineName]);
+
+  useScrollToBottom(() => {
+    console.log(`Load page ${currentPage + 1}.`);
+    setCurrentPage(currentPage + 1);
+    void getHttpTimelineClient()
+      .listPost(timelineOwner, timelineName, currentPage + 1)
+      .then(
+        (page) => {
+          const ps = page.items.filter(
+            (p): p is HttpTimelinePostInfo => !p.deleted
+          );
+          setPosts((old) => [...(old ?? []), ...ps]);
+        },
+        (error) => {
+          if (error instanceof HttpNetworkError) {
+            setError("offline");
+          } else if (error instanceof HttpForbiddenError) {
+            setError("forbid");
+          } else if (error instanceof HttpNotFoundError) {
+            setError("notfound");
+          } else {
+            console.error(error);
+            setError("error");
+          }
+        }
+      );
+  }, currentPage < totalPage);
 
   if (error === "offline") {
     return (
@@ -181,8 +191,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       )}
       {posts && (
         <div style={style} className={classnames("timeline", className)}>
-          <TimelineEmptyItem height={40} />
-          <TimelinePagedPostListView posts={posts} onReload={updatePosts} />
+          <TimelineEmptyItem height={50} />
           {timeline?.postable ? (
             <TimelinePostEdit timeline={timeline} onPosted={updatePosts} />
           ) : user == null ? (
@@ -190,6 +199,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
           ) : (
             <TimelineEmptyItem startSegmentLength={20} center="none" current />
           )}
+          <TimelinePostListView posts={posts} onReload={updatePosts} />
         </div>
       )}
     </>

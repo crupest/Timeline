@@ -400,7 +400,7 @@ namespace Timeline.Services.Timeline
                 query = query.Where(p => p.LastUpdated >= modifiedSince || (p.Author != null && p.Author.UsernameChangeTime >= modifiedSince));
             }
 
-            query = query.OrderBy(p => p.Time).Skip(pageSize * (page - 1)).Take(pageSize);
+            query = query.OrderByDescending(p => p.Time).Skip(pageSize * (page - 1)).Take(pageSize);
 
             var items = await query.ToListAsync();
 
