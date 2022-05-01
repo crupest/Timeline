@@ -19,7 +19,7 @@ const TimelineSearchResultItemView: React.FC<{
     <div className="timeline-search-result-item my-2 p-3">
       <h4>
         <Link
-          to={`${timeline.owner.username}/${timeline.nameV2}`}
+          to={`/${timeline.owner.username}/${timeline.nameV2}`}
           className="mb-2 text-primary"
         >
           {timeline.title}
