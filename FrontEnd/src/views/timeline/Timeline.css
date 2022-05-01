@@ -1,14 +1,7 @@
-@keyframes timeline-enter {
-  from {
-    transform: translate(0, -100%);
-  }
-}
-
 .timeline {
   z-index: 0;
   position: relative;
   width: 100%;
-  animation: 1s timeline-enter;
 }
 
 @keyframes timeline-line-node-noncurrent {
@@ -46,7 +39,7 @@
 
 @keyframes timeline-post-enter {
   from {
-    transform: translate(0, -100%);
+    transform: translate(0, 100%);
     opacity: 0;
   }
   to {
