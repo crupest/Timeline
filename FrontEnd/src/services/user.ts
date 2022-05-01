@@ -98,7 +98,7 @@ export class UserService {
             this.userSubject.next(user);
           },
           (error) => {
-            if (!(error instanceof HttpNetworkError)) {
+            if (error instanceof HttpBadRequestError) {
               localStorage.removeItem(USER_STORAGE_KEY);
               this.userSubject.next(null);
               pushAlert({
