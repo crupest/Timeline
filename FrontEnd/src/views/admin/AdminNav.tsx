@@ -1,12 +1,11 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import Tabs from "../common/tab/Tabs";
 
 const AdminNav: React.FC<{ className?: string }> = ({ className }) => {
-  const params = useParams();
-
-  const name = params.name;
+  const location = useLocation();
+  const name = location.pathname.split("/")[2] ?? "user";
 
   return (
     <Tabs
@@ -14,9 +13,9 @@ const AdminNav: React.FC<{ className?: string }> = ({ className }) => {
       activeTabName={name}
       tabs={[
         {
-          name: "users",
+          name: "user",
           text: "admin:nav.users",
-          link: "/admin/users",
+          link: "/admin/user",
         },
         {
           name: "more",
