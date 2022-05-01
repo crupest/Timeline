@@ -30,16 +30,16 @@ function App(): ReactElement | null {
         <div style={{ height: 56 }} />
         <Routes>
           <Route index element={user == null ? <Home /> : <Center />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/center" element={<Center />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/:owner" element={<TimelinePage />} />
-          <Route path="/:owner/:timeline" element={<TimelinePage />} />
+          <Route path="home" element={<Home />} />
+          <Route path="center" element={<Center />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="about" element={<About />} />
+          <Route path="search" element={<Search />} />
+          <Route path="admin/*" element={<Admin />} />
+          <Route path=":owner" element={<TimelinePage />} />
+          <Route path=":owner/:timeline" element={<TimelinePage />} />
           <Route element={<NoMatch />} />
         </Routes>
         <AlertHost />

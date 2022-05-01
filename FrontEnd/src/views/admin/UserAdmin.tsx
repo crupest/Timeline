@@ -136,7 +136,7 @@ const UserPermissionModifyDialog: React.FC<{
       inputScheme={kUserPermissionList.map<OperationDialogBoolInput>(
         (permission, index) => ({
           type: "bool",
-          label: permission,
+          label: { type: "custom", value: permission },
           initValue: oldPermissionBoolList[index],
         })
       )}
@@ -184,7 +184,6 @@ const UserItem: React.FC<UserItemProps> = ({ user, onChange }) => {
       <div className="admin-user-item">
         <IconButton
           icon="pencil-square"
-          color="primary-enhance"
           className="cru-float-right"
           onClick={() => setEditMaskVisible(true)}
         />
@@ -202,7 +201,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, onChange }) => {
           {user.permissions.map((permission) => {
             return (
               <span key={permission} className="cru-color-danger">
-                {permission}{" "}
+                {permission}
               </span>
             );
           })}

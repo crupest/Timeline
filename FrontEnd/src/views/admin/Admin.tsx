@@ -17,8 +17,8 @@ const Admin: React.FC = () => {
         <AdminNav className="mt-2" />
         <Routes>
           <Route index element={<UserAdmin />} />
-          <Route path="/admin/user" element={<UserAdmin />} />
-          <Route path="/admin/more" element={<MoreAdmin />} />
+          <Route path="user" element={<UserAdmin />} />
+          <Route path="more" element={<MoreAdmin />} />
         </Routes>
       </div>
     </>
