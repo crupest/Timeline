@@ -22,7 +22,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditCardProps> = ({
       className={classnames("timeline-item timeline-post-edit", className)}
       style={style}
     >
-      <TimelineLine center="node" current />
+      <TimelineLine center="node" />
       <Card className="timeline-item-card">{children}</Card>
     </div>
   );

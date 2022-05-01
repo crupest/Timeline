@@ -2,7 +2,7 @@ import React from "react";
 import { fromEvent } from "rxjs";
 import { filter, throttleTime } from "rxjs/operators";
 
-function useScrollToTop(
+function useScrollToBottom(
   handler: () => void,
   enable = true,
   option = {
@@ -23,9 +23,11 @@ function useScrollToTop(
   React.useEffect(() => {
     const subscription = fromEvent(window, "scroll")
       .pipe(
-        filter(() => {
-          return window.scrollY <= option.maxOffset;
-        }),
+        filter(
+          () =>
+            window.scrollY >=
+            document.body.scrollHeight - window.innerHeight - option.maxOffset
+        ),
         throttleTime(option.throttle)
       )
       .subscribe(() => {
@@ -40,4 +42,4 @@ function useScrollToTop(
   }, [enable, option.maxOffset, option.throttle]);
 }
 
-export default useScrollToTop;
+export default useScrollToBottom;
