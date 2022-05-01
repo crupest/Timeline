@@ -143,7 +143,7 @@ namespace Timeline.Services.Api
             var user = await _userService.GetUserAsync(userId);
 
             var totalCount = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId).CountAsync();
-            var entities = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId).Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync();
+            var entities = await _databaseContext.BookmarkTimelines.Where(b => b.UserId == userId).OrderBy(b => b.Rank).Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync();
 
             var items = new List<TimelineBookmark>();
             foreach (var entity in entities)
