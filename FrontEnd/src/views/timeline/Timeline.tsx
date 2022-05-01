@@ -196,9 +196,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
             <TimelinePostEdit timeline={timeline} onPosted={updatePosts} />
           ) : user == null ? (
             <TimelinePostEditNoLogin />
-          ) : (
-            <TimelineEmptyItem startSegmentLength={20} center="none" current />
-          )}
+          ) : null}
           <TimelinePostListView posts={posts} onReload={updatePosts} />
         </div>
       )}
