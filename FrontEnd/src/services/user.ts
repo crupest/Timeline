@@ -4,12 +4,7 @@ import { AxiosError } from "axios";
 
 import { UiLogicError } from "@/common";
 
-import {
-  HttpNetworkError,
-  setHttpToken,
-  axios,
-  HttpBadRequestError,
-} from "@/http/common";
+import { setHttpToken, axios, HttpBadRequestError } from "@/http/common";
 import { getHttpTokenClient } from "@/http/token";
 import { getHttpUserClient, HttpUser, UserPermission } from "@/http/user";
 
