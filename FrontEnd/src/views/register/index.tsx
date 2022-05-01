@@ -29,7 +29,7 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <InputPanel
         scheme={[
           {

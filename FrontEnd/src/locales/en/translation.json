@@ -28,7 +28,7 @@
     "username": "Username",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "regsiterCode": "Register Code",
+    "registerCode": "Register Code",
     "error": {
       "usernameEmpty": "Username can't be empty.",
       "passwordEmpty": "Password can't be emtpy.",
