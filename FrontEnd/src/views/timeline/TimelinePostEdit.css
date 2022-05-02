@@ -1,7 +1,3 @@
-.timeline-item.timeline-post-edit {
-  padding-bottom: 0;
-}
-
 .timeline-post-edit {
   position: sticky !important;
   top: 106px;
