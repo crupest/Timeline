@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import classnames from "classnames";
+import classNames from "classNames";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 import { useUser, userService } from "@/services/user";
@@ -16,7 +16,6 @@ import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
 import "./index.css";
-import classNames from "classnames";
 
 interface SettingSectionProps {
   title: I18nText;
@@ -66,7 +65,7 @@ function SettingItemContainer({
   return (
     <div
       style={style}
-      className={classnames(
+      className={classNames(
         "row settings-item mx-0",
         first && "first",
         onClick && "clickable",
