@@ -185,6 +185,9 @@
     "changeNickname": "Change nickname.",
     "changeBookmarkVisibility": "Change bookmark visibility.",
     "myRegisterCode": "My register code:",
+    "myRegisterCodeDesc": "Click to create a new register code.",
+    "renewRegisterCode": "Renew Register Code",
+    "renewRegisterCodeDesc": "Confirm to renew register code? The old one will no longer be used.",
     "dialogChangePassword": {
       "title": "Change Password",
       "prompt": "You are changing your password. You need to input the correct old password. After change, you need to login again and all old login will be invalid.",

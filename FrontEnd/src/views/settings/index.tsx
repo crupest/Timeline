@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import classnames from "classnames";
 
-import { convertI18nText, I18nText } from "@/common";
+import { convertI18nText, I18nText, UiLogicError } from "@/common";
 import { useUser, userService } from "@/services/user";
 import { getHttpUserClient } from "@/http/user";
 import { TimelineVisibility } from "@/http/timeline";
@@ -69,10 +69,12 @@ function SettingItemContainer({
       className={classnames(
         "row settings-item mx-0",
         first && "first",
+        onClick && "clickable",
         className
       )}
+      onClick={onClick}
     >
-      <div className="px-0 col col-12 col-sm-auto" onClick={onClick}>
+      <div className="px-0 col col-12 col-sm-auto">
         <div className={classNames(danger && "cru-color-danger")}>
           {convertI18nText(title, t)}
         </div>
@@ -87,16 +89,8 @@ function SettingItemContainer({
 
 type ButtonSettingItemProps = SettingItemContainerWithoutChildrenProps;
 
-const ButtonSettingItem: React.FC<ButtonSettingItemProps> = ({
-  className,
-  ...props
-}) => {
-  return (
-    <SettingItemContainer
-      className={classNames("clickable", className)}
-      {...props}
-    />
-  );
+const ButtonSettingItem: React.FC<ButtonSettingItemProps> = ({ ...props }) => {
+  return <SettingItemContainer {...props} />;
 };
 
 interface SelectSettingItemProps
@@ -145,8 +139,17 @@ const SettingsPage: React.FC = (_) => {
   const navigate = useNavigate();
 
   const [dialog, setDialog] = useState<
-    null | "changepassword" | "changeavatar" | "changenickname" | "logout"
+    | null
+    | "changepassword"
+    | "changeavatar"
+    | "changenickname"
+    | "logout"
+    | "renewregistercode"
   >(null);
+
+  const [registerCode, setRegisterCode] = useState<undefined | null | string>(
+    undefined
+  );
 
   const [bookmarkVisibility, setBookmarkVisibility] =
     useState<TimelineVisibility>();
@@ -163,6 +166,20 @@ const SettingsPage: React.FC = (_) => {
     }
   }, [user]);
 
+  React.useEffect(() => {
+    setRegisterCode(undefined);
+  }, [user]);
+
+  React.useEffect(() => {
+    if (user != null && registerCode === undefined) {
+      void getHttpUserClient()
+        .getRegisterCode(user.username)
+        .then((code) => {
+          setRegisterCode(code.registerCode ?? null);
+        });
+    }
+  }, [user, registerCode]);
+
   const language = i18n.language.slice(0, 2);
 
   return (
@@ -170,6 +187,19 @@ const SettingsPage: React.FC = (_) => {
       <div className="container">
         {user ? (
           <SettingSection title="settings.subheaders.account">
+            <SettingItemContainer
+              title="settings.myRegisterCode"
+              subtext="settings.myRegisterCodeDesc"
+              onClick={() => setDialog("renewregistercode")}
+            >
+              {registerCode === undefined ? (
+                <Spinner />
+              ) : registerCode === null ? (
+                <span>Noop</span>
+              ) : (
+                <code>{registerCode}</code>
+              )}
+            </SettingItemContainer>
             <ButtonSettingItem
               title="settings.changeAvatar"
               onClick={() => setDialog("changeavatar")}
@@ -261,6 +291,20 @@ const SettingsPage: React.FC = (_) => {
           void userService.logout().then(() => {
             navigate("/");
           });
+        }}
+      />
+      <ConfirmDialog
+        title="settings.renewRegisterCode"
+        body="settings.renewRegisterCodeDesc"
+        onClose={() => setDialog(null)}
+        open={dialog === "renewregistercode"}
+        onConfirm={() => {
+          if (user == null) throw new UiLogicError();
+          void getHttpUserClient()
+            .renewRegisterCode(user.username)
+            .then(() => {
+              setRegisterCode(undefined);
+            });
         }}
       />
       <ChangeAvatarDialog

@@ -185,6 +185,9 @@
     "changeNickname": "更改昵称",
     "changeBookmarkVisibility": "修改书签时间线可见性",
     "myRegisterCode": "我的注册码：",
+    "myRegisterCodeDesc": "点击以创建新的注册码。",
+    "renewRegisterCode": "创建新的注册码",
+    "renewRegisterCodeDesc": "确定要创建新的注册码吗？旧的注册码将无法再使用。",
     "dialogChangePassword": {
       "title": "修改密码",
       "prompt": "您正在修改密码，您需要输入正确的旧密码。成功修改后您需要重新登陆，而且以前所有的登录都会失效。",
