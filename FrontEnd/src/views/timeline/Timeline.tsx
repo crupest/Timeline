@@ -191,7 +191,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       )}
       {posts && (
         <div style={style} className={classnames("timeline", className)}>
-          <TimelineEmptyItem height={50} />
+          <TimelineEmptyItem className="timeline-top" height={50} />
           {timeline?.postable ? (
             <TimelinePostEdit timeline={timeline} onPosted={updatePosts} />
           ) : user == null ? (
