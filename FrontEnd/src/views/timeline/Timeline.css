@@ -4,7 +4,7 @@
   width: 100%;
 }
 
-@keyframes timeline-line-node-noncurrent {
+@keyframes timeline-line-node {
   to {
     box-shadow: 0 0 20px 3px var(--cru-primary-l1-color);
   }
@@ -103,7 +103,7 @@
   box-sizing: border-box;
   z-index: 1;
   animation: 1s infinite alternate;
-  animation-name: timeline-line-node-noncurrent;
+  animation-name: timeline-line-node;
 }
 .timeline-line .node-loading-edge {
   color: var(--cru-primary-color);
