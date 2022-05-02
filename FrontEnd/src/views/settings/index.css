@@ -12,6 +12,7 @@
   padding: 0.5em 1em;
   transition: background 0.3s;
   border-bottom: 1px solid #e9ecef;
+  align-items: center;
 }
 .settings-item.first {
   border-top: 1px solid #e9ecef;
@@ -21,4 +22,10 @@
 }
 .settings-item:hover {
   background: #dee2e6;
+}
+
+.register-code {
+  border: 1px solid black;
+  border-radius: 3px;
+  padding: 0.2em;
 }

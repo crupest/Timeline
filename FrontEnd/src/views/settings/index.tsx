@@ -74,7 +74,7 @@ function SettingItemContainer({
       )}
       onClick={onClick}
     >
-      <div className="px-0 col col-12 col-sm-auto">
+      <div className="px-0 col col-auto">
         <div className={classNames(danger && "cru-color-danger")}>
           {convertI18nText(title, t)}
         </div>
@@ -82,7 +82,7 @@ function SettingItemContainer({
           {convertI18nText(subtext, t)}
         </small>
       </div>
-      <div className="col col-12 col-sm-auto">{children}</div>
+      <div className="col col-auto">{children}</div>
     </div>
   );
 }
@@ -197,7 +197,7 @@ const SettingsPage: React.FC = (_) => {
               ) : registerCode === null ? (
                 <span>Noop</span>
               ) : (
-                <code>{registerCode}</code>
+                <code className="register-code">{registerCode}</code>
               )}
             </SettingItemContainer>
             <ButtonSettingItem
