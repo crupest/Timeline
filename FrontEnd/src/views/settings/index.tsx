@@ -16,6 +16,7 @@ import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
 import "./index.css";
+import classNames from "classnames";
 
 interface SettingSectionProps {
   title: I18nText;
@@ -35,91 +36,106 @@ const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => {
   );
 };
 
-interface ButtonSettingItemProps {
+interface SettingItemContainerWithoutChildrenProps {
   title: I18nText;
   subtext?: I18nText;
-  onClick: () => void;
   first?: boolean;
   danger?: boolean;
+  style?: React.CSSProperties;
+  className?: string;
+  onClick?: () => void;
 }
 
-const ButtonSettingItem: React.FC<ButtonSettingItemProps> = ({
+interface SettingItemContainerProps
+  extends SettingItemContainerWithoutChildrenProps {
+  children?: React.ReactNode;
+}
+
+function SettingItemContainer({
   title,
   subtext,
-  onClick,
   first,
   danger,
-}) => {
+  children,
+  style,
+  className,
+  onClick,
+}: SettingItemContainerProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
     <div
+      style={style}
       className={classnames(
-        "settings-item clickable",
+        "row settings-item mx-0",
         first && "first",
-        danger && "cru-color-danger"
+        className
       )}
-      onClick={onClick}
     >
-      {convertI18nText(title, t)}
-      {subtext && (
+      <div className="px-0 col col-12 col-sm-auto" onClick={onClick}>
+        <div className={classNames(danger && "cru-color-danger")}>
+          {convertI18nText(title, t)}
+        </div>
         <small className="d-block cru-color-secondary">
           {convertI18nText(subtext, t)}
         </small>
-      )}
+      </div>
+      <div className="col col-12 col-sm-auto">{children}</div>
     </div>
+  );
+}
+
+type ButtonSettingItemProps = SettingItemContainerWithoutChildrenProps;
+
+const ButtonSettingItem: React.FC<ButtonSettingItemProps> = ({
+  className,
+  ...props
+}) => {
+  return (
+    <SettingItemContainer
+      className={classNames("clickable", className)}
+      {...props}
+    />
   );
 };
 
-interface SelectSettingItemProps {
-  title: I18nText;
-  subtext?: I18nText;
+interface SelectSettingItemProps
+  extends SettingItemContainerWithoutChildrenProps {
   options: {
     value: string;
     label: I18nText;
   }[];
   value?: string;
   onSelect: (value: string) => void;
-  first?: boolean;
 }
 
 const SelectSettingsItem: React.FC<SelectSettingItemProps> = ({
-  title,
-  subtext,
   options,
   value,
   onSelect,
-  first,
+  ...props
 }) => {
   const { t } = useTranslation();
 
   return (
-    <div className={classnames("row settings-item mx-0", first && "first")}>
-      <div className="px-0 col col-12 col-sm-auto">
-        <div>{convertI18nText(title, t)}</div>
-        <small className="d-block cru-color-secondary">
-          {convertI18nText(subtext, t)}
-        </small>
-      </div>
-      <div className="col col-12 col-sm-auto">
-        {value == null ? (
-          <Spinner />
-        ) : (
-          <select
-            value={value}
-            onChange={(e) => {
-              onSelect(e.target.value);
-            }}
-          >
-            {options.map(({ value, label }) => (
-              <option key={value} value={value}>
-                {convertI18nText(label, t)}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
-    </div>
+    <SettingItemContainer {...props}>
+      {value == null ? (
+        <Spinner />
+      ) : (
+        <select
+          value={value}
+          onChange={(e) => {
+            onSelect(e.target.value);
+          }}
+        >
+          {options.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {convertI18nText(label, t)}
+            </option>
+          ))}
+        </select>
+      )}
+    </SettingItemContainer>
   );
 };
 
