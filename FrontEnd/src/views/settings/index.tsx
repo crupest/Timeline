@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import classNames from "classNames";
+import classNames from "classnames";
 
 import { convertI18nText, I18nText, UiLogicError } from "@/common";
 import { useUser, userService } from "@/services/user";
