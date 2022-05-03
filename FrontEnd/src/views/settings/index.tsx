@@ -16,6 +16,7 @@ import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
 import "./index.css";
+import { pushAlert } from "@/services/alert";
 
 interface SettingSectionProps {
   title: I18nText;
@@ -196,7 +197,22 @@ const SettingsPage: React.FC = (_) => {
               ) : registerCode === null ? (
                 <span>Noop</span>
               ) : (
-                <code className="register-code">{registerCode}</code>
+                <code
+                  className="register-code"
+                  onClick={(event) => {
+                    void navigator.clipboard
+                      .writeText(registerCode)
+                      .then(() => {
+                        pushAlert({
+                          type: "success",
+                          message: "settings.myRegisterCodeCopied",
+                        });
+                      });
+                    event.stopPropagation();
+                  }}
+                >
+                  {registerCode}
+                </code>
               )}
             </SettingItemContainer>
             <ButtonSettingItem
