@@ -158,7 +158,7 @@ namespace Timeline.Controllers.V2
                 var post = await _postService.CreatePostAsync(timelineId, GetAuthUserId(), createRequest);
 
                 var group = TimelineHub.GenerateTimelinePostChangeListeningGroupName(owner, timeline);
-                await _timelineHubContext.Clients.Group(group).SendAsync(nameof(ITimelineClient.OnTimelinePostChangedV2), timeline);
+                await _timelineHubContext.Clients.Group(group).SendAsync(nameof(ITimelineClient.OnTimelinePostChangedV2), owner, timeline);
 
                 var result = await MapAsync<HttpTimelinePost>(post);
                 return CreatedAtAction("Get", new { owner = owner, timeline = timeline, post = post.LocalId }, result);
