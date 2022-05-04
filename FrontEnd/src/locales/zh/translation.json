@@ -18,6 +18,7 @@
     "public": "对所有人公开"
   },
   "register": {
+    "register": "注册",
     "username": "用户名",
     "password": "密码",
     "confirmPassword": "确认密码",
@@ -26,7 +27,8 @@
       "usernameEmpty": "用户名不能为空。",
       "passwordEmpty": "密码不能为空。",
       "confirmPasswordWrong": "密码不匹配。",
-      "registerCodeEmpty": "注册码不能为空。"
+      "registerCodeEmpty": "注册码不能为空。",
+      "registerCodeInvalid": "注册码无效。"
     }
   },
   "connectionState": {

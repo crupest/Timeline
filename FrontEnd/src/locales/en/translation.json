@@ -25,6 +25,7 @@
     "public": "Public To Everyone"
   },
   "register": {
+    "register": "Register",
     "username": "Username",
     "password": "Password",
     "confirmPassword": "Confirm Password",
@@ -33,7 +34,8 @@
       "usernameEmpty": "Username can't be empty.",
       "passwordEmpty": "Password can't be emtpy.",
       "confirmPasswordWrong": "Password does not match.",
-      "registerCodeEmpty": "Register code can't be empty."
+      "registerCodeEmpty": "Register code can't be empty.",
+      "registerCodeInvalid": "Register code is invalid."
     }
   },
   "serviceWorker": {

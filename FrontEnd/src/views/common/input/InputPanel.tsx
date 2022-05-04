@@ -78,8 +78,8 @@ export type InputPanelError = {
 
 export function hasError(e: InputPanelError | null | undefined): boolean {
   if (e == null) return false;
-  for (const key in e) {
-    if (e[key] != null) return true;
+  for (const key of Object.keys(e)) {
+    if (e[key as unknown as number] != null) return true;
   }
   return false;
 }
