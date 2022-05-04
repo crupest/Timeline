@@ -37,7 +37,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
     "member" | "property" | "delete" | null
   >(null);
 
-  const [collapse, setCollapse] = React.useState(false);
+  const [collapse, setCollapse] = React.useState(true);
   const toggleCollapse = (): void => {
     setCollapse((o) => !o);
   };
