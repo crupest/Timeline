@@ -1,6 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 
 import { useUser, userService } from "@/services/user";
 
@@ -149,6 +149,9 @@ const LoginPage: React.FC = (_) => {
           {t("user.login")}
         </LoadingButton>
       </div>
+      <Trans i18nKey="login.noAccount">
+        0<Link to="/register">1</Link>2
+      </Trans>
     </div>
   );
 };
