@@ -172,7 +172,8 @@
     "emptyUsername": "Username can't be empty.",
     "emptyPassword": "Password can't be empty.",
     "badCredential": "Username or password is invalid.",
-    "alreadyLogin": "Already login! Redirect to home page in 3s!"
+    "alreadyLogin": "Already login! Redirect to home page in 3s!",
+    "noAccount": "If you don't have an account and know a register code, then click <1>here</1> to register."
   },
   "settings": {
     "subheaders": {
