@@ -1,7 +1,8 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
-    es2020: true,
+    es2022: true,
   },
   extends: [
     "eslint:recommended",
@@ -12,17 +13,10 @@ module.exports = {
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
   ],
-  globals: {
-    Atomics: "readonly",
-    SharedArrayBuffer: "readonly",
-  },
   parser: "@typescript-eslint/parser",
   parserOptions: {
+    tsconfigRootDir: __dirname,
     project: ["./tsconfig.json"],
-    ecmaFeatures: {
-      jsx: true,
-    },
-    sourceType: "module",
   },
   plugins: ["react", "@typescript-eslint", "react-hooks"],
   settings: {

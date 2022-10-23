@@ -2,18 +2,17 @@
  * @type {import('vite').UserConfig}
  */
 
-import reactRefresh from "@vitejs/plugin-react-refresh";
 import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [
-    reactRefresh(),
+    react(),
     VitePWA({
       strategies: "injectManifest",
       srcDir: "src",
       filename: "sw.ts",
-      base: "/",
       manifest: false,
       includeAssets: "**",
     }),
