@@ -1,6 +1,6 @@
 .yarn
 node_modules
 dist
-.eslintrc.js
+.eslintrc.cjs
 postcss.config.js
 vite.config.js

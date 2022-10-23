@@ -1,0 +1,4 @@
+{
+  "version": "0.2",
+  "ignorePaths": ["**/node_modules/**", "package-lock.json"]
+}

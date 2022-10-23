@@ -2,6 +2,7 @@
   "profiles": {
     "Dev": {
       "commandName": "Project",
+      "applicationUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_FRONTEND": "Disable"
@@ -9,6 +10,7 @@
     },
     "Dev-Mock": {
       "commandName": "Project",
+      "applicationUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_FRONTEND": "Mock"
@@ -16,8 +18,17 @@
     },
     "Staging": {
       "commandName": "Project",
+      "applicationUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging"
+      }
+    },
+    "Timeline": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:49414",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }
