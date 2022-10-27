@@ -42,7 +42,7 @@ jobs:
         run: dotnet test --logger html --collect:"XPlat Code Coverage" --settings './Timeline.Tests/coverletArgs.runsettings'
 
       - name: Upload Test Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ success() || failure() }}
         with:
           name: test-result
