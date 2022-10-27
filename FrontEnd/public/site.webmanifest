@@ -1,6 +1,5 @@
 {
   "$schema": "http://json.schemastore.org/web-manifest",
-
   "name": "Timeline",
   "short_name": "Timeline",
   "description": "Record your life in Timeline! Created by crupest.",

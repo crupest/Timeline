@@ -233,7 +233,6 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
       <div className="image-cropper-mask-container">
         <div
           className="image-cropper-mask"
-          touch-action="none"
           style={{
             left: toPercentage(c.left * 100),
             top: toPercentage(c.top * 100),
@@ -247,7 +246,6 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
       </div>
       <div
         className="image-cropper-handler"
-        touch-action="none"
         style={{
           left: `calc(${(c.left + c.width) * 100}% - 15px)`,
           top: `calc(${(c.top + c.height) * 100}% - 15px)`,

@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import AppBar from "./views/common/AppBar";
@@ -20,7 +20,7 @@ const NoMatch: React.FC = () => {
   return <div>Ah-oh, 404!</div>;
 };
 
-function App(): ReactElement | null {
+function App(): JSX.Element {
   const user = useUser();
 
   return (
