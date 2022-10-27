@@ -2,7 +2,7 @@ FROM node:latest AS front-build
 WORKDIR /timeline-app
 COPY FrontEnd .
 # Install pnpm
-RUN curl -fsSL https://get.pnpm.io/install.sh | sh -
+RUN npm install -g pnpm
 RUN pnpm install --frozen-lockfile && pnpm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS back-build
