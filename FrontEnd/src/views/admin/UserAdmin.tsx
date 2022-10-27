@@ -58,7 +58,7 @@ const UserDeleteDialog: React.FC<{
       title="admin:user.dialog.delete.title"
       themeColor="danger"
       inputPrompt={() => (
-        <Trans i18nKey="admin:user.dialog.delete.prompt">
+        <Trans i18nKey="user.dialog.delete.prompt" ns="admin">
           0<UsernameLabel>{user.username}</UsernameLabel>2
         </Trans>
       )}

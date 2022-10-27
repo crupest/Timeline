@@ -20,28 +20,27 @@ jobs:
         working-directory: FrontEnd
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/cache@v2
+      - uses: pnpm/action-setup@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          version: 7
 
-      - name: Use Node.js 15
-        uses: actions/setup-node@v1
+      - name: Use Node.js Latest
+        uses: actions/setup-node@v3
         with:
-          node-version: "15"
+          node-version: "latest"
+          cache: "pnpm"
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Restore Packages
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build App
-        run: npm run build
+        run: pnpm run build
 
       - name: Lint Code
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
