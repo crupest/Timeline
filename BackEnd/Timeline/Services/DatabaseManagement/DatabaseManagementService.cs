@@ -17,10 +17,11 @@ namespace Timeline.Services.DatabaseManagement
         private readonly IServiceProvider _serviceProvider;
         private readonly bool _disableAutoBackup;
 
-        public DatabaseManagementService(IServiceProvider serviceProvider, IConfiguration configuration)
+        public DatabaseManagementService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<DatabaseManagementService> logger)
         {
             _serviceProvider = serviceProvider;
             _disableAutoBackup = ApplicationConfiguration.GetBoolConfig(configuration, ApplicationConfiguration.DisableAutoBackupKey, false);
+            _logger = logger;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken = default)
