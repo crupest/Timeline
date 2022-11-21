@@ -99,7 +99,7 @@ namespace Timeline
                     {
                         log.Append(_forwardedHeadersAllowedProxyHosts[i]);
                         log.Append(" (");
-                        log.Append(string.Join(' ', _forwardedHeadersAllowedProxyIPs));
+                        log.Append(string.Join(' ', _forwardedHeadersAllowedProxyIPs[i]));
                         log.Append(")\n");
                     }
                     Console.WriteLine(log.ToString());
