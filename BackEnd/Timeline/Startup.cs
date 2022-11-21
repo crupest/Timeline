@@ -59,6 +59,24 @@ namespace Timeline
 
             _enableForwardedHeaders = ApplicationConfiguration.GetBoolConfig(configuration, ApplicationConfiguration.EnableForwardedHeadersKey, false);
             _forwardedHeadersAllowedProxyHosts = Configuration.GetValue<string?>(ApplicationConfiguration.ForwardedHeadersAllowedProxyHostsKey);
+
+            if (_enableForwardedHeaders)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Forwarded headers enabled.");
+                Console.ResetColor();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                if (_forwardedHeadersAllowedProxyHosts is not null)
+                {
+                    Console.WriteLine("Allowed proxy hosts: {0}", _forwardedHeadersAllowedProxyHosts);
+                }
+                else
+                {
+                    Console.WriteLine("Allowed proxy hosts settings is default");
+                }
+                Console.ResetColor();
+            }
         }
 
         public IWebHostEnvironment Environment { get; }

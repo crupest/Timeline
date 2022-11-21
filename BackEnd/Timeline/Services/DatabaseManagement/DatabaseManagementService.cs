@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Timeline.Services.DatabaseManagement
 {
     public class DatabaseManagementService : IHostedService
     {
+        private readonly ILogger<DatabaseManagementService> _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly bool _disableAutoBackup;
 
@@ -34,6 +36,10 @@ namespace Timeline.Services.DatabaseManagement
             if (!_disableAutoBackup)
             {
                 await backupService.BackupAsync(cancellationToken);
+            }
+            else
+            {
+                _logger.LogWarning("Auto backup is disabled. Please backup your database manually.");
             }
             await database.Database.MigrateAsync(cancellationToken);
             await customMigrator.MigrateAsync(cancellationToken);
