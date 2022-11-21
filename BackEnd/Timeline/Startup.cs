@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
+using System.Text;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -34,7 +37,9 @@ namespace Timeline
     public class Startup
     {
         private readonly bool _enableForwardedHeaders;
-        private readonly string? _forwardedHeadersAllowedProxyHosts;
+        private readonly string? _forwardedHeadersAllowedProxyHostsString;
+        private readonly List<string>? _forwardedHeadersAllowedProxyHosts = null;
+        private readonly List<List<IPAddress>>? _forwardedHeadersAllowedProxyIPs = null;
         private readonly FrontEndMode _frontEndMode;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -62,7 +67,7 @@ namespace Timeline
             }
 
             _enableForwardedHeaders = ApplicationConfiguration.GetBoolConfig(configuration, ApplicationConfiguration.EnableForwardedHeadersKey, false);
-            _forwardedHeadersAllowedProxyHosts = Configuration.GetValue<string?>(ApplicationConfiguration.ForwardedHeadersAllowedProxyHostsKey);
+            _forwardedHeadersAllowedProxyHostsString = Configuration.GetValue<string?>(ApplicationConfiguration.ForwardedHeadersAllowedProxyHostsKey);
 
             if (_enableForwardedHeaders)
             {
@@ -71,9 +76,37 @@ namespace Timeline
                 Console.ResetColor();
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                if (_forwardedHeadersAllowedProxyHosts is not null)
+                if (_forwardedHeadersAllowedProxyHostsString is not null)
                 {
-                    Console.WriteLine("Allowed proxy hosts: {0}", _forwardedHeadersAllowedProxyHosts);
+                    _forwardedHeadersAllowedProxyHosts = new List<string>();
+                    foreach (var host in _forwardedHeadersAllowedProxyHostsString.Split(new char[] { ';', ',' }))
+                    {
+                        _forwardedHeadersAllowedProxyHosts.Add(host.Trim());
+                    }
+
+                    _forwardedHeadersAllowedProxyIPs = new();
+                    foreach (var host in _forwardedHeadersAllowedProxyHosts)
+                    {
+                        // Resolve host to ip
+                        var ips = System.Net.Dns.GetHostAddresses(host);
+                        _forwardedHeadersAllowedProxyIPs.Add(new(ips));
+                    }
+
+                    Console.WriteLine("Allowed proxy hosts:");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    StringBuilder log = new();
+                    for (int i = 0; i < _forwardedHeadersAllowedProxyHosts.Count; i++)
+                    {
+                        log.Append(_forwardedHeadersAllowedProxyHosts[i]);
+                        log.Append(" (");
+                        foreach (var ip in _forwardedHeadersAllowedProxyIPs[i])
+                        {
+                            log.Append(ip.ToString());
+                            log.Append(" ");
+                        }
+                        log.Append(")\n");
+                    }
+                    Console.WriteLine(log.ToString());
                 }
                 else
                 {
@@ -168,18 +201,13 @@ namespace Timeline
                 services.Configure<ForwardedHeadersOptions>(options =>
                 {
                     options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
-                    if (_forwardedHeadersAllowedProxyHosts is not null)
+                    if (_forwardedHeadersAllowedProxyHostsString is not null)
                     {
                         options.KnownNetworks.Clear();
                         options.KnownProxies.Clear();
-                        foreach (var host in _forwardedHeadersAllowedProxyHosts.Split(new char[] { ';', ',' }))
+                        foreach (var ips in _forwardedHeadersAllowedProxyIPs!)
                         {
-                            // Resolve host to ip
-                            var ips = System.Net.Dns.GetHostAddresses(host);
-                            foreach (var ip in ips)
-                            {
-                                options.KnownProxies.Add(ip);
-                            }
+                            ips.ForEach(ip => options.KnownProxies.Add(ip));
                         }
                     }
                 });
