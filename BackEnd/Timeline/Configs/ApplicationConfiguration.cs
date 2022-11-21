@@ -12,8 +12,6 @@ namespace Timeline.Configs
         public const string DatabaseBackupDirectoryName = "backup";
         public const string FrontEndKey = "FrontEnd";
         public const string DisableAutoBackupKey = "DisableAutoBackup";
-        public const string EnableForwardedHeadersKey = "EnableForwardedHeaders";
-        public const string ForwardedHeadersAllowedProxyHostsKey = "ForwardedHeadersAllowedProxyHosts";
 
         public static bool CheckIsValidBoolString(string? value, string configPath, Boolean defaultValue)
         {

@@ -6,10 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
-using System.Text;
 using System.Text.Json.Serialization;
 using Timeline.Auth;
 using Timeline.Configs;
@@ -36,10 +33,6 @@ namespace Timeline
 {
     public class Startup
     {
-        private readonly bool _enableForwardedHeaders;
-        private readonly string? _forwardedHeadersAllowedProxyHostsString;
-        private readonly List<string>? _forwardedHeadersAllowedProxyHosts = null;
-        private readonly List<List<IPAddress>>? _forwardedHeadersAllowedProxyIPs = null;
         private readonly FrontEndMode _frontEndMode;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -64,51 +57,6 @@ namespace Timeline
                     _frontEndMode = FrontEndMode.Normal;
                     Console.WriteLine("Unknown FrontEnd configuration value '{0}', fallback to normal.", frontEndModeString);
                 }
-            }
-
-            _enableForwardedHeaders = ApplicationConfiguration.GetBoolConfig(configuration, ApplicationConfiguration.EnableForwardedHeadersKey, false);
-            _forwardedHeadersAllowedProxyHostsString = Configuration.GetValue<string?>(ApplicationConfiguration.ForwardedHeadersAllowedProxyHostsKey);
-
-            if (_enableForwardedHeaders)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Forwarded headers enabled.");
-                Console.ResetColor();
-
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                if (_forwardedHeadersAllowedProxyHostsString is not null)
-                {
-                    _forwardedHeadersAllowedProxyHosts = new List<string>();
-                    foreach (var host in _forwardedHeadersAllowedProxyHostsString.Split(new char[] { ';', ',' }))
-                    {
-                        _forwardedHeadersAllowedProxyHosts.Add(host.Trim());
-                    }
-
-                    _forwardedHeadersAllowedProxyIPs = new();
-                    foreach (var host in _forwardedHeadersAllowedProxyHosts)
-                    {
-                        // Resolve host to ip
-                        var ips = System.Net.Dns.GetHostAddresses(host);
-                        _forwardedHeadersAllowedProxyIPs.Add(new(ips));
-                    }
-
-                    Console.WriteLine("Allowed proxy hosts:");
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    StringBuilder log = new();
-                    for (int i = 0; i < _forwardedHeadersAllowedProxyHosts.Count; i++)
-                    {
-                        log.Append(_forwardedHeadersAllowedProxyHosts[i]);
-                        log.Append(" (");
-                        log.Append(string.Join(' ', _forwardedHeadersAllowedProxyIPs));
-                        log.Append(")\n");
-                    }
-                    Console.WriteLine(log.ToString());
-                }
-                else
-                {
-                    Console.WriteLine("Allowed proxy hosts settings is default");
-                }
-                Console.ResetColor();
             }
         }
 
@@ -191,23 +139,6 @@ namespace Timeline
                     config.RootPath = "ClientApp";
                 });
             }
-
-            if (_enableForwardedHeaders)
-            {
-                services.Configure<ForwardedHeadersOptions>(options =>
-                {
-                    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
-                    if (_forwardedHeadersAllowedProxyHostsString is not null)
-                    {
-                        options.KnownNetworks.Clear();
-                        options.KnownProxies.Clear();
-                        foreach (var ips in _forwardedHeadersAllowedProxyIPs!)
-                        {
-                            ips.ForEach(ip => options.KnownProxies.Add(ip));
-                        }
-                    }
-                });
-            }
         }
 
 
@@ -222,11 +153,6 @@ namespace Timeline
                 {
                     ServeUnknownFileTypes = true
                 });
-            }
-
-            if (_enableForwardedHeaders)
-            {
-                app.UseForwardedHeaders();
             }
 
             app.UseOpenApi();
