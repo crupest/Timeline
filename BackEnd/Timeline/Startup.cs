@@ -33,6 +33,8 @@ namespace Timeline
 {
     public class Startup
     {
+        private readonly bool _enableForwardedHeaders;
+        private readonly string? _forwardedHeadersAllowedProxyHosts;
         private readonly FrontEndMode _frontEndMode;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -51,9 +53,12 @@ namespace Timeline
                 if (!Enum.TryParse(frontEndModeString, true, out _frontEndMode))
                 {
                     _frontEndMode = FrontEndMode.Normal;
-                    Console.WriteLine("Unknown FrontEnd configuaration value '{0}', fallback to normal.", frontEndModeString);
+                    Console.WriteLine("Unknown FrontEnd configuration value '{0}', fallback to normal.", frontEndModeString);
                 }
             }
+
+            _enableForwardedHeaders = ApplicationConfiguration.GetBoolConfig(configuration, ApplicationConfiguration.EnableForwardedHeadersKey, false);
+            _forwardedHeadersAllowedProxyHosts = Configuration.GetValue<string?>(ApplicationConfiguration.ForwardedHeadersAllowedProxyHostsKey);
         }
 
         public IWebHostEnvironment Environment { get; }
@@ -135,6 +140,28 @@ namespace Timeline
                     config.RootPath = "ClientApp";
                 });
             }
+
+            if (_enableForwardedHeaders)
+            {
+                services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+                    if (_forwardedHeadersAllowedProxyHosts is not null)
+                    {
+                        options.KnownNetworks.Clear();
+                        options.KnownProxies.Clear();
+                        foreach (var host in _forwardedHeadersAllowedProxyHosts.Split(new char[] { ';', ',' }))
+                        {
+                            // Resolve host to ip
+                            var ips = System.Net.Dns.GetHostAddresses(host);
+                            foreach (var ip in ips)
+                            {
+                                options.KnownProxies.Add(ip);
+                            }
+                        }
+                    }
+                });
+            }
         }
 
 
@@ -149,6 +176,11 @@ namespace Timeline
                 {
                     ServeUnknownFileTypes = true
                 });
+            }
+
+            if (_enableForwardedHeaders)
+            {
+                app.UseForwardedHeaders();
             }
 
             app.UseOpenApi();
