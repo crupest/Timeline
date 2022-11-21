@@ -37,9 +37,9 @@ namespace Timeline
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("We are in environment: " + environment.EnvironmentName);
-            Console.ResetColor();
+            // Console.ForegroundColor = ConsoleColor.Green;
+            // Console.WriteLine("We are in environment: " + environment.EnvironmentName);
+            // Console.ResetColor();
 
             Environment = environment;
             Configuration = configuration;
