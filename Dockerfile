@@ -13,6 +13,7 @@ RUN dotnet publish Timeline/Timeline.csproj --configuration Release --output ./T
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 ENV ASPNETCORE_URLS=http://0.0.0.0:5000
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 WORKDIR /app
 COPY --from=back-build /timeline-app/Timeline/publish .
 EXPOSE 5000
