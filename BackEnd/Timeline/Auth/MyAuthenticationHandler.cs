@@ -74,7 +74,7 @@ namespace Timeline.Auth
         private string? ExtractToken()
         {
             // check the authorization header
-            string header = Request.Headers[HeaderNames.Authorization];
+            string? header = Request.Headers[HeaderNames.Authorization];
             if (!string.IsNullOrEmpty(header) && header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 var token = header["Bearer ".Length..].Trim();
@@ -86,7 +86,7 @@ namespace Timeline.Auth
             var paramQueryKey = Options.TokenQueryParamKey;
             if (!string.IsNullOrEmpty(paramQueryKey))
             {
-                string token = Request.Query[paramQueryKey];
+                string? token = Request.Query[paramQueryKey];
                 if (!string.IsNullOrEmpty(token))
                 {
                     _logger.LogInformation(Resource.LogTokenFoundInQuery, paramQueryKey, token);

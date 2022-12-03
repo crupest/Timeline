@@ -5,7 +5,7 @@ COPY FrontEnd .
 RUN npm install -g pnpm
 RUN pnpm install --frozen-lockfile && pnpm run build
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS back-build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS back-build
 WORKDIR /timeline-app
 COPY BackEnd .
 COPY --from=front-build /timeline-app/dist /timeline-app/Timeline/ClientApp
