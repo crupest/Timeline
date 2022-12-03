@@ -40,7 +40,7 @@ namespace Timeline.Tests.Helpers
                 })
                 .ConfigureAppConfiguration((context, config) =>
                 {
-                    config.AddInMemoryCollection(new Dictionary<string, string>
+                    config.AddInMemoryCollection(new Dictionary<string, string?>
                     {
                         [ApplicationConfiguration.FrontEndKey] = "Mock",
                         [ApplicationConfiguration.WorkDirectoryKey] = WorkDirectory
