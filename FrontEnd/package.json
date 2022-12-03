@@ -7,7 +7,7 @@
   "description": "Timeline app.",
   "type": "module",
   "dependencies": {
-    "@microsoft/signalr": "^6.0.10",
+    "@microsoft/signalr": "^7.0.0",
     "@popperjs/core": "^2.11.6",
     "axios": "^1.1.3",
     "bootstrap": "^5.2.2",
