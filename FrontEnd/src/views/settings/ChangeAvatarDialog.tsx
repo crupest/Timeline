@@ -153,7 +153,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           <img
             className="change-avatar-img"
             src={resultUrl}
-            alt={t("settings.dialogChangeAvatar.previewImgAlt")}
+            alt={t("settings.dialogChangeAvatar.previewImgAlt") ?? undefined}
           />
         </div>
       </div>
