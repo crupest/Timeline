@@ -213,7 +213,7 @@ const TimelineBoardItemContainer: React.FC<TimelineBoardItemContainerProps> = ({
 };
 
 interface TimelineBoardUIProps {
-  title?: string;
+  title?: string | null;
   state: "offline" | "loading" | "loaded";
   timelines: TimelineBookmark[];
   onReload: () => void;
@@ -298,7 +298,7 @@ const TimelineBoardUI: React.FC<TimelineBoardUIProps> = (props) => {
 };
 
 export interface TimelineBoardProps {
-  title?: string;
+  title?: string | null;
   className?: string;
   load: () => Promise<TimelineBookmark[]>;
   editHandler?: {
