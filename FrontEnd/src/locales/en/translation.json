@@ -226,8 +226,7 @@
   "about": {
     "author": {
       "title": "Site Developer",
-      "fullname": "Fullname: ",
-      "nickname": "Nickname: ",
+      "name": "Name: ",
       "introduction": "Introduction: ",
       "introductionContent": "A programmer coding based on coincidence",
       "links": "Links: "
