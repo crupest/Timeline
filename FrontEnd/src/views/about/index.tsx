@@ -72,11 +72,7 @@ const AboutPage: React.FC = () => {
             />
             <div>
               <p>
-                <small>{t("about.author.fullname")}</small>
-                <span className="cru-color-primary">杨宇千</span>
-              </p>
-              <p>
-                <small>{t("about.author.nickname")}</small>
+                <small>{t("about.author.name")}</small>
                 <span className="cru-color-primary">crupest</span>
               </p>
               <p>

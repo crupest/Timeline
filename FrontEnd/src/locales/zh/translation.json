@@ -226,8 +226,7 @@
   "about": {
     "author": {
       "title": "网站作者",
-      "fullname": "姓名：",
-      "nickname": "昵称：",
+      "name": "名字：",
       "introduction": "简介：",
       "introductionContent": "一个基于巧合编程的代码爱好者。",
       "links": "链接："
