@@ -222,6 +222,10 @@
   text-align: end;
 }
 
+.cru-float-left {
+  float: left;
+}
+
 .cru-float-right {
   float: right;
 }
@@ -278,6 +282,7 @@
     right: 0;
   }
 }
+
 @media (max-width: 575.98px) {
   .alert-container {
     bottom: 0;
