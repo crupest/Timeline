@@ -65,21 +65,19 @@ const AboutPage: React.FC = () => {
       <Card className="container mt-4 py-3">
         <h4 id="author-info">{t("about.author.title")}</h4>
         <div>
-          <div className="d-flex">
+          <div className="d-block">
             <img
               src={authorAvatarUrl}
-              className="align-self-start cru-avatar large cru-round"
+              className="cru-avatar large cru-round cru-float-left"
             />
-            <div>
-              <p>
-                <small>{t("about.author.name")}</small>
-                <span className="cru-color-primary">crupest</span>
-              </p>
-              <p>
-                <small>{t("about.author.introduction")}</small>
-                {t("about.author.introductionContent")}
-              </p>
-            </div>
+            <p>
+              <small>{t("about.author.name")}</small>
+              <span className="cru-color-primary">crupest</span>
+            </p>
+            <p>
+              <small>{t("about.author.introduction")}</small>
+              {t("about.author.introductionContent")}
+            </p>
           </div>
           <p>
             <small>{t("about.author.links")}</small>
