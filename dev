@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+MYDIR="$(dirname "$(realpath "$0")")"
+
+exec tmux new-session "cd ${MYDIR}/FrontEnd && pnpm run start" \; \
+    split-window -h "cd ${MYDIR}/BackEnd/Timeline && dotnet run --launch-profile Dev"
