@@ -42,7 +42,7 @@ const paletteColorList = [
   "success",
 ] as const;
 
-export type PaletteColorType = typeof paletteColorList[number];
+export type PaletteColorType = (typeof paletteColorList)[number];
 
 export type Palette = Record<PaletteColorType, PaletteColor>;
 

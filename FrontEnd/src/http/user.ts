@@ -16,7 +16,7 @@ export const kUserPermissionList = [
   kHighlightTimelineManagement,
 ] as const;
 
-export type UserPermission = typeof kUserPermissionList[number];
+export type UserPermission = (typeof kUserPermissionList)[number];
 
 export interface HttpUser {
   uniqueId: string;

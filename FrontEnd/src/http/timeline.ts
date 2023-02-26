@@ -11,7 +11,7 @@ import { HttpUser } from "./user";
 
 export const kTimelineVisibilities = ["Public", "Register", "Private"] as const;
 
-export type TimelineVisibility = typeof kTimelineVisibilities[number];
+export type TimelineVisibility = (typeof kTimelineVisibilities)[number];
 
 export interface HttpTimelineInfo {
   uniqueId: string;
