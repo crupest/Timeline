@@ -110,8 +110,8 @@
       },
       "Markdig": {
         "type": "Transitive",
-        "resolved": "0.30.4",
-        "contentHash": "9LL7Mzubwf6QmOTZIqf+vERiinqPA1H+irBA38POhr93W/it00AvFWaCtF80+8VJTooFmcAJyZT2f60t1f88eQ=="
+        "resolved": "0.31.0",
+        "contentHash": "CEdZ3KyFfz5IPMrofhCOSrc4O2KNvSXSMXt3fv0W5AFCsk6a/JhKZuTBxGSadNt8n4zyyd/xXfoUMvr4ZbZ4Fw=="
       },
       "Microsoft.AspNetCore.Connections.Abstractions": {
         "type": "Transitive",
@@ -1535,7 +1535,7 @@
         "dependencies": {
           "AutoMapper": "[12.0.1, )",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "[12.0.0, )",
-          "Markdig": "[0.30.4, )",
+          "Markdig": "[0.31.0, )",
           "Microsoft.AspNetCore.SpaServices.Extensions": "[7.0.3, )",
           "Microsoft.EntityFrameworkCore": "[7.0.3, )",
           "Microsoft.EntityFrameworkCore.Analyzers": "[7.0.3, )",
