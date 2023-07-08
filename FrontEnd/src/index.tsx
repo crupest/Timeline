@@ -1,7 +1,6 @@
 import "regenerator-runtime";
 import "core-js/modules/es.promise";
 import "core-js/modules/es.array.iterator";
-import "pepjs";
 
 import React from "react";
 import { createRoot } from "react-dom/client";
