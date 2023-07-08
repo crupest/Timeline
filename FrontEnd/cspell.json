@@ -1,4 +1,10 @@
 {
   "version": "0.2",
-  "ignorePaths": ["**/node_modules/**", "pnpm-lock.yaml"]
+  "ignorePaths": [
+    "**/node_modules/**",
+    "pnpm-lock.yaml"
+  ],
+  "words": [
+    "languagedetector"
+  ]
 }
