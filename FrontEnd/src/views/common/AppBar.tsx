@@ -11,7 +11,7 @@ import UserAvatar from "./user/UserAvatar";
 
 import "./AppBar.css";
 
-const AppBar: React.FC = (_) => {
+const AppBar: React.FC = () => {
   const { t } = useTranslation();
 
   const user = useUser();

@@ -9,7 +9,7 @@ import LoadingButton from "../common/button/LoadingButton";
 
 import "./index.css";
 
-const LoginPage: React.FC = (_) => {
+const LoginPage: React.FC = () => {
   const { t } = useTranslation();
 
   const navigate = useNavigate();

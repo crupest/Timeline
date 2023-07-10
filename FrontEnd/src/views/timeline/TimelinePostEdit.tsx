@@ -161,7 +161,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       case "image":
         if (image == null) {
           throw new UiLogicError(
-            "Content type is image but image blob is null."
+            "Content type is image but image blob is null.",
           );
         }
         requestData = {
@@ -187,10 +187,10 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
           setKind("text");
           onPosted(data);
         },
-        (_) => {
+        () => {
           setProcess(false);
           onPostError();
-        }
+        },
       );
   };
 

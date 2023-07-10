@@ -5,11 +5,11 @@ import { PaletteColorType } from "@/palette";
 
 import "./IconButton.css";
 
-export type IconButtonProps = {
+export interface IconButtonProps extends React.ComponentPropsWithRef<"i"> {
   icon: string;
   color?: PaletteColorType;
   large?: boolean;
-} & React.ComponentPropsWithRef<"i">;
+}
 
 export default function IconButton(props: IconButtonProps): JSX.Element {
   const { icon, color, className, large, ...otherProps } = props;
@@ -21,7 +21,7 @@ export default function IconButton(props: IconButtonProps): JSX.Element {
         large && "large",
         "bi-" + icon,
         color ? "cru-" + color : "cru-primary",
-        className
+        className,
       )}
       {...otherProps}
     />

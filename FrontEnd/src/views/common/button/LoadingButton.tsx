@@ -7,13 +7,13 @@ import { PaletteColorType } from "@/palette";
 
 import Spinner from "../Spinner";
 
-function LoadingButton(
-  props: {
-    color?: PaletteColorType;
-    text?: I18nText;
-    loading?: boolean;
-  } & React.ComponentPropsWithoutRef<"button">
-): JSX.Element {
+interface LoadingButtonProps extends React.ComponentPropsWithoutRef<"button"> {
+  color?: PaletteColorType;
+  text?: I18nText;
+  loading?: boolean;
+}
+
+function LoadingButton(props: LoadingButtonProps): JSX.Element {
   const { t } = useTranslation();
 
   const { color, text, loading, className, children, ...otherProps } = props;
@@ -27,7 +27,7 @@ function LoadingButton(
       className={classNames(
         "cru-" + (color ?? "primary"),
         "cru-button outline",
-        className
+        className,
       )}
       {...otherProps}
     >

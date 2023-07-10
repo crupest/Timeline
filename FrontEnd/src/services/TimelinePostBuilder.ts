@@ -117,8 +117,8 @@ export default class TimelinePostBuilder {
           base64(image.file).then((data) => ({
             contentType: image.file.type,
             data,
-          }))
-        )
+          })),
+        ),
       )),
     ];
   }
