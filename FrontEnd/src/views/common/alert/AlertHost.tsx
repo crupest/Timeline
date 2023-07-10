@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import without from "lodash/without";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";

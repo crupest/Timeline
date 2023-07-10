@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 
 const BlobImage: React.FC<
   Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
