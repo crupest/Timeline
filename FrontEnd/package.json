@@ -4,6 +4,15 @@
   "private": true,
   "type": "module",
   "source": "index.html",
+  "scripts": {
+    "start": "parcel --port 5678",
+    "build": "tsc && parcel build",
+    "type-check": "tsc",
+    "lint": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx",
+    "lint:fix": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx --fix",
+    "check": "pnpm run type-check && pnpm run lint",
+    "check:fix": "pnpm run type-check && pnpm run lint:fix"
+  },
   "dependencies": {
     "@microsoft/signalr": "^7.0.7",
     "@popperjs/core": "^2.11.8",
@@ -31,13 +40,6 @@
     "rxjs": "^7.8.1",
     "xregexp": "^5.1.1"
   },
-  "scripts": {
-    "start": "parcel --port 5678",
-    "build": "tsc && parcel build",
-    "type-check": "tsc",
-    "lint": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx",
-    "lint:fix": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx --fix"
-  },
   "devDependencies": {
     "@parcel/packager-raw-url": "2.9.3",
     "@parcel/transformer-webmanifest": "2.9.3",
@@ -54,7 +56,7 @@
     "@types/react-transition-group": "^4.4.6",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
-    "buffer": "^5.5.0||^6.0.0",
+    "buffer": "^6.0.0",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",

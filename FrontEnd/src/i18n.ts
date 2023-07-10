@@ -1,29 +1,34 @@
-import i18n, { BackendModule, ResourceKey } from "i18next";
+import i18n, { BackendModule } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
 const backend: BackendModule = {
   type: "backend",
-  async read(language, namespace) {
-    if (namespace === "translation") {
-      if (language === "en") {
-        return await import("./locales/en/translation.json");
-      } else if (language === "zh") {
-        return await import("./locales/zh/translation.json");
+  read(language, namespace, callback) {
+    (async () => {
+      if (namespace === "translation") {
+        if (language === "en") {
+          return await import("./locales/en/translation.json");
+        } else if (language === "zh") {
+          return await import("./locales/zh/translation.json");
+        } else {
+          throw Error(`Language ${language} is not supported.`);
+        }
+      } else if (namespace === "admin") {
+        if (language === "en") {
+          return await import("./locales/en/admin.json");
+        } else if (language === "zh") {
+          return await import("./locales/zh/admin.json");
+        } else {
+          throw Error(`Language ${language} is not supported.`);
+        }
       } else {
-        throw Error(`Language ${language} is not supported.`);
+        throw Error(`Namespace ${namespace} is not supported.`);
       }
-    } else if (namespace === "admin") {
-      if (language === "en") {
-        return await import("./locales/en/admin.json");
-      } else if (language === "zh") {
-        return await import("./locales/zh/admin.json");
-      } else {
-        throw Error(`Language ${language} is not supported.`);
-      }
-    } else {
-      throw Error(`Namespace ${namespace} is not supported.`);
-    }
+    })().then(
+      (resources) => callback(null, resources.default),
+      (error: Error) => callback(error, null),
+    );
   },
   init() {}, // eslint-disable-line @typescript-eslint/no-empty-function
   create() {}, // eslint-disable-line @typescript-eslint/no-empty-function

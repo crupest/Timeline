@@ -22,7 +22,7 @@ export const timelineVisibilityTooltipTranslationMap: Record<
 
 export function getTimelinePostUpdate$(
   owner: string,
-  timeline: string
+  timeline: string,
 ): Observable<{ update: boolean; state: HubConnectionState }> {
   return new Observable((subscriber) => {
     subscriber.next({
@@ -76,7 +76,7 @@ export function getTimelinePostUpdate$(
       return connection.invoke(
         "SubscribeTimelinePostChangeV2",
         owner,
-        timeline
+        timeline,
       );
     });
 

@@ -71,7 +71,7 @@ function SettingItemContainer({
         "row settings-item mx-0",
         first && "first",
         onClick && "clickable",
-        className
+        className,
       )}
       onClick={onClick}
     >
@@ -134,7 +134,7 @@ const SelectSettingsItem: React.FC<SelectSettingItemProps> = ({
   );
 };
 
-const SettingsPage: React.FC = (_) => {
+const SettingsPage: React.FC = () => {
   const { i18n } = useTranslation();
   const user = useUser();
   const navigate = useNavigate();
@@ -149,7 +149,7 @@ const SettingsPage: React.FC = (_) => {
   >(null);
 
   const [registerCode, setRegisterCode] = useState<undefined | null | string>(
-    undefined
+    undefined,
   );
 
   const [bookmarkVisibility, setBookmarkVisibility] =

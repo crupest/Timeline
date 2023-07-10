@@ -1,4 +1,3 @@
-import * as React from "react";
 import pull from "lodash/pull";
 
 import { I18nText } from "@/common";
