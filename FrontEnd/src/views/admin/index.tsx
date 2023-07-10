@@ -1,6 +1,6 @@
-import * as React from "react";
+import { lazy } from "react";
 
-const Admin = React.lazy(
+const Admin = lazy(
   () => import(/* webpackChunkName: "admin" */ "./Admin")
 );
 

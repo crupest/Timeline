@@ -1,9 +1,8 @@
-import React from "react";
 import { useLocation } from "react-router-dom";
 
 import Tabs from "../common/tab/Tabs";
 
-const AdminNav: React.FC<{ className?: string }> = ({ className }) => {
+export function AdminNav({ className }: { className?: string }) {
   const location = useLocation();
   const name = location.pathname.split("/")[2] ?? "user";
 
@@ -25,6 +24,6 @@ const AdminNav: React.FC<{ className?: string }> = ({ className }) => {
       ]}
     />
   );
-};
+}
 
 export default AdminNav;

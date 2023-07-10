@@ -1,6 +1,6 @@
 import { getHttpUserClient } from "@/http/user";
 import { useUser } from "@/services/user";
-import React from "react";
+import * as React from "react";
 
 import OperationDialog from "../common/dailog/OperationDialog";
 

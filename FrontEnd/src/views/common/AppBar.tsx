@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink } from "react-router-dom";
@@ -11,7 +11,7 @@ import UserAvatar from "./user/UserAvatar";
 
 import "./AppBar.css";
 
-const AppBar: React.FC = (_) => {
+const AppBar: React.FC = () => {
   const { t } = useTranslation();
 
   const user = useUser();

@@ -1,4 +1,4 @@
-import React from "react";
+import { useRef, useEffect } from "react";
 import { fromEvent } from "rxjs";
 import { filter, throttleTime } from "rxjs/operators";
 
@@ -10,9 +10,9 @@ function useScrollToBottom(
     throttle: 1000,
   }
 ): void {
-  const handlerRef = React.useRef<(() => void) | null>(null);
+  const handlerRef = useRef<(() => void) | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     handlerRef.current = handler;
 
     return () => {
@@ -20,7 +20,7 @@ function useScrollToBottom(
     };
   }, [handler]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const subscription = fromEvent(window, "scroll")
       .pipe(
         filter(
