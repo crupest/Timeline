@@ -4,39 +4,25 @@ import { initReactI18next } from "react-i18next";
 
 const backend: BackendModule = {
   type: "backend",
-  read(language, namespace, callback) {
-    function error(message: string): void {
-      callback(new Error(message), false);
-    }
-
-    function success(result: ResourceKey): void {
-      callback(null, result);
-    }
-
-    const promise = (() => {
-      if (namespace === "translation") {
-        if (language === "en") {
-          return import("./locales/en/translation.json");
-        } else if (language === "zh") {
-          return import("./locales/zh/translation.json");
-        } else {
-          error(`Language ${language} is not supported.`);
-        }
-      } else if (namespace === "admin") {
-        if (language === "en") {
-          return import("./locales/en/admin.json");
-        } else if (language === "zh") {
-          return import("./locales/zh/admin.json");
-        } else {
-          error(`Language ${language} is not supported.`);
-        }
+  async read(language, namespace) {
+    if (namespace === "translation") {
+      if (language === "en") {
+        return await import("./locales/en/translation.json");
+      } else if (language === "zh") {
+        return await import("./locales/zh/translation.json");
       } else {
-        error(`Namespace ${namespace} is not supported.`);
+        throw Error(`Language ${language} is not supported.`);
       }
-    })();
-
-    if (promise) {
-      void promise.then((d) => success(d.default));
+    } else if (namespace === "admin") {
+      if (language === "en") {
+        return await import("./locales/en/admin.json");
+      } else if (language === "zh") {
+        return await import("./locales/zh/admin.json");
+      } else {
+        throw Error(`Language ${language} is not supported.`);
+      }
+    } else {
+      throw Error(`Namespace ${namespace} is not supported.`);
     }
   },
   init() {}, // eslint-disable-line @typescript-eslint/no-empty-function
@@ -51,7 +37,7 @@ export const i18nPromise = i18n
     fallbackLng: false,
     lowerCaseLng: true,
 
-    debug: import.meta.env.DEV,
+    debug: process.env.NODE_ENV === "development",
 
     interpolation: {
       escapeValue: false, // not needed for react!!
@@ -71,8 +57,8 @@ export const i18nPromise = i18n
     */
   });
 
-if (import.meta.hot) {
-  import.meta.hot.accept(
+if (module.hot) {
+  module.hot.accept(
     [
       "./locales/en/translation.json",
       "./locales/zh/translation.json",
@@ -81,7 +67,7 @@ if (import.meta.hot) {
     ],
     () => {
       void i18n.reloadResources();
-    }
+    },
   );
 }
 

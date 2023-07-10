@@ -15,9 +15,4 @@ BackEnd/Timeline/publish
 
 FrontEnd/dist
 FrontEnd/node_modules
-FrontEnd/.yarn/*
-!FrontEnd/.yarn/releases
-!FrontEnd/.yarn/plugins
-!FrontEnd/.yarn/cache
-!FrontEnd/.yarn/sdks
-!FrontEnd/.yarn/versions
+FrontEnd/.parcel-cache
