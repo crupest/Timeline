@@ -5,6 +5,8 @@
     "pnpm-lock.yaml"
   ],
   "words": [
-    "languagedetector"
+    "languagedetector",
+    "popperjs",
+    "signalr"
   ]
 }

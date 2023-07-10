@@ -1,6 +1,6 @@
-@import "bootstrap/dist/css/bootstrap-reboot.css";
-@import "bootstrap/dist/css/bootstrap-grid.css";
-@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "npm:bootstrap/dist/css/bootstrap-reboot.css";
+@import "npm:bootstrap/dist/css/bootstrap-grid.css";
+@import "npm:bootstrap-icons/font/bootstrap-icons.css";
 
 @import "./views/common/index.css";
 

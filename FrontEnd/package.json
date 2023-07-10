@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "private": true,
   "type": "module",
+  "source": "index.html",
   "dependencies": {
     "@microsoft/signalr": "^7.0.7",
     "@popperjs/core": "^2.11.8",
@@ -31,19 +32,21 @@
     "xregexp": "^5.1.1"
   },
   "scripts": {
-    "start": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "start": "parcel --port 5678",
+    "build": "tsc && parcel build",
     "type-check": "tsc",
     "lint": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx",
     "lint:fix": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx --fix"
   },
   "devDependencies": {
+    "@parcel/packager-raw-url": "2.9.3",
+    "@parcel/transformer-webmanifest": "2.9.3",
     "@tsconfig/vite-react": "^2.0.0",
     "@types/color": "^3.0.3",
     "@types/lodash": "^4.14.195",
     "@types/marked": "^5.0.0",
     "@types/node": "^20.4.1",
+    "@types/parcel-env": "^0.0.1",
     "@types/react": "^18.2.14",
     "@types/react-color": "^3.0.6",
     "@types/react-dom": "^18.2.6",
@@ -51,14 +54,15 @@
     "@types/react-transition-group": "^4.4.6",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
-    "@vitejs/plugin-react": "^4.0.2",
+    "buffer": "^5.5.0||^6.0.0",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "parcel": "latest",
     "prettier": "^3.0.0",
-    "typescript": "^5.1.6",
-    "vite": "^4.4.2"
+    "process": "^0.11.10",
+    "typescript": "^5.1.6"
   }
 }
