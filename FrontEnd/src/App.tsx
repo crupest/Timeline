@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import AppBar from "./views/common/AppBar";

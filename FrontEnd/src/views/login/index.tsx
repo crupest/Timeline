@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 
@@ -9,7 +9,7 @@ import LoadingButton from "../common/button/LoadingButton";
 
 import "./index.css";
 
-const LoginPage: React.FC = (_) => {
+const LoginPage: React.FC = () => {
   const { t } = useTranslation();
 
   const navigate = useNavigate();

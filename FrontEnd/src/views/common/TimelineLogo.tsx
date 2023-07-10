@@ -1,4 +1,5 @@
-import React, { SVGAttributes } from "react";
+import { SVGAttributes } from "react";
+import * as React from "react";
 
 export interface TimelineLogoProps extends SVGAttributes<SVGElement> {
   color?: string;

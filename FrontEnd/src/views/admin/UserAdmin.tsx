@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import * as React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import classnames from "classnames";
 

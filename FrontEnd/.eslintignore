@@ -1,6 +1,1 @@
-.yarn
-node_modules
 dist
-.eslintrc.cjs
-postcss.config.js
-vite.config.js

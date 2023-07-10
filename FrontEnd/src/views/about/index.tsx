@@ -1,4 +1,3 @@
-import React from "react";
 import { useTranslation, Trans } from "react-i18next";
 
 import authorAvatarUrl from "./author-avatar.png";
@@ -57,7 +56,7 @@ const backendCredits: {
   },
 ];
 
-const AboutPage: React.FC = () => {
+export default function AboutPage() {
   const { t } = useTranslation();
 
   return (
@@ -141,6 +140,4 @@ const AboutPage: React.FC = () => {
       </Card>
     </div>
   );
-};
-
-export default AboutPage;
+}

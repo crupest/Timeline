@@ -1,17 +1,17 @@
-import React from "react";
+import { useRef, useEffect } from "react";
 
 export default function useClickOutside(
   element: HTMLElement | null | undefined,
   onClickOutside: () => void,
   nextTick?: boolean
 ): void {
-  const onClickOutsideRef = React.useRef<() => void>(onClickOutside);
+  const onClickOutsideRef = useRef<() => void>(onClickOutside);
 
-  React.useEffect(() => {
+  useEffect(() => {
     onClickOutsideRef.current = onClickOutside;
   }, [onClickOutside]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (element != null) {
       const handler = (event: MouseEvent): void => {
         let e: HTMLElement | null = event.target as HTMLElement;

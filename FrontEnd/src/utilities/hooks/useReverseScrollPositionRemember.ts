@@ -1,6 +1,6 @@
 // Not used now!!! But preserved for future use.
 
-import React from "react";
+import { useEffect } from "react";
 
 let on = false;
 
@@ -43,7 +43,7 @@ const resizeObserver = new ResizeObserver(() => {
 });
 
 export default function useReverseScrollPositionRemember(): void {
-  React.useEffect(() => {
+  useEffect(() => {
     if (on) return;
     on = true;
     window.addEventListener("scroll", scrollListener);
