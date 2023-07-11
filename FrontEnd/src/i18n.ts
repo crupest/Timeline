@@ -4,34 +4,31 @@ import { initReactI18next } from "react-i18next";
 
 const backend: BackendModule = {
   type: "backend",
-  read(language, namespace, callback) {
-    (async () => {
-      if (namespace === "translation") {
-        if (language === "en") {
-          return await import("./locales/en/translation.json");
-        } else if (language === "zh") {
-          return await import("./locales/zh/translation.json");
-        } else {
-          throw Error(`Language ${language} is not supported.`);
-        }
-      } else if (namespace === "admin") {
-        if (language === "en") {
-          return await import("./locales/en/admin.json");
-        } else if (language === "zh") {
-          return await import("./locales/zh/admin.json");
-        } else {
-          throw Error(`Language ${language} is not supported.`);
-        }
-      } else {
-        throw Error(`Namespace ${namespace} is not supported.`);
-      }
-    })().then(
-      (resources) => callback(null, resources.default),
-      (error: Error) => callback(error, null),
-    );
+  init() {
+    /* do nothing */
   },
-  init() {}, // eslint-disable-line @typescript-eslint/no-empty-function
-  create() {}, // eslint-disable-line @typescript-eslint/no-empty-function
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  async read(language, namespace) {
+    if (namespace === "translation") {
+      if (language === "en") {
+        return await import("./locales/en/translation.json");
+      } else if (language === "zh") {
+        return await import("./locales/zh/translation.json");
+      } else {
+        throw Error(`Language ${language} is not supported.`);
+      }
+    } else if (namespace === "admin") {
+      if (language === "en") {
+        return await import("./locales/en/admin.json");
+      } else if (language === "zh") {
+        return await import("./locales/zh/admin.json");
+      } else {
+        throw Error(`Language ${language} is not supported.`);
+      }
+    } else {
+      throw Error(`Namespace ${namespace} is not supported.`);
+    }
+  },
 };
 
 export const i18nPromise = i18n
