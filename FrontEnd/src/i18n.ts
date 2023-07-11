@@ -74,3 +74,41 @@ if (module.hot) {
 }
 
 export default i18n;
+
+export type I18nText =
+  | string
+  | { type: "text" | "custom"; value: string }
+  | { type: "i18n"; value: string };
+
+type T = typeof i18n.t;
+
+export function convertI18nText(text: I18nText, t: T): string;
+export function convertI18nText(
+  text: I18nText | null | undefined,
+  t: T,
+): string | null;
+export function convertI18nText(
+  text: I18nText | null | undefined,
+  t: T,
+): string | null {
+  if (text == null) {
+    return null;
+  } else if (typeof text === "string") {
+    return t(text);
+  } else if (text.type === "i18n") {
+    return t(text.value);
+  } else {
+    return text.value;
+  }
+}
+
+export interface C {
+  (text: I18nText): string;
+  (text: I18nText | null | undefined): string | null;
+}
+
+export function createC(t: T): C {
+  return ((text) => convertI18nText(text, t)) as C;
+}
+
+export const c = createC(i18n.t);
