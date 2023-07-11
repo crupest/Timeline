@@ -11,7 +11,7 @@ import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 import SearchInput from "../common/SearchInput";
 import UserAvatar from "../common/user/UserAvatar";
 import Button from "../common/button/Button";
-import Dialog from "../common/dailog/Dialog";
+import Dialog from "../common/dialog/Dialog";
 
 import "./TimelineMember.css";
 

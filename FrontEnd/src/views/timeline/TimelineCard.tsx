@@ -12,7 +12,7 @@ import { getHttpBookmarkClient } from "@/http/bookmark";
 
 import UserAvatar from "../common/user/UserAvatar";
 import PopupMenu from "../common/menu/PopupMenu";
-import FullPageDialog from "../common/dailog/FullPageDialog";
+import FullPageDialog from "../common/dialog/FullPageDialog";
 import Card from "../common/Card";
 import TimelineDeleteDialog from "./TimelineDeleteDialog";
 import ConnectionStatusBadge from "./ConnectionStatusBadge";

@@ -9,7 +9,7 @@ import { useUser, userService } from "@/services/user";
 import { getHttpUserClient } from "@/http/user";
 import { TimelineVisibility } from "@/http/timeline";
 
-import ConfirmDialog from "../common/dailog/ConfirmDialog";
+import ConfirmDialog from "../common/dialog/ConfirmDialog";
 import Card from "../common/Card";
 import Spinner from "../common/Spinner";
 import ChangePasswordDialog from "./ChangePasswordDialog";

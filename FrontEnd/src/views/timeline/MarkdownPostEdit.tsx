@@ -8,7 +8,7 @@ import TimelinePostBuilder from "@/services/TimelinePostBuilder";
 
 import FlatButton from "../common/button/FlatButton";
 import TabPages from "../common/tab/TabPages";
-import ConfirmDialog from "../common/dailog/ConfirmDialog";
+import ConfirmDialog from "../common/dialog/ConfirmDialog";
 import Spinner from "../common/Spinner";
 import IconButton from "../common/button/IconButton";
 

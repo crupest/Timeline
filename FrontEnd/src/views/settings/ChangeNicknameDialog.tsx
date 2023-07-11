@@ -2,7 +2,7 @@ import { getHttpUserClient } from "@/http/user";
 import { useUser } from "@/services/user";
 import * as React from "react";
 
-import OperationDialog from "../common/dailog/OperationDialog";
+import OperationDialog from "../common/dialog/OperationDialog";
 
 export interface ChangeNicknameDialogProps {
   open: boolean;

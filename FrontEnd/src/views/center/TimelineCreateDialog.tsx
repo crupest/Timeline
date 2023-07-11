@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { validateTimelineName } from "@/services/timeline";
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
-import OperationDialog from "../common/dailog/OperationDialog";
+import OperationDialog from "../common/dialog/OperationDialog";
 import { useUserLoggedIn } from "@/services/user";
 
 interface TimelineCreateDialogProps {

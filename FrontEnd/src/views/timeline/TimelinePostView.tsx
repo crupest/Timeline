@@ -10,7 +10,7 @@ import { useClickOutside } from "@/utilities/hooks";
 import UserAvatar from "../common/user/UserAvatar";
 import Card from "../common/Card";
 import FlatButton from "../common/button/FlatButton";
-import ConfirmDialog from "../common/dailog/ConfirmDialog";
+import ConfirmDialog from "../common/dialog/ConfirmDialog";
 import TimelineLine from "./TimelineLine";
 import TimelinePostContentView from "./TimelinePostContentView";
 import PostPropertyChangeDialog from "./PostPropertyChangeDialog";
