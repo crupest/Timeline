@@ -7,7 +7,7 @@ import { getHttpUserClient, HttpUser, kUserPermissionList } from "@/http/user";
 
 import OperationDialog, {
   OperationDialogBoolInput,
-} from "../common/dailog/OperationDialog";
+} from "../common/dialog/OperationDialog";
 import Button from "../common/button/Button";
 import Spinner from "../common/Spinner";
 import FlatButton from "../common/button/FlatButton";

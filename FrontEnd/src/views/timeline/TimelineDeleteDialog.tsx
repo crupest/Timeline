@@ -4,7 +4,7 @@ import { Trans } from "react-i18next";
 
 import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 
-import OperationDialog from "../common/dailog/OperationDialog";
+import OperationDialog from "../common/dialog/OperationDialog";
 
 interface TimelineDeleteDialog {
   timeline: HttpTimelineInfo;

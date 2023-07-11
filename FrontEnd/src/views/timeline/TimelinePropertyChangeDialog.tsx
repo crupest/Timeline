@@ -8,7 +8,7 @@ import {
   TimelineVisibility,
 } from "@/http/timeline";
 
-import OperationDialog from "../common/dailog/OperationDialog";
+import OperationDialog from "../common/dialog/OperationDialog";
 
 export interface TimelinePropertyChangeDialogProps {
   open: boolean;

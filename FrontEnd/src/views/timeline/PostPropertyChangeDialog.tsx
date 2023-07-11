@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
-import OperationDialog from "../common/dailog/OperationDialog";
+import OperationDialog from "../common/dialog/OperationDialog";
 
 function PostPropertyChangeDialog(props: {
   open: boolean;
