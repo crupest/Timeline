@@ -1,17 +1,23 @@
-import * as React from "react";
+import { ReactNode } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
 
 import "./Dialog.css";
 
-export interface DialogProps {
+const optionalPortalElement = document.getElementById("portal");
+if (optionalPortalElement == null) {
+  throw new Error("Portal element not found");
+}
+const portalElement = optionalPortalElement;
+
+interface DialogProps {
   onClose: () => void;
   open: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
   disableCloseOnClickOnOverlay?: boolean;
 }
 
-export default function Dialog(props: DialogProps): React.ReactElement | null {
+export default function Dialog(props: DialogProps) {
   const { open, onClose, children, disableCloseOnClickOnOverlay } = props;
 
   return ReactDOM.createPortal(
@@ -24,7 +30,7 @@ export default function Dialog(props: DialogProps): React.ReactElement | null {
     >
       <div
         className="cru-dialog-overlay"
-        onClick={
+        onPointerDown={
           disableCloseOnClickOnOverlay
             ? undefined
             : () => {
@@ -34,13 +40,12 @@ export default function Dialog(props: DialogProps): React.ReactElement | null {
       >
         <div
           className="cru-dialog-container"
-          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           {children}
         </div>
       </div>
     </CSSTransition>,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    document.getElementById("portal")!
+    portalElement,
   );
 }
