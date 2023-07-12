@@ -1,7 +1,8 @@
 .cru-icon-button {
   color: var(--cru-theme-color);
   font-size: 1.4rem;
-  cursor: pointer;
+  background: none;
+  border: none;
 }
 
 .cru-icon-button.large {
