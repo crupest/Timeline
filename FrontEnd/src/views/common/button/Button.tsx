@@ -1,43 +1,47 @@
-import * as React from "react";
+import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
-import { useTranslation } from "react-i18next";
 
-import { convertI18nText, I18nText } from "@/common";
+import { I18nText, useC } from "@/common";
 import { PaletteColorType } from "@/palette";
 
 import "./Button.css";
 
-function _Button(
-  props: {
-    color?: PaletteColorType;
-    text?: I18nText;
-    outline?: boolean;
-  } & React.ComponentPropsWithoutRef<"button">,
-  ref: React.ForwardedRef<HTMLButtonElement>
-): JSX.Element {
-  const { t } = useTranslation();
+interface ButtonProps extends ComponentPropsWithoutRef<"button"> {
+  color?: PaletteColorType;
+  text?: I18nText;
+  outline?: boolean;
+  buttonRef?: Ref<HTMLButtonElement> | null;
+}
 
-  const { color, text, outline, className, children, ...otherProps } = props;
+export default function Button(props: ButtonProps) {
+  const {
+    buttonRef,
+    color,
+    text,
+    outline,
+    className,
+    children,
+    ...otherProps
+  } = props;
 
   if (text != null && children != null) {
     console.warn("You can't set both text and children props.");
   }
 
+  const c = useC();
+
   return (
     <button
-      ref={ref}
+      ref={buttonRef}
       className={classNames(
         "cru-" + (color ?? "primary"),
         "cru-button",
         outline && "outline",
-        className
+        className,
       )}
       {...otherProps}
     >
-      {text != null ? convertI18nText(text, t) : children}
+      {text != null ? c(text) : children}
     </button>
   );
 }
-
-const Button = React.forwardRef(_Button);
-export default Button;
