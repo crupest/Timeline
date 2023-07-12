@@ -15,7 +15,7 @@ export default function IconButton(props: IconButtonProps) {
   const { icon, color, className, large, ...otherProps } = props;
 
   return (
-    <i
+    <button
       className={classNames(
         "cru-icon-button",
         large && "large",
