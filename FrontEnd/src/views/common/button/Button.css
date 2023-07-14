@@ -9,11 +9,11 @@
 }
 
 .cru-button:not(.outline):hover {
-  background-color: var(--cru-theme-b1-color);
+  background-color: var(--cru-theme-d1-color);
 }
 
 .cru-button:not(.outline):active {
-  background-color: var(--cru-theme-b2-color);
+  background-color: var(--cru-theme-d2-color);
 }
 
 .cru-button:not(.outline):disabled {
@@ -32,14 +32,14 @@
 }
 
 .cru-button.outline:hover {
-  color: var(--cru-theme-b1-color);
-  border-color: var(--cru-theme-b1-color);
+  color: var(--cru-theme-d1-color);
+  border-color: var(--cru-theme-d1-color);
   background-color: var(--cru-background-color);
 }
 
 .cru-button.outline:active {
-  color: var(--cru-theme-b2-color);
-  border-color: var(--cru-theme-b2-color);
+  color: var(--cru-theme-l2-color);
+  border-color: var(--cru-theme-l2-color);
   background-color: var(--cru-background-1-color);
 }
 
