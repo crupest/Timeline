@@ -2,7 +2,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
-import { convertI18nText, I18nText, ThemeColor } from "@/common";
+import { I18nText, ThemeColor, convertI18nText } from "../common";
 
 import Spinner from "../Spinner";
 

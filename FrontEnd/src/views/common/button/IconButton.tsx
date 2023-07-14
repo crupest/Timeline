@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef } from "react";
 import classNames from "classnames";
 
-import { ThemeColor } from "@/common";
+import { ThemeColor } from "../common";
 
 import "./IconButton.css";
 
