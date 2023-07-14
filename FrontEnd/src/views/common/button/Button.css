@@ -1,5 +1,5 @@
 .cru-button:not(.outline) {
-  color: var(--cru-text-color);
+  color: var(--cru-light-color);
   cursor: pointer;
   padding: 0.2em 0.5em;
   border-radius: 0.2em;
@@ -9,11 +9,11 @@
 }
 
 .cru-button:not(.outline):hover {
-  background-color: var(--cru-theme-f1-color);
+  background-color: var(--cru-theme-b1-color);
 }
 
 .cru-button:not(.outline):active {
-  background-color: var(--cru-theme-f2-color);
+  background-color: var(--cru-theme-b2-color);
 }
 
 .cru-button:not(.outline):disabled {
@@ -32,14 +32,14 @@
 }
 
 .cru-button.outline:hover {
-  color: var(--cru-theme-f1-color);
-  border-color: var(--cru-theme-f1-color);
+  color: var(--cru-theme-b1-color);
+  border-color: var(--cru-theme-b1-color);
   background-color: var(--cru-background-color);
 }
 
 .cru-button.outline:active {
-  color: var(--cru-theme-f2-color);
-  border-color: var(--cru-theme-f2-color);
+  color: var(--cru-theme-b2-color);
+  border-color: var(--cru-theme-b2-color);
   background-color: var(--cru-background-1-color);
 }
 

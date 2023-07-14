@@ -1,5 +1,10 @@
 @import "./theme.css";
 
+body {
+  background: var(--cru-bg-color);
+  color: var(--cru-text-color);
+}
+
 .cru-text-center {
   text-align: center;
 }
