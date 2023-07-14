@@ -9,7 +9,7 @@
 }
 
 .cru-flat-button.disabled {
-  color: var(--cru-theme-l1-color);
+  color: var(--cru-theme-f1-color);
   cursor: default;
 }
 
