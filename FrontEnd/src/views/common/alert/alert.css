@@ -7,7 +7,7 @@
   border-radius: 5px;
   border: var(--cru-theme-color) 1px solid;
   color: var(--cru-theme-t-color);
-  background-color: var(--cru-theme-r1-color);
+  background-color: var(--cru-theme-b1-color);
 
   display: flex;
   overflow: hidden;

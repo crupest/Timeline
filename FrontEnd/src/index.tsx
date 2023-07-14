@@ -1,14 +1,9 @@
-import "regenerator-runtime";
-import "core-js/modules/es.promise";
-import "core-js/modules/es.array.iterator";
-
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import "./index.css";
 
 import "./i18n";
-import "./palette";
 
 import App from "./App";
 
@@ -18,5 +13,5 @@ const root = createRoot(container!);
 root.render(
   <StrictMode>
     <App />
-  </StrictMode>
+  </StrictMode>,
 );

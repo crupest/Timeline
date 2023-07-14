@@ -2,13 +2,12 @@ import * as React from "react";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
-import { convertI18nText, I18nText } from "@/common";
-import { PaletteColorType } from "@/palette";
+import { convertI18nText, I18nText, ThemeColor } from "@/common";
 
 import Spinner from "../Spinner";
 
 interface LoadingButtonProps extends React.ComponentPropsWithoutRef<"button"> {
-  color?: PaletteColorType;
+  color?: ThemeColor;
   text?: I18nText;
   loading?: boolean;
 }

@@ -8,3 +8,13 @@ export const highlightTimelineUsername = "crupest";
 export type { I18nText } from "./i18n";
 export { c, convertI18nText } from "./i18n";
 export { default as useC } from "./utilities/hooks/use-c";
+
+export const themeColors = [
+  "primary",
+  "secondary",
+  "tertiary",
+  "danger",
+  "success",
+] as const;
+
+export type ThemeColor = (typeof themeColors)[number];
