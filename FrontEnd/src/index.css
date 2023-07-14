@@ -4,9 +4,6 @@
 
 @import "./views/common/index.css";
 
-body {
-  background: var(--cru-background-color);
-}
 
 small {
   line-height: 1.2;
@@ -24,7 +21,7 @@ small {
 textarea {
   resize: none;
   outline: none;
-  border-color: var(--cru-background-2-color);
+  border-color: var(--cru-bg-2-color);
 }
 
 textarea:hover {

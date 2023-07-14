@@ -30,11 +30,11 @@ class HslColor implements Color {
   ) {}
 
   lighter(level: number): HslColor {
-    return new HslColor(this.h, this.s, this.l + level * 10);
+    return new HslColor(this.h, this.s, this.l + level * 5);
   }
 
   darker(level: number): HslColor {
-    return new HslColor(this.h, this.s, this.l - level * 10);
+    return new HslColor(this.h, this.s, this.l - level * 5);
   }
 
   toCssString(): string {
@@ -317,6 +317,16 @@ class Theme {
       mode === "light"
         ? GrayscaleColorGroup.white(this.prefix, "bg", this.levels)
         : GrayscaleColorGroup.black(this.prefix, "bg", this.levels);
+    const lightGroup = GrayscaleColorGroup.white(
+      this.prefix,
+      "light",
+      this.levels,
+    );
+    const darkGroup = GrayscaleColorGroup.black(
+      this.prefix,
+      "dark",
+      this.levels,
+    );
     const disabledGroup =
       mode == "light"
         ? new GrayscaleColorGroup(
@@ -333,7 +343,13 @@ class Theme {
             "lighter",
             this.levels,
           );
-    return new CompositeColorGroup([textGroup, bgGroup, disabledGroup]);
+    return new CompositeColorGroup([
+      textGroup,
+      bgGroup,
+      lightGroup,
+      darkGroup,
+      disabledGroup,
+    ]);
   }
 
   generateCss(print: (text: string, indent: number) => void): void {
@@ -370,7 +386,7 @@ class Theme {
     { name: "secondary", color: new HslColor(40, 100, 50) },
     { name: "tertiary", color: new HslColor(160, 100, 50) },
     { name: "danger", color: new HslColor(0, 100, 50) },
-    { name: "success", color: new HslColor(120, 100, 50) },
+    { name: "success", color: new HslColor(120, 60, 50) },
   ];
 
   const theme = new Theme(prefix, themeColors);
