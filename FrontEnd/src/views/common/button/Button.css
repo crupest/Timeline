@@ -1,5 +1,5 @@
 .cru-button:not(.outline) {
-  color: var(--cru-theme-t-color);
+  color: var(--cru-text-color);
   cursor: pointer;
   padding: 0.2em 0.5em;
   border-radius: 0.2em;
@@ -17,7 +17,7 @@
 }
 
 .cru-button:not(.outline):disabled {
-  background-color: var(--cru-disable-color);
+  background-color: var(--cru-disabled-color);
   cursor: auto;
 }
 
@@ -44,8 +44,8 @@
 }
 
 .cru-button.outline:disabled {
-  color: var(--cru-disable-color);
-  border-color: var(--cru-disable-color);
+  color: var(--cru-disabled-color);
+  border-color: var(--cru-disabled-color);
   background-color: white;
   cursor: auto;
 }

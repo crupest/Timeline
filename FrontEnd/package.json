@@ -1,8 +1,6 @@
 {
   "name": "timeline",
   "version": "0.4.0",
-  "private": true,
-  "type": "module",
   "source": "index.html",
   "scripts": {
     "start": "parcel --port 5678",
@@ -43,6 +41,7 @@
   "devDependencies": {
     "@parcel/packager-raw-url": "2.9.3",
     "@parcel/transformer-webmanifest": "2.9.3",
+    "@tsconfig/node20": "^1.0.2",
     "@types/color": "^3.0.3",
     "@types/lodash": "^4.14.195",
     "@types/marked": "^5.0.0",
@@ -64,7 +63,7 @@
     "parcel": "latest",
     "prettier": "^3.0.0",
     "process": "^0.11.10",
-    "ts-node": "latest",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   }
 }

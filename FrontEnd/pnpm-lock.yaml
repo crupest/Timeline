@@ -88,6 +88,9 @@ devDependencies:
   '@parcel/transformer-webmanifest':
     specifier: 2.9.3
     version: 2.9.3(@parcel/core@2.9.3)
+  '@tsconfig/node20':
+    specifier: ^1.0.2
+    version: 1.0.2
   '@types/color':
     specifier: ^3.0.3
     version: 3.0.3
@@ -152,7 +155,7 @@ devDependencies:
     specifier: ^0.11.10
     version: 0.11.10
   ts-node:
-    specifier: latest
+    specifier: ^10.9.1
     version: 10.9.1(@types/node@20.4.1)(typescript@5.1.6)
   typescript:
     specifier: ^5.1.6
@@ -1394,6 +1397,10 @@ packages:
 
   /@tsconfig/node16@1.0.4:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
+    dev: true
+
+  /@tsconfig/node20@1.0.2:
+    resolution: {integrity: sha512-pw0MmECiSTbBfIlT0x3iQLuJ8s3i2mwYoGxJ3vzqTNMdc4nO2VeqfCOQ/doGFa8iyPlqmBd98/5pBctWz7uN2A==}
     dev: true
 
   /@types/color-convert@2.0.0:

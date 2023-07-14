@@ -1,13 +1,13 @@
 import { ComponentPropsWithoutRef } from "react";
 import classNames from "classnames";
 
-import { PaletteColorType } from "@/palette";
+import { ThemeColor } from "@/common";
 
 import "./IconButton.css";
 
 interface IconButtonProps extends ComponentPropsWithoutRef<"i"> {
   icon: string;
-  color?: PaletteColorType;
+  color?: ThemeColor;
   large?: boolean;
 }
 
