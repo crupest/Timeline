@@ -2,11 +2,10 @@
 
 /**
  * Color variable name scheme:
- * has variant: --[prefix]-[name]-[variant]-color: [color];
  * no variant: --[prefix]-[name]-color: [color];
- * Variant scheme:
- * [variant-prefix][level]
- * eg. --cru-primary-color: [color]; --cru-primary-l1-color: [color];
+ * with variant: --[prefix]-[name]-[variant]-color: [color];
+ *
+ * Lightness variants come from material design (https://m3.material.io/styles/color/the-color-system/tokens)
  */
 
 import { stdout } from "process";
@@ -29,12 +28,8 @@ class HslColor implements Color {
     public l: number,
   ) {}
 
-  lighter(level: number): HslColor {
-    return new HslColor(this.h, this.s, this.l + level * 5);
-  }
-
-  darker(level: number): HslColor {
-    return new HslColor(this.h, this.s, this.l - level * 5);
+  withLightness(lightness: number): HslColor {
+    return new HslColor(this.h, this.s, lightness);
   }
 
   toCssString(): string {
@@ -53,11 +48,11 @@ class ColorVariable implements CssSegment {
   constructor(
     public prefix: string,
     public name: string,
-    public variant?: string | null,
+    public variant: string,
   ) {}
 
   toString(): string {
-    const variantPart = this.variant == null ? "" : `-${this.variant}`;
+    const variantPart = this.variant !== "" ? `-${this.variant}` : "";
     return `--${this.prefix}-${this.name}${variantPart}-color`;
   }
 
@@ -82,21 +77,13 @@ class CssVarColor implements Color {
 
 class ColorVariableDefinition implements CssSegment {
   constructor(
-    public name: ColorVariable,
+    public variable: ColorVariable,
     public color: Color,
   ) {}
 
   toCssString(): string {
-    return `${this.name.toCssString()}: ${this.color.toCssString()};`;
+    return `${this.variable.toCssString()}: ${this.color.toCssString()};`;
   }
-}
-
-type LightnessVariantType = "lighter" | "darker";
-
-interface LightnessVariantInfo {
-  prefix: string;
-  type: LightnessVariantType;
-  levels: number;
 }
 
 abstract class ColorGroup implements CssSegment {
@@ -106,6 +93,11 @@ abstract class ColorGroup implements CssSegment {
       .map((c) => c.toCssString())
       .join("\n");
   }
+}
+
+interface LightnessVariantInfo {
+  variant: string;
+  lightness: number;
 }
 
 class LightnessVariantColorGroup extends ColorGroup {
@@ -119,27 +111,16 @@ class LightnessVariantColorGroup extends ColorGroup {
   }
 
   getColorVariables(): ColorVariableDefinition[] {
-    const result: ColorVariableDefinition[] = [
-      new ColorVariableDefinition(
-        new ColorVariable(this.prefix, this.name),
-        this.baseColor,
-      ),
-    ];
+    const result: ColorVariableDefinition[] = [];
 
     for (const lightnessVariant of this.lightnessVariants) {
-      for (let i = 1; i <= lightnessVariant.levels; i++) {
-        const color =
-          lightnessVariant.type === "lighter"
-            ? this.baseColor.lighter(i)
-            : this.baseColor.darker(i);
-        const colorVariant = `${lightnessVariant.prefix}${i}`;
-        result.push(
-          new ColorVariableDefinition(
-            new ColorVariable(this.prefix, this.name, colorVariant),
-            color,
-          ),
-        );
-      }
+      const color = this.baseColor.withLightness(lightnessVariant.lightness);
+      result.push(
+        new ColorVariableDefinition(
+          new ColorVariable(this.prefix, this.name, lightnessVariant.variant),
+          color,
+        ),
+      );
     }
 
     return result;
@@ -157,12 +138,7 @@ class VarAliasColorGroup extends ColorGroup {
   }
 
   getColorVariables(): ColorVariableDefinition[] {
-    const result = [
-      new ColorVariableDefinition(
-        new ColorVariable(this.prefix, this.newName),
-        new CssVarColor(new ColorVariable(this.prefix, this.oldName)),
-      ),
-    ];
+    const result = [];
     for (const variant of this.variants) {
       result.push(
         new ColorVariableDefinition(
@@ -174,51 +150,6 @@ class VarAliasColorGroup extends ColorGroup {
       );
     }
     return result;
-  }
-}
-
-class GrayscaleColorGroup extends ColorGroup {
-  _delegate: LightnessVariantColorGroup;
-
-  constructor(
-    public prefix: string,
-    public name: string,
-    public baseColor: HslColor,
-    public type: LightnessVariantType,
-    public levels = 3,
-  ) {
-    super();
-
-    this._delegate = new LightnessVariantColorGroup(
-      prefix,
-      name,
-      this.baseColor,
-      [{ prefix: "", type: this.type, levels }],
-    );
-  }
-
-  getColorVariables(): ColorVariableDefinition[] {
-    return this._delegate.getColorVariables();
-  }
-
-  static white(prefix: string, name: string, levels = 3): GrayscaleColorGroup {
-    return new GrayscaleColorGroup(
-      prefix,
-      name,
-      HslColor.white,
-      "darker",
-      levels,
-    );
-  }
-
-  static black(prefix: string, name: string, levels = 3): GrayscaleColorGroup {
-    return new GrayscaleColorGroup(
-      prefix,
-      name,
-      HslColor.black,
-      "lighter",
-      levels,
-    );
   }
 }
 
@@ -234,49 +165,145 @@ class CompositeColorGroup extends ColorGroup {
   }
 }
 
-type ThemeColors = { name: string; color: HslColor }[];
+interface ThemeColors {
+  keyColors: { name: string; color: HslColor }[];
+  neutralColor: HslColor;
+}
 
 type ColorMode = "light" | "dark";
 
-class Theme {
-  static getDefaultThemeColorLightnessVariants(
-    mode: ColorMode,
-    levels = 3,
-  ): LightnessVariantInfo[] {
-    return [
-      {
-        prefix: "l",
-        type: "lighter",
-        levels,
-      },
-      {
-        prefix: "d",
-        type: "darker",
-        levels,
-      },
-      {
-        prefix: "f",
-        type: mode === "light" ? "lighter" : "darker",
-        levels,
-      },
-      {
-        prefix: "b",
-        type: mode === "light" ? "darker" : "lighter",
-        levels,
-      },
-    ];
-  }
+interface ColorModeColorVariant {
+  variant: string;
+  lightness: { light: number; dark: number };
+}
 
-  static getThemeColorAllVariants(): string[] {
-    const lightnessVariantInfos =
-      Theme.getDefaultThemeColorLightnessVariants("light");
-    const result: string[] = [];
-    for (const { prefix, levels } of lightnessVariantInfos) {
-      for (let i = 1; i <= levels; i++) {
-        result.push(`${prefix}${i}`);
-      }
-    }
-    return result;
+class Theme {
+  static keyColorVariants: ColorModeColorVariant[] = [
+    {
+      variant: "",
+      lightness: {
+        light: 40,
+        dark: 80,
+      },
+    },
+    {
+      variant: "on",
+      lightness: {
+        light: 100,
+        dark: 20,
+      },
+    },
+    {
+      variant: "container",
+      lightness: {
+        light: 90,
+        dark: 30,
+      },
+    },
+    {
+      variant: "on-container",
+      lightness: {
+        light: 10,
+        dark: 90,
+      },
+    },
+  ];
+
+  static surfaceColorVariants: ColorModeColorVariant[] = [
+    {
+      variant: "dim",
+      lightness: {
+        light: 87,
+        dark: 6,
+      },
+    },
+    {
+      variant: "",
+      lightness: {
+        light: 98,
+        dark: 6,
+      },
+    },
+    {
+      variant: "bright",
+      lightness: {
+        light: 98,
+        dark: 24,
+      },
+    },
+    {
+      variant: "container-lowest",
+      lightness: {
+        light: 100,
+        dark: 4,
+      },
+    },
+    {
+      variant: "container-low",
+      lightness: {
+        light: 96,
+        dark: 10,
+      },
+    },
+    {
+      variant: "container",
+      lightness: {
+        light: 94,
+        dark: 12,
+      },
+    },
+    {
+      variant: "container-high",
+      lightness: {
+        light: 92,
+        dark: 17,
+      },
+    },
+    {
+      variant: "container-highest",
+      lightness: {
+        light: 90,
+        dark: 22,
+      },
+    },
+    {
+      variant: "on",
+      lightness: {
+        light: 10,
+        dark: 90,
+      },
+    },
+    {
+      variant: "on-variant",
+      lightness: {
+        light: 30,
+        dark: 80,
+      },
+    },
+    {
+      variant: "outline",
+      lightness: {
+        light: 50,
+        dark: 60,
+      },
+    },
+    {
+      variant: "outline-variant",
+      lightness: {
+        light: 80,
+        dark: 30,
+      },
+    },
+  ];
+
+  static getLightnessVariants(
+    mode: ColorMode,
+    colorModeColorVariants: ColorModeColorVariant[],
+  ): LightnessVariantInfo[] {
+    return colorModeColorVariants.map((v) => ({
+      variant: v.variant,
+      lightness: v.lightness[mode],
+    }));
   }
 
   constructor(
@@ -285,91 +312,53 @@ class Theme {
     public levels = 3,
   ) {}
 
-  getThemeColorDefinitions(mode: ColorMode): ColorGroup {
+  getColorModeColorDefinitions(mode: ColorMode): ColorGroup {
     const groups: ColorGroup[] = [];
-    for (const { name, color } of this.themeColors) {
+    for (const { name, color } of this.themeColors.keyColors) {
       const colorGroup = new LightnessVariantColorGroup(
         this.prefix,
         name,
         color,
-        Theme.getDefaultThemeColorLightnessVariants(mode, this.levels),
+        Theme.getLightnessVariants(mode, Theme.keyColorVariants),
       );
       groups.push(colorGroup);
     }
+    groups.push(
+      new LightnessVariantColorGroup(
+        this.prefix,
+        "surface",
+        this.themeColors.neutralColor,
+        Theme.getLightnessVariants(mode, Theme.surfaceColorVariants),
+      ),
+    );
     return new CompositeColorGroup(groups);
   }
 
   getAliasColorDefinitions(name: string): ColorGroup {
     return new VarAliasColorGroup(
       this.prefix,
-      "theme",
+      "key",
       name,
-      Theme.getThemeColorAllVariants(),
+      Theme.keyColorVariants.map((v) => v.variant),
     );
-  }
-
-  getGrayscaleDefinitions(mode: ColorMode): ColorGroup {
-    const textGroup =
-      mode === "light"
-        ? GrayscaleColorGroup.black(this.prefix, "text", this.levels)
-        : GrayscaleColorGroup.white(this.prefix, "text", this.levels);
-    const bgGroup =
-      mode === "light"
-        ? GrayscaleColorGroup.white(this.prefix, "bg", this.levels)
-        : GrayscaleColorGroup.black(this.prefix, "bg", this.levels);
-    const lightGroup = GrayscaleColorGroup.white(
-      this.prefix,
-      "light",
-      this.levels,
-    );
-    const darkGroup = GrayscaleColorGroup.black(
-      this.prefix,
-      "dark",
-      this.levels,
-    );
-    const disabledGroup =
-      mode == "light"
-        ? new GrayscaleColorGroup(
-            this.prefix,
-            "disabled",
-            new HslColor(0, 0, 75),
-            "darker",
-            this.levels,
-          )
-        : new GrayscaleColorGroup(
-            this.prefix,
-            "disabled",
-            new HslColor(0, 0, 25),
-            "lighter",
-            this.levels,
-          );
-    return new CompositeColorGroup([
-      textGroup,
-      bgGroup,
-      lightGroup,
-      darkGroup,
-      disabledGroup,
-    ]);
   }
 
   generateCss(print: (text: string, indent: number) => void): void {
     print(":root {", 0);
-    print(this.getThemeColorDefinitions("light").toCssString(), 1);
-    print(this.getGrayscaleDefinitions("light").toCssString(), 1);
+    print(this.getColorModeColorDefinitions("light").toCssString(), 1);
     print("}", 0);
 
     print("", 0);
 
     print("@media (prefers-color-scheme: dark) {", 0);
     print(":root {", 1);
-    print(this.getThemeColorDefinitions("dark").toCssString(), 2);
-    print(this.getGrayscaleDefinitions("dark").toCssString(), 2);
+    print(this.getColorModeColorDefinitions("dark").toCssString(), 2);
     print("}", 1);
     print("}", 0);
 
     print("", 0);
 
-    for (const { name } of this.themeColors) {
+    for (const { name } of this.themeColors.keyColors) {
       print(`.${this.prefix}-${name} {`, 0);
       print(this.getAliasColorDefinitions(name).toCssString(), 1);
       print("}", 0);
@@ -381,13 +370,16 @@ class Theme {
 
 (function main() {
   const prefix = "cru";
-  const themeColors: ThemeColors = [
-    { name: "primary", color: new HslColor(210, 100, 50) },
-    { name: "secondary", color: new HslColor(40, 100, 50) },
-    { name: "tertiary", color: new HslColor(160, 100, 50) },
-    { name: "danger", color: new HslColor(0, 100, 50) },
-    { name: "success", color: new HslColor(120, 60, 50) },
-  ];
+  const themeColors: ThemeColors = {
+    keyColors: [
+      { name: "primary", color: new HslColor(210, 100, 50) },
+      { name: "secondary", color: new HslColor(40, 100, 50) },
+      { name: "tertiary", color: new HslColor(160, 100, 50) },
+      { name: "danger", color: new HslColor(0, 100, 50) },
+      { name: "success", color: new HslColor(120, 60, 50) },
+    ],
+    neutralColor: new HslColor(0, 0, 50),
+  };
 
   const theme = new Theme(prefix, themeColors);
 

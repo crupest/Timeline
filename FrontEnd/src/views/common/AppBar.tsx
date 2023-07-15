@@ -1,9 +1,9 @@
 import * as React from "react";
 import classnames from "classnames";
-import { useTranslation } from "react-i18next";
 import { Link, NavLink } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 
+import { useC } from "./common";
 import { useUser } from "@/services/user";
 
 import TimelineLogo from "./TimelineLogo";
@@ -11,8 +11,8 @@ import UserAvatar from "./user/UserAvatar";
 
 import "./AppBar.css";
 
-const AppBar: React.FC = () => {
-  const { t } = useTranslation();
+export default function AppBar() {
+  const c = useC();
 
   const user = useUser();
   const hasAdministrationPermission = user && user.hasAdministrationPermission;
@@ -26,7 +26,7 @@ const AppBar: React.FC = () => {
   const createLink = (
     link: string,
     label: React.ReactNode,
-    className?: string
+    className?: string,
   ): React.ReactNode => (
     <NavLink
       to={link}
@@ -51,14 +51,14 @@ const AppBar: React.FC = () => {
       <div
         className={classnames(
           "app-bar-main-area",
-          !expand && "app-bar-collapse"
+          !expand && "app-bar-collapse",
         )}
       >
         <div className="app-bar-link-area">
-          {createLink("/settings", t("nav.settings"))}
-          {createLink("/about", t("nav.about"))}
+          {createLink("/settings", c("nav.settings"))}
+          {createLink("/about", c("nav.about"))}
           {hasAdministrationPermission &&
-            createLink("/admin", t("nav.administration"))}
+            createLink("/admin", c("nav.administration"))}
         </div>
 
         <div className="app-bar-user-area">
@@ -69,13 +69,11 @@ const AppBar: React.FC = () => {
                   username={user.username}
                   className="cru-avatar small cru-round cursor-pointer ml-auto"
                 />,
-                "app-bar-avatar"
+                "app-bar-avatar",
               )
-            : createLink("/login", t("nav.login"))}
+            : createLink("/login", c("nav.login"))}
         </div>
       </div>
     </nav>
   );
-};
-
-export default AppBar;
+}

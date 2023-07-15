@@ -1,18 +1,27 @@
 .cru-flat-button {
-  cursor: pointer;
-  padding: 0.2em 0.5em;
+  font-size: 1rem;
+  padding: 0.4em 0.8em;
+  transition: all 0.5s;
   border-radius: 0.2em;
-  border: none;
-  background-color: transparent;
-  transition: all 0.6s;
-  color: var(--cru-theme-color);
+  background-color: var(--cru-surface-color);
+  border: 1px none;
+  color: var(--cru-key-color);
+  cursor: pointer;
+}
+
+.cru-flat-button:hover {
+  filter: brightness(var(--cru-hover-darkness));
+}
+
+.cru-flat-button:focus {
+  filter: brightness(var(--cru-focus-darkness));
+}
+
+.cru-flat-button:active {
+  filter: brightness(var(--cru-press-darkness));
 }
 
 .cru-flat-button.disabled {
   color: var(--cru-disabled-color);
-  cursor: default;
-}
-
-.cru-flat-button:hover:not(.disabled) {
-  background-color: #e9ecef;
+  cursor: auto;
 }
