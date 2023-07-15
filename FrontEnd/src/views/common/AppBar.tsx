@@ -3,7 +3,7 @@ import classnames from "classnames";
 import { Link, NavLink } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 
-import { useC } from "./common";
+import { I18nText, useC, useMobile } from "./common";
 import { useUser } from "@/services/user";
 
 import TimelineLogo from "./TimelineLogo";
@@ -11,7 +11,71 @@ import UserAvatar from "./user/UserAvatar";
 
 import "./AppBar.css";
 
-export default function AppBar() {
+function AppBarNavLink({
+  link,
+  className,
+  label,
+  children,
+}: {
+  link: string;
+  className?: string;
+  label?: I18nText;
+  children?: React.ReactNode;
+}) {
+  if (label != null && children != null) {
+    throw new Error("AppBarNavLink: label and children cannot be both set");
+  }
+
+  const c = useC();
+
+  return (
+    <NavLink
+      to={link}
+      className={({ isActive }) => classnames(className, isActive && "active")}
+    >
+      {children != null ? children : c(label)}
+    </NavLink>
+  );
+}
+
+function DesktopAppBar() {
+  const user = useUser();
+  const hasAdministrationPermission = user && user.hasAdministrationPermission;
+
+  return (
+    <nav className="desktop app-bar">
+      <Link to="/" className="app-bar-brand active">
+        <TimelineLogo className="app-bar-brand-icon" />
+        Timeline
+      </Link>
+      <div className="app-bar-main-area">
+        <div className="app-bar-link-area">
+          <AppBarNavLink link="/settings" label="nav.settings" />
+          <AppBarNavLink link="/about" label="nav.about" />
+          {hasAdministrationPermission && (
+            <AppBarNavLink link="/admin" label="nav.administration" />
+          )}
+        </div>
+
+        <div className="app-bar-user-area">
+          {user != null ? (
+            <AppBarNavLink link="/" className="app-bar-avatar">
+              <UserAvatar
+                username={user.username}
+                className="cru-avatar small cru-round cursor-pointer ml-auto"
+              />
+            </AppBarNavLink>
+          ) : (
+            <AppBarNavLink link="/login" label="nav.login" />
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+// TODO: Go make this!
+function MobileAppBar() {
   const c = useC();
 
   const user = useUser();
@@ -76,4 +140,9 @@ export default function AppBar() {
       </div>
     </nav>
   );
+}
+
+export default function AppBar() {
+  const isMobile = useMobile();
+  return isMobile ? <MobileAppBar /> : <DesktopAppBar />;
 }
