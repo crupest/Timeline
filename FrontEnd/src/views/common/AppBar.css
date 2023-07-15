@@ -1,6 +1,4 @@
 .app-bar {
-  display: flex;
-  align-items: center;
   height: 56px;
   position: fixed;
   z-index: 1030;
@@ -8,52 +6,53 @@
   left: 0;
   right: 0;
   background-color: var(--cru-primary-color);
-  transition: background-color 1s;
 }
 
-.app-bar .cru-avatar {
-  background-color: white;
+.app-bar.desktop {
+  display: flex;
 }
 
-.app-bar a {
-  color: var(--cru-primary-on-color);
-  text-decoration: none;
-  margin: 0 1em;
-  transition: color 1s;
-}
-
-.app-bar a:hover {
-  color: var(--cru-primary-on-color);
-}
-
-.app-bar a.active {
-  color: var(--cru-primary-on-color);
-}
-
-.app-bar-brand {
+.app-bar.desktop .app-bar-brand {
   display: flex;
   align-items: center;
 }
 
-.app-bar-brand-icon {
+.app-bar.desktop .app-bar-brand-icon {
   height: 2em;
 }
 
-.app-bar-main-area {
+.app-bar.desktop .app-bar-main-area {
   display: flex;
   flex-grow: 1;
 }
 
-.app-bar-link-area {
+.app-bar.desktop .app-bar-link-area {
   display: flex;
-  align-items: center;
-  flex-shrink: 0;
 }
 
-.app-bar-user-area {
+.app-bar.desktop a {
+  background-color: var(--cru-primary-color);
+  color: var(--cru-primary-on-color);
+  text-decoration: none;
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+  padding: 0 1em;
+}
+
+.app-bar.desktop a:hover {
+  filter: brightness(var(--cru-hover-brightness));
+}
+
+.app-bar.desktop a:focus {
+  filter: brightness(var(--cru-focus-brightness));
+}
+
+.app-bar.desktop a:active {
+  filter: brightness(var(--cru-press-brightness));
+}
+
+.app-bar.desktop .app-bar-user-area {
+  display: flex;
   margin-left: auto;
 }
 

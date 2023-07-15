@@ -6,20 +6,11 @@
   margin-block: 0;
 }
 
-*::before {
-  box-sizing: border-box;
-}
-
-*::after {
-  box-sizing: border-box;
-}
-
 body {
   font-family: var(--cru-default-font-family);
   background: var(--cru-surface-color);
   color: var(--cru-surface-on-color);
 }
-
 
 .cru-text-center {
   text-align: center;
