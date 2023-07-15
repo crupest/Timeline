@@ -5,9 +5,9 @@
 
 .cru-alert {
   border-radius: 5px;
-  border: var(--cru-theme-color) 1px solid;
-  color: var(--cru-theme-t-color);
-  background-color: var(--cru-theme-b1-color);
+  border: var(--cru-key-color) 1px solid;
+  color: var(--cru-key-t-color);
+  background-color: var(--cru-key-b1-color);
 
   display: flex;
   overflow: hidden;
@@ -25,9 +25,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--cru-theme-t-color);
+  background-color: var(--cru-key-t-color);
 }
 
 .cru-alert-close-button {
-  color: var(--cru-theme-color);
+  color: var(--cru-key-color);
 }
