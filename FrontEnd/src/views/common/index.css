@@ -12,6 +12,10 @@ body {
   color: var(--cru-surface-on-color);
 }
 
+button {
+  background-color: unset;
+}
+
 .cru-text-center {
   text-align: center;
 }
