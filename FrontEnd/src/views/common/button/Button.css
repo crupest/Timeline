@@ -14,15 +14,18 @@
 }
 
 .cru-button:not(.outline):hover {
-  filter: brightness(var(--cru-hover-darkness));
+  background-color: var(--cru-key-1-color);
+  border-color: var(--cru-key-1-color);
 }
 
 .cru-button:not(.outline):focus {
-  filter: brightness(var(--cru-focus-darkness));
+  background-color: var(--cru-key-1-color);
+  border-color: var(--cru-key-1-color);
 }
 
 .cru-button:not(.outline):active {
-  filter: brightness(var(--cru-press-darkness));
+  background-color: var(--cru-key-2-color);
+  border-color: var(--cru-key-2-color);
 }
 
 .cru-button:not(.outline):disabled {
@@ -33,20 +36,22 @@
 
 .cru-button.outline {
   color: var(--cru-key-color);
-  border: var(--cru-key-color) 1px solid;
-  background-color: var(--cru-surface-color);
+  border-color: var(--cru-key-color);
 }
 
 .cru-button.outline:hover {
-  filter: brightness(var(--cru-hover-brightness));
+  color: var(--cru-key-1-color);
+  border-color: var(--cru-key-1-color);
 }
 
 .cru-button.outline:focus {
-  filter: brightness(var(--cru-focus-brightness));
+  color: var(--cru-key-1-color);
+  border-color: var(--cru-key-1-color);
 }
 
 .cru-button.outline:active {
-  filter: brightness(var(--cru-press-brightness));
+  color: var(--cru-key-2-color);
+  border-color: var(--cru-key-2-color);
 }
 
 .cru-button.outline:disabled {

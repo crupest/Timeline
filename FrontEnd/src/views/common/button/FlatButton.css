@@ -10,15 +10,15 @@
 }
 
 .cru-flat-button:hover {
-  filter: brightness(var(--cru-hover-darkness));
+  background-color: var(--cru-surface-1-color);
 }
 
 .cru-flat-button:focus {
-  filter: brightness(var(--cru-focus-darkness));
+  background-color: var(--cru-surface-1-color);
 }
 
 .cru-flat-button:active {
-  filter: brightness(var(--cru-press-darkness));
+  background-color: var(--cru-surface-2-color);
 }
 
 .cru-flat-button.disabled {

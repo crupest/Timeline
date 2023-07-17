@@ -2,27 +2,49 @@
 
 :root {
   --cru-primary-color: hsl(210 100% 40%);
+  --cru-primary-1-color: hsl(210 100% 37%);
+  --cru-primary-2-color: hsl(210 100% 34%);
   --cru-primary-on-color: hsl(210 100% 100%);
   --cru-primary-container-color: hsl(210 100% 90%);
+  --cru-primary-container-1-color: hsl(210 100% 80%);
+  --cru-primary-container-2-color: hsl(210 100% 70%);
   --cru-primary-on-container-color: hsl(210 100% 10%);
   --cru-secondary-color: hsl(40 100% 40%);
+  --cru-secondary-1-color: hsl(40 100% 37%);
+  --cru-secondary-2-color: hsl(40 100% 34%);
   --cru-secondary-on-color: hsl(40 100% 100%);
   --cru-secondary-container-color: hsl(40 100% 90%);
+  --cru-secondary-container-1-color: hsl(40 100% 80%);
+  --cru-secondary-container-2-color: hsl(40 100% 70%);
   --cru-secondary-on-container-color: hsl(40 100% 10%);
   --cru-tertiary-color: hsl(160 100% 40%);
+  --cru-tertiary-1-color: hsl(160 100% 37%);
+  --cru-tertiary-2-color: hsl(160 100% 34%);
   --cru-tertiary-on-color: hsl(160 100% 100%);
   --cru-tertiary-container-color: hsl(160 100% 90%);
+  --cru-tertiary-container-1-color: hsl(160 100% 80%);
+  --cru-tertiary-container-2-color: hsl(160 100% 70%);
   --cru-tertiary-on-container-color: hsl(160 100% 10%);
   --cru-danger-color: hsl(0 100% 40%);
+  --cru-danger-1-color: hsl(0 100% 37%);
+  --cru-danger-2-color: hsl(0 100% 34%);
   --cru-danger-on-color: hsl(0 100% 100%);
   --cru-danger-container-color: hsl(0 100% 90%);
+  --cru-danger-container-1-color: hsl(0 100% 80%);
+  --cru-danger-container-2-color: hsl(0 100% 70%);
   --cru-danger-on-container-color: hsl(0 100% 10%);
   --cru-success-color: hsl(120 60% 40%);
+  --cru-success-1-color: hsl(120 60% 37%);
+  --cru-success-2-color: hsl(120 60% 34%);
   --cru-success-on-color: hsl(120 60% 100%);
   --cru-success-container-color: hsl(120 60% 90%);
+  --cru-success-container-1-color: hsl(120 60% 80%);
+  --cru-success-container-2-color: hsl(120 60% 70%);
   --cru-success-on-container-color: hsl(120 60% 10%);
   --cru-surface-dim-color: hsl(0 0% 87%);
   --cru-surface-color: hsl(0 0% 98%);
+  --cru-surface-1-color: hsl(0 0% 90%);
+  --cru-surface-2-color: hsl(0 0% 82%);
   --cru-surface-bright-color: hsl(0 0% 98%);
   --cru-surface-container-lowest-color: hsl(0 0% 100%);
   --cru-surface-container-low-color: hsl(0 0% 96%);
@@ -38,27 +60,49 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --cru-primary-color: hsl(210 100% 80%);
+    --cru-primary-1-color: hsl(210 100% 75%);
+    --cru-primary-2-color: hsl(210 100% 68%);
     --cru-primary-on-color: hsl(210 100% 20%);
     --cru-primary-container-color: hsl(210 100% 30%);
+    --cru-primary-container-1-color: hsl(210 100% 25%);
+    --cru-primary-container-2-color: hsl(210 100% 20%);
     --cru-primary-on-container-color: hsl(210 100% 90%);
     --cru-secondary-color: hsl(40 100% 80%);
+    --cru-secondary-1-color: hsl(40 100% 75%);
+    --cru-secondary-2-color: hsl(40 100% 68%);
     --cru-secondary-on-color: hsl(40 100% 20%);
     --cru-secondary-container-color: hsl(40 100% 30%);
+    --cru-secondary-container-1-color: hsl(40 100% 25%);
+    --cru-secondary-container-2-color: hsl(40 100% 20%);
     --cru-secondary-on-container-color: hsl(40 100% 90%);
     --cru-tertiary-color: hsl(160 100% 80%);
+    --cru-tertiary-1-color: hsl(160 100% 75%);
+    --cru-tertiary-2-color: hsl(160 100% 68%);
     --cru-tertiary-on-color: hsl(160 100% 20%);
     --cru-tertiary-container-color: hsl(160 100% 30%);
+    --cru-tertiary-container-1-color: hsl(160 100% 25%);
+    --cru-tertiary-container-2-color: hsl(160 100% 20%);
     --cru-tertiary-on-container-color: hsl(160 100% 90%);
     --cru-danger-color: hsl(0 100% 80%);
+    --cru-danger-1-color: hsl(0 100% 75%);
+    --cru-danger-2-color: hsl(0 100% 68%);
     --cru-danger-on-color: hsl(0 100% 20%);
     --cru-danger-container-color: hsl(0 100% 30%);
+    --cru-danger-container-1-color: hsl(0 100% 25%);
+    --cru-danger-container-2-color: hsl(0 100% 20%);
     --cru-danger-on-container-color: hsl(0 100% 90%);
     --cru-success-color: hsl(120 60% 80%);
+    --cru-success-1-color: hsl(120 60% 75%);
+    --cru-success-2-color: hsl(120 60% 68%);
     --cru-success-on-color: hsl(120 60% 20%);
     --cru-success-container-color: hsl(120 60% 30%);
+    --cru-success-container-1-color: hsl(120 60% 25%);
+    --cru-success-container-2-color: hsl(120 60% 20%);
     --cru-success-on-container-color: hsl(120 60% 90%);
     --cru-surface-dim-color: hsl(0 0% 6%);
     --cru-surface-color: hsl(0 0% 6%);
+    --cru-surface-1-color: hsl(0 0% 25%);
+    --cru-surface-2-color: hsl(0 0% 40%);
     --cru-surface-bright-color: hsl(0 0% 24%);
     --cru-surface-container-lowest-color: hsl(0 0% 4%);
     --cru-surface-container-low-color: hsl(0 0% 10%);
@@ -74,36 +118,56 @@
 
 .cru-primary {
   --cru-key-color: var(--cru-primary-color);
+  --cru-key-1-color: var(--cru-primary-1-color);
+  --cru-key-2-color: var(--cru-primary-2-color);
   --cru-key-on-color: var(--cru-primary-on-color);
   --cru-key-container-color: var(--cru-primary-container-color);
+  --cru-key-container-1-color: var(--cru-primary-container-1-color);
+  --cru-key-container-2-color: var(--cru-primary-container-2-color);
   --cru-key-on-container-color: var(--cru-primary-on-container-color);
 }
 
 .cru-secondary {
   --cru-key-color: var(--cru-secondary-color);
+  --cru-key-1-color: var(--cru-secondary-1-color);
+  --cru-key-2-color: var(--cru-secondary-2-color);
   --cru-key-on-color: var(--cru-secondary-on-color);
   --cru-key-container-color: var(--cru-secondary-container-color);
+  --cru-key-container-1-color: var(--cru-secondary-container-1-color);
+  --cru-key-container-2-color: var(--cru-secondary-container-2-color);
   --cru-key-on-container-color: var(--cru-secondary-on-container-color);
 }
 
 .cru-tertiary {
   --cru-key-color: var(--cru-tertiary-color);
+  --cru-key-1-color: var(--cru-tertiary-1-color);
+  --cru-key-2-color: var(--cru-tertiary-2-color);
   --cru-key-on-color: var(--cru-tertiary-on-color);
   --cru-key-container-color: var(--cru-tertiary-container-color);
+  --cru-key-container-1-color: var(--cru-tertiary-container-1-color);
+  --cru-key-container-2-color: var(--cru-tertiary-container-2-color);
   --cru-key-on-container-color: var(--cru-tertiary-on-container-color);
 }
 
 .cru-danger {
   --cru-key-color: var(--cru-danger-color);
+  --cru-key-1-color: var(--cru-danger-1-color);
+  --cru-key-2-color: var(--cru-danger-2-color);
   --cru-key-on-color: var(--cru-danger-on-color);
   --cru-key-container-color: var(--cru-danger-container-color);
+  --cru-key-container-1-color: var(--cru-danger-container-1-color);
+  --cru-key-container-2-color: var(--cru-danger-container-2-color);
   --cru-key-on-container-color: var(--cru-danger-on-container-color);
 }
 
 .cru-success {
   --cru-key-color: var(--cru-success-color);
+  --cru-key-1-color: var(--cru-success-1-color);
+  --cru-key-2-color: var(--cru-success-2-color);
   --cru-key-on-color: var(--cru-success-on-color);
   --cru-key-container-color: var(--cru-success-container-color);
+  --cru-key-container-1-color: var(--cru-success-container-1-color);
+  --cru-key-container-2-color: var(--cru-success-container-2-color);
   --cru-key-on-container-color: var(--cru-success-on-container-color);
 }
 
