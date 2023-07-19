@@ -21,7 +21,7 @@
   background-color: var(--cru-surface-2-color);
 }
 
-.cru-flat-button.disabled {
-  color: var(--cru-disabled-color);
+.cru-flat-button:disabled {
+  color: var(--cru-surface-on-color);
   cursor: auto;
 }

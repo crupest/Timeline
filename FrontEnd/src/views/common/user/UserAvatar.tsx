@@ -1,19 +1,22 @@
-import * as React from "react";
+import { Ref, ComponentPropsWithoutRef } from "react";
 
 import { getHttpUserClient } from "@/http/user";
 
-export interface UserAvatarProps
-  extends React.ImgHTMLAttributes<HTMLImageElement> {
+export interface UserAvatarProps extends ComponentPropsWithoutRef<"img"> {
   username: string;
+  imgRef?: Ref<HTMLImageElement> | null;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ username, ...otherProps }) => {
+export default function UserAvatar({
+  username,
+  imgRef,
+  ...otherProps
+}: UserAvatarProps) {
   return (
     <img
+      ref={imgRef}
       src={getHttpUserClient().generateAvatarUrl(username)}
       {...otherProps}
     />
   );
-};
-
-export default UserAvatar;
+}

@@ -8,29 +8,25 @@
   background-color: var(--cru-primary-color);
 }
 
-.app-bar.desktop {
+.app-bar {
   display: flex;
 }
 
-.app-bar.desktop .app-bar-brand {
+.app-bar .app-bar-brand {
   display: flex;
   align-items: center;
 }
 
-.app-bar.desktop .app-bar-brand-icon {
+.app-bar .app-bar-brand-icon {
   height: 2em;
 }
 
-.app-bar.desktop .app-bar-main-area {
+.app-bar .app-bar-user-area {
   display: flex;
-  flex-grow: 1;
+  margin-left: auto;
 }
 
-.app-bar.desktop .app-bar-link-area {
-  display: flex;
-}
-
-.app-bar.desktop a {
+.app-bar a {
   background-color: var(--cru-primary-color);
   color: var(--cru-primary-on-color);
   text-decoration: none;
@@ -40,63 +36,47 @@
   transition: all 0.5s;
 }
 
-.app-bar.desktop a:hover {
+.app-bar a:hover {
   background-color: var(--cru-primary-1-color);
 }
 
-.app-bar.desktop a:focus {
+.app-bar a:focus {
   background-color: var(--cru-primary-1-color);
 }
 
-.app-bar.desktop a:active {
+.app-bar a:active {
   background-color: var(--cru-primary-2-color);
 }
 
-.app-bar.desktop .app-bar-user-area {
-  display: flex;
-  margin-left: auto;
+.app-bar .app-bar-avatar img {
+  width: 45px;
+  height: 45px;
+  background-color: white;
+  border-radius: 50%;
 }
 
-.small-screen .app-bar-main-area {
+.app-bar.desktop .app-bar-link-area {
+  display: flex;
+}
+
+.app-bar.mobile .app-bar-link-area {
   position: absolute;
+  z-index: -1;
   top: 56px;
   left: 0;
   right: 0;
-  transform-origin: top;
-  transition: transform 0.6s, background-color 1s;
-  background-color: var(--cru-primary-color);
-  flex-direction: column;
+  transition: transform 0.5s;
 }
 
-.small-screen .app-bar-main-area.app-bar-collapse {
-  transform: scale(1, 0);
+.app-bar.mobile a {
+  height: 56px;
 }
 
-.small-screen .app-bar-main-area a {
-  text-align: left;
-  padding: 0.5em 0.5em;
+.app-bar.mobile.collapse .app-bar-link-area {
+  transform: translateY(-100%);
 }
 
-.small-screen .app-bar-link-area {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.small-screen .app-bar-user-area {
-  flex-direction: column;
-  align-items: stretch;
-  margin-left: unset;
-}
-
-.small-screen .app-bar-avatar {
-  align-self: flex-end;
-}
-
-.app-bar-toggler {
-  margin-left: auto;
+.app-bar .toggler {
   font-size: 2em;
-  margin-right: 1em;
-  color: var(--cru-primary-t-color);
-  cursor: pointer;
-  user-select: none;
+  margin-right: 0.5em;
 }
