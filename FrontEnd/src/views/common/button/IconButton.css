@@ -3,8 +3,49 @@
   font-size: 1.4rem;
   background: none;
   border: none;
+  transition: all 0.5s;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cru-icon-button:hover {
+  color: var(--cru-key-1-color);
+}
+
+.cru-icon-button:focus {
+  color: var(--cru-key-1-color);
+}
+
+.cru-icon-button:active {
+  color: var(--cru-key-2-color);
+}
+
+.cru-flat-button:disabled {
+  color: var(--cru-surface-on-color);
+  cursor: auto;
 }
 
 .cru-icon-button.large {
   font-size: 1.6rem;
+}
+
+.cru-icon-button.on-surface {
+  color: var(--cru-surface-color);
+}
+
+.cru-icon-button.on-surface:hover {
+  color: var(--cru-surface-1-color);
+}
+
+.cru-icon-button.on-surface:focus {
+  color: var(--cru-surface-1-color);
+}
+
+.cru-icon-button.on-surface:active {
+  color: var(--cru-surface-2-color);
+}
+
+.cru-flat-button.on-surface:disabled {
+  color: var(--cru-surface-on-color);
+  cursor: auto;
 }

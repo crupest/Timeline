@@ -30,6 +30,7 @@
 
 .cru-button:not(.outline):disabled {
   background-color: var(--cru-surface-on-color);
+  border-color: var(--cru-surface-on-color);
   cursor: auto;
 }
 
@@ -55,8 +56,8 @@
 }
 
 .cru-button.outline:disabled {
-  color: var(--cru-disabled-color);
-  border-color: var(--cru-disabled-color);
+  color: var(--cru-surface-on-color);
+  border-color: var(--cru-surface-on-color);
   background-color: white;
   cursor: auto;
 }
