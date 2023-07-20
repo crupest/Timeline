@@ -10,10 +10,7 @@ body {
   font-family: var(--cru-default-font-family);
   background: var(--cru-surface-color);
   color: var(--cru-surface-on-color);
-}
-
-button {
-  background-color: unset;
+  line-height: 1.2;
 }
 
 .cru-text-center {
