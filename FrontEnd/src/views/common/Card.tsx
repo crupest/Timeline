@@ -4,7 +4,7 @@ import classNames from "classnames";
 import "./Card.css";
 
 interface CardProps extends ComponentPropsWithoutRef<"div"> {
-  containerRef: Ref<HTMLDivElement>;
+  containerRef?: Ref<HTMLDivElement> | null;
 }
 
 export default function Card({

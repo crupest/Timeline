@@ -176,7 +176,7 @@
     "noAccount": "If you don't have an account and know a register code, then click <1>here</1> to register."
   },
   "settings": {
-    "subheaders": {
+    "subheader": {
       "account": "Account",
       "customization": "Customization"
     },
@@ -186,7 +186,6 @@
     "logout": "Log out this account",
     "changeAvatar": "Change avatar",
     "changeNickname": "Change nickname",
-    "changeBookmarkVisibility": "Change bookmark visibility",
     "myRegisterCode": "My register code:",
     "myRegisterCodeDesc": "Click to create a new register code.",
     "renewRegisterCode": "Renew Register Code",
