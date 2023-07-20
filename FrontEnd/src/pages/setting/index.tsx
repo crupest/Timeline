@@ -1,16 +1,21 @@
-import { useState, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  useState,
+  useEffect,
+  ReactNode,
+  ComponentPropsWithoutRef,
+} from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
 
-import { useC, I18nText } from "@/common";
+import { useC, Text } from "@/common";
 import { useUser, userService } from "@/services/user";
 import { getHttpUserClient } from "@/http/user";
 import { TimelineVisibility } from "@/http/timeline";
 
-import ConfirmDialog from "../common/dialog/ConfirmDialog";
-import Card from "../common/Card";
-import Spinner from "../common/Spinner";
+import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
+import Card from "@/views/common/Card";
+import Spinner from "@/views/common/Spinner";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
@@ -18,99 +23,94 @@ import ChangeNicknameDialog from "./ChangeNicknameDialog";
 import "./index.css";
 import { pushAlert } from "@/services/alert";
 
-interface SettingSectionProps {
-  title: I18nText;
+interface SettingSectionProps
+  extends Omit<ComponentPropsWithoutRef<"div">, "title"> {
+  title: Text;
   children: ReactNode;
 }
 
-function SettingSection({ title, children }: SettingSectionProps) {
+function SettingSection({
+  title,
+  className,
+  children,
+  ...otherProps
+}: SettingSectionProps) {
   const c = useC();
 
   return (
-    <Card>
-      <h2 className="">{c(title)}</h2>
+    <Card className={classNames(className, "setting-section")} {...otherProps}>
+      <h2 className="setting-section-title">{c(title)}</h2>
       {children}
     </Card>
   );
 }
 
-interface SettingItemContainerWithoutChildrenProps {
-  title: I18nText;
-  subtext?: I18nText;
-  first?: boolean;
-  danger?: boolean;
-  style?: React.CSSProperties;
-  className?: string;
-  onClick?: () => void;
-}
-
 interface SettingItemContainerProps
-  extends SettingItemContainerWithoutChildrenProps {
-  children?: React.ReactNode;
+  extends Omit<ComponentPropsWithoutRef<"div">, "title"> {
+  title: Text;
+  description?: Text;
+  danger?: boolean;
+  extraClassName?: string;
 }
 
 function SettingItemContainer({
   title,
-  subtext,
-  first,
+  description,
   danger,
-  children,
-  style,
+  extraClassName,
   className,
-  onClick,
-}: SettingItemContainerProps): JSX.Element {
-  const { t } = useTranslation();
+  children,
+  ...otherProps
+}: SettingItemContainerProps) {
+  const c = useC();
 
   return (
     <div
-      style={style}
       className={classNames(
-        "row settings-item mx-0",
-        first && "first",
-        onClick && "clickable",
         className,
+        "setting-item-container",
+        danger && "danger",
+        extraClassName,
       )}
-      onClick={onClick}
+      {...otherProps}
     >
-      <div className="px-0 col col-auto">
-        <div className={classNames(danger && "cru-color-danger")}>
-          {convertI18nText(title, t)}
-        </div>
-        <small className="d-block cru-color-secondary">
-          {convertI18nText(subtext, t)}
-        </small>
+      <div className="setting-item-label-area">
+        <div className="setting-item-label-title">{c(title)}</div>
+        <small className="setting-item-label-sub">{c(description)}</small>
       </div>
-      <div className="col col-auto">{children}</div>
+      <div className="setting-item-value-area">{children}</div>
     </div>
   );
 }
 
-type ButtonSettingItemProps = SettingItemContainerWithoutChildrenProps;
+type ButtonSettingItemProps = Omit<SettingItemContainerProps, "extraClassName">;
 
-const ButtonSettingItem: React.FC<ButtonSettingItemProps> = ({ ...props }) => {
-  return <SettingItemContainer {...props} />;
-};
+function ButtonSettingItem(props: ButtonSettingItemProps) {
+  return (
+    <SettingItemContainer extraClassName="setting-type-button" {...props} />
+  );
+}
 
 interface SelectSettingItemProps
-  extends SettingItemContainerWithoutChildrenProps {
+  extends Omit<SettingItemContainerProps, "onSelect" | "extraClassName"> {
   options: {
     value: string;
-    label: I18nText;
+    label: Text;
   }[];
-  value?: string;
+  value?: string | null;
   onSelect: (value: string) => void;
 }
 
-const SelectSettingsItem: React.FC<SelectSettingItemProps> = ({
+function SelectSettingsItem({
   options,
   value,
   onSelect,
-  ...props
-}) => {
-  const { t } = useTranslation();
+  ...extraProps
+}: SelectSettingItemProps) {
+  const c = useC();
 
   return (
-    <SettingItemContainer {...props}>
+    <SettingItemContainer extraClassName="setting-type-select" {...extraProps}>
       {value == null ? (
         <Spinner />
       ) : (
@@ -122,53 +122,30 @@ const SelectSettingsItem: React.FC<SelectSettingItemProps> = ({
         >
           {options.map(({ value, label }) => (
             <option key={value} value={value}>
-              {convertI18nText(label, t)}
+              {c(label)}
             </option>
           ))}
         </select>
       )}
     </SettingItemContainer>
   );
-};
+}
 
-const SettingsPage: React.FC = () => {
-  const { i18n } = useTranslation();
+function RegisterCodeSettingItem({
+  openRenewDialog,
+}: {
+  openRenewDialog: () => void;
+}) {
   const user = useUser();
-  const navigate = useNavigate();
 
-  const [dialog, setDialog] = useState<
-    | null
-    | "changepassword"
-    | "changeavatar"
-    | "changenickname"
-    | "logout"
-    | "renewregistercode"
-  >(null);
+  // undefined: loading
+  const [registerCode, setRegisterCode] = useState<undefined | null | string>();
 
-  const [registerCode, setRegisterCode] = useState<undefined | null | string>(
-    undefined,
-  );
-
-  const [bookmarkVisibility, setBookmarkVisibility] =
-    useState<TimelineVisibility>();
-
-  React.useEffect(() => {
-    if (user != null) {
-      void getHttpUserClient()
-        .getBookmarkVisibility(user.username)
-        .then(({ visibility }) => {
-          setBookmarkVisibility(visibility);
-        });
-    } else {
-      setBookmarkVisibility(undefined);
-    }
-  }, [user]);
-
-  React.useEffect(() => {
+  useEffect(() => {
     setRegisterCode(undefined);
   }, [user]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user != null && registerCode === undefined) {
       void getHttpUserClient()
         .getRegisterCode(user.username)
@@ -178,87 +155,81 @@ const SettingsPage: React.FC = () => {
     }
   }, [user, registerCode]);
 
+  return (
+    <SettingItemContainer
+      title="settings.myRegisterCode"
+      description="settings.myRegisterCodeDesc"
+      onClick={openRenewDialog}
+    >
+      {registerCode === undefined ? (
+        <Spinner />
+      ) : registerCode === null ? (
+        <span>Noop</span>
+      ) : (
+        <code
+          className="register-code"
+          onClick={(event) => {
+            void navigator.clipboard.writeText(registerCode).then(() => {
+              pushAlert({
+                type: "success",
+                message: "settings.myRegisterCodeCopied",
+              });
+            });
+            event.stopPropagation();
+          }}
+        >
+          {registerCode}
+        </code>
+      )}
+    </SettingItemContainer>
+  );
+}
+
+export default function SettingsPage() {
+  const c = useC();
+  const { i18n } = useTranslation();
+  const user = useUser();
+  const navigate = useNavigate();
+
+  type DialogName =
+    | "change-password"
+    | "change-avatar"
+    | "change-nickname"
+    | "logout"
+    | "renew-register-code";
+
+  const [dialog, setDialog] = useState<null | DialogName>(null);
+
+  function dialogOpener(name: DialogName): () => void {
+    return () => setDialog(name);
+  }
+
   const language = i18n.language.slice(0, 2);
 
   return (
     <>
       <div className="container">
         {user ? (
-          <SettingSection title="settings.subheaders.account">
-            <SettingItemContainer
-              title="settings.myRegisterCode"
-              subtext="settings.myRegisterCodeDesc"
-              onClick={() => setDialog("renewregistercode")}
-            >
-              {registerCode === undefined ? (
-                <Spinner />
-              ) : registerCode === null ? (
-                <span>Noop</span>
-              ) : (
-                <code
-                  className="register-code"
-                  onClick={(event) => {
-                    void navigator.clipboard
-                      .writeText(registerCode)
-                      .then(() => {
-                        pushAlert({
-                          type: "success",
-                          message: "settings.myRegisterCodeCopied",
-                        });
-                      });
-                    event.stopPropagation();
-                  }}
-                >
-                  {registerCode}
-                </code>
-              )}
-            </SettingItemContainer>
+          <SettingSection title="settings.subheader.account">
+            <RegisterCodeSettingItem
+              openRenewDialog={dialogOpener("renew-register-code")}
+            />
             <ButtonSettingItem
               title="settings.changeAvatar"
-              onClick={() => setDialog("changeavatar")}
-              first
+              onClick={dialogOpener("change-avatar")}
             />
             <ButtonSettingItem
               title="settings.changeNickname"
-              onClick={() => setDialog("changenickname")}
-            />
-            <SelectSettingsItem
-              title="settings.changeBookmarkVisibility"
-              options={[
-                {
-                  value: "Private",
-                  label: "visibility.private",
-                },
-                {
-                  value: "Register",
-                  label: "visibility.register",
-                },
-                {
-                  value: "Public",
-                  label: "visibility.public",
-                },
-              ]}
-              value={bookmarkVisibility}
-              onSelect={(value) => {
-                void getHttpUserClient()
-                  .putBookmarkVisibility(user.username, {
-                    visibility: value as TimelineVisibility,
-                  })
-                  .then(() => {
-                    setBookmarkVisibility(value as TimelineVisibility);
-                  });
-              }}
+              onClick={dialogOpener("change-nickname")}
             />
             <ButtonSettingItem
               title="settings.changePassword"
-              onClick={() => setDialog("changepassword")}
+              onClick={dialogOpener("change-password")}
               danger
             />
             <ButtonSettingItem
               title="settings.logout"
-              onClick={() => {
-                setDialog("logout");
-              }}
+              onClick={dialogOpener("logout")}
               danger
             />
           </SettingSection>
@@ -330,6 +301,4 @@ const SettingsPage: React.FC = () => {
       />
     </>
   );
-};
-
-export default SettingsPage;
+}

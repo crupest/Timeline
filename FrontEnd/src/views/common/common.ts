@@ -1,4 +1,4 @@
-export type { I18nText } from "@/common";
+export type { Text, I18nText } from "@/common";
 export { c, convertI18nText, useC } from "@/common";
 
 export const themeColors = [

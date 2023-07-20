@@ -6,5 +6,6 @@ export class UiLogicError extends Error {}
 export const highlightTimelineUsername = "crupest";
 
 export type { I18nText } from "./i18n";
+export type { I18nText as Text } from "./i18n";
 export { c, convertI18nText } from "./i18n";
 export { default as useC } from "./utilities/hooks/use-c";
