@@ -224,23 +224,11 @@
     }
   },
   "about": {
-    "author": {
-      "title": "Site Developer",
-      "name": "Name: ",
-      "introduction": "Introduction: ",
-      "introductionContent": "A programmer coding based on coincidence",
-      "links": "Links: "
-    },
-    "site": {
-      "title": "Site Information",
-      "content": "The name of this site is <1>Timeline</1>, which is a Web App with <3>timeline</3> as its core concept. Its frontend and backend are both developed by <5>me</5>, and open source on GitHub. It is relatively easy to deploy it on your own server, which is also one of my goals. Welcome to comment anything in GitHub repository.",
-      "repo": "GitHub Repo"
-    },
     "credits": {
       "title": "Credits",
-      "content": "Timeline is works standing on shoulders of gaints. Special appreciation for many open source projects listed below or not. Related licenses could be found in GitHub repository.",
-      "frontend": "Frontend: ",
-      "backend": "Backend: "
+      "content": "Timeline stands on shoulders of giants. Special appreciation for many open source projects listed below or not. Related licenses could be found in GitHub repository.",
+      "frontend": "Frontend",
+      "backend": "Backend"
     }
   },
   "admin": {

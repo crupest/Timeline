@@ -1,19 +1,21 @@
+import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
-import * as React from "react";
 
 import "./Card.css";
 
-function _Card(
-  {
-    className,
-    children,
-    ...otherProps
-  }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>,
-  ref: React.ForwardedRef<HTMLDivElement>
-): React.ReactElement | null {
+interface CardProps extends ComponentPropsWithoutRef<"div"> {
+  containerRef: Ref<HTMLDivElement>;
+}
+
+export default function Card({
+  className,
+  children,
+  containerRef,
+  ...otherProps
+}: CardProps) {
   return (
     <div
-      ref={ref}
+      ref={containerRef}
       className={classNames("cru-card", className)}
       {...otherProps}
     >
@@ -21,7 +23,3 @@ function _Card(
     </div>
   );
 }
-
-const Card = React.forwardRef(_Card);
-
-export default Card;

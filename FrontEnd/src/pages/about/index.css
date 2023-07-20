@@ -1,0 +1,8 @@
+.about-page {
+  padding: 1em 2em;
+  line-height: 1.5;
+}
+
+.about-page a {
+  color: var(--cru-surface-on-color);
+}
