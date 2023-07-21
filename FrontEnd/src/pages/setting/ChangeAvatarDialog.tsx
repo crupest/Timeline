@@ -9,9 +9,9 @@ import { useUser } from "@/services/user";
 
 import { getHttpUserClient } from "@/http/user";
 
-import ImageCropper, { Clip, applyClipToImage } from "../common/ImageCropper";
-import Button from "../common/button/Button";
-import Dialog from "../common/dialog/Dialog";
+import ImageCropper, { Clip, applyClipToImage } from "@/views/common/ImageCropper";
+import Button from "@/views/common/button/Button";
+import Dialog from "@/views/common/dialog/Dialog";
 
 export interface ChangeAvatarDialogProps {
   open: boolean;

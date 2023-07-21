@@ -1,9 +1,11 @@
 .cru-card {
+  border: solid 1px;
   border-radius: var(--cru-card-border-radius);
-  background-color: var(--cru-primary-container-color);
+  background-color: var(--cru-key-container-color);
+  border-color: var(--cru-key-container-color);
   transition: all 0.3s;
 }
 
 .cru-card:hover {
-  border-color: var(--cru-primary-1-color);
+  border-color: var(--cru-key-1-color);
 }

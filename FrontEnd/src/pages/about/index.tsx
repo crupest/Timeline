@@ -1,6 +1,7 @@
 import "./index.css";
 
 import { useC } from "@/common";
+import Page from "@/views/common/Page";
 
 interface Credit {
   name: string;
@@ -52,7 +53,7 @@ export default function AboutPage() {
   const c = useC();
 
   return (
-    <div className="about-page">
+    <Page className="about-page">
       <h2>{c("about.credits.title")}</h2>
       <p>{c("about.credits.content")}</p>
       <h3>{c("about.credits.frontend")}</h3>
@@ -81,6 +82,6 @@ export default function AboutPage() {
         })}
         <li>...</li>
       </ul>
-    </div>
+    </Page>
   );
 }

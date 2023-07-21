@@ -13,6 +13,14 @@ body {
   line-height: 1.2;
 }
 
+.cru-page {
+  padding: var(--cru-page-padding);
+}
+
+.cru-page-no-top-padding {
+  padding-top: 0;
+}
+
 .cru-text-center {
   text-align: center;
 }

@@ -4,11 +4,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppBar from "./views/common/AppBar";
 import NotFoundPage from "./pages/404";
 import LoadingPage from "./views/common/LoadingPage";
-import About from "./pages/about";
+import AboutPage from "./pages/about";
+import SettingPage from "./pages/setting";
 import Center from "./views/center";
 import Login from "./views/login";
 import Register from "./views/register";
-import Settings from "./views/settings";
 import TimelinePage from "./views/timeline";
 import Search from "./views/search";
 import Admin from "./views/admin";
@@ -24,8 +24,8 @@ export default function App() {
           <Route path="center" element={<Center />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="about" element={<About />} />
+          <Route path="settings" element={<SettingPage />} />
+          <Route path="about" element={<AboutPage />} />
           <Route path="search" element={<Search />} />
           <Route path="admin/*" element={<Admin />} />
           <Route path=":owner" element={<TimelinePage />} />
