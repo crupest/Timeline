@@ -158,6 +158,7 @@ function RegisterCodeSettingItem() {
     <SettingItemContainer
       title="settings.myRegisterCode"
       description="settings.myRegisterCodeDesc"
+      className="register-code-setting-item"
       onClick={() => setDialogOpen(true)}
     >
       {registerCode === undefined ? (

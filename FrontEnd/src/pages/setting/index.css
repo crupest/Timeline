@@ -43,6 +43,10 @@
   color: var(--cru-secondary-text-color);
 }
 
+.setting-item-value-area {
+  margin-left: auto;
+}
+
 .setting-item-container.setting-type-button {
   cursor: pointer;
 }
@@ -51,6 +55,13 @@
   color: var(--cru-danger-color);
 }
 
+.register-code {
+  background: var(--cru-surface-container-highest-color);
+  border: 1px solid var(--cru-surface-container-highest-color);
+  border-radius: 3px;
+  padding: 0.2em;
+  cursor: pointer;
+}
 
 @media (max-width: 576) {
   .setting-item-container.setting-type-select {
@@ -60,10 +71,12 @@
   .setting-item-container.setting-type-select .setting-item-value-area {
     margin-top: 1em;
   }
-}
 
-.register-code {
-  border: 1px solid black;
-  border-radius: 3px;
-  padding: 0.2em;
+  .register-code-setting-item {
+    flex-direction: column;
+  }
+
+  .register-code-setting-item .register-code {
+    margin-top: 1em;
+  }
 }
