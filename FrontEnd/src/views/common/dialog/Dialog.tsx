@@ -38,6 +38,7 @@ export default function Dialog(props: DialogProps) {
               }
         }
       >
+        <div className="cru-dialog-background"/>
         <div
           className="cru-dialog-container"
           onPointerDown={(e) => e.stopPropagation()}

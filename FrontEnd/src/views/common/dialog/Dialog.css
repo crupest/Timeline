@@ -5,12 +5,20 @@
   top: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.92);
-
   display: flex;
   padding: 2em;
-
   overflow: auto;
+}
+
+.cru-dialog-background {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--cru-surface-dim-color);
+  opacity: 0.8;
 }
 
 .cru-dialog-container {
@@ -22,7 +30,7 @@
   border: var(--cru-primary-color) 1px solid;
   border-radius: 5px;
   padding: 1.5em;
-  background-color: white;
+  background-color: var(--cru-surface-color);
 }
 
 .cru-dialog-bottom-area {
@@ -30,7 +38,7 @@
   justify-content: flex-end;
 }
 
-.cru-dialog-bottom-area > * {
+.cru-dialog-bottom-area>* {
   margin: 0 0.5em;
 }
 
