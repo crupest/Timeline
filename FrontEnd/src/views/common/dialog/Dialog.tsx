@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
+import classNames from "classnames";
+
+import { ThemeColor } from "../common";
 
 import "./Dialog.css";
 
@@ -11,14 +14,21 @@ if (optionalPortalElement == null) {
 const portalElement = optionalPortalElement;
 
 interface DialogProps {
-  onClose: () => void;
   open: boolean;
+  onClose: () => void;
+  color?: ThemeColor;
   children?: ReactNode;
   disableCloseOnClickOnOverlay?: boolean;
 }
 
-export default function Dialog(props: DialogProps) {
-  const { open, onClose, children, disableCloseOnClickOnOverlay } = props;
+export default function Dialog({
+  open,
+  onClose,
+  color,
+  children,
+  disableCloseOnClickOnOverlay,
+}: DialogProps) {
+  color = color ?? "primary";
 
   return ReactDOM.createPortal(
     <CSSTransition
@@ -29,7 +39,7 @@ export default function Dialog(props: DialogProps) {
       classNames="cru-dialog"
     >
       <div
-        className="cru-dialog-overlay"
+        className={classNames("cru-dialog-overlay", `cru-${color}`)}
         onPointerDown={
           disableCloseOnClickOnOverlay
             ? undefined
@@ -38,7 +48,7 @@ export default function Dialog(props: DialogProps) {
               }
         }
       >
-        <div className="cru-dialog-background"/>
+        <div className="cru-dialog-background" />
         <div
           className="cru-dialog-container"
           onPointerDown={(e) => e.stopPropagation()}
