@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { userService } from "@/services/user";
 
-import OperationDialog from "../common/dialog/OperationDialog";
+import OperationDialog from "@/views/common/dialog/OperationDialog";
 
 export interface ChangePasswordDialogProps {
   open: boolean;

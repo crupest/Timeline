@@ -11,11 +11,11 @@ import classNames from "classnames";
 import { useC, Text } from "@/common";
 import { useUser, userService } from "@/services/user";
 import { getHttpUserClient } from "@/http/user";
-import { TimelineVisibility } from "@/http/timeline";
 
 import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
 import Card from "@/views/common/Card";
 import Spinner from "@/views/common/Spinner";
+import Page from "@/views/common/Page";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
@@ -24,9 +24,9 @@ import "./index.css";
 import { pushAlert } from "@/services/alert";
 
 interface SettingSectionProps
-  extends Omit<ComponentPropsWithoutRef<"div">, "title"> {
+  extends Omit<ComponentPropsWithoutRef<typeof Card>, "title"> {
   title: Text;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 function SettingSection({
@@ -40,7 +40,7 @@ function SettingSection({
   return (
     <Card className={classNames(className, "setting-section")} {...otherProps}>
       <h2 className="setting-section-title">{c(title)}</h2>
-      {children}
+      <div className="setting-section-item-area">{children}</div>
     </Card>
   );
 }
@@ -115,6 +115,7 @@ function SelectSettingsItem({
         <Spinner />
       ) : (
         <select
+          className="select-setting-item-select"
           value={value}
           onChange={(e) => {
             onSelect(e.target.value);
@@ -131,15 +132,13 @@ function SelectSettingsItem({
   );
 }
 
-function RegisterCodeSettingItem({
-  openRenewDialog,
-}: {
-  openRenewDialog: () => void;
-}) {
+function RegisterCodeSettingItem() {
   const user = useUser();
 
   // undefined: loading
   const [registerCode, setRegisterCode] = useState<undefined | null | string>();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     setRegisterCode(undefined);
@@ -159,7 +158,7 @@ function RegisterCodeSettingItem({
     <SettingItemContainer
       title="settings.myRegisterCode"
       description="settings.myRegisterCodeDesc"
-      onClick={openRenewDialog}
+      onClick={() => setDialogOpen(true)}
     >
       {registerCode === undefined ? (
         <Spinner />
@@ -181,13 +180,59 @@ function RegisterCodeSettingItem({
           {registerCode}
         </code>
       )}
+
+      <ConfirmDialog
+        title="settings.renewRegisterCode"
+        body="settings.renewRegisterCodeDesc"
+        onClose={() => setDialogOpen(false)}
+        open={dialogOpen}
+        onConfirm={() => {
+          if (user == null) throw new Error();
+          void getHttpUserClient()
+            .renewRegisterCode(user.username)
+            .then(() => {
+              setRegisterCode(undefined);
+            });
+        }}
+      />
     </SettingItemContainer>
   );
 }
 
-export default function SettingsPage() {
-  const c = useC();
+function LanguageChangeSettingItem() {
   const { i18n } = useTranslation();
+
+  const language = i18n.language.slice(0, 2);
+
+  return (
+    <SelectSettingsItem
+      title="settings.languagePrimary"
+      description="settings.languageSecondary"
+      options={[
+        {
+          value: "zh",
+          label: {
+            type: "custom",
+            value: "中文",
+          },
+        },
+        {
+          value: "en",
+          label: {
+            type: "custom",
+            value: "English",
+          },
+        },
+      ]}
+      value={language}
+      onSelect={(value) => {
+        void i18n.changeLanguage(value);
+      }}
+    />
+  );
+}
+
+export default function SettingPage() {
   const user = useUser();
   const navigate = useNavigate();
 
@@ -204,66 +249,36 @@ export default function SettingsPage() {
     return () => setDialog(name);
   }
 
-  const language = i18n.language.slice(0, 2);
-
   return (
-    <>
-      <div className="container">
-        {user ? (
-          <SettingSection title="settings.subheader.account">
-            <RegisterCodeSettingItem
-              openRenewDialog={dialogOpener("renew-register-code")}
-            />
-            <ButtonSettingItem
-              title="settings.changeAvatar"
-              onClick={dialogOpener("change-avatar")}
-            />
-            <ButtonSettingItem
-              title="settings.changeNickname"
-              onClick={dialogOpener("change-nickname")}
-            />
-            <ButtonSettingItem
-              title="settings.changePassword"
-              onClick={dialogOpener("change-password")}
-              danger
-            />
-            <ButtonSettingItem
-              title="settings.logout"
-              onClick={dialogOpener("logout")}
-              danger
-            />
-          </SettingSection>
-        ) : null}
-        <SettingSection title="settings.subheaders.customization">
-          <SelectSettingsItem
-            title="settings.languagePrimary"
-            subtext="settings.languageSecondary"
-            options={[
-              {
-                value: "zh",
-                label: {
-                  type: "custom",
-                  value: "中文",
-                },
-              },
-              {
-                value: "en",
-                label: {
-                  type: "custom",
-                  value: "English",
-                },
-              },
-            ]}
-            value={language}
-            onSelect={(value) => {
-              void i18n.changeLanguage(value);
-            }}
-            first
+    <Page noTopPadding>
+      {user ? (
+        <SettingSection title="settings.subheader.account">
+          <RegisterCodeSettingItem />
+          <ButtonSettingItem
+            title="settings.changeAvatar"
+            onClick={dialogOpener("change-avatar")}
+          />
+          <ButtonSettingItem
+            title="settings.changeNickname"
+            onClick={dialogOpener("change-nickname")}
+          />
+          <ButtonSettingItem
+            title="settings.changePassword"
+            onClick={dialogOpener("change-password")}
+            danger
+          />
+          <ButtonSettingItem
+            title="settings.logout"
+            onClick={dialogOpener("logout")}
+            danger
           />
         </SettingSection>
-      </div>
+      ) : null}
+      <SettingSection title="settings.subheader.customization">
+        <LanguageChangeSettingItem />
+      </SettingSection>
       <ChangePasswordDialog
-        open={dialog === "changepassword"}
+        open={dialog === "change-password"}
         close={() => setDialog(null)}
       />
       <ConfirmDialog
@@ -277,28 +292,14 @@ export default function SettingsPage() {
           });
         }}
       />
-      <ConfirmDialog
-        title="settings.renewRegisterCode"
-        body="settings.renewRegisterCodeDesc"
-        onClose={() => setDialog(null)}
-        open={dialog === "renewregistercode"}
-        onConfirm={() => {
-          if (user == null) throw new UiLogicError();
-          void getHttpUserClient()
-            .renewRegisterCode(user.username)
-            .then(() => {
-              setRegisterCode(undefined);
-            });
-        }}
-      />
       <ChangeAvatarDialog
-        open={dialog === "changeavatar"}
+        open={dialog === "change-avatar"}
         close={() => setDialog(null)}
       />
       <ChangeNicknameDialog
-        open={dialog === "changenickname"}
+        open={dialog === "change-nickname"}
         close={() => setDialog(null)}
       />
-    </>
+    </Page>
   );
 }
