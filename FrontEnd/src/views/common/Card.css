@@ -5,7 +5,3 @@
   border-color: var(--cru-key-container-color);
   transition: all 0.3s;
 }
-
-.cru-card:hover {
-  border-color: var(--cru-key-1-color);
-}

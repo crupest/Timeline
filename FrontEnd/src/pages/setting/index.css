@@ -36,7 +36,6 @@
 
 .setting-item-container:hover {
   background-color: var(--cru-key-container-1-color);
-  border-bottom-color: var(--cru-key-container-1-color);
 }
 
 .setting-item-label-sub {
