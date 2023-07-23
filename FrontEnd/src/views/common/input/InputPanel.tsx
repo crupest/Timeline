@@ -1,7 +1,6 @@
 import * as React from "react";
 import classNames from "classnames";
 import { useTranslation } from "react-i18next";
-import { TwitterPicker } from "react-color";
 
 import { convertI18nText, I18nText } from "@/common";
 
@@ -89,14 +88,14 @@ export interface InputPanelProps<InputList extends readonly Input[]> {
   values: MapInputListToValueTypeList<InputList>;
   onChange: (
     values: MapInputListToValueTypeList<InputList>,
-    index: number
+    index: number,
   ) => void;
   error?: InputPanelError;
   disable?: boolean;
 }
 
 const InputPanel = <InputList extends readonly Input[]>(
-  props: InputPanelProps<InputList>
+  props: InputPanelProps<InputList>,
 ): React.ReactElement => {
   const { values, onChange, scheme, error, disable } = props;
 
@@ -108,7 +107,7 @@ const InputPanel = <InputList extends readonly Input[]>(
     newValues[index] = newValue;
     onChange(
       newValues as unknown as MapInputListToValueTypeList<InputList>,
-      index
+      index,
     );
   };
 

@@ -1,13 +1,8 @@
-import { useState } from "react";
-import * as React from "react";
-import { useTranslation } from "react-i18next";
-import { TwitterPicker } from "react-color";
+import { useState, ReactNode, ComponentPropsWithoutRef } from "react";
 import classNames from "classnames";
 import moment from "moment";
 
-import { convertI18nText, I18nText, UiLogicError } from "@/common";
-
-import { PaletteColorType } from "@/palette";
+import { useC, Text, ThemeColor } from "../common";
 
 import Button from "../button/Button";
 import LoadingButton from "../button/LoadingButton";
@@ -15,69 +10,61 @@ import Dialog from "./Dialog";
 
 import "./OperationDialog.css";
 
-interface DefaultErrorPromptProps {
-  error?: string;
+interface DefaultPromptProps {
+  color?: ThemeColor;
+  message?: Text;
+  customMessage?: ReactNode;
+  className?: string;
 }
 
-const DefaultErrorPrompt: React.FC<DefaultErrorPromptProps> = (props) => {
-  const { t } = useTranslation();
+function DefaultPrompt(props: DefaultPromptProps) {
+  const { color, message, customMessage, className } = props;
 
-  let result = <p className="cru-color-danger">{t("operationDialog.error")}</p>;
+  const c = useC();
 
-  if (props.error != null) {
-    result = (
-      <>
-        {result}
-        <p className="cru-color-danger">{props.error}</p>
-      </>
-    );
-  }
-
-  return result;
-};
+  return (
+    <div className={classNames(className, `cru-${color ?? "primary"}`)}>
+      <p>{c(message)}</p>
+      {customMessage}
+    </div>
+  );
+}
 
 export interface OperationDialogTextInput {
   type: "text";
-  label?: I18nText;
+  label?: Text;
   password?: boolean;
   initValue?: string;
   textFieldProps?: Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
+    ComponentPropsWithoutRef<"input">,
     "type" | "value" | "onChange"
   >;
-  helperText?: string;
+  helperText?: Text;
 }
 
 export interface OperationDialogBoolInput {
   type: "bool";
-  label: I18nText;
+  label: Text;
   initValue?: boolean;
-  helperText?: string;
+  helperText?: Text;
 }
 
 export interface OperationDialogSelectInputOption {
   value: string;
-  label: I18nText;
-  icon?: React.ReactElement;
+  label: Text;
+  icon?: ReactNode;
 }
 
 export interface OperationDialogSelectInput {
   type: "select";
-  label: I18nText;
+  label: Text;
   options: OperationDialogSelectInputOption[];
   initValue?: string;
 }
 
-export interface OperationDialogColorInput {
-  type: "color";
-  label?: I18nText;
-  initValue?: string | null;
-  canBeNull?: boolean;
-}
-
 export interface OperationDialogDateTimeInput {
   type: "datetime";
-  label?: I18nText;
+  label?: Text;
   initValue?: string;
   helperText?: string;
 }
@@ -86,16 +73,17 @@ export type OperationDialogInput =
   | OperationDialogTextInput
   | OperationDialogBoolInput
   | OperationDialogSelectInput
-  | OperationDialogColorInput
   | OperationDialogDateTimeInput;
 
 interface OperationInputTypeStringToValueTypeMap {
   text: string;
   bool: boolean;
   select: string;
-  color: string | null;
   datetime: string;
 }
+
+type OperationInputValueType =
+  OperationInputTypeStringToValueTypeMap[keyof OperationInputTypeStringToValueTypeMap];
 
 type MapOperationInputTypeStringToValueType<Type> =
   Type extends keyof OperationInputTypeStringToValueTypeMap
@@ -106,33 +94,15 @@ type MapOperationInputInfoValueType<T> = T extends OperationDialogInput
   ? MapOperationInputTypeStringToValueType<T["type"]>
   : T;
 
-const initValueMapperMap: {
-  [T in OperationDialogInput as T["type"]]: (
-    item: T
-  ) => MapOperationInputInfoValueType<T>;
-} = {
-  bool: (item) => item.initValue ?? false,
-  color: (item) => item.initValue ?? null,
-  datetime: (item) => {
-    if (item.initValue != null) {
-      return moment(item.initValue).format("YYYY-MM-DDTHH:mm:ss");
-    } else {
-      return "";
-    }
-  },
-  select: (item) => item.initValue ?? item.options[0].value,
-  text: (item) => item.initValue ?? "",
-};
-
 type MapOperationInputInfoValueTypeList<
-  Tuple extends readonly OperationDialogInput[]
+  Tuple extends readonly OperationDialogInput[],
 > = {
   [Index in keyof Tuple]: MapOperationInputInfoValueType<Tuple[Index]>;
-} & { length: Tuple["length"] };
+};
 
 export type OperationInputError =
   | {
-      [index: number]: I18nText | null | undefined;
+      [index: number]: Text | null | undefined;
     }
   | null
   | undefined;
@@ -145,38 +115,68 @@ const isNoError = (error: OperationInputError): boolean => {
   return true;
 };
 
+type ItemValueMapper = {
+  [T in OperationDialogInput as T["type"]]: (
+    item: T,
+  ) => MapOperationInputInfoValueType<T>;
+};
+
+type ValueValueMapper = {
+  [T in OperationDialogInput as T["type"]]: (
+    item: MapOperationInputInfoValueType<T>,
+  ) => MapOperationInputInfoValueType<T>;
+};
+
+const initValueMapperMap: ItemValueMapper = {
+  bool: (item) => item.initValue ?? false,
+  datetime: (item) =>
+    item.initValue != null
+      ? /* cspell: disable-next-line */
+        moment(item.initValue).format("YYYY-MM-DDTHH:mm:ss")
+      : "",
+  select: (item) => item.initValue ?? item.options[0].value,
+  text: (item) => item.initValue ?? "",
+};
+
+const finalValueMapperMap: ValueValueMapper = {
+  bool: (value) => value,
+  datetime: (value) => new Date(value).toISOString(),
+  select: (value) => value,
+  text: (value) => value,
+};
+
 export interface OperationDialogProps<
   TData,
-  OperationInputInfoList extends readonly OperationDialogInput[]
+  OperationInputInfoList extends readonly OperationDialogInput[],
 > {
   open: boolean;
   onClose: () => void;
-  title: I18nText | (() => React.ReactNode);
-  themeColor?: PaletteColorType;
-  onProcess: (
-    inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
-  ) => Promise<TData>;
+
+  themeColor?: ThemeColor;
+  title: Text;
+  inputPrompt?: Text;
+  processPrompt?: Text;
+  successPrompt?: (data: TData) => ReactNode;
+  failurePrompt?: (error: unknown) => ReactNode;
+
   inputScheme?: OperationInputInfoList;
   inputValidator?: (
-    inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>
+    inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>,
   ) => OperationInputError;
-  inputPrompt?: I18nText | (() => React.ReactNode);
-  processPrompt?: () => React.ReactNode;
-  successPrompt?: (data: TData) => React.ReactNode;
-  failurePrompt?: (error: unknown) => React.ReactNode;
+
+  onProcess: (
+    inputs: MapOperationInputInfoValueTypeList<OperationInputInfoList>,
+  ) => Promise<TData>;
   onSuccessAndClose?: (data: TData) => void;
 }
 
-const OperationDialog = <
+function OperationDialog<
   TData,
-  OperationInputInfoList extends readonly OperationDialogInput[]
->(
-  props: OperationDialogProps<TData, OperationInputInfoList>
-): React.ReactElement => {
-  const inputScheme = (props.inputScheme ??
-    []) as readonly OperationDialogInput[];
+  OperationInputInfoList extends readonly OperationDialogInput[],
+>(props: OperationDialogProps<TData, OperationInputInfoList>) {
+  const inputScheme = props.inputScheme ?? ([] as const);
 
-  const { t } = useTranslation();
+  const c = useC();
 
   type Step =
     | { type: "input" }
@@ -189,48 +189,42 @@ const OperationDialog = <
         type: "failure";
         data: unknown;
       };
+
   const [step, setStep] = useState<Step>({ type: "input" });
 
-  type ValueType = boolean | string | null | undefined;
+  type Values = MapOperationInputInfoValueTypeList<OperationInputInfoList>;
 
-  const [values, setValues] = useState<ValueType[]>(
-    inputScheme.map((item) => {
-      if (item.type in initValueMapperMap) {
-        return (
-          initValueMapperMap[item.type] as (
-            i: OperationDialogInput
-          ) => ValueType
-        )(item);
-      } else {
-        throw new UiLogicError("Unknown input scheme.");
-      }
-    })
+  const [values, setValues] = useState<Values>(
+    () =>
+      inputScheme.map((item) =>
+        initValueMapperMap[item.type](item as never),
+      ) as Values,
   );
+
   const [dirtyList, setDirtyList] = useState<boolean[]>(() =>
-    inputScheme.map(() => false)
+    inputScheme.map(() => false),
   );
+
   const [inputError, setInputError] = useState<OperationInputError>();
 
-  const close = (): void => {
+  function close() {
     if (step.type !== "process") {
       props.onClose();
       if (step.type === "success" && props.onSuccessAndClose) {
         props.onSuccessAndClose(step.data);
       }
     } else {
-      console.log("Attempt to close modal when processing.");
+      console.log("Attempt to close modal dialog when processing.");
     }
-  };
+  }
 
-  const onConfirm = (): void => {
+  function onConfirm() {
     setStep({ type: "process" });
     props
       .onProcess(
-        values.map((v, index) => {
-          if (inputScheme[index].type === "datetime" && v !== "")
-            return new Date(v as string).toISOString();
-          else return v;
-        }) as unknown as MapOperationInputInfoValueTypeList<OperationInputInfoList>
+        values.map((value, index) =>
+          finalValueMapperMap[inputScheme[index].type](value as never),
+        ) as Values,
       )
       .then(
         (d) => {
@@ -244,56 +238,51 @@ const OperationDialog = <
             type: "failure",
             data: e,
           });
-        }
+        },
       );
-  };
+  }
 
-  let body: React.ReactNode;
+  let body: ReactNode;
   if (step.type === "input" || step.type === "process") {
     const process = step.type === "process";
 
-    let inputPrompt =
-      typeof props.inputPrompt === "function"
-        ? props.inputPrompt()
-        : convertI18nText(props.inputPrompt, t);
-    inputPrompt = <h6>{inputPrompt}</h6>;
-
-    const validate = (values: ValueType[]): boolean => {
+    const validate = (values: Values): boolean => {
       const { inputValidator } = props;
       if (inputValidator != null) {
-        const result = inputValidator(
-          values as unknown as MapOperationInputInfoValueTypeList<OperationInputInfoList>
-        );
+        const result = inputValidator(values);
         setInputError(result);
         return isNoError(result);
       }
       return true;
     };
 
-    const updateValue = (index: number, newValue: ValueType): void => {
+    const updateValue = (
+      index: number,
+      newValue: OperationInputValueType,
+    ): void => {
       const oldValues = values;
       const newValues = oldValues.slice();
       newValues[index] = newValue;
-      setValues(newValues);
+      setValues(newValues as Values);
       if (dirtyList[index] === false) {
         const newDirtyList = dirtyList.slice();
         newDirtyList[index] = true;
         setDirtyList(newDirtyList);
       }
-      validate(newValues);
+      validate(newValues as Values);
     };
 
     const canProcess = isNoError(inputError);
 
     body = (
-      <>
+      <div className="cru-operation-dialog-main-area">
         <div>
-          {inputPrompt}
-          {inputScheme.map((item, index) => {
+          <div>{c(props.inputPrompt)}</div>
+          {inputScheme.map((item: OperationDialogInput, index: number) => {
             const value = values[index];
             const error: string | null =
               dirtyList[index] && inputError != null
-                ? convertI18nText(inputError[index], t)
+                ? c(inputError[index])
                 : null;
 
             if (item.type === "text") {
@@ -302,31 +291,31 @@ const OperationDialog = <
                   key={index}
                   className={classNames(
                     "cru-operation-dialog-group",
-                    error != null ? "error" : null
+                    error && "error",
                   )}
                 >
                   {item.label && (
                     <label className="cru-operation-dialog-label">
-                      {convertI18nText(item.label, t)}
+                      {c(item.label)}
                     </label>
                   )}
                   <input
                     type={item.password === true ? "password" : "text"}
                     value={value as string}
-                    onChange={(e) => {
-                      const v = e.target.value;
+                    onChange={(event) => {
+                      const v = event.target.value;
                       updateValue(index, v);
                     }}
                     disabled={process}
                   />
-                  {error != null && (
+                  {error && (
                     <div className="cru-operation-dialog-error-text">
                       {error}
                     </div>
                   )}
                   {item.helperText && (
                     <div className="cru-operation-dialog-helper-text">
-                      {t(item.helperText)}
+                      {c(item.helperText)}
                     </div>
                   )}
                 </div>
@@ -337,28 +326,29 @@ const OperationDialog = <
                   key={index}
                   className={classNames(
                     "cru-operation-dialog-group",
-                    error != null ? "error" : null
+                    error && "error",
                   )}
                 >
                   <input
                     type="checkbox"
                     checked={value as boolean}
                     onChange={(event) => {
-                      updateValue(index, event.currentTarget.checked);
+                      const v = event.currentTarget.checked;
+                      updateValue(index, v);
                     }}
                     disabled={process}
                   />
                   <label className="cru-operation-dialog-inline-label">
-                    {convertI18nText(item.label, t)}
+                    {c(item.label)}
                   </label>
-                  {error != null && (
+                  {error && (
                     <div className="cru-operation-dialog-error-text">
                       {error}
                     </div>
                   )}
                   {item.helperText && (
                     <div className="cru-operation-dialog-helper-text">
-                      {t(item.helperText)}
+                      {c(item.helperText)}
                     </div>
                   )}
                 </div>
@@ -369,16 +359,17 @@ const OperationDialog = <
                   key={index}
                   className={classNames(
                     "cru-operation-dialog-group",
-                    error != null ? "error" : null
+                    error && "error",
                   )}
                 >
                   <label className="cru-operation-dialog-label">
-                    {convertI18nText(item.label, t)}
+                    {c(item.label)}
                   </label>
                   <select
                     value={value as string}
                     onChange={(event) => {
-                      updateValue(index, event.target.value);
+                      const e = event.target.value;
+                      updateValue(index, e);
                     }}
                     disabled={process}
                   >
@@ -386,46 +377,11 @@ const OperationDialog = <
                       return (
                         <option value={option.value} key={i}>
                           {option.icon}
-                          {convertI18nText(option.label, t)}
+                          {c(option.label)}
                         </option>
                       );
                     })}
                   </select>
-                </div>
-              );
-            } else if (item.type === "color") {
-              return (
-                <div
-                  key={index}
-                  className={classNames(
-                    "cru-operation-dialog-group",
-                    error != null ? "error" : null
-                  )}
-                >
-                  {item.canBeNull ? (
-                    <input
-                      type="checkbox"
-                      checked={value !== null}
-                      onChange={(event) => {
-                        if (event.currentTarget.checked) {
-                          updateValue(index, "#007bff");
-                        } else {
-                          updateValue(index, null);
-                        }
-                      }}
-                      disabled={process}
-                    />
-                  ) : null}
-                  <label className="cru-operation-dialog-inline-label">
-                    {convertI18nText(item.label, t)}
-                  </label>
-                  {value !== null && (
-                    <TwitterPicker
-                      color={value as string}
-                      triangle="hide"
-                      onChange={(result) => updateValue(index, result.hex)}
-                    />
-                  )}
                 </div>
               );
             } else if (item.type === "datetime") {
@@ -434,24 +390,28 @@ const OperationDialog = <
                   key={index}
                   className={classNames(
                     "cru-operation-dialog-group",
-                    error != null ? "error" : null
+                    error && "error",
                   )}
                 >
                   {item.label && (
                     <label className="cru-operation-dialog-label">
-                      {convertI18nText(item.label, t)}
+                      {c(item.label)}
                     </label>
                   )}
                   <input
                     type="datetime-local"
                     value={value as string}
-                    onChange={(e) => {
-                      const v = e.target.value;
+                    onChange={(event) => {
+                      const v = event.target.value;
                       updateValue(index, v);
                     }}
                     disabled={process}
                   />
-                  {error != null && <div>{error}</div>}
+                  {error && (
+                    <div className="cru-operation-dialog-error-text">
+                      {error}
+                    </div>
+                  )}
                 </div>
               );
             }
@@ -477,55 +437,50 @@ const OperationDialog = <
               }
             }}
           >
-            {t("operationDialog.confirm")}
+            {c("operationDialog.confirm")}
           </LoadingButton>
         </div>
-      </>
+      </div>
     );
   } else {
-    let content: React.ReactNode;
     const result = step;
-    if (result.type === "success") {
-      content =
-        props.successPrompt?.(result.data) ?? t("operationDialog.success");
-      if (typeof content === "string")
-        content = <p className="cru-color-success">{content}</p>;
-    } else {
-      content = props.failurePrompt?.(result.data) ?? <DefaultErrorPrompt />;
-      if (typeof content === "string")
-        content = <DefaultErrorPrompt error={content} />;
-    }
+
+    const promptProps: DefaultPromptProps =
+      result.type === "success"
+        ? {
+            color: "success",
+            message: "operationDialog.success",
+            customMessage: props.successPrompt?.(result.data),
+          }
+        : {
+            color: "danger",
+            message: "operationDialog.error",
+            customMessage: props.failurePrompt?.(result.data),
+          };
     body = (
-      <>
-        <div>{content}</div>
+      <div className="cru-operation-dialog-main-area">
+        <DefaultPrompt {...promptProps} />
         <hr />
         <div className="cru-dialog-bottom-area">
           <Button text="operationDialog.ok" color="primary" onClick={close} />
         </div>
-      </>
+      </div>
     );
   }
 
-  const title =
-    typeof props.title === "function"
-      ? props.title()
-      : convertI18nText(props.title, t);
-
   return (
     <Dialog open={props.open} onClose={close}>
-      <h3
-        className={
-          props.themeColor != null
-            ? "cru-color-" + props.themeColor
-            : "cru-color-primary"
-        }
+      <div
+        className={`cru-operation-dialog-title cru-${
+          props.themeColor ?? "primary"
+        }`}
       >
-        {title}
-      </h3>
+        {c(props.title)}
+      </div>
       <hr />
       {body}
     </Dialog>
   );
-};
+}
 
 export default OperationDialog;
