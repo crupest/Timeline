@@ -52,12 +52,6 @@ const TimelinePropertyChangeDialog: React.FC<
             label: "timeline.dialogChangeProperty.description",
             initValue: timeline.description,
           },
-          {
-            type: "color",
-            label: "timeline.dialogChangeProperty.color",
-            initValue: timeline.color ?? null,
-            canBeNull: true,
-          },
         ] as const
       }
       open={props.open}

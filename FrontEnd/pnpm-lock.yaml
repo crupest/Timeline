@@ -118,6 +118,9 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: ^5.61.0
     version: 5.61.0(eslint@8.44.0)(typescript@5.1.6)
+  buffer:
+    specifier: ^6.0.0
+    version: 6.0.0
   eslint:
     specifier: ^8.44.0
     version: 8.44.0
@@ -1748,6 +1751,10 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
+  /base64-js@1.5.1:
+    resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+    dev: true
+
   /boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
     dev: true
@@ -1787,6 +1794,13 @@ packages:
       electron-to-chromium: 1.4.454
       node-releases: 2.0.13
       update-browserslist-db: 1.0.11(browserslist@4.21.9)
+    dev: true
+
+  /buffer@6.0.0:
+    resolution: {integrity: sha512-Sxdxq98A+Y9kRjO/3+mc2IAxIyTAKqzBiYKpeo5EluWnw9535rI4fN8DeMGsiQqpqqaWtFtTdxQgHnku6IEjCA==}
+    dependencies:
+      base64-js: 1.5.1
+      ieee754: 1.2.1
     dev: true
 
   /call-bind@1.0.2:
@@ -2647,6 +2661,10 @@ packages:
     dependencies:
       '@babel/runtime': 7.22.6
     dev: false
+
+  /ieee754@1.2.1:
+    resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
+    dev: true
 
   /ignore@5.2.4:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
