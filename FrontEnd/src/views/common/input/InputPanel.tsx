@@ -31,23 +31,13 @@ export interface SelectInput {
   options: SelectInputOption[];
 }
 
-export interface ColorInput {
-  type: "color";
-  label?: I18nText;
-}
-
 export interface DateTimeInput {
   type: "datetime";
   label?: I18nText;
   helper?: I18nText;
 }
 
-export type Input =
-  | TextInput
-  | BoolInput
-  | SelectInput
-  | ColorInput
-  | DateTimeInput;
+export type Input = TextInput | BoolInput | SelectInput | DateTimeInput;
 
 interface InputTypeToValueTypeMap {
   text: string;
