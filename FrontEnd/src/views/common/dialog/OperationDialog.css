@@ -1,3 +1,18 @@
+.cru-operation-dialog-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: var(--cru-key-color);
+  margin-bottom: 0.5em;
+}
+
+.cru-operation-dialog-prompt {
+  color: var(--cru-surface-on-color);
+}
+
+.cru-operation-dialog-main-area {
+  margin-top: 0.5em;
+}
+
 .cru-operation-dialog-group {
   display: block;
   margin: 0.4em 0;

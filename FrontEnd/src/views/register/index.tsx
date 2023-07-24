@@ -7,10 +7,7 @@ import { getHttpTokenClient } from "@/http/token";
 import { userService, useUser } from "@/services/user";
 
 import { LoadingButton } from "../common/button";
-import InputPanel, {
-  hasError,
-  InputPanelError,
-} from "../common/input/InputPanel";
+import { hasError, InputPanelError } from "../common/input/InputGroup";
 
 import "./index.css";
 
@@ -101,7 +98,7 @@ const RegisterPage: React.FC = () => {
           setDirty(newDirty);
           const e = validate(
             [username, password, confirmPassword, registerCode],
-            newDirty
+            newDirty,
           );
           if (hasError(e)) {
             setInputError(e);
@@ -128,7 +125,7 @@ const RegisterPage: React.FC = () => {
                     setResultError("error.network");
                   }
                   setProcess(false);
-                }
+                },
               );
           }
         }}
