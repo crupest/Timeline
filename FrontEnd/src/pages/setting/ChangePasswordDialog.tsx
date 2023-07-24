@@ -1,24 +1,25 @@
 import { useState } from "react";
-import * as React from "react";
 import { useNavigate } from "react-router-dom";
 
 import { userService } from "@/services/user";
 
 import OperationDialog from "@/views/common/dialog/OperationDialog";
 
-export interface ChangePasswordDialogProps {
+interface ChangePasswordDialogProps {
   open: boolean;
   close: () => void;
 }
 
-const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
+export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
+  const { open, close } = props;
+
   const navigate = useNavigate();
 
   const [redirect, setRedirect] = useState<boolean>(false);
 
   return (
     <OperationDialog
-      open={props.open}
+      open={open}
       title="settings.dialogChangePassword.title"
       themeColor="danger"
       inputPrompt="settings.dialogChangePassword.prompt"
@@ -64,6 +65,6 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = (props) => {
       }}
     />
   );
-};
+}
 
 export default ChangePasswordDialog;
