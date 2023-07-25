@@ -1,224 +1,185 @@
-import {
-  useState,
-  useEffect,
-  ReactNode,
-  ComponentPropsWithoutRef,
-  Ref,
-} from "react";
+/**
+ * Some notes for InputGroup:
+ * This is one of the most complicated components in this project.
+ * Probably because the feature is complex and involved user inputs.
+ *
+ * I hope it contains following features:
+ * - Input features
+ *   - Supports a wide range of input types.
+ *   - Validator to validate user inputs.
+ *   - Can set initial values.
+ *   - Dirty, aka, has user touched this input.
+ * - Developer friendly
+ *   - Easy to use APIs.
+ *   - Type check as much as possible.
+ * - UI
+ *   - Configurable appearance.
+ *   - Can display helper and error messages.
+ * - Easy to extend, like new input types.
+ *
+ * So here is some design decisions:
+ * Inputs are identified by its _key_.
+ * `InputGroup` component takes care of only UI and no logic.
+ * `useInputs` hook takes care of logic and generate props for `InputGroup`.
+ */
+
+import { useState, Ref } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
 
 import "./InputGroup.css";
 
-export interface TextInput {
-  type: "text";
-  label?: Text;
-  password?: boolean;
-  textFieldProps?: Omit<
-    ComponentPropsWithoutRef<"input">,
-    "type" | "value" | "onChange"
-  >;
-  helperText?: Text;
+export interface InputBase {
+  key: string;
+  label: Text;
+  helper?: Text;
+  disabled?: boolean;
+  error?: Text;
 }
 
-export interface BoolInput {
+export interface TextInput extends InputBase {
+  type: "text";
+  value: string;
+  password?: boolean;
+}
+
+export interface BoolInput extends InputBase {
   type: "bool";
-  label: Text;
-  helperText?: Text;
+  value: boolean;
 }
 
 export interface SelectInputOption {
   value: string;
   label: Text;
-  icon?: ReactNode;
+  icon?: string;
 }
 
-export interface SelectInput {
+export interface SelectInput extends InputBase {
   type: "select";
-  label: Text;
+  value: string;
   options: SelectInputOption[];
 }
 
-export interface DateTimeInput {
-  type: "datetime";
-  label?: Text;
-  helperText?: string;
-}
+export type Input = TextInput | BoolInput | SelectInput;
 
-export type Input = TextInput | BoolInput | SelectInput | DateTimeInput;
-
-export type InputType = Input["type"];
-
-export type InputTypeToInputMap = {
-  [I in Input as I["type"]]: I;
-};
-
-export interface InputTypeToValueMap {
+interface InputInitialValueMap {
   text: string;
   bool: boolean;
   select: string;
-  datetime: Date;
 }
 
-export type InputValue = InputTypeToValueMap[keyof InputTypeToValueMap];
-
-export type MapInputToValue<I extends Input> = InputTypeToValueMap[I["type"]];
-
-export type MapInputListToValueList<Tuple extends Input[]> = {
-  [Index in keyof Tuple]: MapInputToValue<Tuple[Index]>;
+type Dirties<Inputs extends Input[]> = {
+  [Index in keyof Inputs]: boolean;
 };
 
-export type MapInputListTo<Tuple extends Input[], T> = {
-  [Index in keyof Tuple]: T;
+type ExtendInputForComponent<I extends Input> = I & {};
+
+type ExtendInputsForComponent<Inputs extends Input[]> = {
+  [Index in keyof Inputs]: ExtendInputForComponent<Inputs[Index]>;
 };
 
-export interface InputTypeToInitialValueMap {
-  text: string | null | undefined;
-  bool: boolean | null | undefined;
-  select: string | null | undefined;
-  datetime: Date | string | null | undefined;
-}
+type InitialValueTransformer<I extends Input> = (
+  input: I,
+  value: InputInitialValueMap[I["type"]] | null | undefined,
+) => InputValueMap[I["type"]];
 
-export type MapInputToInitialValue<I extends Input> =
-  InputTypeToInitialValueMap[I["type"]];
-
-export type InputValueTransformers = {
-  [I in Input as I["type"]]: (
-    input: I,
-    value: MapInputToInitialValue<I>,
-  ) => MapInputToValue<I>;
+type InitialValueTransformers = {
+  [I in Input as I["type"]]: InitialValueTransformer<I>;
 };
 
-const initialValueTransformers: InputValueTransformers = {
+const defaultInitialValueTransformer: InitialValueTransformers = {
   text: (input, value) => value ?? "",
   bool: (input, value) => value ?? false,
   select: (input, value) => value ?? input.options[0].value,
-  datetime: (input, value) => {
-    if (value == null) return new Date();
-    if (typeof value === "string") {
-      return new Date(value);
-    }
-    return value;
-  },
 };
-
-// No use currently
-//
-// export type ValueValueTransformers = {
-//   [I in Input as I["type"]]: (input: MapInputToValue<I>) => MapInputToValue<I>;
-// };
-//
-// const finalValueMapperMap: ValueValueMapper = {
-//   bool: (value) => value,
-//   datetime: (value) => new Date(value).toISOString(),
-//   select: (value) => value,
-//   text: (value) => value,
-// };
 
 export type InputErrors = {
   index: number;
   message: Text;
 }[];
 
-export type InputList = Input[];
-export type Validator<Inputs extends InputList> = (
-  inputs: MapInputListToValueList<Inputs>,
-) => InputErrors;
-export type Values<Inputs extends InputList> = MapInputListToValueList<Inputs>;
-export type Dirties<Inputs extends InputList> = MapInputListTo<Inputs, boolean>;
+export interface InputGroupProps<Inputs extends Input[]> {
+  color?: ThemeColor;
+  containerClassName?: string;
+  containerRef?: Ref<HTMLDivElement>;
 
-export function useInputs<Inputs extends InputList>(
+  inputs: ExtendInputsForComponent<Inputs>;
+  onChange: <Index extends number>(
+    index: Index,
+    value: InputValueMap[Inputs[Index]["type"]],
+  ) => void;
+}
+
+export type ExtendInputForHook<I extends Input> = I & {
+  initialValue?: InputInitialValueMap[I["type"]] | null;
+};
+
+export type ExtendInputsForHook<Inputs extends Input[]> = {
+  [Index in keyof Inputs]: ExtendInputForHook<Inputs[Index]>;
+};
+
+export type Validator<Inputs extends Input[]> = (
+  values: { [Index in keyof Inputs]: InputValueMap[Inputs[Index]["type"]] },
   inputs: Inputs,
-  validator?: Validator<Inputs>,
+) => InputErrors;
+
+export function useInputs<Inputs extends Input[]>(
+  inputs: ExtendInputsForHook<Inputs>,
+  options: {
+    validator?: Validator<Inputs>;
+    disabled?: boolean;
+  },
 ): {
-  inputs: Inputs;
-  validator?: Validator<Inputs>;
-  dirties: Dirties<Inputs> | undefined;
-  setDirties: (dirties: Dirties<Inputs>) => void;
-  dirtyAll: () => void;
+  inputGroupProps: ExtendInputsForComponent<Inputs>;
+  confirm: (values: Values<Inputs>) => void;
 } {
+  const { validator, disabled } = options;
+
+  const [values, setValues] = useState<Values<Inputs>>(() =>
+    inputs.map((input) =>
+      defaultInitialValueTransformer[input.type](input, input.initialValue),
+    ),
+  );
+  const [errors, setErrors] = useState<InputErrors>([]);
   const [dirties, setDirties] = useState<Dirties<Inputs>>();
 
-  return {
-    inputs,
-    validator,
-    values,
-    dirties,
-    setDirties,
-    dirtyAll: () => {
-      if (dirties != null) {
-        setDirties(new Array(dirties.length).fill(true) as Dirties<Inputs>);
-      }
-    },
-  };
-}
+  const componentInputs: ExtendInputForComponent<Input>[] = [];
 
-export interface InputGroupProps<Inputs extends InputList> {
-  inputs: Inputs;
-  validator?: Validator<Inputs>;
-
-  values?: Values<Inputs>;
-  onChange: (
-    values: Values<Inputs>,
-    errors: InputErrors,
-    trigger: number, // May be -1, which means I don't know who trigger this change.
-  ) => void;
-  errors: InputErrors;
-  dirties: Dirties<Inputs>;
-  onDirty: (dirties: Dirties<Inputs>) => void;
-  disabled?: boolean;
-
-  color?: ThemeColor;
-  className?: string;
-  containerRef?: Ref<HTMLDivElement>;
-}
-
-export default function InputGroup<Inputs extends Input[]>({
-  color,
-  inputs,
-  validator,
-  values,
-  errors,
-  disabled,
-  onChange,
-  dirties,
-  onDirty,
-  containerRef,
-  className,
-}: InputGroupProps<Inputs>) {
-  const c = useC();
-
-  type Values = MapInputListToValueList<Inputs>;
-  type Dirties = MapInputListTo<Inputs, boolean>;
-
-  useEffect(() => {
-    if (values == null) {
-      const values = inputs.map((input) => {
-        return initialValueTransformers[input.type](input as never);
-      }) as Values;
-      const errors = validator?.(values) ?? [];
-      onChange(values, errors, -1);
-      onDirty?.(inputs.map(() => false) as Dirties);
-    }
-  }, [values, inputs, validator, onChange, onDirty]);
-
-  if (values == null) {
-    return null;
+  for (let i = 0; i < inputs.length; i++) {
+    const input = { ...inputs[i] };
+    delete input.initialValue; // No use.
+    const error = dirties[i]
+      ? errors.find((e) => e.index === i)?.message
+      : undefined;
+    const componentInput: ExtendInputForComponent<Input> = {
+      ...input,
+      value: values[i],
+      disabled,
+      error,
+    };
+    componentInputs.push(componentInput);
   }
 
-  const updateValue = (index: number, newValue: InputValue): void => {
-    const oldValues = values;
-    const newValues = oldValues.slice() as Values;
-    newValues[index] = newValue;
-    const error = validator?.(newValues) ?? [];
-    onChange(newValues, error, index);
-    if (dirties != null && onDirty != null && dirties[index] === false) {
-      const newDirties = dirties.slice() as Dirties;
-      newDirties[index] = true;
-      onDirty(newDirties);
+  const dirtyAll = () => {
+    if (dirties != null) {
+      setDirties(new Array(dirties.length).fill(true) as Dirties<Inputs>);
     }
   };
+
+  return {
+    inputGroupProps: {},
+  };
+}
+
+export function InputGroup<Inputs extends Input[]>({
+  color,
+  inputs,
+  onChange,
+  containerRef,
+  containerClassName,
+}: InputGroupProps<ExtendInputsForComponent<Inputs>>) {
+  const c = useC();
 
   return (
     <div
@@ -226,89 +187,73 @@ export default function InputGroup<Inputs extends Input[]>({
       className={classNames(
         "cru-input-group",
         `cru-${color ?? "primary"}`,
-        className,
+        containerClassName,
       )}
     >
-      {inputs.map((item: Input, index: number) => {
-        const value = values[index];
-        const error =
-          dirties &&
-          dirties[index] &&
-          errors &&
-          errors.find((e) => e.index === index)?.message;
+      {inputs.map((item, index) => {
+        const { type, value, label, error, helper, disabled } = item;
 
-        if (item.type === "text") {
+        const getContainerClassName = (
+          ...additionalClassNames: classNames.ArgumentArray
+        ) =>
+          classNames(
+            `cru-input-container cru-input-${type}`,
+            error && "error",
+            ...additionalClassNames,
+          );
+
+        const changeValue = (value: InputValueMap[keyof InputValueMap]) => {
+          // `map` makes every type info lost, so we let ts do _not_ do type check here.
+          onChange(index, value as never);
+        };
+
+        if (type === "text") {
+          const { password } = item;
           return (
             <div
               key={index}
-              className={classNames(
-                "cru-input-container cru-input-text",
-                item.password && "password",
-                error && "error",
-              )}
+              className={getContainerClassName(password && "password")}
             >
-              {item.label && (
-                <label className="cru-input-label">{c(item.label)}</label>
-              )}
+              {label && <label className="cru-input-label">{c(label)}</label>}
               <input
-                type={item.password === true ? "password" : "text"}
+                type={password ? "password" : "text"}
                 value={value as string}
                 onChange={(event) => {
                   const v = event.target.value;
-                  updateValue(index, v);
+                  changeValue(v);
                 }}
                 disabled={disabled}
               />
-              {error && <div className="cru-input-error-text">{c(error)}</div>}
-              {item.helperText && (
-                <div className="cru-input-helper-text">
-                  {c(item.helperText)}
-                </div>
-              )}
+              {error && <div className="cru-input-error">{c(error)}</div>}
+              {helper && <div className="cru-input-helper">{c(helper)}</div>}
             </div>
           );
-        } else if (item.type === "bool") {
+        } else if (type === "bool") {
           return (
-            <div
-              key={index}
-              className={classNames(
-                "cru-input-container cru-input-bool",
-                error && "error",
-              )}
-            >
+            <div key={index} className={getContainerClassName()}>
               <input
                 type="checkbox"
                 checked={value as boolean}
                 onChange={(event) => {
                   const v = event.currentTarget.checked;
-                  updateValue(index, v);
+                  changeValue(v);
                 }}
                 disabled={disabled}
               />
-              <label className="cru-input-label-inline">{c(item.label)}</label>
-              {error && <div className="cru-input-error-text">{c(error)}</div>}
-              {item.helperText && (
-                <div className="cru-operation-dialog-helper-text">
-                  {c(item.helperText)}
-                </div>
-              )}
+              <label className="cru-input-label-inline">{c(label)}</label>
+              {error && <div className="cru-input-error">{c(error)}</div>}
+              {helper && <div className="cru-input-helper">{c(helper)}</div>}
             </div>
           );
-        } else if (item.type === "select") {
+        } else if (type === "select") {
           return (
-            <div
-              key={index}
-              className={classNames(
-                "cru-input-container cru-input-select",
-                error && "error",
-              )}
-            >
-              <label className="cru-input-label">{c(item.label)}</label>
+            <div key={index} className={getContainerClassName()}>
+              <label className="cru-input-label">{c(label)}</label>
               <select
                 value={value as string}
                 onChange={(event) => {
                   const e = event.target.value;
-                  updateValue(index, e);
+                  changeValue(e);
                 }}
                 disabled={disabled}
               >
@@ -321,38 +266,6 @@ export default function InputGroup<Inputs extends Input[]>({
                   );
                 })}
               </select>
-            </div>
-          );
-        } else if (item.type === "datetime") {
-          return (
-            <div
-              key={index}
-              className={classNames(
-                "cru-input-container cru-input-datetime",
-                error && "error",
-              )}
-            >
-              {item.label && (
-                <label className="cru-input-label">{c(item.label)}</label>
-              )}
-              <input
-                type="datetime-local"
-                value={(value as Date).toLocaleString()}
-                onChange={(event) => {
-                  const v = event.target.valueAsDate;
-                  if (v == null) {
-                    if (process.env.NODE_ENV === "development") {
-                      console.log(
-                        "Looks like user input date is null. We do nothing. But you might want to check why.",
-                      );
-                    }
-                    return;
-                  }
-                  updateValue(index, v);
-                }}
-                disabled={disabled}
-              />
-              {error && <div className="cru-input-error-text">{c(error)}</div>}
             </div>
           );
         }
