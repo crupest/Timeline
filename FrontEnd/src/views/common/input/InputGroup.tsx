@@ -23,7 +23,7 @@
  * `useInputs` hook takes care of logic and generate props for `InputGroup`.
  */
 
-import { useState, Ref } from "react";
+import { useState, useRef, Ref } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
@@ -63,92 +63,146 @@ export interface SelectInput extends InputBase {
 
 export type Input = TextInput | BoolInput | SelectInput;
 
-interface InputInitialValueMap {
-  text: string;
-  bool: boolean;
-  select: string;
-}
+export type InputValue = Input["value"];
 
-type Dirties<Inputs extends Input[]> = {
-  [Index in keyof Inputs]: boolean;
+export type InputValueDict = Record<string, InputValue>;
+export type InputErrorDict = Record<string, Text>;
+export type InputDisabledDict = Record<string, boolean>;
+export type InputDirtyDict = Record<string, boolean>;
+
+type MakeInputInfo<I extends Input> = Omit<I, "value" | "error" | "disabled">;
+
+export type InputInfo = {
+  [I in Input as I["type"]]: MakeInputInfo<I>;
+}[Input["type"]];
+
+export type Validator = (
+  values: InputValueDict,
+  inputs: InputInfo[],
+) => InputErrorDict;
+
+export type InputScheme = {
+  inputs: InputInfo[];
+  validator?: Validator;
 };
 
-type ExtendInputForComponent<I extends Input> = I & {};
-
-type ExtendInputsForComponent<Inputs extends Input[]> = {
-  [Index in keyof Inputs]: ExtendInputForComponent<Inputs[Index]>;
+export type InputState = {
+  values: InputValueDict;
+  errors: InputErrorDict;
+  disabled: InputDisabledDict;
+  dirties: InputDirtyDict;
 };
 
-type InitialValueTransformer<I extends Input> = (
-  input: I,
-  value: InputInitialValueMap[I["type"]] | null | undefined,
-) => InputValueMap[I["type"]];
-
-type InitialValueTransformers = {
-  [I in Input as I["type"]]: InitialValueTransformer<I>;
+export type State = {
+  scheme: InputScheme;
+  state: InputState;
 };
 
-const defaultInitialValueTransformer: InitialValueTransformers = {
-  text: (input, value) => value ?? "",
-  bool: (input, value) => value ?? false,
-  select: (input, value) => value ?? input.options[0].value,
+export type StateInitializer = Partial<InputState>;
+
+export type Initializer = {
+  scheme: InputScheme;
+  stateInit?: Partial<InputState>;
 };
 
-export type InputErrors = {
-  index: number;
-  message: Text;
-}[];
-
-export interface InputGroupProps<Inputs extends Input[]> {
+export interface InputGroupProps {
   color?: ThemeColor;
   containerClassName?: string;
   containerRef?: Ref<HTMLDivElement>;
 
-  inputs: ExtendInputsForComponent<Inputs>;
-  onChange: <Index extends number>(
-    index: Index,
-    value: InputValueMap[Inputs[Index]["type"]],
-  ) => void;
+  inputs: Input[];
+  onChange: (index: number, value: Input["value"]) => void;
 }
 
-export type ExtendInputForHook<I extends Input> = I & {
-  initialValue?: InputInitialValueMap[I["type"]] | null;
-};
+function cleanObject<O extends Record<string, unknown>>(o: O): O {
+  const result = { ...o };
+  for (const key of Object.keys(result)) {
+    if (result[key] == null) {
+      delete result[key];
+    }
+  }
+  return result;
+}
 
-export type ExtendInputsForHook<Inputs extends Input[]> = {
-  [Index in keyof Inputs]: ExtendInputForHook<Inputs[Index]>;
-};
-
-export type Validator<Inputs extends Input[]> = (
-  values: { [Index in keyof Inputs]: InputValueMap[Inputs[Index]["type"]] },
-  inputs: Inputs,
-) => InputErrors;
-
-export function useInputs<Inputs extends Input[]>(
-  inputs: ExtendInputsForHook<Inputs>,
-  options: {
-    validator?: Validator<Inputs>;
-    disabled?: boolean;
-  },
-): {
-  inputGroupProps: ExtendInputsForComponent<Inputs>;
-  confirm: (values: Values<Inputs>) => void;
+export function useInputs(options: { init?: () => Initializer }): {
+  inputGroupProps: InputGroupProps;
 } {
-  const { validator, disabled } = options;
+  function initializeValue(
+    input: InputInfo,
+    value?: InputValue | null,
+  ): InputValue {
+    if (input.type === "text") {
+      return value ?? "";
+    } else if (input.type === "bool") {
+      return value ?? false;
+    } else if (input.type === "select") {
+      return value ?? input.options[0].value;
+    }
+    throw new Error("Unknown input type");
+  }
 
-  const [values, setValues] = useState<Values<Inputs>>(() =>
-    inputs.map((input) =>
-      defaultInitialValueTransformer[input.type](input, input.initialValue),
-    ),
-  );
-  const [errors, setErrors] = useState<InputErrors>([]);
-  const [dirties, setDirties] = useState<Dirties<Inputs>>();
+  function initialize(initializer: Initializer): State {
+    const { scheme, stateInit } = initializer;
+    const { inputs, validator } = scheme;
+    const keys = inputs.map((input) => input.key);
 
-  const componentInputs: ExtendInputForComponent<Input>[] = [];
+    if (process.env.NODE_ENV === "development") {
+      const checkKeys = (dict: Record<string, unknown>) => {
+        for (const key of Object.keys(dict)) {
+          if (!keys.includes(key)) {
+            console.warn("");
+          }
+        }
+      };
+
+      checkKeys(stateInit?.values ?? {});
+      checkKeys(stateInit?.errors ?? {});
+      checkKeys(stateInit?.disabled ?? {});
+      checkKeys(stateInit?.dirties ?? {});
+    }
+
+    const values: InputValueDict = {};
+    let errors: InputErrorDict = cleanObject(
+      initializer.stateInit?.errors ?? {},
+    );
+    const disabled: InputDisabledDict = cleanObject(
+      initializer.stateInit?.disabled ?? {},
+    );
+    const dirties: InputDirtyDict = cleanObject(
+      initializer.stateInit?.dirties ?? {},
+    );
+
+    for (let i = 0; i < inputs.length; i++) {
+      const input = inputs[i];
+      const { key } = input;
+      values[key] = initializeValue(input, stateInit?.values?.[key]);
+
+      if (!(key in dirties)) {
+        dirties[key] = false;
+      }
+    }
+
+    if (Object.keys(errors).length === 0 && validator != null) {
+      errors = validator(values, inputs);
+    }
+
+    return {
+      scheme,
+      state: {
+        values,
+        errors,
+        disabled,
+        dirties,
+      },
+    };
+  }
+
+  const { init } = options;
+
+  const componentInputs: Input[] = [];
 
   for (let i = 0; i < inputs.length; i++) {
     const input = { ...inputs[i] };
-    delete input.initialValue; // No use.
     const error = dirties[i]
       ? errors.find((e) => e.index === i)?.message
       : undefined;
@@ -172,13 +226,13 @@ export function useInputs<Inputs extends Input[]>(
   };
 }
 
-export function InputGroup<Inputs extends Input[]>({
+export function InputGroup({
   color,
   inputs,
   onChange,
   containerRef,
   containerClassName,
-}: InputGroupProps<ExtendInputsForComponent<Inputs>>) {
+}: InputGroupProps) {
   const c = useC();
 
   return (
@@ -202,9 +256,8 @@ export function InputGroup<Inputs extends Input[]>({
             ...additionalClassNames,
           );
 
-        const changeValue = (value: InputValueMap[keyof InputValueMap]) => {
-          // `map` makes every type info lost, so we let ts do _not_ do type check here.
-          onChange(index, value as never);
+        const changeValue = (value: InputValue) => {
+          onChange(index, value);
         };
 
         if (type === "text") {
@@ -217,7 +270,7 @@ export function InputGroup<Inputs extends Input[]>({
               {label && <label className="cru-input-label">{c(label)}</label>}
               <input
                 type={password ? "password" : "text"}
-                value={value as string}
+                value={value}
                 onChange={(event) => {
                   const v = event.target.value;
                   changeValue(v);
@@ -233,7 +286,7 @@ export function InputGroup<Inputs extends Input[]>({
             <div key={index} className={getContainerClassName()}>
               <input
                 type="checkbox"
-                checked={value as boolean}
+                checked={value}
                 onChange={(event) => {
                   const v = event.currentTarget.checked;
                   changeValue(v);
@@ -250,7 +303,7 @@ export function InputGroup<Inputs extends Input[]>({
             <div key={index} className={getContainerClassName()}>
               <label className="cru-input-label">{c(label)}</label>
               <select
-                value={value as string}
+                value={value}
                 onChange={(event) => {
                   const e = event.target.value;
                   changeValue(e);
