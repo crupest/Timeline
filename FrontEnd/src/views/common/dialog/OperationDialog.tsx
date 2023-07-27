@@ -5,12 +5,11 @@ import { useC, Text, ThemeColor } from "../common";
 
 import Button from "../button/Button";
 import {
-  default as InputGroup,
-  InputErrors,
-  InputList,
-  Validator,
-  Values,
-  useDirties,
+  useInputs,
+  InputGroup,
+  InitializeInfo as InputInitializer,
+  InputValueDict,
+  InputScheme,
 } from "../input/InputGroup";
 import LoadingButton from "../button/LoadingButton";
 import Dialog from "./Dialog";
@@ -36,41 +35,46 @@ function OperationDialogPrompt(props: OperationDialogPromptProps) {
   );
 }
 
-export interface OperationDialogProps<TData, Inputs extends InputList> {
+export interface OperationDialogProps<TData> {
   open: boolean;
-  onClose: () => void;
+  close: () => void;
 
   color?: ThemeColor;
   title: Text;
   inputPrompt?: Text;
-  processPrompt?: Text;
   successPrompt?: (data: TData) => ReactNode;
   failurePrompt?: (error: unknown) => ReactNode;
 
-  inputs: Inputs;
-  validator?: Validator<Inputs>;
+  inputInit?: InputInitializer;
+  inputScheme?: InputScheme;
 
-  onProcess: (inputs: Values<Inputs>) => Promise<TData>;
+  onProcess: (inputs: InputValueDict) => Promise<TData>;
   onSuccessAndClose?: (data: TData) => void;
 }
 
-function OperationDialog<TData, Inputs extends InputList>(
-  props: OperationDialogProps<TData, Inputs>,
-) {
+function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   const {
     open,
-    onClose,
+    close,
     color,
     title,
     inputPrompt,
-    processPrompt,
     successPrompt,
     failurePrompt,
-    inputs,
-    validator,
+    inputInit,
+    inputScheme,
     onProcess,
     onSuccessAndClose,
   } = props;
+
+  if (process.env.NODE_ENV === "development") {
+    if (inputScheme == null && inputInit == null) {
+      throw Error("Scheme or Init? Choose one and create one.");
+    }
+    if (inputScheme != null && inputInit != null) {
+      throw Error("Scheme or Init? Choose one and drop one");
+    }
+  }
 
   const c = useC();
 
@@ -87,15 +91,17 @@ function OperationDialog<TData, Inputs extends InputList>(
       };
 
   const [step, setStep] = useState<Step>({ type: "input" });
-  const [values, setValues] = useState<Values<Inputs>>();
-  const [errors, setErrors] = useState<InputErrors>();
-  const [dirties, setDirties, dirtyAll] = useDirties();
 
-  function close() {
+  const { inputGroupProps, hasError, setAllDisabled, confirm } = useInputs({
+    /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
+    init: inputInit ?? { scheme: inputScheme! },
+  });
+
+  function onClose() {
     if (step.type !== "process") {
-      props.onClose();
+      close();
       if (step.type === "success" && props.onSuccessAndClose) {
-        props.onSuccessAndClose(step.data);
+        onSuccessAndClose?.(step.data);
       }
     } else {
       console.log("Attempt to close modal dialog when processing.");
@@ -103,14 +109,11 @@ function OperationDialog<TData, Inputs extends InputList>(
   }
 
   function onConfirm() {
-    setStep({ type: "process" });
-    props
-      .onProcess(
-        values.map((value, index) =>
-          finalValueMapperMap[inputScheme[index].type](value as never),
-        ) as Values,
-      )
-      .then(
+    const result = confirm();
+    if (result.type === "ok") {
+      setStep({ type: "process" });
+      setAllDisabled(true);
+      onProcess(result.values).then(
         (d) => {
           setStep({
             type: "success",
@@ -124,31 +127,21 @@ function OperationDialog<TData, Inputs extends InputList>(
           });
         },
       );
+    }
   }
 
   let body: ReactNode;
   if (step.type === "input" || step.type === "process") {
     const isProcessing = step.type === "process";
-    const hasError = errors.length > 0;
 
     body = (
       <div className="cru-operation-dialog-main-area">
         <div>
-          <OperationDialogPrompt customMessage={c(props.inputPrompt)} />
+          <OperationDialogPrompt customMessage={c(inputPrompt)} />
           <InputGroup
-            className="cru-operation-dialog-input-group"
+            containerClassName="cru-operation-dialog-input-group"
             color={color}
-            inputs={inputs}
-            validator={validator}
-            values={values}
-            errors={errors}
-            disabled={isProcessing}
-            onChange={(values, errors) => {
-              setValues(values);
-              setErrors(errors);
-            }}
-            dirties={dirties}
-            onDirty={setDirties}
+            {...inputGroupProps}
           />
         </div>
         <hr />
@@ -157,19 +150,14 @@ function OperationDialog<TData, Inputs extends InputList>(
             text="operationDialog.cancel"
             color="secondary"
             outline
-            onClick={close}
+            onClick={onClose}
             disabled={isProcessing}
           />
           <LoadingButton
             color={color}
             loading={isProcessing}
             disabled={hasError}
-            onClick={() => {
-              dirtyAll();
-              if (validate(values)) {
-                onConfirm();
-              }
-            }}
+            onClick={onConfirm}
           >
             {c("operationDialog.confirm")}
           </LoadingButton>
@@ -183,32 +171,32 @@ function OperationDialog<TData, Inputs extends InputList>(
       result.type === "success"
         ? {
             message: "operationDialog.success",
-            customMessage: props.successPrompt?.(result.data),
+            customMessage: successPrompt?.(result.data),
           }
         : {
             message: "operationDialog.error",
-            customMessage: props.failurePrompt?.(result.data),
+            customMessage: failurePrompt?.(result.data),
           };
     body = (
       <div className="cru-operation-dialog-main-area">
         <OperationDialogPrompt {...promptProps} />
         <hr />
         <div className="cru-dialog-bottom-area">
-          <Button text="operationDialog.ok" color="primary" onClick={close} />
+          <Button text="operationDialog.ok" color="primary" onClick={onClose} />
         </div>
       </div>
     );
   }
 
   return (
-    <Dialog open={props.open} onClose={close}>
+    <Dialog open={open} onClose={onClose}>
       <div
         className={classNames(
           "cru-operation-dialog-container",
-          `cru-${props.themeColor ?? "primary"}`,
+          `cru-${color ?? "primary"}`,
         )}
       >
-        <div className="cru-operation-dialog-title">{c(props.title)}</div>
+        <div className="cru-operation-dialog-title">{c(title)}</div>
         <hr />
         {body}
       </div>

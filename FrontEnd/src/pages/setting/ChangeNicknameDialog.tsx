@@ -26,7 +26,7 @@ const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
           nickname: newNickname,
         });
       }}
-      onClose={props.close}
+      close={props.close}
     />
   );
 };

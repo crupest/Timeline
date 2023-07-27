@@ -21,7 +21,7 @@ export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
     <OperationDialog
       open={open}
       title="settings.dialogChangePassword.title"
-      themeColor="danger"
+      color="danger"
       inputPrompt="settings.dialogChangePassword.prompt"
       inputScheme={[
         {
@@ -57,7 +57,7 @@ export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
         await userService.changePassword(oldPassword, newPassword);
         setRedirect(true);
       }}
-      onClose={() => {
+      close={() => {
         props.close();
         if (redirect) {
           navigate("/login");
