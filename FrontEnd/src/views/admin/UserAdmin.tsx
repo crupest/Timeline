@@ -35,7 +35,7 @@ const CreateUserDialog: React.FC<{
           password,
         })
       }
-      onClose={close}
+      close={close}
       open={open}
       onSuccessAndClose={onSuccess}
     />
@@ -55,7 +55,7 @@ const UserDeleteDialog: React.FC<{
   return (
     <OperationDialog
       open={open}
-      onClose={close}
+      close={close}
       title="admin:user.dialog.delete.title"
       themeColor="danger"
       inputPrompt={() => (
@@ -78,7 +78,7 @@ const UserModifyDialog: React.FC<{
   return (
     <OperationDialog
       open={open}
-      onClose={close}
+      close={close}
       title="admin:user.dialog.modify.title"
       themeColor="danger"
       inputPrompt={() => (
@@ -126,7 +126,7 @@ const UserPermissionModifyDialog: React.FC<{
   return (
     <OperationDialog
       open={open}
-      onClose={close}
+      close={close}
       title="admin:user.dialog.modifyPermissions.title"
       themeColor="danger"
       inputPrompt={() => (

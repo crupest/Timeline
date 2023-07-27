@@ -55,7 +55,7 @@ const TimelinePropertyChangeDialog: React.FC<
         ] as const
       }
       open={props.open}
-      onClose={props.close}
+      close={props.close}
       onProcess={([newTitle, newVisibility, newDescription, newColor]) => {
         const req: HttpTimelinePatchRequest = {};
         if (newTitle !== timeline.title) {

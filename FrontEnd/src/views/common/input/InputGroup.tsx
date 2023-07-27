@@ -23,7 +23,7 @@
  * `useInputs` hook takes care of logic and generate props for `InputGroup`.
  */
 
-import { useState, useRef, Ref } from "react";
+import { useState, Ref } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
@@ -86,7 +86,7 @@ export type InputScheme = {
   validator?: Validator;
 };
 
-export type InputState = {
+export type InputData = {
   values: InputValueDict;
   errors: InputErrorDict;
   disabled: InputDisabledDict;
@@ -95,15 +95,17 @@ export type InputState = {
 
 export type State = {
   scheme: InputScheme;
-  state: InputState;
+  data: InputData;
 };
 
-export type StateInitializer = Partial<InputState>;
+export type DataInitializeInfo = Partial<InputData>;
 
-export type Initializer = {
+export type InitializeInfo = {
   scheme: InputScheme;
-  stateInit?: Partial<InputState>;
+  dataInit?: DataInitializeInfo;
 };
+
+export type Initialize
 
 export interface InputGroupProps {
   color?: ThemeColor;
@@ -114,7 +116,7 @@ export interface InputGroupProps {
   onChange: (index: number, value: Input["value"]) => void;
 }
 
-function cleanObject<O extends Record<string, unknown>>(o: O): O {
+function cleanObject<V>(o: Record<string, V>): Record<string, V> {
   const result = { ...o };
   for (const key of Object.keys(result)) {
     if (result[key] == null) {
@@ -124,8 +126,23 @@ function cleanObject<O extends Record<string, unknown>>(o: O): O {
   return result;
 }
 
-export function useInputs(options: { init?: () => Initializer }): {
+export type ConfirmResult =
+  | {
+      type: "ok";
+      values: InputValueDict;
+    }
+  | {
+      type: "error";
+      errors: InputErrorDict;
+    };
+
+export function useInputs(options: {
+  init: InitializeInfo | (() => InitializeInfo);
+}): {
   inputGroupProps: InputGroupProps;
+  hasError: boolean;
+  confirm: () => ConfirmResult;
+  setAllDisabled: (disabled: boolean) => void;
 } {
   function initializeValue(
     input: InputInfo,
@@ -141,54 +158,59 @@ export function useInputs(options: { init?: () => Initializer }): {
     throw new Error("Unknown input type");
   }
 
-  function initialize(initializer: Initializer): State {
-    const { scheme, stateInit } = initializer;
+  function initialize(info: InitializeInfo): State {
+    const { scheme, dataInit } = info;
     const { inputs, validator } = scheme;
     const keys = inputs.map((input) => input.key);
 
     if (process.env.NODE_ENV === "development") {
-      const checkKeys = (dict: Record<string, unknown>) => {
-        for (const key of Object.keys(dict)) {
-          if (!keys.includes(key)) {
-            console.warn("");
+      const checkKeys = (dict: Record<string, unknown> | undefined) => {
+        if (dict != null) {
+          for (const key of Object.keys(dict)) {
+            if (!keys.includes(key)) {
+              console.warn("");
+            }
           }
         }
       };
 
-      checkKeys(stateInit?.values ?? {});
-      checkKeys(stateInit?.errors ?? {});
-      checkKeys(stateInit?.disabled ?? {});
-      checkKeys(stateInit?.dirties ?? {});
+      checkKeys(dataInit?.values);
+      checkKeys(dataInit?.errors);
+      checkKeys(dataInit?.disabled);
+      checkKeys(dataInit?.dirties);
+    }
+
+    function clean<V>(dict: Record<string, V> | undefined): Record<string, V> {
+      return dict != null ? cleanObject(dict) : {};
     }
 
     const values: InputValueDict = {};
-    let errors: InputErrorDict = cleanObject(
-      initializer.stateInit?.errors ?? {},
-    );
-    const disabled: InputDisabledDict = cleanObject(
-      initializer.stateInit?.disabled ?? {},
-    );
-    const dirties: InputDirtyDict = cleanObject(
-      initializer.stateInit?.dirties ?? {},
-    );
+    const disabled: InputDisabledDict = clean(info.dataInit?.disabled);
+    const dirties: InputDirtyDict = clean(info.dataInit?.dirties);
 
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
       const { key } = input;
-      values[key] = initializeValue(input, stateInit?.values?.[key]);
 
-      if (!(key in dirties)) {
-        dirties[key] = false;
-      }
+      values[key] = initializeValue(input, dataInit?.values?.[key]);
     }
 
-    if (Object.keys(errors).length === 0 && validator != null) {
-      errors = validator(values, inputs);
+    let errors = info.dataInit?.errors;
+
+    if (errors != null) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          "You explicitly set errors (not undefined) in initializer, so validator won't run.",
+        );
+      }
+      errors = cleanObject(errors);
+    } else {
+      errors = validator?.(values, inputs) ?? {};
     }
 
     return {
       scheme,
-      state: {
+      data: {
         values,
         errors,
         disabled,
@@ -198,31 +220,95 @@ export function useInputs(options: { init?: () => Initializer }): {
   }
 
   const { init } = options;
+  const initializer = typeof init === "function" ? init : () => init;
+
+  const [state, setState] = useState<State>(() => initialize(initializer()));
+
+  const { scheme, data } = state;
+  const { validator } = scheme;
+
+  function createAllBooleanDict(value: boolean): Record<string, boolean> {
+    const result: InputDirtyDict = {};
+    for (const key of scheme.inputs.map((input) => input.key)) {
+      result[key] = value;
+    }
+    return result;
+  }
+
+  const createAllDirties = () => createAllBooleanDict(true);
 
   const componentInputs: Input[] = [];
 
-  for (let i = 0; i < inputs.length; i++) {
-    const input = { ...inputs[i] };
-    const error = dirties[i]
-      ? errors.find((e) => e.index === i)?.message
-      : undefined;
-    const componentInput: ExtendInputForComponent<Input> = {
+  for (let i = 0; i < scheme.inputs.length; i++) {
+    const input = scheme.inputs[i];
+    const value = data.values[input.key];
+    const error = data.errors[input.key];
+    const disabled = data.disabled[input.key] ?? false;
+    const dirty = data.dirties[input.key] ?? false;
+    const componentInput: Input = {
       ...input,
-      value: values[i],
+      value: value as never,
       disabled,
-      error,
+      error: dirty ? error : undefined,
     };
     componentInputs.push(componentInput);
   }
 
-  const dirtyAll = () => {
-    if (dirties != null) {
-      setDirties(new Array(dirties.length).fill(true) as Dirties<Inputs>);
-    }
-  };
-
   return {
-    inputGroupProps: {},
+    inputGroupProps: {
+      inputs: componentInputs,
+      onChange: (index, value) => {
+        const input = scheme.inputs[index];
+        const { key } = input;
+        const newValues = { ...data.values, [key]: value };
+        const newDirties = { ...data.dirties, [key]: true };
+        const newErrors = validator?.(newValues, scheme.inputs) ?? {};
+        setState({
+          scheme,
+          data: {
+            ...data,
+            values: newValues,
+            errors: newErrors,
+            dirties: newDirties,
+          },
+        });
+      },
+    },
+    hasError: Object.keys(data.errors).length > 0,
+    confirm() {
+      const newDirties = createAllDirties();
+      const newErrors = validator?.(data.values, scheme.inputs) ?? {};
+
+      setState({
+        scheme,
+        data: {
+          ...data,
+          dirties: newDirties,
+          errors: newErrors,
+        },
+      });
+
+      if (Object.keys(newErrors).length === 0) {
+        return {
+          type: "error",
+          errors: newErrors,
+        };
+      } else {
+        return {
+          type: "ok",
+          values: data.values,
+        };
+      }
+    },
+    setAllDisabled(disabled: boolean) {
+      setState({
+        scheme,
+        data: {
+          ...data,
+          disabled: createAllBooleanDict(disabled),
+        },
+      });
+    },
   };
 }
 

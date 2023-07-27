@@ -15,7 +15,7 @@ function PostPropertyChangeDialog(props: {
   return (
     <OperationDialog
       title="timeline.changePostPropertyDialog.title"
-      onClose={onClose}
+      close={onClose}
       open={open}
       inputScheme={[
         {

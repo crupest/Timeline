@@ -20,7 +20,7 @@ const TimelineCreateDialog: React.FC<TimelineCreateDialogProps> = (props) => {
   return (
     <OperationDialog
       open={props.open}
-      onClose={props.close}
+      close={props.close}
       themeColor="success"
       title="home.createDialog.title"
       inputScheme={
