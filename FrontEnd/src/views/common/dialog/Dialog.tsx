@@ -38,23 +38,18 @@ export default function Dialog({
       timeout={300}
       classNames="cru-dialog"
     >
-      <div
-        className={classNames("cru-dialog-overlay", `cru-${color}`)}
-        onPointerDown={
-          disableCloseOnClickOnOverlay
-            ? undefined
-            : () => {
-                onClose();
-              }
-        }
-      >
-        <div className="cru-dialog-background" />
+      <div className={classNames("cru-dialog-overlay", `cru-${color}`)}>
         <div
-          className="cru-dialog-container"
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          {children}
-        </div>
+          className="cru-dialog-background"
+          onClick={
+            disableCloseOnClickOnOverlay
+              ? undefined
+              : () => {
+                  onClose();
+                }
+          }
+        />
+        <div className="cru-dialog-container">{children}</div>
       </div>
     </CSSTransition>,
     portalElement,

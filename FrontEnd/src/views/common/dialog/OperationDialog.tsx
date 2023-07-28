@@ -7,14 +7,16 @@ import Button from "../button/Button";
 import {
   useInputs,
   InputGroup,
-  InitializeInfo as InputInitializer,
+  Initializer as InputInitializer,
   InputValueDict,
-  InputScheme,
+  InputErrorDict,
 } from "../input/InputGroup";
 import LoadingButton from "../button/LoadingButton";
 import Dialog from "./Dialog";
 
 import "./OperationDialog.css";
+
+export type { InputInitializer, InputValueDict, InputErrorDict };
 
 interface OperationDialogPromptProps {
   message?: Text;
@@ -40,13 +42,13 @@ export interface OperationDialogProps<TData> {
   close: () => void;
 
   color?: ThemeColor;
+  inputColor?: ThemeColor;
   title: Text;
   inputPrompt?: Text;
   successPrompt?: (data: TData) => ReactNode;
   failurePrompt?: (error: unknown) => ReactNode;
 
-  inputInit?: InputInitializer;
-  inputScheme?: InputScheme;
+  inputs: InputInitializer;
 
   onProcess: (inputs: InputValueDict) => Promise<TData>;
   onSuccessAndClose?: (data: TData) => void;
@@ -57,24 +59,15 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
     open,
     close,
     color,
+    inputColor,
     title,
     inputPrompt,
     successPrompt,
     failurePrompt,
-    inputInit,
-    inputScheme,
+    inputs,
     onProcess,
     onSuccessAndClose,
   } = props;
-
-  if (process.env.NODE_ENV === "development") {
-    if (inputScheme == null && inputInit == null) {
-      throw Error("Scheme or Init? Choose one and create one.");
-    }
-    if (inputScheme != null && inputInit != null) {
-      throw Error("Scheme or Init? Choose one and drop one");
-    }
-  }
 
   const c = useC();
 
@@ -93,14 +86,13 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   const [step, setStep] = useState<Step>({ type: "input" });
 
   const { inputGroupProps, hasError, setAllDisabled, confirm } = useInputs({
-    /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-    init: inputInit ?? { scheme: inputScheme! },
+    init: inputs,
   });
 
   function onClose() {
     if (step.type !== "process") {
       close();
-      if (step.type === "success" && props.onSuccessAndClose) {
+      if (step.type === "success" && onSuccessAndClose) {
         onSuccessAndClose?.(step.data);
       }
     } else {
@@ -136,11 +128,11 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
 
     body = (
       <div className="cru-operation-dialog-main-area">
-        <div>
+        <div className="cru-dialog-middle-area">
           <OperationDialogPrompt customMessage={c(inputPrompt)} />
           <InputGroup
             containerClassName="cru-operation-dialog-input-group"
-            color={color}
+            color={inputColor ?? "primary"}
             {...inputGroupProps}
           />
         </div>

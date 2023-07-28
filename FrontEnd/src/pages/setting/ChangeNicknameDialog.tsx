@@ -1,6 +1,5 @@
 import { getHttpUserClient } from "@/http/user";
-import { useUser } from "@/services/user";
-import * as React from "react";
+import { useUserLoggedIn } from "@/services/user";
 
 import OperationDialog from "@/views/common/dialog/OperationDialog";
 
@@ -9,26 +8,28 @@ export interface ChangeNicknameDialogProps {
   close: () => void;
 }
 
-const ChangeNicknameDialog: React.FC<ChangeNicknameDialogProps> = (props) => {
-  const user = useUser();
+export default function ChangeNicknameDialog(props: ChangeNicknameDialogProps) {
+  const { open, close } = props;
 
-  if (user == null) return null;
+  const user = useUserLoggedIn();
 
   return (
     <OperationDialog
-      open={props.open}
+      open={open}
       title="settings.dialogChangeNickname.title"
-      inputScheme={[
-        { type: "text", label: "settings.dialogChangeNickname.inputLabel" },
+      inputs={[
+        {
+          key: "newNickname",
+          type: "text",
+          label: "settings.dialogChangeNickname.inputLabel",
+        },
       ]}
-      onProcess={([newNickname]) => {
+      onProcess={({ newNickname }) => {
         return getHttpUserClient().patch(user.username, {
-          nickname: newNickname,
+          nickname: newNickname as string,
         });
       }}
-      close={props.close}
+      close={close}
     />
   );
-};
-
-export default ChangeNicknameDialog;
+}

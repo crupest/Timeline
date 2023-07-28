@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 
 import { userService } from "@/services/user";
 
-import OperationDialog from "@/views/common/dialog/OperationDialog";
+import OperationDialog, {
+  InputErrorDict,
+} from "@/views/common/dialog/OperationDialog";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -20,45 +22,56 @@ export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
   return (
     <OperationDialog
       open={open}
+      close={close}
       title="settings.dialogChangePassword.title"
       color="danger"
       inputPrompt="settings.dialogChangePassword.prompt"
-      inputScheme={[
-        {
-          type: "text",
-          label: "settings.dialogChangePassword.inputOldPassword",
-          password: true,
+      inputs={{
+        inputs: [
+          {
+            key: "oldPassword",
+            type: "text",
+            label: "settings.dialogChangePassword.inputOldPassword",
+            password: true,
+          },
+          {
+            key: "newPassword",
+            type: "text",
+            label: "settings.dialogChangePassword.inputNewPassword",
+            password: true,
+          },
+          {
+            key: "retypedNewPassword",
+            type: "text",
+            label: "settings.dialogChangePassword.inputRetypeNewPassword",
+            password: true,
+          },
+        ],
+        validator: ({ oldPassword, newPassword, retypedNewPassword }) => {
+          const result: InputErrorDict = {};
+          if (oldPassword === "") {
+            result["oldPassword"] =
+              "settings.dialogChangePassword.errorEmptyOldPassword";
+          }
+          if (newPassword === "") {
+            result["newPassword"] =
+              "settings.dialogChangePassword.errorEmptyNewPassword";
+          }
+          if (retypedNewPassword !== newPassword) {
+            result["retypedNewPassword"] =
+              "settings.dialogChangePassword.errorRetypeNotMatch";
+          }
+          return result;
         },
-        {
-          type: "text",
-          label: "settings.dialogChangePassword.inputNewPassword",
-          password: true,
-        },
-        {
-          type: "text",
-          label: "settings.dialogChangePassword.inputRetypeNewPassword",
-          password: true,
-        },
-      ]}
-      inputValidator={([oldPassword, newPassword, retypedNewPassword]) => {
-        const result: Record<number, string> = {};
-        if (oldPassword === "") {
-          result[0] = "settings.dialogChangePassword.errorEmptyOldPassword";
-        }
-        if (newPassword === "") {
-          result[1] = "settings.dialogChangePassword.errorEmptyNewPassword";
-        }
-        if (retypedNewPassword !== newPassword) {
-          result[2] = "settings.dialogChangePassword.errorRetypeNotMatch";
-        }
-        return result;
       }}
-      onProcess={async ([oldPassword, newPassword]) => {
-        await userService.changePassword(oldPassword, newPassword);
+      onProcess={async ({ oldPassword, newPassword }) => {
+        await userService.changePassword(
+          oldPassword as string,
+          newPassword as string,
+        );
         setRedirect(true);
       }}
-      close={() => {
-        props.close();
+      onSuccessAndClose={() => {
         if (redirect) {
           navigate("/login");
         }

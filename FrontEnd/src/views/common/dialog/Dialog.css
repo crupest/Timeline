@@ -6,7 +6,6 @@
   right: 0;
   bottom: 0;
   display: flex;
-  padding: 2em;
   overflow: auto;
 }
 
@@ -14,8 +13,8 @@
   position: absolute;
   z-index: -1;
   left: 0;
-  top: 0;
   right: 0;
+  top: 0;
   bottom: 0;
   background-color: var(--cru-surface-dim-color);
   opacity: 0.8;
@@ -25,12 +24,18 @@
   max-width: 100%;
   min-width: 30vw;
 
-  margin: auto;
+  margin: 2em auto;
 
   border: var(--cru-key-container-color) 1px solid;
   border-radius: 5px;
   padding: 1.5em;
   background-color: var(--cru-surface-color);
+}
+
+@media (min-width: 576px) {
+  .cru-dialog-container {
+    max-width: 800px;
+  }
 }
 
 .cru-dialog-bottom-area {
