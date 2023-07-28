@@ -30,22 +30,6 @@ textarea:focus {
   border-color: var(--cru-primary-color);
 }
 
-input:not([type="checkbox"]):not([type="radio"]) {
-  resize: none;
-  outline: none;
-  border: 1px solid;
-  transition: all 0.5s;
-  border-color: var(--cru-background-2-color);
-}
-
-input:hover:not([type="checkbox"]):not([type="radio"]) {
-  border-color: var(--cru-primary-r2-color);
-}
-
-input:focus:not([type="checkbox"]):not([type="radio"]) {
-  border-color: var(--cru-primary-color);
-}
-
 .white-space-no-wrap {
   white-space: nowrap;
 }

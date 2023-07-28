@@ -98,14 +98,16 @@ export type State = {
   data: InputData;
 };
 
-export type DataInitializeInfo = Partial<InputData>;
+export type DataInitialization = Partial<InputData>;
 
-export type InitializeInfo = {
+export type Initialization = {
   scheme: InputScheme;
-  dataInit?: DataInitializeInfo;
+  dataInit?: DataInitialization;
 };
 
-export type Initialize
+export type GeneralInitialization = Initialization | InputScheme | InputInfo[];
+
+export type Initializer = GeneralInitialization | (() => GeneralInitialization);
 
 export interface InputGroupProps {
   color?: ThemeColor;
@@ -136,9 +138,7 @@ export type ConfirmResult =
       errors: InputErrorDict;
     };
 
-export function useInputs(options: {
-  init: InitializeInfo | (() => InitializeInfo);
-}): {
+export function useInputs(options: { init: Initializer }): {
   inputGroupProps: InputGroupProps;
   hasError: boolean;
   confirm: () => ConfirmResult;
@@ -158,8 +158,14 @@ export function useInputs(options: {
     throw new Error("Unknown input type");
   }
 
-  function initialize(info: InitializeInfo): State {
-    const { scheme, dataInit } = info;
+  function initialize(generalInitialization: GeneralInitialization): State {
+    const initialization: Initialization = Array.isArray(generalInitialization)
+      ? { scheme: { inputs: generalInitialization } }
+      : "scheme" in generalInitialization
+      ? generalInitialization
+      : { scheme: generalInitialization };
+
+    const { scheme, dataInit } = initialization;
     const { inputs, validator } = scheme;
     const keys = inputs.map((input) => input.key);
 
@@ -185,8 +191,8 @@ export function useInputs(options: {
     }
 
     const values: InputValueDict = {};
-    const disabled: InputDisabledDict = clean(info.dataInit?.disabled);
-    const dirties: InputDirtyDict = clean(info.dataInit?.dirties);
+    const disabled: InputDisabledDict = clean(dataInit?.disabled);
+    const dirties: InputDirtyDict = clean(dataInit?.dirties);
 
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
@@ -195,7 +201,7 @@ export function useInputs(options: {
       values[key] = initializeValue(input, dataInit?.values?.[key]);
     }
 
-    let errors = info.dataInit?.errors;
+    let errors = dataInit?.errors;
 
     if (errors != null) {
       if (process.env.NODE_ENV === "development") {
@@ -331,13 +337,13 @@ export function InputGroup({
       )}
     >
       {inputs.map((item, index) => {
-        const { type, value, label, error, helper, disabled } = item;
+        const { key, type, value, label, error, helper, disabled } = item;
 
         const getContainerClassName = (
           ...additionalClassNames: classNames.ArgumentArray
         ) =>
           classNames(
-            `cru-input-container cru-input-${type}`,
+            `cru-input-container cru-input-type-${type}`,
             error && "error",
             ...additionalClassNames,
           );
@@ -350,7 +356,7 @@ export function InputGroup({
           const { password } = item;
           return (
             <div
-              key={index}
+              key={key}
               className={getContainerClassName(password && "password")}
             >
               {label && <label className="cru-input-label">{c(label)}</label>}
@@ -369,7 +375,7 @@ export function InputGroup({
           );
         } else if (type === "bool") {
           return (
-            <div key={index} className={getContainerClassName()}>
+            <div key={key} className={getContainerClassName()}>
               <input
                 type="checkbox"
                 checked={value}
@@ -386,7 +392,7 @@ export function InputGroup({
           );
         } else if (type === "select") {
           return (
-            <div key={index} className={getContainerClassName()}>
+            <div key={key} className={getContainerClassName()}>
               <label className="cru-input-label">{c(label)}</label>
               <select
                 value={value}
@@ -396,9 +402,9 @@ export function InputGroup({
                 }}
                 disabled={disabled}
               >
-                {item.options.map((option, i) => {
+                {item.options.map((option) => {
                   return (
-                    <option value={option.value} key={i}>
+                    <option value={option.value} key={option.value}>
                       {option.icon}
                       {c(option.label)}
                     </option>

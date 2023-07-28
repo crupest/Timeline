@@ -5,6 +5,7 @@
   border-radius: 0.2em;
   border: 1px solid;
   cursor: pointer;
+  background-color: var(--cru-surface-color);
 }
 
 .cru-button:not(.outline) {
