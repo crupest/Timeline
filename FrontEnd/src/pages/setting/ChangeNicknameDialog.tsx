@@ -5,11 +5,11 @@ import OperationDialog from "@/views/common/dialog/OperationDialog";
 
 export interface ChangeNicknameDialogProps {
   open: boolean;
-  close: () => void;
+  onClose: () => void;
 }
 
 export default function ChangeNicknameDialog(props: ChangeNicknameDialogProps) {
-  const { open, close } = props;
+  const { open, onClose } = props;
 
   const user = useUserLoggedIn();
 
@@ -29,7 +29,7 @@ export default function ChangeNicknameDialog(props: ChangeNicknameDialogProps) {
           nickname: newNickname as string,
         });
       }}
-      close={close}
+      onClose={onClose}
     />
   );
 }

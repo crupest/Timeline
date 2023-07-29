@@ -15,7 +15,8 @@ interface LoadingButtonProps extends React.ComponentPropsWithoutRef<"button"> {
 export default function LoadingButton(props: LoadingButtonProps) {
   const c = useC();
 
-  const { color, text, loading, className, children, ...otherProps } = props;
+  const { color, text, loading, disabled, className, children, ...otherProps } =
+    props;
 
   if (text != null && children != null) {
     console.warn("You can't set both text and children props.");
@@ -23,7 +24,7 @@ export default function LoadingButton(props: LoadingButtonProps) {
 
   return (
     <button
-      disabled={loading}
+      disabled={disabled || loading}
       className={classNames(
         `cru-${color ?? "primary"} cru-button outline cru-loading-button`,
         className,

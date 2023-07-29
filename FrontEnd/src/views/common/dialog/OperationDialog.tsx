@@ -39,7 +39,7 @@ function OperationDialogPrompt(props: OperationDialogPromptProps) {
 
 export interface OperationDialogProps<TData> {
   open: boolean;
-  close: () => void;
+  onClose: () => void;
 
   color?: ThemeColor;
   inputColor?: ThemeColor;
@@ -57,7 +57,7 @@ export interface OperationDialogProps<TData> {
 function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   const {
     open,
-    close,
+    onClose,
     color,
     inputColor,
     title,
@@ -85,13 +85,14 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
 
   const [step, setStep] = useState<Step>({ type: "input" });
 
-  const { inputGroupProps, hasError, setAllDisabled, confirm } = useInputs({
-    init: inputs,
-  });
+  const { inputGroupProps, hasErrorAndDirty, setAllDisabled, confirm } =
+    useInputs({
+      init: inputs,
+    });
 
-  function onClose() {
+  function close() {
     if (step.type !== "process") {
-      close();
+      onClose();
       if (step.type === "success" && onSuccessAndClose) {
         onSuccessAndClose?.(step.data);
       }
@@ -142,12 +143,13 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
             text="operationDialog.cancel"
             color="secondary"
             outline
-            onClick={onClose}
+            onClick={close}
             disabled={isProcessing}
           />
           <LoadingButton
             color={color}
             loading={isProcessing}
+            disabled={hasErrorAndDirty}
             onClick={onConfirm}
           >
             {c("operationDialog.confirm")}
@@ -173,14 +175,14 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
         <OperationDialogPrompt {...promptProps} />
         <hr />
         <div className="cru-dialog-bottom-area">
-          <Button text="operationDialog.ok" color="primary" onClick={onClose} />
+          <Button text="operationDialog.ok" color="primary" onClick={close} />
         </div>
       </div>
     );
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={close}>
       <div
         className={classNames(
           "cru-operation-dialog-container",
