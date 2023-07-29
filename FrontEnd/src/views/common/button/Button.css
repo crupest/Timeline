@@ -56,7 +56,7 @@
   border-color: var(--cru-key-2-color);
 }
 
-.cru-button.outline:disabled {
+.cru-button.outline:not(.cru-loading-button):disabled {
   color: var(--cru-surface-on-color);
   border-color: var(--cru-surface-on-color);
   background-color: white;

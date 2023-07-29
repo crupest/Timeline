@@ -148,7 +148,6 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
           <LoadingButton
             color={color}
             loading={isProcessing}
-            disabled={hasError}
             onClick={onConfirm}
           >
             {c("operationDialog.confirm")}

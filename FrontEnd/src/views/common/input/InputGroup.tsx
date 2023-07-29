@@ -294,7 +294,7 @@ export function useInputs(options: { init: Initializer }): {
         },
       });
 
-      if (Object.keys(newErrors).length === 0) {
+      if (Object.keys(newErrors).length !== 0) {
         return {
           type: "error",
           errors: newErrors,

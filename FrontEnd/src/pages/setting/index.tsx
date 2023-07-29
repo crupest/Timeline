@@ -282,25 +282,29 @@ export default function SettingPage() {
         open={dialog === "change-password"}
         close={() => setDialog(null)}
       />
-      <ConfirmDialog
-        title="settings.dialogConfirmLogout.title"
-        body="settings.dialogConfirmLogout.prompt"
-        onClose={() => setDialog(null)}
-        open={dialog === "logout"}
-        onConfirm={() => {
-          void userService.logout().then(() => {
-            navigate("/");
-          });
-        }}
-      />
-      <ChangeAvatarDialog
-        open={dialog === "change-avatar"}
-        close={() => setDialog(null)}
-      />
-      <ChangeNicknameDialog
-        open={dialog === "change-nickname"}
-        close={() => setDialog(null)}
-      />
+      {user && (
+        <>
+          <ConfirmDialog
+            title="settings.dialogConfirmLogout.title"
+            body="settings.dialogConfirmLogout.prompt"
+            onClose={() => setDialog(null)}
+            open={dialog === "logout"}
+            onConfirm={() => {
+              void userService.logout().then(() => {
+                navigate("/");
+              });
+            }}
+          />
+          <ChangeAvatarDialog
+            open={dialog === "change-avatar"}
+            close={() => setDialog(null)}
+          />
+          <ChangeNicknameDialog
+            open={dialog === "change-nickname"}
+            close={() => setDialog(null)}
+          />
+        </>
+      )}
     </Page>
   );
 }
