@@ -7,7 +7,7 @@ import LoadingPage from "./views/common/LoadingPage";
 import AboutPage from "./pages/about";
 import SettingPage from "./pages/setting";
 import Center from "./views/center";
-import Login from "./views/login";
+import Login from "./pages/login";
 import Register from "./views/register";
 import TimelinePage from "./views/timeline";
 import Search from "./views/search";

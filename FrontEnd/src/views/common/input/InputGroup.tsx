@@ -23,7 +23,7 @@
  * `useInputs` hook takes care of logic and generate props for `InputGroup`.
  */
 
-import { useState, Ref } from "react";
+import { useState, Ref, useId } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
@@ -332,6 +332,8 @@ export function InputGroup({
 }: InputGroupProps) {
   const c = useC();
 
+  const id = useId();
+
   return (
     <div
       ref={containerRef}
@@ -357,6 +359,8 @@ export function InputGroup({
           onChange(index, value);
         };
 
+        const inputId = `${id}-${key}`;
+
         if (type === "text") {
           const { password } = item;
           return (
@@ -364,8 +368,13 @@ export function InputGroup({
               key={key}
               className={getContainerClassName(password && "password")}
             >
-              {label && <label className="cru-input-label">{c(label)}</label>}
+              {label && (
+                <label className="cru-input-label" htmlFor={inputId}>
+                  {c(label)}
+                </label>
+              )}
               <input
+                id={inputId}
                 type={password ? "password" : "text"}
                 value={value}
                 onChange={(event) => {
@@ -382,6 +391,7 @@ export function InputGroup({
           return (
             <div key={key} className={getContainerClassName()}>
               <input
+                id={inputId}
                 type="checkbox"
                 checked={value}
                 onChange={(event) => {
@@ -390,7 +400,9 @@ export function InputGroup({
                 }}
                 disabled={disabled}
               />
-              <label className="cru-input-label-inline">{c(label)}</label>
+              <label className="cru-input-label-inline" htmlFor={inputId}>
+                {c(label)}
+              </label>
               {error && <div className="cru-input-error">{c(error)}</div>}
               {helper && <div className="cru-input-helper">{c(helper)}</div>}
             </div>
@@ -398,8 +410,11 @@ export function InputGroup({
         } else if (type === "select") {
           return (
             <div key={key} className={getContainerClassName()}>
-              <label className="cru-input-label">{c(label)}</label>
+              <label className="cru-input-label" htmlFor={inputId}>
+                {c(label)}
+              </label>
               <select
+                id={inputId}
                 value={value}
                 onChange={(event) => {
                   const e = event.target.value;
