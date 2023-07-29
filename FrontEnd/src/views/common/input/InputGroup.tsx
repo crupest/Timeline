@@ -141,6 +141,7 @@ export type ConfirmResult =
 export function useInputs(options: { init: Initializer }): {
   inputGroupProps: InputGroupProps;
   hasError: boolean;
+  hasErrorAndDirty: boolean;
   confirm: () => ConfirmResult;
   setAllDisabled: (disabled: boolean) => void;
 } {
@@ -260,6 +261,9 @@ export function useInputs(options: { init: Initializer }): {
     componentInputs.push(componentInput);
   }
 
+  const hasError = Object.keys(data.errors).length > 0;
+  const hasDirty = Object.keys(data.dirties).some((key) => data.dirties[key]);
+
   return {
     inputGroupProps: {
       inputs: componentInputs,
@@ -280,7 +284,8 @@ export function useInputs(options: { init: Initializer }): {
         });
       },
     },
-    hasError: Object.keys(data.errors).length > 0,
+    hasError,
+    hasErrorAndDirty: hasError && hasDirty,
     confirm() {
       const newDirties = createAllDirties();
       const newErrors = validator?.(data.values, scheme.inputs) ?? {};

@@ -9,13 +9,16 @@ import { useUser } from "@/services/user";
 
 import { getHttpUserClient } from "@/http/user";
 
-import ImageCropper, { Clip, applyClipToImage } from "@/views/common/ImageCropper";
+import ImageCropper, {
+  Clip,
+  applyClipToImage,
+} from "@/views/common/ImageCropper";
 import Button from "@/views/common/button/Button";
 import Dialog from "@/views/common/dialog/Dialog";
 
 export interface ChangeAvatarDialogProps {
   open: boolean;
-  close: () => void;
+  onClose: () => void;
 }
 
 const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
@@ -42,12 +45,12 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
   >("select");
 
   const [message, setMessage] = useState<I18nText>(
-    "settings.dialogChangeAvatar.prompt.select"
+    "settings.dialogChangeAvatar.prompt.select",
   );
 
   const trueMessage = convertI18nText(message, t);
 
-  const closeDialog = props.close;
+  const closeDialog = props.onClose;
 
   const close = React.useCallback((): void => {
     if (!(state === "uploading")) {
@@ -92,7 +95,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
         setFile(files[0]);
       }
     },
-    []
+    [],
   );
 
   const onCropNext = React.useCallback(() => {
@@ -140,7 +143,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
         (e: unknown) => {
           setState("error");
           setMessage({ type: "custom", value: (e as AxiosError).message });
-        }
+        },
       );
   }, [user, resultBlob]);
 

@@ -12,6 +12,7 @@ import { useC, Text } from "@/common";
 import { useUser, userService } from "@/services/user";
 import { getHttpUserClient } from "@/http/user";
 
+import { useDialog } from "@/views/common/dialog";
 import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
 import Card from "@/views/common/Card";
 import Spinner from "@/views/common/Spinner";
@@ -237,18 +238,13 @@ export default function SettingPage() {
   const user = useUser();
   const navigate = useNavigate();
 
-  type DialogName =
-    | "change-password"
-    | "change-avatar"
-    | "change-nickname"
-    | "logout"
-    | "renew-register-code";
-
-  const [dialog, setDialog] = useState<null | DialogName>(null);
-
-  function dialogOpener(name: DialogName): () => void {
-    return () => setDialog(name);
-  }
+  const { dialogPropsMap, createDialogSwitch } = useDialog([
+    "change-password",
+    "change-avatar",
+    "change-nickname",
+    "logout",
+    "renew-register-code",
+  ]);
 
   return (
     <Page noTopPadding>
@@ -257,20 +253,20 @@ export default function SettingPage() {
           <RegisterCodeSettingItem />
           <ButtonSettingItem
             title="settings.changeAvatar"
-            onClick={dialogOpener("change-avatar")}
+            onClick={createDialogSwitch("change-avatar")}
           />
           <ButtonSettingItem
             title="settings.changeNickname"
-            onClick={dialogOpener("change-nickname")}
+            onClick={createDialogSwitch("change-nickname")}
           />
           <ButtonSettingItem
             title="settings.changePassword"
-            onClick={dialogOpener("change-password")}
+            onClick={createDialogSwitch("change-password")}
             danger
           />
           <ButtonSettingItem
             title="settings.logout"
-            onClick={dialogOpener("logout")}
+            onClick={createDialogSwitch("logout")}
             danger
           />
         </SettingSection>
@@ -278,31 +274,21 @@ export default function SettingPage() {
       <SettingSection title="settings.subheader.customization">
         <LanguageChangeSettingItem />
       </SettingSection>
-      <ChangePasswordDialog
-        open={dialog === "change-password"}
-        close={() => setDialog(null)}
-      />
+      <ChangePasswordDialog {...dialogPropsMap["change-password"]} />
       {user && (
         <>
           <ConfirmDialog
             title="settings.dialogConfirmLogout.title"
             body="settings.dialogConfirmLogout.prompt"
-            onClose={() => setDialog(null)}
-            open={dialog === "logout"}
             onConfirm={() => {
               void userService.logout().then(() => {
                 navigate("/");
               });
             }}
+            {...dialogPropsMap["logout"]}
           />
-          <ChangeAvatarDialog
-            open={dialog === "change-avatar"}
-            close={() => setDialog(null)}
-          />
-          <ChangeNicknameDialog
-            open={dialog === "change-nickname"}
-            close={() => setDialog(null)}
-          />
+          <ChangeAvatarDialog {...dialogPropsMap["change-avatar"]} />
+          <ChangeNicknameDialog {...dialogPropsMap["change-nickname"]} />
         </>
       )}
     </Page>

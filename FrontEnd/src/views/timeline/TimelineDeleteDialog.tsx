@@ -20,7 +20,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
   return (
     <OperationDialog
       open={props.open}
-      close={props.close}
+      onClose={props.close}
       title="timeline.deleteDialog.title"
       themeColor="danger"
       inputPrompt={() => {

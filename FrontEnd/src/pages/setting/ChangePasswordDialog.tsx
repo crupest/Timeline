@@ -9,11 +9,11 @@ import OperationDialog, {
 
 interface ChangePasswordDialogProps {
   open: boolean;
-  close: () => void;
+  onClose: () => void;
 }
 
 export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
-  const { open, close } = props;
+  const { open, onClose } = props;
 
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
   return (
     <OperationDialog
       open={open}
-      close={close}
+      onClose={onClose}
       title="settings.dialogChangePassword.title"
       color="danger"
       inputPrompt="settings.dialogChangePassword.prompt"
