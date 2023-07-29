@@ -1,10 +1,10 @@
-import * as React from "react";
 import classNames from "classnames";
-import { useTranslation } from "react-i18next";
 
-import { I18nText, ThemeColor, convertI18nText } from "../common";
+import { I18nText, ThemeColor, useC } from "../common";
 
 import Spinner from "../Spinner";
+
+import "./LoadingButton.css";
 
 interface LoadingButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   color?: ThemeColor;
@@ -12,8 +12,8 @@ interface LoadingButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   loading?: boolean;
 }
 
-function LoadingButton(props: LoadingButtonProps): JSX.Element {
-  const { t } = useTranslation();
+export default function LoadingButton(props: LoadingButtonProps) {
+  const c = useC();
 
   const { color, text, loading, className, children, ...otherProps } = props;
 
@@ -23,17 +23,15 @@ function LoadingButton(props: LoadingButtonProps): JSX.Element {
 
   return (
     <button
+      disabled={loading}
       className={classNames(
-        "cru-" + (color ?? "primary"),
-        "cru-button outline",
+        `cru-${color ?? "primary"} cru-button outline cru-loading-button`,
         className,
       )}
       {...otherProps}
     >
-      {text != null ? convertI18nText(text, t) : children}
-      {loading && <Spinner />}
+      {text != null ? c(text) : children}
+      {loading && <Spinner className="cru-loading-button-spinner" />}
     </button>
   );
 }
-
-export default LoadingButton;

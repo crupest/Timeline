@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
 import classNames from "classnames";
@@ -30,15 +30,21 @@ export default function Dialog({
 }: DialogProps) {
   color = color ?? "primary";
 
+  const nodeRef = useRef(null);
+
   return ReactDOM.createPortal(
     <CSSTransition
+      nodeRef={nodeRef}
       mountOnEnter
       unmountOnExit
       in={open}
       timeout={300}
       classNames="cru-dialog"
     >
-      <div className={classNames("cru-dialog-overlay", `cru-${color}`)}>
+      <div
+        ref={nodeRef}
+        className={classNames("cru-dialog-overlay", `cru-${color}`)}
+      >
         <div
           className="cru-dialog-background"
           onClick={
