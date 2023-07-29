@@ -7,8 +7,8 @@ import LoadingPage from "./views/common/LoadingPage";
 import AboutPage from "./pages/about";
 import SettingPage from "./pages/setting";
 import Center from "./views/center";
-import Login from "./pages/login";
-import Register from "./views/register";
+import LoginPage from "./pages/login";
+import RegisterPage from "./pages/register";
 import TimelinePage from "./views/timeline";
 import Search from "./views/search";
 import Admin from "./views/admin";
@@ -22,8 +22,8 @@ export default function App() {
         <div style={{ height: 56 }} />
         <Routes>
           <Route path="center" element={<Center />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
           <Route path="settings" element={<SettingPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="search" element={<Search />} />

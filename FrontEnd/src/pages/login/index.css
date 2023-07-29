@@ -8,3 +8,7 @@
   text-align: center;
   font-size: 2em;
 }
+
+.login-page-error {
+  color: var(--cru-danger-color);
+}

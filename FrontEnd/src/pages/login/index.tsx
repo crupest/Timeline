@@ -111,7 +111,7 @@ export default function LoginPage() {
       <div className="login-page-container">
         <div className="login-page-welcome">{c("welcome")}</div>
         <InputGroup {...inputGroupProps} />
-        {error ? <p className="cru-color-danger">{c(error)}</p> : null}
+        {error ? <p className="login-page-error">{c(error)}</p> : null}
         <div className="login-page-button-row">
           <LoadingButton
             loading={process}
