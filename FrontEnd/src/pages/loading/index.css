@@ -1,0 +1,7 @@
+.loading-page {
+  width: 100%;
+  text-align: center;
+  padding-top: 1em;
+  font-size: 2em;
+  color: var(--cru-primary-color);
+}
