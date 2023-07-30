@@ -9,7 +9,7 @@ import OperationDialog from "@/views/common/dialog/OperationDialog";
 interface TimelineDeleteDialog {
   timeline: HttpTimelineInfo;
   open: boolean;
-  close: () => void;
+  onClose: () => void;
 }
 
 const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
@@ -20,7 +20,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
   return (
     <OperationDialog
       open={props.open}
-      onClose={props.close}
+      onClose={props.onClose}
       title="timeline.deleteDialog.title"
       color="danger"
       inputPrompt={() => (
