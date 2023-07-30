@@ -70,6 +70,13 @@ export type InputErrorDict = Record<string, Text>;
 export type InputDisabledDict = Record<string, boolean>;
 export type InputDirtyDict = Record<string, boolean>;
 
+export type GeneralInputErrorDict =
+  | {
+      [key: string]: Text | null | undefined;
+    }
+  | null
+  | undefined;
+
 type MakeInputInfo<I extends Input> = Omit<I, "value" | "error" | "disabled">;
 
 export type InputInfo = {
@@ -79,7 +86,7 @@ export type InputInfo = {
 export type Validator = (
   values: InputValueDict,
   inputs: InputInfo[],
-) => InputErrorDict;
+) => GeneralInputErrorDict;
 
 export type InputScheme = {
   inputs: InputInfo[];
@@ -98,7 +105,12 @@ export type State = {
   data: InputData;
 };
 
-export type DataInitialization = Partial<InputData>;
+export type DataInitialization = {
+  values?: InputValueDict;
+  errors?: GeneralInputErrorDict;
+  disabled?: InputDisabledDict;
+  dirties?: InputDirtyDict;
+};
 
 export type Initialization = {
   scheme: InputScheme;
@@ -118,14 +130,14 @@ export interface InputGroupProps {
   onChange: (index: number, value: Input["value"]) => void;
 }
 
-function cleanObject<V>(o: Record<string, V>): Record<string, V> {
+function cleanObject<V>(o: Record<string, V>): Record<string, NonNullable<V>> {
   const result = { ...o };
   for (const key of Object.keys(result)) {
     if (result[key] == null) {
       delete result[key];
     }
   }
-  return result;
+  return result as never;
 }
 
 export type ConfirmResult =
@@ -137,6 +149,14 @@ export type ConfirmResult =
       type: "error";
       errors: InputErrorDict;
     };
+
+function validate(
+  validator: Validator | null | undefined,
+  values: InputValueDict,
+  inputs: InputInfo[],
+): InputErrorDict {
+  return cleanObject(validator?.(values, inputs) ?? {});
+}
 
 export function useInputs(options: { init: Initializer }): {
   inputGroupProps: InputGroupProps;
@@ -182,18 +202,22 @@ export function useInputs(options: { init: Initializer }): {
       };
 
       checkKeys(dataInit?.values);
-      checkKeys(dataInit?.errors);
+      checkKeys(dataInit?.errors ?? {});
       checkKeys(dataInit?.disabled);
       checkKeys(dataInit?.dirties);
     }
 
-    function clean<V>(dict: Record<string, V> | undefined): Record<string, V> {
+    function clean<V>(
+      dict: Record<string, V> | null | undefined,
+    ): Record<string, NonNullable<V>> {
       return dict != null ? cleanObject(dict) : {};
     }
 
     const values: InputValueDict = {};
     const disabled: InputDisabledDict = clean(dataInit?.disabled);
     const dirties: InputDirtyDict = clean(dataInit?.dirties);
+    const isErrorSet = dataInit?.errors != null;
+    let errors: InputErrorDict = clean(dataInit?.errors);
 
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
@@ -202,17 +226,14 @@ export function useInputs(options: { init: Initializer }): {
       values[key] = initializeValue(input, dataInit?.values?.[key]);
     }
 
-    let errors = dataInit?.errors;
-
-    if (errors != null) {
+    if (isErrorSet) {
       if (process.env.NODE_ENV === "development") {
         console.log(
           "You explicitly set errors (not undefined) in initializer, so validator won't run.",
         );
       }
-      errors = cleanObject(errors);
     } else {
-      errors = validator?.(values, inputs) ?? {};
+      errors = validate(validator, values, inputs);
     }
 
     return {
@@ -272,7 +293,7 @@ export function useInputs(options: { init: Initializer }): {
         const { key } = input;
         const newValues = { ...data.values, [key]: value };
         const newDirties = { ...data.dirties, [key]: true };
-        const newErrors = validator?.(newValues, scheme.inputs) ?? {};
+        const newErrors = validate(validator, newValues, scheme.inputs);
         setState({
           scheme,
           data: {
@@ -288,7 +309,7 @@ export function useInputs(options: { init: Initializer }): {
     hasErrorAndDirty: hasError && hasDirty,
     confirm() {
       const newDirties = createAllDirties();
-      const newErrors = validator?.(data.values, scheme.inputs) ?? {};
+      const newErrors = validate(validator, data.values, scheme.inputs);
 
       setState({
         scheme,

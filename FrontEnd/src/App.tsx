@@ -1,27 +1,26 @@
-import * as React from "react";
+import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import AppBar from "./views/common/AppBar";
 import NotFoundPage from "./pages/404";
-import LoadingPage from "./views/common/LoadingPage";
+import HomePage from "./pages/home";
 import AboutPage from "./pages/about";
 import SettingPage from "./pages/setting";
-import Center from "./views/center";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
-import TimelinePage from "./views/timeline";
+import TimelinePage from "./pages/timeline";
+import LoadingPage from "./pages/loading";
 import Search from "./views/search";
 import Admin from "./views/admin";
 import AlertHost from "./views/common/alert/AlertHost";
 
 export default function App() {
   return (
-    <React.Suspense fallback={<LoadingPage />}>
+    <Suspense fallback={<LoadingPage />}>
       <BrowserRouter>
         <AppBar />
         <div style={{ height: 56 }} />
         <Routes>
-          <Route path="center" element={<Center />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="settings" element={<SettingPage />} />
@@ -30,10 +29,11 @@ export default function App() {
           <Route path="admin/*" element={<Admin />} />
           <Route path=":owner" element={<TimelinePage />} />
           <Route path=":owner/:timeline" element={<TimelinePage />} />
+          <Route path="" element={<HomePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <AlertHost />
       </BrowserRouter>
-    </React.Suspense>
+    </Suspense>
   );
 }

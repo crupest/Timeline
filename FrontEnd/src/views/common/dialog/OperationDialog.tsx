@@ -43,7 +43,7 @@ export interface OperationDialogProps<TData> {
   color?: ThemeColor;
   inputColor?: ThemeColor;
   title: Text;
-  inputPrompt?: Text;
+  inputPrompt?: () => ReactNode;
   successPrompt?: (data: TData) => ReactNode;
   failurePrompt?: (error: unknown) => ReactNode;
 
@@ -67,8 +67,6 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
     onProcess,
     onSuccessAndClose,
   } = props;
-
-  const c = useC();
 
   type Step =
     | { type: "input" }
@@ -130,7 +128,7 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
 
     body = (
       <div>
-        <OperationDialogPrompt customMessage={c(inputPrompt)} />
+        <OperationDialogPrompt customMessage={inputPrompt?.()} />
         <InputGroup
           containerClassName="cru-operation-dialog-input-group"
           color={inputColor ?? "primary"}
