@@ -39,15 +39,6 @@
   }
 }
 
-.cru-dialog-bottom-area {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.cru-dialog-bottom-area>* {
-  margin: 0 0.5em;
-}
-
 .cru-dialog-enter .cru-dialog-container {
   transform: scale(0, 0);
   opacity: 0;

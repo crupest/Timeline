@@ -1,9 +1,8 @@
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, ComponentProps } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
 
-import Button from "../button/Button";
 import {
   useInputs,
   InputGroup,
@@ -11,8 +10,8 @@ import {
   InputValueDict,
   InputErrorDict,
 } from "../input/InputGroup";
-import LoadingButton from "../button/LoadingButton";
 import Dialog from "./Dialog";
+import DialogContainer from "./DialogContainer";
 
 import "./OperationDialog.css";
 
@@ -124,39 +123,45 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   }
 
   let body: ReactNode;
+  let buttons: ComponentProps<typeof DialogContainer>["buttons"];
+
   if (step.type === "input" || step.type === "process") {
     const isProcessing = step.type === "process";
 
     body = (
-      <div className="cru-operation-dialog-main-area">
-        <div className="cru-dialog-middle-area">
-          <OperationDialogPrompt customMessage={c(inputPrompt)} />
-          <InputGroup
-            containerClassName="cru-operation-dialog-input-group"
-            color={inputColor ?? "primary"}
-            {...inputGroupProps}
-          />
-        </div>
-        <hr />
-        <div className="cru-dialog-bottom-area">
-          <Button
-            text="operationDialog.cancel"
-            color="secondary"
-            outline
-            onClick={close}
-            disabled={isProcessing}
-          />
-          <LoadingButton
-            color={color}
-            loading={isProcessing}
-            disabled={hasErrorAndDirty}
-            onClick={onConfirm}
-          >
-            {c("operationDialog.confirm")}
-          </LoadingButton>
-        </div>
+      <div>
+        <OperationDialogPrompt customMessage={c(inputPrompt)} />
+        <InputGroup
+          containerClassName="cru-operation-dialog-input-group"
+          color={inputColor ?? "primary"}
+          {...inputGroupProps}
+        />
       </div>
     );
+    buttons = [
+      {
+        key: "cancel",
+        type: "normal",
+        props: {
+          text: "operationDialog.cancel",
+          color: "secondary",
+          outline: true,
+          onClick: close,
+          disabled: isProcessing,
+        },
+      },
+      {
+        key: "confirm",
+        type: "loading",
+        props: {
+          text: "operationDialog.confirm",
+          color,
+          loading: isProcessing,
+          disabled: hasErrorAndDirty,
+          onClick: onConfirm,
+        },
+      },
+    ];
   } else {
     const result = step;
 
@@ -171,28 +176,29 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
             customMessage: failurePrompt?.(result.data),
           };
     body = (
-      <div className="cru-operation-dialog-main-area">
+      <div>
         <OperationDialogPrompt {...promptProps} />
-        <hr />
-        <div className="cru-dialog-bottom-area">
-          <Button text="operationDialog.ok" color="primary" onClick={close} />
-        </div>
       </div>
     );
+
+    buttons = [
+      {
+        key: "ok",
+        type: "normal",
+        props: {
+          text: "operationDialog.ok",
+          color: "primary",
+          onClick: close,
+        },
+      },
+    ];
   }
 
   return (
     <Dialog open={open} onClose={close}>
-      <div
-        className={classNames(
-          "cru-operation-dialog-container",
-          `cru-${color ?? "primary"}`,
-        )}
-      >
-        <div className="cru-operation-dialog-title">{c(title)}</div>
-        <hr />
+      <DialogContainer title={title} titleColor={color} buttons={buttons}>
         {body}
-      </div>
+      </DialogContainer>
     </Dialog>
   );
 }

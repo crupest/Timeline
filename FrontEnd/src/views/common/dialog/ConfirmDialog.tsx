@@ -1,43 +1,59 @@
-import { convertI18nText, I18nText } from "@/common";
-import * as React from "react";
-import { useTranslation } from "react-i18next";
+import { useC, Text, ThemeColor } from "@/views/common/common";
 
-import Button from "../button/Button";
 import Dialog from "./Dialog";
+import DialogContainer from "./DialogContainer";
 
-const ConfirmDialog: React.FC<{
+export default function ConfirmDialog({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  body,
+  color,
+  bodyColor,
+}: {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: I18nText;
-  body: I18nText;
-}> = ({ open, onClose, onConfirm, title, body }) => {
-  const { t } = useTranslation();
+  title: Text;
+  body: Text;
+  color?: ThemeColor;
+  bodyColor?: ThemeColor;
+}) {
+  const c = useC();
 
   return (
     <Dialog onClose={onClose} open={open}>
-      <h3 className="cru-color-danger">{convertI18nText(title, t)}</h3>
-      <hr />
-      <p>{convertI18nText(body, t)}</p>
-      <hr />
-      <div className="cru-dialog-bottom-area">
-        <Button
-          text="operationDialog.cancel"
-          color="secondary"
-          outline
-          onClick={onClose}
-        />
-        <Button
-          text="operationDialog.confirm"
-          color="danger"
-          onClick={() => {
-            onConfirm();
-            onClose();
-          }}
-        />
-      </div>
+      <DialogContainer
+        title={title}
+        titleColor={color}
+        buttons={[
+          {
+            key: "cancel",
+            type: "normal",
+            props: {
+              text: "operationDialog.cancel",
+              color: "secondary",
+              outline: true,
+              onClick: onClose,
+            },
+          },
+          {
+            key: "confirm",
+            type: "normal",
+            props: {
+              text: "operationDialog.confirm",
+              color: "danger",
+              onClick: () => {
+                onConfirm();
+                onClose();
+              },
+            },
+          },
+        ]}
+      >
+        <div className={`cru-${bodyColor ?? "primary"}`}>{c(body)}</div>
+      </DialogContainer>
     </Dialog>
   );
-};
-
-export default ConfirmDialog;
+}
