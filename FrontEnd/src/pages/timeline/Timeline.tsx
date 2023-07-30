@@ -41,7 +41,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   const [timeline, setTimeline] = React.useState<HttpTimelineInfo | null>(null);
   const [posts, setPosts] = React.useState<HttpTimelinePostInfo[] | null>(null);
   const [signalrState, setSignalrState] = React.useState<HubConnectionState>(
-    HubConnectionState.Connecting
+    HubConnectionState.Connecting,
   );
   const [error, setError] = React.useState<
     "offline" | "forbid" | "notfound" | "error" | null
@@ -81,7 +81,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
             console.error(error);
             setError("error");
           }
-        }
+        },
       );
   }, [timelineOwner, timelineName, timelineReloadKey]);
 
@@ -91,7 +91,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       .then(
         (page) => {
           setPosts(
-            page.items.filter((p): p is HttpTimelinePostInfo => !p.deleted)
+            page.items.filter((p): p is HttpTimelinePostInfo => !p.deleted),
           );
           setTotalPage(page.totalPageCount);
         },
@@ -106,14 +106,14 @@ const Timeline: React.FC<TimelineProps> = (props) => {
             console.error(error);
             setError("error");
           }
-        }
+        },
       );
   }, [timelineOwner, timelineName, postsReloadKey]);
 
   React.useEffect(() => {
     const timelinePostUpdate$ = getTimelinePostUpdate$(
       timelineOwner,
-      timelineName
+      timelineName,
     );
     const subscription = timelinePostUpdate$.subscribe(({ update, state }) => {
       if (update) {
@@ -134,7 +134,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       .then(
         (page) => {
           const ps = page.items.filter(
-            (p): p is HttpTimelinePostInfo => !p.deleted
+            (p): p is HttpTimelinePostInfo => !p.deleted,
           );
           setPosts((old) => [...(old ?? []), ...ps]);
         },
@@ -149,7 +149,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
             console.error(error);
             setError("error");
           }
-        }
+        },
       );
   }, currentPage < totalPage);
 
@@ -183,7 +183,6 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       {timeline == null && posts == null && <TimelineLoading />}
       {timeline && (
         <TimelineCard
-          className="timeline-card"
           timeline={timeline}
           connectionStatus={signalrState}
           onReload={updateTimeline}

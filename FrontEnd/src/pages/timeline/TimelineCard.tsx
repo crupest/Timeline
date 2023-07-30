@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import classnames from "classnames";
 import { HubConnectionState } from "@microsoft/signalr";
 
@@ -10,6 +9,8 @@ import { pushAlert } from "@/services/alert";
 import { HttpTimelineInfo } from "@/http/timeline";
 import { getHttpBookmarkClient } from "@/http/bookmark";
 
+import { useC } from "@/views/common/common";
+import { useDialog } from "@/views/common/dialog";
 import UserAvatar from "@/views/common/user/UserAvatar";
 import PopupMenu from "@/views/common/menu/PopupMenu";
 import FullPageDialog from "@/views/common/dialog/FullPageDialog";
@@ -21,36 +22,36 @@ import { TimelineMemberDialog } from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import IconButton from "@/views/common/button/IconButton";
 
-export interface TimelinePageCardProps {
+import "./TimelineCard.css";
+
+interface TimelinePageCardProps {
   timeline: HttpTimelineInfo;
   connectionStatus: HubConnectionState;
-  className?: string;
   onReload: () => void;
 }
 
-const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
-  const { timeline, connectionStatus, onReload, className } = props;
+export default function TimelineCard(props: TimelinePageCardProps) {
+  const { timeline, connectionStatus, onReload } = props;
 
-  const { t } = useTranslation();
+  const user = useUser();
 
-  const [dialog, setDialog] = React.useState<
-    "member" | "property" | "delete" | null
-  >(null);
+  const c = useC();
 
-  const [collapse, setCollapse] = React.useState(true);
+  const [collapse, setCollapse] = useState(true);
   const toggleCollapse = (): void => {
     setCollapse((o) => !o);
   };
 
   const isSmallScreen = useIsSmallScreen();
 
-  const user = useUser();
+  const { createDialogSwitch, dialog, dialogPropsMap, switchDialog } =
+    useDialog(["member", "property", "delete"]);
 
   const content = (
-    <>
-      <h3 className="cru-color-primary d-inline-block align-middle">
+    <div className="cru-primary">
+      <h3 className="timeline-card-title">
         {timeline.title}
-        <small className="ms-3 cru-color-secondary">{timeline.nameV2}</small>
+        <small className="timeline-card-title-name">{timeline.nameV2}</small>
       </h3>
       <div>
         <UserAvatar
@@ -64,7 +65,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
       </div>
       <p className="mb-0">{timeline.description}</p>
       <small className="mt-1 d-block">
-        {t(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
+        {c(timelineVisibilityTooltipTranslationMap[timeline.visibility])}
       </small>
       <div className="mt-2 cru-text-end">
         {user != null ? (
@@ -92,7 +93,7 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
         <IconButton
           icon="people"
           className="me-3"
-          onClick={() => setDialog("member")}
+          onClick={createDialogSwitch("member")}
         />
         {timeline.manageable ? (
           <PopupMenu
@@ -100,12 +101,12 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
               {
                 type: "button",
                 text: "timeline.manageItem.property",
-                onClick: () => setDialog("property"),
+                onClick: createDialogSwitch("property"),
               },
               { type: "divider" },
               {
                 type: "button",
-                onClick: () => setDialog("delete"),
+                onClick: createDialogSwitch("delete"),
                 color: "danger",
                 text: "timeline.manageItem.delete",
               },
@@ -116,12 +117,12 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
           </PopupMenu>
         ) : null}
       </div>
-    </>
+    </div>
   );
 
   return (
     <>
-      <Card className={classnames("p-2 cru-clearfix", className)}>
+      <Card className="timeline-card">
         <div
           className={classnames(
             "cru-float-right d-flex align-items-center",
@@ -145,23 +146,15 @@ const TimelineCard: React.FC<TimelinePageCardProps> = (props) => {
       </Card>
       <TimelineMemberDialog
         timeline={timeline}
-        onClose={() => setDialog(null)}
-        open={dialog === "member"}
         onChange={onReload}
+        {...dialogPropsMap["member"]}
       />
       <TimelinePropertyChangeDialog
         timeline={timeline}
-        close={() => setDialog(null)}
-        open={dialog === "property"}
         onChange={onReload}
+        {...dialogPropsMap["property"]}
       />
-      <TimelineDeleteDialog
-        timeline={timeline}
-        open={dialog === "delete"}
-        close={() => setDialog(null)}
-      />
+      <TimelineDeleteDialog timeline={timeline} {...dialogPropsMap["delete"]} />
     </>
   );
-};
-
-export default TimelineCard;
+}
