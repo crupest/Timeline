@@ -1,0 +1,30 @@
+.timeline-post {
+  position: relative;
+  padding: 0.5em;
+}
+
+.timeline-post-card {
+  position: relative;
+  padding: 0.5em 0.5em 0.5em 4em;
+}
+
+.timeline-post-header {
+  display: flex;
+  align-items: center;
+}
+
+.timeline-post-author-avatar {
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+}
+
+.timeline-post-delete-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.timeline-post-content {
+  white-space: pre-line;
+}

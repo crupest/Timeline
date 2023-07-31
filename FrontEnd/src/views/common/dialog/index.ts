@@ -18,14 +18,19 @@ type DialogPropsMap<D extends string> = DialogMap<
 
 export function useDialog<D extends string>(
   dialogs: D[],
-  initDialog?: D | null,
+  options?: {
+    initDialog?: D | null;
+    onClose?: {
+      [K in D]?: () => void;
+    };
+  },
 ): {
   dialog: D | null;
   switchDialog: (newDialog: D | null) => void;
   dialogPropsMap: DialogPropsMap<D>;
   createDialogSwitch: (newDialog: D | null) => () => void;
 } {
-  const [dialog, setDialog] = useState<D | null>(initDialog ?? null);
+  const [dialog, setDialog] = useState<D | null>(options?.initDialog ?? null);
 
   const [dialogKeys, setDialogKeys] = useState<DialogKeyMap<D>>(
     () => Object.fromEntries(dialogs.map((d) => [d, 0])) as DialogKeyMap<D>,
@@ -47,7 +52,10 @@ export function useDialog<D extends string>(
         {
           key: `${d}-${dialogKeys[d]}`,
           open: dialog === d,
-          onClose: () => switchDialog(null),
+          onClose: () => {
+            switchDialog(null);
+            options?.onClose?.[d]?.();
+          },
         },
       ]),
     ) as DialogPropsMap<D>,

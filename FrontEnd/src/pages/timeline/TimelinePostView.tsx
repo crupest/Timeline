@@ -1,5 +1,5 @@
-import * as React from "react";
-import classnames from "classnames";
+import { useState } from "react";
+import classNames from "classnames";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
@@ -8,6 +8,7 @@ import { pushAlert } from "@/services/alert";
 import { useClickOutside } from "@/utilities/hooks";
 
 import UserAvatar from "@/views/common/user/UserAvatar";
+import { useDialog } from "@/views/common/dialog";
 import Card from "@/views/common/Card";
 import FlatButton from "@/views/common/button/FlatButton";
 import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
@@ -15,92 +16,68 @@ import TimelineLine from "./TimelineLine";
 import TimelinePostContentView from "./TimelinePostContentView";
 import IconButton from "@/views/common/button/IconButton";
 
+import "./TimelinePostView.css";
+
 export interface TimelinePostViewProps {
   post: HttpTimelinePostInfo;
   className?: string;
-  style?: React.CSSProperties;
-  cardStyle?: React.CSSProperties;
   onChanged: (post: HttpTimelinePostInfo) => void;
   onDeleted: () => void;
 }
 
-const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
-  const { post, className, style, cardStyle, onChanged, onDeleted } = props;
+export function TimelinePostView(props: TimelinePostViewProps) {
+  const { post, className, onDeleted } = props;
 
   const [operationMaskVisible, setOperationMaskVisible] =
-    React.useState<boolean>(false);
-  const [dialog, setDialog] = React.useState<
-    "delete" | "changeproperty" | null
-  >(null);
+    useState<boolean>(false);
 
-  const [maskElement, setMaskElement] = React.useState<HTMLElement | null>(
-    null,
-  );
+  const { switchDialog, dialogPropsMap } = useDialog(["delete"], {
+    onClose: {
+      delete: () => {
+        setOperationMaskVisible(false);
+      },
+    },
+  });
 
+  const [maskElement, setMaskElement] = useState<HTMLElement | null>(null);
   useClickOutside(maskElement, () => setOperationMaskVisible(false));
-
-  const cardRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    const cardIntersectionObserver = new IntersectionObserver(([e]) => {
-      if (e.intersectionRatio > 0) {
-        if (cardRef.current != null) {
-          cardRef.current.style.animationName = "timeline-post-enter";
-        }
-      }
-    });
-    if (cardRef.current) {
-      cardIntersectionObserver.observe(cardRef.current);
-    }
-
-    return () => {
-      cardIntersectionObserver.disconnect();
-    };
-  }, []);
 
   return (
     <div
       id={`timeline-post-${post.id}`}
-      className={classnames("timeline-item", className)}
-      style={style}
+      className={classNames("timeline-post cru-primary", className)}
     >
       <TimelineLine center="node" />
-      <Card
-        containerRef={cardRef}
-        className="timeline-item-card enter-animation"
-        style={cardStyle}
-      >
-        {post.editable ? (
+      <Card className="timeline-post-card">
+        {post.editable && (
           <IconButton
             icon="chevron-down"
-            color="primary"
-            className="cru-float-right"
+            className="timeline-post-edit-button"
             onClick={(e) => {
               setOperationMaskVisible(true);
               e.stopPropagation();
             }}
           />
-        ) : null}
-        <div className="timeline-item-header">
-          <span className="me-2">
-            <span>
-              <UserAvatar
-                username={post.author.username}
-                className="timeline-avatar me-1"
-              />
-              <small className="text-dark me-2">{post.author.nickname}</small>
-              <small className="text-secondary white-space-no-wrap">
-                {new Date(post.time).toLocaleTimeString()}
-              </small>
-            </span>
-          </span>
+        )}
+        <div className="timeline-post-header">
+          <UserAvatar
+            username={post.author.username}
+            className="timeline-post-author-avatar"
+          />
+          <small className="timeline-post-author-nickname">
+            {post.author.nickname}
+          </small>
+          <small className="timeline-post-time">
+            {new Date(post.time).toLocaleTimeString()}
+          </small>
         </div>
-        <div className="timeline-content">
+        <div className="timeline-post-content">
           <TimelinePostContentView post={post} />
         </div>
         {operationMaskVisible ? (
           <div
             ref={setMaskElement}
-            className="timeline-post-item-options-mask"
+            className="timeline-post-options-mask"
             onClick={() => {
               setOperationMaskVisible(false);
             }}
@@ -108,7 +85,6 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
             <FlatButton
               text="changeProperty"
               onClick={(e) => {
-                setDialog("changeproperty");
                 e.stopPropagation();
               }}
             />
@@ -116,7 +92,7 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
               text="delete"
               color="danger"
               onClick={(e) => {
-                setDialog("delete");
+                switchDialog("delete");
                 e.stopPropagation();
               }}
             />
@@ -126,11 +102,6 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
       <ConfirmDialog
         title="timeline.post.deleteDialog.title"
         body="timeline.post.deleteDialog.prompt"
-        open={dialog === "delete"}
-        onClose={() => {
-          setDialog(null);
-          setOperationMaskVisible(false);
-        }}
         onConfirm={() => {
           void getHttpTimelineClient()
             .deletePost(post.timelineOwnerV2, post.timelineNameV2, post.id)
@@ -141,9 +112,10 @@ const TimelinePostView: React.FC<TimelinePostViewProps> = (props) => {
               });
             });
         }}
+        {...dialogPropsMap.delete}
       />
     </div>
   );
-};
+}
 
 export default TimelinePostView;
