@@ -20,11 +20,7 @@ export default function IconButton(props: IconButtonProps) {
         "cru-icon-button",
         large && "large",
         "bi-" + icon,
-        color === "on-surface"
-          ? "on-surface"
-          : color != null
-          ? "cru-" + color
-          : "cru-primary",
+        color && (color === "on-surface" ? "on-surface" : `cru-${color}`),
         className,
       )}
       {...otherProps}

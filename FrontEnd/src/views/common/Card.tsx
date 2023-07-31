@@ -16,11 +16,10 @@ export default function Card({
   containerRef,
   ...otherProps
 }: CardProps) {
-  color = color ?? "primary";
   return (
     <div
       ref={containerRef}
-      className={classNames("cru-card", `cru-${color}`, className)}
+      className={classNames("cru-card", color && `cru-${color}`, className)}
       {...otherProps}
     >
       {children}

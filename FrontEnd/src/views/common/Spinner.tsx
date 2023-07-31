@@ -1,20 +1,18 @@
-import * as React from "react";
+import { CSSProperties } from "react";
 import classnames from "classnames";
 
-import { PaletteColorType } from "@/palette";
+import { ThemeColor } from "./common";
 
 import "./Spinner.css";
 
 export interface SpinnerProps {
   size?: "sm" | "md" | "lg" | number | string;
-  color?: PaletteColorType;
+  color?: ThemeColor;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
-export default function Spinner(
-  props: SpinnerProps
-): React.ReactElement | null {
+export default function Spinner(props: SpinnerProps) {
   const { size, color, className, style } = props;
   const calculatedSize =
     size === "sm"
@@ -28,15 +26,10 @@ export default function Spinner(
       : size == null
       ? "20px"
       : size;
-  const calculatedColor = color ?? "primary";
 
   return (
     <span
-      className={classnames(
-        "cru-spinner",
-        `cru-color-${calculatedColor}`,
-        className
-      )}
+      className={classnames("cru-spinner", color && `cru-${color}`, className)}
       style={{ width: calculatedSize, height: calculatedSize, ...style }}
     />
   );

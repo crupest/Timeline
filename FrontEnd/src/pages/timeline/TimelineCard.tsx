@@ -47,7 +47,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
   ]);
 
   const content = (
-    <div className="cru-primary">
+    <div>
       <h3 className="timeline-card-title">
         {timeline.title}
         <small className="timeline-card-title-name">{timeline.nameV2}</small>
@@ -123,6 +123,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
 
   return (
     <Card
+      color="secondary"
       className={`timeline-card timeline-card-${
         collapse ? "collapse" : "expand"
       }`}

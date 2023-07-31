@@ -24,7 +24,7 @@ export default function FlatButton(props: FlatButtonProps) {
     <button
       ref={buttonRef}
       className={classNames(
-        "cru-" + (color ?? "primary"),
+        color && `cru-${color}`,
         "cru-flat-button",
         className,
       )}

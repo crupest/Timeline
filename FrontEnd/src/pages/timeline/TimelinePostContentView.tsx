@@ -40,7 +40,7 @@ const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
               setError("error");
             }
           }
-        }
+        },
       );
 
     return () => {
@@ -77,7 +77,7 @@ const ImageView: React.FC<TimelinePostContentViewProps> = (props) => {
       src={getHttpTimelineClient().generatePostDataUrl(
         post.timelineOwnerV2,
         post.timelineNameV2,
-        post.id
+        post.id,
       )}
       className={classnames(className, "timeline-content-image")}
       style={style}
@@ -113,7 +113,7 @@ const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
               setError("error");
             }
           }
-        }
+        },
       );
 
     return () => {
@@ -123,7 +123,10 @@ const MarkdownView: React.FC<TimelinePostContentViewProps> = (props) => {
 
   const markdownHtml = React.useMemo<string | null>(() => {
     if (markdown == null) return null;
-    return marked.parse(markdown);
+    return marked.parse(markdown, {
+      mangle: false,
+      headerIds: false,
+    });
   }, [markdown]);
 
   if (error != null) {
@@ -168,7 +171,7 @@ const viewMap: Record<string, React.FC<TimelinePostContentViewProps>> = {
 };
 
 const TimelinePostContentView: React.FC<TimelinePostContentViewProps> = (
-  props
+  props,
 ) => {
   const { post, className, style } = props;
 
