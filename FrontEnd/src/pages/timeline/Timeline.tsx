@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 import classnames from "classnames";
 import { useScrollToBottom } from "@/utilities/hooks";
 import { HubConnectionState } from "@microsoft/signalr";
@@ -14,56 +14,49 @@ import {
   HttpTimelinePostInfo,
 } from "@/http/timeline";
 
-import { useUser } from "@/services/user";
 import { getTimelinePostUpdate$ } from "@/services/timeline";
 
-import TimelinePostListView from "./TimelinePostListView";
-import TimelineEmptyItem from "./TimelineEmptyItem";
-import TimelineLoading from "./TimelineLoading";
+import TimelinePostList from "./TimelinePostList";
 import TimelinePostEdit from "./TimelinePostEdit";
-import TimelinePostEditNoLogin from "./TimelinePostEditNoLogin";
 import TimelineCard from "./TimelineCard";
 
 import "./Timeline.css";
 
 export interface TimelineProps {
   className?: string;
-  style?: React.CSSProperties;
   timelineOwner: string;
   timelineName: string;
 }
 
-const Timeline: React.FC<TimelineProps> = (props) => {
-  const { timelineOwner, timelineName, className, style } = props;
+export function Timeline(props: TimelineProps) {
+  const { timelineOwner, timelineName, className } = props;
 
-  const user = useUser();
-
-  const [timeline, setTimeline] = React.useState<HttpTimelineInfo | null>(null);
-  const [posts, setPosts] = React.useState<HttpTimelinePostInfo[] | null>(null);
-  const [signalrState, setSignalrState] = React.useState<HubConnectionState>(
+  const [timeline, setTimeline] = useState<HttpTimelineInfo | null>(null);
+  const [posts, setPosts] = useState<HttpTimelinePostInfo[] | null>(null);
+  const [signalrState, setSignalrState] = useState<HubConnectionState>(
     HubConnectionState.Connecting,
   );
-  const [error, setError] = React.useState<
+  const [error, setError] = useState<
     "offline" | "forbid" | "notfound" | "error" | null
   >(null);
 
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [totalPage, setTotalPage] = React.useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
 
-  const [timelineReloadKey, setTimelineReloadKey] = React.useState(0);
-  const [postsReloadKey, setPostsReloadKey] = React.useState(0);
+  const [timelineReloadKey, setTimelineReloadKey] = useState(0);
+  const [postsReloadKey, setPostsReloadKey] = useState(0);
 
   const updateTimeline = (): void => setTimelineReloadKey((o) => o + 1);
   const updatePosts = (): void => setPostsReloadKey((o) => o + 1);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setTimeline(null);
     setPosts(null);
     setError(null);
     setSignalrState(HubConnectionState.Connecting);
   }, [timelineOwner, timelineName]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getHttpTimelineClient()
       .getTimeline(timelineOwner, timelineName)
       .then(
@@ -85,7 +78,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       );
   }, [timelineOwner, timelineName, timelineReloadKey]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getHttpTimelineClient()
       .listPost(timelineOwner, timelineName, 1)
       .then(
@@ -110,7 +103,7 @@ const Timeline: React.FC<TimelineProps> = (props) => {
       );
   }, [timelineOwner, timelineName, postsReloadKey]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timelinePostUpdate$ = getTimelinePostUpdate$(
       timelineOwner,
       timelineName,
@@ -154,33 +147,16 @@ const Timeline: React.FC<TimelineProps> = (props) => {
   }, currentPage < totalPage);
 
   if (error === "offline") {
-    return (
-      <div className={className} style={style}>
-        Offline.
-      </div>
-    );
+    return <div className={className}>Offline.</div>;
   } else if (error === "notfound") {
-    return (
-      <div className={className} style={style}>
-        Not exist.
-      </div>
-    );
+    return <div className={className}>Not exist.</div>;
   } else if (error === "forbid") {
-    return (
-      <div className={className} style={style}>
-        Forbid.
-      </div>
-    );
+    return <div className={className}>Forbid.</div>;
   } else if (error === "error") {
-    return (
-      <div className={className} style={style}>
-        Error.
-      </div>
-    );
+    return <div className={className}>Error.</div>;
   }
   return (
     <>
-      {timeline == null && posts == null && <TimelineLoading />}
       {timeline && (
         <TimelineCard
           timeline={timeline}
@@ -189,18 +165,15 @@ const Timeline: React.FC<TimelineProps> = (props) => {
         />
       )}
       {posts && (
-        <div style={style} className={classnames("timeline", className)}>
-          <TimelineEmptyItem className="timeline-top" height={50} />
-          {timeline?.postable ? (
+        <div className={classnames("timeline", className)}>
+          {timeline?.postable && (
             <TimelinePostEdit timeline={timeline} onPosted={updatePosts} />
-          ) : user == null ? (
-            <TimelinePostEditNoLogin />
-          ) : null}
-          <TimelinePostListView posts={posts} onReload={updatePosts} />
+          )}
+          <TimelinePostList posts={posts} onReload={updatePosts} />
         </div>
       )}
     </>
   );
-};
+}
 
 export default Timeline;

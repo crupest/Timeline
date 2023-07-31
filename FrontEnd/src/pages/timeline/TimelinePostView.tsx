@@ -1,5 +1,4 @@
 import { useState } from "react";
-import classNames from "classnames";
 
 import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
 
@@ -9,12 +8,13 @@ import { useClickOutside } from "@/utilities/hooks";
 
 import UserAvatar from "@/views/common/user/UserAvatar";
 import { useDialog } from "@/views/common/dialog";
-import Card from "@/views/common/Card";
 import FlatButton from "@/views/common/button/FlatButton";
 import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
-import TimelineLine from "./TimelineLine";
 import TimelinePostContentView from "./TimelinePostContentView";
 import IconButton from "@/views/common/button/IconButton";
+
+import TimelinePostContainer from "./TimelinePostContainer";
+import TimelinePostCard from "./TimelinePostCard";
 
 import "./TimelinePostView.css";
 
@@ -26,7 +26,7 @@ export interface TimelinePostViewProps {
 }
 
 export function TimelinePostView(props: TimelinePostViewProps) {
-  const { post, className, onDeleted } = props;
+  const { post, onDeleted } = props;
 
   const [operationMaskVisible, setOperationMaskVisible] =
     useState<boolean>(false);
@@ -43,12 +43,8 @@ export function TimelinePostView(props: TimelinePostViewProps) {
   useClickOutside(maskElement, () => setOperationMaskVisible(false));
 
   return (
-    <div
-      id={`timeline-post-${post.id}`}
-      className={classNames("timeline-post cru-primary", className)}
-    >
-      <TimelineLine center="node" />
-      <Card className="timeline-post-card">
+    <TimelinePostContainer>
+      <TimelinePostCard className="cru-primary">
         {post.editable && (
           <IconButton
             icon="chevron-down"
@@ -98,7 +94,7 @@ export function TimelinePostView(props: TimelinePostViewProps) {
             />
           </div>
         ) : null}
-      </Card>
+      </TimelinePostCard>
       <ConfirmDialog
         title="timeline.post.deleteDialog.title"
         body="timeline.post.deleteDialog.prompt"
@@ -114,7 +110,7 @@ export function TimelinePostView(props: TimelinePostViewProps) {
         }}
         {...dialogPropsMap.delete}
       />
-    </div>
+    </TimelinePostContainer>
   );
 }
 
