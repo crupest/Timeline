@@ -247,7 +247,7 @@ export default function SettingPage() {
   ]);
 
   return (
-    <Page noTopPadding>
+    <Page className="cru-primary" noTopPadding>
       {user ? (
         <SettingSection title="settings.subheader.account">
           <RegisterCodeSettingItem />

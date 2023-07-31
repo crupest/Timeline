@@ -5,7 +5,7 @@ import Card from "@/views/common/Card";
 
 import "./TimelinePostCard.css";
 
-export interface TimelinePostEditCardProps {
+interface TimelinePostCardProps {
   className?: string;
   children?: ReactNode;
 }
@@ -13,7 +13,7 @@ export interface TimelinePostEditCardProps {
 export default function TimelinePostCard({
   className,
   children,
-}: TimelinePostEditCardProps) {
+}: TimelinePostCardProps) {
   return (
     <Card className={classNames("timeline-post-card", className)}>
       {children}

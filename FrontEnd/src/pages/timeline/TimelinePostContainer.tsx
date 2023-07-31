@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import "./TimelinePostContainer.css";
 
-export interface TimelinePostEditCardProps {
+interface TimelinePostContainerProps {
   className?: string;
   children?: ReactNode;
 }
@@ -11,7 +11,7 @@ export interface TimelinePostEditCardProps {
 export default function TimelinePostContainer({
   className,
   children,
-}: TimelinePostEditCardProps) {
+}: TimelinePostContainerProps) {
   return (
     <div className={classNames("timeline-post-container", className)}>
       {children}
