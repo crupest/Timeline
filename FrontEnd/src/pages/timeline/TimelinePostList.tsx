@@ -1,10 +1,11 @@
-import { Fragment } from "react";
-import * as React from "react";
+import { useMemo, Fragment } from "react";
 
 import { HttpTimelinePostInfo } from "@/http/timeline";
 
 import TimelinePostView from "./TimelinePostView";
 import TimelineDateLabel from "./TimelineDateLabel";
+
+import "./TimelinePostList.css";
 
 function dateEqual(left: Date, right: Date): boolean {
   return (
@@ -14,15 +15,15 @@ function dateEqual(left: Date, right: Date): boolean {
   );
 }
 
-export interface TimelinePostListViewProps {
+interface TimelinePostListViewProps {
   posts: HttpTimelinePostInfo[];
   onReload: () => void;
 }
 
-const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
+export default function TimelinePostList(props: TimelinePostListViewProps) {
   const { posts, onReload } = props;
 
-  const groupedPosts = React.useMemo<
+  const groupedPosts = useMemo<
     {
       date: Date;
       posts: (HttpTimelinePostInfo & { index: number })[];
@@ -51,7 +52,8 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
   }, [posts]);
 
   return (
-    <>
+    <div>
+      <div className="timeline-post-timeline" />
       {groupedPosts.map((group) => {
         return (
           <Fragment key={group.date.toDateString()}>
@@ -69,8 +71,6 @@ const TimelinePostListView: React.FC<TimelinePostListViewProps> = (props) => {
           </Fragment>
         );
       })}
-    </>
+    </div>
   );
-};
-
-export default TimelinePostListView;
+}

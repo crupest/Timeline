@@ -1,19 +1,13 @@
-import * as React from "react";
-import TimelineLine from "./TimelineLine";
+import TimelinePostContainer from "./TimelinePostContainer";
 
-export interface TimelineDateItemProps {
-  date: Date;
-}
+import "./TimelineDateLabel.css";
 
-const TimelineDateLabel: React.FC<TimelineDateItemProps> = ({ date }) => {
+export default function TimelineDateLabel({ date }: { date: Date }) {
   return (
-    <div className="timeline-date-item">
-      <TimelineLine center="none" />
-      <div className="timeline-date-item-badge">
+    <TimelinePostContainer>
+      <div className="timeline-post-date-badge">
         {date.toLocaleDateString()}
       </div>
-    </div>
+    </TimelinePostContainer>
   );
-};
-
-export default TimelineDateLabel;
+}

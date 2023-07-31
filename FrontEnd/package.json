@@ -12,8 +12,8 @@
     "check:fix": "pnpm run type-check && pnpm run lint:fix"
   },
   "dependencies": {
+    "@floating-ui/react-dom": "^2.0.1",
     "@microsoft/signalr": "^7.0.7",
-    "@popperjs/core": "^2.11.8",
     "axios": "^1.4.0",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.10.5",

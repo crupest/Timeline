@@ -18,7 +18,7 @@ import BlobImage from "@/views/common/BlobImage";
 import LoadingButton from "@/views/common/button/LoadingButton";
 import PopupMenu from "@/views/common/menu/PopupMenu";
 import MarkdownPostEdit from "./MarkdownPostEdit";
-import TimelinePostEditCard from "./TimelinePostEditCard";
+import TimelinePostEditCard from "./TimelinePostContainer";
 import IconButton from "@/views/common/button/IconButton";
 
 import "./TimelinePostEdit.css";
@@ -118,7 +118,7 @@ export interface TimelinePostEditProps {
 }
 
 const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
-  const { timeline, style, className, onPosted } = props;
+  const { timeline, className, onPosted } = props;
 
   const { t } = useTranslation();
 
@@ -195,7 +195,7 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
   };
 
   return (
-    <TimelinePostEditCard className={className} style={style}>
+    <TimelinePostEditCard className={className}>
       {showMarkdown ? (
         <MarkdownPostEdit
           className="cru-fill-parent"

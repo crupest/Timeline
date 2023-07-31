@@ -123,7 +123,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
 
   return (
     <Card
-      color="secondary"
+      color="tertiary"
       className={`timeline-card timeline-card-${
         collapse ? "collapse" : "expand"
       }`}

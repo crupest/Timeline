@@ -1,0 +1,10 @@
+.timeline-post-timeline {
+  position: absolute;
+  left: 2.5em;
+  width: 1em;
+  top: 0;
+  bottom: 0;
+  background-color: var(--timeline-post-line-color);
+  box-shadow: var(--timeline-post-line-shadow);
+  z-index: -1;
+}
