@@ -96,7 +96,10 @@ export default class TimelinePostBuilder {
   }
 
   renderHtml(): string {
-    return marked.parse(this._text);
+    return marked.parse(this._text, {
+      mangle: false,
+      headerIds: false,
+    });
   }
 
   dispose(): void {

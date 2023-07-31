@@ -19,19 +19,20 @@ export type { InputInitializer, InputValueDict, InputErrorDict };
 
 interface OperationDialogPromptProps {
   message?: Text;
-  customMessage?: ReactNode;
+  customMessage?: Text;
+  customMessageNode?: ReactNode;
   className?: string;
 }
 
 function OperationDialogPrompt(props: OperationDialogPromptProps) {
-  const { message, customMessage, className } = props;
+  const { message, customMessage, customMessageNode, className } = props;
 
   const c = useC();
 
   return (
     <div className={classNames(className, "cru-operation-dialog-prompt")}>
       {message && <p>{c(message)}</p>}
-      {customMessage}
+      {customMessageNode ?? (customMessage != null ? c(customMessage) : null)}
     </div>
   );
 }
@@ -43,9 +44,12 @@ export interface OperationDialogProps<TData> {
   color?: ThemeColor;
   inputColor?: ThemeColor;
   title: Text;
-  inputPrompt?: () => ReactNode;
-  successPrompt?: (data: TData) => ReactNode;
-  failurePrompt?: (error: unknown) => ReactNode;
+  inputPrompt?: Text;
+  inputPromptNode?: ReactNode;
+  successPrompt?: (data: TData) => Text;
+  successPromptNode?: (data: TData) => ReactNode;
+  failurePrompt?: (error: unknown) => Text;
+  failurePromptNode?: (error: unknown) => ReactNode;
 
   inputs: InputInitializer;
 
@@ -61,12 +65,27 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
     inputColor,
     title,
     inputPrompt,
+    inputPromptNode,
     successPrompt,
+    successPromptNode,
     failurePrompt,
+    failurePromptNode,
     inputs,
     onProcess,
     onSuccessAndClose,
   } = props;
+
+  if (process.env.NODE_ENV === "development") {
+    if (inputPrompt && inputPromptNode) {
+      console.log("InputPrompt and inputPromptNode are both set.");
+    }
+    if (successPrompt && successPromptNode) {
+      console.log("SuccessPrompt and successPromptNode are both set.");
+    }
+    if (failurePrompt && failurePromptNode) {
+      console.log("FailurePrompt and failurePromptNode are both set.");
+    }
+  }
 
   type Step =
     | { type: "input" }
@@ -128,7 +147,10 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
 
     body = (
       <div>
-        <OperationDialogPrompt customMessage={inputPrompt?.()} />
+        <OperationDialogPrompt
+          customMessage={inputPrompt}
+          customMessageNode={inputPromptNode}
+        />
         <InputGroup
           containerClassName="cru-operation-dialog-input-group"
           color={inputColor ?? "primary"}
@@ -168,10 +190,12 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
         ? {
             message: "operationDialog.success",
             customMessage: successPrompt?.(result.data),
+            customMessageNode: successPromptNode?.(result.data),
           }
         : {
             message: "operationDialog.error",
             customMessage: failurePrompt?.(result.data),
+            customMessageNode: failurePromptNode?.(result.data),
           };
     body = (
       <div>

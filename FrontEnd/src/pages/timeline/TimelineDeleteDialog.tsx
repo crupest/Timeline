@@ -23,14 +23,14 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
       onClose={props.onClose}
       title="timeline.deleteDialog.title"
       color="danger"
-      inputPrompt={() => (
+      inputPromptNode={
         <Trans
           i18nKey="timeline.deleteDialog.inputPrompt"
           values={{ name: timeline.nameV2 }}
         >
           0<code className="mx-2">1</code>2
         </Trans>
-      )}
+      }
       inputs={{
         inputs: [
           {

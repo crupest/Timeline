@@ -1,7 +1,5 @@
 .cru-card {
-  border: solid 1px;
   border-radius: var(--cru-card-border-radius);
   background-color: var(--cru-key-container-color);
-  border-color: var(--cru-key-container-color);
   transition: all 0.3s;
 }
