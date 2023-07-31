@@ -11,7 +11,7 @@
 }
 
 .cru-menu-item:hover {
-  color: var(--cru-key-t-color);
+  color: var(--cru-key-on-color);
   background-color: var(--cru-key-color);
 }
 
@@ -20,5 +20,6 @@
 }
 
 .cru-menu-divider {
-  border-top: 1px solid #e9ecef;
+  border-width: 0;
+  border-top: 1px solid var(--cru-key-color);
 }
