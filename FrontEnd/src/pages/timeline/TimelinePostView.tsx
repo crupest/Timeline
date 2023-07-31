@@ -18,14 +18,14 @@ import TimelinePostCard from "./TimelinePostCard";
 
 import "./TimelinePostView.css";
 
-export interface TimelinePostViewProps {
+interface TimelinePostViewProps {
   post: HttpTimelinePostInfo;
   className?: string;
   onChanged: (post: HttpTimelinePostInfo) => void;
   onDeleted: () => void;
 }
 
-export function TimelinePostView(props: TimelinePostViewProps) {
+export default function TimelinePostView(props: TimelinePostViewProps) {
   const { post, onDeleted } = props;
 
   const [operationMaskVisible, setOperationMaskVisible] =
@@ -113,5 +113,3 @@ export function TimelinePostView(props: TimelinePostViewProps) {
     </TimelinePostContainer>
   );
 }
-
-export default TimelinePostView;

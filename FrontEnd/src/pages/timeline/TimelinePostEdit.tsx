@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect, ChangeEventHandler } from "react";
 import { useTranslation } from "react-i18next";
 
 import { UiLogicError } from "@/common";
@@ -28,11 +28,10 @@ interface TimelinePostEditTextProps {
   disabled: boolean;
   onChange: (text: string) => void;
   className?: string;
-  style?: React.CSSProperties;
 }
 
-const TimelinePostEditText: React.FC<TimelinePostEditTextProps> = (props) => {
-  const { text, disabled, onChange, className, style } = props;
+function TimelinePostEditText(props: TimelinePostEditTextProps) {
+  const { text, disabled, onChange, className } = props;
 
   return (
     <textarea
@@ -42,25 +41,24 @@ const TimelinePostEditText: React.FC<TimelinePostEditTextProps> = (props) => {
         onChange(event.target.value);
       }}
       className={className}
-      style={style}
     />
   );
-};
+}
 
 interface TimelinePostEditImageProps {
   onSelect: (file: File | null) => void;
   disabled: boolean;
 }
 
-const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
+function TimelinePostEditImage(props: TimelinePostEditImageProps) {
   const { onSelect, disabled } = props;
 
   const { t } = useTranslation();
 
-  const [file, setFile] = React.useState<File | null>(null);
-  const [error, setError] = React.useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<boolean>(false);
 
-  const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setError(false);
     const files = e.target.files;
     if (files == null || files.length === 0) {
@@ -71,7 +69,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       onSelect(null);
     };
@@ -100,7 +98,7 @@ const TimelinePostEditImage: React.FC<TimelinePostEditImageProps> = (props) => {
       {error ? <div className="text-danger">{t("loadImageError")}</div> : null}
     </>
   );
-};
+}
 
 type PostKind = "text" | "markdown" | "image";
 
@@ -112,27 +110,26 @@ const postKindIconMap: Record<PostKind, string> = {
 
 export interface TimelinePostEditProps {
   className?: string;
-  style?: React.CSSProperties;
   timeline: HttpTimelineInfo;
   onPosted: (newPost: HttpTimelinePostInfo) => void;
 }
 
-const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
+function TimelinePostEdit(props: TimelinePostEditProps) {
   const { timeline, className, onPosted } = props;
 
   const { t } = useTranslation();
 
-  const [process, setProcess] = React.useState<boolean>(false);
+  const [process, setProcess] = useState<boolean>(false);
 
-  const [kind, setKind] = React.useState<Exclude<PostKind, "markdown">>("text");
-  const [showMarkdown, setShowMarkdown] = React.useState<boolean>(false);
+  const [kind, setKind] = useState<Exclude<PostKind, "markdown">>("text");
+  const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
 
-  const [text, setText] = React.useState<string>("");
-  const [image, setImage] = React.useState<File | null>(null);
+  const [text, setText] = useState<string>("");
+  const [image, setImage] = useState<File | null>(null);
 
   const draftTextLocalStorageKey = `timeline.${timeline.owner.username}.${timeline.nameV2}.postDraft.text`;
 
-  React.useEffect(() => {
+  useEffect(() => {
     setText(window.localStorage.getItem(draftTextLocalStorageKey) ?? "");
   }, [draftTextLocalStorageKey]);
 
@@ -262,6 +259,6 @@ const TimelinePostEdit: React.FC<TimelinePostEditProps> = (props) => {
       )}
     </TimelinePostEditCard>
   );
-};
+}
 
 export default TimelinePostEdit;
