@@ -1,11 +1,10 @@
-import * as React from "react";
-import classnames from "classnames";
-import { useTranslation } from "react-i18next";
+import { CSSProperties } from "react";
+import classNames from "classnames";
 
-import { convertI18nText, I18nText } from "@/common";
-import { PaletteColorType } from "@/palette";
+import { useC, Text, ThemeColor } from "../common";
 
 import "./Menu.css";
+import Icon from "../Icon";
 
 export type MenuItem =
   | {
@@ -13,9 +12,9 @@ export type MenuItem =
     }
   | {
       type: "button";
-      text: I18nText;
-      iconClassName?: string;
-      color?: PaletteColorType;
+      text: Text;
+      icon?: string;
+      color?: ThemeColor;
       onClick: () => void;
     };
 
@@ -25,44 +24,38 @@ export type MenuProps = {
   items: MenuItems;
   onItemClicked?: () => void;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 };
 
-export default function _Menu({
+export default function Menu({
   items,
   onItemClicked,
   className,
   style,
-}: MenuProps): React.ReactElement | null {
-  const { t } = useTranslation();
+}: MenuProps) {
+  const c = useC();
 
   return (
-    <div className={classnames("cru-menu", className)} style={style}>
+    <div
+      className={classNames("cru-menu cru-primary", className)}
+      style={style}
+    >
       {items.map((item, index) => {
         if (item.type === "divider") {
-          return <div key={index} className="cru-menu-divider" />;
+          return <hr key={index} className="cru-menu-divider" />;
         } else {
+          const { text, color, icon, onClick } = item;
           return (
             <div
               key={index}
-              className={classnames(
-                "cru-menu-item",
-                `cru-${item.color ?? "primary"}`
-              )}
+              className={`cru-menu-item cru-${color ?? "primary"}`}
               onClick={() => {
-                item.onClick();
+                onClick();
                 onItemClicked?.();
               }}
             >
-              {item.iconClassName != null ? (
-                <i
-                  className={classnames(
-                    item.iconClassName,
-                    "cru-menu-item-icon"
-                  )}
-                />
-              ) : null}
-              {convertI18nText(item.text, t)}
+              {icon != null && <Icon color={color} icon={icon} />}
+              {c(text)}
             </div>
           );
         }
