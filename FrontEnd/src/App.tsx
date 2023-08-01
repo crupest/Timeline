@@ -10,8 +10,6 @@ import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import TimelinePage from "./pages/timeline";
 import LoadingPage from "./pages/loading";
-import Search from "./views/search";
-import Admin from "./views/admin";
 import AlertHost from "./views/common/alert/AlertHost";
 
 export default function App() {
@@ -25,8 +23,6 @@ export default function App() {
           <Route path="register" element={<RegisterPage />} />
           <Route path="settings" element={<SettingPage />} />
           <Route path="about" element={<AboutPage />} />
-          <Route path="search" element={<Search />} />
-          <Route path="admin/*" element={<Admin />} />
           <Route path=":owner" element={<TimelinePage />} />
           <Route path=":owner/:timeline" element={<TimelinePage />} />
           <Route path="" element={<HomePage />} />
