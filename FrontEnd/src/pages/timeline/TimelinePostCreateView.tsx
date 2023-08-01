@@ -18,10 +18,12 @@ import BlobImage from "@/views/common/BlobImage";
 import LoadingButton from "@/views/common/button/LoadingButton";
 import PopupMenu from "@/views/common/menu/PopupMenu";
 import MarkdownPostEdit from "./MarkdownPostEdit";
-import TimelinePostEditCard from "./TimelinePostContainer";
+import TimelinePostCard from "./TimelinePostCard";
+import TimelinePostContainer from "./TimelinePostContainer";
 import IconButton from "@/views/common/button/IconButton";
 
-import "./TimelinePostEdit.css";
+import "./TimelinePostCreateView.css";
+import classNames from "classnames";
 
 interface TimelinePostEditTextProps {
   text: string;
@@ -87,7 +89,7 @@ function TimelinePostEditImage(props: TimelinePostEditImageProps) {
       {file != null && !error && (
         <BlobImage
           blob={file}
-          className="timeline-post-edit-image"
+          className="timeline-post-create-image"
           onLoad={() => onSelect(file)}
           onError={() => {
             onSelect(null);
@@ -192,45 +194,51 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
   };
 
   return (
-    <TimelinePostEditCard className={className}>
-      {showMarkdown ? (
-        <MarkdownPostEdit
-          className="cru-fill-parent"
-          onClose={() => setShowMarkdown(false)}
-          owner={timeline.owner.username}
-          timeline={timeline.nameV2}
-          onPosted={onPosted}
-          onPostError={onPostError}
-        />
-      ) : (
-        <div className="row">
-          <div className="col px-1 py-1">
-            {(() => {
-              if (kind === "text") {
-                return (
-                  <TimelinePostEditText
-                    className="cru-fill-parent timeline-post-edit"
-                    text={text}
-                    disabled={process}
-                    onChange={(t) => {
-                      setText(t);
-                      window.localStorage.setItem(draftTextLocalStorageKey, t);
-                    }}
-                  />
-                );
-              } else if (kind === "image") {
-                return (
-                  <TimelinePostEditImage
-                    onSelect={setImage}
-                    disabled={process}
-                  />
-                );
-              }
-            })()}
-          </div>
-          <div className="col col-auto align-self-end m-1">
-            <div className="d-block cru-text-center mt-1 mb-2">
+    <TimelinePostContainer
+      className={classNames(className, "timeline-post-create-container")}
+    >
+      <TimelinePostCard className="timeline-post-create-card">
+        {showMarkdown ? (
+          <MarkdownPostEdit
+            className="cru-fill-parent"
+            onClose={() => setShowMarkdown(false)}
+            owner={timeline.owner.username}
+            timeline={timeline.nameV2}
+            onPosted={onPosted}
+            onPostError={onPostError}
+          />
+        ) : (
+          <div className="timeline-post-create">
+            <div className="timeline-post-create-edit-area">
+              {(() => {
+                if (kind === "text") {
+                  return (
+                    <TimelinePostEditText
+                      className="timeline-post-create-edit-text"
+                      text={text}
+                      disabled={process}
+                      onChange={(text) => {
+                        setText(text);
+                        window.localStorage.setItem(
+                          draftTextLocalStorageKey,
+                          text,
+                        );
+                      }}
+                    />
+                  );
+                } else if (kind === "image") {
+                  return (
+                    <TimelinePostEditImage
+                      onSelect={setImage}
+                      disabled={process}
+                    />
+                  );
+                }
+              })()}
+            </div>
+            <div className="timeline-post-create-right-area">
               <PopupMenu
+                containerClassName="timeline-post-create-kind-select"
                 items={(["text", "image", "markdown"] as const).map((kind) => ({
                   type: "button",
                   text: `timeline.post.type.${kind}`,
@@ -244,20 +252,21 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
                   },
                 }))}
               >
-                <IconButton large icon={postKindIconMap[kind]} />
+                <IconButton color="primary" icon={postKindIconMap[kind]} />
               </PopupMenu>
+              <LoadingButton
+                onClick={() => void onSend()}
+                color="primary"
+                disabled={!canSend}
+                loading={process}
+              >
+                {t("timeline.send")}
+              </LoadingButton>
             </div>
-            <LoadingButton
-              onClick={() => void onSend()}
-              disabled={!canSend}
-              loading={process}
-            >
-              {t("timeline.send")}
-            </LoadingButton>
           </div>
-        </div>
-      )}
-    </TimelinePostEditCard>
+        )}
+      </TimelinePostCard>
+    </TimelinePostContainer>
   );
 }
 

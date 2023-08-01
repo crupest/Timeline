@@ -17,7 +17,7 @@ import {
 import { getTimelinePostUpdate$ } from "@/services/timeline";
 
 import TimelinePostList from "./TimelinePostList";
-import TimelinePostEdit from "./TimelinePostEdit";
+import TimelinePostEdit from "./TimelinePostCreateView";
 import TimelineCard from "./TimelineCard";
 
 import "./Timeline.css";

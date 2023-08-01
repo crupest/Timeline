@@ -9,6 +9,10 @@
   height: 2em;
 }
 
+.timeline-post-author-nickname {
+  margin: 0 1em;
+}
+
 .timeline-post-edit-button {
   float: right;
 }
@@ -23,5 +27,5 @@
 }
 
 .timeline-post-content {
-  white-space: pre-line;
+  margin-top: 0.5em;
 }

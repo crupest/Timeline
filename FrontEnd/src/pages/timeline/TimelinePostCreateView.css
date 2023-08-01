@@ -1,0 +1,31 @@
+.timeline-post-create-card {
+  position: sticky !important;
+  top: 106px;
+  z-index: 100;
+  margin-right: 200px;
+}
+
+.timeline-post-create {
+  display: flex;
+}
+
+.timeline-post-create-edit-area {
+  flex-grow: 1;
+}
+
+.timeline-post-create-edit-text {
+  width: 100%;
+  height: 100%;
+}
+
+.timeline-post-create-image {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+.timeline-post-create-right-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 1em;
+}
