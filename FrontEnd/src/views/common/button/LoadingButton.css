@@ -4,9 +4,9 @@
 }
 
 .cru-loading-button:disabled {
-  color: var(--cru-key-2-color);
-  border-color: var(--cru-key-2-color);
-  cursor: auto;
+  color: var(--cru-surface-on-color);
+  border-color: var(--cru-surface-on-color);
+  cursor: not-allowed;
 }
 
 .cru-loading-button-spinner {
