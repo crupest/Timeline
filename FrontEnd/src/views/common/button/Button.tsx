@@ -33,7 +33,7 @@ export default function Button(props: ButtonProps) {
     <button
       ref={buttonRef}
       className={classNames(
-        color && `cru-${color}`,
+        color && `cru-${color}-button`,
         "cru-button",
         outline && "outline",
         className,
