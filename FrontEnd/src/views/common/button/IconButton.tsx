@@ -7,7 +7,7 @@ import "./IconButton.css";
 
 interface IconButtonProps extends ComponentPropsWithoutRef<"i"> {
   icon: string;
-  color?: ThemeColor | "on-surface";
+  color?: ThemeColor;
   large?: boolean;
 }
 
@@ -20,7 +20,7 @@ export default function IconButton(props: IconButtonProps) {
         "cru-icon-button",
         large && "large",
         "bi-" + icon,
-        color && (color === "on-surface" ? "on-surface" : `cru-${color}`),
+        color && `cru-button-${color}`,
         className,
       )}
       {...otherProps}

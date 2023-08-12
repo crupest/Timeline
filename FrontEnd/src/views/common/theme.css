@@ -12,19 +12,10 @@
 
 /* theme colors */
 :root {
-  --cru-primary-color: #ffffff;
-  --cru-secondary-color: #ffffff;
-  --cru-create-color: #ffffff;
-  --cru-danger-color: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --cru-primary-color: #ffffff;
-    --cru-secondary-color: #ffffff;
-    --cru-create-color: #ffffff;
-    --cru-danger-color: #ffffff;
-  }
+  --cru-primary-color: hsl(210, 100%, 50%);
+  --cru-secondary-color: hsl(30, 100%, 50%);
+  --cru-create-color: hsl(120, 100%, 25%);
+  --cru-danger-color: hsl(0, 100%, 50%);
 }
 
 /* common colors */
@@ -37,58 +28,66 @@
 /* button colors */
 :root {
   --cru-button-primary-normal-color: var(--cru-primary-color);
-  --cru-button-primary-hover-color: #ffffff;
-  --cru-button-primary-focus-color: #ffffff;
-  --cru-button-primary-active-color: #ffffff;
+  --cru-button-primary-hover-color: hsl(210, 100%, 60%);
+  --cru-button-primary-focus-color: hsl(210, 100%, 60%);
+  --cru-button-primary-active-color: hsl(210, 100%, 70%);
   --cru-button-secondary-normal-color: var(--cru-secondary-color);
-  --cru-button-secondary-hover-color: #ffffff;
-  --cru-button-secondary-focus-color: #ffffff;
-  --cru-button-secondary-active-color: #ffffff;
+  --cru-button-secondary-hover-color: hsl(30, 100%, 60%);
+  --cru-button-secondary-focus-color: hsl(30, 100%, 60%);
+  --cru-button-secondary-active-color: hsl(30, 100%, 70%);
   --cru-button-create-normal-color: var(--cru-create-color);
-  --cru-button-create-hover-color: #ffffff;
-  --cru-button-create-focus-color: #ffffff;
-  --cru-button-create-active-color: #ffffff;
+  --cru-button-create-hover-color: hsl(120, 100%, 35%);
+  --cru-button-create-focus-color: hsl(120, 100%, 35%);
+  --cru-button-create-active-color: hsl(120, 100%, 35%);
   --cru-button-danger-normal-color: var(--cru-danger-color);
-  --cru-button-danger-hover-color: #ffffff;
-  --cru-button-danger-focus-color: #ffffff;
-  --cru-button-danger-active-color: #ffffff;
-  --cru-button-disabled-color: #ffffff;
+  --cru-button-danger-hover-color: hsl(0, 100%, 60%);
+  --cru-button-danger-focus-color: hsl(0, 100%, 60%);
+  --cru-button-danger-active-color: hsl(0, 100%, 70%);
+  --cru-button-disabled-color: hsl(0, 0, 80%);
   /* push button colors */
-  --push-button-text: #ffffff;
-  --push-button-disabled-text: #ffffff;
+  --cru-push-button-text-color: #ffffff;
+  --cru-push-button-disabled-text-color: hsl(0, 0, 80%);
   /* flat button colors */
-  --flat-button-background-normal: #ffffff;
-  --flat-button-background-hover: #ffffff;
-  --flat-button-background-focus: #ffffff;
-  --flat-button-background-active: #ffffff;
+  --cru-flat-button-background-normal-color: #ffffff;
+  --cru-flat-button-background-hover-color: hsl(0, 0, 90%);
+  --cru-flat-button-background-focus-color: hsl(0, 0, 90%);
+  --cru-flat-button-background-active-color: hsl(0, 0, 80%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --cru-button-primary-normal-color: var(--cru-primary-color);
-    --cru-button-primary-hover-color: #ffffff;
-    --cru-button-primary-focus-color: #ffffff;
-    --cru-button-primary-active-color: #ffffff;
-    --cru-button-secondary-normal-color: var(--cru-secondary-color);
-    --cru-button-secondary-hover-color: #ffffff;
-    --cru-button-secondary-focus-color: #ffffff;
-    --cru-button-secondary-active-color: #ffffff;
-    --cru-button-create-normal-color: var(--cru-create-color);
-    --cru-button-create-hover-color: #ffffff;
-    --cru-button-create-focus-color: #ffffff;
-    --cru-button-create-active-color: #ffffff;
-    --cru-button-danger-normal-color: var(--cru-danger-color);
-    --cru-button-danger-hover-color: #ffffff;
-    --cru-button-danger-focus-color: #ffffff;
-    --cru-button-danger-active-color: #ffffff;
-    --cru-button-disabled-color: #ffffff;
-    /* push button colors */
-    --push-button-text: #ffffff;
-    --push-button-disabled-text: #ffffff;
     /* flat button colors */
-    --flat-button-background-normal: #ffffff;
-    --flat-button-background-hover: #ffffff;
-    --flat-button-background-focus: #ffffff;
-    --flat-button-background-active: #ffffff;
+    --cru-flat-button-background-normal-color: #ffffff;
+    --cru-flat-button-background-hover-color: #ffffff;
+    --cru-flat-button-background-focus-color: #ffffff;
+    --cru-flat-button-background-active-color: #ffffff;
   }
+}
+
+.cru-button-primary {
+  --cru-button-normal-color: var(--cru-button-primary-normal-color);
+  --cru-button-hover-color: var(--cru-button-primary-hover-color);
+  --cru-button-focus-color: var(--cru-button-primary-focus-color);
+  --cru-button-active-color: var(--cru-button-primary-active-color);
+}
+
+.cru-button-secondary {
+  --cru-button-normal-color: var(--cru-button-secondary-normal-color);
+  --cru-button-hover-color: var(--cru-button-secondary-hover-color);
+  --cru-button-focus-color: var(--cru-button-secondary-focus-color);
+  --cru-button-active-color: var(--cru-button-secondary-active-color);
+}
+
+.cru-button-create {
+  --cru-button-normal-color: var(--cru-button-create-normal-color);
+  --cru-button-hover-color: var(--cru-button-create-hover-color);
+  --cru-button-focus-color: var(--cru-button-create-focus-color);
+  --cru-button-active-color: var(--cru-button-create-active-color);
+}
+
+.cru-button-danger {
+  --cru-button-normal-color: var(--cru-button-danger-normal-color);
+  --cru-button-hover-color: var(--cru-button-danger-hover-color);
+  --cru-button-focus-color: var(--cru-button-danger-focus-color);
+  --cru-button-active-color: var(--cru-button-danger-active-color);
 }

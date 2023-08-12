@@ -5,60 +5,59 @@
   border-radius: 0.2em;
   border: 1px solid;
   cursor: pointer;
-  background-color: var(--cru-surface-color);
 }
 
 .cru-button:not(.outline) {
-  color: var(--cru-key-on-color);
-  background-color: var(--cru-key-color);
-  border-color: var(--cru-key-color);
+  color: var(--cru--push-button-text-color);
+  background-color: var(--cru-button-normal-color);
+  border-color: var(--cru-button-normal-color);
 }
 
 .cru-button:not(.outline):hover {
-  background-color: var(--cru-key-1-color);
-  border-color: var(--cru-key-1-color);
+  background-color: var(--cru-button-hover-color);
+  border-color: var(--cru-button-hover-color);
 }
 
 .cru-button:not(.outline):focus {
-  background-color: var(--cru-key-1-color);
-  border-color: var(--cru-key-1-color);
+  background-color: var(--cru-button-focus-color);
+  border-color: var(--cru-button-focus-color);
 }
 
 .cru-button:not(.outline):active {
-  background-color: var(--cru-key-2-color);
-  border-color: var(--cru-key-2-color);
+  background-color: var(--cru-button-active-color);
+  border-color: var(--cru-button-active-color);
 }
 
 .cru-button:not(.outline):disabled {
-  background-color: var(--cru-surface-on-color);
-  border-color: var(--cru-surface-on-color);
+  color: var(--cru-push-button-disabled-text-color);
+  background-color: var(--cru-push-button-disabled-color);
+  border-color: var(--cru-push-button-disabled-color);
   cursor: auto;
 }
 
 
 .cru-button.outline {
-  color: var(--cru-key-color);
-  border-color: var(--cru-key-color);
+  color: var(--cru-button-normal-color);
+  border-color: var(--cru-button-normal-color);
 }
 
 .cru-button.outline:hover {
-  color: var(--cru-key-1-color);
-  border-color: var(--cru-key-1-color);
+  color: var(--cru-button-hover-color);
+  border-color: var(--cru-button-hover-color);
 }
 
 .cru-button.outline:focus {
-  color: var(--cru-key-1-color);
-  border-color: var(--cru-key-1-color);
+  color: var(--cru-button-focus-color);
+  border-color: var(--cru-button-focus-color);
 }
 
 .cru-button.outline:active {
-  color: var(--cru-key-2-color);
-  border-color: var(--cru-key-2-color);
+  color: var(--cru-button-active-color);
+  border-color: var(--cru-button-active-color);
 }
 
 .cru-button.outline:not(.cru-loading-button):disabled {
-  color: var(--cru-surface-on-color);
-  border-color: var(--cru-surface-on-color);
-  background-color: white;
+  color: var(--cru-button-disabled-color);
+  border-color: var(--cru-button-disabled-color);
   cursor: auto;
 }

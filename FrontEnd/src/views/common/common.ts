@@ -4,9 +4,8 @@ export { c, convertI18nText, useC } from "@/common";
 export const themeColors = [
   "primary",
   "secondary",
-  "tertiary",
   "danger",
-  "success",
+  "create",
 ] as const;
 
 export type ThemeColor = (typeof themeColors)[number];
