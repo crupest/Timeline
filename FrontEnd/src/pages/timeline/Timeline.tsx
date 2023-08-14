@@ -156,7 +156,7 @@ export function Timeline(props: TimelineProps) {
     return <div className={className}>Error.</div>;
   }
   return (
-    <>
+    <div>
       {timeline && (
         <TimelineCard
           timeline={timeline}
@@ -172,7 +172,7 @@ export function Timeline(props: TimelineProps) {
           <TimelinePostList posts={posts} onReload={updatePosts} />
         </div>
       )}
-    </>
+    </div>
   );
 }
 

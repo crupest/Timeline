@@ -20,9 +20,21 @@
 
 /* common colors */
 :root {
-  --cru-body-background-color: #ffffff;
-  --cru-text-primary-color: #ffffff;
-  --cru-text-secondary-color: #ffffff;
+  --cru-background-color: #ffffff;
+  --cru-text-primary-color: #000000;
+  --cru-text-secondary-color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cru-background-color: #000000;
+    --cru-text-primary-color: #ffffff;
+    --cru-text-secondary-color: #ffffff;
+  }
+}
+
+:root {
+  --cru-body-background-color: var(--cru-background-color);
 }
 
 /* button colors */
@@ -90,4 +102,36 @@
   --cru-button-hover-color: var(--cru-button-danger-hover-color);
   --cru-button-focus-color: var(--cru-button-danger-focus-color);
   --cru-button-active-color: var(--cru-button-danger-active-color);
+}
+
+/* Card colors */
+:root {
+  --cru-card-background-primary-color: hsl(210, 100%, 50%);
+  --cru-card-border-primary-color: hsl(210, 100%, 50%);
+  --cru-card-background-secondary-color: hsl(30, 100%, 50%);
+  --cru-card-border-secondary-color: hsl(30, 100%, 50%);
+  --cru-card-background-create-color: hsl(120, 100%, 25%);
+  --cru-card-border-create-color: hsl(120, 100%, 25%);
+  --cru-card-background-danger-color: hsl(0, 100%, 50%);
+  --cru-card-border-danger-color: hsl(0, 100%, 50%);
+}
+
+.cru-card-primary {
+  --cru-card-background-color: var(--cru-card-background-primary-color);
+  --cru-card-border-color: var(--cru-card-border-primary-color)
+}
+
+.cru-card-secondary {
+  --cru-card-background-color: var(--cru-card-background-secondary-color);
+  --cru-card-border-color: var(--cru-card-border-secondary-color)
+}
+
+.cru-card-create {
+  --cru-card-background-color: var(--cru-card-background-create-color);
+  --cru-card-border-color: var(--cru-card-border-create-color)
+}
+
+.cru-card-danger {
+  --cru-card-background-color: var(--cru-card-background-danger-color);
+  --cru-card-border-color: var(--cru-card-border-danger-color)
 }

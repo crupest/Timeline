@@ -1,5 +1,4 @@
 .timeline {
-  --timeline-background-color: #f3f3f3;
   --timeline-shadow-color: #00000080;
   --timeline-post-line-color: #eadd2c;
   --timeline-post-line-shadow: 2px 1px 10px -1px var(--timeline-shadow-color);
@@ -13,7 +12,6 @@
   z-index: 0;
   position: relative;
   width: 100%;
-  background-color: var(--timeline-background-color);
 }
 
 @keyframes timeline-line-node {

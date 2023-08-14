@@ -15,7 +15,7 @@ export default function TimelinePostCard({
   children,
 }: TimelinePostCardProps) {
   return (
-    <Card className={classNames("timeline-post-card", className)}>
+    <Card color="primary" className={classNames("timeline-post-card", className)}>
       {children}
     </Card>
   );

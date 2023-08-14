@@ -1,11 +1,10 @@
-import * as React from "react";
 import { useParams } from "react-router-dom";
 
 import { UiLogicError } from "@/common";
 
 import Timeline from "./Timeline";
 
-const TimelinePage: React.FC = () => {
+export default function TimelinePage() {
   const { owner, timeline: timelineNameParam } = useParams();
 
   if (owner == null || owner == "")
@@ -13,11 +12,5 @@ const TimelinePage: React.FC = () => {
 
   const timeline = timelineNameParam || "self";
 
-  return (
-    <div className="container">
-      <Timeline timelineOwner={owner} timelineName={timeline} />
-    </div>
-  );
+  return <Timeline timelineOwner={owner} timelineName={timeline} />;
 };
-
-export default TimelinePage;

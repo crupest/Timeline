@@ -18,9 +18,9 @@ export default function IconButton(props: IconButtonProps) {
     <button
       className={classNames(
         "cru-icon-button",
+        `cru-button-${color ?? "primary"}`,
         large && "large",
         "bi-" + icon,
-        color && `cru-button-${color}`,
         className,
       )}
       {...otherProps}
