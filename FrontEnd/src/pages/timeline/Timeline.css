@@ -2,10 +2,16 @@
   --timeline-shadow-color: #00000080;
   --timeline-post-line-color: #eadd2c;
   --timeline-post-line-shadow: 2px 1px 10px -1px var(--timeline-shadow-color);
-  --timeline-post-card-background-color: rgb(255, 255, 255);
+  --timeline-post-card-background-color: hsl(0, 0%, 100%);
   --timeline-post-card-shadow: 4px 2px 10px -2px var(--timeline-shadow-color);
   --timeline-post-card-border-radius: 10px;
   --timeline-post-text-color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  .timeline {
+    --timeline-post-card-background-color: hsl(0, 0%, 12%);
+  }
 }
 
 .timeline {
