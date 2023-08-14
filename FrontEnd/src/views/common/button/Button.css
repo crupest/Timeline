@@ -1,7 +1,7 @@
 .cru-button {
   font-size: 1rem;
   padding: 0.4em 0.8em;
-  transition: all 0.5s;
+  transition: all 0.3s;
   border-radius: 0.2em;
   border: 1px solid;
   cursor: pointer;
@@ -39,6 +39,7 @@
 .cru-button.outline {
   color: var(--cru-button-normal-color);
   border-color: var(--cru-button-normal-color);
+  background-color: transparent;
 }
 
 .cru-button.outline:hover {

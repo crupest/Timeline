@@ -17,29 +17,39 @@
 
 .setting-section-title {
   padding: 0 1em;
+  color: white;
 }
 
 .setting-section-item-area {
   margin-top: 1em;
-  border-top: 1px solid var(--cru-key-container-color);
+  border-top: 1px solid var(--cru-secondary-color);
 }
 
 .setting-item-container {
   padding: 0.5em 1em;
   transition: background-color 0.3s;
-  color: var(--cru-surface-on-color);
-  background-color: var(--cru-surface-color);
-  border-bottom: 1px solid var(--cru-key-container-color);
+  background-color: var(--cru-background-color);
+  border-bottom: 1px solid var(--cru-secondary-color);
   display: flex;
   align-items: center;
 }
 
 .setting-item-container:hover {
-  background-color: var(--cru-key-container-1-color);
+  color: white;
+  background-color: var(--cru-secondary-color);
+}
+
+.setting-item-container.danger {
+  color: var(--cru-danger-color);
+}
+
+.setting-item-container.danger:hover {
+  color: white;
+  background-color: var(--cru-danger-color);
 }
 
 .setting-item-label-sub {
-  color: var(--cru-secondary-text-color);
+  color: var(--cru-text-secondary-color);
 }
 
 .setting-item-value-area {
@@ -48,10 +58,6 @@
 
 .setting-item-container.setting-type-button {
   cursor: pointer;
-}
-
-.setting-item-container.setting-type-button.danger {
-  color: var(--cru-danger-color);
 }
 
 .register-code {

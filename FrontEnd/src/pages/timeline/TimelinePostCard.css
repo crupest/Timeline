@@ -1,7 +1,6 @@
 .timeline-post-card {
   padding: 1em 1em 1em 3em;
-  color: var(--timeline-post-text-color);
-  background-color: var(--timeline-post-card-background-color);
+  background-color: var(--cru-background-color);
   box-shadow: var(--timeline-post-card-shadow);
   border-radius: var(--timeline-post-card-border-radius);
   position: relative;

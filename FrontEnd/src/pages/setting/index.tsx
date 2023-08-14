@@ -172,7 +172,7 @@ function RegisterCodeSettingItem() {
           onClick={(event) => {
             void navigator.clipboard.writeText(registerCode).then(() => {
               pushAlert({
-                type: "success",
+                type: "create",
                 message: "settings.myRegisterCodeCopied",
               });
             });
@@ -249,7 +249,7 @@ export default function SettingPage() {
   return (
     <Page className="cru-primary" noTopPadding>
       {user ? (
-        <SettingSection title="settings.subheader.account">
+        <SettingSection title="settings.subheader.account" color="secondary">
           <RegisterCodeSettingItem />
           <ButtonSettingItem
             title="settings.changeAvatar"
@@ -271,7 +271,7 @@ export default function SettingPage() {
           />
         </SettingSection>
       ) : null}
-      <SettingSection title="settings.subheader.customization">
+      <SettingSection title="settings.subheader.customization" color="secondary">
         <LanguageChangeSettingItem />
       </SettingSection>
       <ChangePasswordDialog {...dialogPropsMap["change-password"]} />

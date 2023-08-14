@@ -28,7 +28,7 @@
 
 .app-bar a {
   background-color: var(--cru-primary-color);
-  color: var(--cru-primary-on-color);
+  color: var(--cru-push-button-text-color);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -37,15 +37,15 @@
 }
 
 .app-bar a:hover {
-  background-color: var(--cru-primary-1-color);
+  background-color: var(--cru-button-primary-hover-color);
 }
 
 .app-bar a:focus {
-  background-color: var(--cru-primary-1-color);
+  background-color: var(--cru-button-primary-focus-color);
 }
 
 .app-bar a:active {
-  background-color: var(--cru-primary-2-color);
+  background-color: var(--cru-button-primary-active-color);
 }
 
 .app-bar .app-bar-avatar img {

@@ -26,8 +26,8 @@ export default function LoadingButton(props: LoadingButtonProps) {
     <button
       disabled={disabled || loading}
       className={classNames(
-        color && `cru-${color}`,
         "cru-button outline cru-loading-button",
+        `cru-button-${color ?? "primary"}`,
         className,
       )}
       {...otherProps}

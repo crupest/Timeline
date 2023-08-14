@@ -8,8 +8,8 @@
 
 body {
   font-family: var(--cru-default-font-family);
-  background: var(--cru-surface-color);
-  color: var(--cru-surface-on-color);
+  background: var(--cru-body-background-color);
+  color: var(--cru-text-primary-color);
   line-height: 1.2;
 }
 
