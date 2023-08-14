@@ -42,7 +42,7 @@ function TimelinePostEditText(props: TimelinePostEditTextProps) {
       onChange={(event) => {
         onChange(event.target.value);
       }}
-      className={className}
+      className={classNames("timeline-post-create-edit-text", className)}
     />
   );
 }
