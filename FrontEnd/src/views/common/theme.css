@@ -56,21 +56,21 @@
   --cru-button-disabled-color: hsl(0, 0%, 50%);
   /* push button colors */
   --cru-push-button-text-color: #ffffff;
-  --cru-push-button-disabled-text-color: hsl(0, 0, 80%);
+  --cru-push-button-disabled-text-color: hsl(0, 0%, 80%);
   /* flat button colors */
   --cru-flat-button-background-normal-color: #ffffff;
-  --cru-flat-button-background-hover-color: hsl(0, 0, 90%);
-  --cru-flat-button-background-focus-color: hsl(0, 0, 90%);
-  --cru-flat-button-background-active-color: hsl(0, 0, 80%);
+  --cru-flat-button-background-hover-color: hsl(0, 0%, 90%);
+  --cru-flat-button-background-focus-color: hsl(0, 0%, 90%);
+  --cru-flat-button-background-active-color: hsl(0, 0%, 80%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     /* flat button colors */
-    --cru-flat-button-background-normal-color: #ffffff;
-    --cru-flat-button-background-hover-color: #ffffff;
-    --cru-flat-button-background-focus-color: #ffffff;
-    --cru-flat-button-background-active-color: #ffffff;
+    --cru-flat-button-background-normal-color: #000000;
+    --cru-flat-button-background-hover-color: hsl(0, 0%, 20%);
+    --cru-flat-button-background-focus-color: hsl(0, 0%, 20%);
+    --cru-flat-button-background-active-color: hsl(0, 0%, 30%);
   }
 }
 

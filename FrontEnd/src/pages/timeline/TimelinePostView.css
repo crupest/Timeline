@@ -26,6 +26,12 @@
   justify-content: space-around;
 }
 
+@media (prefers-color-scheme: dark) {
+  .timeline-post-options-mask {
+    background-color: hsla(0, 0%, 0%, 0.8);
+  }
+}
+
 .timeline-post-content {
   margin-top: 0.5em;
 }
