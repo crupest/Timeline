@@ -6,8 +6,6 @@
 
   --cru-border-radius: 4px;
   --cru-card-border-radius: 4px;
-
-  --cru-secondary-text-color: var(--cru-surface-on-color);
 }
 
 /* theme colors */
@@ -55,7 +53,7 @@
   --cru-button-danger-hover-color: hsl(0, 100%, 60%);
   --cru-button-danger-focus-color: hsl(0, 100%, 60%);
   --cru-button-danger-active-color: hsl(0, 100%, 70%);
-  --cru-button-disabled-color: hsl(0, 0, 80%);
+  --cru-button-disabled-color: hsl(0, 0%, 50%);
   /* push button colors */
   --cru-push-button-text-color: #ffffff;
   --cru-push-button-disabled-text-color: hsl(0, 0, 80%);

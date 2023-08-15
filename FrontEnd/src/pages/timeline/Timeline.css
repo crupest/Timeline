@@ -1,5 +1,6 @@
-.timeline {
+.timeline-container {
   --timeline-shadow-color: #00000080;
+  --timeline-card-shadow: 2px 1px 10px -2px var(--timeline-shadow-color);
   --timeline-post-line-color: #eadd2c;
   --timeline-post-line-shadow: 2px 1px 10px -1px var(--timeline-shadow-color);
   --timeline-post-card-background-color: hsl(0, 0%, 100%);
@@ -18,6 +19,7 @@
   z-index: 0;
   position: relative;
   width: 100%;
+  padding-top: 10px;
 }
 
 @keyframes timeline-line-node {

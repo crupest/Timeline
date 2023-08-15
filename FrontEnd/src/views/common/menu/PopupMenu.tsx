@@ -7,9 +7,12 @@ import { useClickOutside } from "@/utilities/hooks";
 
 import Menu, { MenuItems } from "./Menu";
 
+import { ThemeColor } from "../common";
+
 import "./PopupMenu.css";
 
 export interface PopupMenuProps {
+  color?: ThemeColor;
   items: MenuItems;
   children?: ReactNode;
   containerClassName?: string;
@@ -17,6 +20,7 @@ export interface PopupMenuProps {
 }
 
 export default function PopupMenu({
+  color,
   items,
   children,
   containerClassName,
@@ -48,7 +52,9 @@ export default function PopupMenu({
         createPortal(
           <div
             ref={setPopperElement}
-            className="cru-popup-menu-menu-container"
+            className={`cru-popup-menu-menu-container cru-button-${
+              color ?? "primary"
+            }`}
             style={styles.popper}
             {...attributes.popper}
           >

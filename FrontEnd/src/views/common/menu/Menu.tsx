@@ -21,6 +21,7 @@ export type MenuItem =
 export type MenuItems = MenuItem[];
 
 export type MenuProps = {
+  color?: ThemeColor;
   items: MenuItems;
   onItemClicked?: () => void;
   className?: string;
@@ -28,6 +29,7 @@ export type MenuProps = {
 };
 
 export default function Menu({
+  color,
   items,
   onItemClicked,
   className,
@@ -37,7 +39,7 @@ export default function Menu({
 
   return (
     <div
-      className={classNames("cru-menu cru-primary", className)}
+      className={classNames(`cru-menu cru-button-${color ?? "primary"}`, className)}
       style={style}
     >
       {items.map((item, index) => {
@@ -48,7 +50,7 @@ export default function Menu({
           return (
             <div
               key={index}
-              className={`cru-menu-item cru-${color ?? "primary"}`}
+              className={`cru-menu-item cru-button-${color ?? "primary"}`}
               onClick={() => {
                 onClick();
                 onItemClicked?.();

@@ -3,12 +3,6 @@
   align-items: center;
 }
 
-.cru-loading-button:disabled {
-  color: var(--cru-surface-on-color);
-  border-color: var(--cru-surface-on-color);
-  cursor: not-allowed;
-}
-
 .cru-loading-button-spinner {
   margin-left: 0.5em;
 }

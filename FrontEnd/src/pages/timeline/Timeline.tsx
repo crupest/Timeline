@@ -156,7 +156,7 @@ export function Timeline(props: TimelineProps) {
     return <div className={className}>Error.</div>;
   }
   return (
-    <div>
+    <div className="timeline-container">
       {timeline && (
         <TimelineCard
           timeline={timeline}

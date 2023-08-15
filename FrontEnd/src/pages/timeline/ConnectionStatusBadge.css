@@ -2,8 +2,8 @@
   font-size: 0.8em;
   border-radius: 5px;
   padding: 0.1em 1em;
-  background-color: #eaf2ff;
 }
+
 .connection-status-badge::before {
   width: 10px;
   height: 10px;
@@ -12,11 +12,13 @@
   content: "";
   margin-right: 0.6em;
 }
+
 .connection-status-badge.success {
-  color: #006100;
+  color: var(--cru-create-color);
 }
+
 .connection-status-badge.success::before {
-  background-color: #006100;
+  background-color: var(--cru-create-color);
 }
 
 .connection-status-badge.warning {
@@ -28,9 +30,9 @@
 }
 
 .connection-status-badge.danger {
-  color: #fd1616;
+  color: var(--cru-danger-color);
 }
 
 .connection-status-badge.danger::before {
-  background-color: #fd1616;
+  background-color: var(--cru-danger-color);
 }
