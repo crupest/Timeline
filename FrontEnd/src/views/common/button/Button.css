@@ -57,7 +57,7 @@
   border-color: var(--cru-button-active-color);
 }
 
-.cru-button.outline:not(.cru-loading-button):disabled {
+.cru-button.outline:disabled {
   color: var(--cru-button-disabled-color);
   border-color: var(--cru-button-disabled-color);
   cursor: auto;

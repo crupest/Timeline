@@ -4,6 +4,7 @@
   top: 56px;
   right: 0;
   margin: 0.5em;
+  box-shadow: var(--timeline-card-shadow);
 }
 
 @media (min-width: 576px) {
@@ -15,13 +16,13 @@
 .timeline-card-title {
   display: inline-block;
   vertical-align: middle;
-  color: var(--cru-key-container-on-color);
+  color: var(--cru-text-primary-color);
   margin: 0.5em 1em;
 }
 
 .timeline-card-title-name {
   margin-inline-start: 1em;
-  color: var(--cru-surface-on-variant-color);
+  color: var(--cru-text-secondary-color);
 }
 
 .timeline-card-user {

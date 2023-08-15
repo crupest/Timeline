@@ -7,12 +7,12 @@
   padding: 0.5em 1.5em;
   cursor: pointer;
   transition: all 0.5s;
-  color: var(--cru-key-color);
+  color: var(--cru-button-normal-color);
 }
 
 .cru-menu-item:hover {
-  color: var(--cru-key-on-color);
-  background-color: var(--cru-key-color);
+  color: white;
+  background-color: var(--cru-button-normal-color);
 }
 
 .cru-menu-item-icon {
@@ -21,5 +21,5 @@
 
 .cru-menu-divider {
   border-width: 0;
-  border-top: 1px solid var(--cru-key-color);
+  border-top: 1px solid var(--cru-button-normal-color);
 }

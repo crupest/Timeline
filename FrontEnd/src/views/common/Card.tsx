@@ -7,10 +7,12 @@ import "./Card.css";
 interface CardProps extends ComponentPropsWithoutRef<"div"> {
   containerRef?: Ref<HTMLDivElement>;
   color?: ThemeColor;
+  noBackground?: boolean;
 }
 
 export default function Card({
   color,
+  noBackground,
   className,
   children,
   containerRef,
@@ -19,7 +21,12 @@ export default function Card({
   return (
     <div
       ref={containerRef}
-      className={classNames("cru-card", `cru-card-${color ?? "primary"}`, className)}
+      className={classNames(
+        "cru-card",
+        `cru-card-${color ?? "primary"}`,
+        noBackground && "cru-card-no-background",
+        className,
+      )}
       {...otherProps}
     >
       {children}
