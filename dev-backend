@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+MYDIR="$(dirname "$(realpath "$0")")"
+
+cd ${MYDIR}/BackEnd/Timeline && dotnet run --launch-profile Dev

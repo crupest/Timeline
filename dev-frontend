@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+MYDIR="$(dirname "$(realpath "$0")")"
+
+cd ${MYDIR}/FrontEnd && pnpm run start
