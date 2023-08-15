@@ -3,25 +3,25 @@
   padding: 0.4em 0.8em;
   transition: all 0.5s;
   border-radius: 0.2em;
-  background-color: var(--cru-surface-color);
+  background-color: var(--cru-flat-button-background-normal-color);
   border: 1px none;
-  color: var(--cru-key-color);
+  color: var(--cru-button-normal-color);
   cursor: pointer;
 }
 
 .cru-flat-button:hover {
-  background-color: var(--cru-surface-1-color);
+  background-color: var(--cru-flat-button-background-hover-color);
 }
 
 .cru-flat-button:focus {
-  background-color: var(--cru-surface-1-color);
+  background-color: var(--cru-flat-button-background-focus-color);
 }
 
 .cru-flat-button:active {
-  background-color: var(--cru-surface-2-color);
+  background-color: var(--cru-flat-button-background-active-color);
 }
 
 .cru-flat-button:disabled {
-  color: var(--cru-surface-on-color);
+  color: var(--cru-button-disabled-color);
   cursor: auto;
 }

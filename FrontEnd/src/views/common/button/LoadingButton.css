@@ -6,3 +6,8 @@
 .cru-loading-button-spinner {
   margin-left: 0.5em;
 }
+
+.cru-loading-button-loading {
+  color: var(--cru-button-normal-color) !important;
+  border-color: var(--cru-button-normal-color) !important;
+}
