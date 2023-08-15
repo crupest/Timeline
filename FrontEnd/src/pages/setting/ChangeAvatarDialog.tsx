@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
-import * as React from "react";
-import { useTranslation } from "react-i18next";
+import {
+  useState,
+  useEffect,
+  ChangeEvent,
+  ComponentPropsWithoutRef,
+} from "react";
 import { AxiosError } from "axios";
 
-import { convertI18nText, I18nText, UiLogicError } from "@/common";
+import { useC, Text, UiLogicError } from "@/common";
 
 import { useUser } from "@/services/user";
 
@@ -14,49 +17,53 @@ import ImageCropper, {
   applyClipToImage,
 } from "@/views/common/ImageCropper";
 import Button from "@/views/common/button/Button";
+import ButtonRow from "@/views/common/button/ButtonRow";
 import Dialog from "@/views/common/dialog/Dialog";
+import DialogContainer from "@/views/common/dialog/DialogContainer";
 
-export interface ChangeAvatarDialogProps {
+interface ChangeAvatarDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
-  const { t } = useTranslation();
+export default function ChangeAvatarDialog({
+  open,
+  onClose,
+}: ChangeAvatarDialogProps) {
+  const c = useC();
 
   const user = useUser();
 
-  const [file, setFile] = React.useState<File | null>(null);
-  const [fileUrl, setFileUrl] = React.useState<string | null>(null);
-  const [clip, setClip] = React.useState<Clip | null>(null);
-  const [cropImgElement, setCropImgElement] =
-    React.useState<HTMLImageElement | null>(null);
-  const [resultBlob, setResultBlob] = React.useState<Blob | null>(null);
-  const [resultUrl, setResultUrl] = React.useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [clip, setClip] = useState<Clip | null>(null);
+  const [cropImgElement, setCropImgElement] = useState<HTMLImageElement | null>(
+    null,
+  );
+  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
+  const [resultUrl, setResultUrl] = useState<string | null>(null);
 
-  const [state, setState] = React.useState<
+  type State =
     | "select"
     | "crop"
-    | "processcrop"
+    | "process-crop"
     | "preview"
     | "uploading"
     | "success"
-    | "error"
-  >("select");
+    | "error";
+  const [state, setState] = useState<State>("select");
 
-  const [message, setMessage] = useState<I18nText>(
+  const [message, setMessage] = useState<Text>(
     "settings.dialogChangeAvatar.prompt.select",
   );
 
-  const trueMessage = convertI18nText(message, t);
+  const trueMessage = c(message);
 
-  const closeDialog = props.onClose;
-
-  const close = React.useCallback((): void => {
+  const close = (): void => {
     if (!(state === "uploading")) {
-      closeDialog();
+      onClose();
     }
-  }, [state, closeDialog]);
+  };
 
   useEffect(() => {
     if (file != null) {
@@ -73,7 +80,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
     }
   }, [file]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (resultBlob != null) {
       const url = URL.createObjectURL(resultBlob);
       setResultUrl(url);
@@ -86,19 +93,16 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
     }
   }, [resultBlob]);
 
-  const onSelectFile = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>): void => {
-      const files = e.target.files;
-      if (files == null || files.length === 0) {
-        setFile(null);
-      } else {
-        setFile(files[0]);
-      }
-    },
-    [],
-  );
+  const onSelectFile = (e: ChangeEvent<HTMLInputElement>): void => {
+    const files = e.target.files;
+    if (files == null || files.length === 0) {
+      setFile(null);
+    } else {
+      setFile(files[0]);
+    }
+  };
 
-  const onCropNext = React.useCallback(() => {
+  const onCropNext = () => {
     if (
       cropImgElement == null ||
       clip == null ||
@@ -108,23 +112,23 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
       throw new UiLogicError();
     }
 
-    setState("processcrop");
+    setState("process-crop");
     void applyClipToImage(cropImgElement, clip, file.type).then((b) => {
       setResultBlob(b);
     });
-  }, [cropImgElement, clip, file]);
+  };
 
-  const onCropPrevious = React.useCallback(() => {
+  const onCropPrevious = () => {
     setFile(null);
     setState("select");
-  }, []);
+  };
 
-  const onPreviewPrevious = React.useCallback(() => {
+  const onPreviewPrevious = () => {
     setResultBlob(null);
     setState("crop");
-  }, []);
+  };
 
-  const upload = React.useCallback(() => {
+  const upload = () => {
     if (resultBlob == null) {
       throw new UiLogicError();
     }
@@ -145,7 +149,7 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           setMessage({ type: "custom", value: (e as AxiosError).message });
         },
       );
-  }, [user, resultBlob]);
+  };
 
   const createPreviewRow = (): React.ReactElement => {
     if (resultUrl == null) {
@@ -157,26 +161,77 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
           <img
             className="change-avatar-img"
             src={resultUrl}
-            alt={t("settings.dialogChangeAvatar.previewImgAlt") ?? undefined}
+            alt={c("settings.dialogChangeAvatar.previewImgAlt") ?? undefined}
+            alt={c("settings.dialogChangeAvatar.previewImgAlt") ?? undefined}
           />
         </div>
       </div>
     );
   };
 
+  const buttonsMap: Record<
+    State,
+    ComponentPropsWithoutRef<typeof ButtonRow>["buttons"]
+  > = {
+    select: [
+      {
+        key: "cancel",
+        type: "normal",
+        props: {
+          outline: true,
+          color: "secondary",
+          text: "operationDialog.cancel",
+          onClick: close,
+        },
+      },
+    ],
+    crop: [
+      {
+        key: "cancel",
+        type: "normal",
+        props: {
+          outline: true,
+          color: "secondary",
+          text: "operationDialog.cancel",
+          onClick: close,
+        },
+      },
+      {
+        key: "previous",
+        type: "normal",
+        props: {
+          outline: true,
+          color: "secondary",
+          text: "operationDialog.previousStep",
+          onClick: onCropPrevious,
+        },
+      },
+      {
+        key: "next",
+        type: "normal",
+        props: {
+          color: "primary",
+          text: "operationDialog.nextStep",
+          onClick: onCropNext,
+          disabled: cropImgElement == null || clip == null || clip.width === 0,
+        },
+      },
+    ],
+  };
+
   return (
-    <Dialog open={props.open} onClose={close}>
-      <h3 className="cru-color-primary">
-        {t("settings.dialogChangeAvatar.title")}
-      </h3>
-      <hr />
-      {(() => {
-        if (state === "select") {
-          return (
-            <>
-              <div className="container">
+    <Dialog open={open} onClose={close}>
+      <DialogContainer
+        title="settings.dialogChangeAvatar.title"
+        titleColor="primary"
+        buttons={buttonsMap[state]}
+      >
+        {(() => {
+          if (state === "select") {
+            return (
+              <div className="">
                 <div className="row">
-                  {t("settings.dialogChangeAvatar.prompt.select")}
+                  {c("settings.dialogChangeAvatar.prompt.select")}
                 </div>
                 <div className="row">
                   <input
@@ -187,22 +242,12 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   />
                 </div>
               </div>
-              <hr />
-              <div className="cru-dialog-bottom-area">
-                <Button
-                  text="operationDialog.cancel"
-                  color="secondary"
-                  onClick={close}
-                />
-              </div>
-            </>
-          );
-        } else if (state === "crop") {
-          if (fileUrl == null) {
-            throw new UiLogicError();
-          }
-          return (
-            <>
+            );
+          } else if (state === "crop") {
+            if (fileUrl == null) {
+              throw new UiLogicError();
+            }
+            return (
               <div className="container">
                 <div className="row justify-content-center">
                   <ImageCropper
@@ -213,145 +258,120 @@ const ChangeAvatarDialog: React.FC<ChangeAvatarDialogProps> = (props) => {
                   />
                 </div>
                 <div className="row">
-                  {t("settings.dialogChangeAvatar.prompt.crop")}
+                  {c("settings.dialogChangeAvatar.prompt.crop")}
                 </div>
               </div>
-              <hr />
-              <div className="cru-dialog-bottom-area">
-                <Button
-                  text="operationDialog.cancel"
-                  color="secondary"
-                  outline
-                  onClick={close}
-                />
-                <Button
-                  text="operationDialog.previousStep"
-                  color="secondary"
-                  outline
-                  onClick={onCropPrevious}
-                />
-                <Button
-                  text="operationDialog.nextStep"
-                  color="primary"
-                  onClick={onCropNext}
-                  disabled={
-                    cropImgElement == null || clip == null || clip.width === 0
-                  }
-                />
-              </div>
-            </>
-          );
-        } else if (state === "processcrop") {
-          return (
-            <>
-              <div className="container">
-                <div className="row">
-                  {t("settings.dialogChangeAvatar.prompt.processingCrop")}
+            );
+          } else if (state === "process-crop") {
+            return (
+              <>
+                <div className="container">
+                  <div className="row">
+                    {c("settings.dialogChangeAvatar.prompt.processingCrop")}
+                  </div>
                 </div>
-              </div>
-              <hr />
-              <div className="cru-dialog-bottom-area">
-                <Button
-                  text="operationDialog.cancel"
-                  color="secondary"
-                  onClick={close}
-                  outline
-                />
-                <Button
-                  text="operationDialog.previousStep"
-                  color="secondary"
-                  onClick={onPreviewPrevious}
-                  outline
-                />
-              </div>
-            </>
-          );
-        } else if (state === "preview") {
-          return (
-            <>
-              <div className="container">
-                {createPreviewRow()}
-                <div className="row">
-                  {t("settings.dialogChangeAvatar.prompt.preview")}
+                <hr />
+                <div className="cru-dialog-bottom-area">
+                  <Button
+                    text="operationDialog.cancel"
+                    color="secondary"
+                    onClick={close}
+                    outline
+                  />
+                  <Button
+                    text="operationDialog.previousStep"
+                    color="secondary"
+                    onClick={onPreviewPrevious}
+                    outline
+                  />
                 </div>
-              </div>
-              <hr />
-              <div className="cru-dialog-bottom-area">
-                <Button
-                  text="operationDialog.cancel"
-                  color="secondary"
-                  outline
-                  onClick={close}
-                />
-                <Button
-                  text="operationDialog.previousStep"
-                  color="secondary"
-                  outline
-                  onClick={onPreviewPrevious}
-                />
-                <Button
-                  text="settings.dialogChangeAvatar.upload"
-                  color="primary"
-                  onClick={upload}
-                />
-              </div>
-            </>
-          );
-        } else if (state === "uploading") {
-          return (
-            <>
-              <div className="container">
-                {createPreviewRow()}
-                <div className="row">
-                  {t("settings.dialogChangeAvatar.prompt.uploading")}
+              </>
+            );
+          } else if (state === "preview") {
+            return (
+              <>
+                <div className="container">
+                  {createPreviewRow()}
+                  <div className="row">
+                    {t("settings.dialogChangeAvatar.prompt.preview")}
+                  </div>
                 </div>
-              </div>
-            </>
-          );
-        } else if (state === "success") {
-          return (
-            <>
-              <div className="container">
-                <div className="row p-4 text-success">
-                  {t("operationDialog.success")}
+                <hr />
+                <div className="cru-dialog-bottom-area">
+                  <Button
+                    text="operationDialog.cancel"
+                    color="secondary"
+                    outline
+                    onClick={close}
+                  />
+                  <Button
+                    text="operationDialog.previousStep"
+                    color="secondary"
+                    outline
+                    onClick={onPreviewPrevious}
+                  />
+                  <Button
+                    text="settings.dialogChangeAvatar.upload"
+                    color="primary"
+                    onClick={upload}
+                  />
                 </div>
-              </div>
-              <hr />
-              <div className="cru-dialog-bottom-area">
-                <Button
-                  text="operationDialog.ok"
-                  color="success"
-                  onClick={close}
-                />
-              </div>
-            </>
-          );
-        } else {
-          return (
-            <>
-              <div className="container">
-                {createPreviewRow()}
-                <div className="row text-danger">{trueMessage}</div>
-              </div>
-              <hr />
-              <div>
-                <Button
-                  text="operationDialog.cancel"
-                  color="secondary"
-                  onClick={close}
-                />
-                <Button
-                  text="operationDialog.retry"
-                  color="primary"
-                  onClick={upload}
-                />
-              </div>
-            </>
-          );
-        }
-      })()}
+              </>
+            );
+          } else if (state === "uploading") {
+            return (
+              <>
+                <div className="container">
+                  {createPreviewRow()}
+                  <div className="row">
+                    {t("settings.dialogChangeAvatar.prompt.uploading")}
+                  </div>
+                </div>
+              </>
+            );
+          } else if (state === "success") {
+            return (
+              <>
+                <div className="container">
+                  <div className="row p-4 text-success">
+                    {t("operationDialog.success")}
+                  </div>
+                </div>
+                <hr />
+                <div className="cru-dialog-bottom-area">
+                  <Button
+                    text="operationDialog.ok"
+                    color="success"
+                    onClick={close}
+                  />
+                </div>
+              </>
+            );
+          } else {
+            return (
+              <>
+                <div className="container">
+                  {createPreviewRow()}
+                  <div className="row text-danger">{trueMessage}</div>
+                </div>
+                <hr />
+                <div>
+                  <Button
+                    text="operationDialog.cancel"
+                    color="secondary"
+                    onClick={close}
+                  />
+                  <Button
+                    text="operationDialog.retry"
+                    color="primary"
+                    onClick={upload}
+                  />
+                </div>
+              </>
+            );
+          }
+        })()}
+      </DialogContainer>
     </Dialog>
   );
-};
-
-export default ChangeAvatarDialog;
+}
