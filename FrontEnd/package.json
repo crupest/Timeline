@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "source": "index.html",
   "scripts": {
-    "start": "parcel --port 5678",
+    "start": "parcel --port 5678 --hmr-port 6789",
     "build": "tsc && parcel build",
     "type-check": "tsc",
     "lint": "eslint src/ --ext .js --ext .jsx --ext .ts --ext .tsx",
