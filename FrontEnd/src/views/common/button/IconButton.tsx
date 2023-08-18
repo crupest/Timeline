@@ -9,6 +9,7 @@ interface IconButtonProps extends ComponentPropsWithoutRef<"i"> {
   icon: string;
   color?: ThemeColor;
   large?: boolean;
+  disabled?: boolean; // TODO: Not implemented
 }
 
 export default function IconButton(props: IconButtonProps) {

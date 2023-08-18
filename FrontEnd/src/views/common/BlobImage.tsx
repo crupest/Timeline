@@ -1,27 +1,26 @@
-import * as React from "react";
+import { ComponentPropsWithoutRef, useState, useEffect } from "react";
 
-const BlobImage: React.FC<
-  Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
-    blob?: Blob | unknown;
-  }
-> = (props) => {
-  const { blob, ...otherProps } = props;
+type BlobImageProps = Omit<ComponentPropsWithoutRef<"img">, "src"> & {
+  imgRef?: React.Ref<HTMLImageElement>;
+  src?: Blob | string | null;
+};
 
-  const [url, setUrl] = React.useState<string | undefined>(undefined);
+export default function BlobImage(props: BlobImageProps) {
+  const { imgRef, src, ...otherProps } = props;
 
-  React.useEffect(() => {
-    if (blob instanceof Blob) {
-      const url = URL.createObjectURL(blob);
+  const [url, setUrl] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (src instanceof Blob) {
+      const url = URL.createObjectURL(src);
       setUrl(url);
       return () => {
         URL.revokeObjectURL(url);
       };
     } else {
-      setUrl(undefined);
+      setUrl(src);
     }
-  }, [blob]);
+  }, [src]);
 
-  return <img {...otherProps} src={url} />;
-};
-
-export default BlobImage;
+  return <img ref={imgRef} {...otherProps} src={url ?? undefined} />;
+}

@@ -4,6 +4,7 @@ import classnames from "classnames";
 import { UiLogicError } from "@/common";
 
 import "./ImageCropper.css";
+import BlobImage from "./BlobImage";
 
 export interface Clip {
   left: number;
@@ -33,17 +34,17 @@ interface ImageCropperSavedState {
 
 export interface ImageCropperProps {
   clip: Clip | null;
-  imageUrl: string;
+  image: string | Blob;
   onChange: (clip: Clip) => void;
   imageElementCallback?: (element: HTMLImageElement | null) => void;
   className?: string;
 }
 
 const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
-  const { clip, imageUrl, onChange, imageElementCallback, className } = props;
+  const { clip, image, onChange, imageElementCallback, className } = props;
 
   const [oldState, setOldState] = React.useState<ImageCropperSavedState | null>(
-    null
+    null,
   );
   const [imageInfo, setImageInfo] = React.useState<ImageInfo | null>(null);
 
@@ -71,7 +72,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
         imageElementCallback(null);
       }
     },
-    [imageElementCallback]
+    [imageElementCallback],
   );
 
   const onImageLoad = React.useCallback(
@@ -93,7 +94,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
         imageElementCallback(img);
       }
     },
-    [onChange, imageElementCallback]
+    [onChange, imageElementCallback],
   );
 
   const onPointerDown = React.useCallback(
@@ -107,7 +108,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
         pointerId: e.pointerId,
       });
     },
-    [oldState, c]
+    [oldState, c],
   );
 
   const onPointerUp = React.useCallback(
@@ -116,7 +117,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
       e.currentTarget.releasePointerCapture(e.pointerId);
       setOldState(null);
     },
-    [oldState]
+    [oldState],
   );
 
   const onPointerMove = React.useCallback(
@@ -153,7 +154,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
       onChange({ left: newRatio.x, top: newRatio.y, width: oldClip.width });
     },
-    [oldState, onChange]
+    [oldState, onChange],
   );
 
   const onHandlerPointerMove = React.useCallback(
@@ -198,7 +199,7 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
 
       onChange({ left: oldClip.left, top: oldClip.top, width: newWidth });
     },
-    [imageInfo, oldState, onChange]
+    [imageInfo, oldState, onChange],
   );
 
   const toPercentage = (n: number): string => `${n}%`;
@@ -229,7 +230,12 @@ const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
       className={classnames("image-cropper-container", className)}
       style={containerStyle}
     >
-      <img ref={onImageRef} src={imageUrl} onLoad={onImageLoad} alt="to crop" />
+      <BlobImage
+        imgRef={onImageRef}
+        src={image}
+        onLoad={onImageLoad}
+        alt="to crop"
+      />
       <div className="image-cropper-mask-container">
         <div
           className="image-cropper-mask"
@@ -263,7 +269,7 @@ export default ImageCropper;
 export function applyClipToImage(
   image: HTMLImageElement,
   clip: Clip,
-  mimeType: string
+  mimeType: string,
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const naturalSize = {
@@ -292,7 +298,7 @@ export function applyClipToImage(
       0,
       0,
       clipArea.length,
-      clipArea.length
+      clipArea.length,
     );
 
     canvas.toBlob((blob) => {

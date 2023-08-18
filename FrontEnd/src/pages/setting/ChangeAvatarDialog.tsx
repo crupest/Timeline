@@ -1,10 +1,4 @@
-import {
-  useState,
-  useEffect,
-  ChangeEvent,
-  ComponentPropsWithoutRef,
-} from "react";
-import { AxiosError } from "axios";
+import { useState, ChangeEvent, ComponentPropsWithoutRef } from "react";
 
 import { useC, Text, UiLogicError } from "@/common";
 
@@ -16,10 +10,12 @@ import ImageCropper, {
   Clip,
   applyClipToImage,
 } from "@/views/common/ImageCropper";
-import Button from "@/views/common/button/Button";
-import ButtonRow from "@/views/common/button/ButtonRow";
+import BlobImage from "@/views/common/BlobImage";
+import ButtonRowV2 from "@/views/common/button/ButtonRowV2";
 import Dialog from "@/views/common/dialog/Dialog";
 import DialogContainer from "@/views/common/dialog/DialogContainer";
+
+import "./ChangeAvatarDialog.css";
 
 interface ChangeAvatarDialogProps {
   open: boolean;
@@ -34,15 +30,6 @@ export default function ChangeAvatarDialog({
 
   const user = useUser();
 
-  const [file, setFile] = useState<File | null>(null);
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
-  const [clip, setClip] = useState<Clip | null>(null);
-  const [cropImgElement, setCropImgElement] = useState<HTMLImageElement | null>(
-    null,
-  );
-  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
-  const [resultUrl, setResultUrl] = useState<string | null>(null);
-
   type State =
     | "select"
     | "crop"
@@ -53,45 +40,21 @@ export default function ChangeAvatarDialog({
     | "error";
   const [state, setState] = useState<State>("select");
 
+  const [file, setFile] = useState<File | null>(null);
+  const [clip, setClip] = useState<Clip | null>(null);
+  const [cropImgElement, setCropImgElement] = useState<HTMLImageElement | null>(
+    null,
+  );
+  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
   const [message, setMessage] = useState<Text>(
     "settings.dialogChangeAvatar.prompt.select",
   );
 
-  const trueMessage = c(message);
-
   const close = (): void => {
-    if (!(state === "uploading")) {
+    if (state !== "uploading") {
       onClose();
     }
   };
-
-  useEffect(() => {
-    if (file != null) {
-      const url = URL.createObjectURL(file);
-      setClip(null);
-      setFileUrl(url);
-      setState("crop");
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    } else {
-      setFileUrl(null);
-      setState("select");
-    }
-  }, [file]);
-
-  useEffect(() => {
-    if (resultBlob != null) {
-      const url = URL.createObjectURL(resultBlob);
-      setResultUrl(url);
-      setState("preview");
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    } else {
-      setResultUrl(null);
-    }
-  }, [resultBlob]);
 
   const onSelectFile = (e: ChangeEvent<HTMLInputElement>): void => {
     const files = e.target.files;
@@ -113,7 +76,9 @@ export default function ChangeAvatarDialog({
     }
 
     setState("process-crop");
+
     void applyClipToImage(cropImgElement, clip, file.type).then((b) => {
+      setState("preview");
       setResultBlob(b);
     });
   };
@@ -124,7 +89,6 @@ export default function ChangeAvatarDialog({
   };
 
   const onPreviewPrevious = () => {
-    setResultBlob(null);
     setState("crop");
   };
 
@@ -144,77 +108,80 @@ export default function ChangeAvatarDialog({
         () => {
           setState("success");
         },
-        (e: unknown) => {
+        () => {
           setState("error");
-          setMessage({ type: "custom", value: (e as AxiosError).message });
+          setMessage("operationDialog.error");
         },
       );
   };
 
-  const createPreviewRow = (): React.ReactElement => {
-    if (resultUrl == null) {
-      throw new UiLogicError();
-    }
-    return (
-      <div className="row justify-content-center">
-        <div className="col col-auto">
-          <img
-            className="change-avatar-img"
-            src={resultUrl}
-            alt={c("settings.dialogChangeAvatar.previewImgAlt") ?? undefined}
-            alt={c("settings.dialogChangeAvatar.previewImgAlt") ?? undefined}
-          />
-        </div>
-      </div>
-    );
-  };
+  const cancelButton = {
+    key: "cancel",
+    action: "secondary",
+    text: "operationDialog.cancel",
+    onClick: close,
+  } as const;
+
+  const createPreviousButton = (onClick: () => void) =>
+    ({
+      key: "previous",
+      action: "secondary",
+      text: "operationDialog.previousStep",
+      onClick,
+    }) as const;
 
   const buttonsMap: Record<
     State,
-    ComponentPropsWithoutRef<typeof ButtonRow>["buttons"]
+    ComponentPropsWithoutRef<typeof ButtonRowV2>["buttons"]
   > = {
     select: [
+      cancelButton,
       {
-        key: "cancel",
-        type: "normal",
-        props: {
-          outline: true,
-          color: "secondary",
-          text: "operationDialog.cancel",
-          onClick: close,
-        },
+        key: "next",
+        action: "primary",
+        text: "operationDialog.nextStep",
+        onClick: () => setState("crop"),
+        disabled: file == null,
       },
     ],
     crop: [
-      {
-        key: "cancel",
-        type: "normal",
-        props: {
-          outline: true,
-          color: "secondary",
-          text: "operationDialog.cancel",
-          onClick: close,
-        },
-      },
-      {
-        key: "previous",
-        type: "normal",
-        props: {
-          outline: true,
-          color: "secondary",
-          text: "operationDialog.previousStep",
-          onClick: onCropPrevious,
-        },
-      },
+      cancelButton,
+      createPreviousButton(onCropPrevious),
       {
         key: "next",
-        type: "normal",
-        props: {
-          color: "primary",
-          text: "operationDialog.nextStep",
-          onClick: onCropNext,
-          disabled: cropImgElement == null || clip == null || clip.width === 0,
-        },
+        action: "primary",
+        text: "operationDialog.nextStep",
+        onClick: onCropNext,
+        disabled: cropImgElement == null || clip == null || clip.width === 0,
+      },
+    ],
+    "process-crop": [cancelButton, createPreviousButton(onPreviewPrevious)],
+    preview: [
+      cancelButton,
+      createPreviousButton(onPreviewPrevious),
+      {
+        key: "upload",
+        action: "primary",
+        text: "settings.dialogChangeAvatar.upload",
+        onClick: upload,
+      },
+    ],
+    uploading: [],
+    success: [
+      {
+        key: "ok",
+        text: "operationDialog.ok",
+        color: "create",
+        onClick: close,
+      },
+    ],
+    error: [
+      cancelButton,
+      {
+        key: "retry",
+        action: "primary",
+        text: "operationDialog.retry",
+        onClick: upload,
       },
     ],
   };
@@ -224,150 +191,95 @@ export default function ChangeAvatarDialog({
       <DialogContainer
         title="settings.dialogChangeAvatar.title"
         titleColor="primary"
-        buttons={buttonsMap[state]}
+        buttonsV2={buttonsMap[state]}
       >
         {(() => {
           if (state === "select") {
             return (
-              <div className="">
-                <div className="row">
+              <div className="change-avatar-dialog-container">
+                <div className="change-avatar-dialog-prompt">
                   {c("settings.dialogChangeAvatar.prompt.select")}
                 </div>
-                <div className="row">
-                  <input
-                    className="px-0"
-                    type="file"
-                    accept="image/*"
-                    onChange={onSelectFile}
-                  />
-                </div>
+                <input
+                  className="change-avatar-select-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={onSelectFile}
+                />
               </div>
             );
           } else if (state === "crop") {
-            if (fileUrl == null) {
+            if (file == null) {
               throw new UiLogicError();
             }
             return (
-              <div className="container">
-                <div className="row justify-content-center">
-                  <ImageCropper
-                    clip={clip}
-                    onChange={setClip}
-                    imageUrl={fileUrl}
-                    imageElementCallback={setCropImgElement}
-                  />
-                </div>
-                <div className="row">
+              <div className="change-avatar-dialog-container">
+                <ImageCropper
+                  className="change-avatar-cropper"
+                  clip={clip}
+                  onChange={setClip}
+                  image={file}
+                  imageElementCallback={setCropImgElement}
+                />
+                <div className="change-avatar-dialog-prompt">
                   {c("settings.dialogChangeAvatar.prompt.crop")}
                 </div>
               </div>
             );
           } else if (state === "process-crop") {
             return (
-              <>
-                <div className="container">
-                  <div className="row">
-                    {c("settings.dialogChangeAvatar.prompt.processingCrop")}
-                  </div>
+              <div className="change-avatar-dialog-container">
+                <div className="change-avatar-dialog-prompt">
+                  {c("settings.dialogChangeAvatar.prompt.processingCrop")}
                 </div>
-                <hr />
-                <div className="cru-dialog-bottom-area">
-                  <Button
-                    text="operationDialog.cancel"
-                    color="secondary"
-                    onClick={close}
-                    outline
-                  />
-                  <Button
-                    text="operationDialog.previousStep"
-                    color="secondary"
-                    onClick={onPreviewPrevious}
-                    outline
-                  />
-                </div>
-              </>
+              </div>
             );
           } else if (state === "preview") {
             return (
-              <>
-                <div className="container">
-                  {createPreviewRow()}
-                  <div className="row">
-                    {t("settings.dialogChangeAvatar.prompt.preview")}
-                  </div>
+              <div className="change-avatar-dialog-container">
+                <BlobImage
+                  className="change-avatar-preview-image"
+                  src={resultBlob}
+                  alt={
+                    c("settings.dialogChangeAvatar.previewImgAlt") ?? undefined
+                  }
+                />
+                <div className="change-avatar-dialog-prompt">
+                  {c("settings.dialogChangeAvatar.prompt.preview")}
                 </div>
-                <hr />
-                <div className="cru-dialog-bottom-area">
-                  <Button
-                    text="operationDialog.cancel"
-                    color="secondary"
-                    outline
-                    onClick={close}
-                  />
-                  <Button
-                    text="operationDialog.previousStep"
-                    color="secondary"
-                    outline
-                    onClick={onPreviewPrevious}
-                  />
-                  <Button
-                    text="settings.dialogChangeAvatar.upload"
-                    color="primary"
-                    onClick={upload}
-                  />
-                </div>
-              </>
+              </div>
             );
           } else if (state === "uploading") {
             return (
-              <>
-                <div className="container">
-                  {createPreviewRow()}
-                  <div className="row">
-                    {t("settings.dialogChangeAvatar.prompt.uploading")}
-                  </div>
+              <div className="change-avatar-dialog-container">
+                <BlobImage
+                  className="change-avatar-preview-image"
+                  src={resultBlob}
+                />
+                <div className="change-avatar-dialog-prompt">
+                  {c("settings.dialogChangeAvatar.prompt.uploading")}
                 </div>
-              </>
+              </div>
             );
           } else if (state === "success") {
             return (
-              <>
-                <div className="container">
-                  <div className="row p-4 text-success">
-                    {t("operationDialog.success")}
-                  </div>
+              <div className="change-avatar-dialog-container">
+                <div className="change-avatar-dialog-prompt success">
+                  {c("operationDialog.success")}
                 </div>
-                <hr />
-                <div className="cru-dialog-bottom-area">
-                  <Button
-                    text="operationDialog.ok"
-                    color="success"
-                    onClick={close}
-                  />
-                </div>
-              </>
+              </div>
             );
           } else {
             return (
-              <>
-                <div className="container">
-                  {createPreviewRow()}
-                  <div className="row text-danger">{trueMessage}</div>
+              <div className="change-avatar-dialog-container">
+                <BlobImage
+                  className="change-avatar-preview-image"
+                  src={resultBlob}
+                />
+                <div className="change-avatar-dialog-prompt error">
+                  {c(message)}
                 </div>
-                <hr />
-                <div>
-                  <Button
-                    text="operationDialog.cancel"
-                    color="secondary"
-                    onClick={close}
-                  />
-                  <Button
-                    text="operationDialog.retry"
-                    color="primary"
-                    onClick={upload}
-                  />
-                </div>
-              </>
+              </div>
             );
           }
         })()}
