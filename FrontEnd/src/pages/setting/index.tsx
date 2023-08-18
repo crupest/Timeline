@@ -156,33 +156,34 @@ function RegisterCodeSettingItem() {
   }, [user, registerCode]);
 
   return (
-    <SettingItemContainer
-      title="settings.myRegisterCode"
-      description="settings.myRegisterCodeDesc"
-      className="register-code-setting-item"
-      onClick={() => setDialogOpen(true)}
-    >
-      {registerCode === undefined ? (
-        <Spinner />
-      ) : registerCode === null ? (
-        <span>Noop</span>
-      ) : (
-        <code
-          className="register-code"
-          onClick={(event) => {
-            void navigator.clipboard.writeText(registerCode).then(() => {
-              pushAlert({
-                type: "create",
-                message: "settings.myRegisterCodeCopied",
+    <>
+      <SettingItemContainer
+        title="settings.myRegisterCode"
+        description="settings.myRegisterCodeDesc"
+        className="register-code-setting-item"
+        onClick={() => setDialogOpen(true)}
+      >
+        {registerCode === undefined ? (
+          <Spinner />
+        ) : registerCode === null ? (
+          <span>Noop</span>
+        ) : (
+          <code
+            className="register-code"
+            onClick={(event) => {
+              void navigator.clipboard.writeText(registerCode).then(() => {
+                pushAlert({
+                  type: "create",
+                  message: "settings.myRegisterCodeCopied",
+                });
               });
-            });
-            event.stopPropagation();
-          }}
-        >
-          {registerCode}
-        </code>
-      )}
-
+              event.stopPropagation();
+            }}
+          >
+            {registerCode}
+          </code>
+        )}
+      </SettingItemContainer>
       <ConfirmDialog
         title="settings.renewRegisterCode"
         body="settings.renewRegisterCodeDesc"
@@ -196,8 +197,8 @@ function RegisterCodeSettingItem() {
               setRegisterCode(undefined);
             });
         }}
-      />
-    </SettingItemContainer>
+      />{" "}
+    </>
   );
 }
 
@@ -243,7 +244,6 @@ export default function SettingPage() {
     "change-avatar",
     "change-nickname",
     "logout",
-    "renew-register-code",
   ]);
 
   return (
@@ -271,7 +271,10 @@ export default function SettingPage() {
           />
         </SettingSection>
       ) : null}
-      <SettingSection title="settings.subheader.customization" color="secondary">
+      <SettingSection
+        title="settings.subheader.customization"
+        color="secondary"
+      >
         <LanguageChangeSettingItem />
       </SettingSection>
       <ChangePasswordDialog {...dialogPropsMap["change-password"]} />
