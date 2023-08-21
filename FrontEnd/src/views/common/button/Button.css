@@ -8,7 +8,7 @@
 }
 
 .cru-button:not(.outline) {
-  color: var(--cru--push-button-text-color);
+  color: var(--cru-push-button-text-color);
   background-color: var(--cru-button-normal-color);
   border-color: var(--cru-button-normal-color);
 }
