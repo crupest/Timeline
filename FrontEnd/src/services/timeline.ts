@@ -1,5 +1,12 @@
 import XRegExp from "xregexp";
-import { Observable, BehaviorSubject, switchMap, filter } from "rxjs";
+import {
+  Observable,
+  BehaviorSubject,
+  switchMap,
+  filter,
+  first,
+  distinctUntilChanged,
+} from "rxjs";
 import {
   HubConnection,
   HubConnectionBuilder,
@@ -62,9 +69,18 @@ function createConnection$(token: string | null): Observable<Connection> {
       connectionStateSubject.next("Connected");
     };
 
-    void connection.start().then(() => {
-      connectionStateSubject.next("Connected");
-    });
+    let requestStopped = false;
+
+    void connection.start().then(
+      () => {
+        connectionStateSubject.next("Connected");
+      },
+      (e) => {
+        if (!requestStopped) {
+          throw e;
+        }
+      },
+    );
 
     subscriber.next({
       connection,
@@ -73,25 +89,29 @@ function createConnection$(token: string | null): Observable<Connection> {
 
     return () => {
       void connection.stop();
+      requestStopped = true;
     };
   });
 }
 
 const connectionSubject = new BehaviorSubject<Connection | null>(null);
 
-token$.pipe(switchMap(createConnection$)).subscribe(connectionSubject);
+token$
+  .pipe(distinctUntilChanged(), switchMap(createConnection$))
+  .subscribe(connectionSubject);
 
 const connection$ = connectionSubject
   .asObservable()
   .pipe(filter((c): c is Connection => c != null));
 
 function createTimelinePostUpdateCount$(
-  connection: HubConnection,
+  connection: Connection,
   owner: string,
   timeline: string,
 ): Observable<number> {
   const [o, t] = [owner, timeline];
   return new Observable<number>((subscriber) => {
+    const hubConnection = connection.connection;
     let count = 0;
 
     const handler = (owner: string, timeline: string): void => {
@@ -100,16 +120,31 @@ function createTimelinePostUpdateCount$(
       }
     };
 
-    connection.on("OnTimelinePostChangedV2", handler);
-    void connection.invoke("SubscribeTimelinePostChangeV2", owner, timeline);
+    let hubOn = false;
+
+    const subscription = connection.state$
+      .pipe(first((state) => state === "Connected"))
+      .subscribe(() => {
+        hubConnection.on("OnTimelinePostChangedV2", handler);
+        void hubConnection.invoke(
+          "SubscribeTimelinePostChangeV2",
+          owner,
+          timeline,
+        );
+        hubOn = true;
+      });
 
     return () => {
-      void connection.invoke(
-        "UnsubscribeTimelinePostChangeV2",
-        owner,
-        timeline,
-      );
-      connection.off("OnTimelinePostChangedV2", handler);
+      if (hubOn) {
+        void hubConnection.invoke(
+          "UnsubscribeTimelinePostChangeV2",
+          owner,
+          timeline,
+        );
+        hubConnection.off("OnTimelinePostChangedV2", handler);
+      }
+
+      subscription.unsubscribe();
     };
   });
 }
@@ -125,7 +160,7 @@ function createTimelinePostOldUpdateInfo$(
     let savedState: ConnectionState = "Connecting";
 
     const postUpdateSubscription = createTimelinePostUpdateCount$(
-      connection.connection,
+      connection,
       owner,
       timeline,
     ).subscribe(() => {
