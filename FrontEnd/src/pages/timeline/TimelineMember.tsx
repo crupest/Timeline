@@ -1,5 +1,4 @@
 import { useState } from "react";
-import * as React from "react";
 import { useTranslation } from "react-i18next";
 
 import { convertI18nText, I18nText } from "@/common";
@@ -11,45 +10,50 @@ import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
 import SearchInput from "@/views/common/SearchInput";
 import UserAvatar from "@/views/common/user/UserAvatar";
 import Button from "@/views/common/button/Button";
-import Dialog from "@/views/common/dialog/Dialog";
+import { ListContainer, ListItemContainer } from "@/views/common/list";
 
 import "./TimelineMember.css";
 
-const TimelineMemberItem: React.FC<{
+function TimelineMemberItem({
+  user,
+  add,
+  onAction,
+}: {
   user: HttpUser;
   add?: boolean;
   onAction?: (username: string) => void;
-}> = ({ user, add, onAction }) => {
+}) {
   return (
-    <div className="container timeline-member-item">
-      <div className="row">
-        <div className="col col-auto">
-          <UserAvatar username={user.username} className="cru-avatar small" />
-        </div>
-        <div className="col">
-          <div className="row">{user.nickname}</div>
-          <small className="row">{"@" + user.username}</small>
-        </div>
-        {onAction ? (
-          <div className="col col-auto">
-            <Button
-              text={`timeline.member.${add ? "add" : "remove"}`}
-              color={add ? "success" : "danger"}
-              onClick={() => {
-                onAction(user.username);
-              }}
-            />
-          </div>
-        ) : null}
+    <ListItemContainer className="timeline-member-item">
+      <UserAvatar username={user.username} className="timeline-member-avatar" />
+      <div className="timeline-member-info">
+        <div className="timeline-member-nickname">{user.nickname}</div>
+        <small className="timeline-member-username">
+          {"@" + user.username}
+        </small>
       </div>
-    </div>
+      {onAction ? (
+        <div className="timeline-member-action">
+          <Button
+            text={`timeline.member.${add ? "add" : "remove"}`}
+            color={add ? "create" : "danger"}
+            onClick={() => {
+              onAction(user.username);
+            }}
+          />
+        </div>
+      ) : null}
+    </ListItemContainer>
   );
-};
+}
 
-const TimelineMemberUserSearch: React.FC<{
+function TimelineMemberUserSearch({
+  timeline,
+  onChange,
+}: {
   timeline: HttpTimelineInfo;
   onChange: () => void;
-}> = ({ timeline, onChange }) => {
+}) {
   const { t } = useTranslation();
 
   const [userSearchText, setUserSearchText] = useState<string>("");
@@ -64,9 +68,9 @@ const TimelineMemberUserSearch: React.FC<{
   >({ type: "init" });
 
   return (
-    <>
+    <div className="timeline-member-user-search">
       <SearchInput
-        className="mt-3"
+        className=""
         value={userSearchText}
         onChange={(v) => {
           setUserSearchText(v);
@@ -88,8 +92,8 @@ const TimelineMemberUserSearch: React.FC<{
                 users = users.filter(
                   (user) =>
                     timeline.members.findIndex(
-                      (m) => m.username === user.username
-                    ) === -1 && timeline.owner.username !== user.username
+                      (m) => m.username === user.username,
+                    ) === -1 && timeline.owner.username !== user.username,
                 );
                 setUserSearchState({ type: "users", data: users });
               },
@@ -98,7 +102,7 @@ const TimelineMemberUserSearch: React.FC<{
                   type: "error",
                   data: { type: "custom", value: String(e) },
                 });
-              }
+              },
             );
         }}
       />
@@ -109,7 +113,7 @@ const TimelineMemberUserSearch: React.FC<{
             return <div>{t("timeline.member.noUserAvailableToAdd")}</div>;
           } else {
             return (
-              <div className="mt-2">
+              <div className="">
                 {users.map((user) => (
                   <TimelineMemberItem
                     key={user.username}
@@ -120,7 +124,7 @@ const TimelineMemberUserSearch: React.FC<{
                         .memberPut(
                           timeline.owner.username,
                           timeline.nameV2,
-                          user.username
+                          user.username,
                         )
                         .then(() => {
                           setUserSearchText("");
@@ -141,22 +145,22 @@ const TimelineMemberUserSearch: React.FC<{
           );
         }
       })()}
-    </>
+    </div>
   );
-};
+}
 
-export interface TimelineMemberProps {
+interface TimelineMemberProps {
   timeline: HttpTimelineInfo;
   onChange: () => void;
 }
 
-const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
+export default function TimelineMember(props: TimelineMemberProps) {
   const { timeline, onChange } = props;
   const members = [timeline.owner, ...timeline.members];
 
   return (
     <div className="container px-4 py-3">
-      <div>
+      <ListContainer>
         {members.map((member, index) => (
           <TimelineMemberItem
             key={member.username}
@@ -168,7 +172,7 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
                       .memberDelete(
                         timeline.owner.username,
                         timeline.nameV2,
-                        member.username
+                        member.username,
                       )
                       .then(onChange);
                   }
@@ -176,27 +180,10 @@ const TimelineMember: React.FC<TimelineMemberProps> = (props) => {
             }
           />
         ))}
-      </div>
+      </ListContainer>
       {timeline.manageable ? (
         <TimelineMemberUserSearch timeline={timeline} onChange={onChange} />
       ) : null}
     </div>
   );
-};
-
-export default TimelineMember;
-
-export interface TimelineMemberDialogProps extends TimelineMemberProps {
-  open: boolean;
-  onClose: () => void;
 }
-
-export const TimelineMemberDialog: React.FC<TimelineMemberDialogProps> = (
-  props
-) => {
-  return (
-    <Dialog open={props.open} onClose={props.onClose}>
-      <TimelineMember {...props} />
-    </Dialog>
-  );
-};
