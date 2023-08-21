@@ -1,8 +1,20 @@
 .timeline-member-item {
-  border: var(--cru-background-1-color) solid;
-  border-width: 0.5px 1px;
+  align-items: center;
+  display: flex;
+  padding: 0.5em;
 }
 
-.timeline-member-item > div {
-  padding: 0.5em;
+.timeline-member-avatar {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.timeline-member-info {
+  margin-left: 1em;
+  margin-right: auto;
+}
+
+.timeline-member-user-search {
+  margin-top: 1em;
 }

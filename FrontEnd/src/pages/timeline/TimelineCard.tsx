@@ -8,7 +8,7 @@ import { HttpTimelineInfo } from "@/http/timeline";
 import { getHttpBookmarkClient } from "@/http/bookmark";
 
 import { useMobile } from "@/views/common/common";
-import { useDialog } from "@/views/common/dialog";
+import { Dialog, useDialog } from "@/views/common/dialog";
 import UserAvatar from "@/views/common/user/UserAvatar";
 import PopupMenu from "@/views/common/menu/PopupMenu";
 import FullPageDialog from "@/views/common/dialog/FullPageDialog";
@@ -16,7 +16,7 @@ import Card from "@/views/common/Card";
 import TimelineDeleteDialog from "./TimelineDeleteDialog";
 import ConnectionStatusBadge from "./ConnectionStatusBadge";
 import CollapseButton from "./CollapseButton";
-import { TimelineMemberDialog } from "./TimelineMember";
+import TimelineMember from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
 import IconButton from "@/views/common/button/IconButton";
 
@@ -144,11 +144,9 @@ export default function TimelineCard(props: TimelinePageCardProps) {
       ) : (
         <div style={{ display: collapse ? "none" : "block" }}>{content}</div>
       )}
-      <TimelineMemberDialog
-        timeline={timeline}
-        onChange={onReload}
-        {...dialogPropsMap["member"]}
-      />
+      <Dialog {...dialogPropsMap["member"]}>
+        <TimelineMember timeline={timeline} onChange={onReload} />
+      </Dialog>
       <TimelinePropertyChangeDialog
         timeline={timeline}
         onChange={onReload}
