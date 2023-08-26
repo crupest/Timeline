@@ -18,17 +18,17 @@
 
 /* common colors */
 :root {
-  --cru-background-color: #ffffff;
+  --cru-background-color: hsl(0, 0%, 100%);
   --cru-container-background-color: hsl(0, 0%, 97%);
-  --cru-text-primary-color: #000000;
+  --cru-text-primary-color: hsl(0, 0%, 0%);
   --cru-text-secondary-color: hsl(0, 0%, 38%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --cru-background-color: #000000;
+    --cru-background-color: hsl(0, 0%, 0%);
     --cru-container-background-color: hsl(0, 0%, 2%);
-    --cru-text-primary-color: #ffffff;
+    --cru-text-primary-color: hsl(0, 0%, 100%);
     --cru-text-secondary-color: hsl(0, 0%, 85%);
   }
 }

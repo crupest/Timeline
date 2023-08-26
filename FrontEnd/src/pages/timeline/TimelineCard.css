@@ -4,6 +4,7 @@
   top: 56px;
   right: 0;
   margin: 0.5em;
+  padding: 0.5em;
   box-shadow: var(--timeline-card-shadow);
 }
 
