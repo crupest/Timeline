@@ -26,7 +26,7 @@ export default function ConfirmDialog({
     <Dialog onClose={onClose} open={open}>
       <DialogContainer
         title={title}
-        titleColor={color}
+        titleColor={color ?? "danger"}
         buttons={[
           {
             key: "cancel",
