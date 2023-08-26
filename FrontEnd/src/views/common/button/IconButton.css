@@ -1,5 +1,5 @@
 .cru-icon-button {
-  color: var(--cru-button-normal-color);
+  color: var(--cru-clickable-normal-color);
   font-size: 1.4rem;
   background: none;
   border: none;
@@ -9,19 +9,19 @@
 }
 
 .cru-icon-button:hover {
-  color: var(--cru-button-hover-color);
+  color: var(--cru-clickable-hover-color);
 }
 
 .cru-icon-button:focus {
-  color: var(--cru-button-focus-color);
+  color: var(--cru-clickable-focus-color);
 }
 
 .cru-icon-button:active {
-  color: var(--cru-button-active-color);
+  color: var(--cru-clickable-active-color);
 }
 
 .cru-flat-button:disabled {
-  color: var(--cru-button-disabled-color);
+  color: var(--cru-clickable-disabled-color);
   cursor: auto;
 }
 

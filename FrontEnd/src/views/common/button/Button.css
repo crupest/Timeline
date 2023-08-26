@@ -9,23 +9,23 @@
 
 .cru-button:not(.outline) {
   color: var(--cru-push-button-text-color);
-  background-color: var(--cru-button-normal-color);
-  border-color: var(--cru-button-normal-color);
+  background-color: var(--cru-clickable-normal-color);
+  border-color: var(--cru-clickable-normal-color);
 }
 
 .cru-button:not(.outline):hover {
-  background-color: var(--cru-button-hover-color);
-  border-color: var(--cru-button-hover-color);
+  background-color: var(--cru-clickable-hover-color);
+  border-color: var(--cru-clickable-hover-color);
 }
 
 .cru-button:not(.outline):focus {
-  background-color: var(--cru-button-focus-color);
-  border-color: var(--cru-button-focus-color);
+  background-color: var(--cru-clickable-focus-color);
+  border-color: var(--cru-clickable-focus-color);
 }
 
 .cru-button:not(.outline):active {
-  background-color: var(--cru-button-active-color);
-  border-color: var(--cru-button-active-color);
+  background-color: var(--cru-clickable-active-color);
+  border-color: var(--cru-clickable-active-color);
 }
 
 .cru-button:not(.outline):disabled {
@@ -37,28 +37,28 @@
 
 
 .cru-button.outline {
-  color: var(--cru-button-normal-color);
-  border-color: var(--cru-button-normal-color);
+  color: var(--cru-clickable-normal-color);
+  border-color: var(--cru-clickable-normal-color);
   background-color: transparent;
 }
 
 .cru-button.outline:hover {
-  color: var(--cru-button-hover-color);
-  border-color: var(--cru-button-hover-color);
+  color: var(--cru-clickable-hover-color);
+  border-color: var(--cru-clickable-hover-color);
 }
 
 .cru-button.outline:focus {
-  color: var(--cru-button-focus-color);
-  border-color: var(--cru-button-focus-color);
+  color: var(--cru-clickable-focus-color);
+  border-color: var(--cru-clickable-focus-color);
 }
 
 .cru-button.outline:active {
-  color: var(--cru-button-active-color);
-  border-color: var(--cru-button-active-color);
+  color: var(--cru-clickable-active-color);
+  border-color: var(--cru-clickable-active-color);
 }
 
 .cru-button.outline:disabled {
-  color: var(--cru-button-disabled-color);
-  border-color: var(--cru-button-disabled-color);
+  color: var(--cru-clickable-disabled-color);
+  border-color: var(--cru-clickable-disabled-color);
   cursor: auto;
 }

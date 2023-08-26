@@ -47,6 +47,7 @@ export default function TimelinePostView(props: TimelinePostViewProps) {
       <TimelinePostCard className="cru-primary">
         {post.editable && (
           <IconButton
+            color="primary"
             icon="chevron-down"
             className="timeline-post-edit-button"
             onClick={(e) => {

@@ -112,6 +112,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
             containerClassName="d-inline"
           >
             <IconButton
+              color="primary"
               className="timeline-card-button"
               icon="three-dots-vertical"
             />

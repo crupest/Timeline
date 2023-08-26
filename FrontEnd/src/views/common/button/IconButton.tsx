@@ -7,7 +7,7 @@ import "./IconButton.css";
 
 interface IconButtonProps extends ComponentPropsWithoutRef<"i"> {
   icon: string;
-  color?: ThemeColor;
+  color?: ThemeColor | "grayscale";
   large?: boolean;
   disabled?: boolean; // TODO: Not implemented
 }
@@ -19,7 +19,7 @@ export default function IconButton(props: IconButtonProps) {
     <button
       className={classNames(
         "cru-icon-button",
-        `cru-button-${color ?? "primary"}`,
+        `cru-clickable-${color ?? "grayscale"}`,
         large && "large",
         "bi-" + icon,
         className,

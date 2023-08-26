@@ -34,7 +34,7 @@ export default function Button(props: ButtonProps) {
       ref={buttonRef}
       className={classNames(
         "cru-button",
-        `cru-button-${color ?? "primary"}`,
+        `cru-clickable-${color ?? "primary"}`,
         outline && "outline",
         className,
       )}

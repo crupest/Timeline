@@ -1,5 +1,3 @@
-/* TODO: Make item prettier. */
-
 .setting-section {
   padding: 1em 0;
   margin: 1em 0;
@@ -7,35 +5,36 @@
 
 .setting-section-title {
   padding: 0 1em;
-  color: white;
 }
 
 .setting-section-item-area {
   margin-top: 1em;
-  border-top: 1px solid var(--cru-secondary-color);
+  border-top: 1px solid var(--cru-primary-color);
 }
 
 .setting-item-container {
   padding: 0.5em 1em;
   transition: background-color 0.3s;
-  background-color: var(--cru-background-color);
-  border-bottom: 1px solid var(--cru-secondary-color);
+  background-color: var(--cru-clickable-grayscale-normal-color);
+  border-bottom: 1px solid var(--cru-clickable-grayscale-active-color);
   display: flex;
   align-items: center;
 }
 
 .setting-item-container:hover {
-  color: white;
-  background-color: var(--cru-secondary-color);
+  background-color: var(--cru-clickable-grayscale-hover-color);
+}
+
+.setting-item-container:focus {
+  background-color: var(--cru-clickable-grayscale-focus-color);
+}
+
+.setting-item-container:active {
+  background-color: var(--cru-clickable-grayscale-active-color);
 }
 
 .setting-item-container.danger {
   color: var(--cru-danger-color);
-}
-
-.setting-item-container.danger:hover {
-  color: white;
-  background-color: var(--cru-danger-color);
 }
 
 .setting-item-label-sub {

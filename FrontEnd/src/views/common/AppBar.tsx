@@ -59,7 +59,7 @@ export default function AppBar() {
         isCollapse && "collapse",
       )}
     >
-      <Link to="/" className="app-bar-brand active" onClick={collapse}>
+      <Link to="/" className="app-bar-brand" onClick={collapse}>
         <TimelineLogo className="app-bar-brand-icon" />
         Timeline
       </Link>
@@ -91,12 +91,7 @@ export default function AppBar() {
       </div>
 
       {isMobile && (
-        <IconButton
-          icon="list"
-          className="toggler"
-          color="on-surface"
-          onClick={toggleCollapse}
-        />
+        <IconButton icon="list" className="toggler" onClick={toggleCollapse} />
       )}
     </nav>
   );
