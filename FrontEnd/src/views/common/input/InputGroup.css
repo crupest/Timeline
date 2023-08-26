@@ -8,7 +8,7 @@
 
 .cru-input-label {
   display: block;
-  color: var(--cru-key-color);
+  color: var(--cru-clickable-normal-color);
   font-size: 0.9em;
   margin-bottom: 0.3em;
 }
@@ -20,24 +20,24 @@
 .cru-input-type-text input {
   appearance: none;
   display: block;
-  border: 1px solid var(--cru-surface-outline-color);
-  color: var(--cru-surface-on-color);
-  background-color: var(--cru-surface-color);
+  border: 1px solid;
+  /* color: var(--cru-surface-on-color); */
+  /* background-color: var(--cru-surface-color); */
   margin: 0;
-  padding: 0;
-  font-size: 1.2em;
+  font-size: 1em;
+  padding: 0.2em;
 }
 
 .cru-input-type-text input:hover {
-  border-color: var(--cru-key-color);
+  border-color: var(--cru-clickable-hover-color);
 }
 
 .cru-input-type-text input:focus {
-  border-color: var(--cru-key-color);
+  border-color: var(--cru-clickable-focus-color);
 }
 
 .cru-input-type-text input:disabled {
-  border-color: var(--cru-surface-on-color);
+  border-color: var(--cru-clickable-disabled-color);
 }
 
 .cru-input-error {

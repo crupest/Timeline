@@ -21,7 +21,6 @@ export type MenuItem =
 export type MenuItems = MenuItem[];
 
 export type MenuProps = {
-  color?: ThemeColor;
   items: MenuItems;
   onItemClicked?: () => void;
   className?: string;
@@ -29,7 +28,6 @@ export type MenuProps = {
 };
 
 export default function Menu({
-  color,
   items,
   onItemClicked,
   className,
@@ -38,19 +36,16 @@ export default function Menu({
   const c = useC();
 
   return (
-    <div
-      className={classNames(`cru-menu cru-button-${color ?? "primary"}`, className)}
-      style={style}
-    >
+    <div className={classNames("cru-menu", className)} style={style}>
       {items.map((item, index) => {
         if (item.type === "divider") {
           return <hr key={index} className="cru-menu-divider" />;
         } else {
           const { text, color, icon, onClick } = item;
           return (
-            <div
+            <button
               key={index}
-              className={`cru-menu-item cru-button-${color ?? "primary"}`}
+              className={`cru-menu-item cru-clickable-${color ?? "primary"}`}
               onClick={() => {
                 onClick();
                 onItemClicked?.();
@@ -58,7 +53,7 @@ export default function Menu({
             >
               {icon != null && <Icon color={color} icon={icon} />}
               {c(text)}
-            </div>
+            </button>
           );
         }
       })}
