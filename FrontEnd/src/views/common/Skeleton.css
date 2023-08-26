@@ -4,7 +4,7 @@
 
 .cru-skeleton-line {
   height: 1em;
-  background-color: #e6e6e6;
+  background-color: hsl(0, 0%, 90%);
   margin: 0.7em 0;
   border-radius: 0.2em;
 }
