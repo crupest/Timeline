@@ -1,21 +1,25 @@
-import * as React from "react";
+import { CSSProperties } from "react";
 
 import IconButton from "@/views/common/button/IconButton";
 
-const CollapseButton: React.FC<{
+export default function CollapseButton({
+  collapse,
+  onClick,
+  className,
+  style,
+}: {
   collapse: boolean;
   onClick: () => void;
   className?: string;
-  style?: React.CSSProperties;
-}> = ({ collapse, onClick, className, style }) => {
+  style?: CSSProperties;
+}) {
   return (
     <IconButton
+      color="primary"
       icon={collapse ? "arrows-angle-expand" : "arrows-angle-contract"}
       onClick={onClick}
       className={className}
       style={style}
     />
   );
-};
-
-export default CollapseButton;
+}

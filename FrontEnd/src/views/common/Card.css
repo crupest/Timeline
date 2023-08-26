@@ -1,10 +1,20 @@
 .cru-card {
   border-radius: var(--cru-card-border-radius);
-  border: 2px solid var(--cru-card-border-color);
-  background-color: var(--cru-card-background-color);
   transition: all 0.3s;
 }
 
-.cru-card-no-background {
+.cru-card-background-none {
+  background-color: transparent;
+}
+
+.cru-card-background-solid {
   background-color: var(--cru-background-color);
+}
+
+.cru-card-background-grayscale {
+  background-color: var(--cru-container-background-color);
+}
+
+.cru-card-border-color {
+  border: 2px solid var(--cru-card-border-color);
 }

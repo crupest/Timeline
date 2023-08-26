@@ -247,9 +247,9 @@ export default function SettingPage() {
   ]);
 
   return (
-    <Page className="cru-primary" noTopPadding>
+    <Page noTopPadding>
       {user ? (
-        <SettingSection title="settings.subheader.account" color="secondary">
+        <SettingSection title="settings.subheader.account">
           <RegisterCodeSettingItem />
           <ButtonSettingItem
             title="settings.changeAvatar"
@@ -271,10 +271,7 @@ export default function SettingPage() {
           />
         </SettingSection>
       ) : null}
-      <SettingSection
-        title="settings.subheader.customization"
-        color="secondary"
-      >
+      <SettingSection title="settings.subheader.customization">
         <LanguageChangeSettingItem />
       </SettingSection>
       <ChangePasswordDialog {...dialogPropsMap["change-password"]} />

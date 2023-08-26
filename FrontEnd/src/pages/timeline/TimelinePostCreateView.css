@@ -24,11 +24,11 @@
 }
 
 .timeline-post-create-edit-text:hover {
-  border-color: var(--cru-button-secondary-normal-color)
+  border-color: var(--cru-clickable-secondary-normal-color)
 }
 
 .timeline-post-create-edit-text:focus {
-  border-color: var(--cru-button-secondary-normal-color)
+  border-color: var(--cru-clickable-secondary-normal-color)
 }
 
 .timeline-post-create-image {

@@ -7,12 +7,14 @@ import "./Card.css";
 interface CardProps extends ComponentPropsWithoutRef<"div"> {
   containerRef?: Ref<HTMLDivElement>;
   color?: ThemeColor;
-  noBackground?: boolean;
+  border?: "color" | "none";
+  background?: "color" | "solid" | "grayscale" | "none";
 }
 
 export default function Card({
   color,
-  noBackground,
+  background,
+  border,
   className,
   children,
   containerRef,
@@ -24,7 +26,8 @@ export default function Card({
       className={classNames(
         "cru-card",
         `cru-card-${color ?? "primary"}`,
-        noBackground && "cru-card-no-background",
+        `cru-card-border-${border ?? "color"}`,
+        `cru-card-background-${background ?? "solid"}`,
         className,
       )}
       {...otherProps}

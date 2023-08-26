@@ -37,15 +37,20 @@
 }
 
 .app-bar a:hover {
-  background-color: var(--cru-button-primary-hover-color);
+  background-color: var(--cru-clickable-primary-hover-color);
 }
 
 .app-bar a:focus {
-  background-color: var(--cru-button-primary-focus-color);
+  background-color: var(--cru-clickable-primary-focus-color);
 }
 
 .app-bar a:active {
-  background-color: var(--cru-button-primary-active-color);
+  background-color: var(--cru-clickable-primary-active-color);
+}
+
+/* the current page */
+.app-bar a.active {
+  background-color: var(--cru-clickable-primary-focus-color);
 }
 
 .app-bar .app-bar-avatar img {
