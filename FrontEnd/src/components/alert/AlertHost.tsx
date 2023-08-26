@@ -3,8 +3,8 @@ import without from "lodash/without";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
-import { alertService, AlertInfoEx, AlertInfo } from "@/services/alert";
-import { convertI18nText } from "@/common";
+import { alertService, AlertInfoEx, AlertInfo } from "~src/services/alert";
+import { convertI18nText } from "~src/common";
 
 import IconButton from "../button/IconButton";
 

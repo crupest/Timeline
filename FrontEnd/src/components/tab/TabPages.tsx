@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { I18nText, UiLogicError } from "@/common";
+import { I18nText, UiLogicError } from "~src/common";
 
 import Tabs from "./Tabs";
 

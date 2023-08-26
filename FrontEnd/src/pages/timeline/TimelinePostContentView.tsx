@@ -2,15 +2,15 @@ import * as React from "react";
 import classnames from "classnames";
 import { marked } from "marked";
 
-import { UiLogicError } from "@/common";
+import { UiLogicError } from "~src/common";
 
-import { HttpNetworkError } from "@/http/common";
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
+import { HttpNetworkError } from "~src/http/common";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "~src/http/timeline";
 
-import { useUser } from "@/services/user";
+import { useUser } from "~src/services/user";
 
-import Skeleton from "@/views/common/Skeleton";
-import LoadFailReload from "@/views/common/LoadFailReload";
+import Skeleton from "~src/components/Skeleton";
+import LoadFailReload from "~src/components/LoadFailReload";
 
 const TextView: React.FC<TimelinePostContentViewProps> = (props) => {
   const { post, className, style } = props;

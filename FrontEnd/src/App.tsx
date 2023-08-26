@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import AppBar from "./views/common/AppBar";
+import AppBar from "./components/AppBar";
 import NotFoundPage from "./pages/404";
 import HomePage from "./pages/home";
 import AboutPage from "./pages/about";
@@ -10,7 +10,7 @@ import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import TimelinePage from "./pages/timeline";
 import LoadingPage from "./pages/loading";
-import AlertHost from "./views/common/alert/AlertHost";
+import AlertHost from "./components/alert/AlertHost";
 
 export default function App() {
   return (

@@ -1,6 +1,6 @@
 import { CSSProperties } from "react";
 
-import IconButton from "@/views/common/button/IconButton";
+import IconButton from "~src/components/button/IconButton";
 
 export default function CollapseButton({
   collapse,

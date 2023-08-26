@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { BehaviorSubject, Observable } from "rxjs";
 import { AxiosError } from "axios";
 
-import { UiLogicError } from "@/common";
+import { UiLogicError } from "~src/common";
 
-import { setHttpToken, axios, HttpBadRequestError } from "@/http/common";
-import { getHttpTokenClient } from "@/http/token";
-import { getHttpUserClient, HttpUser, UserPermission } from "@/http/user";
+import { setHttpToken, axios, HttpBadRequestError } from "~src/http/common";
+import { getHttpTokenClient } from "~src/http/token";
+import { getHttpUserClient, HttpUser, UserPermission } from "~src/http/user";
 
 import { pushAlert } from "./alert";
 

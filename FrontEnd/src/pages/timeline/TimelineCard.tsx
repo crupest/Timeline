@@ -1,24 +1,24 @@
 import { useState } from "react";
 import { HubConnectionState } from "@microsoft/signalr";
 
-import { useUser } from "@/services/user";
-import { pushAlert } from "@/services/alert";
+import { useUser } from "~src/services/user";
+import { pushAlert } from "~src/services/alert";
 
-import { HttpTimelineInfo } from "@/http/timeline";
-import { getHttpBookmarkClient } from "@/http/bookmark";
+import { HttpTimelineInfo } from "~src/http/timeline";
+import { getHttpBookmarkClient } from "~src/http/bookmark";
 
-import { useMobile } from "@/views/common/common";
-import { Dialog, useDialog } from "@/views/common/dialog";
-import UserAvatar from "@/views/common/user/UserAvatar";
-import PopupMenu from "@/views/common/menu/PopupMenu";
-import FullPageDialog from "@/views/common/dialog/FullPageDialog";
-import Card from "@/views/common/Card";
+import { useMobile } from "~src/components/common";
+import { Dialog, useDialog } from "~src/components/dialog";
+import UserAvatar from "~src/components/user/UserAvatar";
+import PopupMenu from "~src/components/menu/PopupMenu";
+import FullPageDialog from "~src/components/dialog/FullPageDialog";
+import Card from "~src/components/Card";
 import TimelineDeleteDialog from "./TimelineDeleteDialog";
 import ConnectionStatusBadge from "./ConnectionStatusBadge";
 import CollapseButton from "./CollapseButton";
 import TimelineMember from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
-import IconButton from "@/views/common/button/IconButton";
+import IconButton from "~src/components/button/IconButton";
 
 import "./TimelineCard.css";
 

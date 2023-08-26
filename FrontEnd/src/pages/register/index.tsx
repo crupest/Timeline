@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-import { HttpBadRequestError } from "@/http/common";
-import { getHttpTokenClient } from "@/http/token";
-import { userService, useUser } from "@/services/user";
+import { HttpBadRequestError } from "~src/http/common";
+import { getHttpTokenClient } from "~src/http/token";
+import { userService, useUser } from "~src/services/user";
 
-import { LoadingButton } from "@/views/common/button";
+import { LoadingButton } from "~src/components/button";
 import {
   useInputs,
   InputErrorDict,
   InputGroup,
-} from "@/views/common/input/InputGroup";
+} from "~src/components/input/InputGroup";
 
 import "./index.css";
 

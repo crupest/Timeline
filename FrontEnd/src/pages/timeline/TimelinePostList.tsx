@@ -1,6 +1,6 @@
 import { useMemo, Fragment } from "react";
 
-import { HttpTimelinePostInfo } from "@/http/timeline";
+import { HttpTimelinePostInfo } from "~src/http/timeline";
 
 import TimelinePostView from "./TimelinePostView";
 import TimelineDateLabel from "./TimelineDateLabel";

@@ -69,6 +69,8 @@ export type InputValueDict = Record<string, InputValue>;
 export type InputErrorDict = Record<string, Text>;
 export type InputDisabledDict = Record<string, boolean>;
 export type InputDirtyDict = Record<string, boolean>;
+// use never so you don't have to cast everywhere
+export type InputConfirmValueDict = Record<string, never>;
 
 export type GeneralInputErrorDict =
   | {
@@ -143,7 +145,7 @@ function cleanObject<V>(o: Record<string, V>): Record<string, NonNullable<V>> {
 export type ConfirmResult =
   | {
       type: "ok";
-      values: InputValueDict;
+      values: InputConfirmValueDict;
     }
   | {
       type: "error";
@@ -328,7 +330,7 @@ export function useInputs(options: { init: Initializer }): {
       } else {
         return {
           type: "ok",
-          values: data.values,
+          values: data.values as InputConfirmValueDict,
         };
       }
     },

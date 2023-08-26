@@ -2,15 +2,15 @@ import * as React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "~src/http/timeline";
 
-import TimelinePostBuilder from "@/services/TimelinePostBuilder";
+import TimelinePostBuilder from "~src/services/TimelinePostBuilder";
 
-import FlatButton from "@/views/common/button/FlatButton";
-import TabPages from "@/views/common/tab/TabPages";
-import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
-import Spinner from "@/views/common/Spinner";
-import IconButton from "@/views/common/button/IconButton";
+import FlatButton from "~src/components/button/FlatButton";
+import TabPages from "~src/components/tab/TabPages";
+import ConfirmDialog from "~src/components/dialog/ConfirmDialog";
+import Spinner from "~src/components/Spinner";
+import IconButton from "~src/components/button/IconButton";
 
 import "./MarkdownPostEdit.css";
 

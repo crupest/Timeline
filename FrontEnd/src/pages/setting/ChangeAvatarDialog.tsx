@@ -1,19 +1,19 @@
 import { useState, ChangeEvent, ComponentPropsWithoutRef } from "react";
 
-import { useC, Text, UiLogicError } from "@/common";
+import { useC, Text, UiLogicError } from "~src/common";
 
-import { useUser } from "@/services/user";
+import { useUser } from "~src/services/user";
 
-import { getHttpUserClient } from "@/http/user";
+import { getHttpUserClient } from "~src/http/user";
 
 import ImageCropper, {
   Clip,
   applyClipToImage,
-} from "@/views/common/ImageCropper";
-import BlobImage from "@/views/common/BlobImage";
-import ButtonRowV2 from "@/views/common/button/ButtonRowV2";
-import Dialog from "@/views/common/dialog/Dialog";
-import DialogContainer from "@/views/common/dialog/DialogContainer";
+} from "~src/components/ImageCropper";
+import BlobImage from "~src/components/BlobImage";
+import ButtonRowV2 from "~src/components/button/ButtonRowV2";
+import Dialog from "~src/components/dialog/Dialog";
+import DialogContainer from "~src/components/dialog/DialogContainer";
 
 import "./ChangeAvatarDialog.css";
 

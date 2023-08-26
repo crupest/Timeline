@@ -8,21 +8,21 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
 
-import { useC, Text } from "@/common";
-import { useUser, userService } from "@/services/user";
-import { getHttpUserClient } from "@/http/user";
+import { useC, Text } from "~src/common";
+import { useUser, userService } from "~src/services/user";
+import { getHttpUserClient } from "~src/http/user";
 
-import { useDialog } from "@/views/common/dialog";
-import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
-import Card from "@/views/common/Card";
-import Spinner from "@/views/common/Spinner";
-import Page from "@/views/common/Page";
+import { useDialog } from "~src/components/dialog";
+import ConfirmDialog from "~src/components/dialog/ConfirmDialog";
+import Card from "~src/components/Card";
+import Spinner from "~src/components/Spinner";
+import Page from "~src/components/Page";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
 import "./index.css";
-import { pushAlert } from "@/services/alert";
+import { pushAlert } from "~src/services/alert";
 
 interface SettingSectionProps
   extends Omit<ComponentPropsWithoutRef<typeof Card>, "title"> {

@@ -1,26 +1,26 @@
 import { useState, useEffect, ChangeEventHandler } from "react";
 import { useTranslation } from "react-i18next";
 
-import { UiLogicError } from "@/common";
+import { UiLogicError } from "~src/common";
 
 import {
   getHttpTimelineClient,
   HttpTimelineInfo,
   HttpTimelinePostInfo,
   HttpTimelinePostPostRequestData,
-} from "@/http/timeline";
+} from "~src/http/timeline";
 
-import { pushAlert } from "@/services/alert";
+import { pushAlert } from "~src/services/alert";
 
-import base64 from "@/utilities/base64";
+import base64 from "~src/utilities/base64";
 
-import BlobImage from "@/views/common/BlobImage";
-import LoadingButton from "@/views/common/button/LoadingButton";
-import PopupMenu from "@/views/common/menu/PopupMenu";
+import BlobImage from "~src/components/BlobImage";
+import LoadingButton from "~src/components/button/LoadingButton";
+import PopupMenu from "~src/components/menu/PopupMenu";
 import MarkdownPostEdit from "./MarkdownPostEdit";
 import TimelinePostCard from "./TimelinePostCard";
 import TimelinePostContainer from "./TimelinePostContainer";
-import IconButton from "@/views/common/button/IconButton";
+import IconButton from "~src/components/button/IconButton";
 
 import "./TimelinePostCreateView.css";
 import classNames from "classnames";

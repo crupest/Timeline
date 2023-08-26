@@ -9,9 +9,11 @@ import {
   Initializer as InputInitializer,
   InputValueDict,
   InputErrorDict,
-} from "../input/InputGroup";
+  InputConfirmValueDict,
+} from "../input";
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";
+import { ButtonRow } from "../button";
 
 import "./OperationDialog.css";
 
@@ -53,7 +55,7 @@ export interface OperationDialogProps<TData> {
 
   inputs: InputInitializer;
 
-  onProcess: (inputs: InputValueDict) => Promise<TData>;
+  onProcess: (inputs: InputConfirmValueDict) => Promise<TData>;
   onSuccessAndClose?: (data: TData) => void;
 }
 
@@ -140,7 +142,7 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   }
 
   let body: ReactNode;
-  let buttons: ComponentProps<typeof DialogContainer>["buttons"];
+  let buttons: ComponentProps<typeof ButtonRow>["buttons"];
 
   if (step.type === "input" || step.type === "process") {
     const isProcessing = step.type === "process";

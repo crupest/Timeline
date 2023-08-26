@@ -1,7 +1,7 @@
 import "./index.css";
 
-import { useC } from "@/common";
-import Page from "@/views/common/Page";
+import { useC } from "~src/common";
+import Page from "~src/components/Page";
 
 interface Credit {
   name: string;

@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
-import { useUser, userService } from "@/services/user";
+import { useUser, userService } from "~src/services/user";
 
-import { useC } from "@/views/common/common";
-import LoadingButton from "@/views/common/button/LoadingButton";
+import { useC } from "~src/components/common";
+import LoadingButton from "~src/components/button/LoadingButton";
 import {
   InputErrorDict,
   InputGroup,
   useInputs,
-} from "@/views/common/input/InputGroup";
-import Page from "@/views/common/Page";
+} from "~src/components/input/InputGroup";
+import Page from "~src/components/Page";
 
 import "./index.css";
 

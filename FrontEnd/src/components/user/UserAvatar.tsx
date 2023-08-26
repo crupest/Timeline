@@ -1,6 +1,6 @@
 import { Ref, ComponentPropsWithoutRef } from "react";
 
-import { getHttpUserClient } from "@/http/user";
+import { getHttpUserClient } from "~src/http/user";
 
 export interface UserAvatarProps extends ComponentPropsWithoutRef<"img"> {
   username: string;

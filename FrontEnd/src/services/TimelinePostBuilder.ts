@@ -1,10 +1,10 @@
 import { marked } from "marked";
 
-import { UiLogicError } from "@/common";
+import { UiLogicError } from "~src/common";
 
-import base64 from "@/utilities/base64";
+import base64 from "~src/utilities/base64";
 
-import { HttpTimelinePostPostRequest } from "@/http/timeline";
+import { HttpTimelinePostPostRequest } from "~src/http/timeline";
 
 class TimelinePostMarkedRenderer extends marked.Renderer {
   constructor(private _images: { file: File; url: string }[]) {

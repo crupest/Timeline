@@ -1,4 +1,4 @@
-import { useC, Text, ThemeColor } from "@/views/common/common";
+import { useC, Text, ThemeColor } from "../common";
 
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";

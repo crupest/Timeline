@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
 import classnames from "classnames";
-import { useScrollToBottom } from "@/utilities/hooks";
+import { useScrollToBottom } from "~src/utilities/hooks";
 import { HubConnectionState } from "@microsoft/signalr";
 
 import {
   HttpForbiddenError,
   HttpNetworkError,
   HttpNotFoundError,
-} from "@/http/common";
+} from "~src/http/common";
 import {
   getHttpTimelineClient,
   HttpTimelineInfo,
   HttpTimelinePostInfo,
-} from "@/http/timeline";
+} from "~src/http/timeline";
 
-import { getTimelinePostUpdate$ } from "@/services/timeline";
+import { getTimelinePostUpdate$ } from "~src/services/timeline";
 
 import TimelinePostList from "./TimelinePostList";
 import TimelinePostEdit from "./TimelinePostCreateView";
