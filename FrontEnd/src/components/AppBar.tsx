@@ -3,7 +3,7 @@ import classnames from "classnames";
 import { Link, NavLink } from "react-router-dom";
 
 import { I18nText, useC, useMobile } from "./common";
-import { useUser } from "@/services/user";
+import { useUser } from "~src/services/user";
 
 import TimelineLogo from "./TimelineLogo";
 import { IconButton } from "./button";

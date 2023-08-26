@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { userService } from "@/services/user";
+import { userService } from "~src/services/user";
 
 import OperationDialog, {
   InputErrorDict,
-} from "@/views/common/dialog/OperationDialog";
+} from "~src/components/dialog/OperationDialog";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -65,10 +65,7 @@ export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
         },
       }}
       onProcess={async ({ oldPassword, newPassword }) => {
-        await userService.changePassword(
-          oldPassword as string,
-          newPassword as string,
-        );
+        await userService.changePassword(oldPassword, newPassword);
         setRedirect(true);
       }}
       onSuccessAndClose={() => {

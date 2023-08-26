@@ -1,7 +1,7 @@
 import * as React from "react";
 import classnames from "classnames";
 
-import { UiLogicError } from "@/common";
+import { UiLogicError } from "~src/common";
 
 import "./ImageCropper.css";
 import BlobImage from "./BlobImage";

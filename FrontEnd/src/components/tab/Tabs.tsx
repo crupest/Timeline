@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import classnames from "classnames";
 
-import { convertI18nText, I18nText } from "@/common";
+import { convertI18nText, I18nText } from "~src/common";
 
 import "./Tabs.css";
 

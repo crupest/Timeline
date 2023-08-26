@@ -1,4 +1,4 @@
-import { withQuery } from "@/utilities/url";
+import { withQuery } from "~src/utilities/url";
 
 import { axios, apiBaseUrl, extractResponseData, Page } from "./common";
 

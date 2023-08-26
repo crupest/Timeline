@@ -2,9 +2,9 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
-import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
+import { getHttpTimelineClient, HttpTimelineInfo } from "~src/http/timeline";
 
-import OperationDialog from "@/views/common/dialog/OperationDialog";
+import OperationDialog from "~src/components/dialog/OperationDialog";
 
 interface TimelineDeleteDialog {
   timeline: HttpTimelineInfo;

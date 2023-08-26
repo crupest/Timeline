@@ -6,9 +6,9 @@ import {
   HttpTimelinePatchRequest,
   kTimelineVisibilities,
   TimelineVisibility,
-} from "@/http/timeline";
+} from "~src/http/timeline";
 
-import OperationDialog from "@/views/common/dialog/OperationDialog";
+import OperationDialog from "~src/components/dialog/OperationDialog";
 
 export interface TimelinePropertyChangeDialogProps {
   open: boolean;
@@ -68,13 +68,13 @@ const TimelinePropertyChangeDialog: React.FC<
       onProcess={({ title, visibility, description }) => {
         const req: HttpTimelinePatchRequest = {};
         if (title !== timeline.title) {
-          req.title = title as string;
+          req.title = title;
         }
         if (visibility !== timeline.visibility) {
-          req.visibility = visibility as TimelineVisibility;
+          req.visibility = visibility;
         }
         if (description !== timeline.description) {
-          req.description = description as string;
+          req.description = description;
         }
         return getHttpTimelineClient()
           .patchTimeline(timeline.owner.username, timeline.nameV2, req)

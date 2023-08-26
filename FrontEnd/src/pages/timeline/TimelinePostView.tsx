@@ -1,17 +1,17 @@
 import { useState } from "react";
 
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "@/http/timeline";
+import { getHttpTimelineClient, HttpTimelinePostInfo } from "~src/http/timeline";
 
-import { pushAlert } from "@/services/alert";
+import { pushAlert } from "~src/services/alert";
 
-import { useClickOutside } from "@/utilities/hooks";
+import { useClickOutside } from "~src/utilities/hooks";
 
-import UserAvatar from "@/views/common/user/UserAvatar";
-import { useDialog } from "@/views/common/dialog";
-import FlatButton from "@/views/common/button/FlatButton";
-import ConfirmDialog from "@/views/common/dialog/ConfirmDialog";
+import UserAvatar from "~src/components/user/UserAvatar";
+import { useDialog } from "~src/components/dialog";
+import FlatButton from "~src/components/button/FlatButton";
+import ConfirmDialog from "~src/components/dialog/ConfirmDialog";
 import TimelinePostContentView from "./TimelinePostContentView";
-import IconButton from "@/views/common/button/IconButton";
+import IconButton from "~src/components/button/IconButton";
 
 import TimelinePostContainer from "./TimelinePostContainer";
 import TimelinePostCard from "./TimelinePostCard";

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useUserLoggedIn } from "@/services/user";
+import { useUserLoggedIn } from "~src/services/user";
 
 import SearchInput from "../common/SearchInput";
 import Button from "../common/button/Button";

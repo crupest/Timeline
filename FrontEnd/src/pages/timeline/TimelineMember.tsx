@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { convertI18nText, I18nText } from "@/common";
+import { convertI18nText, I18nText } from "~src/common";
 
-import { HttpUser } from "@/http/user";
-import { getHttpSearchClient } from "@/http/search";
-import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
+import { HttpUser } from "~src/http/user";
+import { getHttpSearchClient } from "~src/http/search";
+import { getHttpTimelineClient, HttpTimelineInfo } from "~src/http/timeline";
 
-import SearchInput from "@/views/common/SearchInput";
-import UserAvatar from "@/views/common/user/UserAvatar";
-import Button from "@/views/common/button/Button";
-import { ListContainer, ListItemContainer } from "@/views/common/list";
+import SearchInput from "~src/components/SearchInput";
+import UserAvatar from "~src/components/user/UserAvatar";
+import Button from "~src/components/button/Button";
+import { ListContainer, ListItemContainer } from "~src/components/list";
 
 import "./TimelineMember.css";
 

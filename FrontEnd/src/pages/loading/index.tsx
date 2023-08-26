@@ -1,4 +1,4 @@
-import Spinner from "@/views/common/Spinner";
+import Spinner from "~src/components/Spinner";
 
 import "./index.css";
 

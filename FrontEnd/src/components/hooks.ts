@@ -4,7 +4,7 @@ export {
   useIsSmallScreen,
   useClickOutside,
   useScrollToBottom,
-} from "@/utilities/hooks";
+} from "~src/utilities/hooks";
 
 import { useMediaQuery } from "react-responsive";
 import { breakpoints } from "./breakpoints";

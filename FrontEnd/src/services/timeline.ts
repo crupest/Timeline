@@ -13,8 +13,8 @@ import {
   HubConnectionState,
 } from "@microsoft/signalr";
 
-import { TimelineVisibility } from "@/http/timeline";
-import { token$ } from "@/http/common";
+import { TimelineVisibility } from "~src/http/timeline";
+import { token$ } from "~src/http/common";
 
 // cSpell:ignore onreconnected onreconnecting
 

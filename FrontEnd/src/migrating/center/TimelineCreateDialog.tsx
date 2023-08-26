@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { validateTimelineName } from "@/services/timeline";
-import { getHttpTimelineClient, HttpTimelineInfo } from "@/http/timeline";
+import { validateTimelineName } from "~src/services/timeline";
+import { getHttpTimelineClient, HttpTimelineInfo } from "~src/http/timeline";
 
 import OperationDialog from "../common/dialog/OperationDialog";
-import { useUserLoggedIn } from "@/services/user";
+import { useUserLoggedIn } from "~src/services/user";
 
 interface TimelineCreateDialogProps {
   open: boolean;

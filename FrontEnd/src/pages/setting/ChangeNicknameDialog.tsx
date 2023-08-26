@@ -1,7 +1,7 @@
-import { getHttpUserClient } from "@/http/user";
-import { useUserLoggedIn } from "@/services/user";
+import { getHttpUserClient } from "~src/http/user";
+import { useUserLoggedIn } from "~src/services/user";
 
-import OperationDialog from "@/views/common/dialog/OperationDialog";
+import OperationDialog from "~src/components/dialog/OperationDialog";
 
 export interface ChangeNicknameDialogProps {
   open: boolean;
@@ -26,7 +26,7 @@ export default function ChangeNicknameDialog(props: ChangeNicknameDialogProps) {
       ]}
       onProcess={({ newNickname }) => {
         return getHttpUserClient().patch(user.username, {
-          nickname: newNickname as string,
+          nickname: newNickname,
         });
       }}
       onClose={onClose}

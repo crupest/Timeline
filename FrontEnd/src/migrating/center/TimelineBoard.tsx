@@ -2,7 +2,7 @@ import * as React from "react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
 
-import { TimelineBookmark } from "@/http/bookmark";
+import { TimelineBookmark } from "~src/http/bookmark";
 
 import TimelineLogo from "../common/TimelineLogo";
 import LoadFailReload from "../common/LoadFailReload";

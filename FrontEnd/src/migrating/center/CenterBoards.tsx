@@ -1,13 +1,13 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 
-import { highlightTimelineUsername } from "@/common";
+import { highlightTimelineUsername } from "~src/common";
 
-import { pushAlert } from "@/services/alert";
-import { useUserLoggedIn } from "@/services/user";
+import { pushAlert } from "~src/services/alert";
+import { useUserLoggedIn } from "~src/services/user";
 
-import { getHttpTimelineClient } from "@/http/timeline";
-import { getHttpBookmarkClient } from "@/http/bookmark";
+import { getHttpTimelineClient } from "~src/http/timeline";
+import { getHttpBookmarkClient } from "~src/http/bookmark";
 
 import TimelineBoard from "./TimelineBoard";
 

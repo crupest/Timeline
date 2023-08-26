@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { UiLogicError } from "@/common";
+import { UiLogicError } from "~src/common";
 
 import Timeline from "./Timeline";
 

@@ -1,7 +1,7 @@
 import pull from "lodash/pull";
 
-import { I18nText } from "@/common";
-import { ThemeColor } from "@/views/common/common";
+import { I18nText } from "~src/common";
+import { ThemeColor } from "~src/views/common/common";
 
 export interface AlertInfo {
   type?: ThemeColor;

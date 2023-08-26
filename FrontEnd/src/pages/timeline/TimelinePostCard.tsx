@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import classNames from "classnames";
 
-import Card from "@/views/common/Card";
+import Card from "~src/components/Card";
 
 import "./TimelinePostCard.css";
 
