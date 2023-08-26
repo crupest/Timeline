@@ -360,7 +360,7 @@ export function InputGroup({
       ref={containerRef}
       className={classNames(
         "cru-input-group",
-        `cru-${color ?? "primary"}`,
+        `cru-clickable-${color ?? "primary"}`,
         containerClassName,
       )}
     >

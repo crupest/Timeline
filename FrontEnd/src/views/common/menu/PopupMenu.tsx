@@ -52,7 +52,7 @@ export default function PopupMenu({
         createPortal(
           <div
             ref={setPopperElement}
-            className={`cru-popup-menu-menu-container cru-button-${
+            className={`cru-popup-menu-menu-container cru-clickable-${
               color ?? "primary"
             }`}
             style={styles.popper}
