@@ -3,11 +3,9 @@ import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 
-import { useClickOutside } from "~src/utilities/hooks";
-
-import Menu, { MenuItems } from "./Menu";
-
 import { ThemeColor } from "../common";
+import { useClickOutside } from "../hooks";
+import Menu, { MenuItems } from "./Menu";
 
 import "./PopupMenu.css";
 

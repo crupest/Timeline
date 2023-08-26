@@ -1,7 +1,6 @@
 import classNames from "classnames";
 
 import { I18nText, ThemeColor, useC } from "../common";
-
 import Spinner from "../Spinner";
 
 import "./LoadingButton.css";

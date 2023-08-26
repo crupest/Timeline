@@ -1,13 +1,14 @@
 import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
 
+import { Text, ThemeColor } from "../common";
+
 import Button from "./Button";
 import FlatButton from "./FlatButton";
 import IconButton from "./IconButton";
 import LoadingButton from "./LoadingButton";
 
 import "./ButtonRow.css";
-import { Text, ThemeColor } from "../common";
 
 interface ButtonRowV2ButtonBase {
   key: string | number;

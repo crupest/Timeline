@@ -4,6 +4,7 @@ export { default as Dialog } from "./Dialog";
 export { default as FullPageDialog } from "./FullPageDialog";
 export { default as OperationDialog } from "./OperationDialog";
 export { default as ConfirmDialog } from "./ConfirmDialog";
+export { default as DialogContainer } from "./DialogContainer";
 
 type DialogMap<D extends string, V> = {
   [K in D]: V;

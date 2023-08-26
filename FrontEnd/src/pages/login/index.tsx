@@ -6,11 +6,7 @@ import { useUser, userService } from "~src/services/user";
 
 import { useC } from "~src/components/common";
 import LoadingButton from "~src/components/button/LoadingButton";
-import {
-  InputErrorDict,
-  InputGroup,
-  useInputs,
-} from "~src/components/input/InputGroup";
+import { InputGroup, useInputs } from "~src/components/input/InputGroup";
 import Page from "~src/components/Page";
 
 import "./index.css";
@@ -47,15 +43,13 @@ export default function LoginPage() {
               label: "user.rememberMe",
             },
           ],
-          validator: ({ username, password }) => {
-            const result: InputErrorDict = {};
+          validator: ({ username, password }, errors) => {
             if (username === "") {
-              result["username"] = "login.emptyUsername";
+              errors["username"] = "login.emptyUsername";
             }
             if (password === "") {
-              result["password"] = "login.emptyPassword";
+              errors["password"] = "login.emptyPassword";
             }
-            return result;
           },
         },
         dataInit: {},

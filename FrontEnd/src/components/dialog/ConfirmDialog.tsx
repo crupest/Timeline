@@ -1,5 +1,4 @@
 import { useC, Text, ThemeColor } from "../common";
-
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";
 

@@ -3,8 +3,6 @@
 // This error should never occur. If it does, it indicates there is some logic bug in codes.
 export class UiLogicError extends Error {}
 
-export const highlightTimelineUsername = "crupest";
-
 export type { I18nText } from "./i18n";
 export type { I18nText as Text } from "./i18n";
 export { c, convertI18nText } from "./i18n";

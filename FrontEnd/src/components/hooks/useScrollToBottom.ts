@@ -1,6 +1,5 @@
 import { useRef, useEffect } from "react";
-import { fromEvent } from "rxjs";
-import { filter, throttleTime } from "rxjs/operators";
+import { fromEvent, filter, throttleTime } from "rxjs";
 
 function useScrollToBottom(
   handler: () => void,
@@ -8,7 +7,7 @@ function useScrollToBottom(
   option = {
     maxOffset: 5,
     throttle: 1000,
-  }
+  },
 ): void {
   const handlerRef = useRef<(() => void) | null>(null);
 
@@ -26,9 +25,9 @@ function useScrollToBottom(
         filter(
           () =>
             window.scrollY >=
-            document.body.scrollHeight - window.innerHeight - option.maxOffset
+            document.body.scrollHeight - window.innerHeight - option.maxOffset,
         ),
-        throttleTime(option.throttle)
+        throttleTime(option.throttle),
       )
       .subscribe(() => {
         if (enable) {
