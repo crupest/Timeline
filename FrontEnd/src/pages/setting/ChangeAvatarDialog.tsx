@@ -11,9 +11,8 @@ import ImageCropper, {
   applyClipToImage,
 } from "~src/components/ImageCropper";
 import BlobImage from "~src/components/BlobImage";
-import ButtonRowV2 from "~src/components/button/ButtonRowV2";
-import Dialog from "~src/components/dialog/Dialog";
-import DialogContainer from "~src/components/dialog/DialogContainer";
+import { ButtonRowV2 } from "~src/components/button";
+import { Dialog, DialogContainer } from "~src/components/dialog";
 
 import "./ChangeAvatarDialog.css";
 

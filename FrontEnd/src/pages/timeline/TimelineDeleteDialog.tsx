@@ -39,9 +39,9 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
             label: "",
           },
         ],
-        validator: ({ name }) => {
+        validator: ({ name }, errors) => {
           if (name !== timeline.nameV2) {
-            return { name: "timeline.deleteDialog.notMatch" };
+            errors.name = "timeline.deleteDialog.notMatch";
           }
         },
       }}

@@ -2,22 +2,17 @@ import { useState, ReactNode, ComponentProps } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
-
 import {
   useInputs,
   InputGroup,
   Initializer as InputInitializer,
-  InputValueDict,
-  InputErrorDict,
   InputConfirmValueDict,
 } from "../input";
+import { ButtonRow } from "../button";
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";
-import { ButtonRow } from "../button";
 
 import "./OperationDialog.css";
-
-export type { InputInitializer, InputValueDict, InputErrorDict };
 
 interface OperationDialogPromptProps {
   message?: Text;

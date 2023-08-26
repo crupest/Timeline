@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
 import { useC, Text } from "./common";
-import LoadingButton from "./button/LoadingButton";
+import { LoadingButton } from "./button";
 
 import "./SearchInput.css";
 

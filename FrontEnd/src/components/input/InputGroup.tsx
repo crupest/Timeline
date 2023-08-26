@@ -72,12 +72,9 @@ export type InputDirtyDict = Record<string, boolean>;
 // use never so you don't have to cast everywhere
 export type InputConfirmValueDict = Record<string, never>;
 
-export type GeneralInputErrorDict =
-  | {
-      [key: string]: Text | null | undefined;
-    }
-  | null
-  | undefined;
+export type GeneralInputErrorDict = {
+  [key: string]: Text | null | undefined;
+};
 
 type MakeInputInfo<I extends Input> = Omit<I, "value" | "error" | "disabled">;
 
@@ -87,8 +84,9 @@ export type InputInfo = {
 
 export type Validator = (
   values: InputValueDict,
+  errors: GeneralInputErrorDict,
   inputs: InputInfo[],
-) => GeneralInputErrorDict;
+) => void;
 
 export type InputScheme = {
   inputs: InputInfo[];
@@ -157,7 +155,9 @@ function validate(
   values: InputValueDict,
   inputs: InputInfo[],
 ): InputErrorDict {
-  return cleanObject(validator?.(values, inputs) ?? {});
+  const errors: GeneralInputErrorDict = {};
+  validator?.(values, errors, inputs);
+  return cleanObject(errors);
 }
 
 export function useInputs(options: { init: Initializer }): {

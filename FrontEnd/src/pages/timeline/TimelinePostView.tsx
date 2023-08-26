@@ -1,11 +1,13 @@
 import { useState } from "react";
 
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "~src/http/timeline";
+import {
+  getHttpTimelineClient,
+  HttpTimelinePostInfo,
+} from "~src/http/timeline";
 
 import { pushAlert } from "~src/services/alert";
 
-import { useClickOutside } from "~src/utilities/hooks";
-
+import { useClickOutside } from "~src/components/hooks";
 import UserAvatar from "~src/components/user/UserAvatar";
 import { useDialog } from "~src/components/dialog";
 import FlatButton from "~src/components/button/FlatButton";

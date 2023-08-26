@@ -7,11 +7,7 @@ import { getHttpTokenClient } from "~src/http/token";
 import { userService, useUser } from "~src/services/user";
 
 import { LoadingButton } from "~src/components/button";
-import {
-  useInputs,
-  InputErrorDict,
-  InputGroup,
-} from "~src/components/input/InputGroup";
+import { useInputs, InputGroup } from "~src/components/input/InputGroup";
 
 import "./index.css";
 
@@ -51,26 +47,22 @@ export default function RegisterPage() {
               label: "register.registerCode",
             },
           ],
-          validator: ({
-            username,
-            password,
-            confirmPassword,
-            registerCode,
-          }) => {
-            const result: InputErrorDict = {};
+          validator: (
+            { username, password, confirmPassword, registerCode },
+            errors,
+          ) => {
             if (username === "") {
-              result["username"] = "register.error.usernameEmpty";
+              errors["username"] = "register.error.usernameEmpty";
             }
             if (password === "") {
-              result["password"] = "register.error.passwordEmpty";
+              errors["password"] = "register.error.passwordEmpty";
             }
             if (confirmPassword !== password) {
-              result["confirmPassword"] = "register.error.confirmPasswordWrong";
+              errors["confirmPassword"] = "register.error.confirmPasswordWrong";
             }
             if (registerCode === "") {
-              result["registerCode"] = "register.error.registerCodeEmpty";
+              errors["registerCode"] = "register.error.registerCodeEmpty";
             }
-            return result;
           },
         },
         dataInit: {},

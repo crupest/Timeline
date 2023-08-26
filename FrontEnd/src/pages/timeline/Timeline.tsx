@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import classnames from "classnames";
-import { useScrollToBottom } from "~src/utilities/hooks";
 import { HubConnectionState } from "@microsoft/signalr";
 
 import {
@@ -15,6 +14,8 @@ import {
 } from "~src/http/timeline";
 
 import { getTimelinePostUpdate$ } from "~src/services/timeline";
+
+import { useScrollToBottom } from "~src/components/hooks";
 
 import TimelinePostList from "./TimelinePostList";
 import TimelinePostEdit from "./TimelinePostCreateView";

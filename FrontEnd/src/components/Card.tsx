@@ -2,6 +2,7 @@ import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
 
 import { ThemeColor } from "./common";
+
 import "./Card.css";
 
 interface CardProps extends ComponentPropsWithoutRef<"div"> {

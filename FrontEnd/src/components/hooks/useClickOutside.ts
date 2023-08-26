@@ -3,7 +3,7 @@ import { useRef, useEffect } from "react";
 export default function useClickOutside(
   element: HTMLElement | null | undefined,
   onClickOutside: () => void,
-  nextTick?: boolean
+  nextTick?: boolean,
 ): void {
   const onClickOutsideRef = useRef<() => void>(onClickOutside);
 

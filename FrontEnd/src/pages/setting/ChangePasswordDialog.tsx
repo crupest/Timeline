@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { userService } from "~src/services/user";
 
-import OperationDialog, {
-  InputErrorDict,
-} from "~src/components/dialog/OperationDialog";
+import { OperationDialog } from "~src/components/dialog";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -47,21 +45,22 @@ export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
             password: true,
           },
         ],
-        validator: ({ oldPassword, newPassword, retypedNewPassword }) => {
-          const result: InputErrorDict = {};
+        validator: (
+          { oldPassword, newPassword, retypedNewPassword },
+          errors,
+        ) => {
           if (oldPassword === "") {
-            result["oldPassword"] =
+            errors["oldPassword"] =
               "settings.dialogChangePassword.errorEmptyOldPassword";
           }
           if (newPassword === "") {
-            result["newPassword"] =
+            errors["newPassword"] =
               "settings.dialogChangePassword.errorEmptyNewPassword";
           }
           if (retypedNewPassword !== newPassword) {
-            result["retypedNewPassword"] =
+            errors["retypedNewPassword"] =
               "settings.dialogChangePassword.errorRetypeNotMatch";
           }
-          return result;
         },
       }}
       onProcess={async ({ oldPassword, newPassword }) => {

@@ -2,9 +2,9 @@ import { CSSProperties } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
+import Icon from "../Icon";
 
 import "./Menu.css";
-import Icon from "../Icon";
 
 export type MenuItem =
   | {
