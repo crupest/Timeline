@@ -7,7 +7,7 @@ import { pushAlert } from "~src/services/alert";
 import { HttpTimelineInfo } from "~src/http/timeline";
 import { getHttpBookmarkClient } from "~src/http/bookmark";
 
-import { useMobile } from "~src/components/common";
+import { useMobile } from "~src/components/hooks";
 import { Dialog, useDialog } from "~src/components/dialog";
 import UserAvatar from "~src/components/user/UserAvatar";
 import PopupMenu from "~src/components/menu/PopupMenu";

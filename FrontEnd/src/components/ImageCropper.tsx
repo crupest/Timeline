@@ -1,270 +1,25 @@
-import * as React from "react";
+import {
+  useState,
+  useRef,
+  SyntheticEvent,
+  PointerEvent,
+  useMemo,
+  MutableRefObject,
+} from "react";
 import classnames from "classnames";
 
-import { UiLogicError } from "~src/common";
-
-import "./ImageCropper.css";
+import { UiLogicError } from "./common";
 import BlobImage from "./BlobImage";
 
+import "./ImageCropper.css";
+
+// All in natural size of image.
 export interface Clip {
   left: number;
   top: number;
   width: number;
-}
-
-interface NormailizedClip extends Clip {
   height: number;
 }
-
-interface ImageInfo {
-  width: number;
-  height: number;
-  landscape: boolean;
-  ratio: number;
-  maxClipWidth: number;
-  maxClipHeight: number;
-}
-
-interface ImageCropperSavedState {
-  clip: NormailizedClip;
-  x: number;
-  y: number;
-  pointerId: number;
-}
-
-export interface ImageCropperProps {
-  clip: Clip | null;
-  image: string | Blob;
-  onChange: (clip: Clip) => void;
-  imageElementCallback?: (element: HTMLImageElement | null) => void;
-  className?: string;
-}
-
-const ImageCropper = (props: ImageCropperProps): React.ReactElement => {
-  const { clip, image, onChange, imageElementCallback, className } = props;
-
-  const [oldState, setOldState] = React.useState<ImageCropperSavedState | null>(
-    null,
-  );
-  const [imageInfo, setImageInfo] = React.useState<ImageInfo | null>(null);
-
-  const normalizeClip = (c: Clip | null | undefined): NormailizedClip => {
-    if (c == null) {
-      return { left: 0, top: 0, width: 0, height: 0 };
-    }
-
-    return {
-      left: c.left || 0,
-      top: c.top || 0,
-      width: c.width || 0,
-      height: imageInfo != null ? (c.width || 0) / imageInfo.ratio : 0,
-    };
-  };
-
-  const c = normalizeClip(clip);
-
-  const imgElementRef = React.useRef<HTMLImageElement | null>(null);
-
-  const onImageRef = React.useCallback(
-    (e: HTMLImageElement | null) => {
-      imgElementRef.current = e;
-      if (imageElementCallback != null && e == null) {
-        imageElementCallback(null);
-      }
-    },
-    [imageElementCallback],
-  );
-
-  const onImageLoad = React.useCallback(
-    (e: React.SyntheticEvent<HTMLImageElement>) => {
-      const img = e.currentTarget;
-      const landscape = img.naturalWidth >= img.naturalHeight;
-
-      const info = {
-        width: img.naturalWidth,
-        height: img.naturalHeight,
-        landscape,
-        ratio: img.naturalHeight / img.naturalWidth,
-        maxClipWidth: landscape ? img.naturalHeight / img.naturalWidth : 1,
-        maxClipHeight: landscape ? 1 : img.naturalWidth / img.naturalHeight,
-      };
-      setImageInfo(info);
-      onChange({ left: 0, top: 0, width: info.maxClipWidth });
-      if (imageElementCallback != null) {
-        imageElementCallback(img);
-      }
-    },
-    [onChange, imageElementCallback],
-  );
-
-  const onPointerDown = React.useCallback(
-    (e: React.PointerEvent) => {
-      if (oldState != null) return;
-      e.currentTarget.setPointerCapture(e.pointerId);
-      setOldState({
-        x: e.clientX,
-        y: e.clientY,
-        clip: c,
-        pointerId: e.pointerId,
-      });
-    },
-    [oldState, c],
-  );
-
-  const onPointerUp = React.useCallback(
-    (e: React.PointerEvent) => {
-      if (oldState == null || oldState.pointerId !== e.pointerId) return;
-      e.currentTarget.releasePointerCapture(e.pointerId);
-      setOldState(null);
-    },
-    [oldState],
-  );
-
-  const onPointerMove = React.useCallback(
-    (e: React.PointerEvent) => {
-      if (oldState == null) return;
-
-      const oldClip = oldState.clip;
-
-      const movement = { x: e.clientX - oldState.x, y: e.clientY - oldState.y };
-
-      const { current: imgElement } = imgElementRef;
-
-      if (imgElement == null) throw new UiLogicError("Image element is null.");
-
-      const moveRatio = {
-        x: movement.x / imgElement.width,
-        y: movement.y / imgElement.height,
-      };
-
-      const newRatio = {
-        x: oldClip.left + moveRatio.x,
-        y: oldClip.top + moveRatio.y,
-      };
-      if (newRatio.x < 0) {
-        newRatio.x = 0;
-      } else if (newRatio.x > 1 - oldClip.width) {
-        newRatio.x = 1 - oldClip.width;
-      }
-      if (newRatio.y < 0) {
-        newRatio.y = 0;
-      } else if (newRatio.y > 1 - oldClip.height) {
-        newRatio.y = 1 - oldClip.height;
-      }
-
-      onChange({ left: newRatio.x, top: newRatio.y, width: oldClip.width });
-    },
-    [oldState, onChange],
-  );
-
-  const onHandlerPointerMove = React.useCallback(
-    (e: React.PointerEvent) => {
-      if (oldState == null) return;
-
-      const oldClip = oldState.clip;
-
-      const movement = { x: e.clientX - oldState.x, y: e.clientY - oldState.y };
-
-      const ratio = imageInfo == null ? 1 : imageInfo.ratio;
-
-      const { current: imgElement } = imgElementRef;
-
-      if (imgElement == null) throw new UiLogicError("Image element is null.");
-
-      const moveRatio = {
-        x: movement.x / imgElement.width,
-        y: movement.x / imgElement.width / ratio,
-      };
-
-      const newRatio = {
-        x: oldClip.width + moveRatio.x,
-        y: oldClip.height + moveRatio.y,
-      };
-
-      const maxRatio = {
-        x: Math.min(1 - oldClip.left, newRatio.x),
-        y: Math.min(1 - oldClip.top, newRatio.y),
-      };
-
-      const maxWidthRatio = Math.min(maxRatio.x, maxRatio.y * ratio);
-
-      let newWidth;
-      if (newRatio.x < 0) {
-        newWidth = 0;
-      } else if (newRatio.x > maxWidthRatio) {
-        newWidth = maxWidthRatio;
-      } else {
-        newWidth = newRatio.x;
-      }
-
-      onChange({ left: oldClip.left, top: oldClip.top, width: newWidth });
-    },
-    [imageInfo, oldState, onChange],
-  );
-
-  const toPercentage = (n: number): string => `${n}%`;
-
-  // fuck!!! I just can't find a better way to implement this in pure css
-  const containerStyle: React.CSSProperties = (() => {
-    if (imageInfo == null) {
-      return { width: "100%", paddingTop: "100%", height: 0 };
-    } else {
-      if (imageInfo.ratio > 1) {
-        return {
-          width: toPercentage(100 / imageInfo.ratio),
-          paddingTop: "100%",
-          height: 0,
-        };
-      } else {
-        return {
-          width: "100%",
-          paddingTop: toPercentage(100 * imageInfo.ratio),
-          height: 0,
-        };
-      }
-    }
-  })();
-
-  return (
-    <div
-      className={classnames("image-cropper-container", className)}
-      style={containerStyle}
-    >
-      <BlobImage
-        imgRef={onImageRef}
-        src={image}
-        onLoad={onImageLoad}
-        alt="to crop"
-      />
-      <div className="image-cropper-mask-container">
-        <div
-          className="image-cropper-mask"
-          style={{
-            left: toPercentage(c.left * 100),
-            top: toPercentage(c.top * 100),
-            width: toPercentage(c.width * 100),
-            height: toPercentage(c.height * 100),
-          }}
-          onPointerMove={onPointerMove}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-        />
-      </div>
-      <div
-        className="image-cropper-handler"
-        style={{
-          left: `calc(${(c.left + c.width) * 100}% - 15px)`,
-          top: `calc(${(c.top + c.height) * 100}% - 15px)`,
-        }}
-        onPointerMove={onHandlerPointerMove}
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-      />
-    </div>
-  );
-};
-
-export default ImageCropper;
 
 export function applyClipToImage(
   image: HTMLImageElement,
@@ -272,33 +27,23 @@ export function applyClipToImage(
   mimeType: string,
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    const naturalSize = {
-      width: image.naturalWidth,
-      height: image.naturalHeight,
-    };
-    const clipArea = {
-      x: naturalSize.width * clip.left,
-      y: naturalSize.height * clip.top,
-      length: naturalSize.width * clip.width,
-    };
-
     const canvas = document.createElement("canvas");
-    canvas.width = clipArea.length;
-    canvas.height = clipArea.length;
+    canvas.width = clip.width;
+    canvas.height = clip.height;
     const context = canvas.getContext("2d");
 
     if (context == null) throw new Error("Failed to create context.");
 
     context.drawImage(
       image,
-      clipArea.x,
-      clipArea.y,
-      clipArea.length,
-      clipArea.length,
+      clip.left,
+      clip.top,
+      clip.width,
+      clip.height,
       0,
       0,
-      clipArea.length,
-      clipArea.length,
+      clip.width,
+      clip.height,
     );
 
     canvas.toBlob((blob) => {
@@ -309,4 +54,343 @@ export function applyClipToImage(
       }
     }, mimeType);
   });
+}
+
+interface Movement {
+  x: number;
+  y: number;
+}
+
+interface ImageInfo {
+  element: HTMLImageElement;
+  width: number;
+  height: number;
+  ratio: number;
+  landscape: boolean;
+}
+
+export interface CropConstraint {
+  ratio?: number;
+  //   minClipWidth?: number;
+  //   minClipHeight?: number;
+  //   maxClipWidth?: number;
+  //   maxClipHeight?: number;
+}
+
+function generateImageInfo(
+  imageElement: HTMLImageElement | null,
+): ImageInfo | null {
+  if (imageElement == null) return null;
+
+  const { naturalWidth, naturalHeight } = imageElement;
+  const imageRatio = naturalHeight / naturalWidth;
+
+  return {
+    element: imageElement,
+    width: naturalWidth,
+    height: naturalHeight,
+    ratio: imageRatio,
+    landscape: imageRatio < 1,
+  };
+}
+
+const emptyClip: Clip = {
+  left: 0,
+  top: 0,
+  width: 0,
+  height: 0,
+};
+
+const allClip : Clip = {
+  left: 0,
+  top: 0,
+  width: Number.MAX_VALUE,
+  height: Number.MAX_VALUE,
+}
+
+// TODO: Continue here... mode...
+function adjustClip(
+  clip: Clip,
+  mode: "move" | "resize" | "both",
+  imageSize: { width: number; height: number },
+  targetRatio?: number | null | undefined,
+): Clip {
+  class ClipGeometry {
+    constructor(
+      public left: number,
+      public top: number,
+      public width: number,
+      public height: number,
+    ) {}
+
+    get right(): number {
+      return this.left + this.width;
+    }
+
+    set right(value: number) {
+      this.width = this.left + value;
+    }
+
+    get bottom(): number {
+      return this.top + this.height;
+    }
+
+    set bottom(value: number) {
+      this.height = this.top + value;
+    }
+
+    get ratio(): number {
+      return this.height / this.width;
+    }
+
+    toClip(): Clip {
+      return {
+        left: this.left,
+        top: this.top,
+        width: this.width,
+        height: this.height,
+      };
+    }
+  }
+
+  const clipGeometry = new ClipGeometry(
+    clip.left,
+    clip.top,
+    clip.width,
+    clip.height,
+  );
+
+  // Make clip in image.
+  clipGeometry.left = Math.max(clipGeometry.left, 0);
+  clipGeometry.top = Math.max(clipGeometry.top, 0);
+  clipGeometry.right = Math.min(clipGeometry.right, imageSize.width);
+  clipGeometry.bottom = Math.min(clipGeometry.bottom, imageSize.height);
+
+  // Make image "positive"
+  if (clipGeometry.right < clipGeometry.left) {
+    clipGeometry.right = clipGeometry.left;
+  }
+  if (clipGeometry.bottom < clipGeometry.top) {
+    clipGeometry.bottom = clipGeometry.top;
+  }
+
+  // Now correct ratio
+  const currentRatio = clipGeometry.ratio;
+  if (targetRatio != null && targetRatio > 0 && currentRatio !== targetRatio) {
+    if (currentRatio < targetRatio) {
+      // too wide
+      clipGeometry.width = clipGeometry.height / targetRatio;
+    } else {
+      clipGeometry.height = clipGeometry.width * targetRatio;
+    }
+  }
+
+  return clipGeometry.toClip();
+}
+
+interface ImageCropperProps {
+  clip: Clip;
+  image: Blob | string | null;
+  imageElementRef: MutableRefObject<HTMLImageElement | null>;
+  onImageLoad: (event: SyntheticEvent<HTMLImageElement>) => void;
+  onMove: (movement: Movement) => void;
+  onResize: (movement: Movement) => void;
+  containerClassName?: string;
+}
+
+export function useImageCrop(
+  file: File | null,
+  options?: {
+    constraint?: CropConstraint;
+  },
+): {
+  clip: Clip;
+  setClip: (clip: Clip) => void;
+  canCrop: boolean;
+  crop: () => Promise<Blob>;
+  imageCropperProps: ImageCropperProps;
+} {
+  const targetRatio = options?.constraint?.ratio;
+
+  const imageElementRef = useRef<HTMLImageElement | null>(null);
+  const [image, setImage] = useState<ImageInfo | null>(null);
+  const [clip, setClip] = useState<Clip>(emptyClip  );
+
+  if (imageElementRef.current == null && image != null) {
+    setImage(null);
+    setClip(emptyClip);
+  }
+
+  const canCrop = file != null && image != null;
+
+  const adjustedClip = useMemo(() => {
+    return image == null ? emptyClip : adjustClip(clip, image, targetRatio);
+  }, [clip, image, targetRatio]);
+
+  return {
+    clip,
+    setClip,
+    canCrop,
+    crop() {
+      if (!canCrop) throw new UiLogicError();
+      return applyClipToImage(image.element, adjustedClip, file.type);
+    },
+    imageCropperProps: {
+      clip: adjustedClip,
+      image: file,
+      imageElementRef: imageElementRef,
+      // TODO: Continue here...
+      onMove: ,
+      onResize: ,
+      onImageLoad: () => {
+        const image = generateImageInfo(imageElementRef.current);
+        setImage(image);
+        setClip(adjustClip(allClip, "both", image, targetRatio));
+      },
+    },
+  };
+}
+
+interface PointerState {
+  x: number;
+  y: number;
+  pointerId: number;
+}
+
+const imageCropperHandlerSize = 15;
+
+export function ImageCropper(props: ImageCropperProps) {
+  function convertClipToElement(
+    clip: Clip,
+    imageElement: HTMLImageElement,
+  ): Clip {
+    const xRatio = imageElement.clientWidth / imageElement.naturalWidth;
+    const yRatio = imageElement.clientHeight / imageElement.naturalHeight;
+    return {
+      left: xRatio * clip.left,
+      top: yRatio * clip.top,
+      width: xRatio * clip.width,
+      height: yRatio * clip.height,
+    };
+  }
+
+  function convertMovementFromElement(
+    move: Movement,
+    imageElement: HTMLImageElement,
+  ): Movement {
+    const xRatio = imageElement.naturalWidth / imageElement.clientWidth;
+    const yRatio = imageElement.naturalHeight / imageElement.clientHeight;
+    return {
+      x: xRatio * move.x,
+      y: yRatio * move.y,
+    };
+  }
+
+  const {
+    clip,
+    image,
+    imageElementRef,
+    onImageLoad,
+    onMove,
+    onResize,
+    containerClassName,
+  } = props;
+
+  const pointerStateRef = useRef<PointerState | null>(null);
+
+  const clipInElement =
+    imageElementRef.current != null
+      ? convertClipToElement(clip, imageElementRef.current)
+      : emptyClip;
+
+  const actOnMovement = (
+    e: PointerEvent,
+    change: (movement: Movement) => void,
+  ) => {
+    if (
+      imageElementRef.current == null ||
+      pointerStateRef.current == null ||
+      pointerStateRef.current.pointerId != e.pointerId
+    ) {
+      return;
+    }
+
+    const { x, y } = pointerStateRef.current;
+
+    const movement = {
+      x: e.clientX - x,
+      y: e.clientY - y,
+    };
+
+    change(movement);
+  };
+
+  const onPointerDown = (e: PointerEvent) => {
+    if (imageElementRef.current == null || pointerStateRef.current != null)
+      return;
+
+    e.currentTarget.setPointerCapture(e.pointerId);
+
+    pointerStateRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      pointerId: e.pointerId,
+    };
+  };
+
+  const onPointerUp = (e: PointerEvent) => {
+    if (
+      pointerStateRef.current == null ||
+      pointerStateRef.current.pointerId != e.pointerId
+    ) {
+      return;
+    }
+
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    pointerStateRef.current = null;
+  };
+
+  const onMaskPointerMove = (e: PointerEvent) => {
+    actOnMovement(e, onMove);
+  };
+
+  const onResizeHandlerPointerMove = (e: PointerEvent) => {
+    actOnMovement(e, onResize);
+  };
+
+  return (
+    <div
+      className={classnames("cru-image-cropper-container", containerClassName)}
+    >
+      <BlobImage imgRef={imageElementRef} src={image} onLoad={onImageLoad} />
+      <div className="cru-image-cropper-mask-container">
+        <div
+          className="cru-image-cropper-mask"
+          style={{
+            left: clipInElement.left,
+            top: clipInElement.top,
+            width: clipInElement.width,
+            height: clipInElement.height,
+          }}
+          onPointerMove={onMaskPointerMove}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+        />
+      </div>
+      <div
+        className="cru-image-cropper-handler"
+        style={{
+          left:
+            clipInElement.left + clipInElement.width - imageCropperHandlerSize,
+          top:
+            clipInElement.top + clipInElement.height - imageCropperHandlerSize,
+          width: imageCropperHandlerSize * 2,
+          height: imageCropperHandlerSize * 2,
+        }}
+        onPointerMove={onResizeHandlerPointerMove}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+      />
+    </div>
+  );
 }

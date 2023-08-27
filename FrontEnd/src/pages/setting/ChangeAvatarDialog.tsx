@@ -6,10 +6,7 @@ import { useUser } from "~src/services/user";
 
 import { getHttpUserClient } from "~src/http/user";
 
-import ImageCropper, {
-  Clip,
-  applyClipToImage,
-} from "~src/components/ImageCropper";
+import { ImageCropper, useImageCrop } from "~src/components/ImageCropper";
 import BlobImage from "~src/components/BlobImage";
 import { ButtonRowV2 } from "~src/components/button";
 import { Dialog, DialogContainer } from "~src/components/dialog";
@@ -40,10 +37,13 @@ export default function ChangeAvatarDialog({
   const [state, setState] = useState<State>("select");
 
   const [file, setFile] = useState<File | null>(null);
-  const [clip, setClip] = useState<Clip | null>(null);
-  const [cropImgElement, setCropImgElement] = useState<HTMLImageElement | null>(
-    null,
-  );
+
+  const { canCrop, crop, imageCropperProps } = useImageCrop(file, {
+    constraint: {
+      ratio: 1,
+    },
+  });
+
   const [resultBlob, setResultBlob] = useState<Blob | null>(null);
   const [message, setMessage] = useState<Text>(
     "settings.dialogChangeAvatar.prompt.select",
@@ -65,18 +65,13 @@ export default function ChangeAvatarDialog({
   };
 
   const onCropNext = () => {
-    if (
-      cropImgElement == null ||
-      clip == null ||
-      clip.width === 0 ||
-      file == null
-    ) {
+    if (!canCrop) {
       throw new UiLogicError();
     }
 
     setState("process-crop");
 
-    void applyClipToImage(cropImgElement, clip, file.type).then((b) => {
+    void crop().then((b) => {
       setState("preview");
       setResultBlob(b);
     });
@@ -151,7 +146,7 @@ export default function ChangeAvatarDialog({
         action: "primary",
         text: "operationDialog.nextStep",
         onClick: onCropNext,
-        disabled: cropImgElement == null || clip == null || clip.width === 0,
+        disabled: !canCrop,
       },
     ],
     "process-crop": [cancelButton, createPreviousButton(onPreviewPrevious)],
@@ -214,11 +209,8 @@ export default function ChangeAvatarDialog({
             return (
               <div className="change-avatar-dialog-container">
                 <ImageCropper
-                  className="change-avatar-cropper"
-                  clip={clip}
-                  onChange={setClip}
-                  image={file}
-                  imageElementCallback={setCropImgElement}
+                  {...imageCropperProps}
+                  containerClassName="change-avatar-cropper"
                 />
                 <div className="change-avatar-dialog-prompt">
                   {c("settings.dialogChangeAvatar.prompt.crop")}
