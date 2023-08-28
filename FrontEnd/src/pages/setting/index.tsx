@@ -14,7 +14,11 @@ import { pushAlert } from "~src/services/alert";
 
 import { useC, Text } from "~src/common";
 
-import { useDialog, ConfirmDialog } from "~src/components/dialog";
+import {
+  useDialog,
+  DialogProvider,
+  ConfirmDialog,
+} from "~src/components/dialog";
 import Card from "~src/components/Card";
 import Spinner from "~src/components/Spinner";
 import Page from "~src/components/Page";
@@ -140,7 +144,22 @@ function RegisterCodeSettingItem() {
   // undefined: loading
   const [registerCode, setRegisterCode] = useState<undefined | null | string>();
 
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { controller, createDialogSwitch } = useDialog({
+    confirm: (
+      <ConfirmDialog
+        title="settings.renewRegisterCode"
+        body="settings.renewRegisterCodeDesc"
+        onConfirm={() => {
+          if (user == null) throw new Error();
+          void getHttpUserClient()
+            .renewRegisterCode(user.username)
+            .then(() => {
+              setRegisterCode(undefined);
+            });
+        }}
+      />
+    ),
+  });
 
   useEffect(() => {
     setRegisterCode(undefined);
@@ -157,49 +176,34 @@ function RegisterCodeSettingItem() {
   }, [user, registerCode]);
 
   return (
-    <>
-      <SettingItemContainer
-        title="settings.myRegisterCode"
-        description="settings.myRegisterCodeDesc"
-        className="register-code-setting-item"
-        onClick={() => setDialogOpen(true)}
-      >
-        {registerCode === undefined ? (
-          <Spinner />
-        ) : registerCode === null ? (
-          <span>Noop</span>
-        ) : (
-          <code
-            className="register-code"
-            onClick={(event) => {
-              void navigator.clipboard.writeText(registerCode).then(() => {
-                pushAlert({
-                  type: "create",
-                  message: "settings.myRegisterCodeCopied",
-                });
+    <SettingItemContainer
+      title="settings.myRegisterCode"
+      description="settings.myRegisterCodeDesc"
+      className="register-code-setting-item"
+      onClick={createDialogSwitch("confirm")}
+    >
+      {registerCode === undefined ? (
+        <Spinner />
+      ) : registerCode === null ? (
+        <span>Noop</span>
+      ) : (
+        <code
+          className="register-code"
+          onClick={(event) => {
+            void navigator.clipboard.writeText(registerCode).then(() => {
+              pushAlert({
+                type: "create",
+                message: "settings.myRegisterCodeCopied",
               });
-              event.stopPropagation();
-            }}
-          >
-            {registerCode}
-          </code>
-        )}
-      </SettingItemContainer>
-      <ConfirmDialog
-        title="settings.renewRegisterCode"
-        body="settings.renewRegisterCodeDesc"
-        onClose={() => setDialogOpen(false)}
-        open={dialogOpen}
-        onConfirm={() => {
-          if (user == null) throw new Error();
-          void getHttpUserClient()
-            .renewRegisterCode(user.username)
-            .then(() => {
-              setRegisterCode(undefined);
             });
-        }}
-      />{" "}
-    </>
+            event.stopPropagation();
+          }}
+        >
+          {registerCode}
+        </code>
+      )}
+      <DialogProvider controller={controller} />
+    </SettingItemContainer>
   );
 }
 
@@ -240,12 +244,22 @@ export default function SettingPage() {
   const user = useUser();
   const navigate = useNavigate();
 
-  const { dialogPropsMap, createDialogSwitch } = useDialog([
-    "change-password",
-    "change-avatar",
-    "change-nickname",
-    "logout",
-  ]);
+  const { controller, createDialogSwitch } = useDialog({
+    "change-password": <ChangeNicknameDialog />,
+    "change-avatar": <ChangeAvatarDialog />,
+    "change-nickname": <ChangePasswordDialog />,
+    logout: (
+      <ConfirmDialog
+        title="settings.dialogConfirmLogout.title"
+        body="settings.dialogConfirmLogout.prompt"
+        onConfirm={() => {
+          void userService.logout().then(() => {
+            navigate("/");
+          });
+        }}
+      />
+    ),
+  });
 
   return (
     <Page noTopPadding>
@@ -275,23 +289,7 @@ export default function SettingPage() {
       <SettingSection title="settings.subheader.customization">
         <LanguageChangeSettingItem />
       </SettingSection>
-      <ChangePasswordDialog {...dialogPropsMap["change-password"]} />
-      {user && (
-        <>
-          <ConfirmDialog
-            title="settings.dialogConfirmLogout.title"
-            body="settings.dialogConfirmLogout.prompt"
-            onConfirm={() => {
-              void userService.logout().then(() => {
-                navigate("/");
-              });
-            }}
-            {...dialogPropsMap["logout"]}
-          />
-          <ChangeAvatarDialog {...dialogPropsMap["change-avatar"]} />
-          <ChangeNicknameDialog {...dialogPropsMap["change-nickname"]} />
-        </>
-      )}
+      <DialogProvider controller={controller} />
     </Page>
   );
 }

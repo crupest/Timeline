@@ -5,6 +5,8 @@ import classNames from "classnames";
 
 import { ThemeColor } from "../common";
 
+import { useCloseDialog } from "./DialogProvider";
+
 import "./Dialog.css";
 
 const optionalPortalElement = document.getElementById("portal");
@@ -14,21 +16,19 @@ if (optionalPortalElement == null) {
 const portalElement = optionalPortalElement;
 
 interface DialogProps {
-  open: boolean;
-  onClose: () => void;
   color?: ThemeColor;
   children?: ReactNode;
   disableCloseOnClickOnOverlay?: boolean;
 }
 
 export default function Dialog({
-  open,
-  onClose,
   color,
   children,
   disableCloseOnClickOnOverlay,
 }: DialogProps) {
   color = color ?? "primary";
+
+  const closeDialog = useCloseDialog();
 
   const nodeRef = useRef(null);
 
@@ -37,7 +37,7 @@ export default function Dialog({
       nodeRef={nodeRef}
       mountOnEnter
       unmountOnExit
-      in={open}
+      in
       timeout={300}
       classNames="cru-dialog"
     >
@@ -47,13 +47,7 @@ export default function Dialog({
       >
         <div
           className="cru-dialog-background"
-          onClick={
-            disableCloseOnClickOnOverlay
-              ? undefined
-              : () => {
-                  onClose();
-                }
-          }
+          onClick={disableCloseOnClickOnOverlay ? undefined : closeDialog}
         />
         <div className="cru-dialog-container">{children}</div>
       </div>

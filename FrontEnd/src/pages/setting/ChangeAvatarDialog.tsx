@@ -9,22 +9,20 @@ import { getHttpUserClient } from "~src/http/user";
 import { ImageCropper, useImageCrop } from "~src/components/ImageCropper";
 import BlobImage from "~src/components/BlobImage";
 import { ButtonRowV2 } from "~src/components/button";
-import { Dialog, DialogContainer } from "~src/components/dialog";
+import {
+  Dialog,
+  DialogContainer,
+  useDialogController,
+} from "~src/components/dialog";
 
 import "./ChangeAvatarDialog.css";
 
-interface ChangeAvatarDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-export default function ChangeAvatarDialog({
-  open,
-  onClose,
-}: ChangeAvatarDialogProps) {
+export default function ChangeAvatarDialog() {
   const c = useC();
 
   const user = useUser();
+
+  const controller = useDialogController();
 
   type State =
     | "select"
@@ -49,11 +47,7 @@ export default function ChangeAvatarDialog({
     "settings.dialogChangeAvatar.prompt.select",
   );
 
-  const close = (): void => {
-    if (state !== "uploading") {
-      onClose();
-    }
-  };
+  const close = controller.closeDialog;
 
   const onSelectFile = (e: ChangeEvent<HTMLInputElement>): void => {
     const files = e.target.files;
@@ -96,6 +90,7 @@ export default function ChangeAvatarDialog({
     }
 
     setState("uploading");
+    controller.setCanSwitchDialog(false);
     getHttpUserClient()
       .putAvatar(user.username, resultBlob)
       .then(
@@ -106,7 +101,10 @@ export default function ChangeAvatarDialog({
           setState("error");
           setMessage("operationDialog.error");
         },
-      );
+      )
+      .finally(() => {
+        controller.setCanSwitchDialog(true);
+      });
   };
 
   const cancelButton = {
@@ -181,7 +179,7 @@ export default function ChangeAvatarDialog({
   };
 
   return (
-    <Dialog open={open} onClose={close}>
+    <Dialog>
       <DialogContainer
         title="settings.dialogChangeAvatar.title"
         titleColor="primary"
