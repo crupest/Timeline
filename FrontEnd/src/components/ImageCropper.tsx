@@ -83,8 +83,8 @@ interface ImageCropperProps {
   image: Blob | string | null;
   imageElementCallback: (element: HTMLImageElement | null) => void;
   onImageLoad: () => void;
-  onMove: (movement: Movement) => void;
-  onResize: (movement: Movement) => void;
+  onMove: (movement: Movement, originalClip: Rect) => void;
+  onResize: (movement: Movement, originalClip: Rect) => void;
   containerClassName?: string;
 }
 
@@ -127,10 +127,10 @@ export function useImageCrop(
       clip,
       image: file,
       imageElementCallback: setImageElement,
-      onMove: (movement) => {
+      onMove: (movement, originalClip) => {
         if (imageInfo == null) return;
         const newClip = geometry.adjustRectToContainer(
-          clip.copy().move(movement),
+          originalClip.copy().move(movement),
           imageInfo.rect,
           "move",
           {
@@ -139,10 +139,10 @@ export function useImageCrop(
         );
         setClip(newClip);
       },
-      onResize: (movement) => {
+      onResize: (movement, originalClip) => {
         if (imageInfo == null) return;
         const newClip = geometry.adjustRectToContainer(
-          clip.copy().expand(movement),
+          originalClip.copy().expand(movement),
           imageInfo.rect,
           "resize",
           { targetRatio, resizeNoFlip: true, ratioCorrectBasedOn: "width" },
@@ -167,6 +167,7 @@ interface PointerState {
   x: number;
   y: number;
   pointerId: number;
+  originalClip: Rect;
 }
 
 const imageCropperHandlerSize = 15;
@@ -220,7 +221,7 @@ export function ImageCropper(props: ImageCropperProps) {
 
   const actOnMovement = (
     e: PointerEvent,
-    change: (movement: Movement) => void,
+    change: (movement: Movement, originalClip: Rect) => void,
   ) => {
     if (
       imageElement == null ||
@@ -230,17 +231,14 @@ export function ImageCropper(props: ImageCropperProps) {
       return;
     }
 
-    const { x, y } = pointerStateRef.current;
+    const { x, y, originalClip } = pointerStateRef.current;
 
     const movement = {
       x: e.clientX - x,
       y: e.clientY - y,
     };
 
-    pointerStateRef.current.x = e.clientX;
-    pointerStateRef.current.y = e.clientY;
-
-    change(convertMovementFromElement(movement, imageElement));
+    change(convertMovementFromElement(movement, imageElement), originalClip);
   };
 
   const onPointerDown = (e: PointerEvent) => {
@@ -252,6 +250,7 @@ export function ImageCropper(props: ImageCropperProps) {
       x: e.clientX,
       y: e.clientY,
       pointerId: e.pointerId,
+      originalClip: clip,
     };
   };
 
