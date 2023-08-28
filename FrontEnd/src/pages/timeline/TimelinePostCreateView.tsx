@@ -88,7 +88,7 @@ function TimelinePostEditImage(props: TimelinePostEditImageProps) {
       />
       {file != null && !error && (
         <BlobImage
-          blob={file}
+          src={file}
           className="timeline-post-create-image"
           onLoad={() => onSelect(file)}
           onError={() => {

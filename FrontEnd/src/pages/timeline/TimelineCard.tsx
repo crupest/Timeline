@@ -8,7 +8,7 @@ import { HttpTimelineInfo } from "~src/http/timeline";
 import { getHttpBookmarkClient } from "~src/http/bookmark";
 
 import { useMobile } from "~src/components/hooks";
-import { Dialog, useDialog } from "~src/components/dialog";
+import { Dialog, DialogProvider, useDialog } from "~src/components/dialog";
 import UserAvatar from "~src/components/user/UserAvatar";
 import PopupMenu from "~src/components/menu/PopupMenu";
 import FullPageDialog from "~src/components/dialog/FullPageDialog";
@@ -40,11 +40,17 @@ export default function TimelineCard(props: TimelinePageCardProps) {
 
   const isMobile = useMobile();
 
-  const { createDialogSwitch, dialogPropsMap } = useDialog([
-    "member",
-    "property",
-    "delete",
-  ]);
+  const { controller, createDialogSwitch } = useDialog({
+    member: (
+      <Dialog>
+        <TimelineMember timeline={timeline} onChange={onReload} />
+      </Dialog>
+    ),
+    property: (
+      <TimelinePropertyChangeDialog timeline={timeline} onChange={onReload} />
+    ),
+    delete: <TimelineDeleteDialog timeline={timeline} />,
+  });
 
   const content = (
     <div>
@@ -144,15 +150,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
       ) : (
         <div style={{ display: collapse ? "none" : "block" }}>{content}</div>
       )}
-      <Dialog {...dialogPropsMap["member"]}>
-        <TimelineMember timeline={timeline} onChange={onReload} />
-      </Dialog>
-      <TimelinePropertyChangeDialog
-        timeline={timeline}
-        onChange={onReload}
-        {...dialogPropsMap["property"]}
-      />
-      <TimelineDeleteDialog timeline={timeline} {...dialogPropsMap["delete"]} />
+      <DialogProvider controller={controller} />
     </Card>
   );
 }

@@ -2,7 +2,10 @@ import * as React from "react";
 import classnames from "classnames";
 import { useTranslation } from "react-i18next";
 
-import { getHttpTimelineClient, HttpTimelinePostInfo } from "~src/http/timeline";
+import {
+  getHttpTimelineClient,
+  HttpTimelinePostInfo,
+} from "~src/http/timeline";
 
 import TimelinePostBuilder from "~src/services/TimelinePostBuilder";
 
@@ -13,6 +16,7 @@ import Spinner from "~src/components/Spinner";
 import IconButton from "~src/components/button/IconButton";
 
 import "./MarkdownPostEdit.css";
+import { DialogProvider, useDialog } from "~src/components/dialog";
 
 export interface MarkdownPostEditProps {
   owner: string;
@@ -39,12 +43,19 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
 
   const [process, setProcess] = React.useState<boolean>(false);
 
-  const [showLeaveConfirmDialog, setShowLeaveConfirmDialog] =
-    React.useState<boolean>(false);
+  const { controller, switchDialog } = useDialog({
+    "leave-confirm": (
+      <ConfirmDialog
+        onConfirm={onClose}
+        title="timeline.dropDraft"
+        body="timeline.confirmLeave"
+      />
+    ),
+  });
 
   const [text, _setText] = React.useState<string>("");
   const [images, _setImages] = React.useState<{ file: File; url: string }[]>(
-    []
+    [],
   );
   const [previewHtml, _setPreviewHtml] = React.useState<string>("");
 
@@ -92,7 +103,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
         timelineName,
         {
           dataList,
-        }
+        },
       );
       onPosted(post);
       onClose();
@@ -123,7 +134,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                   if (canLeave) {
                     onClose();
                   } else {
-                    setShowLeaveConfirmDialog(true);
+                    switchDialog("leave-confirm");
                   }
                 }}
               />
@@ -167,7 +178,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
                       color="danger"
                       className={classnames(
                         "timeline-markdown-post-edit-image-delete-button",
-                        process && "d-none"
+                        process && "d-none",
                       )}
                       onClick={() => {
                         getBuilder().deleteImage(index);
@@ -201,13 +212,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
           },
         ]}
       />
-      <ConfirmDialog
-        onClose={() => setShowLeaveConfirmDialog(false)}
-        onConfirm={onClose}
-        open={showLeaveConfirmDialog}
-        title="timeline.dropDraft"
-        body="timeline.confirmLeave"
-      />
+      <DialogProvider controller={controller} />
     </>
   );
 };

@@ -11,6 +11,7 @@ import {
 import { ButtonRow } from "../button";
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";
+import { useDialogController } from "./DialogProvider";
 
 import "./OperationDialog.css";
 
@@ -35,9 +36,6 @@ function OperationDialogPrompt(props: OperationDialogPromptProps) {
 }
 
 export interface OperationDialogProps<TData> {
-  open: boolean;
-  onClose: () => void;
-
   color?: ThemeColor;
   inputColor?: ThemeColor;
   title: Text;
@@ -56,8 +54,6 @@ export interface OperationDialogProps<TData> {
 
 function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   const {
-    open,
-    onClose,
     color,
     inputColor,
     title,
@@ -96,6 +92,8 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
         data: unknown;
       };
 
+  const dialogController = useDialogController();
+
   const [step, setStep] = useState<Step>({ type: "input" });
 
   const { inputGroupProps, hasErrorAndDirty, setAllDisabled, confirm } =
@@ -105,7 +103,7 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
 
   function close() {
     if (step.type !== "process") {
-      onClose();
+      dialogController.closeDialog();
       if (step.type === "success" && onSuccessAndClose) {
         onSuccessAndClose?.(step.data);
       }
@@ -118,21 +116,26 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
     const result = confirm();
     if (result.type === "ok") {
       setStep({ type: "process" });
+      dialogController.setCanSwitchDialog(false);
       setAllDisabled(true);
-      onProcess(result.values).then(
-        (d) => {
-          setStep({
-            type: "success",
-            data: d,
-          });
-        },
-        (e: unknown) => {
-          setStep({
-            type: "failure",
-            data: e,
-          });
-        },
-      );
+      onProcess(result.values)
+        .then(
+          (d) => {
+            setStep({
+              type: "success",
+              data: d,
+            });
+          },
+          (e: unknown) => {
+            setStep({
+              type: "failure",
+              data: e,
+            });
+          },
+        )
+        .finally(() => {
+          dialogController.setCanSwitchDialog(true);
+        });
     }
   }
 
@@ -214,7 +217,7 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   }
 
   return (
-    <Dialog open={open} onClose={close}>
+    <Dialog>
       <DialogContainer title={title} titleColor={color} buttons={buttons}>
         {body}
       </DialogContainer>

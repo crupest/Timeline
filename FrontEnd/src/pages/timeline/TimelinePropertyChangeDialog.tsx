@@ -11,8 +11,6 @@ import {
 import OperationDialog from "~src/components/dialog/OperationDialog";
 
 export interface TimelinePropertyChangeDialogProps {
-  open: boolean;
-  onClose: () => void;
   timeline: HttpTimelineInfo;
   onChange: () => void;
 }
@@ -63,8 +61,6 @@ const TimelinePropertyChangeDialog: React.FC<
           },
         },
       }}
-      open={props.open}
-      onClose={props.onClose}
       onProcess={({ title, visibility, description }) => {
         const req: HttpTimelinePatchRequest = {};
         if (title !== timeline.title) {

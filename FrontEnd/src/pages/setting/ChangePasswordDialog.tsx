@@ -5,22 +5,13 @@ import { userService } from "~src/services/user";
 
 import { OperationDialog } from "~src/components/dialog";
 
-interface ChangePasswordDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-export function ChangePasswordDialog(props: ChangePasswordDialogProps) {
-  const { open, onClose } = props;
-
+export function ChangePasswordDialog() {
   const navigate = useNavigate();
 
   const [redirect, setRedirect] = useState<boolean>(false);
 
   return (
     <OperationDialog
-      open={open}
-      onClose={onClose}
       title="settings.dialogChangePassword.title"
       color="danger"
       inputPrompt="settings.dialogChangePassword.prompt"
