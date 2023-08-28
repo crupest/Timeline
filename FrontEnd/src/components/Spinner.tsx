@@ -1,36 +1,46 @@
-import { CSSProperties } from "react";
-import classnames from "classnames";
-
-import { ThemeColor } from "./common";
+import { CSSProperties, ComponentPropsWithoutRef } from "react";
+import classNames from "classnames";
 
 import "./Spinner.css";
 
-export interface SpinnerProps {
+const sizeMap: Record<string, string> = {
+  sm: "18px",
+  md: "30px",
+  lg: "42px",
+};
+
+function calculateSize(size: SpinnerProps["size"]) {
+  if (size == null) {
+    return "1em";
+  }
+  if (typeof size === "number") {
+    return size;
+  }
+  if (size in sizeMap) {
+    return sizeMap[size];
+  }
+  return size;
+}
+
+export interface SpinnerProps extends ComponentPropsWithoutRef<"span"> {
   size?: "sm" | "md" | "lg" | number | string;
-  color?: ThemeColor;
   className?: string;
   style?: CSSProperties;
 }
 
 export default function Spinner(props: SpinnerProps) {
-  const { size, color, className, style } = props;
-  const calculatedSize =
-    size === "sm"
-      ? "18px"
-      : size === "md"
-      ? "30px"
-      : size === "lg"
-      ? "42px"
-      : typeof size === "number"
-      ? size
-      : size == null
-      ? "20px"
-      : size;
+  const { size, className, style, ...otherProps } = props;
+  const calculatedSize = calculateSize(size);
 
   return (
     <span
-      className={classnames("cru-spinner", color && `cru-${color}`, className)}
-      style={{ width: calculatedSize, height: calculatedSize, ...style }}
+      className={classNames("cru-spinner", className)}
+      style={{
+        width: calculatedSize,
+        height: calculatedSize,
+        ...style,
+      }}
+      {...otherProps}
     />
   );
 }
