@@ -11,3 +11,5 @@ export const themeColors = [
 export type ThemeColor = (typeof themeColors)[number];
 
 export { breakpoints } from "./breakpoints";
+
+export * as geometry from "~src/utilities/geometry";
