@@ -1,12 +1,11 @@
 .cru-image-cropper-container {
   position: relative;
   box-sizing: border-box;
+  display: flex;
   user-select: none;
 }
 
 .cru-image-cropper-container img {
-  left: 0;
-  top: 0;
   width: 100%;
   height: 100%;
 }
