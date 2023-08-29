@@ -9,7 +9,7 @@ import { getHttpTimelineClient, HttpTimelineInfo } from "~src/http/timeline";
 
 import SearchInput from "~src/components/SearchInput";
 import UserAvatar from "~src/components/user/UserAvatar";
-import Button from "~src/components/button/Button";
+import { IconButton } from "~src/components/button";
 import { ListContainer, ListItemContainer } from "~src/components/list";
 
 import "./TimelineMember.css";
@@ -34,8 +34,8 @@ function TimelineMemberItem({
       </div>
       {onAction ? (
         <div className="timeline-member-action">
-          <Button
-            text={`timeline.member.${add ? "add" : "remove"}`}
+          <IconButton
+            icon={add ? "plus-lg" : "trash"}
             color={add ? "create" : "danger"}
             onClick={() => {
               onAction(user.username);
