@@ -245,9 +245,9 @@ export default function SettingPage() {
   const navigate = useNavigate();
 
   const { controller, createDialogSwitch } = useDialog({
-    "change-password": <ChangeNicknameDialog />,
+    "change-nickname": <ChangeNicknameDialog />,
     "change-avatar": <ChangeAvatarDialog />,
-    "change-nickname": <ChangePasswordDialog />,
+    "change-password": <ChangePasswordDialog />,
     logout: (
       <ConfirmDialog
         title="settings.dialogConfirmLogout.title"

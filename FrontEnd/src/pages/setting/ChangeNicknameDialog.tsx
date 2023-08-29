@@ -1,7 +1,7 @@
 import { getHttpUserClient } from "~src/http/user";
 import { useUserLoggedIn } from "~src/services/user";
 
-import OperationDialog from "~src/components/dialog/OperationDialog";
+import { OperationDialog } from "~src/components/dialog";
 
 export default function ChangeNicknameDialog() {
   const user = useUserLoggedIn();

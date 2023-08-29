@@ -1,3 +1,5 @@
+import "./index.css";
+
 export type { Text, I18nText } from "~src/common";
 export { UiLogicError, c, convertI18nText, useC } from "~src/common";
 
