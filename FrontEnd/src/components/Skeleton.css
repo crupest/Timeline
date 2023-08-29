@@ -4,11 +4,17 @@
 
 .cru-skeleton-line {
   height: 1em;
-  background-color: hsl(0, 0%, 90%);
+  background-color: hsl(0 0% 90%);
   margin: 0.7em 0;
   border-radius: 0.2em;
 }
 
-.cru-skeleton-line.last {
+@media (prefers-color-scheme: dark) {
+  .cru-skeleton-line {
+    background-color: hsl(0 0% 20%);
+  }
+}
+
+.cru-skeleton-line:last-child {
   width: 50%;
 }
