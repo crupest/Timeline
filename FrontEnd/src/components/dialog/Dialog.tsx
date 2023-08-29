@@ -15,11 +15,13 @@ if (optionalPortalElement == null) {
 const portalElement = optionalPortalElement;
 
 interface DialogProps {
+  color?: ThemeColor;
   children?: ReactNode;
   disableCloseOnClickOnOverlay?: boolean;
 }
 
 export default function Dialog({
+  color,
   children,
   disableCloseOnClickOnOverlay,
 }: DialogProps) {
@@ -28,7 +30,12 @@ export default function Dialog({
   const lastPointerDownIdRef = useRef<number | null>(null);
 
   return ReactDOM.createPortal(
-    <div className={classNames("cru-dialog-overlay")}>
+    <div
+      className={classNames(
+        `cru-theme-${color ?? "primary"}`,
+        "cru-dialog-overlay",
+      )}
+    >
       <div
         className="cru-dialog-background"
         onPointerDown={(e) => {

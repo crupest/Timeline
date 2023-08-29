@@ -52,7 +52,7 @@ export default function DialogContainer(props: DialogContainerProps) {
       <div
         ref={titleRef}
         className={classNames(
-          `cru-dialog-container-title cru-${titleColor ?? "primary"}`,
+          `cru-dialog-container-title cru-theme-${titleColor ?? "primary"}`,
           titleClassName,
         )}
       >

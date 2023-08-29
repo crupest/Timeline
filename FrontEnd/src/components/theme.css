@@ -14,6 +14,22 @@
   --cru-danger-color: hsl(0 100% 50%);
 }
 
+.cru-theme-primary {
+  --cru-theme-color: var(--cru-primary-color);
+}
+
+.cru-theme-secondary {
+  --cru-theme-color: var(--cru-secondary-color);
+}
+
+.cru-theme-create {
+  --cru-theme-color: var(--cru-create-color);
+}
+
+.cru-theme-danger {
+  --cru-theme-color: var(--cru-danger-color);
+}
+
 /* common colors */
 :root {
   --cru-background-color: hsl(0 0% 100%);

@@ -9,7 +9,6 @@ export default function ConfirmDialog({
   title,
   body,
   color,
-  bodyColor,
 }: {
   onConfirm: () => void;
   title: Text;
@@ -22,7 +21,7 @@ export default function ConfirmDialog({
   const closeDialog = useCloseDialog();
 
   return (
-    <Dialog>
+    <Dialog color={color ?? "danger"}>
       <DialogContainer
         title={title}
         titleColor={color ?? "danger"}
@@ -51,7 +50,7 @@ export default function ConfirmDialog({
           },
         ]}
       >
-        <div className={`cru-${bodyColor ?? "primary"}`}>{c(body)}</div>
+        <div>{c(body)}</div>
       </DialogContainer>
     </Dialog>
   );

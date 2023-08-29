@@ -217,7 +217,7 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   }
 
   return (
-    <Dialog>
+    <Dialog color={color}>
       <DialogContainer title={title} titleColor={color} buttons={buttons}>
         {body}
       </DialogContainer>
