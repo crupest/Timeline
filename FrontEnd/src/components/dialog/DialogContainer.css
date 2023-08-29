@@ -1,10 +1,9 @@
 .cru-dialog-container-title {
   font-size: 1.2em;
   font-weight: bold;
-  color: var(--cru-key-color);
+  color: var(--cru-theme-color);
   margin-bottom: 0.5em;
 }
-
 
 .cru-dialog-container-hr {
   margin: 1em 0;

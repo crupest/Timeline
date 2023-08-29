@@ -27,34 +27,14 @@
 
   margin: 2em auto;
 
-  border: var(--cru-dialog-container-background-color) 1px solid;
+  border: var(--cru-theme-color) 2px solid;
   border-radius: 5px;
   padding: 1.5em;
-  background-color: var(--cru-surface-color);
+  background-color: var(--cru-dialog-container-background-color);
 }
 
 @media (min-width: 576px) {
   .cru-dialog-container {
     max-width: 800px;
   }
-}
-
-.cru-dialog-enter .cru-dialog-container {
-  transform: scale(0, 0);
-  opacity: 0;
-  transform-origin: center;
-}
-
-.cru-dialog-enter-active .cru-dialog-container {
-  transform: scale(1, 1);
-  opacity: 1;
-  transition: transform 0.3s, opacity 0.3s;
-  transform-origin: center;
-}
-
-.cru-dialog-exit-active .cru-dialog-container {
-  transition: transform 0.3s, opacity 0.3s;
-  transform: scale(0, 0);
-  opacity: 0;
-  transform-origin: center;
 }
