@@ -1,32 +1,22 @@
-import * as React from "react";
-import classnames from "classnames";
-import range from "lodash/range";
+import { ComponentPropsWithoutRef } from "react";
+import classNames from "classnames";
+
+import { range } from "~src/utilities";
 
 import "./Skeleton.css";
 
-export interface SkeletonProps {
+interface SkeletonProps extends ComponentPropsWithoutRef<"div"> {
   lineNumber?: number;
-  className?: string;
-  style?: React.CSSProperties;
 }
 
-const Skeleton: React.FC<SkeletonProps> = (props) => {
-  const { lineNumber: lineNumberProps, className, style } = props;
-  const lineNumber = lineNumberProps ?? 3;
+export default function Skeleton(props: SkeletonProps) {
+  const { lineNumber, className, ...otherProps } = props;
 
   return (
-    <div className={classnames(className, "cru-skeleton")} style={style}>
-      {range(lineNumber).map((i) => (
-        <div
-          key={i}
-          className={classnames(
-            "cru-skeleton-line",
-            i === lineNumber - 1 && "last"
-          )}
-        />
+    <div className={classNames(className, "cru-skeleton")} {...otherProps}>
+      {range(lineNumber ?? 3).map((i) => (
+        <div key={i} className="cru-skeleton-line" />
       ))}
     </div>
   );
-};
-
-export default Skeleton;
+}
