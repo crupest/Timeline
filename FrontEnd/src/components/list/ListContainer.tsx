@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, forwardRef, Ref } from "react";
 import classNames from "classnames";
 
-import "./ListContainer.css"
+import "./ListContainer.css";
 
 function _ListContainer(
   { className, children, ...otherProps }: ComponentPropsWithoutRef<"div">,
