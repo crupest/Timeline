@@ -27,7 +27,7 @@ export default function SearchInput({
   return (
     <div className={classNames("cru-search-input", className)}>
       <input
-        type="text"
+        type="search"
         className="cru-search-input-input"
         value={value}
         onChange={(event) => {
