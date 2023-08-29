@@ -75,6 +75,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
         {user && (
           <IconButton
             icon={timeline.isBookmark ? "bookmark-fill" : "bookmark"}
+            color="primary"
             className="timeline-card-button"
             onClick={() => {
               getHttpBookmarkClient()
@@ -96,6 +97,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
         )}
         <IconButton
           icon="people"
+          color="primary"
           className="timeline-card-button"
           onClick={createDialogSwitch("member")}
         />
