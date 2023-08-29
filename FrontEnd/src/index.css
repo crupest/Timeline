@@ -1,8 +1,5 @@
 @import "npm:bootstrap-icons/font/bootstrap-icons.css";
 
-@import "./views/common/index.css";
-
-
 small {
   line-height: 1.2;
 }

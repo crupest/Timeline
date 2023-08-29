@@ -17,7 +17,7 @@
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: var(--cru-surface-dim-color);
+  background-color: var(--cru-dialog-overlay-color);
   opacity: 0.8;
 }
 
@@ -27,7 +27,7 @@
 
   margin: 2em auto;
 
-  border: var(--cru-key-container-color) 1px solid;
+  border: var(--cru-dialog-container-background-color) 1px solid;
   border-radius: 5px;
   padding: 1.5em;
   background-color: var(--cru-surface-color);
