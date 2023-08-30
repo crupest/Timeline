@@ -46,11 +46,14 @@ export default function AlertHost() {
   const [alerts, setAlerts] = useState<AlertInfoWithId[]>([]);
 
   useEffect(() => {
-    alertService.registerListener(setAlerts);
+    const listener = (alerts: AlertInfoWithId[]) => {
+      setAlerts(alerts);
+    };
+
+    alertService.registerListener(listener);
 
     return () => {
-      alertService.unregisterListener(setAlerts);
-      alert;
+      alertService.unregisterListener(listener);
     };
   }, []);
 

@@ -5,17 +5,16 @@
 
 .cru-alert {
   border-radius: 5px;
-  border: var(--cru-theme-color) 1px solid;
+  border: var(--cru-theme-color) 2px solid;
   color: var(--cru-text-primary-color);
   background-color: var(--cru-container-background-color);
 
-  padding: 0.5em 2em;
+  margin: 1em;
+  padding: 0.5em 1em;
 
   display: flex;
   align-items: center;
 }
-
-.cru-alert-message {}
 
 .cru-alert-close-button {
   margin-left: auto;

@@ -1,5 +1,7 @@
 import { ThemeColor, Text } from "../common";
 
+const defaultDismissTime = 5000;
+
 export interface AlertInfo {
   color?: ThemeColor;
   message: Text;
@@ -50,7 +52,7 @@ export class AlertService {
       timerId: null,
     };
 
-    this.alerts.push(newAlert);
+    this.alerts = [...this.alerts, newAlert];
     this._resetDismissTimer(newAlert);
 
     this.notify();
@@ -91,7 +93,8 @@ export class AlertService {
   ) {
     this._clearDismissTimer(alert);
 
-    const realDismissTime = dismissTime ?? alert.dismissTime;
+    const realDismissTime =
+      dismissTime ?? alert.dismissTime ?? defaultDismissTime;
 
     if (typeof realDismissTime === "number") {
       alert.timerId = window.setTimeout(() => {
