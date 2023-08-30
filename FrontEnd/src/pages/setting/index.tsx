@@ -176,34 +176,36 @@ function RegisterCodeSettingItem() {
   }, [user, registerCode]);
 
   return (
-    <SettingItemContainer
-      title="settings.myRegisterCode"
-      description="settings.myRegisterCodeDesc"
-      className="register-code-setting-item"
-      onClick={createDialogSwitch("confirm")}
-    >
-      {registerCode === undefined ? (
-        <Spinner />
-      ) : registerCode === null ? (
-        <span>Noop</span>
-      ) : (
-        <code
-          className="register-code"
-          onClick={(event) => {
-            void navigator.clipboard.writeText(registerCode).then(() => {
-              pushAlert({
-                color: "create",
-                message: "settings.myRegisterCodeCopied",
+    <>
+      <SettingItemContainer
+        title="settings.myRegisterCode"
+        description="settings.myRegisterCodeDesc"
+        className="register-code-setting-item"
+        onClick={createDialogSwitch("confirm")}
+      >
+        {registerCode === undefined ? (
+          <Spinner />
+        ) : registerCode === null ? (
+          <span>Noop</span>
+        ) : (
+          <code
+            className="register-code"
+            onClick={(event) => {
+              void navigator.clipboard.writeText(registerCode).then(() => {
+                pushAlert({
+                  color: "create",
+                  message: "settings.myRegisterCodeCopied",
+                });
               });
-            });
-            event.stopPropagation();
-          }}
-        >
-          {registerCode}
-        </code>
-      )}
+              event.stopPropagation();
+            }}
+          >
+            {registerCode}
+          </code>
+        )}
+      </SettingItemContainer>
       <DialogProvider controller={controller} />
-    </SettingItemContainer>
+    </>
   );
 }
 
