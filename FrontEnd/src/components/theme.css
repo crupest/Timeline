@@ -34,16 +34,16 @@
 :root {
   --cru-background-color: hsl(0 0% 100%);
   --cru-container-background-color: hsl(0 0% 97%);
-  --cru-text-primary-color: hsl(0 0% 0%);
-  --cru-text-secondary-color: hsl(0 0% 38%);
+  --cru-text-major-color: hsl(0 0% 0%);
+  --cru-text-minor-color: hsl(0 0% 38%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --cru-background-color: hsl(0 0% 0%);
     --cru-container-background-color: hsl(0 0% 2%);
-    --cru-text-primary-color: hsl(0 0% 100%);
-    --cru-text-secondary-color: hsl(0 0% 85%);
+    --cru-text-major-color: hsl(0 0% 100%);
+    --cru-text-minor-color: hsl(0 0% 85%);
   }
 }
 
@@ -87,11 +87,19 @@
   --cru-clickable-grayscale-hover-color: hsl(0 0% 92%);
   --cru-clickable-grayscale-focus-color: hsl(0 0% 92%);
   --cru-clickable-grayscale-active-color: hsl(0 0% 88%);
+  --cru-clickable-minor-normal-color: hsl(0 0% 30%);
+  --cru-clickable-minor-hover-color: hsl(0 0% 40%);
+  --cru-clickable-minor-focus-color: hsl(0 0% 40%);
+  --cru-clickable-minor-active-color: hsl(0 0% 45%);
   --cru-clickable-disabled-color: hsl(0 0% 50%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --cru-clickable-minor-normal-color: hsl(0 0% 74%);
+    --cru-clickable-minor-hover-color: hsl(0 0% 82%);
+    --cru-clickable-minor-focus-color: hsl(0 0% 82%);
+    --cru-clickable-minor-active-color: hsl(0 0% 90%);
     --cru-clickable-grayscale-normal-color: hsl(0 0% 0%);
     --cru-clickable-grayscale-hover-color: hsl(0 0% 10%);
     --cru-clickable-grayscale-focus-color: hsl(0 0% 10%);
@@ -132,6 +140,13 @@
   --cru-clickable-hover-color: var(--cru-clickable-grayscale-hover-color);
   --cru-clickable-focus-color: var(--cru-clickable-grayscale-focus-color);
   --cru-clickable-active-color: var(--cru-clickable-grayscale-active-color);
+}
+
+.cru-clickable-minor {
+  --cru-clickable-normal-color: var(--cru-clickable-minor-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-minor-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-minor-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-minor-active-color);
 }
 
 /* button colors */

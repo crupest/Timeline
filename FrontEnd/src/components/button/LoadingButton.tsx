@@ -1,12 +1,12 @@
 import classNames from "classnames";
 
-import { I18nText, ThemeColor, useC } from "../common";
+import { I18nText, ClickableColor, useC } from "../common";
 import Spinner from "../Spinner";
 
 import "./LoadingButton.css";
 
 interface LoadingButtonProps extends React.ComponentPropsWithoutRef<"button"> {
-  color?: ThemeColor;
+  color?: ClickableColor;
   text?: I18nText;
   loading?: boolean;
 }

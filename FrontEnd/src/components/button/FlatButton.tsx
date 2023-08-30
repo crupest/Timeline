@@ -1,12 +1,12 @@
 import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
 
-import { Text, useC, ThemeColor } from "../common";
+import { Text, useC, ClickableColor } from "../common";
 
 import "./FlatButton.css";
 
 interface FlatButtonProps extends ComponentPropsWithoutRef<"button"> {
-  color?: ThemeColor;
+  color?: ClickableColor;
   text?: Text;
   buttonRef?: Ref<HTMLButtonElement> | null;
 }

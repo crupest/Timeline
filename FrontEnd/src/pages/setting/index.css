@@ -38,7 +38,7 @@
 }
 
 .setting-item-label-sub {
-  color: var(--cru-text-secondary-color);
+  color: var(--cru-text-minor-color);
 }
 
 .setting-item-value-area {
@@ -50,7 +50,7 @@
 }
 
 .register-code {
-  background: var(--cru-text-primary-color);
+  background: var(--cru-text-major-color);
   color: var(--cru-background-color);
   border-radius: 3px;
   padding: 0.2em;

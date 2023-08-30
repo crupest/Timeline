@@ -1,13 +1,13 @@
 import { ComponentPropsWithoutRef } from "react";
 import classNames from "classnames";
 
-import { ThemeColor } from "../common";
+import { ClickableColor } from "../common";
 
 import "./IconButton.css";
 
 interface IconButtonProps extends ComponentPropsWithoutRef<"i"> {
   icon: string;
-  color?: ThemeColor | "grayscale";
+  color?: ClickableColor;
   large?: boolean;
   disabled?: boolean; // TODO: Not implemented
 }

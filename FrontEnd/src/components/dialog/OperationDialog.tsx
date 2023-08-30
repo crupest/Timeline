@@ -8,7 +8,7 @@ import {
   Initializer as InputInitializer,
   InputConfirmValueDict,
 } from "../input";
-import { ButtonRow } from "../button";
+import { ButtonRowV2 } from "../button";
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";
 import { useDialogController } from "./DialogProvider";
@@ -140,7 +140,7 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
   }
 
   let body: ReactNode;
-  let buttons: ComponentProps<typeof ButtonRow>["buttons"];
+  let buttons: ComponentProps<typeof ButtonRowV2>["buttons"];
 
   if (step.type === "input" || step.type === "process") {
     const isProcessing = step.type === "process";
@@ -161,25 +161,19 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
     buttons = [
       {
         key: "cancel",
-        type: "normal",
-        props: {
-          text: "operationDialog.cancel",
-          color: "secondary",
-          outline: true,
-          onClick: close,
-          disabled: isProcessing,
-        },
+        text: "operationDialog.cancel",
+        onClick: close,
+        disabled: isProcessing,
       },
       {
         key: "confirm",
         type: "loading",
-        props: {
-          text: "operationDialog.confirm",
-          color,
-          loading: isProcessing,
-          disabled: hasErrorAndDirty,
-          onClick: onConfirm,
-        },
+        action: "major",
+        text: "operationDialog.confirm",
+        color,
+        loading: isProcessing,
+        disabled: hasErrorAndDirty,
+        onClick: onConfirm,
       },
     ];
   } else {
@@ -207,18 +201,17 @@ function OperationDialog<TData>(props: OperationDialogProps<TData>) {
       {
         key: "ok",
         type: "normal",
-        props: {
-          text: "operationDialog.ok",
-          color: "primary",
-          onClick: close,
-        },
+        action: "major",
+        color: "create",
+        text: "operationDialog.ok",
+        onClick: close,
       },
     ];
   }
 
   return (
     <Dialog color={color}>
-      <DialogContainer title={title} titleColor={color} buttons={buttons}>
+      <DialogContainer title={title} titleColor={color} buttonsV2={buttons}>
         {body}
       </DialogContainer>
     </Dialog>

@@ -38,7 +38,7 @@ const FullPageDialog: React.FC<FullPageDialogProps> = ({
         <div
           className={classnames(
             "cru-full-page-content-container",
-            contentContainerClassName
+            contentContainerClassName,
           )}
         >
           {children}
@@ -46,7 +46,7 @@ const FullPageDialog: React.FC<FullPageDialogProps> = ({
       </div>
     </CSSTransition>,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    document.getElementById("portal")!
+    document.getElementById("portal")!,
   );
 };
 
