@@ -17,13 +17,13 @@
 .timeline-card-title {
   display: inline-block;
   vertical-align: middle;
-  color: var(--cru-text-primary-color);
+  color: var(--cru-text-major-color);
   margin: 0.5em 1em;
 }
 
 .timeline-card-title-name {
   margin-inline-start: 1em;
-  color: var(--cru-text-secondary-color);
+  color: var(--cru-text-minor-color);
 }
 
 .timeline-card-user {

@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
 
-import { Text, ThemeColor } from "../common";
+import { Text, ClickableColor } from "../common";
 
 import Button from "./Button";
 import FlatButton from "./FlatButton";
@@ -10,10 +10,12 @@ import LoadingButton from "./LoadingButton";
 
 import "./ButtonRow.css";
 
+type ButtonAction = "major" | "minor";
+
 interface ButtonRowV2ButtonBase {
   key: string | number;
-  action?: "primary" | "secondary";
-  color?: ThemeColor;
+  action?: ButtonAction;
+  color?: ClickableColor;
   disabled?: boolean;
   onClick?: () => void;
 }
@@ -76,9 +78,9 @@ export default function ButtonRowV2({
       {buttons.map((button) => {
         const { key, action, color, disabled, onClick } = button;
 
-        const realAction = action ?? "primary";
+        const realAction: ButtonAction = action ?? "minor";
         const realColor =
-          color ?? (realAction === "primary" ? "primary" : "secondary");
+          color ?? (realAction === "major" ? "primary" : "minor");
 
         const commonProps = { key, color: realColor, disabled, onClick };
         const newClassName = classNames(
@@ -95,7 +97,7 @@ export default function ButtonRowV2({
               <Button
                 {...commonProps}
                 text={text}
-                outline={outline ?? realAction !== "primary"}
+                outline={outline ?? realAction !== "major"}
                 {...props}
                 className={newClassName}
               />

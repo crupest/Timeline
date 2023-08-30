@@ -9,7 +9,7 @@
 body {
   font-family: var(--cru-default-font-family);
   background: var(--cru-body-background-color);
-  color: var(--cru-text-primary-color);
+  color: var(--cru-text-major-color);
   line-height: 1.2;
 }
 
