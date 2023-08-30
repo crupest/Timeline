@@ -8,14 +8,17 @@ import { setHttpToken, axios, HttpBadRequestError } from "~src/http/common";
 import { getHttpTokenClient } from "~src/http/token";
 import { getHttpUserClient, HttpUser, UserPermission } from "~src/http/user";
 
-import { pushAlert } from "./alert";
+import { pushAlert } from "~src/components/alert";
 
 interface IAuthUser extends HttpUser {
   token: string;
 }
 
 export class AuthUser implements IAuthUser {
-  constructor(user: HttpUser, public token: string) {
+  constructor(
+    user: HttpUser,
+    public token: string,
+  ) {
     this.uniqueId = user.uniqueId;
     this.username = user.username;
     this.permissions = user.permissions;
@@ -61,7 +64,7 @@ export class UserService {
       if (e.isAxiosError && e.response && e.response.status === 401) {
         this.userSubject.next(null);
         pushAlert({
-          type: "danger",
+          color: "danger",
           message: "user.tokenInvalid",
         });
       } else {
@@ -97,11 +100,11 @@ export class UserService {
               localStorage.removeItem(USER_STORAGE_KEY);
               this.userSubject.next(null);
               pushAlert({
-                type: "danger",
+                color: "danger",
                 message: "user.tokenInvalid",
               });
             }
-          }
+          },
         );
     }
   }
@@ -118,7 +121,7 @@ export class UserService {
 
   async login(
     credentials: LoginCredentials,
-    rememberMe: boolean
+    rememberMe: boolean,
   ): Promise<void> {
     if (this.currentUser) {
       throw new UiLogicError("Already login.");

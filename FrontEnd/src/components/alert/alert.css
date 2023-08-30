@@ -5,29 +5,18 @@
 
 .cru-alert {
   border-radius: 5px;
-  border: var(--cru-key-color) 1px solid;
-  color: var(--cru-key-t-color);
-  background-color: var(--cru-key-b1-color);
+  border: var(--cru-theme-color) 1px solid;
+  color: var(--cru-text-primary-color);
+  background-color: var(--cru-container-background-color);
 
-  display: flex;
-  overflow: hidden;
-}
-
-.cru-alert-content {
   padding: 0.5em 2em;
-}
 
-.cru-alert-close-button-container {
-  flex-shrink: 0;
-  margin-left: auto;
-  width: 2em;
-  text-align: center;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: var(--cru-key-t-color);
 }
 
+.cru-alert-message {}
+
 .cru-alert-close-button {
-  color: var(--cru-key-color);
+  margin-left: auto;
 }

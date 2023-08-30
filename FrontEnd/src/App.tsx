@@ -10,7 +10,7 @@ import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import TimelinePage from "./pages/timeline";
 import LoadingPage from "./pages/loading";
-import AlertHost from "./components/alert/AlertHost";
+import { AlertHost } from "./components/alert";
 
 export default function App() {
   return (

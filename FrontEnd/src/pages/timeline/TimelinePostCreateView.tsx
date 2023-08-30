@@ -10,10 +10,9 @@ import {
   HttpTimelinePostPostRequestData,
 } from "~src/http/timeline";
 
-import { pushAlert } from "~src/services/alert";
-
 import base64 from "~src/utilities/base64";
 
+import { pushAlert } from "~src/components/alert";
 import BlobImage from "~src/components/BlobImage";
 import LoadingButton from "~src/components/button/LoadingButton";
 import PopupMenu from "~src/components/menu/PopupMenu";
@@ -141,7 +140,7 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
 
   const onPostError = (): void => {
     pushAlert({
-      type: "danger",
+      color: "danger",
       message: "timeline.sendPostFailed",
     });
   };

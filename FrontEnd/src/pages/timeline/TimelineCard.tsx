@@ -2,11 +2,11 @@ import { useState } from "react";
 import { HubConnectionState } from "@microsoft/signalr";
 
 import { useUser } from "~src/services/user";
-import { pushAlert } from "~src/services/alert";
 
 import { HttpTimelineInfo } from "~src/http/timeline";
 import { getHttpBookmarkClient } from "~src/http/bookmark";
 
+import { pushAlert } from "~src/components/alert";
 import { useMobile } from "~src/components/hooks";
 import { Dialog, DialogProvider, useDialog } from "~src/components/dialog";
 import UserAvatar from "~src/components/user/UserAvatar";
@@ -89,7 +89,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
                     message: timeline.isBookmark
                       ? "timeline.removeBookmarkFail"
                       : "timeline.addBookmarkFail",
-                    type: "danger",
+                    color: "danger",
                   });
                 });
             }}
