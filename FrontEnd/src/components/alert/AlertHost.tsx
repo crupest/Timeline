@@ -1,95 +1,56 @@
-import * as React from "react";
-import without from "lodash/without";
-import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 
-import { alertService, AlertInfoEx, AlertInfo } from "~src/services/alert";
-import { convertI18nText } from "~src/common";
-
+import { ThemeColor, useC, Text } from "../common";
 import IconButton from "../button/IconButton";
+
+import { alertService, AlertInfoWithId } from "./AlertService";
 
 import "./alert.css";
 
 interface AutoCloseAlertProps {
-  alert: AlertInfo;
-  close: () => void;
+  color: ThemeColor;
+  message: Text;
+  onDismiss?: () => void;
+  onIn?: () => void;
+  onOut?: () => void;
 }
 
-export const AutoCloseAlert: React.FC<AutoCloseAlertProps> = (props) => {
-  const { alert, close } = props;
-  const { dismissTime } = alert;
-
-  const { t } = useTranslation();
-
-  const timerTag = React.useRef<number | null>(null);
-  const closeHandler = React.useRef<(() => void) | null>(null);
-
-  React.useEffect(() => {
-    closeHandler.current = close;
-  }, [close]);
-
-  React.useEffect(() => {
-    const tag =
-      dismissTime === "never"
-        ? null
-        : typeof dismissTime === "number"
-        ? window.setTimeout(() => closeHandler.current?.(), dismissTime)
-        : window.setTimeout(() => closeHandler.current?.(), 5000);
-    timerTag.current = tag;
-    return () => {
-      if (tag != null) {
-        window.clearTimeout(tag);
-      }
-    };
-  }, [dismissTime]);
-
-  const cancelTimer = (): void => {
-    const { current: tag } = timerTag;
-    if (tag != null) {
-      window.clearTimeout(tag);
-    }
-  };
+function Alert({
+  color,
+  message,
+  onDismiss,
+  onIn,
+  onOut,
+}: AutoCloseAlertProps) {
+  const c = useC();
 
   return (
     <div
-      className={classNames(
-        "m-3 cru-alert",
-        "cru-" + (alert.type ?? "primary")
-      )}
-      onClick={cancelTimer}
+      className={classNames("cru-alert", `cru-theme-${color}`)}
+      onPointerEnter={onIn}
+      onPointerLeave={onOut}
     >
-      <div className="cru-alert-content">
-        {(() => {
-          const { message, customMessage } = alert;
-          if (customMessage != null) {
-            return customMessage;
-          } else {
-            return convertI18nText(message, t);
-          }
-        })()}
-      </div>
-      <div className="cru-alert-close-button-container">
-        <IconButton
-          icon="x"
-          className="cru-alert-close-button"
-          onClick={close}
-        />
-      </div>
+      <div className="cru-alert-message">{c(message)}</div>
+      <IconButton
+        icon="x"
+        color="danger"
+        className="cru-alert-close-button"
+        onClick={onDismiss}
+      />
     </div>
   );
-};
+}
 
-const AlertHost: React.FC = () => {
-  const [alerts, setAlerts] = React.useState<AlertInfoEx[]>([]);
+export default function AlertHost() {
+  const [alerts, setAlerts] = useState<AlertInfoWithId[]>([]);
 
-  React.useEffect(() => {
-    const consume = (alert: AlertInfoEx): void => {
-      setAlerts((old) => [...old, alert]);
-    };
+  useEffect(() => {
+    alertService.registerListener(setAlerts);
 
-    alertService.registerConsumer(consume);
     return () => {
-      alertService.unregisterConsumer(consume);
+      alertService.unregisterListener(setAlerts);
+      alert;
     };
   }, []);
 
@@ -97,17 +58,22 @@ const AlertHost: React.FC = () => {
     <div className="alert-container">
       {alerts.map((alert) => {
         return (
-          <AutoCloseAlert
+          <Alert
             key={alert.id}
-            alert={alert}
-            close={() => {
-              setAlerts((old) => without(old, alert));
+            message={alert.message}
+            color={alert.color ?? "primary"}
+            onIn={() => {
+              alertService.clearDismissTimer(alert.id);
+            }}
+            onOut={() => {
+              alertService.resetDismissTimer(alert.id);
+            }}
+            onDismiss={() => {
+              alertService.dismiss(alert.id);
             }}
           />
         );
       })}
     </div>
   );
-};
-
-export default AlertHost;
+}

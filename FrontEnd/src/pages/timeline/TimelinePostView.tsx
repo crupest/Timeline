@@ -5,8 +5,7 @@ import {
   HttpTimelinePostInfo,
 } from "~src/http/timeline";
 
-import { pushAlert } from "~src/services/alert";
-
+import { pushAlert } from "~src/components/alert";
 import { useClickOutside } from "~src/components/hooks";
 import UserAvatar from "~src/components/user/UserAvatar";
 import { DialogProvider, useDialog } from "~src/components/dialog";
@@ -44,7 +43,7 @@ export default function TimelinePostView(props: TimelinePostViewProps) {
               .deletePost(post.timelineOwnerV2, post.timelineNameV2, post.id)
               .then(onDeleted, () => {
                 pushAlert({
-                  type: "danger",
+                  color: "danger",
                   message: "timeline.deletePostFailed",
                 });
               });

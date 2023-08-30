@@ -10,10 +10,10 @@ import classNames from "classnames";
 
 import { useUser, userService } from "~src/services/user";
 import { getHttpUserClient } from "~src/http/user";
-import { pushAlert } from "~src/services/alert";
 
 import { useC, Text } from "~src/common";
 
+import { pushAlert } from "~src/components/alert";
 import {
   useDialog,
   DialogProvider,
@@ -192,7 +192,7 @@ function RegisterCodeSettingItem() {
           onClick={(event) => {
             void navigator.clipboard.writeText(registerCode).then(() => {
               pushAlert({
-                type: "create",
+                color: "create",
                 message: "settings.myRegisterCodeCopied",
               });
             });
