@@ -87,6 +87,10 @@
   --cru-clickable-grayscale-hover-color: hsl(0 0% 92%);
   --cru-clickable-grayscale-focus-color: hsl(0 0% 92%);
   --cru-clickable-grayscale-active-color: hsl(0 0% 88%);
+  --cru-clickable-light-normal-color: hsl(0 0% 100%);
+  --cru-clickable-light-hover-color: hsl(0 0% 92%);
+  --cru-clickable-light-focus-color: hsl(0 0% 92%);
+  --cru-clickable-light-active-color: hsl(0 0% 88%);
   --cru-clickable-minor-normal-color: hsl(0 0% 30%);
   --cru-clickable-minor-hover-color: hsl(0 0% 40%);
   --cru-clickable-minor-focus-color: hsl(0 0% 40%);
@@ -140,6 +144,13 @@
   --cru-clickable-hover-color: var(--cru-clickable-grayscale-hover-color);
   --cru-clickable-focus-color: var(--cru-clickable-grayscale-focus-color);
   --cru-clickable-active-color: var(--cru-clickable-grayscale-active-color);
+}
+
+.cru-clickable-light {
+  --cru-clickable-normal-color: var(--cru-clickable-light-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-light-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-light-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-light-active-color);
 }
 
 .cru-clickable-minor {

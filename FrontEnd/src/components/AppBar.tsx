@@ -92,7 +92,12 @@ export default function AppBar() {
       </div>
 
       {isMobile && (
-        <IconButton icon="list" className="toggler" onClick={toggleCollapse} />
+        <IconButton
+          icon="list"
+          color="light"
+          className="toggler"
+          onClick={toggleCollapse}
+        />
       )}
     </nav>
   );
