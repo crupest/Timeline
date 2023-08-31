@@ -2,7 +2,7 @@ import { ReactNode, useRef } from "react";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 
-import { ThemeColor } from "../common";
+import { ThemeColor, UiLogicError } from "../common";
 
 import { useCloseDialog } from "./DialogProvider";
 
@@ -10,7 +10,7 @@ import "./Dialog.css";
 
 const optionalPortalElement = document.getElementById("portal");
 if (optionalPortalElement == null) {
-  throw new Error("Portal element not found");
+  throw new UiLogicError();
 }
 const portalElement = optionalPortalElement;
 

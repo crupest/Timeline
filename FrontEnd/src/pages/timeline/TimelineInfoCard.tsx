@@ -8,37 +8,54 @@ import { getHttpBookmarkClient } from "~src/http/bookmark";
 
 import { pushAlert } from "~src/components/alert";
 import { useMobile } from "~src/components/hooks";
-import { Dialog, DialogProvider, useDialog } from "~src/components/dialog";
+import { IconButton } from "~src/components/button";
+import {
+  Dialog,
+  FullPageDialog,
+  DialogProvider,
+  useDialog,
+} from "~src/components/dialog";
 import UserAvatar from "~src/components/user/UserAvatar";
 import PopupMenu from "~src/components/menu/PopupMenu";
-import FullPageDialog from "~src/components/dialog/FullPageDialog";
 import Card from "~src/components/Card";
+
 import TimelineDeleteDialog from "./TimelineDeleteDialog";
 import ConnectionStatusBadge from "./ConnectionStatusBadge";
-import CollapseButton from "./CollapseButton";
 import TimelineMember from "./TimelineMember";
 import TimelinePropertyChangeDialog from "./TimelinePropertyChangeDialog";
-import IconButton from "~src/components/button/IconButton";
 
-import "./TimelineCard.css";
+import "./TimelineInfoCard.css";
 
-interface TimelinePageCardProps {
+function CollapseButton({
+  collapse,
+  onClick,
+  className,
+}: {
+  collapse: boolean;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <IconButton
+      color="primary"
+      icon={collapse ? "info-circle" : "x-circle"}
+      onClick={onClick}
+      className={className}
+    />
+  );
+}
+
+interface TimelineInfoCardProps {
   timeline: HttpTimelineInfo;
   connectionStatus: HubConnectionState;
   onReload: () => void;
 }
 
-export default function TimelineCard(props: TimelinePageCardProps) {
-  const { timeline, connectionStatus, onReload } = props;
-
+function TimelineInfoContent({
+  timeline,
+  onReload,
+}: Omit<TimelineInfoCardProps, "connectionStatus">) {
   const user = useUser();
-
-  const [collapse, setCollapse] = useState(true);
-  const toggleCollapse = (): void => {
-    setCollapse((o) => !o);
-  };
-
-  const isMobile = useMobile();
 
   const { controller, createDialogSwitch } = useDialog({
     member: (
@@ -52,7 +69,7 @@ export default function TimelineCard(props: TimelinePageCardProps) {
     delete: <TimelineDeleteDialog timeline={timeline} />,
   });
 
-  const content = (
+  return (
     <div>
       <h3 className="timeline-card-title">
         {timeline.title}
@@ -127,8 +144,31 @@ export default function TimelineCard(props: TimelinePageCardProps) {
           </PopupMenu>
         )}
       </div>
+      <DialogProvider controller={controller} />
     </div>
   );
+}
+
+export default function TimelineInfoCard(props: TimelineInfoCardProps) {
+  const { timeline, connectionStatus, onReload } = props;
+
+  const [collapse, setCollapse] = useState(true);
+
+  const isMobile = useMobile((mobile) => {
+    if (!mobile) {
+      switchDialog(null);
+    } else {
+      setCollapse(true);
+    }
+  });
+
+  const { controller, switchDialog } = useDialog({
+    "full-page": (
+      <FullPageDialog>
+        <TimelineInfoContent timeline={timeline} onReload={onReload} />
+      </FullPageDialog>
+    ),
+  });
 
   return (
     <Card
@@ -139,18 +179,19 @@ export default function TimelineCard(props: TimelinePageCardProps) {
     >
       <div className="timeline-card-top-right-area">
         <ConnectionStatusBadge status={connectionStatus} />
-        <CollapseButton collapse={collapse} onClick={toggleCollapse} />
+        <CollapseButton
+          collapse={collapse}
+          onClick={() => {
+            const open = collapse;
+            setCollapse(!open);
+            if (isMobile && open) {
+              switchDialog("full-page");
+            }
+          }}
+        />
       </div>
-      {isMobile ? (
-        <FullPageDialog
-          onBack={toggleCollapse}
-          show={!collapse}
-          contentContainerClassName="p-2"
-        >
-          {content}
-        </FullPageDialog>
-      ) : (
-        <div style={{ display: collapse ? "none" : "block" }}>{content}</div>
+      {!collapse && !isMobile && (
+        <TimelineInfoContent timeline={timeline} onReload={onReload} />
       )}
       <DialogProvider controller={controller} />
     </Card>

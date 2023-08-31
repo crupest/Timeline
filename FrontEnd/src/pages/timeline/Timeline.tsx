@@ -19,7 +19,7 @@ import { useScrollToBottom } from "~src/components/hooks";
 
 import TimelinePostList from "./TimelinePostList";
 import TimelinePostEdit from "./TimelinePostCreateView";
-import TimelineCard from "./TimelineCard";
+import TimelineInfoCard from "./TimelineInfoCard";
 
 import "./Timeline.css";
 
@@ -159,7 +159,7 @@ export function Timeline(props: TimelineProps) {
   return (
     <div className="timeline-container">
       {timeline && (
-        <TimelineCard
+        <TimelineInfoCard
           timeline={timeline}
           connectionStatus={signalrState}
           onReload={updateTimeline}
