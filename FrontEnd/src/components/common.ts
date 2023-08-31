@@ -12,7 +12,7 @@ export const themeColors = [
 
 export type ThemeColor = (typeof themeColors)[number];
 
-export type ClickableColor = ThemeColor | "grayscale" | "minor";
+export type ClickableColor = ThemeColor | "grayscale" | "light" | "minor";
 
 export { breakpoints } from "./breakpoints";
 

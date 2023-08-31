@@ -33,6 +33,7 @@ export default function FullPageDialog({
       <div className="cru-dialog-full-page-top-bar">
         <IconButton
           icon="arrow-left"
+          color="light"
           className="cru-dialog-full-page-back-button"
           onClick={closeDialog}
         />
