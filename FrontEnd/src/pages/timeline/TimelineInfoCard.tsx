@@ -162,13 +162,22 @@ export default function TimelineInfoCard(props: TimelineInfoCardProps) {
     }
   });
 
-  const { controller, switchDialog } = useDialog({
-    "full-page": (
-      <FullPageDialog>
-        <TimelineInfoContent timeline={timeline} onReload={onReload} />
-      </FullPageDialog>
-    ),
-  });
+  const { controller, switchDialog } = useDialog(
+    {
+      "full-page": (
+        <FullPageDialog>
+          <TimelineInfoContent timeline={timeline} onReload={onReload} />
+        </FullPageDialog>
+      ),
+    },
+    {
+      onClose: {
+        "full-page": () => {
+          setCollapse(true);
+        },
+      },
+    },
+  );
 
   return (
     <Card
