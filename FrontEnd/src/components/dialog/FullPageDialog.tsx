@@ -1,53 +1,51 @@
-import * as React from "react";
+import { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import classnames from "classnames";
-import { CSSTransition } from "react-transition-group";
+import classNames from "classnames";
+
+import { ThemeColor, UiLogicError } from "../common";
+import { IconButton } from "../button";
+
+import { useCloseDialog } from "./DialogProvider";
 
 import "./FullPageDialog.css";
-import IconButton from "../button/IconButton";
 
-export interface FullPageDialogProps {
-  show: boolean;
-  onBack: () => void;
+const optionalPortalElement = document.getElementById("portal");
+if (optionalPortalElement == null) {
+  throw new UiLogicError();
+}
+const portalElement = optionalPortalElement;
+
+interface FullPageDialogProps {
+  color?: ThemeColor;
   contentContainerClassName?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const FullPageDialog: React.FC<FullPageDialogProps> = ({
-  show,
-  onBack,
+export default function FullPageDialog({
+  color,
   children,
   contentContainerClassName,
-}) => {
-  return createPortal(
-    <CSSTransition
-      mountOnEnter
-      unmountOnExit
-      in={show}
-      timeout={300}
-      classNames="cru-full-page"
-    >
-      <div className="cru-full-page">
-        <div className="cru-full-page-top-bar">
-          <IconButton
-            icon="arrow-left"
-            className="ms-3 cru-full-page-back-button"
-            onClick={onBack}
-          />
-        </div>
-        <div
-          className={classnames(
-            "cru-full-page-content-container",
-            contentContainerClassName,
-          )}
-        >
-          {children}
-        </div>
-      </div>
-    </CSSTransition>,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    document.getElementById("portal")!,
-  );
-};
+}: FullPageDialogProps) {
+  const closeDialog = useCloseDialog();
 
-export default FullPageDialog;
+  return createPortal(
+    <div className={`cru-dialog-full-page cru-theme-${color ?? "primary"}`}>
+      <div className="cru-dialog-full-page-top-bar">
+        <IconButton
+          icon="arrow-left"
+          className="cru-dialog-full-page-back-button"
+          onClick={closeDialog}
+        />
+      </div>
+      <div
+        className={classNames(
+          "cru-dialog-full-page-content-container",
+          contentContainerClassName,
+        )}
+      >
+        {children}
+      </div>
+    </div>,
+    portalElement,
+  );
+}
