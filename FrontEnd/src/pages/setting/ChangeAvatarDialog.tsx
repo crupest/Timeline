@@ -109,7 +109,6 @@ export default function ChangeAvatarDialog() {
 
   const cancelButton = {
     key: "cancel",
-    action: "secondary",
     text: "operationDialog.cancel",
     onClick: close,
   } as const;
@@ -117,7 +116,6 @@ export default function ChangeAvatarDialog() {
   const createPreviousButton = (onClick: () => void) =>
     ({
       key: "previous",
-      action: "secondary",
       text: "operationDialog.previousStep",
       onClick,
     }) as const;
@@ -130,7 +128,7 @@ export default function ChangeAvatarDialog() {
       cancelButton,
       {
         key: "next",
-        action: "primary",
+        action: "major",
         text: "operationDialog.nextStep",
         onClick: () => setState("crop"),
         disabled: file == null,
@@ -141,7 +139,7 @@ export default function ChangeAvatarDialog() {
       createPreviousButton(onCropPrevious),
       {
         key: "next",
-        action: "primary",
+        action: "major",
         text: "operationDialog.nextStep",
         onClick: onCropNext,
         disabled: !canCrop,
@@ -153,7 +151,7 @@ export default function ChangeAvatarDialog() {
       createPreviousButton(onPreviewPrevious),
       {
         key: "upload",
-        action: "primary",
+        action: "major",
         text: "settings.dialogChangeAvatar.upload",
         onClick: upload,
       },
@@ -171,7 +169,7 @@ export default function ChangeAvatarDialog() {
       cancelButton,
       {
         key: "retry",
-        action: "primary",
+        action: "major",
         text: "operationDialog.retry",
         onClick: upload,
       },
