@@ -49,7 +49,7 @@ export class Rect {
   }
 
   set right(value: number) {
-    this.width = this.left + value;
+    this.width = value - this.left;
   }
 
   get bottom(): number {
@@ -57,7 +57,7 @@ export class Rect {
   }
 
   set bottom(value: number) {
-    this.height = this.top + value;
+    this.height = value - this.top;
   }
 
   get ratio(): number {
@@ -218,15 +218,16 @@ export function adjustRectToContainer(
         : clamp(rect.top, container.top - rect.height, container.bottom);
   } else if (mode === "resize") {
     const noFlip = options?.resizeNoFlip;
-    rect.right = clamp(
+    const newRight = clamp(
       rect.right,
-      noFlip ? 0 : container.left,
-      container.right,
+      rect.width > 0 && noFlip ? rect.left : container.left,
+      rect.width < 0 && noFlip ? rect.left : container.right,
     );
+    rect.right = newRight;
     rect.bottom = clamp(
       rect.bottom,
-      noFlip ? 0 : container.top,
-      container.bottom,
+      rect.height > 0 && noFlip ? rect.top : container.top,
+      rect.height < 0 && noFlip ? rect.top : container.bottom,
     );
   } else {
     rect.left = clamp(rect.left, container.left, container.right);

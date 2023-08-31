@@ -1,7 +1,13 @@
-import { ComponentPropsWithoutRef, useState, useEffect, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  Ref,
+  ComponentPropsWithoutRef,
+} from "react";
 
 type BlobImageProps = Omit<ComponentPropsWithoutRef<"img">, "src"> & {
-  imgRef?: React.Ref<HTMLImageElement>;
+  imgRef?: Ref<HTMLImageElement>;
   src?: Blob | string | null;
   keyBySrc?: boolean;
 };
