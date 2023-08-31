@@ -3,6 +3,19 @@
   max-height: 300px;
 }
 
+.timeline-post-create-markdown-edit-area {
+  border: 1px solid var(--cru-clickable-primary-normal-color);
+  border-top: none;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding: 0.6em;
+}
+
+.timeline-post-create-markdown-edit-area:hover {
+  border: 1px solid var(--cru-clickable-primary-normal-color);
+  border-top: none;
+}
+
 .timeline-markdown-post-edit-image-container {
   position: relative;
   text-align: center;

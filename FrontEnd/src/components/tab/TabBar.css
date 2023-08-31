@@ -1,0 +1,38 @@
+.cru-tab-bar {
+  border-bottom: var(--cru-clickable-normal-color) 1px solid;
+  display: flex;
+}
+
+.cru-tab-bar-tab-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  border: var(--cru-clickable-normal-color) 1px solid;
+  border-bottom: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 0.2em 0.5em;
+}
+
+.cru-tab-bar-item {
+  color: var(--cru-clickable-normal-color);
+  transition: all 0.5s;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0.3em 1em;
+}
+
+.cru-tab-bar-item:hover {
+  color: var(--cru-push-button-text-color);
+  background-color: var(--cru-clickable-normal-color);
+}
+
+.cru-tab-bar-item.active {
+  color: var(--cru-push-button-text-color);
+  background-color: var(--cru-clickable-normal-color);
+  border-color: var(--cru-primary-color);
+}
+
+.cru-tab-bar-action-area {
+  margin-left: auto;
+}
