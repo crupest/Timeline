@@ -10,13 +10,13 @@ import {
 import TimelinePostBuilder from "~src/services/TimelinePostBuilder";
 
 import FlatButton from "~src/components/button/FlatButton";
-import TabPages from "~src/components/tab/TabPages";
+import { TabPages } from "~src/components/tab";
 import ConfirmDialog from "~src/components/dialog/ConfirmDialog";
 import Spinner from "~src/components/Spinner";
 import IconButton from "~src/components/button/IconButton";
+import { DialogProvider, useDialog } from "~src/components/dialog";
 
 import "./MarkdownPostEdit.css";
-import { DialogProvider, useDialog } from "~src/components/dialog";
 
 export interface MarkdownPostEditProps {
   owner: string;
@@ -25,7 +25,6 @@ export interface MarkdownPostEditProps {
   onPostError: () => void;
   onClose: () => void;
   className?: string;
-  style?: React.CSSProperties;
 }
 
 const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
@@ -35,7 +34,6 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
   onClose,
   onPostError,
   className,
-  style,
 }) => {
   const { t } = useTranslation();
 
@@ -117,8 +115,6 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
     <>
       <TabPages
         className={className}
-        style={style}
-        pageContainerClassName="py-2"
         dense
         actions={
           process ? (
@@ -152,7 +148,7 @@ const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
               <textarea
                 value={text}
                 disabled={process}
-                className="cru-fill-parent"
+                className="timeline-post-create-markdown-edit-area cru-fill-parent"
                 onChange={(event) => {
                   getBuilder().setMarkdownText(event.currentTarget.value);
                 }}

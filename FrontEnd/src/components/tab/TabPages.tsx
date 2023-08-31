@@ -1,52 +1,43 @@
-import * as React from "react";
+import { ReactNode, useState } from "react";
+import classNames from "classnames";
 
-import { I18nText, UiLogicError } from "~src/common";
+import { Text, UiLogicError } from "../common";
 
-import Tabs from "./Tabs";
+import Tabs from "./TabBar";
 
-export interface TabPage {
+import "./TabPages.css";
+
+interface TabPage {
   name: string;
-  text: I18nText;
-  page: React.ReactNode;
+  text: Text;
+  page: ReactNode;
 }
 
-export interface TabPagesProps {
+interface TabPagesProps {
   pages: TabPage[];
-  actions?: React.ReactNode;
+  actions?: ReactNode;
   dense?: boolean;
   className?: string;
-  style?: React.CSSProperties;
-  navClassName?: string;
-  navStyle?: React.CSSProperties;
+  tabBarClassName?: string;
   pageContainerClassName?: string;
-  pageContainerStyle?: React.CSSProperties;
 }
 
-const TabPages: React.FC<TabPagesProps> = ({
+export default function TabPages({
   pages,
   actions,
   dense,
   className,
-  style,
-  navClassName,
-  navStyle,
+  tabBarClassName,
   pageContainerClassName,
-  pageContainerStyle,
-}) => {
-  if (pages.length === 0) {
-    throw new UiLogicError("Page list can't be empty.");
-  }
-
-  const [tab, setTab] = React.useState<string>(pages[0].name);
+}: TabPagesProps) {
+  const [tab, setTab] = useState<string>(pages[0].name);
 
   const currentPage = pages.find((p) => p.name === tab);
 
-  if (currentPage == null) {
-    throw new UiLogicError("Current tab value is bad.");
-  }
+  if (currentPage == null) throw new UiLogicError();
 
   return (
-    <div className={className} style={style}>
+    <div className={className}>
       <Tabs
         tabs={pages.map((page) => ({
           name: page.name,
@@ -57,15 +48,14 @@ const TabPages: React.FC<TabPagesProps> = ({
         }))}
         dense={dense}
         activeTabName={tab}
-        className={navClassName}
-        style={navStyle}
+        className={tabBarClassName}
         actions={actions}
       />
-      <div className={pageContainerClassName} style={pageContainerStyle}>
+      <div
+        className={classNames("cru-tab-page-container", pageContainerClassName)}
+      >
         {currentPage.page}
       </div>
     </div>
   );
-};
-
-export default TabPages;
+}
