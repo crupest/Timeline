@@ -12,6 +12,10 @@
   display: flex;
 }
 
+.app-bar > * {
+  background-color: var(--cru-primary-color);
+}
+
 .app-bar .app-bar-brand {
   display: flex;
   align-items: center;
@@ -21,9 +25,12 @@
   height: 2em;
 }
 
+.app-bar .app-bar-space {
+  flex-grow: 1;
+}
+
 .app-bar .app-bar-user-area {
   display: flex;
-  margin-left: auto;
 }
 
 .app-bar a {
@@ -67,7 +74,7 @@
 .app-bar.mobile .app-bar-link-area {
   position: absolute;
   z-index: -1;
-  top: 56px;
+  top: -100%;
   left: 0;
   right: 0;
   transition: transform 0.5s;
@@ -77,11 +84,12 @@
   height: 56px;
 }
 
-.app-bar.mobile.collapse .app-bar-link-area {
-  transform: translateY(-100%);
+.app-bar.mobile.expand .app-bar-link-area {
+  transform: translateY(100%);
 }
 
 .app-bar .toggler {
   font-size: 2em;
-  margin-right: 0.5em;
+  padding-right: 0.5em;
 }
+
