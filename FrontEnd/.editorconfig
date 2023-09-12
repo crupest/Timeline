@@ -1,14 +1,16 @@
 root = true
 end_of_line = lf
+indent_style = space
 
 [*.ts]
-tab_width = 2
+indent_size = 2
 
 [*.tsx]
-tab_width = 2
+indent_size = 2
 
 [*.css]
-tab_width = 2
+indent_size = 2
 
 [*.sass]
-tab_width = 2
+indent_size = 2
+

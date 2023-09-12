@@ -57,7 +57,7 @@ export default function AppBar() {
       className={classnames(
         isMobile ? "mobile" : "desktop",
         "app-bar",
-        isCollapse && "collapse",
+        isCollapse || "expand",
       )}
     >
       <Link to="/" className="app-bar-brand" onClick={collapse}>
@@ -80,6 +80,8 @@ export default function AppBar() {
           />
         )}
       </div>
+
+      <div className="app-bar-space" />
 
       <div className="app-bar-user-area">
         {user != null ? (
