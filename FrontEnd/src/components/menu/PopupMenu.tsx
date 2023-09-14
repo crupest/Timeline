@@ -58,8 +58,9 @@ export default function PopupMenu({
           >
             <Menu
               items={items}
-              onItemClicked={() => {
+              onItemClick={(e) => {
                 setShow(false);
+                e.stopPropagation();
               }}
             />
           </div>,

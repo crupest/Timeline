@@ -1,6 +1,8 @@
 import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
 
+import "./Page.css";
+
 interface PageProps extends ComponentPropsWithoutRef<"div"> {
   noTopPadding?: boolean;
   pageRef?: Ref<HTMLDivElement>;

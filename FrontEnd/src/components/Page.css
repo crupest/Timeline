@@ -1,0 +1,8 @@
+.cru-page {
+  padding: var(--cru-page-padding);
+}
+
+.cru-page-no-top-padding {
+  padding-top: 0;
+}
+

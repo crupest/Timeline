@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { MouseEvent, CSSProperties } from "react";
 import classNames from "classnames";
 
 import { useC, Text, ThemeColor } from "../common";
@@ -15,21 +15,21 @@ export type MenuItem =
       text: Text;
       icon?: string;
       color?: ThemeColor;
-      onClick: () => void;
+      onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
     };
 
 export type MenuItems = MenuItem[];
 
 export type MenuProps = {
   items: MenuItems;
-  onItemClicked?: () => void;
+  onItemClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   style?: CSSProperties;
 };
 
 export default function Menu({
   items,
-  onItemClicked,
+  onItemClick,
   className,
   style,
 }: MenuProps) {
@@ -46,9 +46,9 @@ export default function Menu({
             <button
               key={index}
               className={`cru-menu-item cru-clickable-${color ?? "primary"}`}
-              onClick={() => {
-                onClick();
-                onItemClicked?.();
+              onClick={(e) => {
+                onClick?.(e);
+                onItemClick?.(e);
               }}
             >
               {icon != null && <Icon color={color} icon={icon} />}
