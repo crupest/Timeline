@@ -1,19 +1,12 @@
+.timeline-edit-plain-text-container {
+  width: 100%;
+  height: 100%;
+}
+
 .timeline-edit-plain-text-input {
   width: 100%;
   height: 100%;
-  background-color: var(--cru-background-color);
-  color: var(--cru-text-major-color);
-  border: 1px solid var(--cru-text-major-color);
   padding: 0.5em;
-  border-radius: 5px;
-  transition: border-color 0.5s;
-}
-
-.timeline-edit-plain-text-input:hover {
-  border-color: var(--cru-clickable-secondary-normal-color);
-}
-
-.timeline-edit-plain-text-input:focus {
-  border-color: var(--cru-clickable-secondary-normal-color);
+  border-radius: 4px;
 }
 

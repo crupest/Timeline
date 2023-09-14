@@ -10,7 +10,7 @@
     padding-top: 60px;
   }
 
-  .timeline-post-create-card{
+  .timeline-post-create-card {
     margin-right: 0;
   }
 }
@@ -23,11 +23,13 @@
   flex-grow: 1;
 }
 
-
-
 .timeline-post-create-right-area {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-left: 1em;
+}
+
+.timeline-post-create-send {
+  margin-top: auto;
 }

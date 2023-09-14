@@ -104,6 +104,7 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
           throw new UiLogicError();
         }
         requestDataList = await mdBuild();
+        break;
       default:
         throw new UiLogicError("Unknown content type.");
     }
@@ -174,6 +175,7 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
               <IconButton color="primary" icon={postKindIconMap[kind]} />
             </PopupMenu>
             <LoadingButton
+              className="timeline-post-create-send"
               onClick={() => void onSend()}
               color="primary"
               disabled={!canSend}

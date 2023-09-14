@@ -27,7 +27,7 @@ class MarkedRenderer extends marked.Renderer {
       }
     }
 
-    return this.image(href, title, text);
+    return super.image(href, title, text);
   }
 }
 
@@ -136,6 +136,7 @@ export function MarkdownPostEdit({
   return (
     <TabPages
       className={className}
+      pageContainerClassName="timeline-edit-markdown-tab-page"
       dense
       pages={[
         {

@@ -13,69 +13,17 @@ body {
   line-height: 1.2;
 }
 
-.cru-page {
-  padding: var(--cru-page-padding);
+textarea {
+  transition: border-color 0.3s;
+  border-color: var(--cru-text-minor-color);
 }
 
-.cru-page-no-top-padding {
-  padding-top: 0;
+textarea:hover {
+  border-color: var(--cru-clickable-primary-hover-color);
 }
 
-.cru-text-center {
-  text-align: center;
-}
-
-.cru-text-end {
-  text-align: end;
-}
-
-.cru-float-left {
-  float: left;
-}
-
-.cru-float-right {
-  float: right;
-}
-
-.cru-align-text-bottom {
-  vertical-align: text-bottom;
-}
-
-.cru-align-middle {
-  vertical-align: middle;
-}
-
-.cru-clearfix::after {
-  clear: both;
-}
-
-.cru-fill-parent {
-  width: 100%;
-  height: 100%;
-}
-
-.cru-avatar {
-  width: 60px;
-  height: 60px;
-}
-
-.cru-avatar.large {
-  width: 100px;
-  height: 100px;
-}
-
-.cru-avatar.small {
-  width: 40px;
-  height: 40px;
-}
-
-.cru-round {
-  border-radius: 50%;
-}
-
-.cru-tab-pages-action-area {
-  display: flex;
-  align-items: center;
+textarea:focus {
+  border-color: var(--cru-clickable-primary-normal-color);
 }
 
 .alert-container {
