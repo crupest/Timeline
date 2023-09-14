@@ -17,3 +17,6 @@ export type ClickableColor = ThemeColor | "grayscale" | "light" | "minor";
 export { breakpoints } from "./breakpoints";
 
 export * as geometry from "~src/utilities/geometry";
+
+export * as array from "~src/utilities/array"
+

@@ -1,5 +1,4 @@
-import { useState, useEffect, ChangeEventHandler } from "react";
-import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import classNames from "classnames";
 
 import { UiLogicError } from "~src/common";
@@ -13,21 +12,19 @@ import {
 
 import base64 from "~src/utilities/base64";
 
+import { useC } from "~/src/components/common";
 import { pushAlert } from "~src/components/alert";
-import LoadingButton from "~src/components/button/LoadingButton";
+import { IconButton, LoadingButton } from "~src/components/button";
 import PopupMenu from "~src/components/menu/PopupMenu";
+import { useWindowLeave } from "~src/components/hooks";
+
 import TimelinePostCard from "../TimelinePostCard";
 import TimelinePostContainer from "../TimelinePostContainer";
-import IconButton from "~src/components/button/IconButton";
-
-import PlainTextPostEdit from './PlainTextPostEdit'
-import MarkdownPostEdit from "./MarkdownPostEdit";
+import PlainTextPostEdit from "./PlainTextPostEdit";
+import ImagePostEdit from "./ImagePostEdit";
+import { MarkdownPostEdit, useMarkdownEdit } from "./MarkdownPostEdit";
 
 import "./TimelinePostCreateView.css";
-
-
-
-
 
 type PostKind = "text" | "markdown" | "image";
 
@@ -46,25 +43,30 @@ export interface TimelinePostEditProps {
 function TimelinePostEdit(props: TimelinePostEditProps) {
   const { timeline, className, onPosted } = props;
 
-  const { t } = useTranslation();
+  const c = useC();
 
   const [process, setProcess] = useState<boolean>(false);
 
-  const [kind, setKind] = useState<Exclude<PostKind, "markdown">>("text");
-  const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
-
-  const [text, setText] = useState<string>("");
-  const [image, setImage] = useState<File | null>(null);
+  const [kind, setKind] = useState<PostKind>("text");
 
   const draftTextLocalStorageKey = `timeline.${timeline.owner.username}.${timeline.nameV2}.postDraft.text`;
+  const [text, setText] = useState<string>(
+    () => window.localStorage.getItem(draftTextLocalStorageKey) ?? "",
+  );
+  const [image, setImage] = useState<File | null>(null);
+  const {
+    hasContent: mdHasContent,
+    build: mdBuild,
+    clear: mdClear,
+    markdownEditProps,
+  } = useMarkdownEdit(process);
 
-  useEffect(() => {
-    setText(window.localStorage.getItem(draftTextLocalStorageKey) ?? "");
-  }, [draftTextLocalStorageKey]);
+  useWindowLeave(!mdHasContent && !image);
 
   const canSend =
     (kind === "text" && text.length !== 0) ||
-    (kind === "image" && image != null);
+    (kind === "image" && image != null) ||
+    (kind === "markdown" && mdHasContent);
 
   const onPostError = (): void => {
     pushAlert({
@@ -76,48 +78,59 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
   const onSend = async (): Promise<void> => {
     setProcess(true);
 
-    let requestData: HttpTimelinePostPostRequestData;
+    let requestDataList: HttpTimelinePostPostRequestData[];
     switch (kind) {
       case "text":
-        requestData = {
-          contentType: "text/plain",
-          data: await base64(text),
-        };
+        requestDataList = [
+          {
+            contentType: "text/plain",
+            data: await base64(text),
+          },
+        ];
         break;
       case "image":
         if (image == null) {
-          throw new UiLogicError(
-            "Content type is image but image blob is null.",
-          );
+          throw new UiLogicError();
         }
-        requestData = {
-          contentType: image.type,
-          data: await base64(image),
-        };
+        requestDataList = [
+          {
+            contentType: image.type,
+            data: await base64(image),
+          },
+        ];
         break;
+      case "markdown":
+        if (!mdHasContent) {
+          throw new UiLogicError();
+        }
+        requestDataList = await mdBuild();
       default:
         throw new UiLogicError("Unknown content type.");
     }
 
-    getHttpTimelineClient()
-      .postPost(timeline.owner.username, timeline.nameV2, {
-        dataList: [requestData],
-      })
-      .then(
-        (data) => {
-          if (kind === "text") {
-            setText("");
-            window.localStorage.removeItem(draftTextLocalStorageKey);
-          }
-          setProcess(false);
-          setKind("text");
-          onPosted(data);
-        },
-        () => {
-          setProcess(false);
-          onPostError();
+    try {
+      const res = await getHttpTimelineClient().postPost(
+        timeline.owner.username,
+        timeline.nameV2,
+        {
+          dataList: requestDataList,
         },
       );
+
+      if (kind === "text") {
+        setText("");
+        window.localStorage.removeItem(draftTextLocalStorageKey);
+      } else if (kind === "image") {
+        setImage(null);
+      } else if (kind === "markdown") {
+        mdClear();
+      }
+      onPosted(res);
+    } catch (e) {
+      onPostError();
+    } finally {
+      setProcess(false);
+    }
   };
 
   return (
@@ -125,73 +138,51 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
       className={classNames(className, "timeline-post-create-container")}
     >
       <TimelinePostCard className="timeline-post-create-card">
-        {showMarkdown ? (
-          <MarkdownPostEdit
-            className="cru-fill-parent"
-            onClose={() => setShowMarkdown(false)}
-            owner={timeline.owner.username}
-            timeline={timeline.nameV2}
-            onPosted={onPosted}
-            onPostError={onPostError}
-          />
-        ) : (
-          <div className="timeline-post-create">
-            <div className="timeline-post-create-edit-area">
-              {(() => {
-                if (kind === "text") {
-                  return (
-                    <PlainTextPostEdit
-                      className="timeline-post-create-edit-text"
-                      text={text}
-                      disabled={process}
-                      onChange={(text) => {
-                        setText(text);
-                        window.localStorage.setItem(
-                          draftTextLocalStorageKey,
-                          text,
-                        );
-                      }}
-                    />
-                  );
-                } else if (kind === "image") {
-                  return (
-                    <TimelinePostEditImage
-                      onSelect={setImage}
-                      disabled={process}
-                    />
-                  );
-                }
-              })()}
-            </div>
-            <div className="timeline-post-create-right-area">
-              <PopupMenu
-                containerClassName="timeline-post-create-kind-select"
-                items={(["text", "image", "markdown"] as const).map((kind) => ({
-                  type: "button",
-                  text: `timeline.post.type.${kind}`,
-                  iconClassName: postKindIconMap[kind],
-                  onClick: () => {
-                    if (kind === "markdown") {
-                      setShowMarkdown(true);
-                    } else {
-                      setKind(kind);
-                    }
-                  },
-                }))}
-              >
-                <IconButton color="primary" icon={postKindIconMap[kind]} />
-              </PopupMenu>
-              <LoadingButton
-                onClick={() => void onSend()}
-                color="primary"
-                disabled={!canSend}
-                loading={process}
-              >
-                {t("timeline.send")}
-              </LoadingButton>
-            </div>
+        <div className="timeline-post-create">
+          <div className="timeline-post-create-edit-area">
+            {kind === "text" && (
+              <PlainTextPostEdit
+                text={text}
+                disabled={process}
+                onChange={(text) => {
+                  setText(text);
+                  window.localStorage.setItem(draftTextLocalStorageKey, text);
+                }}
+              />
+            )}
+            {kind === "image" && (
+              <ImagePostEdit
+                file={image}
+                onChange={setImage}
+                disabled={process}
+              />
+            )}
+            {kind === "markdown" && <MarkdownPostEdit {...markdownEditProps} />}
           </div>
-        )}
+          <div className="timeline-post-create-right-area">
+            <PopupMenu
+              containerClassName="timeline-post-create-kind-select"
+              items={(["text", "image", "markdown"] as const).map((kind) => ({
+                type: "button",
+                text: `timeline.post.type.${kind}`,
+                iconClassName: postKindIconMap[kind],
+                onClick: () => {
+                  setKind(kind);
+                },
+              }))}
+            >
+              <IconButton color="primary" icon={postKindIconMap[kind]} />
+            </PopupMenu>
+            <LoadingButton
+              onClick={() => void onSend()}
+              color="primary"
+              disabled={!canSend}
+              loading={process}
+            >
+              {c("timeline.send")}
+            </LoadingButton>
+          </div>
+        </div>
       </TimelinePostCard>
     </TimelinePostContainer>
   );
