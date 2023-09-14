@@ -1,0 +1,18 @@
+.timeline-post-create-edit-text {
+  width: 100%;
+  height: 100%;
+  background-color: var(--cru-background-color);
+  color: var(--cru-text-major-color);
+  border: 1px solid var(--cru-text-major-color);
+  padding: 0.5em;
+  border-radius: 5px;
+}
+
+.timeline-post-create-edit-text:hover {
+  border-color: var(--cru-clickable-secondary-normal-color);
+}
+
+.timeline-post-create-edit-text:focus {
+  border-color: var(--cru-clickable-secondary-normal-color);
+}
+
