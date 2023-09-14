@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import classnames from "classnames";
+import classNames from "classnames";
 import { HubConnectionState } from "@microsoft/signalr";
 
 import {
@@ -166,7 +166,7 @@ export function Timeline(props: TimelineProps) {
         />
       )}
       {posts && (
-        <div className={classnames("timeline", className)}>
+        <div className={classNames("timeline", className)}>
           {timeline?.postable && (
             <TimelinePostEdit timeline={timeline} onPosted={updatePosts} />
           )}
