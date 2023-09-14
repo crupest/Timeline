@@ -16,6 +16,7 @@ body {
 textarea {
   transition: border-color 0.3s;
   border-color: var(--cru-text-minor-color);
+  background: var(--cru-background-color);
 }
 
 textarea:hover {
