@@ -18,8 +18,8 @@ import { getTimelinePostUpdate$ } from "~src/services/timeline";
 import { useScrollToBottom } from "~src/components/hooks";
 
 import TimelinePostList from "./TimelinePostList";
-import TimelinePostEdit from "./TimelinePostCreateView";
 import TimelineInfoCard from "./TimelineInfoCard";
+import TimelinePostEdit from "./edit/TimelinePostCreateView";
 
 import "./Timeline.css";
 

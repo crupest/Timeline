@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import {
   getHttpTimelineClient,
   HttpTimelineInfo,
@@ -10,7 +8,7 @@ import {
 
 import OperationDialog from "~src/components/dialog/OperationDialog";
 
-export interface TimelinePropertyChangeDialogProps {
+interface TimelinePropertyChangeDialogProps {
   timeline: HttpTimelineInfo;
   onChange: () => void;
 }
@@ -21,11 +19,10 @@ const labelMap: { [key in TimelineVisibility]: string } = {
   Register: "timeline.visibility.register",
 };
 
-const TimelinePropertyChangeDialog: React.FC<
-  TimelinePropertyChangeDialogProps
-> = (props) => {
-  const { timeline, onChange } = props;
-
+export default function TimelinePropertyChangeDialog({
+  timeline,
+  onChange,
+}: TimelinePropertyChangeDialogProps) {
   return (
     <OperationDialog
       title={"timeline.dialogChangeProperty.title"}
@@ -78,6 +75,5 @@ const TimelinePropertyChangeDialog: React.FC<
       }}
     />
   );
-};
+}
 
-export default TimelinePropertyChangeDialog;

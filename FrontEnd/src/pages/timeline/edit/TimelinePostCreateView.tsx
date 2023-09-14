@@ -1,5 +1,6 @@
 import { useState, useEffect, ChangeEventHandler } from "react";
 import { useTranslation } from "react-i18next";
+import classNames from "classnames";
 
 import { UiLogicError } from "~src/common";
 
@@ -13,93 +14,20 @@ import {
 import base64 from "~src/utilities/base64";
 
 import { pushAlert } from "~src/components/alert";
-import BlobImage from "~src/components/BlobImage";
 import LoadingButton from "~src/components/button/LoadingButton";
 import PopupMenu from "~src/components/menu/PopupMenu";
-import MarkdownPostEdit from "./MarkdownPostEdit";
-import TimelinePostCard from "./TimelinePostCard";
-import TimelinePostContainer from "./TimelinePostContainer";
+import TimelinePostCard from "../TimelinePostCard";
+import TimelinePostContainer from "../TimelinePostContainer";
 import IconButton from "~src/components/button/IconButton";
 
+import PlainTextPostEdit from './PlainTextPostEdit'
+import MarkdownPostEdit from "./MarkdownPostEdit";
+
 import "./TimelinePostCreateView.css";
-import classNames from "classnames";
 
-interface TimelinePostEditTextProps {
-  text: string;
-  disabled: boolean;
-  onChange: (text: string) => void;
-  className?: string;
-}
 
-function TimelinePostEditText(props: TimelinePostEditTextProps) {
-  const { text, disabled, onChange, className } = props;
 
-  return (
-    <textarea
-      value={text}
-      disabled={disabled}
-      onChange={(event) => {
-        onChange(event.target.value);
-      }}
-      className={classNames("timeline-post-create-edit-text", className)}
-    />
-  );
-}
 
-interface TimelinePostEditImageProps {
-  onSelect: (file: File | null) => void;
-  disabled: boolean;
-}
-
-function TimelinePostEditImage(props: TimelinePostEditImageProps) {
-  const { onSelect, disabled } = props;
-
-  const { t } = useTranslation();
-
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<boolean>(false);
-
-  const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setError(false);
-    const files = e.target.files;
-    if (files == null || files.length === 0) {
-      setFile(null);
-      onSelect(null);
-    } else {
-      setFile(files[0]);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      onSelect(null);
-    };
-  }, [onSelect]);
-
-  return (
-    <>
-      <input
-        type="file"
-        onChange={onInputChange}
-        accept="image/*"
-        disabled={disabled}
-        className="mx-3 my-1"
-      />
-      {file != null && !error && (
-        <BlobImage
-          src={file}
-          className="timeline-post-create-image"
-          onLoad={() => onSelect(file)}
-          onError={() => {
-            onSelect(null);
-            setError(true);
-          }}
-        />
-      )}
-      {error ? <div className="text-danger">{t("loadImageError")}</div> : null}
-    </>
-  );
-}
 
 type PostKind = "text" | "markdown" | "image";
 
@@ -212,7 +140,7 @@ function TimelinePostEdit(props: TimelinePostEditProps) {
               {(() => {
                 if (kind === "text") {
                   return (
-                    <TimelinePostEditText
+                    <PlainTextPostEdit
                       className="timeline-post-create-edit-text"
                       text={text}
                       disabled={process}

@@ -1,14 +1,13 @@
-import * as React from "react";
-import classnames from "classnames";
+import classNames from "classnames";
 import { HubConnectionState } from "@microsoft/signalr";
-import { useTranslation } from "react-i18next";
+
+import { useC }from '~/src/components/common';
 
 import "./ConnectionStatusBadge.css";
 
-export interface ConnectionStatusBadgeProps {
+interface ConnectionStatusBadgeProps {
   status: HubConnectionState;
   className?: string;
-  style?: React.CSSProperties;
 }
 
 const classNameMap: Record<HubConnectionState, string> = {
@@ -19,23 +18,19 @@ const classNameMap: Record<HubConnectionState, string> = {
   Reconnecting: "warning",
 };
 
-const ConnectionStatusBadge: React.FC<ConnectionStatusBadgeProps> = (props) => {
-  const { status, className, style } = props;
-
-  const { t } = useTranslation();
+export default function ConnectionStatusBadge({status, className}: ConnectionStatusBadgeProps) {
+  const c = useC();
 
   return (
     <div
-      className={classnames(
+      className={classNames(
         "connection-status-badge",
         classNameMap[status],
         className
       )}
-      style={style}
     >
-      {t(`connectionState.${status}`)}
+      {c(`connectionState.${status}`)}
     </div>
   );
 };
 
-export default ConnectionStatusBadge;
