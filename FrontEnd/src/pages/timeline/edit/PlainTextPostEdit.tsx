@@ -1,4 +1,6 @@
-import classNames from 'classnames'
+import classNames from "classnames";
+
+import "./PlainTextPostEdit.css";
 
 interface TimelinePostEditTextProps {
   text: string;
@@ -11,16 +13,17 @@ export default function TimelinePostEditText(props: TimelinePostEditTextProps) {
   const { text, disabled, onChange, className } = props;
 
   return (
-    <div className={classNames("timeline-post-create-edit-container", className)}>
+    <div
+      className={classNames("timeline-edit-plain-text-container", className)}
+    >
       <textarea
         value={text}
         disabled={disabled}
         onChange={(event) => {
           onChange(event.target.value);
         }}
-        className={classNames("timeline-post-create-edit-text")}
+        className={classNames("timeline-edit-plain-text-input")}
       />
     </div>
   );
 }
-

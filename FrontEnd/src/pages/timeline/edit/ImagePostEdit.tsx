@@ -3,7 +3,7 @@ import classNames from "classnames";
 import BlobImage from "~/src/components/BlobImage";
 
 interface TimelinePostEditImageProps {
-  file: File;
+  file: File | null;
   onChange: (file: File | null) => void;
   disabled: boolean;
   className?: string;
@@ -14,7 +14,7 @@ export default function ImagePostEdit(props: TimelinePostEditImageProps) {
 
   return (
     <div
-      className={classNames("timeline-post-create-edit-container", className)}
+      className={classNames("timeline-edit-image-container", className)}
     >
       <input
         type="file"
@@ -30,7 +30,7 @@ export default function ImagePostEdit(props: TimelinePostEditImageProps) {
         }}
         className="mx-3 my-1"
       />
-      {file && <BlobImage src={file} className="timeline-post-create-image" />}
+      {file && <BlobImage src={file} className="timeline-edit-image" />}
     </div>
   );
 }

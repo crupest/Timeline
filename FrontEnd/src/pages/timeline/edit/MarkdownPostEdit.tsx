@@ -1,216 +1,201 @@
-import * as React from "react";
+import { useEffect, useState } from "react";
 import classnames from "classnames";
-import { useTranslation } from "react-i18next";
+import { marked } from "marked";
 
-import {
-  getHttpTimelineClient,
-  HttpTimelinePostInfo,
-} from "~src/http/timeline";
+import { HttpTimelinePostPostRequestData } from "~src/http/timeline";
 
-import TimelinePostBuilder from "~src/services/TimelinePostBuilder";
+import base64 from "~src/utilities/base64";
 
-import FlatButton from "~src/components/button/FlatButton";
+import { array } from "~src/components/common";
 import { TabPages } from "~src/components/tab";
-import ConfirmDialog from "~src/components/dialog/ConfirmDialog";
-import Spinner from "~src/components/Spinner";
-import IconButton from "~src/components/button/IconButton";
-import { DialogProvider, useDialog } from "~src/components/dialog";
+import { IconButton } from "~src/components/button";
+import BlobImage from "~src/components/BlobImage";
 
 import "./MarkdownPostEdit.css";
 
-export interface MarkdownPostEditProps {
-  owner: string;
-  timeline: string;
-  onPosted: (post: HttpTimelinePostInfo) => void;
-  onPostError: () => void;
-  onClose: () => void;
+class MarkedRenderer extends marked.Renderer {
+  constructor(public images: string[]) {
+    super();
+  }
+
+  // Custom image parser for indexed image link.
+  image(href: string | null, title: string | null, text: string): string {
+    if (href != null) {
+      const i = parseInt(href);
+      if (!isNaN(i) && i > 0 && i <= this.images.length) {
+        href = this.images[i - 1];
+      }
+    }
+
+    return this.image(href, title, text);
+  }
+}
+
+function generateMarkedOptions(imageUrls: string[]): marked.MarkedOptions {
+  return {
+    mangle: false,
+    headerIds: false,
+    renderer: new MarkedRenderer(imageUrls),
+  };
+}
+
+function renderHtml(text: string, imageUrls: string[]): string {
+  return marked.parse(text, generateMarkedOptions(imageUrls));
+}
+
+async function build(
+  text: string,
+  images: File[],
+): Promise<HttpTimelinePostPostRequestData[]> {
+  return [
+    {
+      contentType: "text/markdown",
+      data: await base64(text),
+    },
+    ...(await Promise.all(
+      images.map(async (image) => {
+        const data = await base64(image);
+        return { contentType: image.type, data };
+      }),
+    )),
+  ];
+}
+
+export function useMarkdownEdit(disabled: boolean): {
+  hasContent: boolean;
+  clear: () => void;
+  build: () => Promise<HttpTimelinePostPostRequestData[]>;
+  markdownEditProps: Omit<MarkdownPostEditProps, "className">;
+} {
+  const [text, setText] = useState<string>("");
+  const [images, setImages] = useState<File[]>([]);
+
+  return {
+    hasContent: text !== "" || images.length !== 0,
+    clear: () => {
+      setText("");
+      setImages([]);
+    },
+    build: () => {
+      return build(text, images);
+    },
+    markdownEditProps: {
+      disabled,
+      text,
+      images,
+      onTextChange: setText,
+      onImageAppend: (image) => setImages(array.copy_push(images, image)),
+      onImageMove: (o, n) => setImages(array.copy_move(images, o, n)),
+      onImageDelete: (i) => setImages(array.copy_delete(images, i)),
+    },
+  };
+}
+
+function MarkdownPreview({ text, images }: { text: string; images: File[] }) {
+  const [html, setHtml] = useState("");
+
+  useEffect(() => {
+    const imageUrls = images.map((image) => URL.createObjectURL(image));
+
+    setHtml(renderHtml(text, imageUrls));
+
+    return () => {
+      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [text, images]);
+
+  return (
+    <div
+      className="timeline-edit-markdown-preview"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
+
+interface MarkdownPostEditProps {
+  disabled: boolean;
+  text: string;
+  images: File[];
+  onTextChange: (text: string) => void;
+  onImageAppend: (image: File) => void;
+  onImageMove: (oldIndex: number, newIndex: number) => void;
+  onImageDelete: (index: number) => void;
   className?: string;
 }
 
-const MarkdownPostEdit: React.FC<MarkdownPostEditProps> = ({
-  owner: ownerUsername,
-  timeline: timelineName,
-  onPosted,
-  onClose,
-  onPostError,
+export function MarkdownPostEdit({
+  disabled,
+  text,
+  images,
+  onTextChange,
+  onImageAppend,
+  // onImageMove,
+  onImageDelete,
   className,
-}) => {
-  const { t } = useTranslation();
-
-  const [canLeave, setCanLeave] = React.useState<boolean>(true);
-
-  const [process, setProcess] = React.useState<boolean>(false);
-
-  const { controller, switchDialog } = useDialog({
-    "leave-confirm": (
-      <ConfirmDialog
-        onConfirm={onClose}
-        title="timeline.dropDraft"
-        body="timeline.confirmLeave"
-      />
-    ),
-  });
-
-  const [text, _setText] = React.useState<string>("");
-  const [images, _setImages] = React.useState<{ file: File; url: string }[]>(
-    [],
-  );
-  const [previewHtml, _setPreviewHtml] = React.useState<string>("");
-
-  const _builder = React.useRef<TimelinePostBuilder | null>(null);
-
-  const getBuilder = (): TimelinePostBuilder => {
-    if (_builder.current == null) {
-      const builder = new TimelinePostBuilder(() => {
-        setCanLeave(builder.isEmpty);
-        _setText(builder.text);
-        _setImages(builder.images);
-        _setPreviewHtml(builder.renderHtml());
-      });
-      _builder.current = builder;
-    }
-    return _builder.current;
-  };
-
-  const canSend = text.length > 0;
-
-  React.useEffect(() => {
-    return () => {
-      getBuilder().dispose();
-    };
-  }, []);
-
-  React.useEffect(() => {
-    window.onbeforeunload = (): unknown => {
-      if (!canLeave) {
-        return t("timeline.confirmLeave");
-      }
-    };
-
-    return () => {
-      window.onbeforeunload = null;
-    };
-  }, [canLeave, t]);
-
-  const send = async (): Promise<void> => {
-    setProcess(true);
-    try {
-      const dataList = await getBuilder().build();
-      const post = await getHttpTimelineClient().postPost(
-        ownerUsername,
-        timelineName,
-        {
-          dataList,
-        },
-      );
-      onPosted(post);
-      onClose();
-    } catch (e) {
-      setProcess(false);
-      onPostError();
-    }
-  };
-
+}: MarkdownPostEditProps) {
   return (
-    <>
-      <TabPages
-        className={className}
-        dense
-        actions={
-          process ? (
-            <Spinner />
-          ) : (
-            <div>
-              <IconButton
-                icon="x"
-                color="danger"
-                large
-                className="cru-align-middle me-2"
-                onClick={() => {
-                  if (canLeave) {
-                    onClose();
-                  } else {
-                    switchDialog("leave-confirm");
+    <TabPages
+      className={className}
+      dense
+      pages={[
+        {
+          name: "text",
+          text: "edit",
+          page: (
+            <textarea
+              value={text}
+              disabled={disabled}
+              className="timeline-edit-markdown-text"
+              onChange={(event) => {
+                onTextChange(event.currentTarget.value);
+              }}
+            />
+          ),
+        },
+        {
+          name: "images",
+          text: "image",
+          page: (
+            <div className="timeline-edit-markdown-images">
+              {images.map((image, index) => (
+                <div
+                  key={image.name}
+                  className="timeline-edit-markdown-image-container"
+                >
+                  <BlobImage src={image} />
+                  <IconButton
+                    icon="trash"
+                    color="danger"
+                    className={classnames(
+                      "timeline-edit-markdown-image-delete",
+                      process && "d-none",
+                    )}
+                    onClick={() => {
+                      onImageDelete(index);
+                    }}
+                  />
+                </div>
+              ))}
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  const { files } = event.currentTarget;
+                  if (files != null && files.length !== 0) {
+                    onImageAppend(files[0]);
                   }
                 }}
+                disabled={disabled}
               />
-              {canSend && (
-                <FlatButton text="timeline.send" onClick={() => void send()} />
-              )}
             </div>
-          )
-        }
-        pages={[
-          {
-            name: "text",
-            text: "edit",
-            page: (
-              <textarea
-                value={text}
-                disabled={process}
-                className="timeline-post-create-markdown-edit-area cru-fill-parent"
-                onChange={(event) => {
-                  getBuilder().setMarkdownText(event.currentTarget.value);
-                }}
-              />
-            ),
-          },
-          {
-            name: "images",
-            text: "image",
-            page: (
-              <div className="timeline-markdown-post-edit-page">
-                {images.map((image, index) => (
-                  <div
-                    key={image.url}
-                    className="timeline-markdown-post-edit-image-container"
-                  >
-                    <img
-                      src={image.url}
-                      className="timeline-markdown-post-edit-image"
-                    />
-                    <IconButton
-                      icon="trash"
-                      color="danger"
-                      className={classnames(
-                        "timeline-markdown-post-edit-image-delete-button",
-                        process && "d-none",
-                      )}
-                      onClick={() => {
-                        getBuilder().deleteImage(index);
-                      }}
-                    />
-                  </div>
-                ))}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    const { files } = event.currentTarget;
-                    if (files != null && files.length !== 0) {
-                      getBuilder().appendImage(files[0]);
-                    }
-                  }}
-                  disabled={process}
-                />
-              </div>
-            ),
-          },
-          {
-            name: "preview",
-            text: "preview",
-            page: (
-              <div
-                className="markdown-container timeline-markdown-post-edit-page"
-                dangerouslySetInnerHTML={{ __html: previewHtml }}
-              />
-            ),
-          },
-        ]}
-      />
-      <DialogProvider controller={controller} />
-    </>
+          ),
+        },
+        {
+          name: "preview",
+          text: "preview",
+          page: <MarkdownPreview text={text} images={images} />,
+        },
+      ]}
+    />
   );
-};
-
-export default MarkdownPostEdit;
+}
