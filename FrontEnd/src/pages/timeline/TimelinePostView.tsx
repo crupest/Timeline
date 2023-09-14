@@ -11,7 +11,7 @@ import UserAvatar from "~src/components/user/UserAvatar";
 import { DialogProvider, useDialog } from "~src/components/dialog";
 import FlatButton from "~src/components/button/FlatButton";
 import ConfirmDialog from "~src/components/dialog/ConfirmDialog";
-import TimelinePostContentView from "./TimelinePostContentView";
+import TimelinePostContentView from "./view/TimelinePostContentView";
 import IconButton from "~src/components/button/IconButton";
 
 import TimelinePostContainer from "./TimelinePostContainer";

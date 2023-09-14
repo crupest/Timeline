@@ -1,19 +1,16 @@
-import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { getHttpTimelineClient, HttpTimelineInfo } from "~src/http/timeline";
 
-import OperationDialog from "~src/components/dialog/OperationDialog";
+import { OperationDialog } from "~src/components/dialog";
 
 interface TimelineDeleteDialog {
   timeline: HttpTimelineInfo;
 }
 
-const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
+export default function TimelineDeleteDialog({ timeline }: TimelineDeleteDialog) {
   const navigate = useNavigate();
-
-  const { timeline } = props;
 
   return (
     <OperationDialog
@@ -24,7 +21,7 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
           i18nKey="timeline.deleteDialog.inputPrompt"
           values={{ name: timeline.nameV2 }}
         >
-          0<code className="mx-2">1</code>2
+          0<code>1</code>2
         </Trans>
       }
       inputs={{
@@ -54,4 +51,4 @@ const TimelineDeleteDialog: React.FC<TimelineDeleteDialog> = (props) => {
   );
 };
 
-export default TimelineDeleteDialog;
+TimelineDeleteDialog;
