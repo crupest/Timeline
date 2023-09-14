@@ -5,6 +5,16 @@
   margin-right: 200px;
 }
 
+@media (max-width: 576px) {
+  .timeline-post-create-container {
+    padding-top: 60px;
+  }
+
+  .timeline-post-create-card{
+    margin-right: 0;
+  }
+}
+
 .timeline-post-create {
   display: flex;
 }
