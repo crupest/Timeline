@@ -23,7 +23,7 @@ function calculateSize(size: SpinnerProps["size"]) {
 }
 
 export interface SpinnerProps extends ComponentPropsWithoutRef<"span"> {
-  size?: "sm" | "md" | "lg" | number | string;
+  size?: number | string;
   className?: string;
   style?: CSSProperties;
 }

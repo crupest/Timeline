@@ -19,5 +19,6 @@ export default function useAutoUnsubscribePromise<T>(
         subscribe = false;
       };
     }
-  }, dependencies);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promiseGenerator, resultHandler, ...(dependencies ?? [])]);
 }
