@@ -5,3 +5,9 @@
   font-size: 2em;
   color: var(--cru-primary-color);
 }
+
+.home-page-2 {
+  width: 100%;
+  text-align: center;
+  margin-top: 2em;
+}

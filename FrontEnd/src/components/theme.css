@@ -12,6 +12,7 @@
   --cru-secondary-color: hsl(30 100% 50%);
   --cru-create-color: hsl(120 100% 25%);
   --cru-danger-color: hsl(0 100% 50%);
+  --cru-warn-color:  #e4a700;
 }
 
 .cru-theme-primary {
