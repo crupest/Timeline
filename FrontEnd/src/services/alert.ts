@@ -1,10 +1,10 @@
 import pull from "lodash/pull";
 
-import { I18nText } from "@/common";
-import { PaletteColorType } from "@/palette";
+import { I18nText } from "~src/common";
+import { ThemeColor } from "~src/components/common";
 
 export interface AlertInfo {
-  type?: PaletteColorType;
+  type?: ThemeColor;
   message?: I18nText;
   customMessage?: React.ReactElement;
   dismissTime?: number | "never";

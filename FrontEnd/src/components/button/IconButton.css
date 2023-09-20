@@ -1,0 +1,30 @@
+.cru-icon-button {
+  color: var(--cru-clickable-normal-color);
+  font-size: 1.4rem;
+  background: none;
+  border: none;
+  transition: all 0.5s;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cru-icon-button:hover {
+  color: var(--cru-clickable-hover-color);
+}
+
+.cru-icon-button:focus {
+  color: var(--cru-clickable-focus-color);
+}
+
+.cru-icon-button:active {
+  color: var(--cru-clickable-active-color);
+}
+
+.cru-flat-button:disabled {
+  color: var(--cru-clickable-disabled-color);
+  cursor: auto;
+}
+
+.cru-icon-button.large {
+  font-size: 1.6rem;
+}

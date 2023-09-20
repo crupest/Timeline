@@ -1,0 +1,7 @@
+.cru-list-item-container {
+  border-bottom: 1px solid var(--cru-clickable-primary-normal-color);
+}
+
+.cru-list-item-container:last-child {
+  border-bottom: none;
+}

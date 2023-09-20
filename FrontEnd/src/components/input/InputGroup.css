@@ -1,0 +1,54 @@
+.cru-input-group {
+  display: block;
+}
+
+.cru-input-container {
+  margin: 0.4em 0;
+}
+
+.cru-input-label {
+  display: block;
+  color: var(--cru-clickable-normal-color);
+  font-size: 0.9em;
+  margin-bottom: 0.3em;
+}
+
+.cru-input-label-inline {
+  margin-inline-start: 0.5em;
+}
+
+.cru-input-type-text input {
+  appearance: none;
+  display: block;
+  border: 1px solid;
+  /* color: var(--cru-surface-on-color); */
+  /* background-color: var(--cru-surface-color); */
+  margin: 0;
+  font-size: 1em;
+  padding: 0.2em;
+}
+
+.cru-input-type-text input:hover {
+  border-color: var(--cru-clickable-hover-color);
+}
+
+.cru-input-type-text input:focus {
+  border-color: var(--cru-clickable-focus-color);
+}
+
+.cru-input-type-text input:disabled {
+  border-color: var(--cru-clickable-disabled-color);
+}
+
+.cru-input-error {
+  display: block;
+  font-size: 0.8em;
+  color: var(--cru-danger-color);
+  margin-top: 0.4em;
+}
+
+.cru-input-helper {
+  display: block;
+  font-size: 0.8em;
+  color: var(--cru-primary-color);
+}

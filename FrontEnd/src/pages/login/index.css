@@ -1,0 +1,14 @@
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-page-welcome {
+  text-align: center;
+  font-size: 2em;
+}
+
+.login-page-error {
+  color: var(--cru-danger-color);
+}

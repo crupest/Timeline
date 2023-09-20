@@ -1,0 +1,96 @@
+.app-bar {
+  height: 56px;
+  position: fixed;
+  z-index: 1030;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--cru-primary-color);
+}
+
+.app-bar {
+  display: flex;
+}
+
+.app-bar > * {
+  background-color: var(--cru-primary-color);
+}
+
+.app-bar .app-bar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.app-bar .app-bar-brand-icon {
+  height: 2em;
+}
+
+.app-bar .app-bar-space {
+  flex-grow: 1;
+}
+
+.app-bar .app-bar-user-area {
+  display: flex;
+}
+
+.app-bar a {
+  background-color: var(--cru-primary-color);
+  color: var(--cru-push-button-text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 0 1em;
+  transition: all 0.5s;
+}
+
+.app-bar a:hover {
+  background-color: var(--cru-clickable-primary-hover-color);
+}
+
+.app-bar a:focus {
+  background-color: var(--cru-clickable-primary-focus-color);
+}
+
+.app-bar a:active {
+  background-color: var(--cru-clickable-primary-active-color);
+}
+
+/* the current page */
+.app-bar a.active {
+  background-color: var(--cru-clickable-primary-focus-color);
+}
+
+.app-bar .app-bar-avatar img {
+  width: 45px;
+  height: 45px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.app-bar.desktop .app-bar-link-area {
+  display: flex;
+}
+
+.app-bar.mobile .app-bar-link-area {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: 100%;
+  translate: 0 -100%;
+  transition: transform 0.5s;
+}
+
+.app-bar.mobile a {
+  height: 56px;
+}
+
+.app-bar.mobile.expand .app-bar-link-area {
+  transform: translateY(100%);
+}
+
+.app-bar .toggler {
+  font-size: 2em;
+  padding-right: 0.5em;
+}
+

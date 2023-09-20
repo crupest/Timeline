@@ -21,13 +21,13 @@
       "~*": [
         "./*"
       ],
-      "@/*": [
-        "./src/*"
-      ]
     },
     "noEmit": true
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "src/migrating"
   ]
 }

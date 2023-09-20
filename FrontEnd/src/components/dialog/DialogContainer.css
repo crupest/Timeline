@@ -1,0 +1,20 @@
+.cru-dialog-container-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: var(--cru-theme-color);
+  margin-bottom: 0.5em;
+}
+
+.cru-dialog-container-hr {
+  margin: 1em 0;
+  border-color: var(--cru-text-minor-color);
+}
+
+.cru-dialog-container-button-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cru-dialog-container-button {
+  margin-left: 1em;
+}

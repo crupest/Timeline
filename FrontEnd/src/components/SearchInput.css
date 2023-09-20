@@ -1,0 +1,8 @@
+.cru-search-input {
+  display: flex;
+  gap: 1em;
+}
+
+.cru-search-input-input {
+  width: 100%;
+}

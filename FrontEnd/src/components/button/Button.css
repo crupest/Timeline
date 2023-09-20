@@ -1,0 +1,64 @@
+.cru-button {
+  font-size: 1rem;
+  padding: 0.4em 0.8em;
+  transition: all 0.3s;
+  border-radius: 0.2em;
+  border: 1px solid;
+  cursor: pointer;
+}
+
+.cru-button:not(.outline) {
+  color: var(--cru-push-button-text-color);
+  background-color: var(--cru-clickable-normal-color);
+  border-color: var(--cru-clickable-normal-color);
+}
+
+.cru-button:not(.outline):hover {
+  background-color: var(--cru-clickable-hover-color);
+  border-color: var(--cru-clickable-hover-color);
+}
+
+.cru-button:not(.outline):focus {
+  background-color: var(--cru-clickable-focus-color);
+  border-color: var(--cru-clickable-focus-color);
+}
+
+.cru-button:not(.outline):active {
+  background-color: var(--cru-clickable-active-color);
+  border-color: var(--cru-clickable-active-color);
+}
+
+.cru-button:not(.outline):disabled {
+  color: var(--cru-push-button-disabled-text-color);
+  background-color: var(--cru-push-button-disabled-color);
+  border-color: var(--cru-push-button-disabled-color);
+  cursor: auto;
+}
+
+
+.cru-button.outline {
+  color: var(--cru-clickable-normal-color);
+  border-color: var(--cru-clickable-normal-color);
+  background-color: transparent;
+}
+
+.cru-button.outline:hover {
+  color: var(--cru-clickable-hover-color);
+  border-color: var(--cru-clickable-hover-color);
+}
+
+.cru-button.outline:focus {
+  color: var(--cru-clickable-focus-color);
+  border-color: var(--cru-clickable-focus-color);
+}
+
+.cru-button.outline:active {
+  color: var(--cru-clickable-active-color);
+  border-color: var(--cru-clickable-active-color);
+}
+
+.cru-button.outline:disabled {
+  color: var(--cru-clickable-disabled-color);
+  border-color: var(--cru-clickable-disabled-color);
+  cursor: auto;
+}

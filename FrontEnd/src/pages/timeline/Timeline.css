@@ -1,0 +1,42 @@
+.timeline-container {
+  --timeline-background-color: hsl(0, 0%, 95%);
+  --timeline-shadow-color: hsla(0, 0%, 0%, 0.5);
+  --timeline-card-shadow: 2px 1px 10px -2px var(--timeline-shadow-color);
+  --timeline-post-card-background-color: hsl(0, 0%, 100%);
+  --timeline-post-card-shadow: 0px 0px 11px -2px var(--timeline-shadow-color);
+  --timeline-post-card-border-radius: 10px;
+  --timeline-post-text-color: hsl(0, 0%, 0%);
+  --timeline-datetime-label-background-color: hsl(0, 0%, 30%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .timeline-container {
+    --timeline-background-color: hsl(0, 0%, 0%);
+    --timeline-post-card-background-color: hsl(0, 0%, 15%);
+    --timeline-post-card-shadow: none;
+  }
+}
+
+.timeline {
+  z-index: 0;
+  position: relative;
+  width: 100%;
+  padding-top: 10px;
+  background: var(--timeline-background-color);
+}
+
+.timeline-sync-state-badge {
+  font-size: 0.8em;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #e8fbff;
+}
+
+.timeline-sync-state-badge-pin {
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 0.6em;
+}

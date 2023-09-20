@@ -1,0 +1,38 @@
+.connection-status-badge {
+  font-size: 0.8em;
+  border-radius: 5px;
+  padding: 0.1em 1em;
+}
+
+.connection-status-badge::before {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  content: "";
+  margin-right: 0.6em;
+}
+
+.connection-status-badge.success {
+  color: var(--cru-create-color);
+}
+
+.connection-status-badge.success::before {
+  background-color: var(--cru-create-color);
+}
+
+.connection-status-badge.warning {
+  color: var(--cru-warn-color);
+}
+
+.connection-status-badge.warning::before {
+  background-color: var(--cru-warn-color);
+}
+
+.connection-status-badge.danger {
+  color: var(--cru-danger-color);
+}
+
+.connection-status-badge.danger::before {
+  background-color: var(--cru-danger-color);
+}

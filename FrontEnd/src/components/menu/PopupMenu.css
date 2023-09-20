@@ -1,0 +1,7 @@
+.cru-popup-menu-menu-container {
+  z-index: 1040;
+  border-radius: 3px;
+  border: var(--cru-clickable-normal-color) 1.5px solid;
+  background-color: var(--cru-background-color);
+  overflow: hidden;
+}

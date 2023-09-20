@@ -1,0 +1,32 @@
+.cru-tab-bar {
+  display: flex;
+}
+
+.cru-tab-bar-tab-area {
+  display: flex;
+  align-items: center;
+  border: var(--cru-clickable-normal-color) 1.6px solid;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cru-tab-bar-item {
+  color: var(--cru-text-minor-color);
+  transition: all 0.2s;
+  cursor: pointer;
+  padding: 0.3em 1em;
+}
+
+.cru-tab-bar-item:hover {
+  color: var(--cru-clickable-normal-color);
+}
+
+.cru-tab-bar-item.active {
+  color: var(--cru-push-button-text-color);
+  background-color: var(--cru-clickable-normal-color);
+  border-color: var(--cru-primary-color);
+}
+
+.cru-tab-bar-action-area {
+  margin-left: auto;
+}
