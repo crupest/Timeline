@@ -53,7 +53,6 @@ export default function TimelinePostList(props: TimelinePostListViewProps) {
 
   return (
     <div>
-      <div className="timeline-post-timeline" />
       {groupedPosts.map((group) => {
         return (
           <Fragment key={group.date.toDateString()}>

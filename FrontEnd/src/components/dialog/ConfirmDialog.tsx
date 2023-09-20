@@ -25,27 +25,24 @@ export default function ConfirmDialog({
       <DialogContainer
         title={title}
         titleColor={color ?? "danger"}
-        buttons={[
+        buttonsV2={[
           {
             key: "cancel",
             type: "normal",
-            props: {
-              text: "operationDialog.cancel",
-              color: "secondary",
-              outline: true,
-              onClick: closeDialog,
-            },
+            action: "minor",
+
+            text: "operationDialog.cancel",
+            onClick: closeDialog,
           },
           {
             key: "confirm",
             type: "normal",
-            props: {
-              text: "operationDialog.confirm",
-              color: "danger",
-              onClick: () => {
-                onConfirm();
-                closeDialog();
-              },
+            action: "major",
+            text: "operationDialog.confirm",
+            color: "danger",
+            onClick: () => {
+              onConfirm();
+              closeDialog();
             },
           },
         ]}

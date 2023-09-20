@@ -1,8 +1,8 @@
 .timeline-post-date-badge {
   display: inline-block;
-  padding: 0.1em 0.4em;
+  padding: 0.2em 0.5em;
   border-radius: 0.4em;
-  background: #7c7c7c;
+  background: var(--timeline-datetime-label-background-color);
   color: white;
   font-size: 0.8em;
   margin-left: 5em;
