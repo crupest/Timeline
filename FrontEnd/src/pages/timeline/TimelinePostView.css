@@ -1,0 +1,37 @@
+.timeline-post-header {
+  display: flex;
+  align-items: center;
+}
+
+.timeline-post-author-avatar {
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+}
+
+.timeline-post-author-nickname {
+  margin: 0 1em;
+}
+
+.timeline-post-edit-button {
+  float: right;
+}
+
+.timeline-post-options-mask {
+  position: absolute;
+  inset: 0;
+  background-color: hsla(0, 0%, 100%, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+@media (prefers-color-scheme: dark) {
+  .timeline-post-options-mask {
+    background-color: hsla(0, 0%, 0%, 0.8);
+  }
+}
+
+.timeline-post-content {
+  margin-top: 0.5em;
+}

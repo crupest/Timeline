@@ -1,0 +1,49 @@
+@import "./theme.css";
+
+* {
+  box-sizing: border-box;
+  margin-inline: 0;
+  margin-block: 0;
+}
+
+body {
+  font-family: var(--cru-default-font-family);
+  background: var(--cru-body-background-color);
+  color: var(--cru-text-major-color);
+  line-height: 1.2;
+}
+
+textarea {
+  transition: border-color 0.3s;
+  border-color: var(--cru-text-minor-color);
+  background: var(--cru-background-color);
+}
+
+textarea:hover {
+  border-color: var(--cru-clickable-primary-hover-color);
+}
+
+textarea:focus {
+  border-color: var(--cru-clickable-primary-normal-color);
+}
+
+.alert-container {
+  position: fixed;
+  z-index: 1070;
+}
+
+@media (min-width: 576px) {
+  .alert-container {
+    bottom: 0;
+    right: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .alert-container {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    text-align: center;
+  }
+}

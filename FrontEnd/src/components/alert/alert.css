@@ -1,0 +1,21 @@
+.alert-container {
+  position: fixed;
+  z-index: 1040;
+}
+
+.cru-alert {
+  border-radius: 5px;
+  border: var(--cru-theme-color) 2px solid;
+  color: var(--cru-text-primary-color);
+  background-color: var(--cru-container-background-color);
+
+  margin: 1em;
+  padding: 0.5em 1em;
+
+  display: flex;
+  align-items: center;
+}
+
+.cru-alert-close-button {
+  margin-left: auto;
+}

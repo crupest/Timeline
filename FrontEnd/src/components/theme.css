@@ -1,0 +1,201 @@
+:root {
+  --cru-default-font-family: 'Segoe UI', 'DengXian', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --cru-page-padding: 1em 2em;
+
+  --cru-border-radius: 4px;
+  --cru-card-border-radius: 4px;
+}
+
+/* theme colors */
+:root {
+  --cru-primary-color: hsl(210 100% 50%);
+  --cru-secondary-color: hsl(30 100% 50%);
+  --cru-create-color: hsl(120 100% 25%);
+  --cru-danger-color: hsl(0 100% 50%);
+  --cru-warn-color:  #e4a700;
+}
+
+.cru-theme-primary {
+  --cru-theme-color: var(--cru-primary-color);
+}
+
+.cru-theme-secondary {
+  --cru-theme-color: var(--cru-secondary-color);
+}
+
+.cru-theme-create {
+  --cru-theme-color: var(--cru-create-color);
+}
+
+.cru-theme-danger {
+  --cru-theme-color: var(--cru-danger-color);
+}
+
+/* common colors */
+:root {
+  --cru-background-color: hsl(0 0% 100%);
+  --cru-container-background-color: hsl(0 0% 97%);
+  --cru-text-major-color: hsl(0 0% 0%);
+  --cru-text-minor-color: hsl(0 0% 38%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cru-background-color: hsl(0 0% 0%);
+    --cru-container-background-color: hsl(0 0% 2%);
+    --cru-text-major-color: hsl(0 0% 100%);
+    --cru-text-minor-color: hsl(0 0% 85%);
+  }
+}
+
+:root {
+  --cru-body-background-color: var(--cru-background-color);
+}
+
+/* dialog color */
+
+:root {
+  --cru-dialog-overlay-color: hsl(0 0% 100%);
+  --cru-dialog-container-background-color: hsl(0 0% 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cru-dialog-overlay-color: hsl(0 0% 0%);
+    --cru-dialog-container-background-color: hsl(0 0% 0%);
+  }
+}
+
+/* clickable color */
+:root {
+  --cru-clickable-primary-normal-color: var(--cru-primary-color);
+  --cru-clickable-primary-hover-color: hsl(210 100% 60%);
+  --cru-clickable-primary-focus-color: hsl(210 100% 60%);
+  --cru-clickable-primary-active-color: hsl(210 100% 70%);
+  --cru-clickable-secondary-normal-color: var(--cru-secondary-color);
+  --cru-clickable-secondary-hover-color: hsl(30 100% 60%);
+  --cru-clickable-secondary-focus-color: hsl(30 100% 60%);
+  --cru-clickable-secondary-active-color: hsl(30 100% 70%);
+  --cru-clickable-create-normal-color: var(--cru-create-color);
+  --cru-clickable-create-hover-color: hsl(120 100% 35%);
+  --cru-clickable-create-focus-color: hsl(120 100% 35%);
+  --cru-clickable-create-active-color: hsl(120 100% 35%);
+  --cru-clickable-danger-normal-color: var(--cru-danger-color);
+  --cru-clickable-danger-hover-color: hsl(0 100% 60%);
+  --cru-clickable-danger-focus-color: hsl(0 100% 60%);
+  --cru-clickable-danger-active-color: hsl(0 100% 70%);
+  --cru-clickable-grayscale-normal-color: hsl(0 0% 100%);
+  --cru-clickable-grayscale-hover-color: hsl(0 0% 92%);
+  --cru-clickable-grayscale-focus-color: hsl(0 0% 92%);
+  --cru-clickable-grayscale-active-color: hsl(0 0% 88%);
+  --cru-clickable-light-normal-color: hsl(0 0% 100%);
+  --cru-clickable-light-hover-color: hsl(0 0% 92%);
+  --cru-clickable-light-focus-color: hsl(0 0% 92%);
+  --cru-clickable-light-active-color: hsl(0 0% 88%);
+  --cru-clickable-minor-normal-color: hsl(0 0% 30%);
+  --cru-clickable-minor-hover-color: hsl(0 0% 40%);
+  --cru-clickable-minor-focus-color: hsl(0 0% 40%);
+  --cru-clickable-minor-active-color: hsl(0 0% 45%);
+  --cru-clickable-disabled-color: hsl(0 0% 50%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cru-clickable-minor-normal-color: hsl(0 0% 74%);
+    --cru-clickable-minor-hover-color: hsl(0 0% 82%);
+    --cru-clickable-minor-focus-color: hsl(0 0% 82%);
+    --cru-clickable-minor-active-color: hsl(0 0% 90%);
+    --cru-clickable-grayscale-normal-color: hsl(0 0% 0%);
+    --cru-clickable-grayscale-hover-color: hsl(0 0% 10%);
+    --cru-clickable-grayscale-focus-color: hsl(0 0% 10%);
+    --cru-clickable-grayscale-active-color: hsl(0 0% 20%);
+  }
+}
+
+.cru-clickable-primary {
+  --cru-clickable-normal-color: var(--cru-clickable-primary-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-primary-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-primary-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-primary-active-color);
+}
+
+.cru-clickable-secondary {
+  --cru-clickable-normal-color: var(--cru-clickable-secondary-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-secondary-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-secondary-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-secondary-active-color);
+}
+
+.cru-clickable-create {
+  --cru-clickable-normal-color: var(--cru-clickable-create-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-create-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-create-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-create-active-color);
+}
+
+.cru-clickable-danger {
+  --cru-clickable-normal-color: var(--cru-clickable-danger-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-danger-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-danger-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-danger-active-color);
+}
+
+.cru-clickable-grayscale {
+  --cru-clickable-normal-color: var(--cru-clickable-grayscale-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-grayscale-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-grayscale-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-grayscale-active-color);
+}
+
+.cru-clickable-light {
+  --cru-clickable-normal-color: var(--cru-clickable-light-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-light-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-light-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-light-active-color);
+}
+
+.cru-clickable-minor {
+  --cru-clickable-normal-color: var(--cru-clickable-minor-normal-color);
+  --cru-clickable-hover-color: var(--cru-clickable-minor-hover-color);
+  --cru-clickable-focus-color: var(--cru-clickable-minor-focus-color);
+  --cru-clickable-active-color: var(--cru-clickable-minor-active-color);
+}
+
+/* button colors */
+:root {
+  /* push button colors */
+  --cru-push-button-text-color: #ffffff;
+  --cru-push-button-disabled-text-color: hsl(0 0% 80%);
+}
+
+/* Card colors */
+:root {
+  --cru-card-background-primary-color: hsl(210 100% 50%);
+  --cru-card-border-primary-color: hsl(210 100% 50%);
+  --cru-card-background-secondary-color: hsl(30 100% 50%);
+  --cru-card-border-secondary-color: hsl(30 100% 50%);
+  --cru-card-background-create-color: hsl(120 100% 25%);
+  --cru-card-border-create-color: hsl(120 100% 25%);
+  --cru-card-background-danger-color: hsl(0 100% 50%);
+  --cru-card-border-danger-color: hsl(0 100% 50%);
+}
+
+.cru-card-primary {
+  --cru-card-background-color: var(--cru-card-background-primary-color);
+  --cru-card-border-color: var(--cru-card-border-primary-color)
+}
+
+.cru-card-secondary {
+  --cru-card-background-color: var(--cru-card-background-secondary-color);
+  --cru-card-border-color: var(--cru-card-border-secondary-color)
+}
+
+.cru-card-create {
+  --cru-card-background-color: var(--cru-card-background-create-color);
+  --cru-card-border-color: var(--cru-card-border-create-color)
+}
+
+.cru-card-danger {
+  --cru-card-background-color: var(--cru-card-background-danger-color);
+  --cru-card-border-color: var(--cru-card-border-danger-color)
+}

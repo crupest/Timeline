@@ -1,0 +1,13 @@
+.cru-loading-button {
+  display: flex;
+  align-items: center;
+}
+
+.cru-loading-button-spinner {
+  margin-left: 0.5em;
+}
+
+.cru-loading-button-loading {
+  color: var(--cru-clickable-normal-color) !important;
+  border-color: var(--cru-clickable-normal-color) !important;
+}

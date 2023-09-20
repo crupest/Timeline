@@ -1,0 +1,20 @@
+.timeline-member-item {
+  align-items: center;
+  display: flex;
+  padding: 0.6em;
+}
+
+.timeline-member-avatar {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.timeline-member-info {
+  margin-left: 1em;
+  margin-right: auto;
+}
+
+.timeline-member-user-search {
+  margin-top: 1em;
+}

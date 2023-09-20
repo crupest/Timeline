@@ -1,0 +1,39 @@
+.cru-dialog-overlay {
+  position: fixed;
+  z-index: 1040;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  padding: 20vh 1em;
+}
+
+.cru-dialog-background {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--cru-dialog-overlay-color);
+  opacity: 0.8;
+}
+
+.cru-dialog-container {
+  max-width: 100%;
+  min-width: 30vw;
+
+  margin: 2em auto;
+
+  border: var(--cru-theme-color) 2px solid;
+  border-radius: 5px;
+  padding: 1.5em;
+  background-color: var(--cru-dialog-container-background-color);
+}
+
+@media (min-width: 576px) {
+  .cru-dialog-container {
+    max-width: 800px;
+  }
+}

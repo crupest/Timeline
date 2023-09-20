@@ -1,0 +1,34 @@
+.cru-image-cropper-container {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  user-select: none;
+}
+
+.cru-image-cropper-container img {
+  width: 100%;
+  height: 100%;
+}
+
+.cru-image-cropper-mask-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.cru-image-cropper-mask {
+  position: absolute;
+  box-shadow: 0 0 0 10000px rgba(255, 255, 255, 0.8);
+  touch-action: none;
+}
+
+.cru-image-cropper-handler {
+  position: absolute;
+  border: black solid 2px;
+  border-radius: 50%;
+  background: white;
+  touch-action: none;
+}

@@ -1,0 +1,63 @@
+.timeline-card {
+  position: fixed;
+  z-index: 1029;
+  top: 56px;
+  right: 0;
+  margin: 0.5em;
+  padding: 0.5em;
+  box-shadow: var(--timeline-card-shadow);
+}
+
+@media (min-width: 576px) {
+  .timeline-card-expand {
+    min-width: 400px;
+  }
+}
+
+.timeline-card-title {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--cru-text-major-color);
+  margin: 0.5em 1em;
+}
+
+.timeline-card-title-name {
+  margin-inline-start: 1em;
+  color: var(--cru-text-minor-color);
+}
+
+.timeline-card-user {
+  display: flex;
+  align-items: center;
+  margin: 0 1em 0.5em;
+}
+
+.timeline-card-user-avatar {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+}
+
+.timeline-card-user-nickname {
+  margin-inline: 0.6em;
+}
+
+.timeline-card-description {
+  margin: 0 1em 0.5em;
+}
+
+.timeline-card-top-right-area {
+  float: right;
+  display: flex;
+  align-items: center;
+  margin: 0 1em;
+}
+
+.timeline-card-buttons {
+  display: flex;
+  justify-content: end;
+}
+
+.timeline-card-button {
+  margin: 0 0.2em;
+}

@@ -1,0 +1,36 @@
+.cru-menu {
+  min-width: 200px;
+}
+
+.cru-menu-item {
+  display: block;
+  font-size: 1em;
+  width: 100%;
+  padding: 0.5em 1.5em;
+  transition: all 0.5s;
+  color: var(--cru-clickable-normal-color);
+  background-color: var(--cru-clickable-grayscale-normal-color);
+  border: none;
+  cursor: pointer;
+}
+
+.cru-menu-item:hover {
+  background-color: var(--cru-clickable-grayscale-hover-color);
+}
+
+.cru-menu-item:focus {
+  background-color: var(--cru-clickable-grayscale-focus-color);
+}
+
+.cru-menu-item:active {
+  background-color: var(--cru-clickable-grayscale-active-color);
+}
+
+.cru-menu-item-icon {
+  margin-right: 1em;
+}
+
+.cru-menu-divider {
+  border-width: 0;
+  border-top: 1px solid var(--cru-primary-color);
+}

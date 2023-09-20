@@ -1,0 +1,4 @@
+.cru-list-container {
+  border: 1px solid var(--cru-clickable-primary-normal-color);
+  border-radius: 5px;
+}

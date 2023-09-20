@@ -1,0 +1,35 @@
+.timeline-post-create-card {
+  position: sticky !important;
+  top: 106px;
+  z-index: 100;
+  margin-right: 200px;
+}
+
+@media (max-width: 576px) {
+  .timeline-post-create-container {
+    padding-top: 60px;
+  }
+
+  .timeline-post-create-card {
+    margin-right: 0;
+  }
+}
+
+.timeline-post-create {
+  display: flex;
+}
+
+.timeline-post-create-edit-area {
+  flex-grow: 1;
+}
+
+.timeline-post-create-right-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 1em;
+}
+
+.timeline-post-create-send {
+  margin-top: auto;
+}
