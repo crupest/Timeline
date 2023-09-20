@@ -19,24 +19,21 @@ class MarkedRenderer extends marked.Renderer {
   }
 
   // Custom image parser for indexed image link.
-  image(href: string | null, title: string | null, text: string): string {
-    if (href != null) {
-      const i = parseInt(href);
-      if (!isNaN(i) && i > 0 && i <= this.images.length) {
-        href = this.images[i - 1];
-      }
+  image(href: string, title: string | null, text: string): string {
+    const i = parseInt(href);
+    if (!isNaN(i) && i > 0 && i <= this.images.length) {
+      href = this.images[i - 1];
     }
 
     return super.image(href, title, text);
   }
 }
 
-function generateMarkedOptions(imageUrls: string[]): marked.MarkedOptions {
+function generateMarkedOptions(imageUrls: string[]) {
   return {
-    mangle: false,
-    headerIds: false,
     renderer: new MarkedRenderer(imageUrls),
-  };
+    async: false,
+  } as const;
 }
 
 function renderHtml(text: string, imageUrls: string[]): string {

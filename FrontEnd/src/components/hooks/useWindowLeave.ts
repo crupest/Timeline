@@ -18,5 +18,5 @@ export default function useWindowLeave(
         window.onbeforeunload = null;
       };
     }
-  }, [allow, message]);
+  }, [c, allow, message]);
 }

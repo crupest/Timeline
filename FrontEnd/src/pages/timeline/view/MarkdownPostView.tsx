@@ -40,8 +40,7 @@ export default function MarkdownPostView({
   const markdownHtml = useMemo<string | null>(() => {
     if (markdown == null) return null;
     return marked.parse(markdown, {
-      mangle: false,
-      headerIds: false,
+      async: false,
     });
   }, [markdown]);
 
