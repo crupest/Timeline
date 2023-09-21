@@ -51,7 +51,8 @@ export function useDialog<D extends string>(
       dialogs.map((d) => [
         d,
         {
-          key: `${d}-${dialogKeys[d]}`,
+          // TODO: Fix the animation problem, maybe we have to use a better way to re-enable this.
+          //key: `${d}-${dialogKeys[d]}`,
           open: dialog === d,
           onClose: () => {
             switchDialog(null);
