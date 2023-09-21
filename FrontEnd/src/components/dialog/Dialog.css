@@ -7,7 +7,6 @@
   bottom: 0;
   overflow: auto;
   padding: 20vh 1em;
-  user-select: none;
 }
 
 .cru-dialog-background {
@@ -31,7 +30,6 @@
   border-radius: 5px;
   padding: 1.5em;
   background-color: var(--cru-dialog-container-background-color);
-  user-select: unset;
 }
 
 @media (min-width: 576px) {
