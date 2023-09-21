@@ -6,14 +6,22 @@ import { getHttpTimelineClient, HttpTimelineInfo } from "~src/http/timeline";
 import { OperationDialog } from "~src/components/dialog";
 
 interface TimelineDeleteDialog {
+  open: boolean;
+  onClose: () => void;
   timeline: HttpTimelineInfo;
 }
 
-export default function TimelineDeleteDialog({ timeline }: TimelineDeleteDialog) {
+export default function TimelineDeleteDialog({
+  open,
+  onClose,
+  timeline,
+}: TimelineDeleteDialog) {
   const navigate = useNavigate();
 
   return (
     <OperationDialog
+      open={open}
+      onClose={onClose}
       title="timeline.deleteDialog.title"
       color="danger"
       inputPromptNode={
@@ -49,6 +57,6 @@ export default function TimelineDeleteDialog({ timeline }: TimelineDeleteDialog)
       }}
     />
   );
-};
+}
 
 TimelineDeleteDialog;

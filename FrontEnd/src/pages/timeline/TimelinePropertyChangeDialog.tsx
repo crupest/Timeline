@@ -9,6 +9,8 @@ import {
 import OperationDialog from "~src/components/dialog/OperationDialog";
 
 interface TimelinePropertyChangeDialogProps {
+  open: boolean;
+  onClose: () => void;
   timeline: HttpTimelineInfo;
   onChange: () => void;
 }
@@ -20,11 +22,15 @@ const labelMap: { [key in TimelineVisibility]: string } = {
 };
 
 export default function TimelinePropertyChangeDialog({
+  open,
+  onClose,
   timeline,
   onChange,
 }: TimelinePropertyChangeDialogProps) {
   return (
     <OperationDialog
+      open={open}
+      onClose={onClose}
       title={"timeline.dialogChangeProperty.title"}
       inputs={{
         scheme: {
@@ -76,4 +82,3 @@ export default function TimelinePropertyChangeDialog({
     />
   );
 }
-

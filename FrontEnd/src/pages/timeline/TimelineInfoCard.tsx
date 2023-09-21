@@ -9,12 +9,7 @@ import { getHttpBookmarkClient } from "~src/http/bookmark";
 import { pushAlert } from "~src/components/alert";
 import { useMobile } from "~src/components/hooks";
 import { IconButton } from "~src/components/button";
-import {
-  Dialog,
-  FullPageDialog,
-  DialogProvider,
-  useDialog,
-} from "~src/components/dialog";
+import { Dialog, FullPageDialog, useDialog } from "~src/components/dialog";
 import UserAvatar from "~src/components/user/UserAvatar";
 import PopupMenu from "~src/components/menu/PopupMenu";
 import Card from "~src/components/Card";
@@ -57,17 +52,11 @@ function TimelineInfoContent({
 }: Omit<TimelineInfoCardProps, "connectionStatus">) {
   const user = useUser();
 
-  const { controller, createDialogSwitch } = useDialog({
-    member: (
-      <Dialog>
-        <TimelineMember timeline={timeline} onChange={onReload} />
-      </Dialog>
-    ),
-    property: (
-      <TimelinePropertyChangeDialog timeline={timeline} onChange={onReload} />
-    ),
-    delete: <TimelineDeleteDialog timeline={timeline} />,
-  });
+  const { createDialogSwitch, dialogPropsMap } = useDialog([
+    "member",
+    "property",
+    "delete",
+  ]);
 
   return (
     <div>
@@ -144,7 +133,17 @@ function TimelineInfoContent({
           </PopupMenu>
         )}
       </div>
-      <DialogProvider controller={controller} />
+
+      <Dialog {...dialogPropsMap["member"]}>
+        <TimelineMember timeline={timeline} onChange={onReload} />
+      </Dialog>
+
+      <TimelinePropertyChangeDialog
+        timeline={timeline}
+        onChange={onReload}
+        {...dialogPropsMap["property"]}
+      />
+      <TimelineDeleteDialog timeline={timeline} {...dialogPropsMap["delete"]} />
     </div>
   );
 }
@@ -162,22 +161,13 @@ export default function TimelineInfoCard(props: TimelineInfoCardProps) {
     }
   });
 
-  const { controller, switchDialog } = useDialog(
-    {
-      "full-page": (
-        <FullPageDialog>
-          <TimelineInfoContent timeline={timeline} onReload={onReload} />
-        </FullPageDialog>
-      ),
-    },
-    {
-      onClose: {
-        "full-page": () => {
-          setCollapse(true);
-        },
+  const { switchDialog, dialogPropsMap } = useDialog(["full-page"], {
+    onClose: {
+      "full-page": () => {
+        setCollapse(true);
       },
     },
-  );
+  });
 
   return (
     <Card
@@ -202,7 +192,9 @@ export default function TimelineInfoCard(props: TimelineInfoCardProps) {
       {!collapse && !isMobile && (
         <TimelineInfoContent timeline={timeline} onReload={onReload} />
       )}
-      <DialogProvider controller={controller} />
+      <FullPageDialog {...dialogPropsMap["full-page"]}>
+        <TimelineInfoContent timeline={timeline} onReload={onReload} />
+      </FullPageDialog>
     </Card>
   );
 }

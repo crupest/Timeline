@@ -1,52 +1,59 @@
-import { ReactNode } from "react";
-import { createPortal } from "react-dom";
+import { ReactNode, useRef } from "react";
 import classNames from "classnames";
+import { CSSTransition } from "react-transition-group";
 
-import { ThemeColor, UiLogicError } from "../common";
+import { ThemeColor } from "../common";
 import { IconButton } from "../button";
-
-import { useCloseDialog } from "./DialogProvider";
 
 import "./FullPageDialog.css";
 
-const optionalPortalElement = document.getElementById("portal");
-if (optionalPortalElement == null) {
-  throw new UiLogicError();
-}
-const portalElement = optionalPortalElement;
-
 interface FullPageDialogProps {
+  open: boolean;
+  onClose: () => void;
   color?: ThemeColor;
   contentContainerClassName?: string;
   children: ReactNode;
 }
 
 export default function FullPageDialog({
+  open,
+  onClose,
   color,
   children,
   contentContainerClassName,
 }: FullPageDialogProps) {
-  const closeDialog = useCloseDialog();
+  const nodeRef = useRef(null);
 
-  return createPortal(
-    <div className={`cru-dialog-full-page cru-theme-${color ?? "primary"}`}>
-      <div className="cru-dialog-full-page-top-bar">
-        <IconButton
-          icon="arrow-left"
-          color="light"
-          className="cru-dialog-full-page-back-button"
-          onClick={closeDialog}
-        />
-      </div>
+  return (
+    <CSSTransition
+      nodeRef={nodeRef}
+      mountOnEnter
+      unmountOnExit
+      in={open}
+      timeout={300}
+      classNames="cru-dialog-full-page"
+    >
       <div
-        className={classNames(
-          "cru-dialog-full-page-content-container",
-          contentContainerClassName,
-        )}
+        ref={nodeRef}
+        className={`cru-dialog-full-page cru-theme-${color ?? "primary"}`}
       >
-        {children}
+        <div className="cru-dialog-full-page-top-bar">
+          <IconButton
+            icon="arrow-left"
+            color="light"
+            className="cru-dialog-full-page-back-button"
+            onClick={onClose}
+          />
+        </div>
+        <div
+          className={classNames(
+            "cru-dialog-full-page-content-container",
+            contentContainerClassName,
+          )}
+        >
+          {children}
+        </div>
       </div>
-    </div>,
-    portalElement,
+    </CSSTransition>
   );
 }

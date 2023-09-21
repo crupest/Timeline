@@ -1,6 +1,5 @@
 import { useState, CSSProperties, ReactNode } from "react";
 import classNames from "classnames";
-import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 
 import { ThemeColor } from "../common";
@@ -46,27 +45,24 @@ export default function PopupMenu({
       onClick={() => setShow(true)}
     >
       {children}
-      {show &&
-        createPortal(
-          <div
-            ref={setPopperElement}
-            className={`cru-popup-menu-menu-container cru-clickable-${
-              color ?? "primary"
-            }`}
-            style={styles.popper}
-            {...attributes.popper}
-          >
-            <Menu
-              items={items}
-              onItemClick={(e) => {
-                setShow(false);
-                e.stopPropagation();
-              }}
-            />
-          </div>,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          document.getElementById("portal")!,
-        )}
+      {show && (
+        <div
+          ref={setPopperElement}
+          className={`cru-popup-menu-menu-container cru-clickable-${
+            color ?? "primary"
+          }`}
+          style={styles.popper}
+          {...attributes.popper}
+        >
+          <Menu
+            items={items}
+            onItemClick={(e) => {
+              setShow(false);
+              e.stopPropagation();
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

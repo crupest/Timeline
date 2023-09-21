@@ -28,3 +28,18 @@
 .cru-dialog-full-page-back-button {
   margin-left: 0.5em;
 }
+
+.cru-dialog-full-page-enter {
+  transform: translate(100%, 0);
+}
+
+.cru-dialog-full-page-enter-active {
+  transform: none;
+  transition: transform 0.3s;
+}
+
+.cru-dialog-full-page-exit-active {
+  transition: transform 0.3s;
+  transform: translate(100%, 0);
+}
+
