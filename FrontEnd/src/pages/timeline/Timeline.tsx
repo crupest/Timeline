@@ -15,7 +15,7 @@ import {
 
 import { getTimelinePostUpdate$ } from "~src/services/timeline";
 
-import { useScrollToBottom } from "~src/components/hooks";
+import { useReloadKey, useScrollToBottom } from "~src/components/hooks";
 
 import TimelinePostList from "./TimelinePostList";
 import TimelineInfoCard from "./TimelineInfoCard";
@@ -44,11 +44,8 @@ export function Timeline(props: TimelineProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
 
-  const [timelineReloadKey, setTimelineReloadKey] = useState(0);
-  const [postsReloadKey, setPostsReloadKey] = useState(0);
-
-  const updateTimeline = (): void => setTimelineReloadKey((o) => o + 1);
-  const updatePosts = (): void => setPostsReloadKey((o) => o + 1);
+  const [timelineKey, reloadTimeline] = useReloadKey();
+  const [postsKey, reloadPosts] = useReloadKey();
 
   useEffect(() => {
     setTimeline(null);
@@ -77,7 +74,7 @@ export function Timeline(props: TimelineProps) {
           }
         },
       );
-  }, [timelineOwner, timelineName, timelineReloadKey]);
+  }, [timelineOwner, timelineName, timelineKey]);
 
   useEffect(() => {
     getHttpTimelineClient()
@@ -102,7 +99,7 @@ export function Timeline(props: TimelineProps) {
           }
         },
       );
-  }, [timelineOwner, timelineName, postsReloadKey]);
+  }, [timelineOwner, timelineName, postsKey]);
 
   useEffect(() => {
     const timelinePostUpdate$ = getTimelinePostUpdate$(
@@ -111,7 +108,7 @@ export function Timeline(props: TimelineProps) {
     );
     const subscription = timelinePostUpdate$.subscribe(({ update, state }) => {
       if (update) {
-        setPostsReloadKey((o) => o + 1);
+        reloadPosts();
       }
       setSignalrState(state);
     });
@@ -162,15 +159,15 @@ export function Timeline(props: TimelineProps) {
         <TimelineInfoCard
           timeline={timeline}
           connectionStatus={signalrState}
-          onReload={updateTimeline}
+          onReload={reloadTimeline}
         />
       )}
       {posts && (
         <div className={classNames("timeline", className)}>
           {timeline?.postable && (
-            <TimelinePostEdit timeline={timeline} onPosted={updatePosts} />
+            <TimelinePostEdit timeline={timeline} onPosted={reloadPosts} />
           )}
-          <TimelinePostList posts={posts} onReload={updatePosts} />
+          <TimelinePostList posts={posts} onReload={reloadPosts} />
         </div>
       )}
     </div>

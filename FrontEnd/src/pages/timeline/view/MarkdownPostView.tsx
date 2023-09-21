@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { marked } from "marked";
 import classNames from "classnames";
 
@@ -7,7 +7,7 @@ import {
   getHttpTimelineClient,
 } from "~src/http/timeline";
 
-import { useAutoUnsubscribePromise } from "~src/components/hooks";
+import { subscribePromise } from "~src/components/utilities";
 import Skeleton from "~src/components/Skeleton";
 
 import "./MarkdownPostView.css";
@@ -23,19 +23,18 @@ export default function MarkdownPostView({
 }: MarkdownPostViewProps) {
   const [markdown, setMarkdown] = useState<string | null>(null);
 
-  useAutoUnsubscribePromise(
-    () => {
-      if (post) {
-        return getHttpTimelineClient().getPostDataAsString(
+  useEffect(() => {
+    if (post) {
+      return subscribePromise(
+        getHttpTimelineClient().getPostDataAsString(
           post.timelineOwnerV2,
           post.timelineNameV2,
           post.id,
-        );
-      }
-    },
-    setMarkdown,
-    [post],
-  );
+        ),
+        setMarkdown,
+      );
+    }
+  }, [post]);
 
   const markdownHtml = useMemo<string | null>(() => {
     if (markdown == null) return null;
