@@ -2,14 +2,17 @@ import { useC, Text, ThemeColor } from "../common";
 
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";
-import { useCloseDialog } from "./DialogProvider";
 
 export default function ConfirmDialog({
+  open,
+  onClose,
   onConfirm,
   title,
   body,
   color,
 }: {
+  open: boolean;
+  onClose: () => void;
   onConfirm: () => void;
   title: Text;
   body: Text;
@@ -18,10 +21,8 @@ export default function ConfirmDialog({
 }) {
   const c = useC();
 
-  const closeDialog = useCloseDialog();
-
   return (
-    <Dialog color={color ?? "danger"}>
+    <Dialog open={open} onClose={onClose} color={color ?? "danger"}>
       <DialogContainer
         title={title}
         titleColor={color ?? "danger"}
@@ -32,7 +33,7 @@ export default function ConfirmDialog({
             action: "minor",
 
             text: "operationDialog.cancel",
-            onClick: closeDialog,
+            onClick: onClose,
           },
           {
             key: "confirm",
@@ -42,7 +43,7 @@ export default function ConfirmDialog({
             color: "danger",
             onClick: () => {
               onConfirm();
-              closeDialog();
+              onClose();
             },
           },
         ]}

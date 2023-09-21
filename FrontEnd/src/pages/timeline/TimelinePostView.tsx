@@ -8,7 +8,7 @@ import {
 import { pushAlert } from "~src/components/alert";
 import { useClickOutside } from "~src/components/hooks";
 import UserAvatar from "~src/components/user/UserAvatar";
-import { DialogProvider, useDialog } from "~src/components/dialog";
+import { useDialog } from "~src/components/dialog";
 import FlatButton from "~src/components/button/FlatButton";
 import ConfirmDialog from "~src/components/dialog/ConfirmDialog";
 import TimelinePostContentView from "./view/TimelinePostContentView";
@@ -32,33 +32,13 @@ export default function TimelinePostView(props: TimelinePostViewProps) {
   const [operationMaskVisible, setOperationMaskVisible] =
     useState<boolean>(false);
 
-  const { controller, switchDialog } = useDialog(
-    {
-      delete: (
-        <ConfirmDialog
-          title="timeline.post.deleteDialog.title"
-          body="timeline.post.deleteDialog.prompt"
-          onConfirm={() => {
-            void getHttpTimelineClient()
-              .deletePost(post.timelineOwnerV2, post.timelineNameV2, post.id)
-              .then(onDeleted, () => {
-                pushAlert({
-                  color: "danger",
-                  message: "timeline.deletePostFailed",
-                });
-              });
-          }}
-        />
-      ),
-    },
-    {
-      onClose: {
-        delete: () => {
-          setOperationMaskVisible(false);
-        },
+  const { switchDialog, dialogPropsMap } = useDialog(["delete"], {
+    onClose: {
+      delete: () => {
+        setOperationMaskVisible(false);
       },
     },
-  );
+  });
 
   const [maskElement, setMaskElement] = useState<HTMLElement | null>(null);
   useClickOutside(maskElement, () => setOperationMaskVisible(false));
@@ -114,10 +94,28 @@ export default function TimelinePostView(props: TimelinePostViewProps) {
                 e.stopPropagation();
               }}
             />
+            <ConfirmDialog
+              title="timeline.post.deleteDialog.title"
+              body="timeline.post.deleteDialog.prompt"
+              onConfirm={() => {
+                void getHttpTimelineClient()
+                  .deletePost(
+                    post.timelineOwnerV2,
+                    post.timelineNameV2,
+                    post.id,
+                  )
+                  .then(onDeleted, () => {
+                    pushAlert({
+                      color: "danger",
+                      message: "timeline.deletePostFailed",
+                    });
+                  });
+              }}
+              {...dialogPropsMap["delete"]}
+            />
           </div>
         ) : null}
       </TimelinePostCard>
-      <DialogProvider controller={controller} />
     </TimelinePostContainer>
   );
 }

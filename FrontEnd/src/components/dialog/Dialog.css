@@ -7,6 +7,7 @@
   bottom: 0;
   overflow: auto;
   padding: 20vh 1em;
+  user-select: none;
 }
 
 .cru-dialog-background {
@@ -30,10 +31,41 @@
   border-radius: 5px;
   padding: 1.5em;
   background-color: var(--cru-dialog-container-background-color);
+  user-select: unset;
 }
 
 @media (min-width: 576px) {
   .cru-dialog-container {
     max-width: 800px;
   }
+}
+
+.cru-dialog-enter .cru-dialog-container {
+  opacity: 0;
+  transform: scale(0, 0);
+  transform-origin: center;
+}
+
+.cru-dialog-enter-active .cru-dialog-container {
+  opacity: 1;
+  transform: scale(1, 1);
+  transform-origin: center;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
+}
+
+.cru-dialog-exit .cru-dialog-container {
+  opacity: 1;
+  transform: scale(1, 1);
+  transform-origin: center;
+}
+
+.cru-dialog-exit-active .cru-dialog-container {
+  opacity: 0;
+  transform: scale(0, 0);
+  transform-origin: center;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
 }

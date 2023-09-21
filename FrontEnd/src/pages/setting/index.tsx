@@ -14,11 +14,7 @@ import { getHttpUserClient } from "~src/http/user";
 import { useC, Text } from "~src/common";
 
 import { pushAlert } from "~src/components/alert";
-import {
-  useDialog,
-  DialogProvider,
-  ConfirmDialog,
-} from "~src/components/dialog";
+import { useDialog, ConfirmDialog } from "~src/components/dialog";
 import Card from "~src/components/Card";
 import Spinner from "~src/components/Spinner";
 import Page from "~src/components/Page";
@@ -144,22 +140,7 @@ function RegisterCodeSettingItem() {
   // undefined: loading
   const [registerCode, setRegisterCode] = useState<undefined | null | string>();
 
-  const { controller, createDialogSwitch } = useDialog({
-    confirm: (
-      <ConfirmDialog
-        title="settings.renewRegisterCode"
-        body="settings.renewRegisterCodeDesc"
-        onConfirm={() => {
-          if (user == null) throw new Error();
-          void getHttpUserClient()
-            .renewRegisterCode(user.username)
-            .then(() => {
-              setRegisterCode(undefined);
-            });
-        }}
-      />
-    ),
-  });
+  const { createDialogSwitch, dialogPropsMap } = useDialog(["confirm"]);
 
   useEffect(() => {
     setRegisterCode(undefined);
@@ -204,7 +185,19 @@ function RegisterCodeSettingItem() {
           </code>
         )}
       </SettingItemContainer>
-      <DialogProvider controller={controller} />
+      <ConfirmDialog
+        title="settings.renewRegisterCode"
+        body="settings.renewRegisterCodeDesc"
+        onConfirm={() => {
+          if (user == null) throw new Error();
+          void getHttpUserClient()
+            .renewRegisterCode(user.username)
+            .then(() => {
+              setRegisterCode(undefined);
+            });
+        }}
+        {...dialogPropsMap["confirm"]}
+      />
     </>
   );
 }
@@ -246,22 +239,12 @@ export default function SettingPage() {
   const user = useUser();
   const navigate = useNavigate();
 
-  const { controller, createDialogSwitch } = useDialog({
-    "change-nickname": <ChangeNicknameDialog />,
-    "change-avatar": <ChangeAvatarDialog />,
-    "change-password": <ChangePasswordDialog />,
-    logout: (
-      <ConfirmDialog
-        title="settings.dialogConfirmLogout.title"
-        body="settings.dialogConfirmLogout.prompt"
-        onConfirm={() => {
-          void userService.logout().then(() => {
-            navigate("/");
-          });
-        }}
-      />
-    ),
-  });
+  const { createDialogSwitch, dialogPropsMap } = useDialog([
+    "change-nickname",
+    "change-avatar",
+    "change-password",
+    "logout",
+  ]);
 
   return (
     <Page noTopPadding>
@@ -286,12 +269,24 @@ export default function SettingPage() {
             onClick={createDialogSwitch("logout")}
             danger
           />
+          <ChangeNicknameDialog {...dialogPropsMap["change-nickname"]} />
+          <ChangeAvatarDialog {...dialogPropsMap["change-avatar"]} />
+          <ChangePasswordDialog {...dialogPropsMap["change-password"]} />
+          <ConfirmDialog
+            title="settings.dialogConfirmLogout.title"
+            body="settings.dialogConfirmLogout.prompt"
+            onConfirm={() => {
+              void userService.logout().then(() => {
+                navigate("/");
+              });
+            }}
+            {...dialogPropsMap["logout"]}
+          />
         </SettingSection>
       ) : null}
       <SettingSection title="settings.subheader.customization">
         <LanguageChangeSettingItem />
       </SettingSection>
-      <DialogProvider controller={controller} />
     </Page>
   );
 }
