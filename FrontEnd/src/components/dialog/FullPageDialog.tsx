@@ -4,6 +4,7 @@ import { CSSTransition } from "react-transition-group";
 
 import { ThemeColor } from "../common";
 import { IconButton } from "../button";
+import InPortal from "../InPortal";
 
 import "./FullPageDialog.css";
 
@@ -25,35 +26,37 @@ export default function FullPageDialog({
   const nodeRef = useRef(null);
 
   return (
-    <CSSTransition
-      nodeRef={nodeRef}
-      mountOnEnter
-      unmountOnExit
-      in={open}
-      timeout={300}
-      classNames="cru-dialog-full-page"
-    >
-      <div
-        ref={nodeRef}
-        className={`cru-dialog-full-page cru-theme-${color ?? "primary"}`}
+    <InPortal>
+      <CSSTransition
+        nodeRef={nodeRef}
+        mountOnEnter
+        unmountOnExit
+        in={open}
+        timeout={300}
+        classNames="cru-dialog-full-page"
       >
-        <div className="cru-dialog-full-page-top-bar">
-          <IconButton
-            icon="arrow-left"
-            color="light"
-            className="cru-dialog-full-page-back-button"
-            onClick={onClose}
-          />
-        </div>
         <div
-          className={classNames(
-            "cru-dialog-full-page-content-container",
-            contentContainerClassName,
-          )}
+          ref={nodeRef}
+          className={`cru-dialog-full-page cru-theme-${color ?? "primary"}`}
         >
-          {children}
+          <div className="cru-dialog-full-page-top-bar">
+            <IconButton
+              icon="arrow-left"
+              color="light"
+              className="cru-dialog-full-page-back-button"
+              onClick={onClose}
+            />
+          </div>
+          <div
+            className={classNames(
+              "cru-dialog-full-page-content-container",
+              contentContainerClassName,
+            )}
+          >
+            {children}
+          </div>
         </div>
-      </div>
-    </CSSTransition>
+      </CSSTransition>
+    </InPortal>
   );
 }
