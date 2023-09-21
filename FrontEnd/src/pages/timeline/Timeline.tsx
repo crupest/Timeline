@@ -115,7 +115,7 @@ export function Timeline(props: TimelineProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [timelineOwner, timelineName]);
+  }, [timelineOwner, timelineName, reloadPosts]);
 
   useScrollToBottom(() => {
     console.log(`Load page ${currentPage + 1}.`);

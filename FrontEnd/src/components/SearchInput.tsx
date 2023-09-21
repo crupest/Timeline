@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import { useC, Text } from "./common";
+import { useC, I18nText } from "./common";
 import { LoadingButton } from "./button";
 
 import "./SearchInput.css";
@@ -11,7 +11,7 @@ interface SearchInputProps {
   onButtonClick: () => void;
   loading?: boolean;
   className?: string;
-  buttonText?: Text;
+  buttonText?: I18nText;
 }
 
 export default function SearchInput({

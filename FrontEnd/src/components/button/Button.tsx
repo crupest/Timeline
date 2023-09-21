@@ -1,13 +1,13 @@
 import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
 
-import { Text, useC, ClickableColor } from "../common";
+import { I18nText, useC, ClickableColor } from "../common";
 
 import "./Button.css";
 
 interface ButtonProps extends ComponentPropsWithoutRef<"button"> {
   color?: ClickableColor;
-  text?: Text;
+  text?: I18nText;
   outline?: boolean;
   buttonRef?: Ref<HTMLButtonElement> | null;
 }

@@ -1,7 +1,9 @@
 import "./index.css";
 
-export type { Text, I18nText } from "~src/common";
-export { UiLogicError, c, convertI18nText, useC } from "~src/common";
+export type { I18nText } from "~src/i18n";
+export { convertI18nText, useC } from "~src/i18n";
+
+export class UiLogicError extends Error {}
 
 export const themeColors = [
   "primary",
@@ -18,5 +20,4 @@ export { breakpoints } from "./breakpoints";
 
 export * as geometry from "~src/utilities/geometry";
 
-export * as array from "~src/utilities/array"
-
+export * as array from "~src/utilities/array";

@@ -11,8 +11,7 @@ import classNames from "classnames";
 import { useUser, userService } from "~src/services/user";
 import { getHttpUserClient } from "~src/http/user";
 
-import { useC, Text } from "~src/common";
-
+import { useC, I18nText } from "~src/components/common";
 import { pushAlert } from "~src/components/alert";
 import { useDialog, ConfirmDialog } from "~src/components/dialog";
 import Card from "~src/components/Card";
@@ -27,7 +26,7 @@ import "./index.css";
 
 interface SettingSectionProps
   extends Omit<ComponentPropsWithoutRef<typeof Card>, "title"> {
-  title: Text;
+  title: I18nText;
   children?: ReactNode;
 }
 
@@ -49,8 +48,8 @@ function SettingSection({
 
 interface SettingItemContainerProps
   extends Omit<ComponentPropsWithoutRef<"div">, "title"> {
-  title: Text;
-  description?: Text;
+  title: I18nText;
+  description?: I18nText;
   danger?: boolean;
   extraClassName?: string;
 }
@@ -78,7 +77,9 @@ function SettingItemContainer({
     >
       <div className="setting-item-label-area">
         <div className="setting-item-label-title">{c(title)}</div>
-        <small className="setting-item-label-sub">{c(description)}</small>
+        {description && (
+          <small className="setting-item-label-sub">{c(description)}</small>
+        )}
       </div>
       <div className="setting-item-value-area">{children}</div>
     </div>
@@ -97,7 +98,7 @@ interface SelectSettingItemProps
   extends Omit<SettingItemContainerProps, "onSelect" | "extraClassName"> {
   options: {
     value: string;
-    label: Text;
+    label: I18nText;
   }[];
   value?: string | null;
   onSelect: (value: string) => void;

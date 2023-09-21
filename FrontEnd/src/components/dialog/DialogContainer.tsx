@@ -1,14 +1,14 @@
 import { ComponentProps, Ref, ReactNode } from "react";
 import classNames from "classnames";
 
-import { ThemeColor, Text, useC } from "../common";
+import { ThemeColor, I18nText, useC } from "../common";
 import { ButtonRow, ButtonRowV2 } from "../button";
 
 import "./DialogContainer.css";
 
 interface DialogContainerBaseProps {
   className?: string;
-  title: Text;
+  title: I18nText;
   titleColor?: ThemeColor;
   titleClassName?: string;
   titleRef?: Ref<HTMLDivElement>;

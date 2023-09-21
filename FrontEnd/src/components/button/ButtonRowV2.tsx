@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, Ref } from "react";
 import classNames from "classnames";
 
-import { Text, ClickableColor } from "../common";
+import { I18nText, ClickableColor } from "../common";
 
 import Button from "./Button";
 import FlatButton from "./FlatButton";
@@ -22,21 +22,21 @@ interface ButtonRowV2ButtonBase {
 
 interface ButtonRowV2ButtonWithNoType extends ButtonRowV2ButtonBase {
   type?: undefined | null;
-  text: Text;
+  text: I18nText;
   outline?: boolean;
   props?: ComponentPropsWithoutRef<typeof Button>;
 }
 
 interface ButtonRowV2NormalButton extends ButtonRowV2ButtonBase {
   type: "normal";
-  text: Text;
+  text: I18nText;
   outline?: boolean;
   props?: ComponentPropsWithoutRef<typeof Button>;
 }
 
 interface ButtonRowV2FlatButton extends ButtonRowV2ButtonBase {
   type: "flat";
-  text: Text;
+  text: I18nText;
   props?: ComponentPropsWithoutRef<typeof FlatButton>;
 }
 
@@ -48,7 +48,7 @@ interface ButtonRowV2IconButton extends ButtonRowV2ButtonBase {
 
 interface ButtonRowV2LoadingButton extends ButtonRowV2ButtonBase {
   type: "loading";
-  text: Text;
+  text: I18nText;
   loading?: boolean;
   props?: ComponentPropsWithoutRef<typeof LoadingButton>;
 }

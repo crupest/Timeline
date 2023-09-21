@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { BehaviorSubject, Observable } from "rxjs";
 import { AxiosError } from "axios";
 
-import { UiLogicError } from "~src/common";
 
 import { setHttpToken, axios, HttpBadRequestError } from "~src/http/common";
 import { getHttpTokenClient } from "~src/http/token";
 import { getHttpUserClient, HttpUser, UserPermission } from "~src/http/user";
 
+import { UiLogicError } from "~src/components/common";
 import { pushAlert } from "~src/components/alert";
 
 interface IAuthUser extends HttpUser {

@@ -1,10 +1,10 @@
-import { ThemeColor, Text } from "../common";
+import { ThemeColor, I18nText } from "../common";
 
 const defaultDismissTime = 5000;
 
 export interface AlertInfo {
   color?: ThemeColor;
-  message: Text;
+  message: I18nText;
   dismissTime?: number | "never";
 }
 

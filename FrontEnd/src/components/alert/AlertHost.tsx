@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 
-import { ThemeColor, useC, Text } from "../common";
+import { ThemeColor, useC, I18nText } from "../common";
 import IconButton from "../button/IconButton";
 
 import { alertService, AlertInfoWithId } from "./AlertService";
@@ -10,7 +10,7 @@ import "./alert.css";
 
 interface AutoCloseAlertProps {
   color: ThemeColor;
-  message: Text;
+  message: I18nText;
   onDismiss?: () => void;
   onIn?: () => void;
   onOut?: () => void;

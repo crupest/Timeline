@@ -1,7 +1,7 @@
 import { ReactNode, useState } from "react";
 import classNames from "classnames";
 
-import { Text, UiLogicError } from "../common";
+import { I18nText, UiLogicError } from "../common";
 
 import Tabs from "./TabBar";
 
@@ -9,7 +9,7 @@ import "./TabPages.css";
 
 interface TabPage {
   name: string;
-  text: Text;
+  text: I18nText;
   page: ReactNode;
 }
 
