@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 
 import {
@@ -6,8 +6,8 @@ import {
   getHttpTimelineClient,
 } from "~src/http/timeline";
 
+import { subscribePromise } from "~src/components/utilities";
 import Skeleton from "~src/components/Skeleton";
-import { useAutoUnsubscribePromise } from "~src/components/hooks";
 
 import "./PlainTextPostView.css";
 
@@ -22,19 +22,18 @@ export default function PlainTextPostView({
 }: PlainTextPostViewProps) {
   const [text, setText] = useState<string | null>(null);
 
-  useAutoUnsubscribePromise(
-    () => {
-      if (post) {
-        return getHttpTimelineClient().getPostDataAsString(
+  useEffect(() => {
+    if (post) {
+      return subscribePromise(
+        getHttpTimelineClient().getPostDataAsString(
           post.timelineOwnerV2,
           post.timelineNameV2,
           post.id,
-        );
-      }
-    },
-    setText,
-    [post],
-  );
+        ),
+        setText,
+      );
+    }
+  }, [post]);
 
   return (
     <div

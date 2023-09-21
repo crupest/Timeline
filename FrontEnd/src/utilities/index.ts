@@ -1,5 +1,6 @@
 export { default as base64 } from "./base64";
 export { withQuery } from "./url";
+export { subscribePromise } from "./promise";
 
 export function delay(milliseconds: number): Promise<void> {
   return new Promise<void>((resolve) => {
