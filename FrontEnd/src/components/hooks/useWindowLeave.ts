@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
-import { useC, Text } from "../common";
+import { useC, I18nText } from "../common";
 
 export default function useWindowLeave(
   allow: boolean,
-  message: Text = "timeline.confirmLeave",
+  message: I18nText = "timeline.confirmLeave",
 ) {
   const c = useC();
 

@@ -1,6 +1,6 @@
 import "./index.css";
 
-import { useC } from "~src/common";
+import { useC } from "~src/components/common";
 import Page from "~src/components/Page";
 
 interface Credit {

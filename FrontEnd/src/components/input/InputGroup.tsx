@@ -26,16 +26,16 @@
 import { useState, Ref, useId } from "react";
 import classNames from "classnames";
 
-import { useC, Text, ThemeColor } from "../common";
+import { useC, I18nText, ThemeColor } from "../common";
 
 import "./InputGroup.css";
 
 export interface InputBase {
   key: string;
-  label: Text;
-  helper?: Text;
+  label: I18nText;
+  helper?: I18nText;
   disabled?: boolean;
-  error?: Text;
+  error?: I18nText;
 }
 
 export interface TextInput extends InputBase {
@@ -51,7 +51,7 @@ export interface BoolInput extends InputBase {
 
 export interface SelectInputOption {
   value: string;
-  label: Text;
+  label: I18nText;
   icon?: string;
 }
 
@@ -66,14 +66,14 @@ export type Input = TextInput | BoolInput | SelectInput;
 export type InputValue = Input["value"];
 
 export type InputValueDict = Record<string, InputValue>;
-export type InputErrorDict = Record<string, Text>;
+export type InputErrorDict = Record<string, I18nText>;
 export type InputDisabledDict = Record<string, boolean>;
 export type InputDirtyDict = Record<string, boolean>;
 // use never so you don't have to cast everywhere
 export type InputConfirmValueDict = Record<string, never>;
 
 export type GeneralInputErrorDict = {
-  [key: string]: Text | null | undefined;
+  [key: string]: I18nText | null | undefined;
 };
 
 type MakeInputInfo<I extends Input> = Omit<I, "value" | "error" | "disabled">;

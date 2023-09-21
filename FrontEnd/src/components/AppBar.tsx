@@ -37,7 +37,8 @@ function AppBarNavLink({
       className={({ isActive }) => classnames(className, isActive && "active")}
       onClick={onClick}
     >
-      {children != null ? children : c(label)}
+      {children}
+      {label && c(label)}
     </NavLink>
   );
 }

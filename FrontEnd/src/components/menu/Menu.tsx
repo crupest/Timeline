@@ -1,7 +1,7 @@
 import { MouseEvent, CSSProperties } from "react";
 import classNames from "classnames";
 
-import { useC, Text, ThemeColor } from "../common";
+import { useC, I18nText, ThemeColor } from "../common";
 import Icon from "../Icon";
 
 import "./Menu.css";
@@ -12,7 +12,7 @@ export type MenuItem =
     }
   | {
       type: "button";
-      text: Text;
+      text: I18nText;
       icon?: string;
       color?: ThemeColor;
       onClick?: (e: MouseEvent<HTMLButtonElement>) => void;

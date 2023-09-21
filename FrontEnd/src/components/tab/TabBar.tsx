@@ -2,13 +2,13 @@ import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 
-import { Text, ThemeColor, useC } from "../common";
+import { I18nText, ThemeColor, useC } from "../common";
 
 import "./TabBar.css";
 
 export interface Tab {
   name: string;
-  text: Text;
+  text: I18nText;
   link?: string;
   onClick?: () => void;
 }

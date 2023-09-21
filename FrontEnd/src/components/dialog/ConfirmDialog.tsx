@@ -1,4 +1,4 @@
-import { useC, Text, ThemeColor } from "../common";
+import { useC, I18nText, ThemeColor } from "../common";
 
 import Dialog from "./Dialog";
 import DialogContainer from "./DialogContainer";
@@ -14,8 +14,8 @@ export default function ConfirmDialog({
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: Text;
-  body: Text;
+  title: I18nText;
+  body: I18nText;
   color?: ThemeColor;
   bodyColor?: ThemeColor;
 }) {

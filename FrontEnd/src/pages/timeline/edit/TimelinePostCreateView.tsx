@@ -1,8 +1,6 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-import { UiLogicError } from "~src/common";
-
 import {
   getHttpTimelineClient,
   HttpTimelineInfo,
@@ -12,7 +10,7 @@ import {
 
 import base64 from "~src/utilities/base64";
 
-import { useC } from "~/src/components/common";
+import { UiLogicError, useC } from "~/src/components/common";
 import { pushAlert } from "~src/components/alert";
 import { IconButton, LoadingButton } from "~src/components/button";
 import PopupMenu from "~src/components/menu/PopupMenu";

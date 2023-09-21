@@ -1,7 +1,7 @@
 import { useState, ReactNode, ComponentProps } from "react";
 import classNames from "classnames";
 
-import { useC, Text, ThemeColor } from "../common";
+import { useC, I18nText, ThemeColor } from "../common";
 import {
   useInputs,
   InputGroup,
@@ -15,8 +15,8 @@ import DialogContainer from "./DialogContainer";
 import "./OperationDialog.css";
 
 interface OperationDialogPromptProps {
-  message?: Text;
-  customMessage?: Text;
+  message?: I18nText;
+  customMessage?: I18nText;
   customMessageNode?: ReactNode;
   className?: string;
 }
@@ -39,12 +39,12 @@ export interface OperationDialogProps<TData> {
   onClose: () => void;
   color?: ThemeColor;
   inputColor?: ThemeColor;
-  title: Text;
-  inputPrompt?: Text;
+  title: I18nText;
+  inputPrompt?: I18nText;
   inputPromptNode?: ReactNode;
-  successPrompt?: (data: TData) => Text;
+  successPrompt?: (data: TData) => I18nText;
   successPromptNode?: (data: TData) => ReactNode;
-  failurePrompt?: (error: unknown) => Text;
+  failurePrompt?: (error: unknown) => I18nText;
   failurePromptNode?: (error: unknown) => ReactNode;
 
   inputs: InputInitializer;

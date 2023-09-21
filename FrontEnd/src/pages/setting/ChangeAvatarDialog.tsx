@@ -1,11 +1,10 @@
 import { useState, ChangeEvent, ComponentPropsWithoutRef } from "react";
 
-import { useC, Text, UiLogicError } from "~src/common";
-
 import { useUser } from "~src/services/user";
 
 import { getHttpUserClient } from "~src/http/user";
 
+import { useC, I18nText, UiLogicError } from "~src/components/common";
 import { ImageCropper, useImageCrop } from "~src/components/ImageCropper";
 import BlobImage from "~src/components/BlobImage";
 import { ButtonRowV2 } from "~src/components/button";
@@ -43,7 +42,7 @@ export default function ChangeAvatarDialog({
   });
 
   const [resultBlob, setResultBlob] = useState<Blob | null>(null);
-  const [message, setMessage] = useState<Text>(
+  const [message, setMessage] = useState<I18nText>(
     "settings.dialogChangeAvatar.prompt.select",
   );
 

@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { convertI18nText, I18nText } from "~src/common";
-
 import { HttpUser } from "~src/http/user";
 import { getHttpSearchClient } from "~src/http/search";
 import { getHttpTimelineClient, HttpTimelineInfo } from "~src/http/timeline";
 
+import { convertI18nText, I18nText } from "~src/components/common";
 import SearchInput from "~src/components/SearchInput";
 import UserAvatar from "~src/components/user/UserAvatar";
 import { IconButton } from "~src/components/button";
