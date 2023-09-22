@@ -16,6 +16,7 @@ body {
 
 textarea {
   font-size: 1rem;
+  color: var(--cru-text-major-color);
   resize: none;
   outline: none;
   transition: border-color 0.3s;
