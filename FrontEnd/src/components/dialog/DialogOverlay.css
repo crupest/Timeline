@@ -1,0 +1,13 @@
+.cru-dialog-overlay {
+  position: fixed;
+  z-index: 1040;
+  inset: 0;
+}
+
+.cru-dialog-background {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background-color: var(--cru-dialog-overlay-color);
+  opacity: 0.8;
+}

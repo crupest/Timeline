@@ -13,20 +13,6 @@ small {
   cursor: pointer;
 }
 
-textarea {
-  resize: none;
-  outline: none;
-  border-color: var(--cru-bg-2-color);
-}
-
-textarea:hover {
-  border-color: var(--cru-primary-r2-color);
-}
-
-textarea:focus {
-  border-color: var(--cru-primary-color);
-}
-
 .white-space-no-wrap {
   white-space: nowrap;
 }

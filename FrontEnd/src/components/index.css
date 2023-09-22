@@ -7,6 +7,7 @@
 }
 
 body {
+  font-size: var(--cru-default-font-size);
   font-family: var(--cru-default-font-family);
   background: var(--cru-body-background-color);
   color: var(--cru-text-major-color);
@@ -14,6 +15,9 @@ body {
 }
 
 textarea {
+  font-size: 1rem;
+  resize: none;
+  outline: none;
   transition: border-color 0.3s;
   border-color: var(--cru-text-minor-color);
   background: var(--cru-background-color);

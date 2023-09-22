@@ -1,10 +1,8 @@
-import { ReactNode, useRef } from "react";
-import classNames from "classnames";
-import { CSSTransition } from "react-transition-group";
+import { ReactNode } from "react";
 
 import { ThemeColor } from "../common";
 
-import InPortal from "../InPortal";
+import DialogOverlay from "./DialogOverlay";
 
 import "./Dialog.css";
 
@@ -23,41 +21,15 @@ export default function Dialog({
   children,
   disableCloseOnClickOnOverlay,
 }: DialogProps) {
-  const nodeRef = useRef(null);
-  const lastPointerDownIdRef = useRef<number | null>(null);
-
   return (
-    <InPortal>
-      <CSSTransition
-        nodeRef={nodeRef}
-        mountOnEnter
-        unmountOnExit
-        in={open}
-        timeout={300}
-        classNames="cru-dialog"
-      >
-        <div
-          ref={nodeRef}
-          className={classNames(
-            `cru-theme-${color ?? "primary"}`,
-            "cru-dialog-overlay",
-          )}
-        >
-          <div
-            className="cru-dialog-background"
-            onPointerDown={(e) => {
-              lastPointerDownIdRef.current = e.pointerId;
-            }}
-            onPointerUp={(e) => {
-              if (lastPointerDownIdRef.current === e.pointerId) {
-                if (!disableCloseOnClickOnOverlay) onClose();
-              }
-              lastPointerDownIdRef.current = null;
-            }}
-          />
-          <div className="cru-dialog-container">{children}</div>
-        </div>
-      </CSSTransition>
-    </InPortal>
+    <DialogOverlay
+      open={open}
+      onClose={onClose}
+      transitionClassNames="cru-dialog-normal"
+      overlayClassName={`cru-dialog-normal cru-theme-${color ?? "primary"}`}
+      disableCloseOnClickOnOverlay={disableCloseOnClickOnOverlay}
+    >
+      {children}
+    </DialogOverlay>
   );
 }

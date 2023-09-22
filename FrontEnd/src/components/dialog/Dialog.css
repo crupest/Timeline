@@ -1,26 +1,9 @@
-.cru-dialog-overlay {
-  position: fixed;
-  z-index: 1040;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
+.cru-dialog-normal {
   overflow: auto;
-  padding: 20vh 1em;
+  padding: 20vh 1em 0;
 }
 
-.cru-dialog-background {
-  position: absolute;
-  z-index: -1;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: var(--cru-dialog-overlay-color);
-  opacity: 0.8;
-}
-
-.cru-dialog-container {
+.cru-dialog-normal .cru-dialog-container {
   max-width: 100%;
   min-width: 30vw;
 
@@ -33,18 +16,18 @@
 }
 
 @media (min-width: 576px) {
-  .cru-dialog-container {
+  .cru-dialog-normal .cru-dialog-container {
     max-width: 800px;
   }
 }
 
-.cru-dialog-enter .cru-dialog-container {
+.cru-dialog-normal-enter .cru-dialog-container {
   opacity: 0;
   transform: scale(0, 0);
   transform-origin: center;
 }
 
-.cru-dialog-enter-active .cru-dialog-container {
+.cru-dialog-normal-enter-active .cru-dialog-container {
   opacity: 1;
   transform: scale(1, 1);
   transform-origin: center;
@@ -53,13 +36,13 @@
     opacity 0.3s;
 }
 
-.cru-dialog-exit .cru-dialog-container {
+.cru-dialog-normal-exit .cru-dialog-container {
   opacity: 1;
   transform: scale(1, 1);
   transform-origin: center;
 }
 
-.cru-dialog-exit-active .cru-dialog-container {
+.cru-dialog-normal-exit-active .cru-dialog-container {
   opacity: 0;
   transform: scale(0, 0);
   transform-origin: center;
