@@ -1,45 +1,32 @@
-.cru-dialog-full-page {
-  position: fixed;
-  z-index: 1030;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--cru-background-color);
-  padding-top: 56px;
-}
-
-.cru-dialog-full-page-top-bar {
-  height: 56px;
+.cru-dialog-full-page .cru-dialog-container {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  background-color: var(--cru-theme-color);
-  display: flex;
-  align-items: center;
+  bottom: 0;
+  width: 100%;
+  height: 85%;
+  border-top: 2px solid var(--cru-theme-color);
+  padding-top: 0.5em;
+  background-color: var(--cru-background-color);
 }
 
-.cru-dialog-full-page-content-container {
+.cru-dialog-full-page-content {
   overflow: scroll;
 }
 
-.cru-dialog-full-page-back-button {
-  margin-left: 0.5em;
+.cru-dialog-full-page-back {
+  float: right;
+  padding-right: 0.5em;
 }
 
-.cru-dialog-full-page-enter {
-  transform: translate(100%, 0);
+.cru-dialog-full-page-enter .cru-dialog-container {
+  transform: translate(0, 100%);
 }
 
-.cru-dialog-full-page-enter-active {
+.cru-dialog-full-page-enter-active .cru-dialog-container {
   transform: none;
   transition: transform 0.3s;
 }
 
-.cru-dialog-full-page-exit-active {
+.cru-dialog-full-page-exit-active .cru-dialog-container {
   transition: transform 0.3s;
-  transform: translate(100%, 0);
+  transform: translate(0, 100%);
 }
-
